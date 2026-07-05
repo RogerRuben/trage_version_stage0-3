@@ -47,6 +47,7 @@ stage0/
     methodology.md
     sample_workflow.md
     full_day_workflow.md
+    monthly_stage01_workflow.md
   results/                         # Aggregate, non-identifying results only
 ```
 
@@ -87,6 +88,8 @@ The full-day pipeline hashes complete orders into 128 Parquet buckets, keeping m
 
 ## Method boundary
 
-The matcher uses a 10 m densified-road candidate index, exact point-to-LineString projection, and geometry-aware topology diagnostics. It is designed for feasibility validation, not as a replacement for a production HMM/Viterbi map matcher.
+The original matcher uses a 10 m densified-road candidate index, exact point-to-LineString projection, and geometry-aware topology diagnostics. The monthly extension adds a reproducible HMM/Viterbi matcher while preserving the original result as a baseline and per-order fallback; it is still a research pipeline rather than a production navigation matcher.
 
 See [methodology](docs/methodology.md), the [small-sample workflow](docs/sample_workflow.md), and the [full-day workflow](docs/full_day_workflow.md) for details and limitations.
+
+The resume-safe monthly Stage0/HMM/Stage1 workflow is documented in [monthly_stage01_workflow.md](docs/monthly_stage01_workflow.md).

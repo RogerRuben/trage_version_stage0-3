@@ -6,6 +6,8 @@ import argparse
 import json
 import math
 import time
+import tarfile
+from contextlib import ExitStack
 from pathlib import Path
 
 import geopandas as gpd
@@ -38,6 +40,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--chunksize", type=int, default=1_000_000)
     parser.add_argument("--input-crs", choices=["wgs84", "gcj02"], default="gcj02")
     parser.add_argument("--limit-buckets", type=int, help="For benchmark/debug runs only")
+    parser.add_argument("--max-input-chunks", type=int, help="For streaming smoke tests only")
     return parser.parse_args()
 
 
@@ -79,33 +82,46 @@ def bucketize(args: argparse.Namespace, bucket_dir: Path) -> dict:
     source_offset = 0
     started = time.time()
     try:
-        reader = pd.read_csv(
-            args.input, header=None, names=COLUMNS, chunksize=args.chunksize,
-            dtype={"driver_id": "string", "order_id": "string"},
-        )
-        for chunk_no, chunk in enumerate(reader, start=1):
-            chunk["source_row"] = np.arange(source_offset, source_offset + len(chunk), dtype="int64")
-            source_offset += len(chunk)
-            chunk["bucket"] = order_bucket(chunk.order_id, args.buckets)
-            for bucket, frame in chunk.groupby("bucket", sort=False):
-                bucket = int(bucket)
-                table = pa.Table.from_pandas(frame.drop(columns="bucket"), preserve_index=False)
-                if bucket not in writers:
-                    writers[bucket] = pq.ParquetWriter(
-                        bucket_dir / f"bucket_{bucket:03d}.parquet", table.schema,
-                        compression="zstd", use_dictionary=["driver_id", "order_id"],
-                    )
-                writers[bucket].write_table(table)
-                counts[bucket] += len(frame)
-            print(
-                f"bucketize chunk={chunk_no} rows={source_offset:,} elapsed={time.time()-started:.1f}s",
-                flush=True,
+        with ExitStack() as stack:
+            source: object = args.input
+            if args.input.name.lower().endswith((".tar.gz", ".tgz")):
+                archive = stack.enter_context(tarfile.open(args.input, mode="r:gz"))
+                members = [member for member in archive.getmembers() if member.isfile() and "/gps_" in member.name]
+                if len(members) != 1:
+                    raise ValueError(f"expected one xian GPS member in {args.input}, found {len(members)}")
+                extracted = archive.extractfile(members[0])
+                if extracted is None:
+                    raise OSError(f"could not stream {members[0].name}")
+                source = stack.enter_context(extracted)
+            reader = pd.read_csv(
+                source, header=None, names=COLUMNS, chunksize=args.chunksize,
+                dtype={"driver_id": "string", "order_id": "string"},
             )
+            for chunk_no, chunk in enumerate(reader, start=1):
+                chunk["source_row"] = np.arange(source_offset, source_offset + len(chunk), dtype="int64")
+                source_offset += len(chunk)
+                chunk["bucket"] = order_bucket(chunk.order_id, args.buckets)
+                for bucket, frame in chunk.groupby("bucket", sort=False):
+                    bucket = int(bucket)
+                    table = pa.Table.from_pandas(frame.drop(columns="bucket"), preserve_index=False)
+                    if bucket not in writers:
+                        writers[bucket] = pq.ParquetWriter(
+                            bucket_dir / f"bucket_{bucket:03d}.parquet", table.schema,
+                            compression="zstd", use_dictionary=["driver_id", "order_id"],
+                        )
+                    writers[bucket].write_table(table)
+                    counts[bucket] += len(frame)
+                print(
+                    f"bucketize chunk={chunk_no} rows={source_offset:,} elapsed={time.time()-started:.1f}s",
+                    flush=True,
+                )
+                if args.max_input_chunks is not None and chunk_no >= args.max_input_chunks:
+                    break
     finally:
         for writer in writers.values():
             writer.close()
     manifest = {
-        "complete": True,
+        "complete": args.max_input_chunks is None,
         "source": str(args.input.resolve()),
         "rows": int(source_offset),
         "buckets": args.buckets,
@@ -156,7 +172,7 @@ class FastRoadMatcher:
 
 
 def add_segment_metrics(frame: pd.DataFrame) -> pd.DataFrame:
-    same = frame.order_id.eq(frame.order_id.shift())
+    same = frame.order_id.eq(frame.order_id.shift()).fillna(False)
     frame["dt_s"] = frame.timestamp.diff().where(same)
     frame["segment_distance_m"] = np.hypot(frame.proj_x.diff(), frame.proj_y.diff()).where(same)
     frame["speed_kmh"] = frame.segment_distance_m / frame.dt_s * 3.6
@@ -227,10 +243,10 @@ def match_bucket(frame: pd.DataFrame, matcher: FastRoadMatcher) -> pd.DataFrame:
     frame["snap_y"] = snap_y
     frame["intersection_distance_m"] = intersection_distance
 
-    same = frame.order_id.eq(frame.order_id.shift())
+    same = frame.order_id.eq(frame.order_id.shift()).fillna(False)
     frame["matched_step_m"] = np.hypot(frame.snap_x.diff(), frame.snap_y.diff()).where(same)
     prev_road = frame.road_idx.shift()
-    changed = same & frame.road_idx.ne(prev_road)
+    changed = (same & frame.road_idx.ne(prev_road)).fillna(False)
     prev_u = frame.road_idx.shift().map(matcher.roads.from_node)
     prev_v = frame.road_idx.shift().map(matcher.roads.to_node)
     curr_u = frame.road_idx.map(matcher.roads.from_node)

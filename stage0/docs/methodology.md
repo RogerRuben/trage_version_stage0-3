@@ -47,5 +47,12 @@ The full-day order table contains speed statistics, low-speed ratio, stop count 
 - The free 2017 shape has no lane-count field.
 - Only about 1% of core road features carry a non-zero `maxspeed` value.
 - The Xi'an envelope is rectangular, not an exact administrative boundary.
-- The matcher is topology-audited nearest-road projection, not full HMM/Viterbi inference.
+- The original Stage0 baseline matcher is topology-audited nearest-road projection; the monthly extension adds HMM/Viterbi while retaining that baseline for comparison and fallback.
 
+## Monthly HMM/Stage1 extension
+
+The monthly extension retains the geometric/topology matcher as a baseline and fallback, then applies an HMM/Viterbi matcher with exact road projections. Emission likelihood is distance-based. Transition likelihood compares observed displacement with a locally routed network distance; directed routing is primary and a penalized undirected relaxation handles clipped-network and incomplete-oneway edge cases. A non-degradation guard falls back to the geometric result when the HMM topology audit is worse.
+
+Consecutive HMM states are expanded to link paths. Interpolated links are explicitly flagged and are used for route topology, turn movements, and intrinsic GNS only; traversal-specific realized stress is not imputed where no GPS behavior was observed.
+
+Stage1 produces LCS, IIS, GNS, RTS, and PMIS at traversal level. RTS uses a hierarchical historical seconds-per-meter reference. Empirical percentiles use bounded streaming histograms and fall back through link/time/weekday, link/peak, road-class/grid/time, road-class/time, road-class, and global cohorts. Topology gaps, route-length ratio, and matching distance remain quality controls rather than stress inputs.
