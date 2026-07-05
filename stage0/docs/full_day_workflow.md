@@ -38,11 +38,11 @@
 ## 复现
 
 ```powershell
-python .\scripts\extract_xian_2017_network.py --source-dir .\map_data\china-170101-free.shp --output-dir .\map_data\xian_2017
+python .\stage0\scripts\extract_xian_2017_network.py --source-dir .\map_data\china-170101-free.shp --output-dir .\map_data\xian_2017
 
-python .\scripts\run_full_day_2017.py --input .\10.1\gps_20161001 --roads .\map_data\xian_2017\xian_2017_core_roads.parquet --nodes .\map_data\xian_2017\xian_2017_core_nodes.parquet --output-dir .\full_day_output --input-crs gcj02
+python .\stage0\scripts\run_full_day_2017.py --input .\10.1\gps_20161001 --roads .\map_data\xian_2017\xian_2017_core_roads.parquet --nodes .\map_data\xian_2017\xian_2017_core_nodes.parquet --output-dir .\full_day_output --input-crs gcj02
 
-python .\scripts\generate_full_day_cases.py --roads .\map_data\xian_2017\xian_2017_core_roads.parquet --output-dir .\full_day_output
+python .\stage0\scripts\generate_full_day_cases.py --roads .\map_data\xian_2017\xian_2017_core_roads.parquet --output-dir .\full_day_output
 ```
 
 脚本会复用已完成的分桶 manifest 和各桶结果，可断点续跑。当前 matcher 是道路候选加密、精确线投影和拓扑审计，仍不是完整 HMM/Viterbi。

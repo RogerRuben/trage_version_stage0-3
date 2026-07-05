@@ -9,6 +9,8 @@
 # Generated outputs (may contain order/driver identifiers)
 /stage0_output/
 /full_day_output/
+/stage0/stage0_output/
+/stage0/full_day_output/
 /tmp/
 
 # Local agent/application state
@@ -30,4 +32,3 @@ venv/
 .vscode/
 .DS_Store
 Thumbs.db
-

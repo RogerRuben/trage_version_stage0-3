@@ -14,11 +14,11 @@
 ## 复现命令
 
 ```powershell
-python .\scripts\prepare_sample.py --input .\10.1\gps_20161001 --output-dir .\stage0_output --start-local "2016-10-01 17:00:00" --hours 2 --orders 500
+python .\stage0\scripts\prepare_sample.py --input .\10.1\gps_20161001 --output-dir .\stage0_output --start-local "2016-10-01 17:00:00" --hours 2 --orders 500
 
-python .\scripts\download_osm_network.py --region fixed-xian-core --output-dir .\stage0_output\network
+python .\stage0\scripts\download_osm_network.py --region fixed-xian-core --output-dir .\stage0_output\network
 
-python .\scripts\run_stage0.py --sample .\stage0_output\sample_raw.parquet --graphml .\stage0_output\network\xian_stage0_drive.graphml --output-dir .\stage0_output --input-crs gcj02
+python .\stage0\scripts\run_stage0.py --sample .\stage0_output\sample_raw.parquet --graphml .\stage0_output\network\xian_stage0_drive.graphml --output-dir .\stage0_output --input-crs gcj02
 ```
 
 若 GraphML 已存在，路网导出可加 `--reuse-existing`，不会重新请求 OSM。
