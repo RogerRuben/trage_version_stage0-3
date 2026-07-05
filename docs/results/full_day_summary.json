@@ -1,0 +1,16 @@
+{
+  "verdict": "CONDITIONAL GO",
+  "input_rows": 28334617,
+  "orders": 119018,
+  "drivers": 17855,
+  "clean_points": 28334605,
+  "point_retention_ratio": 0.9999995765,
+  "good_order_ratio": 0.9669629804,
+  "matching_success_ratio": 0.9899174915,
+  "high_confidence_ratio": 0.9478818330,
+  "median_order_p90_gps_link_distance_m": 8.6710563117,
+  "p90_order_p90_gps_link_distance_m": 15.5959436271,
+  "route_ratio_good_ratio": 0.9939757012,
+  "road_snapshot": "2017-01-01T20:28:02Z Geofabrik OSM"
+}
+

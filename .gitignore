@@ -1,0 +1,33 @@
+# Private and licensed source data
+/10.1/
+/80b8f738fde94a21989c8b126af26677/
+/map_data/
+*.rar
+*.tar.gz
+*.zip
+
+# Generated outputs (may contain order/driver identifiers)
+/stage0_output/
+/full_day_output/
+/tmp/
+
+# Local agent/application state
+/.agents/
+/.codex/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+

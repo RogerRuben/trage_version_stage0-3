@@ -1,0 +1,7 @@
+{
+  "test_points": 15529,
+  "as_declared_wgs84_p90_gps_link_distance_m": 120.1680,
+  "gcj02_to_wgs84_p90_gps_link_distance_m": 10.7837,
+  "gcj02_to_wgs84_within_50m_ratio": 0.999163,
+  "inference": "Source values are empirically GCJ-02-like; provider confirmation remains required."
+}
