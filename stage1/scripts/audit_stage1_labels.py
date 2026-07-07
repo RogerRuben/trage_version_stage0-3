@@ -26,11 +26,13 @@ INDICATORS = {
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--output-root", type=Path, default=Path("stage0_output"))
+    parser.add_argument("--output-root", type=Path, default=Path("stage1/output/prediction_split"))
     parser.add_argument("--date", required=True)
     parser.add_argument("--roads", type=Path, required=True)
     parser.add_argument("--matched-dir", type=Path)
     parser.add_argument("--poi-exposure", type=Path)
+    parser.add_argument("--split", choices=["train", "validation", "test"])
+    parser.add_argument("--precomputed-sensitivity", type=Path)
     return parser.parse_args()
 
 
@@ -43,9 +45,11 @@ def monotonicity(primitives_dir: Path, labels_dir: Path) -> pd.DataFrame:
         label = pd.read_parquet(label_path, columns=["order_id", "link_seq"] + [f"{d}_pct_link" for d in DIMENSIONS])
         frame = primitive.merge(label, on=["order_id", "link_seq"], how="inner", validate="one_to_one")
         for dimension in DIMENSIONS:
-            decile = np.minimum((frame[f"{dimension}_pct_link"].fillna(0) * 10).astype(int), 9) + 1
+            valid_label = frame[f"{dimension}_pct_link"].notna()
+            decile = np.minimum((frame.loc[valid_label, f"{dimension}_pct_link"] * 10).astype(int), 9) + 1
             for indicator in INDICATORS[dimension]:
-                value = frame[indicator].abs() if indicator == "turn_angle" else frame[indicator]
+                value = frame.loc[valid_label, indicator]
+                value = value.abs() if indicator == "turn_angle" else value
                 summary = pd.DataFrame({"decile": decile, "value": value}).groupby("decile").value.agg(["sum", "count"]).reset_index()
                 summary["dimension"] = dimension; summary["indicator"] = indicator
                 totals.append(summary)
@@ -101,7 +105,7 @@ def poi_hourly(primitives_dir: Path, labels_dir: Path) -> pd.DataFrame:
         hour = pd.to_datetime(frame.enter_time, unit="s", utc=True).dt.tz_convert("Asia/Shanghai").dt.hour
         for category in categories:
             density = frame.get(f"poi_density_100m_{category}", pd.Series(0, index=frame.index))
-            selected = density.gt(0)
+            selected = density.gt(0) & frame.pmis_pct_link.notna()
             if selected.any():
                 data = pd.DataFrame({
                     "hour": hour[selected], "pmis": frame.loc[selected, "pmis_pct_link"],
@@ -145,9 +149,14 @@ def order_monotonicity(primitives_dir: Path, order_path: Path) -> pd.DataFrame:
     }
     rows = []
     for dimension, indicators in mapping.items():
-        decile = np.minimum((frame[f"{dimension}_mean"].rank(pct=True) * 10).astype(int), 9) + 1
+        valid_label = frame[f"{dimension}_mean"].notna()
+        ranked = frame.loc[valid_label, f"{dimension}_mean"].rank(pct=True)
+        decile = np.minimum((ranked * 10).astype(int), 9) + 1
         for indicator in indicators:
-            summary = pd.DataFrame({"decile": decile, "value": frame[indicator]}).groupby("decile").value.mean().reset_index(name="mean")
+            summary = pd.DataFrame({
+                "decile": decile,
+                "value": frame.loc[valid_label, indicator],
+            }).groupby("decile").value.mean().reset_index(name="mean")
             summary["dimension"] = dimension; summary["indicator"] = indicator
             summary["spearman_decile_mean"] = pd.Series(summary["mean"].to_numpy()).corr(
                 pd.Series(summary.decile.to_numpy()), method="spearman"
@@ -202,19 +211,24 @@ def threshold_sensitivity(matched_dir: Path | None, poi_path: Path | None) -> di
 
 def main() -> None:
     args = parse_args()
-    primitives = args.output_root / "stage1_primitives" / f"day={args.date}"
-    labels = args.output_root / "stage1_link_labels" / f"day={args.date}"
-    report_dir = args.output_root / "stage1_validity" / f"day={args.date}"
+    primitives = args.output_root / "primitives" / f"day={args.date}"
+    labels = args.output_root / "link_labels" / f"day={args.date}"
+    report_dir = args.output_root / "validity"
+    if args.split:
+        report_dir = report_dir / args.split
+    report_dir = report_dir / f"day={args.date}"
     figures = report_dir / "figures"; figures.mkdir(parents=True, exist_ok=True)
     mono = monotonicity(primitives, labels); mono.to_csv(report_dir / "link_decile_monotonicity.csv", index=False)
     plot_monotonicity(mono, figures)
-    order_path = args.output_root / "stage1_order_labels" / f"day={args.date}.parquet"
+    order_path = args.output_root / "order_labels" / f"day={args.date}.parquet"
     order_mono = order_monotonicity(primitives, order_path)
     order_mono.to_csv(report_dir / "order_decile_monotonicity.csv", index=False)
     plot_order_monotonicity(order_mono, figures)
     spatial = spatial_plot(labels, args.roads, figures); spatial.to_parquet(report_dir / "link_spatial_summary.parquet", index=False)
     poi = poi_hourly(primitives, labels); poi.to_csv(report_dir / "poi_hourly_validity.csv", index=False); plot_poi(poi, figures)
     sensitivity = threshold_sensitivity(args.matched_dir, args.poi_exposure)
+    if args.precomputed_sensitivity and args.precomputed_sensitivity.exists():
+        sensitivity.update(json.loads(args.precomputed_sensitivity.read_text(encoding="utf-8")))
     orders = pd.read_parquet(order_path)
     maximum = orders[[f"{dimension}_max" for dimension in DIMENSIONS]].max(axis=1)
     high_rates = {str(x): float(maximum.ge(x).mean()) for x in [0.85, 0.90, 0.95]}

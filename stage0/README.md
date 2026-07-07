@@ -92,4 +92,6 @@ The original matcher uses a 10 m densified-road candidate index, exact point-to-
 
 See [methodology](docs/methodology.md), the [small-sample workflow](docs/sample_workflow.md), and the [full-day workflow](docs/full_day_workflow.md) for details and limitations.
 
-The resume-safe monthly Stage0/HMM/Stage1 workflow is documented in [monthly_stage01_workflow.md](docs/monthly_stage01_workflow.md).
+The primary workflow is now the split-aware compact pipeline documented in
+[split_compact_workflow.md](docs/split_compact_workflow.md). The earlier monthly
+workflow remains available as a descriptive/full-retention reference only.

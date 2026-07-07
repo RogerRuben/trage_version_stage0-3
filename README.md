@@ -2,7 +2,10 @@
 
 This repository is organized by research stage. The currently published component is:
 
-- [Stage0: Xi'an trajectory feasibility validation](stage0/README.md)
+- [Stage0: Xi'an trajectory processing and HMM link products](stage0/README.md)
+- [Stage1: train-fitted link stress labels](stage1/README.md)
 
-Stage0 contains the reproducible code, methodology, and aggregate non-identifying validation results. Raw trajectories, extracted road data, point-level matches, and order-level outputs are intentionally excluded from version control.
+The primary experiment is a compact temporal split: seven train days, one validation day, and one test day. Raw trajectories, generated matches, and labels are intentionally excluded from version control.
 
+See the [compact split workflow](stage0/docs/split_compact_workflow.md) for the
+one-day, three-day, and nine-day execution gates.

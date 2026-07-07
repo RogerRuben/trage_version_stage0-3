@@ -27,7 +27,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--poi", type=Path, required=True)
     parser.add_argument("--roads", type=Path, required=True)
     parser.add_argument("--nodes", type=Path, required=True)
-    parser.add_argument("--output-root", type=Path, default=Path("stage0_output"))
+    parser.add_argument("--output-root", type=Path, default=Path("stage0/output"))
     parser.add_argument("--input-crs", choices=["auto", "wgs84", "gcj02"], default="auto")
     return parser.parse_args()
 
@@ -140,12 +140,13 @@ def main() -> None:
     })
     poi = poi.loc[valid].reset_index(drop=True)
     poi_geo = gpd.GeoDataFrame(poi, geometry=gpd.points_from_xy(poi.lon, poi.lat), crs=4326)
-    args.output_root.mkdir(parents=True, exist_ok=True)
-    cleaned_path = args.output_root / "poi_cleaned.parquet"
+    poi_output = args.output_root / "poi"
+    poi_output.mkdir(parents=True, exist_ok=True)
+    cleaned_path = poi_output / "poi_cleaned.parquet"
     poi_geo.to_parquet(cleaned_path, index=False, compression="zstd")
     roads = gpd.read_parquet(args.roads)
     exposure = build_exposure(roads, poi_geo)
-    exposure.to_parquet(args.output_root / "stage0_link_poi_exposure.parquet", index=False, compression="zstd")
+    exposure.to_parquet(poi_output / "stage0_link_poi_exposure.parquet", index=False, compression="zstd")
     log = {
         "poi_file_path": str(args.poi.resolve()), "encoding_used": "utf-8",
         "row_count": int(len(raw)), "valid_geometry_count": int(len(poi_geo)),
@@ -153,8 +154,11 @@ def main() -> None:
         "coordinate_interpretation": interpretation,
         "category_mapping_summary": poi.poi_category.value_counts().to_dict(),
     }
-    (args.output_root / "poi_processing_log.json").write_text(
+    (poi_output / "poi_coordinate_diagnostic.json").write_text(
         json.dumps(log, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    poi.poi_category.value_counts().rename_axis("poi_category").rename("count").reset_index().to_csv(
+        poi_output / "poi_category_summary.csv", index=False, encoding="utf-8"
     )
     print(json.dumps(log, ensure_ascii=False, indent=2))
 

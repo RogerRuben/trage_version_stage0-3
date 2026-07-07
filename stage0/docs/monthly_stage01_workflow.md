@@ -1,5 +1,8 @@
 # Monthly Stage0/Stage1 workflow
 
+> Legacy descriptive/full-retention reference. The prediction experiment uses
+> `split_compact_workflow.md` and must not fit labels on validation/test dates.
+
 ## Output contract
 
 The monthly pipeline writes Hive-style daily partitions under `stage0_output/`:
@@ -54,7 +57,7 @@ python .\stage0\scripts\run_stage01_day.py `
   --date 20161001 `
   --roads .\map_data\xian_2017\xian_2017_core_roads.parquet `
   --nodes .\map_data\xian_2017\xian_2017_core_nodes.parquet `
-  --poi-exposure .\stage0_output\stage0_link_poi_exposure.parquet `
+  --poi-exposure .\stage0\output\poi\stage0_link_poi_exposure.parquet `
   --output-root .\stage0_output `
   --workers 4
 ```
@@ -68,7 +71,7 @@ HMM state transitions are expanded to network link paths. Links inserted between
 After the desired HMM traversal days exist, fit reference travel times and cohort histograms, then generate link and order labels:
 
 ```powershell
-python .\stage0\scripts\build_stage1_labels.py `
+python .\stage1\scripts\build_stage1_labels.py `
   --traversal-root .\stage0_output\hmm_link_traversals `
   --movement-root .\stage0_output\hmm_turn_movements `
   --poi-exposure .\stage0_output\stage0_link_poi_exposure.parquet `
@@ -85,7 +88,7 @@ The empirical CDF is estimated with bounded histograms and the requested six-lev
 ## 5. Validity audit
 
 ```powershell
-python .\stage0\scripts\audit_stage1_labels.py `
+python .\stage1\scripts\audit_stage1_labels.py `
   --output-root .\stage0_output `
   --date 20161001 `
   --roads .\map_data\xian_2017\xian_2017_core_roads.parquet `

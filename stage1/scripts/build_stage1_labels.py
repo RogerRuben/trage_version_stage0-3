@@ -29,9 +29,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--poi-exposure", type=Path, required=True)
     parser.add_argument("--roads", type=Path, required=True)
     parser.add_argument("--order-base-root", type=Path)
-    parser.add_argument("--output-root", type=Path, default=Path("stage0_output"))
-    parser.add_argument("--fit-dates", default="all", help="all or comma-separated YYYYMMDD")
-    parser.add_argument("--target-dates", default="all", help="all or comma-separated YYYYMMDD")
+    parser.add_argument("--output-root", type=Path, default=Path("stage1/output/prediction_split"))
+    parser.add_argument("--stage0-output-root", type=Path)
+    parser.add_argument("--fit-dates", required=True, help="all or comma-separated YYYYMMDD")
+    parser.add_argument("--target-dates", required=True, help="all or comma-separated YYYYMMDD")
     parser.add_argument("--min-cohort-size", type=int, default=100)
     parser.add_argument("--histogram-bins", type=int, default=200)
     parser.add_argument("--high-threshold", type=float, default=0.90)
@@ -259,23 +260,32 @@ def fit_histograms(files: list[Path], model_dir: Path, bins: int) -> None:
 
 
 def normalize_part(frame: pd.DataFrame, model_dir: Path, bins: int, minimum: int) -> pd.DataFrame:
-    common_level = np.full(len(frame), 6, dtype="int8"); common_size = np.zeros(len(frame), dtype="int32")
-    unresolved = np.ones(len(frame), dtype=bool)
-    count_models: dict[str, pd.Series] = {}
-    for level_no, level in enumerate(LEVELS, start=1):
-        model = pd.read_parquet(model_dir / f"lcs_{level}.parquet", columns=["key", "sample_size"]).drop_duplicates("key")
-        counts = model.set_index("key").sample_size
-        count_models[level] = counts
-        values = frame[level].map(counts).fillna(0).to_numpy(dtype=int)
-        eligible = unresolved & ((values >= minimum) | (level_no == 6))
-        common_level[eligible] = level_no; common_size[eligible] = values[eligible]; unresolved[eligible] = False
-    frame["cohort_level_used"] = common_level
-    frame["cohort_sample_size"] = common_size
+    dimension_levels = []
+    dimension_sizes = []
     for dimension in DIMENSIONS:
+        selected_level = np.full(len(frame), 6, dtype="int8")
+        selected_size = np.zeros(len(frame), dtype="int32")
+        unresolved = np.ones(len(frame), dtype=bool)
+        count_models: dict[str, pd.Series] = {}
+        for level_no, level in enumerate(LEVELS, start=1):
+            model = pd.read_parquet(
+                model_dir / f"{dimension}_{level}.parquet", columns=["key", "sample_size"]
+            ).drop_duplicates("key")
+            counts = model.set_index("key").sample_size
+            count_models[level] = counts
+            values = frame[level].map(counts).fillna(0).to_numpy(dtype=int)
+            eligible = unresolved & ((values >= minimum) | (level_no == 6))
+            selected_level[eligible] = level_no
+            selected_size[eligible] = values[eligible]
+            unresolved[eligible] = False
+        frame[f"{dimension}_cohort_level_used"] = selected_level
+        frame[f"{dimension}_cohort_sample_size"] = selected_size
+        dimension_levels.append(selected_level)
+        dimension_sizes.append(selected_size)
         result = np.full(len(frame), np.nan)
         value_bin = np.minimum((frame[f"{dimension}_raw"].fillna(0).clip(0, 1) * bins).astype(int), bins - 1)
         for level_no, level in enumerate(LEVELS, start=1):
-            mask = common_level == level_no
+            mask = selected_level == level_no
             if not mask.any():
                 continue
             model = pd.read_parquet(model_dir / f"{dimension}_{level}.parquet", columns=["key", "bin", "cdf_midrank"])
@@ -284,6 +294,8 @@ def normalize_part(frame: pd.DataFrame, model_dir: Path, bins: int, minimum: int
             result[mask] = lookup.reindex(index).fillna(0.5).to_numpy()
         result[frame[f"{dimension}_raw"].isna().to_numpy()] = np.nan
         frame[f"{dimension}_pct_link"] = result
+    frame["cohort_level_used"] = np.max(np.vstack(dimension_levels), axis=0).astype("int8")
+    frame["cohort_sample_size"] = np.min(np.vstack(dimension_sizes), axis=0).astype("int32")
     return frame
 
 
@@ -337,20 +349,21 @@ def main() -> None:
     roads = road_features(args.roads)
     exposure = pd.read_parquet(args.poi_exposure).drop(columns=["link_length_m"], errors="ignore")
     fit_traversals = [path for date in fit_dates for path in sorted((args.traversal_root / f"day={date}").glob("*.parquet"))]
-    reference_dir = args.output_root / "stage1_models" / "travel_time_reference"
+    reference_dir = args.output_root / "models" / "travel_time_reference"
     references = fit_reference(fit_traversals, roads, reference_dir)
 
     primitive_files: list[Path] = []
     for date in sorted(set(fit_dates) | set(target_dates)):
         traversal_dir = args.traversal_root / f"day={date}"
         movement_dir = args.movement_root / f"day={date}"
-        primitive_dir = args.output_root / "stage1_primitives" / f"day={date}"
+        primitive_dir = args.output_root / "primitives" / f"day={date}"
         primitive_dir.mkdir(parents=True, exist_ok=True)
         for traversal_path in sorted(traversal_dir.glob("*.parquet")):
             part = traversal_path.stem.split("=")[-1].split("_")[-1]
             movement_path = movement_dir / f"part={part}.parquet"
             target = primitive_dir / f"part={part}.parquet"
-            behavior_target = args.output_root / "stage0_order_link_poi_behavior" / f"day={date}" / f"part={part}.parquet"
+            stage0_root = args.stage0_output_root or args.output_root
+            behavior_target = stage0_root / "stage0_order_link_poi_behavior" / f"day={date}" / f"part={part}.parquet"
             if args.force or not target.exists():
                 frame = enrich_part(traversal_path, movement_path, roads, exposure, references, args.min_cohort_size)
                 frame.to_parquet(target, index=False, compression="zstd")
@@ -359,12 +372,12 @@ def main() -> None:
             write_final_poi_behavior(frame, behavior_target)
             if date in fit_dates:
                 primitive_files.append(target)
-    model_dir = args.output_root / "stage1_models" / "cohort_histograms"
+    model_dir = args.output_root / "models" / "cohort_histograms"
     fit_histograms(primitive_files, model_dir, args.histogram_bins)
 
     for date in target_dates:
-        primitive_dir = args.output_root / "stage1_primitives" / f"day={date}"
-        label_dir = args.output_root / "stage1_link_labels" / f"day={date}"
+        primitive_dir = args.output_root / "primitives" / f"day={date}"
+        label_dir = args.output_root / "link_labels" / f"day={date}"
         label_dir.mkdir(parents=True, exist_ok=True)
         order_parts: list[pd.DataFrame] = []
         for source in sorted(primitive_dir.glob("*.parquet")):
@@ -374,7 +387,9 @@ def main() -> None:
                 "order_id", "driver_id", "date", "link_id", "link_seq", "enter_time", "exit_time",
                 "travel_time_sec", "observed_distance_m", "traversal_quality", "reference_travel_time_sec",
                 "excess_time_ratio", "tail_delay_ratio", "cohort_level_used", "cohort_sample_size",
-            ] + [f"{dimension}_{suffix}" for dimension in DIMENSIONS for suffix in ["raw", "pct_link"]]
+            ] + [f"{dimension}_{suffix}" for dimension in DIMENSIONS for suffix in [
+                "raw", "pct_link", "cohort_level_used", "cohort_sample_size"
+            ]]
             frame[columns].to_parquet(label_dir / f"part={part}.parquet", index=False, compression="zstd")
             order_parts.append(aggregate_orders(frame, args.high_threshold))
             print(f"labels day={date} part={part} rows={len(frame):,}", flush=True)
@@ -384,13 +399,14 @@ def main() -> None:
             if base_path.exists():
                 base = pd.read_parquet(base_path, columns=["order_id", "quality_tier"]).rename(columns={"quality_tier": "stage0_quality_tier"})
                 orders = orders.merge(base, on="order_id", how="left")
-        order_path = args.output_root / "stage1_order_labels" / f"day={date}.parquet"
+        order_path = args.output_root / "order_labels" / f"day={date}.parquet"
         order_path.parent.mkdir(parents=True, exist_ok=True)
         orders.to_parquet(order_path, index=False, compression="zstd")
     manifest = {
         "fit_dates": fit_dates, "target_dates": target_dates, "dimensions": DIMENSIONS,
         "min_cohort_size": args.min_cohort_size, "histogram_bins": args.histogram_bins,
         "high_threshold": args.high_threshold, "complete": True,
+        "fit_scope": "train_only" if set(fit_dates) != set(target_dates) else "descriptive_or_train_self_fit",
     }
     manifest_dir = args.output_root / "manifests"; manifest_dir.mkdir(parents=True, exist_ok=True)
     (manifest_dir / "stage1_labels.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")

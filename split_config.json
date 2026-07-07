@@ -1,0 +1,13 @@
+{
+  "experiment_name": "xian_201610_temporal_7_1_1",
+  "train_dates": [
+    "20161001", "20161002", "20161003", "20161004",
+    "20161005", "20161006", "20161007"
+  ],
+  "validation_date": "20161008",
+  "test_date": "20161009",
+  "timezone": "Asia/Shanghai",
+  "stage1_fit_scope": "train_only",
+  "stage1_target_scope": "train_validation_test",
+  "calendar_caveat": "The training window overlaps the National Day holiday period; treat this compact split as the first prediction experiment and audit the train-to-validation/test distribution shift explicitly."
+}

@@ -133,7 +133,9 @@ class HMMRoadNetwork:
 
     def candidate_arrays(self, x: np.ndarray, y: np.ndarray, k: int, radius: float):
         query_k = max(12, k * 4)
-        _, sample_idx = self.tree.query(np.column_stack([x, y]), k=query_k, workers=-1)
+        # The day runner already parallelizes by process. Spawning all CPU
+        # threads again for every small order causes severe oversubscription.
+        _, sample_idx = self.tree.query(np.column_stack([x, y]), k=query_k, workers=1)
         sampled_roads = self.sample_road_ids[sample_idx]
         candidates = np.full((len(x), k), -1, dtype="int32")
         for i, values in enumerate(sampled_roads):

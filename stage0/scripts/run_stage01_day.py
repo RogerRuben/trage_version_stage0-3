@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -15,8 +16,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--roads", type=Path, required=True)
     parser.add_argument("--nodes", type=Path, required=True)
     parser.add_argument("--poi-exposure", type=Path, required=True)
-    parser.add_argument("--output-root", type=Path, default=Path("stage0_output"))
-    parser.add_argument("--workers", type=int, default=4)
+    parser.add_argument("--output-root", type=Path, default=Path("stage0/output"))
+    parser.add_argument("--workers", type=int, default=min(8, max(1, (os.cpu_count() or 2) // 2)))
     parser.add_argument("--candidates", type=int, default=3)
     return parser.parse_args()
 
