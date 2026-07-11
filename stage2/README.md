@@ -70,6 +70,166 @@ The gap audit is written to:
 stage2/output/route_conditioned_eval/gap_audit/estimated_oracle_gap_report.md
 ```
 
+## Deep v3: RC-MSTNet main-candidate test
+
+Deep v3 promotes deep learning from the old 30k structural probe to a formal
+main-candidate test under the final route-conditioned estimated-time protocol.
+The first implemented candidate is:
+
+```text
+RC-MSTNet =
+  link semantic encoder
+  + lagged-state temporal encoder
+  + local route convolution
+  + route Transformer
+  + multi-task LCS/PMIS/RTS heads
+  + route-level auxiliary head
+```
+
+IIS remains movement-level and is handled by a separate applicability/severity
+script. The RTS stress-correlation module is deferred until Model B/C
+feasibility is stable.
+
+Build sequence manifests:
+
+```powershell
+python stage2/scripts/build_stage2_deep_v3_sequences.py `
+  --dataset-root stage2/output/route_conditioned_dataset/estimated_time_daily `
+  --fold-config rolling_threefold_config.json `
+  --output-root stage2/output/deep_v3/data_manifests
+```
+
+Train RC-MSTNet:
+
+```powershell
+python stage2/scripts/train_stage2_rc_mstnet.py `
+  --dataset-root stage2/output/route_conditioned_dataset/estimated_time_daily `
+  --fold-config rolling_threefold_config.json `
+  --output-root stage2/output/deep_v3/feasibility_100k/rc_mstnet `
+  --prediction-root stage2/output/deep_v3/rolling_predictions/rc_mstnet `
+  --max-train-orders 100000 `
+  --epochs 5
+```
+
+The optimized trainer uses balanced sampling across every training date,
+pre-encoded contiguous order arrays, aligned `4 x 24` lagged-state channels,
+length-bucket batches, CUDA AMP, pinned transfers, and metric-only validation
+during epochs. On Windows/16 GB RAM, keep `--num-workers 0`; the contiguous
+arrays remove the need for multiprocessing and avoid worker-side dataset
+copies. `--max-train-orders` is a total fold budget and is distributed evenly
+across the fold's training dates.
+
+For 100k+ experiments, first build fold-aware daily mmap tensor shards. The
+builder fits normalization statistics and categorical vocabularies on training
+dates only, reads one day at a time, stores float16 inputs plus float32 targets,
+and fingerprints metadata/order selection for safe resume:
+
+```powershell
+python stage2/scripts/build_stage2_deep_v3_tensor_shards.py `
+  --dataset-root stage2/output/route_conditioned_dataset_5k/estimated_time_daily `
+  --fold-config rolling_threefold_config.json `
+  --output-root stage2/output/deep_v3_tensor_shards_5k `
+  --folds 1,2,3 `
+  --max-train-orders 5000 `
+  --max-eval-orders 1000 `
+  --max-seq-len 96 `
+  --feature-dtype float16
+```
+
+Train directly from the shards:
+
+```powershell
+python stage2/scripts/train_stage2_rc_mstnet.py `
+  --tensor-shard-root stage2/output/deep_v3_tensor_shards_5k `
+  --fold-config rolling_threefold_config.json `
+  --output-root stage2/output/deep_v3_5k/p5_mmap_rolling_5k/rc_mstnet `
+  --prediction-root stage2/output/deep_v3_5k/p5_mmap_rolling_5k_predictions/rc_mstnet `
+  --folds 1,2,3 `
+  --max-train-orders 5000 `
+  --max-eval-orders 1000 `
+  --max-seq-len 96 `
+  --batch-size 64 `
+  --epochs 2 `
+  --num-workers 0
+```
+
+The order budgets passed to the trainer are descriptive when tensor shards are
+used; the effective sample sizes are fixed by the shard manifests.
+
+Audit every shard before a formal run:
+
+```powershell
+python stage2/scripts/audit_stage2_deep_v3_tensor_shards.py `
+  --tensor-shard-root stage2/output/deep_v3_tensor_shards_5k
+```
+
+Formal 100k rolling run (completed locally):
+
+```powershell
+python stage2/scripts/train_stage2_rc_mstnet.py `
+  --tensor-shard-root stage2/output/deep_v3_tensor_shards_100k `
+  --fold-config rolling_threefold_config.json `
+  --output-root stage2/output/deep_v3_100k/formal_rolling/rc_mstnet `
+  --prediction-root stage2/output/deep_v3_100k/formal_rolling_predictions/rc_mstnet `
+  --folds 1,2,3 `
+  --max-train-orders 100000 `
+  --max-eval-orders 0 `
+  --max-seq-len 96 `
+  --batch-size 128 `
+  --epochs 5 `
+  --hidden-dim 128 `
+  --layers 3 `
+  --heads 4 `
+  --num-workers 0
+```
+
+The formal test AUC/AP pairs are `0.8667/0.4376` for LCS,
+`0.8716/0.4398` for PMIS, and `0.8234/0.3875` for RTS. See
+`stage2/docs/stage2_deep_v3_formal_100k_report.md` for the full rolling,
+bootstrap, order-level, and resource audit.
+
+For a resource-safe local run:
+
+```powershell
+python stage2/scripts/train_stage2_rc_mstnet.py `
+  --dataset-root stage2/output/route_conditioned_dataset_5k/estimated_time_daily `
+  --fold-config rolling_threefold_config.json `
+  --output-root stage2/output/deep_v3_5k/rolling_5k/rc_mstnet `
+  --prediction-root stage2/output/deep_v3_5k/rolling_5k_predictions/rc_mstnet `
+  --folds 1,2,3 `
+  --max-train-orders 5000 `
+  --max-eval-orders 1000 `
+  --max-seq-len 96 `
+  --batch-size 64 `
+  --epochs 2 `
+  --num-workers 0
+```
+
+Train movement-level IIS:
+
+```powershell
+python stage2/scripts/train_stage2_rc_mstnet_movement.py `
+  --dataset-root stage2/output/iis_movement_causal_dataset `
+  --fold-config rolling_threefold_config.json `
+  --output-root stage2/output/deep_v3/feasibility_100k/rc_mstnet_movement
+```
+
+Evaluate against the LightGBM route-context benchmark:
+
+```powershell
+python stage2/scripts/evaluate_stage2_deep_v3.py
+python stage2/scripts/summarize_stage2_deep_v3.py
+```
+
+Current scale status:
+
+```text
+stage2/output/route_conditioned_dataset_15k/estimated_time_daily contains
+15,000 orders/day for 20161009-20161019. The formal 100k three-fold experiment
+is complete. A 300k experiment would require a larger upstream daily sample;
+the mmap tensor-shard loader itself is no longer the RAM bottleneck.
+```
+
 Stage2 starts from the compact split pipeline outputs and builds a supervised link-level prediction dataset.
 
 Current split:

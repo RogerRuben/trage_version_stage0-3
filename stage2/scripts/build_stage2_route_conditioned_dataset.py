@@ -56,6 +56,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--fold", type=int, default=1, help="Fold used for the top-level train/validation/test aliases.")
     parser.add_argument("--dates", default="", help="Optional comma-separated date override.")
     parser.add_argument("--skip-existing", action="store_true")
+    parser.add_argument("--daily-only", action="store_true", help="Only write daily files; skip fold/top-level concat copies.")
+    parser.add_argument("--modes", default="estimated,oracle", help="Comma-separated modes to write: estimated,oracle.")
     return parser.parse_args()
 
 
@@ -258,6 +260,9 @@ def main() -> None:
     args.output_root.mkdir(parents=True, exist_ok=True)
     folds, config_dates = load_folds(args.fold_config)
     dates = [part.strip() for part in args.dates.split(",") if part.strip()] if args.dates else config_dates
+    modes = {part.strip() for part in args.modes.split(",") if part.strip()}
+    if not modes <= {"estimated", "oracle"}:
+        raise ValueError(f"unsupported modes: {modes}")
     estimated_day_root = args.output_root / "estimated_time_daily"
     oracle_day_root = args.output_root / "oracle_time_daily"
     manifest = {
@@ -273,22 +278,79 @@ def main() -> None:
         source = args.source_root / f"day={date}.parquet"
         if not source.exists():
             raise FileNotFoundError(source)
-        stats = write_day(
-            source,
-            estimated_day_root / f"day={date}.parquet",
-            oracle_day_root / f"day={date}.parquet",
-            args.skip_existing,
-        )
+        if modes == {"estimated", "oracle"}:
+            stats = write_day(
+                source,
+                estimated_day_root / f"day={date}.parquet",
+                oracle_day_root / f"day={date}.parquet",
+                args.skip_existing,
+            )
+        else:
+            frame = add_common_route_columns(pd.read_parquet(source))
+            stats = {}
+            if "estimated" in modes:
+                path = estimated_day_root / f"day={date}.parquet"
+                if args.skip_existing and path.exists():
+                    estimated = pd.read_parquet(path, columns=["order_id", "route_conditioned_time_check"])
+                    stats.update({
+                        "estimated_rows": len(estimated),
+                        "estimated_orders": int(estimated["order_id"].nunique()),
+                        "estimated_time_check_ratio": float(estimated["route_conditioned_time_check"].mean()),
+                        "skipped_estimated": True,
+                    })
+                else:
+                    estimated, estimated_meta = select_columns(add_time_columns(frame, "estimated"), "estimated")
+                    estimated = normalize_timestamp_precision(estimated)
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    estimated.to_parquet(path, index=False, compression="zstd")
+                    stats.update({
+                        "estimated_rows": len(estimated),
+                        "estimated_orders": int(estimated["order_id"].nunique()),
+                        "estimated_time_check_ratio": float(estimated["route_conditioned_time_check"].mean()),
+                        "estimated_feature_count": len(estimated_meta["feature_columns"]),
+                        "estimated_target_count": len(estimated_meta["target_columns"]),
+                        "skipped_estimated": False,
+                    })
+            if "oracle" in modes:
+                path = oracle_day_root / f"day={date}.parquet"
+                if args.skip_existing and path.exists():
+                    oracle = pd.read_parquet(path, columns=["order_id", "route_conditioned_time_check"])
+                    stats.update({
+                        "oracle_rows": len(oracle),
+                        "oracle_orders": int(oracle["order_id"].nunique()),
+                        "oracle_time_check_ratio": float(oracle["route_conditioned_time_check"].mean()),
+                        "skipped_oracle": True,
+                    })
+                else:
+                    oracle, oracle_meta = select_columns(add_time_columns(frame, "oracle"), "oracle")
+                    oracle = normalize_timestamp_precision(oracle)
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    oracle.to_parquet(path, index=False, compression="zstd")
+                    stats.update({
+                        "oracle_rows": len(oracle),
+                        "oracle_orders": int(oracle["order_id"].nunique()),
+                        "oracle_time_check_ratio": float(oracle["route_conditioned_time_check"].mean()),
+                        "oracle_feature_count": len(oracle_meta["feature_columns"]),
+                        "oracle_target_count": len(oracle_meta["target_columns"]),
+                        "skipped_oracle": False,
+                    })
         manifest["days"][date] = stats
         if not first_meta_written:
-            sample_est = pd.read_parquet(estimated_day_root / f"day={date}.parquet")
-            sample_oracle = pd.read_parquet(oracle_day_root / f"day={date}.parquet")
-            _, estimated_meta = select_columns(sample_est, "estimated")
-            _, oracle_meta = select_columns(sample_oracle, "oracle")
-            (args.output_root / "route_conditioned_estimated_time_schema.json").write_text(json.dumps(estimated_meta, indent=2), encoding="utf-8")
-            (args.output_root / "route_conditioned_oracle_time_schema.json").write_text(json.dumps(oracle_meta, indent=2), encoding="utf-8")
+            if "estimated" in modes:
+                sample_est = pd.read_parquet(estimated_day_root / f"day={date}.parquet")
+                _, estimated_meta = select_columns(sample_est, "estimated")
+                (args.output_root / "route_conditioned_estimated_time_schema.json").write_text(json.dumps(estimated_meta, indent=2), encoding="utf-8")
+            if "oracle" in modes:
+                sample_oracle = pd.read_parquet(oracle_day_root / f"day={date}.parquet")
+                _, oracle_meta = select_columns(sample_oracle, "oracle")
+                (args.output_root / "route_conditioned_oracle_time_schema.json").write_text(json.dumps(oracle_meta, indent=2), encoding="utf-8")
             first_meta_written = True
         print(f"route-conditioned day={date} {stats}", flush=True)
+    if args.daily_only:
+        manifest["daily_only"] = True
+        manifest["modes"] = sorted(modes)
+        (args.output_root / "route_conditioned_dataset_manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+        return
     for fold in folds:
         fold_id = int(fold["fold"])
         fold_dir = args.output_root / f"fold={fold_id}"
