@@ -18,6 +18,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--date", required=True)
     parser.add_argument("--activity-threshold", type=float, default=0.75)
     parser.add_argument("--output-collection", default="stage0_order_link_poi_behavior")
+    parser.add_argument("--force", action="store_true")
     return parser.parse_args()
 
 
@@ -46,7 +47,7 @@ def main() -> None:
     for source in sorted(args.traversal_dir.glob("*.parquet")):
         part = source.stem.split("=")[-1].split("_")[-1]
         target = output_dir / f"part={part}.parquet"
-        if target.exists():
+        if target.exists() and not args.force:
             continue
         traversal = pd.read_parquet(source)
         merged = traversal.merge(exposure, on="link_id", how="left", validate="many_to_one")

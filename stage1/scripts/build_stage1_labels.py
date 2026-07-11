@@ -36,6 +36,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--min-cohort-size", type=int, default=100)
     parser.add_argument("--histogram-bins", type=int, default=200)
     parser.add_argument("--high-threshold", type=float, default=0.90)
+    parser.add_argument("--reuse-models", action="store_true", help="reuse existing travel-time and cohort models without refitting")
+    parser.add_argument("--manifest-name", default="stage1_labels.json")
+    parser.add_argument("--skip-existing-labels", action="store_true", help="reuse completed label parts while rebuilding order aggregation")
     parser.add_argument("--force", action="store_true")
     return parser.parse_args()
 
@@ -304,15 +307,17 @@ def aggregate_orders(labels: pd.DataFrame, threshold: float) -> pd.DataFrame:
     for order_id, group in labels.groupby("order_id", sort=False):
         row: dict[str, object] = {"order_id": order_id}
         maxima = []
+        dimension_values: dict[str, np.ndarray] = {}
+        dimension_weights: dict[str, np.ndarray] = {}
         for dimension in DIMENSIONS:
             if dimension == "gns":
-                length_column = next(
-                    column for column in ["link_length_m", "link_length_m_x", "link_length_m_static"]
+                length_column = next((
+                    column for column in ["link_length_m", "link_length_m_x", "link_length_m_static", "observed_distance_m"]
                     if column in group.columns
-                )
-                weight_series = group[length_column]
+                ), None)
+                weight_series = group[length_column] if length_column else pd.Series(1.0, index=group.index)
             else:
-                weight_series = group.travel_time_sec
+                weight_series = group.travel_time_sec if "travel_time_sec" in group.columns else pd.Series(1.0, index=group.index)
             weights = weight_series.fillna(0).clip(lower=0).to_numpy(dtype=float)
             if weights.sum() <= 0: weights = np.ones(len(group), dtype=float)
             values = group[f"{dimension}_pct_link"].to_numpy(dtype=float)
@@ -327,12 +332,23 @@ def aggregate_orders(labels: pd.DataFrame, threshold: float) -> pd.DataFrame:
             tail_values = valid_values[valid_values >= threshold]
             row[f"{dimension}_tail"] = float(tail_values.mean()) if len(tail_values) else float(np.max(valid_values))
             row[f"{dimension}_persistence"] = float(valid_weights[valid_values >= threshold].sum() / valid_weights.sum())
+            dimension_values[dimension] = valid_values
+            dimension_weights[dimension] = valid_weights
             maxima.append(float(np.max(valid_values)))
         for cutoff in [0.85, 0.90, 0.95]:
-            row[f"high_odd_exceedance_{int(cutoff*100)}"] = any(
-                row[f"{dimension}_tail"] >= cutoff and row[f"{dimension}_persistence"] >= 0.05
-                for dimension in DIMENSIONS
-            )
+            exceeded = False
+            for dimension in DIMENSIONS:
+                valid_values = dimension_values.get(dimension)
+                valid_weights = dimension_weights.get(dimension)
+                if valid_values is None or valid_weights is None or not len(valid_values):
+                    continue
+                high_mask = valid_values >= cutoff
+                tail_at_cutoff = float(valid_values[high_mask].mean()) if high_mask.any() else float(np.max(valid_values))
+                persistence_at_cutoff = float(valid_weights[high_mask].sum() / valid_weights.sum())
+                if tail_at_cutoff >= cutoff and persistence_at_cutoff >= 0.05:
+                    exceeded = True
+                    break
+            row[f"high_odd_exceedance_{int(cutoff*100)}"] = exceeded
         row["composite_mean"] = float(np.nanmean([row[f"{d}_mean"] for d in DIMENSIONS]))
         row["composite_tail"] = float(np.nanmean([row[f"{d}_tail"] for d in DIMENSIONS]))
         high_quality = group.traversal_quality.eq("high").mean()
@@ -348,12 +364,17 @@ def main() -> None:
     fit_dates = select_dates(args.fit_dates, available); target_dates = select_dates(args.target_dates, available)
     roads = road_features(args.roads)
     exposure = pd.read_parquet(args.poi_exposure).drop(columns=["link_length_m"], errors="ignore")
-    fit_traversals = [path for date in fit_dates for path in sorted((args.traversal_root / f"day={date}").glob("*.parquet"))]
     reference_dir = args.output_root / "models" / "travel_time_reference"
-    references = fit_reference(fit_traversals, roads, reference_dir)
+    if args.reuse_models:
+        references = {level: pd.read_parquet(reference_dir / f"{level}.parquet") for level in LEVELS}
+        prepare_dates = target_dates
+    else:
+        fit_traversals = [path for date in fit_dates for path in sorted((args.traversal_root / f"day={date}").glob("*.parquet"))]
+        references = fit_reference(fit_traversals, roads, reference_dir)
+        prepare_dates = sorted(set(fit_dates) | set(target_dates))
 
     primitive_files: list[Path] = []
-    for date in sorted(set(fit_dates) | set(target_dates)):
+    for date in prepare_dates:
         traversal_dir = args.traversal_root / f"day={date}"
         movement_dir = args.movement_root / f"day={date}"
         primitive_dir = args.output_root / "primitives" / f"day={date}"
@@ -370,10 +391,19 @@ def main() -> None:
             else:
                 frame = pd.read_parquet(target)
             write_final_poi_behavior(frame, behavior_target)
-            if date in fit_dates:
+            if date in fit_dates and not args.reuse_models:
                 primitive_files.append(target)
     model_dir = args.output_root / "models" / "cohort_histograms"
-    fit_histograms(primitive_files, model_dir, args.histogram_bins)
+    if args.reuse_models:
+        missing_models = [
+            str(model_dir / f"{dimension}_{level}.parquet")
+            for dimension in DIMENSIONS for level in LEVELS
+            if not (model_dir / f"{dimension}_{level}.parquet").exists()
+        ]
+        if missing_models:
+            raise FileNotFoundError(f"frozen cohort models missing: {missing_models[:5]}")
+    else:
+        fit_histograms(primitive_files, model_dir, args.histogram_bins)
 
     for date in target_dates:
         primitive_dir = args.output_root / "primitives" / f"day={date}"
@@ -382,6 +412,12 @@ def main() -> None:
         order_parts: list[pd.DataFrame] = []
         for source in sorted(primitive_dir.glob("*.parquet")):
             part = source.stem.split("=")[-1].split("_")[-1]
+            label_path = label_dir / f"part={part}.parquet"
+            if args.skip_existing_labels and label_path.exists():
+                frame = pd.read_parquet(label_path)
+                order_parts.append(aggregate_orders(frame, args.high_threshold))
+                print(f"labels day={date} part={part} reused rows={len(frame):,}", flush=True)
+                continue
             frame = normalize_part(pd.read_parquet(source), model_dir, args.histogram_bins, args.min_cohort_size)
             columns = [
                 "order_id", "driver_id", "date", "link_id", "link_seq", "enter_time", "exit_time",
@@ -390,7 +426,7 @@ def main() -> None:
             ] + [f"{dimension}_{suffix}" for dimension in DIMENSIONS for suffix in [
                 "raw", "pct_link", "cohort_level_used", "cohort_sample_size"
             ]]
-            frame[columns].to_parquet(label_dir / f"part={part}.parquet", index=False, compression="zstd")
+            frame[columns].to_parquet(label_path, index=False, compression="zstd")
             order_parts.append(aggregate_orders(frame, args.high_threshold))
             print(f"labels day={date} part={part} rows={len(frame):,}", flush=True)
         orders = pd.concat(order_parts, ignore_index=True)
@@ -406,10 +442,11 @@ def main() -> None:
         "fit_dates": fit_dates, "target_dates": target_dates, "dimensions": DIMENSIONS,
         "min_cohort_size": args.min_cohort_size, "histogram_bins": args.histogram_bins,
         "high_threshold": args.high_threshold, "complete": True,
+        "models_reused": args.reuse_models,
         "fit_scope": "train_only" if set(fit_dates) != set(target_dates) else "descriptive_or_train_self_fit",
     }
     manifest_dir = args.output_root / "manifests"; manifest_dir.mkdir(parents=True, exist_ok=True)
-    (manifest_dir / "stage1_labels.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    (manifest_dir / args.manifest_name).write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     print(json.dumps(manifest, indent=2))
 
 

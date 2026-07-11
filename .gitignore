@@ -13,6 +13,7 @@
 /stage0/full_day_output/
 /stage0/output/
 /stage1/output/
+/stage2/output/
 /tmp/
 
 # Local agent/application state

@@ -12,6 +12,8 @@ HEAVY_COLLECTIONS = [
     "matched_points", "hmm_matched_points", "hmm_state_sequences", "hmm_route_parts",
     "hmm_quality_parts", "route_parts", "hmm_observed_link_traversals", "hmm_observed_turn_movements",
     "stage0_link_traversals", "stage0_turn_movements",
+    "fast_matched_points", "fast_route_parts", "fast_quality_parts",
+    "fast_observed_link_traversals", "fast_observed_turn_movements",
 ]
 
 
@@ -20,6 +22,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-root", type=Path, required=True)
     parser.add_argument("--date", required=True)
     parser.add_argument("--execute", action="store_true", help="Actually delete; otherwise dry-run")
+    parser.add_argument("--comparison-collection", default="matcher_comparison")
+    parser.add_argument("--link-traversal-collection", default="hmm_link_traversals")
+    parser.add_argument("--turn-movement-collection", default="hmm_turn_movements")
+    parser.add_argument("--poi-behavior-collection", default="stage0_order_link_poi_behavior")
     return parser.parse_args()
 
 
@@ -27,10 +33,10 @@ def main() -> None:
     args = parse_args(); root = args.output_root.resolve()
     required = [
         root / "order_base" / f"day={args.date}.parquet",
-        root / "hmm_link_traversals" / f"day={args.date}",
-        root / "hmm_turn_movements" / f"day={args.date}",
-        root / "stage0_order_link_poi_behavior" / f"day={args.date}",
-        root / "matcher_comparison" / f"day={args.date}" / "order_comparison.parquet",
+        root / args.link_traversal_collection / f"day={args.date}",
+        root / args.turn_movement_collection / f"day={args.date}",
+        root / args.poi_behavior_collection / f"day={args.date}",
+        root / args.comparison_collection / f"day={args.date}" / "order_comparison.parquet",
         root / "case_traces" / f"day={args.date}" / "case_index.csv",
         root / "reports" / "threshold_sensitivity" / f"day={args.date}.json",
     ]

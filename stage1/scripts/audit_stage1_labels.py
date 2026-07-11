@@ -17,11 +17,27 @@ import pandas as pd
 DIMENSIONS = ["lcs", "iis", "gns", "rts", "pmis"]
 INDICATORS = {
     "lcs": ["low_speed_ratio", "stop_duration_ratio", "speed_cv"],
-    "iis": ["intersection_low_speed_time", "intersection_stop_time", "turn_angle", "node_degree"],
-    "gns": ["curvature_deg_per_km_link", "minor_road", "link_fragmentation", "endpoint_degree"],
+    "iis": ["intersection_low_speed_time", "intersection_stop_time", "turn_angle"],
+    "gns": ["curvature_deg_per_km_link", "link_fragmentation", "endpoint_degree"],
     "rts": ["excess_time_ratio", "tail_delay_ratio", "travel_time_sec"],
-    "pmis": ["activity_intensity_index", "delay_on_poi_link", "low_speed_ratio", "stop_time_sec"],
+    "pmis": ["delay_on_poi_link", "low_speed_ratio_on_poi_link", "stop_time_on_poi_link"],
 }
+
+CONTEXT_FEATURES = {
+    "iis": ["node_degree"],
+    "gns": ["minor_road"],
+    "pmis": ["activity_intensity_index"],
+}
+
+
+def add_derived_audit_fields(frame: pd.DataFrame) -> pd.DataFrame:
+    if "activity_intensity_index" in frame.columns:
+        poi_exposed = frame["activity_intensity_index"].fillna(0).gt(0)
+        if "low_speed_ratio_on_poi_link" not in frame.columns and "low_speed_ratio" in frame.columns:
+            frame["low_speed_ratio_on_poi_link"] = frame["low_speed_ratio"].where(poi_exposed, 0.0)
+        if "stop_time_on_poi_link" not in frame.columns and "stop_time_sec" in frame.columns:
+            frame["stop_time_on_poi_link"] = frame["stop_time_sec"].where(poi_exposed, 0.0)
+    return frame
 
 
 def parse_args() -> argparse.Namespace:
@@ -41,7 +57,7 @@ def monotonicity(primitives_dir: Path, labels_dir: Path) -> pd.DataFrame:
     for primitive_path in sorted(primitives_dir.glob("*.parquet")):
         part = primitive_path.stem.split("=")[-1].split("_")[-1]
         label_path = labels_dir / f"part={part}.parquet"
-        primitive = pd.read_parquet(primitive_path)
+        primitive = add_derived_audit_fields(pd.read_parquet(primitive_path))
         label = pd.read_parquet(label_path, columns=["order_id", "link_seq"] + [f"{d}_pct_link" for d in DIMENSIONS])
         frame = primitive.merge(label, on=["order_id", "link_seq"], how="inner", validate="one_to_one")
         for dimension in DIMENSIONS:
@@ -59,6 +75,39 @@ def monotonicity(primitives_dir: Path, labels_dir: Path) -> pd.DataFrame:
     result["spearman_decile_mean"] = result.groupby(["dimension", "indicator"])["mean"].transform(
         lambda x: pd.Series(x.to_numpy()).corr(pd.Series(range(1, len(x) + 1)), method="spearman")
     )
+    return result
+
+
+def context_descriptors(primitives_dir: Path, labels_dir: Path) -> pd.DataFrame:
+    """Summarize contextual variables by label decile without treating them as monotonic anchors."""
+    totals: list[pd.DataFrame] = []
+    for primitive_path in sorted(primitives_dir.glob("*.parquet")):
+        part = primitive_path.stem.split("=")[-1].split("_")[-1]
+        label_path = labels_dir / f"part={part}.parquet"
+        primitive = add_derived_audit_fields(pd.read_parquet(primitive_path))
+        label = pd.read_parquet(label_path, columns=["order_id", "link_seq"] + [f"{d}_pct_link" for d in DIMENSIONS])
+        frame = primitive.merge(label, on=["order_id", "link_seq"], how="inner", validate="one_to_one")
+        for dimension, features in CONTEXT_FEATURES.items():
+            valid_label = frame[f"{dimension}_pct_link"].notna()
+            if not valid_label.any():
+                continue
+            decile = np.minimum((frame.loc[valid_label, f"{dimension}_pct_link"] * 10).astype(int), 9) + 1
+            for feature in features:
+                if feature not in frame.columns:
+                    continue
+                summary = pd.DataFrame({
+                    "decile": decile,
+                    "value": frame.loc[valid_label, feature],
+                }).groupby("decile").value.agg(["sum", "count"]).reset_index()
+                summary["dimension"] = dimension
+                summary["feature"] = feature
+                totals.append(summary)
+    if not totals:
+        return pd.DataFrame(columns=["dimension", "feature", "decile", "sum", "count", "mean"])
+    result = pd.concat(totals, ignore_index=True).groupby(
+        ["dimension", "feature", "decile"], as_index=False
+    )[["sum", "count"]].sum()
+    result["mean"] = result["sum"] / result["count"]
     return result
 
 
@@ -219,6 +268,8 @@ def main() -> None:
     report_dir = report_dir / f"day={args.date}"
     figures = report_dir / "figures"; figures.mkdir(parents=True, exist_ok=True)
     mono = monotonicity(primitives, labels); mono.to_csv(report_dir / "link_decile_monotonicity.csv", index=False)
+    context = context_descriptors(primitives, labels)
+    context.to_csv(report_dir / "link_decile_context_descriptors.csv", index=False)
     plot_monotonicity(mono, figures)
     order_path = args.output_root / "order_labels" / f"day={args.date}.parquet"
     order_mono = order_monotonicity(primitives, order_path)
@@ -242,6 +293,8 @@ def main() -> None:
 The decile audit covers LCS, IIS, GNS, RTS, and PMIS. Detailed decile means and Spearman coefficients are stored in `link_decile_monotonicity.csv`; dimension plots are in `figures/`.
 
 Median indicator-decile Spearman correlation: **{correlations.median():.3f}**.
+
+`activity_intensity_index`, `minor_road`, and `node_degree` are treated as context descriptors rather than core monotonicity anchors; their decile summaries are stored in `link_decile_context_descriptors.csv`.
 
 Order-level decile validation is stored in `order_decile_monotonicity.csv` and `order_decile_validation.png`.
 

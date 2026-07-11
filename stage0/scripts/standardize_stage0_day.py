@@ -65,7 +65,7 @@ def approximate_point_quantiles(files: list[Path], column: str, maximum: float, 
     for path in files:
         parquet = pq.ParquetFile(path)
         for row_group in range(parquet.num_row_groups):
-            values = parquet.read_row_group(row_group, columns=[column]).column(0).to_numpy(zero_copy_only=False)
+            values = parquet.read_row_group(row_group, columns=[column]).column(0).to_numpy()
             values = values[np.isfinite(values)]
             values = np.clip(values, 0, maximum - step / 10)
             counts += np.histogram(values, bins=edges)[0]; total += len(values)

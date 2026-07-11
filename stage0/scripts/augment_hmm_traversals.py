@@ -20,6 +20,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--roads", type=Path, required=True)
     parser.add_argument("--traversal-output-dir", type=Path, required=True)
     parser.add_argument("--movement-output-dir", type=Path, required=True)
+    parser.add_argument("--force", action="store_true")
     return parser.parse_args()
 
 
@@ -35,7 +36,7 @@ def main() -> None:
         traversal_path = next(iter(args.observed_traversal_dir.glob(f"*{part}.parquet")))
         target = args.traversal_output_dir / f"part={part}.parquet"
         movement_target = args.movement_output_dir / f"part={part}.parquet"
-        if target.exists() and movement_target.exists(): continue
+        if target.exists() and movement_target.exists() and not args.force: continue
         observed = pd.read_parquet(traversal_path)
         routes = pd.read_parquet(route_path)
         observed["_occurrence"] = observed.groupby(["order_id", "link_id"]).cumcount()
@@ -82,4 +83,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

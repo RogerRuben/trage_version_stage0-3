@@ -17,6 +17,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-root", type=Path, required=True)
     parser.add_argument("--date", required=True)
     parser.add_argument("--buckets", type=int, default=128)
+    parser.add_argument("--comparison-collection", default="matcher_comparison")
+    parser.add_argument("--matched-collection", default="hmm_matched_points")
+    parser.add_argument("--route-collection", default="hmm_route_parts")
+    parser.add_argument("--traversal-collection", default="hmm_link_traversals")
+    parser.add_argument("--movement-collection", default="hmm_turn_movements")
+    parser.add_argument("--poi-behavior-collection", default="stage0_order_link_poi_behavior")
+    parser.add_argument("--matched-suffix", default="hmm_points")
     return parser.parse_args()
 
 
@@ -30,7 +37,7 @@ def choose(candidates: list[tuple[str, str, str]]) -> list[tuple[str, str, str]]
 
 def main() -> None:
     args = parse_args(); root = args.output_root
-    comparison_path = root / "matcher_comparison" / f"day={args.date}" / "order_comparison.parquet"
+    comparison_path = root / args.comparison_collection / f"day={args.date}" / "order_comparison.parquet"
     comparison = pd.read_parquet(comparison_path)
     candidates: list[tuple[str, str, str]] = []
     improvement = comparison.assign(delta=comparison.geo_topology_gap_count - comparison.topology_gap_count)
@@ -43,7 +50,7 @@ def main() -> None:
         candidates.append(("hmm_fallback", row.order_id, str(row.fallback_reason)))
 
     traversal_summaries = []
-    traversal_dir = root / "hmm_link_traversals" / f"day={args.date}"
+    traversal_dir = root / args.traversal_collection / f"day={args.date}"
     for path in sorted(traversal_dir.glob("*.parquet")):
         frame = pd.read_parquet(path, columns=[
             "order_id", "low_speed_ratio", "stop_duration_ratio", "speed_cv", "travel_time_sec",
@@ -74,7 +81,7 @@ def main() -> None:
     if len(smooth): candidates.append(("normal_smooth", smooth.iloc[0].order_id, "low_lcs_high_quality"))
 
     movement_summaries = []
-    for path in sorted((root / "hmm_turn_movements" / f"day={args.date}").glob("*.parquet")):
+    for path in sorted((root / args.movement_collection / f"day={args.date}").glob("*.parquet")):
         frame = pd.read_parquet(path, columns=[
             "order_id", "turn_angle", "node_degree", "intersection_low_speed_time", "movement_quality"
         ])
@@ -91,7 +98,7 @@ def main() -> None:
         candidates.append(("high_iis_candidate", row.order_id, f"iis_proxy={row.iis_proxy:.3f}"))
 
     behavior_summaries = []
-    for path in sorted((root / "stage0_order_link_poi_behavior" / f"day={args.date}").glob("*.parquet")):
+    for path in sorted((root / args.poi_behavior_collection / f"day={args.date}").glob("*.parquet")):
         frame = pd.read_parquet(path, columns=[
             "order_id", "activity_intensity_index", "low_speed_ratio_on_poi_link",
             "stop_time_on_poi_link", "poi_interaction_candidate",
@@ -120,14 +127,14 @@ def main() -> None:
         bucket = int(order_bucket(pd.Series([order_id], dtype="string"), args.buckets)[0])
         part = f"{bucket:03d}"
         geo_path = next(iter((root / "matched_points" / f"day={args.date}").glob(f"*{part}.parquet")))
-        hmm_path = next(iter((root / "hmm_matched_points" / f"day={args.date}").glob(f"*{part}.parquet")))
-        route_path = next(iter((root / "hmm_route_parts" / f"day={args.date}").glob(f"*{part}.parquet")))
+        hmm_path = next(iter((root / args.matched_collection / f"day={args.date}").glob(f"*{part}.parquet")))
+        route_path = next(iter((root / args.route_collection / f"day={args.date}").glob(f"*{part}.parquet")))
         geo = pd.read_parquet(geo_path, filters=[[('order_id', '==', order_id)]])
         hmm = pd.read_parquet(hmm_path, filters=[[('order_id', '==', order_id)]])
         route = pd.read_parquet(route_path, filters=[[('order_id', '==', order_id)]])
         prefix = f"order_id={order_id}"
         geo.to_parquet(case_dir / f"{prefix}_geo_points.parquet", index=False, compression="zstd")
-        hmm.to_parquet(case_dir / f"{prefix}_hmm_points.parquet", index=False, compression="zstd")
+        hmm.to_parquet(case_dir / f"{prefix}_{args.matched_suffix}.parquet", index=False, compression="zstd")
         route.to_parquet(case_dir / f"{prefix}_route.parquet", index=False, compression="zstd")
         index_rows.append({"case_type": label, "order_id": order_id, "bucket": bucket, "reason": reason})
     pd.DataFrame(index_rows).to_csv(case_dir / "case_index.csv", index=False)

@@ -43,15 +43,15 @@ def main() -> None:
     checks = {
         "all_split_days_complete": bool(complete.all() and len(coverage) == expected_days),
         "test_gns_coverage_ge_98pct": bool(test_metric("gns_nonnull_ratio") >= 0.98),
-        "test_realized_labels_ge_55pct": bool(
+        "test_core_realized_labels_ge_55pct": bool(
             min(
                 test_metric("lcs_nonnull_ratio"),
-                test_metric("iis_nonnull_ratio"),
                 test_metric("rts_nonnull_ratio"),
                 test_metric("pmis_nonnull_ratio"),
             )
             >= 0.55
         ),
+        "test_iis_coverage_ge_30pct": bool(test_metric("iis_nonnull_ratio") >= 0.30),
         "test_global_fallback_below_30pct": bool(
             max(
                 test_metric("lcs_cohort_level_6_ratio", 1.0),

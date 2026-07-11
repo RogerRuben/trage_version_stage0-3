@@ -1,13 +1,14 @@
 {
-  "experiment_name": "xian_201610_temporal_7_1_1",
+  "experiment_name": "xian_201610_postholiday_temporal_7_1_1",
   "train_dates": [
-    "20161001", "20161002", "20161003", "20161004",
-    "20161005", "20161006", "20161007"
+    "20161009", "20161010", "20161011", "20161012",
+    "20161013", "20161014", "20161015"
   ],
-  "validation_date": "20161008",
-  "test_date": "20161009",
+  "validation_date": "20161016",
+  "test_date": "20161017",
   "timezone": "Asia/Shanghai",
+  "stage0_matcher": "local_topology_fmm",
   "stage1_fit_scope": "train_only",
   "stage1_target_scope": "train_validation_test",
-  "calendar_caveat": "The training window overlaps the National Day holiday period; treat this compact split as the first prediction experiment and audit the train-to-validation/test distribution shift explicitly."
+  "calendar_caveat": "The split starts after the National Day holiday window to reduce holiday-driven distribution bias. It begins on 20161009 to reuse the completed local_topology_fmm day and avoid recomputing pruned 20161008 point-level products."
 }

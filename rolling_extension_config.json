@@ -1,0 +1,17 @@
+{
+  "experiment_name": "xian_201610_rolling_extension_11_19",
+  "train_dates": [
+    "20161011", "20161012", "20161013", "20161014",
+    "20161015", "20161016", "20161017"
+  ],
+  "validation_date": "20161018",
+  "test_date": "20161019",
+  "timezone": "Asia/Shanghai",
+  "stage0_matcher": "local_topology_fmm",
+  "stage1_measurement_fit_dates": [
+    "20161009", "20161010", "20161011", "20161012",
+    "20161013", "20161014", "20161015"
+  ],
+  "stage1_measurement_policy": "reuse_frozen_20161009_20161015",
+  "rolling_fold_role": "adds fold-2/fold-3 validation-test coverage without recomputing retained days"
+}

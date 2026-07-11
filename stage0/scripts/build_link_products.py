@@ -24,8 +24,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--stop-speed-kmh", type=float, default=2.0)
     parser.add_argument("--stop-duration-sec", type=float, default=5.0)
     parser.add_argument("--limit-parts", type=int)
+    parser.add_argument("--worker-count", type=int, default=1)
+    parser.add_argument("--worker-index", type=int, default=0)
+    parser.add_argument("--min-part-index", type=int, default=0)
     parser.add_argument("--traversal-collection", default="stage0_link_traversals")
     parser.add_argument("--movement-collection", default="stage0_turn_movements")
+    parser.add_argument("--force", action="store_true")
     return parser.parse_args()
 
 
@@ -161,6 +165,12 @@ def main() -> None:
     if not files:
         raise FileNotFoundError(f"no Parquet partitions in {args.matched_dir}")
     all_files = files
+    if not 0 <= args.worker_index < args.worker_count:
+        raise ValueError("worker-index must be in [0, worker-count)")
+    files = [
+        path for index, path in enumerate(files)
+        if index >= args.min_part_index and index % args.worker_count == args.worker_index
+    ]
     if args.limit_parts is not None:
         files = files[: args.limit_parts]
     traversal_dir = args.output_root / args.traversal_collection / f"day={args.date}"
@@ -171,7 +181,7 @@ def main() -> None:
         part = source.stem.split("=")[-1].split("_")[-1]
         traversal_path = traversal_dir / f"part={part}.parquet"
         movement_path = movement_dir / f"part={part}.parquet"
-        if traversal_path.exists() and movement_path.exists():
+        if traversal_path.exists() and movement_path.exists() and not args.force:
             continue
         frame = pd.read_parquet(source)
         traversals = build_traversals(frame, roads, args)
@@ -186,7 +196,9 @@ def main() -> None:
         "complete": len(list(traversal_dir.glob('part=*.parquet'))) == len(all_files),
         "matcher_version": args.matcher_version,
     })
-    (manifest_dir / f"day={args.date}.link_products.json").write_text(
+    manifest_name = f"day={args.date}.link_products.json" if args.worker_count == 1 else f"day={args.date}.link_products.worker={args.worker_index}.json"
+    totals.update({"worker_count": args.worker_count, "worker_index": args.worker_index})
+    (manifest_dir / manifest_name).write_text(
         json.dumps(totals, ensure_ascii=False, indent=2), encoding="utf-8"
     )
     print(json.dumps(totals, ensure_ascii=False, indent=2))

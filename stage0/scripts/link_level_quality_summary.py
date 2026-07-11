@@ -22,12 +22,14 @@ COLUMNS = [
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output-root", type=Path, required=True)
+    parser.add_argument("--traversal-collection", default="hmm_link_traversals")
+    parser.add_argument("--report-name", default="link_level_quality_summary.csv")
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args(); rows = []
-    for day_dir in sorted((args.output_root / "hmm_link_traversals").glob("day=*")):
+    for day_dir in sorted((args.output_root / args.traversal_collection).glob("day=*")):
         date = day_dir.name.split("=")[1]
         order_counts = []
         total = inferred = high = usable = low = 0
@@ -62,7 +64,7 @@ def main() -> None:
         })
     report = pd.DataFrame(rows, columns=COLUMNS)
     reports = args.output_root / "reports"; reports.mkdir(parents=True, exist_ok=True)
-    report.to_csv(reports / "link_level_quality_summary.csv", index=False)
+    report.to_csv(reports / args.report_name, index=False)
     print(report.to_string(index=False))
 
 
