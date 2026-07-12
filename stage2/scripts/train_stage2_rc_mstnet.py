@@ -57,6 +57,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--lr", type=float, default=8e-4)
     parser.add_argument("--tail-loss-weight", type=float, default=0.5)
     parser.add_argument("--route-aux-weight", type=float, default=0.2)
+    parser.add_argument("--active-targets", default="lcs,pmis,rts", help="Comma-separated target heads contributing to loss/model selection.")
+    parser.add_argument("--dynamic-encoder", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--local-route-encoder", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--route-transformer", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--route-aux-head", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--seed", type=int, default=2026)
     parser.add_argument("--num-workers", type=int, default=0, help="Keep 0 on Windows/low-RAM hosts; encoded arrays make workers optional.")
     parser.add_argument("--bucket-multiplier", type=int, default=4)
@@ -66,34 +71,31 @@ def parse_args() -> argparse.Namespace:
 
 
 class RC_MSTNet(nn.Module):
-    def __init__(self, n_static: int, n_dynamic: int, category_sizes: list[int], hidden_dim: int, cat_emb_dim: int, layers: int, heads: int, dropout: float):
+    def __init__(self, n_static: int, n_dynamic: int, category_sizes: list[int], hidden_dim: int, cat_emb_dim: int, layers: int, heads: int, dropout: float, use_dynamic: bool = True, use_local_route: bool = True, use_transformer: bool = True):
         super().__init__()
+        self.use_dynamic = use_dynamic
+        self.use_local_route = use_local_route
+        self.use_transformer = use_transformer
         self.embeddings = nn.ModuleList([nn.Embedding(size, cat_emb_dim, padding_idx=0) for size in category_sizes])
         cat_dim = len(category_sizes) * cat_emb_dim
         self.static_mlp = nn.Sequential(nn.Linear(n_static + cat_dim, hidden_dim), nn.GELU(), nn.LayerNorm(hidden_dim), nn.Dropout(dropout))
-        self.dynamic_in = nn.Linear(max(n_dynamic, 1), hidden_dim)
+        self.dynamic_in = nn.Linear(max(n_dynamic, 1), hidden_dim) if use_dynamic else None
         self.temporal_conv = nn.Sequential(
-            nn.Conv1d(hidden_dim, hidden_dim, kernel_size=3, padding=1),
-            nn.GELU(),
-            nn.Conv1d(hidden_dim, hidden_dim, kernel_size=1),
-            nn.GELU(),
-        )
+            nn.Conv1d(hidden_dim, hidden_dim, kernel_size=3, padding=1), nn.GELU(),
+            nn.Conv1d(hidden_dim, hidden_dim, kernel_size=1), nn.GELU(),
+        ) if use_dynamic else None
         self.local_route = nn.Sequential(
-            nn.Conv1d(hidden_dim, hidden_dim, kernel_size=5, padding=2),
-            nn.GELU(),
-            nn.Conv1d(hidden_dim, hidden_dim, kernel_size=1),
-            nn.GELU(),
-        )
-        encoder_layer = nn.TransformerEncoderLayer(
-            d_model=hidden_dim,
-            nhead=heads,
-            dim_feedforward=hidden_dim * 3,
-            dropout=dropout,
-            activation="gelu",
-            batch_first=True,
-            norm_first=True,
-        )
-        self.route_encoder = nn.TransformerEncoder(encoder_layer, num_layers=layers)
+            nn.Conv1d(hidden_dim, hidden_dim, kernel_size=5, padding=2), nn.GELU(),
+            nn.Conv1d(hidden_dim, hidden_dim, kernel_size=1), nn.GELU(),
+        ) if use_local_route else None
+        if use_transformer:
+            encoder_layer = nn.TransformerEncoderLayer(
+                d_model=hidden_dim, nhead=heads, dim_feedforward=hidden_dim * 3,
+                dropout=dropout, activation="gelu", batch_first=True, norm_first=True,
+            )
+            self.route_encoder = nn.TransformerEncoder(encoder_layer, num_layers=layers)
+        else:
+            self.route_encoder = None
         self.raw_head = nn.Sequential(nn.Linear(hidden_dim, hidden_dim), nn.GELU(), nn.Dropout(dropout), nn.Linear(hidden_dim, len(LINK_TARGETS)))
         self.tail_head = nn.Sequential(nn.Linear(hidden_dim, hidden_dim), nn.GELU(), nn.Dropout(dropout), nn.Linear(hidden_dim, len(LINK_TARGETS)))
         self.route_tail_head = nn.Sequential(nn.Linear(hidden_dim, hidden_dim), nn.GELU(), nn.Linear(hidden_dim, len(LINK_TARGETS)))
@@ -102,22 +104,26 @@ class RC_MSTNet(nn.Module):
         embeddings = [emb(categorical[:, :, i]) for i, emb in enumerate(self.embeddings)]
         static = torch.cat([static_numeric] + embeddings, dim=-1) if embeddings else static_numeric
         h_static = self.static_mlp(static)
-        if dynamic.shape[-1] == 0:
+        if not self.use_dynamic or dynamic.shape[-1] == 0:
             h_dynamic = torch.zeros_like(h_static)
         else:
             b, l, w, d = dynamic.shape
             h = self.dynamic_in(dynamic.reshape(b * l, w, d)).transpose(1, 2)
             h = self.temporal_conv(h).mean(dim=2).reshape(b, l, -1)
             h_dynamic = h
-        h = h_static + h_dynamic
-        h = h + self.local_route(h.transpose(1, 2)).transpose(1, 2)
-        h = self.route_encoder(h, src_key_padding_mask=pad_mask)
+        h = h_static + (h_dynamic if self.use_dynamic else 0)
+        if self.use_local_route:
+            h = h + self.local_route(h.transpose(1, 2)).transpose(1, 2)
+        if self.use_transformer:
+            h = self.route_encoder(h, src_key_padding_mask=pad_mask)
         valid = (~pad_mask).float().unsqueeze(-1)
         pooled = (h * valid).sum(dim=1) / valid.sum(dim=1).clamp_min(1)
         return torch.sigmoid(self.raw_head(h)), self.tail_head(h), self.route_tail_head(pooled)
 
 
-def loss_fn(raw_pred, tail_logits, route_tail_logits, target, tail, mask, tail_weight: float, route_weight: float) -> torch.Tensor:
+def loss_fn(raw_pred, tail_logits, route_tail_logits, target, tail, mask, tail_weight: float, route_weight: float, active_mask: torch.Tensor | None = None) -> torch.Tensor:
+    if active_mask is not None:
+        mask = mask * active_mask.view(1, 1, -1)
     valid = mask.sum().clamp_min(1.0)
     huber = nn.functional.huber_loss(raw_pred, target, reduction="none", delta=0.08)
     raw_loss = (huber * mask).sum() / valid
@@ -241,7 +247,14 @@ def run_fold(args: argparse.Namespace, fold: dict, device: torch.device) -> dict
         layers=args.layers,
         heads=args.heads,
         dropout=args.dropout,
+        use_dynamic=args.dynamic_encoder,
+        use_local_route=args.local_route_encoder,
+        use_transformer=args.route_transformer,
     ).to(device)
+    active_targets = [value.strip().lower() for value in args.active_targets.split(",") if value.strip()]
+    if not active_targets or not set(active_targets) <= set(LINK_TARGETS):
+        raise ValueError(f"Unsupported active targets: {active_targets}")
+    active_mask = torch.tensor([target in active_targets for target in LINK_TARGETS], dtype=torch.float32, device=device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=1e-4)
     amp_enabled = bool(args.amp and device.type == "cuda")
     scaler = torch.amp.GradScaler("cuda", enabled=amp_enabled)
@@ -273,7 +286,7 @@ def run_fold(args: argparse.Namespace, fold: dict, device: torch.device) -> dict
                         batch["target"].to(device, non_blocking=True),
                         batch["tail"].to(device, non_blocking=True),
                         batch["mask"].to(device, non_blocking=True),
-                        args.tail_loss_weight, args.route_aux_weight,
+                        args.tail_loss_weight, args.route_aux_weight if args.route_aux_head else 0.0, active_mask,
                     )
                 scaler.scale(loss).backward()
                 scaler.unscale_(optimizer)
@@ -285,7 +298,7 @@ def run_fold(args: argparse.Namespace, fold: dict, device: torch.device) -> dict
         train_loss = float(np.mean(losses))
         print(f"fold={fold_id} epoch={epoch} train_loss={train_loss:.5f} train_seconds={timer.seconds:.1f}", flush=True)
         _, val_metrics = predict(model, loaders["validation"], device, materialize=False, amp_enabled=amp_enabled)
-        score = float(np.nanmean([val_metrics[target]["ap"] for target in LINK_TARGETS]))
+        score = float(np.nanmean([val_metrics[target]["ap"] for target in active_targets]))
         history.append({"epoch": epoch, "train_loss": train_loss, "validation_mean_ap": score, "epoch_seconds": timer.seconds})
         print(f"fold={fold_id} epoch={epoch} validation_mean_ap={score:.4f}", flush=True)
         if score > best_score:
@@ -293,8 +306,10 @@ def run_fold(args: argparse.Namespace, fold: dict, device: torch.device) -> dict
             best_state = {key: value.detach().cpu().clone() for key, value in model.state_dict().items()}
     if best_state is not None:
         model.load_state_dict(best_state)
-    val_predictions, val_metrics = predict(model, loaders["validation"], device, materialize=True, amp_enabled=amp_enabled)
-    test_predictions, test_metrics = predict(model, loaders["test"], device, materialize=True, amp_enabled=amp_enabled)
+    with Timer() as val_prediction_timer:
+        val_predictions, val_metrics = predict(model, loaders["validation"], device, materialize=True, amp_enabled=amp_enabled)
+    with Timer() as test_prediction_timer:
+        test_predictions, test_metrics = predict(model, loaders["test"], device, materialize=True, amp_enabled=amp_enabled)
     args.prediction_root.mkdir(parents=True, exist_ok=True)
     fold_pred_root = args.prediction_root / f"fold={fold_id}"
     fold_pred_root.mkdir(parents=True, exist_ok=True)
@@ -311,6 +326,14 @@ def run_fold(args: argparse.Namespace, fold: dict, device: torch.device) -> dict
         "device": str(device),
         "data_source": "tensor_shards" if args.tensor_shard_root is not None else "daily_parquet_in_memory",
         "amp_enabled": amp_enabled,
+        "active_targets": active_targets,
+        "architecture": {
+            "dynamic_encoder": args.dynamic_encoder,
+            "local_route_encoder": args.local_route_encoder,
+            "route_transformer": args.route_transformer,
+            "route_aux_head": args.route_aux_head,
+        },
+        "parameter_count": int(sum(parameter.numel() for parameter in model.parameters())),
         "data_preparation_seconds": prep_timer.seconds,
         "requested_max_train_orders": args.max_train_orders,
         "requested_max_eval_orders": args.max_eval_orders,
@@ -328,6 +351,8 @@ def run_fold(args: argparse.Namespace, fold: dict, device: torch.device) -> dict
         "validation_metrics": val_metrics,
         "test_metrics": test_metrics,
         "training_seconds": training_seconds,
+        "validation_prediction_seconds": val_prediction_timer.seconds,
+        "test_prediction_seconds": test_prediction_timer.seconds,
         "training_orders_per_second": float(len(datasets["train"]) * args.epochs / max(training_seconds, 1e-9)),
         "training_links_per_second": float(training_tokens / max(training_seconds, 1e-9)),
         "padding_efficiency": float(training_tokens / max(padded_tokens, 1)),

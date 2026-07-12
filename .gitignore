@@ -14,6 +14,7 @@
 /stage0/output/
 /stage1/output/
 /stage2/output/
+/stage3/output/
 /tmp/
 
 # Local agent/application state

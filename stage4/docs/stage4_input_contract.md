@@ -1,0 +1,33 @@
+# Stage4 Input Contract
+
+Stage4 remains on hold until Stage3 has at least three strict rolling test folds,
+fixed missing-modality behavior, validation-only calibration, and leakage-audited
+prediction warehouses.
+
+Each Stage4 candidate order row must contain only deployable predictions:
+
+- `order_id`
+- `decision_time`
+- `route_id` or `matched_route_proxy_id`
+- `lcs_expected`, `lcs_tail_probability`, `lcs_uncertainty`
+- `pmis_expected`, `pmis_tail_probability`, `pmis_uncertainty`
+- `rts_expected`, `rts_tail_probability`, `rts_uncertainty`
+- `iis_applicability`, `iis_conditional_severity`, `iis_tail_probability`
+- `iis_availability`, `iis_uncertainty`
+- `overall_high_stress_probability`
+- `overall_uncertainty`
+- `modality_coverage_score`
+- `route_prediction_confidence`
+
+Forbidden fields:
+
+- actual realized stress
+- actual link entry time
+- post-trip behavior features
+- future traffic state
+- Stage1 labels as model inputs
+- Stage2 in-sample predictions
+
+Stage4 readiness status is `READY_FOR_COUNTERFACTUAL_SIMULATION` only after the
+Stage3 rolling and uncertainty gates pass. It is not a real deployment-readiness
+claim.

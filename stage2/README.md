@@ -188,6 +188,12 @@ The formal test AUC/AP pairs are `0.8667/0.4376` for LCS,
 `stage2/docs/stage2_deep_v3_formal_100k_report.md` for the full rolling,
 bootstrap, order-level, and resource audit.
 
+The Stage2 finalization and strict Stage3 prototype are summarized in:
+
+```text
+stage2/docs/stage2_deep_v3_stage3_prototype_report.md
+```
+
 For a resource-safe local run:
 
 ```powershell

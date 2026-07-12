@@ -14,6 +14,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import pyarrow.parquet as pq
 import torch
 from sklearn.metrics import average_precision_score, roc_auc_score
 from torch import nn
@@ -42,6 +43,10 @@ NUMERIC_BASE = [
     "rolling_iis_raw_std",
     "rolling_iis_history_count",
 ]
+ID_COLUMNS = ["order_id", "date", "planned_link_id", "planned_link_seq", "from_link_id", "node_id", "to_link_id", "movement_key"]
+TARGET_COLUMNS = [
+    "iis_applicable", "iis_observed", "target_iis_valid", "target_iis_raw", "target_iis_tail90_raw",
+]
 
 
 def parse_args() -> argparse.Namespace:
@@ -63,8 +68,33 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def existing_columns(path: Path) -> list[str]:
+    return pq.ParquetFile(path).schema_arrow.names
+
+
+def movement_read_columns(path: Path) -> list[str]:
+    available = set(existing_columns(path))
+    columns = [column for column in ID_COLUMNS + TARGET_COLUMNS + CATEGORICAL + NUMERIC_BASE if column in available]
+    columns += [column for column in available if column.startswith("poi_density_100m_")]
+    columns += [
+        column for column in available
+        if any(column.startswith(prefix) for prefix in ["link_recent_", "area_recent_", "network_recent_", "upstream_recent_", "downstream_recent_"])
+        and "timestamp" not in column
+    ]
+    return list(dict.fromkeys(columns))
+
+
 def read_dates(root: Path, dates: list[str], max_rows: int | None, seed: int) -> pd.DataFrame:
-    parts = [pd.read_parquet(root / f"day={date}.parquet") for date in dates]
+    parts = []
+    per_day_budget = None
+    if max_rows:
+        per_day_budget = max(1, int(np.ceil(max_rows / max(1, len(dates)))))
+    for index, date in enumerate(dates):
+        path = root / f"day={date}.parquet"
+        frame = pd.read_parquet(path, columns=movement_read_columns(path))
+        if per_day_budget and len(frame) > per_day_budget:
+            frame = frame.sample(n=per_day_budget, random_state=seed + index)
+        parts.append(frame)
     frame = pd.concat(parts, ignore_index=True)
     if max_rows and len(frame) > max_rows:
         frame = frame.sample(n=max_rows, random_state=seed)
@@ -118,6 +148,7 @@ class MovementDataset(Dataset):
         observed = bool(row.get("iis_observed", False)) and bool(row.get("target_iis_valid", False))
         severity = float(row.get("target_iis_raw", 0.0)) if observed and pd.notna(row.get("target_iis_raw")) else 0.0
         tail = float(row.get("target_iis_tail90_raw", 0.0)) if observed and pd.notna(row.get("target_iis_tail90_raw")) else 0.0
+        ids = {key: row.get(key) for key in ID_COLUMNS if key in self.frame.columns}
         return {
             "numeric": torch.tensor(nums, dtype=torch.float32),
             "categorical": torch.tensor(cats, dtype=torch.long),
@@ -125,7 +156,7 @@ class MovementDataset(Dataset):
             "severity": torch.tensor(severity, dtype=torch.float32),
             "tail": torch.tensor(tail, dtype=torch.float32),
             "severity_mask": torch.tensor(float(observed), dtype=torch.float32),
-            "id": {key: row.get(key) for key in ["order_id", "date", "planned_link_id", "planned_link_seq", "from_link_id", "node_id", "to_link_id"]},
+            "id": ids,
         }
 
 
@@ -209,6 +240,8 @@ def run_fold(args: argparse.Namespace, fold: dict, device: torch.device) -> dict
                     row["pred_iis_tail_prob"] = float(tail_pred[i])
                     row["iis_applicable"] = bool(batch["applicable"][i])
                     row["iis_observed"] = bool(batch["severity_mask"][i])
+                    row["iis_prediction_available"] = True
+                    row["iis_severity_prediction_available"] = True
                     row["target_iis_raw"] = float(batch["severity"][i]) if row["iis_observed"] else np.nan
                     row["target_iis_tail"] = bool(batch["tail"][i]) if row["iis_observed"] else False
                     rows.append(row)

@@ -1,0 +1,33 @@
+{
+  "description": "Stage3 rolling protocol over Stage2 held-out prediction dates. All Stage2 inputs must be held-out predictions, never in-sample outputs.",
+  "folds": [
+    {
+      "fold": 1,
+      "train_dates": ["20161017", "20161018", "20161019"],
+      "validation_date": "20161020",
+      "test_date": "20161021"
+    },
+    {
+      "fold": 2,
+      "train_dates": ["20161018", "20161019", "20161020"],
+      "validation_date": "20161021",
+      "test_date": "20161022"
+    },
+    {
+      "fold": 3,
+      "train_dates": ["20161019", "20161020", "20161021"],
+      "validation_date": "20161022",
+      "test_date": "20161023"
+    }
+  ],
+  "requirements": {
+    "stage2_inputs": "held-out predictions only",
+    "split_rule": "train dates < validation date < test date",
+    "forbidden_inputs": [
+      "Stage2 in-sample predictions",
+      "Stage1 realized labels as Stage3 features",
+      "post-trip realized trajectory features",
+      "future traffic state"
+    ]
+  }
+}
