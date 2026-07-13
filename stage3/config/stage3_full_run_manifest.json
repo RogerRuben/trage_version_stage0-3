@@ -1,0 +1,50 @@
+{
+  "baseline_commit": "ce2d61c",
+  "started_from_branch": "codex/organize-stage0",
+  "stage3_rolling_config": "stage3/config/stage3_rolling_fold_config.json",
+  "stage4_input_contract": "stage4/docs/stage4_input_contract.md",
+  "extension_split_config": "split_config_stage3_extension_20161015_23.json",
+  "data_dates_required": [
+    "20161020",
+    "20161021",
+    "20161022",
+    "20161023"
+  ],
+  "fixed_measurement_fit_dates": [
+    "20161009",
+    "20161010",
+    "20161011",
+    "20161012",
+    "20161013",
+    "20161014",
+    "20161015"
+  ],
+  "random_seeds": {
+    "stage2_rc_mstnet": 2026,
+    "stage2_iis_fast": 2026,
+    "stage3_deepsets": 2026
+  },
+  "model_contract": {
+    "stage2_l": "RC-MSTNet",
+    "stage2_i": "movement-level IIS applicability + conditional severity",
+    "stage3_default": "Core DeepSets / lightweight route attention",
+    "stage3_optional": "Core + IIS gated branch with modality dropout"
+  },
+  "methodology_boundary": {
+    "claim": "trajectory-informed operational stress and ODD-relevant condition vector",
+    "not_claimed": [
+      "AV crash risk",
+      "AV failure probability",
+      "AV disengagement probability",
+      "real AV safety risk"
+    ]
+  },
+  "outputs": {
+    "storage_audit": "stage2/output/storage_audit",
+    "stage3_rolling_results": "stage3/results/rolling",
+    "stage3_output_schema": "stage3/config/stage3_output_schema.json",
+    "stage4_mapping": "stage4/output/capability_mapping",
+    "stage4_dry_run": "stage4/output/odd_gated_dry_run",
+    "scaling_300k": "stage2/output/deep_v3_scaling_300k"
+  }
+}

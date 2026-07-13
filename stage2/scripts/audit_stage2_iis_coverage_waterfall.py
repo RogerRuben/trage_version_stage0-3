@@ -14,6 +14,10 @@ CANONICAL_FOLDS = {
     "20161017": {"fold": 1, "split": "train"},
     "20161018": {"fold": 2, "split": "validation"},
     "20161019": {"fold": 3, "split": "test"},
+    "20161020": {"fold": 4, "split": "heldout"},
+    "20161021": {"fold": 5, "split": "heldout"},
+    "20161022": {"fold": 6, "split": "heldout"},
+    "20161023": {"fold": 7, "split": "heldout"},
 }
 
 
@@ -80,10 +84,17 @@ def canonical_prediction_path(root: Path, date: str) -> Path | None:
 
 
 def warehouse_path(root: Path, date: str) -> Path | None:
+    daily = root / "movement_predictions" / f"day={date}.parquet"
+    if daily.exists():
+        return daily
     spec = CANONICAL_FOLDS.get(date)
     if not spec:
         return None
-    return root / "movement_predictions" / f"split={spec['split']}" / f"day={date}.parquet"
+    legacy = root / "movement_predictions" / f"split={spec['split']}" / f"day={date}.parquet"
+    if legacy.exists():
+        return legacy
+    matches = list((root / "movement_predictions").glob(f"fold=*/split=*/day={date}.parquet")) if (root / "movement_predictions").exists() else []
+    return matches[0] if matches else legacy
 
 
 def key_frame(frame: pd.DataFrame, seq_col: str, from_col: str, node_col: str, to_col: str) -> pd.DataFrame:

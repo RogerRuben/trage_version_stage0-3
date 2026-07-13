@@ -1,0 +1,35 @@
+{
+  "experiment_name": "xian_20161015_23_stage3_extension",
+  "train_dates": [
+    "20161015",
+    "20161016",
+    "20161017",
+    "20161018",
+    "20161019",
+    "20161020",
+    "20161021"
+  ],
+  "validation_date": "20161022",
+  "test_date": "20161023",
+  "timezone": "Asia/Shanghai",
+  "stage0_matcher": "local_topology_fmm",
+  "stage1_measurement_fit_dates": [
+    "20161009",
+    "20161010",
+    "20161011",
+    "20161012",
+    "20161013",
+    "20161014",
+    "20161015"
+  ],
+  "stage1_measurement_policy": "reuse_frozen_20161009_20161015",
+  "stage3_extension_target_dates": [
+    "20161020",
+    "20161021",
+    "20161022",
+    "20161023"
+  ],
+  "route_source": "matched_actual_route_as_assigned_service_route_proxy",
+  "prediction_timestamp": "estimated_link_entry_time",
+  "feature_availability_rule": "availability_timestamp < prediction_timestamp"
+}

@@ -49,6 +49,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--use-iis", action="store_true")
     parser.add_argument("--modality-dropout", type=float, default=0.0)
     parser.add_argument("--seed", type=int, default=2026)
+    parser.add_argument("--fold", type=int, default=None, help="Optional Stage3 rolling fold id.")
     return parser.parse_args()
 
 
@@ -107,8 +108,19 @@ class RouteAttention(nn.Module):
         return torch.sigmoid(self.raw(z)), self.tail(z), self.overall(z).squeeze(1)
 
 
-def load_split(warehouse: Path, targets: Path, split: str, order_feature_root: Path | None):
-    link = pd.read_parquet(next((warehouse / "link_predictions" / f"split={split}").glob("*.parquet")))
+def read_many(base: Path) -> pd.DataFrame:
+    paths = sorted(base.glob("*.parquet"))
+    if not paths:
+        raise FileNotFoundError(f"No parquet files under {base}")
+    return pd.concat([pd.read_parquet(path) for path in paths], ignore_index=True)
+
+
+def load_split(warehouse: Path, targets: Path, split: str, order_feature_root: Path | None, fold: int | None = None):
+    if fold is None:
+        link_base = warehouse / "link_predictions" / f"split={split}"
+    else:
+        link_base = warehouse / "link_predictions" / f"fold={fold}" / f"split={split}"
+    link = read_many(link_base)
     target = pd.read_parquet(targets / f"split={split}" / "order_targets.parquet")
     features = pd.read_parquet(order_feature_root / f"split={split}" / "order_features.parquet") if order_feature_root else None
     return link, target, features
@@ -132,7 +144,7 @@ def evaluate(model, loader, device):
 def main():
     args=parse_args(); args.output_root.mkdir(parents=True, exist_ok=True); np.random.seed(args.seed); torch.manual_seed(args.seed)
     order_feature_root = args.order_feature_root if args.use_iis else None
-    data={split:load_split(args.warehouse_root,args.target_root,split,order_feature_root) for split in ["train","validation","test"]}
+    data={split:load_split(args.warehouse_root,args.target_root,split,order_feature_root,args.fold) for split in ["train","validation","test"]}
     numeric=data["train"][0][LINK_FEATURES].apply(pd.to_numeric,errors="coerce"); mean=numeric.mean().fillna(0); std=numeric.std().replace(0,1).fillna(1)
     if args.use_iis:
         order_numeric=data["train"][2][IIS_ORDER_FEATURES].apply(pd.to_numeric,errors="coerce"); order_mean=order_numeric.mean().fillna(0); order_std=order_numeric.std().replace(0,1).fillna(1)

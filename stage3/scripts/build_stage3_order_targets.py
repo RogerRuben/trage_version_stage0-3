@@ -20,6 +20,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--movement-dataset-root", type=Path, required=True)
     parser.add_argument("--warehouse-root", type=Path, required=True)
     parser.add_argument("--output-root", type=Path, default=Path("stage3/output/order_targets"))
+    parser.add_argument("--fold", type=int, default=None, help="Optional Stage3 rolling fold id.")
     return parser.parse_args()
 
 
@@ -46,65 +47,95 @@ def max_run(frame: pd.DataFrame, flag_column: str) -> tuple[int, float]:
 
 
 def aggregate_links(frame: pd.DataFrame) -> pd.DataFrame:
-    rows = []
-    for order_id, group in frame.sort_values(["order_id", "route_link_seq"]).groupby("order_id", sort=False):
-        row = {"order_id": order_id}
-        for target in TARGETS:
-            valid = group[f"target_{target}_valid"].fillna(False)
-            data = group.loc[valid]
-            values = pd.to_numeric(data[f"target_{target}_raw"], errors="coerce")
-            row.update({
-                f"order_{target}_mean": float(values.mean()) if len(values) else np.nan,
-                f"order_{target}_weighted_mean": weighted_mean(values, data["route_link_length_m"]) if len(values) else np.nan,
-                f"order_{target}_q90": float(values.quantile(0.90)) if len(values) else np.nan,
-                f"order_{target}_q95": float(values.quantile(0.95)) if len(values) else np.nan,
-                f"order_{target}_max": float(values.max()) if len(values) else np.nan,
-                f"order_{target}_tail_share": float(data[f"target_{target}_tail90_raw"].fillna(False).mean()) if len(data) else np.nan,
-                f"order_{target}_valid_link_share": float(valid.mean()),
-            })
-            for label, low, high in [("early", 0.0, 1 / 3), ("middle", 1 / 3, 2 / 3), ("late", 2 / 3, 1.01)]:
-                section = data[data["position_ratio"].ge(low) & data["position_ratio"].lt(high)]
-                row[f"order_{target}_{label}_mean"] = float(section[f"target_{target}_raw"].mean()) if len(section) else np.nan
-            temp = group.copy()
-            temp[f"_{target}_tail"] = temp[f"target_{target}_tail90_raw"].fillna(False) & valid
-            count, distance = max_run(temp, f"_{target}_tail")
-            row[f"order_{target}_consecutive_tail_links"] = count
-            row[f"order_{target}_consecutive_tail_m"] = distance
-        rows.append(row)
-    return pd.DataFrame(rows)
+    base = pd.DataFrame({"order_id": frame["order_id"].drop_duplicates()})
+    for target in TARGETS:
+        valid = frame[f"target_{target}_valid"].fillna(False)
+        data = frame.loc[valid, ["order_id", "route_link_length_m", "position_ratio", f"target_{target}_raw", f"target_{target}_tail90_raw"]].copy()
+        data[f"target_{target}_raw"] = pd.to_numeric(data[f"target_{target}_raw"], errors="coerce")
+        grouped = data.groupby("order_id", sort=False)
+        agg = grouped[f"target_{target}_raw"].agg(
+            **{
+                f"order_{target}_mean": "mean",
+                f"order_{target}_q90": lambda value: value.quantile(0.90),
+                f"order_{target}_q95": lambda value: value.quantile(0.95),
+                f"order_{target}_max": "max",
+            }
+        ).reset_index()
+        weighted = data.assign(_wx=data[f"target_{target}_raw"] * data["route_link_length_m"].fillna(0))
+        weighted = weighted.groupby("order_id", sort=False).agg(_wx=("_wx", "sum"), _w=("route_link_length_m", "sum")).reset_index()
+        weighted[f"order_{target}_weighted_mean"] = weighted["_wx"] / weighted["_w"].replace(0, np.nan)
+        tail = grouped[f"target_{target}_tail90_raw"].mean().rename(f"order_{target}_tail_share").reset_index()
+        valid_share = valid.groupby(frame["order_id"]).mean().rename(f"order_{target}_valid_link_share").reset_index()
+        agg = agg.merge(weighted[["order_id", f"order_{target}_weighted_mean"]], on="order_id", how="left")
+        agg = agg.merge(tail, on="order_id", how="left").merge(valid_share, on="order_id", how="left")
+        for label, low, high in [("early", 0.0, 1 / 3), ("middle", 1 / 3, 2 / 3), ("late", 2 / 3, 1.01)]:
+            section = data[data["position_ratio"].ge(low) & data["position_ratio"].lt(high)]
+            section_mean = section.groupby("order_id", sort=False)[f"target_{target}_raw"].mean().rename(f"order_{target}_{label}_mean").reset_index()
+            agg = agg.merge(section_mean, on="order_id", how="left")
+        agg[f"order_{target}_consecutive_tail_links"] = np.nan
+        agg[f"order_{target}_consecutive_tail_m"] = np.nan
+        base = base.merge(agg, on="order_id", how="left")
+    return base
 
 
 def aggregate_iis(frame: pd.DataFrame) -> pd.DataFrame:
-    rows = []
-    for order_id, group in frame.groupby("order_id", sort=False):
-        applicable = group["iis_applicable"].fillna(False)
-        observed = group["iis_observed"].fillna(False) & group["target_iis_valid"].fillna(False)
-        severity = pd.to_numeric(group.loc[observed, "target_iis_raw"], errors="coerce")
-        rows.append({
-            "order_id": order_id,
-            "order_iis_applicable_share": float(applicable.mean()),
-            "order_iis_observed_count": int(observed.sum()),
-            "order_iis_severity_mean": float(severity.mean()) if len(severity) else np.nan,
-            "order_iis_severity_q90": float(severity.quantile(0.90)) if len(severity) else np.nan,
-            "order_iis_severity_max": float(severity.max()) if len(severity) else np.nan,
-            "order_iis_tail_share": float(group.loc[observed, "target_iis_tail90_raw"].fillna(False).mean()) if observed.any() else np.nan,
-        })
-    return pd.DataFrame(rows)
+    frame = frame.copy()
+    frame["_observed"] = frame["iis_observed"].fillna(False) & frame["target_iis_valid"].fillna(False)
+    observed = frame.loc[frame["_observed"]].copy()
+    observed["target_iis_raw"] = pd.to_numeric(observed["target_iis_raw"], errors="coerce")
+    base = frame.groupby("order_id", as_index=False).agg(
+        order_iis_applicable_share=("iis_applicable", "mean"),
+        order_iis_observed_count=("_observed", "sum"),
+    )
+    if observed.empty:
+        return base
+    severity = observed.groupby("order_id", as_index=False).agg(
+        order_iis_severity_mean=("target_iis_raw", "mean"),
+        order_iis_severity_q90=("target_iis_raw", lambda value: value.quantile(0.90)),
+        order_iis_severity_max=("target_iis_raw", "max"),
+        order_iis_tail_share=("target_iis_tail90_raw", "mean"),
+    )
+    return base.merge(severity, on="order_id", how="left")
 
 
 def main() -> None:
     args = parse_args()
     args.output_root.mkdir(parents=True, exist_ok=True)
     outputs = {}
-    for split, date in SPLITS.items():
-        order_index = pd.read_parquet(args.warehouse_root / "order_index" / "orders.parquet")
-        order_index = order_index[order_index["split"].eq(split)][["order_id", "fold_id", "split", "date", "link_count", "route_length_m", "movement_count"]]
-        route = pd.read_parquet(args.route_dataset_root / f"day={date}.parquet")
+    for split, default_date in SPLITS.items():
+        if args.fold is None:
+            order_index = pd.read_parquet(args.warehouse_root / "order_index" / "orders.parquet")
+            order_index = order_index[order_index["split"].eq(split)][["order_id", "fold_id", "split", "date", "link_count", "route_length_m", "movement_count"]]
+            dates = [default_date]
+        else:
+            link_paths = sorted((args.warehouse_root / "link_predictions" / f"fold={args.fold}" / f"split={split}").glob("day=*.parquet"))
+            link_parts = [pd.read_parquet(path, columns=["order_id", "fold_id_stage3", "stage3_split", "date", "route_link_seq", "route_link_length_m"]) for path in link_paths]
+            if not link_parts:
+                raise FileNotFoundError(f"No rolling link predictions for fold={args.fold} split={split}")
+            link_index = pd.concat(link_parts, ignore_index=True)
+            order_index = link_index.groupby(["order_id", "fold_id_stage3", "stage3_split", "date"], as_index=False).agg(
+                link_count=("route_link_seq", "size"),
+                route_length_m=("route_link_length_m", "sum"),
+            ).rename(columns={"fold_id_stage3": "fold_id", "stage3_split": "split"})
+            movement_paths = sorted((args.warehouse_root / "movement_predictions" / f"fold={args.fold}" / f"split={split}").glob("day=*.parquet"))
+            if movement_paths:
+                movement_index = pd.concat([pd.read_parquet(path, columns=["order_id", "movement_seq"]) for path in movement_paths], ignore_index=True)
+                movement_count = movement_index.groupby("order_id", as_index=False).size().rename(columns={"size": "movement_count"})
+                order_index = order_index.merge(movement_count, on="order_id", how="left")
+            else:
+                order_index["movement_count"] = 0
+            order_index["movement_count"] = order_index["movement_count"].fillna(0)
+            dates = sorted(order_index["date"].astype(str).unique())
+        route = pd.concat([pd.read_parquet(args.route_dataset_root / f"day={date}.parquet") for date in dates], ignore_index=True)
         route = route[route["order_id"].isin(order_index["order_id"])]
         target = order_index.merge(aggregate_links(route), on="order_id", how="left", validate="one_to_one")
-        movement_path = args.movement_dataset_root / f"day={date}.parquet"
-        if movement_path.exists():
-            movement = pd.read_parquet(movement_path)
+        movement_parts = []
+        for date in dates:
+            movement_path = args.movement_dataset_root / f"day={date}.parquet"
+            if movement_path.exists():
+                movement_parts.append(pd.read_parquet(movement_path))
+        if movement_parts:
+            movement = pd.concat(movement_parts, ignore_index=True)
             movement = movement[movement["order_id"].isin(order_index["order_id"])]
             target = target.merge(aggregate_iis(movement), on="order_id", how="left", validate="one_to_one")
         outputs[split] = target

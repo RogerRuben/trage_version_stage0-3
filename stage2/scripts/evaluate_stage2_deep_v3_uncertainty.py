@@ -20,6 +20,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--calibration-root", type=Path, default=None)
     parser.add_argument("--output-root", type=Path, default=Path("stage2/output/deep_v3/uncertainty"))
     parser.add_argument("--coverage", type=float, default=0.90)
+    parser.add_argument("--folds", default=None, help="Optional comma-separated fold ids.")
     return parser.parse_args()
 
 
@@ -59,13 +60,28 @@ def slice_row(frame: pd.DataFrame, mask: np.ndarray, target: str, fold: int, sli
 def main() -> None:
     args = parse_args()
     roots = {int(seed): Path(path) for seed, path in (spec.split("=", 1) for spec in args.prediction_run)}
-    if len(roots) < 3:
-        raise ValueError("At least three seed prediction roots are required")
+    if not roots:
+        raise ValueError("At least one prediction root is required")
     args.output_root.mkdir(parents=True, exist_ok=True)
     metrics = []
     slices = []
-    manifest = {"coverage": args.coverage, "seeds": sorted(roots), "fit_split": "validation", "test_labels_used_for_fit": False, "folds": {}}
-    for fold in [1, 2, 3]:
+    requested_folds = None
+    if args.folds:
+        requested_folds = [int(value.strip()) for value in args.folds.split(",") if value.strip()]
+    else:
+        first_root = roots[sorted(roots)[0]]
+        requested_folds = sorted(int(path.name.split("=", 1)[-1]) for path in first_root.glob("fold=*"))
+    if not requested_folds:
+        raise FileNotFoundError("No prediction folds found")
+    manifest = {
+        "coverage": args.coverage,
+        "seeds": sorted(roots),
+        "fit_split": "validation",
+        "test_labels_used_for_fit": False,
+        "single_run_mode": len(roots) == 1,
+        "folds": {},
+    }
+    for fold in requested_folds:
         val_frame, val_arrays = read_ensemble(roots, fold, "validation")
         test_frame, test_arrays = read_ensemble(roots, fold, "test")
         output = test_frame[KEYS].copy()
@@ -76,8 +92,9 @@ def main() -> None:
             test_valid = test_frame[f"{target}_valid"].fillna(False).to_numpy(bool)
             val_mean = val_arrays[f"{target}_raw"].mean(axis=0)
             test_mean = test_arrays[f"{target}_raw"].mean(axis=0)
-            val_std = val_arrays[f"{target}_raw"].std(axis=0, ddof=1)
-            test_std = test_arrays[f"{target}_raw"].std(axis=0, ddof=1)
+            ddof = 1 if len(roots) > 1 else 0
+            val_std = val_arrays[f"{target}_raw"].std(axis=0, ddof=ddof)
+            test_std = test_arrays[f"{target}_raw"].std(axis=0, ddof=ddof)
             floor = max(float(np.nanmedian(val_std[val_valid])), 0.005)
             val_scale = val_std + floor
             test_scale = test_std + floor
@@ -92,7 +109,7 @@ def main() -> None:
             output[f"{target}_lower"] = lower.astype("float32")
             output[f"{target}_upper"] = upper.astype("float32")
             output[f"{target}_interval_width"] = (upper - lower).astype("float32")
-            output[f"{target}_ensemble_variance"] = np.var(test_arrays[f"{target}_raw"], axis=0, ddof=1).astype("float32")
+            output[f"{target}_ensemble_variance"] = np.var(test_arrays[f"{target}_raw"], axis=0, ddof=ddof).astype("float32")
             output[f"{target}_uncertainty"] = test_scale.astype("float32")
             output[f"{target}_valid"] = test_valid
             output[f"target_{target}_raw"] = truth.astype("float32")

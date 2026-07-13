@@ -31,3 +31,20 @@ Forbidden fields:
 Stage4 readiness status is `READY_FOR_COUNTERFACTUAL_SIMULATION` only after the
 Stage3 rolling and uncertainty gates pass. It is not a real deployment-readiness
 claim.
+
+## Capability mapping layer
+
+Stage4 consumes a multi-dimensional, technology-neutral condition vector. It
+must not reinterpret Stage3 outputs as AV crash risk, disengagement probability,
+or real ADS safety failure probability.
+
+Vehicle-specific behavior enters through explicit scenario profiles:
+
+- `conservative_av`
+- `moderate_av`
+- `mature_av`
+- `reference_hv`
+
+These profiles define stress sensitivities, ODD thresholds, uncertainty
+tolerance, and placeholder remote-assistance/fallback costs. They are scenario
+parameters until real AV operational data are available for calibration.

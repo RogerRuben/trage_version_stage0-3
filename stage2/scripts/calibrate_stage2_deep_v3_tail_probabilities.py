@@ -28,6 +28,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--prediction-root", type=Path, required=True)
     parser.add_argument("--output-root", type=Path, default=Path("stage2/output/deep_v3/calibration"))
     parser.add_argument("--bins", type=int, default=10)
+    parser.add_argument("--folds", default=None, help="Optional comma-separated fold ids.")
     return parser.parse_args()
 
 
@@ -63,8 +64,18 @@ def main() -> None:
     metrics = []
     curves = []
     manifest = {"fit_split": "validation", "test_labels_used_for_fit": False, "folds": {}}
+    requested_folds = None
+    if args.folds:
+        requested_folds = {int(value.strip()) for value in args.folds.split(",") if value.strip()}
+    fold_roots = []
     for fold_root in sorted(args.prediction_root.glob("fold=*")):
         fold = int(fold_root.name.split("=", 1)[-1])
+        if requested_folds is not None and fold not in requested_folds:
+            continue
+        fold_roots.append((fold, fold_root))
+    if not fold_roots:
+        raise FileNotFoundError(f"No prediction folds found under {args.prediction_root}")
+    for fold, fold_root in fold_roots:
         frames = {split: pd.read_parquet(fold_root / f"{split}_predictions.parquet") for split in ["validation", "test"]}
         output_frames = {split: frame[KEYS].copy() for split, frame in frames.items()}
         fold_methods = {}

@@ -1,0 +1,42 @@
+{
+  "profile_version": "scenario_parameters_v1",
+  "profiles": {
+    "conservative_av": {
+      "vehicle_type": "AV",
+      "stress_sensitivity": {"stop_go": 1.0, "poi_mediated": 1.1, "reliability": 1.2, "intersection": 1.4},
+      "odd_hard_threshold": 0.72,
+      "odd_soft_threshold": 0.55,
+      "uncertainty_tolerance": 0.30,
+      "remote_assistance_cost_placeholder": 8.0,
+      "fallback_cost_placeholder": 20.0
+    },
+    "moderate_av": {
+      "vehicle_type": "AV",
+      "stress_sensitivity": {"stop_go": 0.9, "poi_mediated": 1.0, "reliability": 1.0, "intersection": 1.1},
+      "odd_hard_threshold": 0.82,
+      "odd_soft_threshold": 0.65,
+      "uncertainty_tolerance": 0.42,
+      "remote_assistance_cost_placeholder": 5.0,
+      "fallback_cost_placeholder": 12.0
+    },
+    "mature_av": {
+      "vehicle_type": "AV",
+      "stress_sensitivity": {"stop_go": 0.75, "poi_mediated": 0.85, "reliability": 0.85, "intersection": 0.9},
+      "odd_hard_threshold": 0.90,
+      "odd_soft_threshold": 0.75,
+      "uncertainty_tolerance": 0.55,
+      "remote_assistance_cost_placeholder": 3.0,
+      "fallback_cost_placeholder": 8.0
+    },
+    "reference_hv": {
+      "vehicle_type": "HV",
+      "stress_sensitivity": {"stop_go": 0.9, "poi_mediated": 0.8, "reliability": 1.0, "intersection": 0.7},
+      "odd_hard_threshold": 1.00,
+      "odd_soft_threshold": 0.95,
+      "uncertainty_tolerance": 1.00,
+      "remote_assistance_cost_placeholder": 0.0,
+      "fallback_cost_placeholder": 0.0
+    }
+  },
+  "methodology_note": "Profiles are scenario parameters for capability mapping, not empirical AV safety estimates."
+}

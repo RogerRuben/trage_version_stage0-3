@@ -1,0 +1,34 @@
+{
+  "schema_version": "stage3_odd_condition_vector_v1",
+  "field_roles": {
+    "order_id": "pre_dispatch_feature",
+    "date": "pre_dispatch_feature",
+    "request_time": "pre_dispatch_feature",
+    "route_id": "pre_dispatch_feature",
+    "pred_stop_go_stress": "predicted_output",
+    "pred_poi_mediated_stress": "predicted_output",
+    "pred_reliability_stress": "predicted_output",
+    "pred_intersection_stress": "predicted_output_experimental",
+    "pred_composite_operational_stress": "predicted_output",
+    "overall_high_stress_probability": "predicted_output",
+    "overall_uncertainty": "predicted_output",
+    "modality_coverage_score": "predicted_output",
+    "route_prediction_confidence": "predicted_output",
+    "model_version": "metadata",
+    "prediction_cutoff_time": "metadata"
+  },
+  "forbidden_as_input": [
+    "actual_*",
+    "target_*",
+    "post_trip_*",
+    "realized_*",
+    "future_*"
+  ],
+  "dimension_status": {
+    "stop_go": "available",
+    "poi_mediated": "available",
+    "reliability": "available",
+    "intersection": "experimental",
+    "geometry_complexity": "future_av_calibration_required"
+  }
+}
