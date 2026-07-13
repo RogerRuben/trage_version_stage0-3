@@ -1,0 +1,6 @@
+strategy,search_stage,search_radius_m,orders
+ODD-Gated Price-Aware,0.0,2000.0,49162
+ODD-Gated Price-Aware,1.0,3000.0,11654
+ODD-Gated Price-Aware,2.0,4500.0,6924
+ODD-Gated Price-Aware,3.0,6000.0,5063
+ODD-Gated Price-Aware,,,39362

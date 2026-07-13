@@ -1,5 +1,12 @@
 # Stage4 Experiment Design
 
+## Current experiment status
+
+The earlier multi-fold and multi-scenario Stage4 outputs are now treated as
+synthetic-supply mechanism regression tests.  The formal Stage4 simulation
+base has moved to the full-day 2016-10-23 agent-based setup documented in
+`stage4_single_day_agent_based_design.md`.
+
 The current Stage4 experiment studies ODD-constrained pricing-and-dispatch
 coordination for mixed AV/HV ride-hailing fleets.
 

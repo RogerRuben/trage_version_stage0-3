@@ -1,0 +1,44 @@
+{
+  "hv_agent_count": 18301,
+  "hv_session_count": 31627,
+  "av_count": 915,
+  "av_ratio_to_hv": 0.04999726790885744,
+  "av_ratio_cap_pass": true,
+  "depot_count": 8,
+  "depot_uses_test_day_future_demand": false,
+  "moderate_av_feasible_share": 0.0,
+  "moderate_av_missing_iis_share": 1.0,
+  "strategies": {
+    "GlobalMatch-MinPickup": {
+      "served_plus_cancelled_ok": true,
+      "radius_violation_count": 0,
+      "av_odd_violation": 23506,
+      "gated_odd_pass": true,
+      "status_counts": {
+        "served": 103565,
+        "cancelled_patience_timeout": 8600
+      }
+    },
+    "ODD-Gated Price-Aware": {
+      "served_plus_cancelled_ok": true,
+      "radius_violation_count": 0,
+      "av_odd_violation": 0,
+      "gated_odd_pass": true,
+      "status_counts": {
+        "served": 72803,
+        "cancelled_patience_timeout": 39362
+      }
+    },
+    "Three-Stakeholder Balanced": {
+      "served_plus_cancelled_ok": true,
+      "radius_violation_count": 0,
+      "av_odd_violation": 0,
+      "gated_odd_pass": true,
+      "status_counts": {
+        "served": 72743,
+        "cancelled_patience_timeout": 39422
+      }
+    }
+  },
+  "status": "PASS"
+}

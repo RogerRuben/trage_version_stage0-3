@@ -1,0 +1,7 @@
+{
+  "test_day": "20161023",
+  "av_ratio_to_hv": 0.05,
+  "maximum_av_ratio_to_hv": 0.05,
+  "num_depots": 8,
+  "av_profile": "moderate_av"
+}

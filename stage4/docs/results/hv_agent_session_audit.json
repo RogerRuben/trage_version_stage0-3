@@ -1,0 +1,10 @@
+{
+  "driver_id_unique_in_agents": true,
+  "session_online_start_before_end": true,
+  "session_overlap_count": 0,
+  "initial_location_missing_count": 0,
+  "agent_source_values": [
+    "observed_full_day_driver"
+  ],
+  "status": "PASS"
+}

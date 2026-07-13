@@ -1,0 +1,29 @@
+{
+  "strategies": {
+    "GlobalMatch_MinPickup": {
+      "served_rows": 103565,
+      "first_stage_rows": 99489,
+      "radius_stage_mismatch_count": 0,
+      "over_patience_served_count": 0,
+      "max_radius_m": 6000.0,
+      "status": "PASS"
+    },
+    "odd_gated_price_aware": {
+      "served_rows": 72803,
+      "first_stage_rows": 49162,
+      "radius_stage_mismatch_count": 0,
+      "over_patience_served_count": 0,
+      "max_radius_m": 6000.0,
+      "status": "PASS"
+    },
+    "three_stakeholder_balanced": {
+      "served_rows": 72743,
+      "first_stage_rows": 49158,
+      "radius_stage_mismatch_count": 0,
+      "over_patience_served_count": 0,
+      "max_radius_m": 6000.0,
+      "status": "PASS"
+    }
+  },
+  "status": "PASS"
+}

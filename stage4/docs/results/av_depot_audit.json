@@ -1,0 +1,13 @@
+{
+  "hv_agent_count": 18301,
+  "av_count": 915,
+  "av_ratio_to_hv": 0.04999726790885744,
+  "av_ratio_cap_pass": true,
+  "depot_count": 8,
+  "av_initial_position_equals_depot": true,
+  "uses_test_day_future_demand": false,
+  "depot_methods": [
+    "training_origin_kmeans_medoid_no_test_day_demand"
+  ],
+  "status": "PASS"
+}

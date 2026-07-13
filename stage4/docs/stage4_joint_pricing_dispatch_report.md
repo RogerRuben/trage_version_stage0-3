@@ -1,5 +1,14 @@
 # Stage4 Joint Pricing and Dynamic Matching Report
 
+## Status update: single-day ABM supersedes synthetic-supply tests
+
+The previous multi-fold synthetic-supply scenarios remain useful as regression
+tests for pricing/accounting and matching logic. They are no longer the main
+empirical Stage4 result. The current formal Stage4 base is the 2016-10-23
+full-day agent-based simulation with full-day model predictions, observed HV
+driver sessions, depot-based AV initialization, and dynamic search radius.
+See `stage4_single_day_simulation_report.md` for the current result table.
+
 ## Scope
 
 This stage studies ODD-constrained pricing-and-dispatch coordination for mixed

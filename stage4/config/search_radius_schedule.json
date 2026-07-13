@@ -1,0 +1,10 @@
+{
+  "version": "single_day_dynamic_radius_v1",
+  "passenger_patience_seconds": 480,
+  "stages": [
+    {"wait_min": 0, "wait_max": 2, "radius_m": 2000},
+    {"wait_min": 2, "wait_max": 4, "radius_m": 3000},
+    {"wait_min": 4, "wait_max": 6, "radius_m": 4500},
+    {"wait_min": 6, "wait_max": 8, "radius_m": 6000}
+  ]
+}

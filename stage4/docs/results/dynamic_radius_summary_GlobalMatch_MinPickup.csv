@@ -1,0 +1,6 @@
+strategy,search_stage,search_radius_m,orders
+GlobalMatch-MinPickup,0.0,2000.0,99489
+GlobalMatch-MinPickup,1.0,3000.0,2698
+GlobalMatch-MinPickup,2.0,4500.0,919
+GlobalMatch-MinPickup,3.0,6000.0,459
+GlobalMatch-MinPickup,,,8600

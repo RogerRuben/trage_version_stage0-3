@@ -1,0 +1,16 @@
+strategy,search_stage,search_radius_m,orders
+GlobalMatch-MinPickup,0.0,2000.0,99489
+GlobalMatch-MinPickup,1.0,3000.0,2698
+GlobalMatch-MinPickup,2.0,4500.0,919
+GlobalMatch-MinPickup,3.0,6000.0,459
+GlobalMatch-MinPickup,,,8600
+ODD-Gated Price-Aware,0.0,2000.0,49162
+ODD-Gated Price-Aware,1.0,3000.0,11654
+ODD-Gated Price-Aware,2.0,4500.0,6924
+ODD-Gated Price-Aware,3.0,6000.0,5063
+ODD-Gated Price-Aware,,,39362
+Three-Stakeholder Balanced,0.0,2000.0,49158
+Three-Stakeholder Balanced,1.0,3000.0,11706
+Three-Stakeholder Balanced,2.0,4500.0,6910
+Three-Stakeholder Balanced,3.0,6000.0,4969
+Three-Stakeholder Balanced,,,39422
