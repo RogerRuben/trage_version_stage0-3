@@ -6,12 +6,13 @@ Stage3 exports a technology-neutral, pre-dispatch order condition vector. It is 
 
 The vector represents trajectory-informed operational stress:
 
-- `pred_stop_go_stress`: predicted stop-and-go / longitudinal control stress.
-- `pred_poi_mediated_stress`: predicted POI-mediated interaction stress.
-- `pred_reliability_stress`: predicted tail-delay / reliability stress.
-- `pred_intersection_stress`: optional IIS movement-derived context.
-- `pred_composite_operational_stress`: transparent composite of available predicted dimensions.
-- `overall_high_stress_probability`: order-level high-stress probability from Stage3.
+- `lcs_expected`, `pmis_expected`, `rts_expected`: predicted continuous operational-stress levels.
+- `lcs_tail_probability`, `pmis_tail_probability`, `rts_tail_probability`: probabilities of exceeding train-period high-stress thresholds.
+- `lcs_uncertainty`, `pmis_uncertainty`, `rts_uncertainty`: predictive uncertainty proxies.
+- `intersection_applicability`, `intersection_severity`, `intersection_tail_probability`: optional IIS movement-derived context.
+- `composite_expected`: transparent aggregation of LCS/PMIS/RTS expected values.
+- `core_overall_high_stress_probability`: Stage3 probability for LCS OR PMIS OR RTS high stress. This is the main target.
+- `extended_overall_high_stress_probability`: core overall OR IIS tail. This is an extension target.
 - `overall_uncertainty`: predictive uncertainty proxy from Stage2/Stage3.
 - `modality_coverage_score`: availability of required/optional prediction modalities.
 - `route_prediction_confidence`: pre-dispatch route prediction confidence.
@@ -21,6 +22,8 @@ The vector represents trajectory-informed operational stress:
 - Stage3 inputs are held-out Stage2 predictions and pre-dispatch route context.
 - Realized Stage1 labels are targets/evaluation-only.
 - Actual post-trip behavior and future traffic state are forbidden as Stage3 inputs.
+- `route_id` is an observed/matched service-route proxy, not a platform-generated multi-candidate route set.
+- `decision_time` is the first estimated service-route link entry time, with OD origin timestamp as the nearest available order-start proxy when needed.
 
 ## Availability flags
 
@@ -28,4 +31,6 @@ Dimensions may be marked:
 
 - `available`: production candidate from current data.
 - `experimental`: useful but not yet stable enough as a required modality.
-- `future_av_calibration_required`: should be calibrated with real AV operational data before vehicle-specific claims.
+- `not_implemented_due_to_current_data_limit`: first-layer condition not currently supported by reliable data.
+
+`geometry_complexity` is currently `not_implemented_due_to_current_data_limit`, rather than an AV-calibration item.

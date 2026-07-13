@@ -147,7 +147,9 @@ def main() -> None:
             frame[f"order_{target}_raw"] = frame[f"order_{target}_q90"]
             frame[f"order_{target}_tail"] = frame[f"order_{target}_raw"].ge(thresholds[target]) & frame[f"order_{target}_raw"].notna()
         frame["order_iis_tail"] = frame["order_iis_severity_q90"].ge(iis_threshold) & frame["order_iis_severity_q90"].notna()
-        frame["order_overall_high_stress"] = frame[[f"order_{target}_tail" for target in TARGETS] + ["order_iis_tail"]].any(axis=1)
+        frame["core_overall_high_stress"] = frame[[f"order_{target}_tail" for target in TARGETS]].any(axis=1)
+        frame["extended_overall_high_stress"] = frame["core_overall_high_stress"] | frame["order_iis_tail"].fillna(False)
+        frame["order_overall_high_stress"] = frame["extended_overall_high_stress"]
         split_root = args.output_root / f"split={split}"
         split_root.mkdir(parents=True, exist_ok=True)
         frame.to_parquet(split_root / "order_targets.parquet", index=False, compression="zstd")

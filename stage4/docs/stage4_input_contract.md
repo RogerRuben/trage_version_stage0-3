@@ -8,13 +8,17 @@ Each Stage4 candidate order row must contain only deployable predictions:
 
 - `order_id`
 - `decision_time`
+- `origin_lon`, `origin_lat`
+- `destination_lon`, `destination_lat`
 - `route_id` or `matched_route_proxy_id`
+- `route_proxy_type = observed_matched_service_route_proxy`
 - `lcs_expected`, `lcs_tail_probability`, `lcs_uncertainty`
 - `pmis_expected`, `pmis_tail_probability`, `pmis_uncertainty`
 - `rts_expected`, `rts_tail_probability`, `rts_uncertainty`
-- `iis_applicability`, `iis_conditional_severity`, `iis_tail_probability`
+- `core_overall_high_stress_probability`
+- `extended_overall_high_stress_probability`
+- `iis_applicability`, `iis_severity`, `iis_tail_probability`
 - `iis_availability`, `iis_uncertainty`
-- `overall_high_stress_probability`
 - `overall_uncertainty`
 - `modality_coverage_score`
 - `route_prediction_confidence`
@@ -48,3 +52,7 @@ Vehicle-specific behavior enters through explicit scenario profiles:
 These profiles define stress sensitivities, ODD thresholds, uncertainty
 tolerance, and placeholder remote-assistance/fallback costs. They are scenario
 parameters until real AV operational data are available for calibration.
+
+IIS missingness must be treated as unknown intersection information, not zero
+intersection stress. Capability mapping therefore uses availability-aware
+aggregation and an explicit missing-modality uncertainty penalty.

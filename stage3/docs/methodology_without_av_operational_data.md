@@ -21,6 +21,8 @@ Future AV operational data should calibrate the second layer:
 
 This calibration layer replaces or updates vehicle capability response functions. It does not require rebuilding the first-layer order environment representation or Stage3 prediction warehouse.
 
+Current Stage4 vehicle profiles are scenario priors, not empirical AV capability estimates.
+
 ## Structural vs numerical conclusions
 
 The current framework can support structural counterfactuals: how ODD gates reshape assignment, whether AVs cream-skim lower-stress orders, how HV burden shifts, and how compensation/fairness constraints alter allocations.

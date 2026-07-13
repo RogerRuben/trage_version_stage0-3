@@ -1,42 +1,67 @@
 {
-  "profile_version": "scenario_parameters_v1",
+  "profile_version": "dimension_specific_scenario_priors_v2",
+  "parameter_status": "scenario prior, not empirical AV capability estimate",
+  "dimensions": ["lcs", "pmis", "rts", "iis"],
   "profiles": {
     "conservative_av": {
       "vehicle_type": "AV",
-      "stress_sensitivity": {"stop_go": 1.0, "poi_mediated": 1.1, "reliability": 1.2, "intersection": 1.4},
-      "odd_hard_threshold": 0.72,
-      "odd_soft_threshold": 0.55,
+      "dimension_sensitivity": {"lcs": 1.00, "pmis": 1.10, "rts": 1.20, "iis": 1.35},
+      "dimension_soft_threshold": {"lcs": 0.45, "pmis": 0.45, "rts": 0.45, "iis": 0.35},
+      "dimension_hard_threshold": {"lcs": 0.70, "pmis": 0.70, "rts": 0.68, "iis": 0.55},
       "uncertainty_tolerance": 0.30,
+      "missing_modality_penalty": 0.08,
       "remote_assistance_cost_placeholder": 8.0,
       "fallback_cost_placeholder": 20.0
     },
     "moderate_av": {
       "vehicle_type": "AV",
-      "stress_sensitivity": {"stop_go": 0.9, "poi_mediated": 1.0, "reliability": 1.0, "intersection": 1.1},
-      "odd_hard_threshold": 0.82,
-      "odd_soft_threshold": 0.65,
+      "dimension_sensitivity": {"lcs": 0.90, "pmis": 1.00, "rts": 1.00, "iis": 1.10},
+      "dimension_soft_threshold": {"lcs": 0.55, "pmis": 0.55, "rts": 0.55, "iis": 0.45},
+      "dimension_hard_threshold": {"lcs": 0.82, "pmis": 0.82, "rts": 0.80, "iis": 0.68},
       "uncertainty_tolerance": 0.42,
+      "missing_modality_penalty": 0.05,
       "remote_assistance_cost_placeholder": 5.0,
       "fallback_cost_placeholder": 12.0
     },
     "mature_av": {
       "vehicle_type": "AV",
-      "stress_sensitivity": {"stop_go": 0.75, "poi_mediated": 0.85, "reliability": 0.85, "intersection": 0.9},
-      "odd_hard_threshold": 0.90,
-      "odd_soft_threshold": 0.75,
+      "dimension_sensitivity": {"lcs": 0.75, "pmis": 0.85, "rts": 0.85, "iis": 0.90},
+      "dimension_soft_threshold": {"lcs": 0.65, "pmis": 0.65, "rts": 0.65, "iis": 0.55},
+      "dimension_hard_threshold": {"lcs": 0.92, "pmis": 0.92, "rts": 0.90, "iis": 0.82},
       "uncertainty_tolerance": 0.55,
+      "missing_modality_penalty": 0.03,
       "remote_assistance_cost_placeholder": 3.0,
       "fallback_cost_placeholder": 8.0
     },
+    "intersection_sensitive_av": {
+      "vehicle_type": "AV",
+      "dimension_sensitivity": {"lcs": 0.85, "pmis": 0.95, "rts": 0.95, "iis": 1.70},
+      "dimension_soft_threshold": {"lcs": 0.58, "pmis": 0.58, "rts": 0.55, "iis": 0.32},
+      "dimension_hard_threshold": {"lcs": 0.84, "pmis": 0.84, "rts": 0.80, "iis": 0.50},
+      "uncertainty_tolerance": 0.40,
+      "missing_modality_penalty": 0.10,
+      "remote_assistance_cost_placeholder": 7.0,
+      "fallback_cost_placeholder": 15.0
+    },
+    "uncertainty_sensitive_av": {
+      "vehicle_type": "AV",
+      "dimension_sensitivity": {"lcs": 0.90, "pmis": 0.95, "rts": 1.10, "iis": 1.10},
+      "dimension_soft_threshold": {"lcs": 0.55, "pmis": 0.55, "rts": 0.52, "iis": 0.45},
+      "dimension_hard_threshold": {"lcs": 0.82, "pmis": 0.82, "rts": 0.76, "iis": 0.65},
+      "uncertainty_tolerance": 0.22,
+      "missing_modality_penalty": 0.12,
+      "remote_assistance_cost_placeholder": 7.5,
+      "fallback_cost_placeholder": 16.0
+    },
     "reference_hv": {
       "vehicle_type": "HV",
-      "stress_sensitivity": {"stop_go": 0.9, "poi_mediated": 0.8, "reliability": 1.0, "intersection": 0.7},
-      "odd_hard_threshold": 1.00,
-      "odd_soft_threshold": 0.95,
+      "dimension_sensitivity": {"lcs": 0.90, "pmis": 0.80, "rts": 1.00, "iis": 0.70},
+      "dimension_soft_threshold": {"lcs": 0.95, "pmis": 0.95, "rts": 0.95, "iis": 0.95},
+      "dimension_hard_threshold": {"lcs": 1.00, "pmis": 1.00, "rts": 1.00, "iis": 1.00},
       "uncertainty_tolerance": 1.00,
+      "missing_modality_penalty": 0.00,
       "remote_assistance_cost_placeholder": 0.0,
       "fallback_cost_placeholder": 0.0
     }
-  },
-  "methodology_note": "Profiles are scenario parameters for capability mapping, not empirical AV safety estimates."
+  }
 }
