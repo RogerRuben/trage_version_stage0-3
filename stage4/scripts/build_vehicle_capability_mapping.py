@@ -52,6 +52,7 @@ def main() -> None:
             hard_violations = []
             soft_violations = []
             missing_dimensions = []
+            dimension_margins = {}
             for dim, column in DIMENSIONS.items():
                 if column not in frame:
                     available = pd.Series(False, index=frame.index)
@@ -65,15 +66,23 @@ def main() -> None:
                 hard_violations.append((value.gt(float(hard[dim])) & available).map(lambda flag, d=dim: d if flag else ""))
                 soft_violations.append((value.gt(float(soft[dim])) & available).map(lambda flag, d=dim: d if flag else ""))
                 missing_dimensions.append((~available).map(lambda flag, d=dim: d if flag else ""))
+                dimension_margins[dim] = (float(hard[dim]) - value).where(available, np.nan)
             stress = weighted_sum / weight_sum.replace(0, np.nan)
             missing_count = pd.concat(missing_dimensions, axis=1).ne("").sum(axis=1)
             uncertainty = pd.to_numeric(frame["overall_uncertainty"], errors="coerce").fillna(0.0)
-            adjusted_stress = stress.fillna(0.0) + missing_count * missing_penalty + uncertainty * 0.25
+            effective_uncertainty = uncertainty + missing_count * missing_penalty
+            adjusted_stress = stress.fillna(0.0) + effective_uncertainty * 0.25
             hard_text = pd.concat(hard_violations, axis=1).agg(lambda row: ",".join([value for value in row if value]), axis=1)
             soft_text = pd.concat(soft_violations, axis=1).agg(lambda row: ",".join([value for value in row if value]), axis=1)
             missing_text = pd.concat(missing_dimensions, axis=1).agg(lambda row: ",".join([value for value in row if value]), axis=1)
+            margin_frame = pd.DataFrame(dimension_margins)
+            minimum_dimension_margin = margin_frame.min(axis=1, skipna=True)
+            binding_dimension = margin_frame.idxmin(axis=1, skipna=True).fillna("none")
+            uncertainty_margin = float(profile["uncertainty_tolerance"]) - effective_uncertainty
+            odd_margin = pd.concat([minimum_dimension_margin.rename("minimum_dimension_margin"), uncertainty_margin.rename("uncertainty_margin")], axis=1).min(axis=1, skipna=True)
+            binding_dimension = binding_dimension.where(minimum_dimension_margin.le(uncertainty_margin), "uncertainty")
             hard_broken = hard_text.ne("")
-            feasible = (~hard_broken) & uncertainty.le(float(profile["uncertainty_tolerance"]))
+            feasible = (~hard_broken) & effective_uncertainty.le(float(profile["uncertainty_tolerance"]))
             soft_only = soft_text.ne("") & feasible
             capability_cost = (
                 adjusted_stress * 10
@@ -90,11 +99,15 @@ def main() -> None:
                 "service_feasible": feasible,
                 "feasible_with_extra_cost": soft_only,
                 "capability_cost": capability_cost,
-                "ODD_margin": (1.0 - adjusted_stress).astype("float32"),
+                "ODD_margin": odd_margin.astype("float32"),
+                "uncertainty_margin": uncertainty_margin.astype("float32"),
+                "minimum_dimension_margin": minimum_dimension_margin.astype("float32"),
+                "binding_dimension": binding_dimension,
                 "threshold_violation_dimensions": hard_text,
                 "soft_threshold_violation_dimensions": soft_text,
                 "missing_modality_dimensions": missing_text,
                 "missing_modality_uncertainty_penalty": (missing_count * missing_penalty).astype("float32"),
+                "effective_uncertainty": effective_uncertainty.astype("float32"),
                 "availability_adjusted_stress": adjusted_stress.astype("float32"),
                 "uncertainty_adjusted_feasibility": feasible,
             }))

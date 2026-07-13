@@ -8,6 +8,7 @@ Each Stage4 candidate order row must contain only deployable predictions:
 
 - `order_id`
 - `decision_time`
+- `decision_time_source`
 - `origin_lon`, `origin_lat`
 - `destination_lon`, `destination_lat`
 - `route_id` or `matched_route_proxy_id`
@@ -18,7 +19,7 @@ Each Stage4 candidate order row must contain only deployable predictions:
 - `core_overall_high_stress_probability`
 - `extended_overall_high_stress_probability`
 - `iis_applicability`, `iis_severity`, `iis_tail_probability`
-- `iis_availability`, `iis_uncertainty`
+- `iis_availability`
 - `overall_uncertainty`
 - `modality_coverage_score`
 - `route_prediction_confidence`
@@ -54,5 +55,7 @@ tolerance, and placeholder remote-assistance/fallback costs. They are scenario
 parameters until real AV operational data are available for calibration.
 
 IIS missingness must be treated as unknown intersection information, not zero
-intersection stress. Capability mapping therefore uses availability-aware
-aggregation and an explicit missing-modality uncertainty penalty.
+intersection stress. The current export does not provide a standalone
+`iis_uncertainty` field; IIS uncertainty is represented by `iis_applicability`,
+`iis_availability`, `iis_coverage_quality`, and the overall
+missing-modality uncertainty penalty.

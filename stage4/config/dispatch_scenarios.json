@@ -1,0 +1,48 @@
+{
+  "version": "dispatch_scenarios_v1",
+  "dispatch_interval_seconds": 120,
+  "passenger_patience_seconds": 480,
+  "pickup_speed_mps": 7.0,
+  "service_speed_mps": 8.0,
+  "max_pickup_m": 6000.0,
+  "candidate_zone_grid_size": 0.02,
+  "max_neighbor_zones": 8,
+  "max_candidates_per_order": 10,
+  "supply_scenarios": {
+    "abundant": {"total_fleet": 1000},
+    "moderate": {"total_fleet": 420},
+    "tight": {"total_fleet": 220}
+  },
+  "av_penetration_rates": [0.0, 0.25, 0.5, 0.75],
+  "odd_profiles": [
+    "conservative_av",
+    "moderate_av",
+    "mature_av",
+    "intersection_sensitive_av",
+    "uncertainty_sensitive_av"
+  ],
+  "dispatch_strategies": [
+    "Random",
+    "Nearest",
+    "GlobalMatch-MinPickup",
+    "GlobalMatch-MinOperatingCost",
+    "Cost-only",
+    "Simple Risk Penalty",
+    "ODD Gate Only",
+    "ODD-Gated Price-Aware Matching",
+    "Three-Stakeholder Balanced"
+  ],
+  "relocation_modes": ["none", "pending_demand"],
+  "main_experiment": {
+    "folds": [1, 2, 3],
+    "supply_scenarios": ["abundant", "moderate", "tight"],
+    "av_penetration_rates": [0.0, 0.25, 0.5, 0.75],
+    "odd_profiles": ["conservative_av", "moderate_av", "mature_av", "intersection_sensitive_av", "uncertainty_sensitive_av"],
+    "pricing_scenarios": ["P0_uniform", "P1_platform_funded_comp", "P2_passenger_funded_comp", "P3_shared_comp", "P4_av_discount_hv_comp", "P5_three_stakeholder_balanced"],
+    "selected_strategy_grid": [
+      {"dispatch_strategy": "GlobalMatch-MinOperatingCost", "pricing_scenario": "P0_uniform", "supply_scenario": "moderate", "av_penetration": 0.5, "odd_profile": "moderate_av"},
+      {"dispatch_strategy": "ODD-Gated Price-Aware Matching", "pricing_scenario": "P3_shared_comp", "supply_scenario": "moderate", "av_penetration": 0.5, "odd_profile": "moderate_av"},
+      {"dispatch_strategy": "Three-Stakeholder Balanced", "pricing_scenario": "P5_three_stakeholder_balanced", "supply_scenario": "moderate", "av_penetration": 0.5, "odd_profile": "moderate_av"}
+    ]
+  }
+}

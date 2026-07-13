@@ -1,0 +1,30 @@
+{
+  "version": "stakeholder_parameters_v1",
+  "passenger": {
+    "value_of_wait_time_per_min": 0.8,
+    "value_of_pickup_time_per_min": 0.4,
+    "generalized_cost_threshold": 95.0,
+    "av_preference_adjustment": -1.0,
+    "hv_preference_adjustment": 0.0
+  },
+  "driver": {
+    "base_payout": 6.0,
+    "service_time_payout_per_min": 0.45,
+    "pickup_compensation_per_km": 0.8,
+    "peak_scarcity_bonus": 2.0,
+    "pickup_cost_per_km": 0.6,
+    "service_cost_per_min": 0.15,
+    "stress_disutility_multiplier": 6.0,
+    "minimum_utility": 0.0
+  },
+  "platform": {
+    "hv_variable_cost": 1.0,
+    "av_pickup_cost_per_km": 0.5,
+    "av_service_cost_per_km": 0.35,
+    "av_service_time_cost_per_min": 0.10,
+    "av_energy_cost_per_km": 0.18,
+    "lost_demand_penalty": 5.0,
+    "remote_assistance_cost_weight": 1.0,
+    "fallback_cost_weight": 1.0
+  }
+}

@@ -50,11 +50,31 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--modality-dropout", type=float, default=0.0)
     parser.add_argument("--seed", type=int, default=2026)
     parser.add_argument("--fold", type=int, default=None, help="Optional Stage3 rolling fold id.")
+    parser.add_argument(
+        "--overall-target",
+        choices=["core_overall_high_stress", "extended_overall_high_stress", "order_overall_high_stress"],
+        default="core_overall_high_stress",
+        help=(
+            "Order-level overall label used by the OVERALL head. Core-only models "
+            "must use core_overall_high_stress; Core+IIS models use "
+            "extended_overall_high_stress."
+        ),
+    )
     return parser.parse_args()
 
 
 class OrderSequenceDataset(Dataset):
-    def __init__(self, link: pd.DataFrame, target: pd.DataFrame, mean: pd.Series, std: pd.Series, order_features: pd.DataFrame | None, order_mean: pd.Series | None, order_std: pd.Series | None):
+    def __init__(
+        self,
+        link: pd.DataFrame,
+        target: pd.DataFrame,
+        mean: pd.Series,
+        std: pd.Series,
+        order_features: pd.DataFrame | None,
+        order_mean: pd.Series | None,
+        order_std: pd.Series | None,
+        overall_target: str,
+    ):
         target = target.set_index("order_id")
         features = order_features.set_index("order_id") if order_features is not None else None
         self.items = []
@@ -73,7 +93,7 @@ class OrderSequenceDataset(Dataset):
             row = target.loc[order_id]
             raw = np.array([row[f"order_{name}_raw"] for name in TARGETS], dtype="float32")
             tail = np.array([row[f"order_{name}_tail"] for name in TARGETS], dtype="float32")
-            self.items.append((order_id, x, order_x, availability, np.nan_to_num(raw), np.isfinite(raw).astype("float32"), tail, float(row["order_overall_high_stress"])))
+            self.items.append((order_id, x, order_x, availability, np.nan_to_num(raw), np.isfinite(raw).astype("float32"), tail, float(row[overall_target])))
 
     def __len__(self): return len(self.items)
     def __getitem__(self, index):
@@ -150,7 +170,7 @@ def main():
         order_numeric=data["train"][2][IIS_ORDER_FEATURES].apply(pd.to_numeric,errors="coerce"); order_mean=order_numeric.mean().fillna(0); order_std=order_numeric.std().replace(0,1).fillna(1)
     else:
         order_mean=None; order_std=None
-    datasets={split:OrderSequenceDataset(link,target,mean,std,features if args.use_iis else None,order_mean,order_std) for split,(link,target,features) in data.items()}
+    datasets={split:OrderSequenceDataset(link,target,mean,std,features if args.use_iis else None,order_mean,order_std,args.overall_target) for split,(link,target,features) in data.items()}
     loaders={split:DataLoader(dataset,batch_size=args.batch_size,shuffle=split=="train",collate_fn=collate) for split,dataset in datasets.items()}
     device=torch.device("cuda" if torch.cuda.is_available() else "cpu"); model=RouteAttention(len(LINK_FEATURES),args.hidden_dim,len(IIS_ORDER_FEATURES) if args.use_iis else 0).to(device); optimizer=torch.optim.AdamW(model.parameters(),lr=8e-4)
     best=-np.inf; state=None
@@ -173,8 +193,8 @@ def main():
     for split in ["validation","test"]:
         prediction,metrics=evaluate(model,loaders[split],device); prediction["split"]=split; metrics["split"]=split; metrics["model"]="deepsets_route_attention"; prediction_parts.append(prediction); metric_parts.append(metrics)
     metrics=pd.concat(metric_parts,ignore_index=True); metrics.to_csv(args.output_root/"metrics.csv",index=False); pd.concat(prediction_parts,ignore_index=True).to_parquet(args.output_root/"predictions.parquet",index=False,compression="zstd")
-    torch.save({"state":model.state_dict(),"features":LINK_FEATURES,"order_features":IIS_ORDER_FEATURES if args.use_iis else [],"mean":mean.to_dict(),"std":std.to_dict(),"order_mean":order_mean.to_dict() if order_mean is not None else {},"order_std":order_std.to_dict() if order_std is not None else {}},args.output_root/"model.pt")
-    (args.output_root/"report.md").write_text("# Stage3 DeepSets / route attention\n\n"+metrics[metrics.split.eq("test")].to_markdown(index=False,floatfmt=".4f"),encoding="utf-8"); print(metrics[metrics.split.eq("test")].to_string(index=False))
+    torch.save({"state":model.state_dict(),"features":LINK_FEATURES,"order_features":IIS_ORDER_FEATURES if args.use_iis else [],"mean":mean.to_dict(),"std":std.to_dict(),"order_mean":order_mean.to_dict() if order_mean is not None else {},"order_std":order_std.to_dict() if order_std is not None else {},"overall_target":args.overall_target},args.output_root/"model.pt")
+    (args.output_root/"report.md").write_text("# Stage3 DeepSets / route attention\n\n"+f"overall_target: `{args.overall_target}`\n\n"+metrics[metrics.split.eq("test")].to_markdown(index=False,floatfmt=".4f"),encoding="utf-8"); print(metrics[metrics.split.eq("test")].to_string(index=False))
 
 
 if __name__=="__main__": main()

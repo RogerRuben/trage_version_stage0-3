@@ -1,0 +1,2065 @@
+{
+  "status": "PASS",
+  "audits": {
+    "matching_feasibility": "PASS",
+    "pricing_accounting": "PASS",
+    "scenario_comparability": "PASS",
+    "dynamic_dispatch_consistency": "PASS",
+    "stage3_stage4_export": "PASS",
+    "capability_mapping": "PASS"
+  },
+  "details": {
+    "matching_feasibility": {
+      "status": "PASS",
+      "errors": [],
+      "rows": [
+        {
+          "fold": "1",
+          "experiment": "exp=000_strategy",
+          "served_orders": 1317,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=001_strategy",
+          "served_orders": 1316,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=002_strategy",
+          "served_orders": 1318,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=003_strategy",
+          "served_orders": 1318,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=004_strategy",
+          "served_orders": 1319,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=005_strategy",
+          "served_orders": 1314,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=006_strategy",
+          "served_orders": 1317,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=007_strategy",
+          "served_orders": 1317,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=008_strategy",
+          "served_orders": 1314,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=009_supply",
+          "served_orders": 1310,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=010_supply",
+          "served_orders": 1317,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=011_av_penetration",
+          "served_orders": 1312,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=012_av_penetration",
+          "served_orders": 1315,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=013_av_penetration",
+          "served_orders": 1305,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=014_odd_profile",
+          "served_orders": 1310,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=015_odd_profile",
+          "served_orders": 1317,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=016_odd_profile",
+          "served_orders": 1299,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=017_odd_profile",
+          "served_orders": 1312,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=018_pricing",
+          "served_orders": 1313,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=019_pricing",
+          "served_orders": 1317,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=020_pricing",
+          "served_orders": 1304,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=021_pricing",
+          "served_orders": 1326,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=022_pricing",
+          "served_orders": 1289,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=000_strategy",
+          "served_orders": 1322,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=001_strategy",
+          "served_orders": 1319,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=002_strategy",
+          "served_orders": 1320,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=003_strategy",
+          "served_orders": 1322,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=004_strategy",
+          "served_orders": 1322,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=005_strategy",
+          "served_orders": 1320,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=006_strategy",
+          "served_orders": 1314,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=007_strategy",
+          "served_orders": 1304,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=008_strategy",
+          "served_orders": 1305,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=009_supply",
+          "served_orders": 1299,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=010_supply",
+          "served_orders": 1300,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=011_av_penetration",
+          "served_orders": 1316,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=012_av_penetration",
+          "served_orders": 1318,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=013_av_penetration",
+          "served_orders": 1280,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=014_odd_profile",
+          "served_orders": 1306,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=015_odd_profile",
+          "served_orders": 1310,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=016_odd_profile",
+          "served_orders": 1309,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=017_odd_profile",
+          "served_orders": 1308,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=018_pricing",
+          "served_orders": 1303,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=019_pricing",
+          "served_orders": 1301,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=020_pricing",
+          "served_orders": 1296,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=021_pricing",
+          "served_orders": 1306,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=022_pricing",
+          "served_orders": 1282,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=000_strategy",
+          "served_orders": 1349,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=001_strategy",
+          "served_orders": 1345,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=002_strategy",
+          "served_orders": 1347,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=003_strategy",
+          "served_orders": 1345,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=004_strategy",
+          "served_orders": 1347,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=005_strategy",
+          "served_orders": 1347,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=006_strategy",
+          "served_orders": 1344,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=007_strategy",
+          "served_orders": 1325,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=008_strategy",
+          "served_orders": 1329,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=009_supply",
+          "served_orders": 1320,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=010_supply",
+          "served_orders": 1340,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=011_av_penetration",
+          "served_orders": 1342,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=012_av_penetration",
+          "served_orders": 1345,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=013_av_penetration",
+          "served_orders": 1320,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=014_odd_profile",
+          "served_orders": 1318,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=015_odd_profile",
+          "served_orders": 1336,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=016_odd_profile",
+          "served_orders": 1330,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=017_odd_profile",
+          "served_orders": 1325,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=018_pricing",
+          "served_orders": 1339,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=019_pricing",
+          "served_orders": 1331,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=020_pricing",
+          "served_orders": 1324,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=021_pricing",
+          "served_orders": 1346,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=022_pricing",
+          "served_orders": 1310,
+          "duplicate_served_orders": 0,
+          "av_odd_violations": 0,
+          "pickup_time_violations": 0,
+          "passenger_reject_served": 0,
+          "hv_negative_utility_served": 0
+        }
+      ]
+    },
+    "pricing_accounting": {
+      "status": "PASS",
+      "errors": [],
+      "rows": [
+        {
+          "fold": "1",
+          "experiment": "exp=000_strategy",
+          "served_orders": 1317,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=001_strategy",
+          "served_orders": 1316,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=002_strategy",
+          "served_orders": 1318,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=003_strategy",
+          "served_orders": 1318,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=004_strategy",
+          "served_orders": 1319,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=005_strategy",
+          "served_orders": 1314,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=006_strategy",
+          "served_orders": 1317,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=007_strategy",
+          "served_orders": 1317,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=008_strategy",
+          "served_orders": 1314,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=009_supply",
+          "served_orders": 1310,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=010_supply",
+          "served_orders": 1317,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=011_av_penetration",
+          "served_orders": 1312,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=012_av_penetration",
+          "served_orders": 1315,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=013_av_penetration",
+          "served_orders": 1305,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=014_odd_profile",
+          "served_orders": 1310,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=015_odd_profile",
+          "served_orders": 1317,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=016_odd_profile",
+          "served_orders": 1299,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=017_odd_profile",
+          "served_orders": 1312,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=018_pricing",
+          "served_orders": 1313,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=019_pricing",
+          "served_orders": 1317,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=020_pricing",
+          "served_orders": 1304,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=021_pricing",
+          "served_orders": 1326,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=022_pricing",
+          "served_orders": 1289,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=000_strategy",
+          "served_orders": 1322,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=001_strategy",
+          "served_orders": 1319,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=002_strategy",
+          "served_orders": 1320,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=003_strategy",
+          "served_orders": 1322,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=004_strategy",
+          "served_orders": 1322,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=005_strategy",
+          "served_orders": 1320,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=006_strategy",
+          "served_orders": 1314,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=007_strategy",
+          "served_orders": 1304,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=008_strategy",
+          "served_orders": 1305,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=009_supply",
+          "served_orders": 1299,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=010_supply",
+          "served_orders": 1300,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=011_av_penetration",
+          "served_orders": 1316,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=012_av_penetration",
+          "served_orders": 1318,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=013_av_penetration",
+          "served_orders": 1280,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=014_odd_profile",
+          "served_orders": 1306,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=015_odd_profile",
+          "served_orders": 1310,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=016_odd_profile",
+          "served_orders": 1309,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=017_odd_profile",
+          "served_orders": 1308,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=018_pricing",
+          "served_orders": 1303,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=019_pricing",
+          "served_orders": 1301,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=020_pricing",
+          "served_orders": 1296,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=021_pricing",
+          "served_orders": 1306,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=022_pricing",
+          "served_orders": 1282,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=000_strategy",
+          "served_orders": 1349,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=001_strategy",
+          "served_orders": 1345,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=002_strategy",
+          "served_orders": 1347,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=003_strategy",
+          "served_orders": 1345,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=004_strategy",
+          "served_orders": 1347,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=005_strategy",
+          "served_orders": 1347,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=006_strategy",
+          "served_orders": 1344,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=007_strategy",
+          "served_orders": 1325,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=008_strategy",
+          "served_orders": 1329,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=009_supply",
+          "served_orders": 1320,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=010_supply",
+          "served_orders": 1340,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=011_av_penetration",
+          "served_orders": 1342,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=012_av_penetration",
+          "served_orders": 1345,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=013_av_penetration",
+          "served_orders": 1320,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=014_odd_profile",
+          "served_orders": 1318,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=015_odd_profile",
+          "served_orders": 1336,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=016_odd_profile",
+          "served_orders": 1330,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=017_odd_profile",
+          "served_orders": 1325,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=018_pricing",
+          "served_orders": 1339,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=019_pricing",
+          "served_orders": 1331,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=020_pricing",
+          "served_orders": 1324,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=021_pricing",
+          "served_orders": 1346,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=022_pricing",
+          "served_orders": 1310,
+          "max_profit_identity_error": 0.0,
+          "negative_fare_count": 0,
+          "bad_compensation_share_count": 0
+        }
+      ]
+    },
+    "scenario_comparability": {
+      "status": "PASS",
+      "errors": [],
+      "rows": [
+        {
+          "fold": 1,
+          "scenario_count": 23,
+          "order_counts": "1500",
+          "comparable": true
+        },
+        {
+          "fold": 2,
+          "scenario_count": 23,
+          "order_counts": "1500",
+          "comparable": true
+        },
+        {
+          "fold": 3,
+          "scenario_count": 23,
+          "order_counts": "1500",
+          "comparable": true
+        }
+      ]
+    },
+    "dynamic_dispatch_consistency": {
+      "status": "PASS",
+      "errors": [],
+      "rows": [
+        {
+          "fold": "1",
+          "experiment": "exp=000_strategy",
+          "served_orders": 1317,
+          "cancelled_orders": 183,
+          "vehicle_order_count_sum": 1317,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=001_strategy",
+          "served_orders": 1316,
+          "cancelled_orders": 184,
+          "vehicle_order_count_sum": 1316,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=002_strategy",
+          "served_orders": 1318,
+          "cancelled_orders": 182,
+          "vehicle_order_count_sum": 1318,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=003_strategy",
+          "served_orders": 1318,
+          "cancelled_orders": 182,
+          "vehicle_order_count_sum": 1318,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=004_strategy",
+          "served_orders": 1319,
+          "cancelled_orders": 181,
+          "vehicle_order_count_sum": 1319,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=005_strategy",
+          "served_orders": 1314,
+          "cancelled_orders": 186,
+          "vehicle_order_count_sum": 1314,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=006_strategy",
+          "served_orders": 1317,
+          "cancelled_orders": 183,
+          "vehicle_order_count_sum": 1317,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=007_strategy",
+          "served_orders": 1317,
+          "cancelled_orders": 183,
+          "vehicle_order_count_sum": 1317,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=008_strategy",
+          "served_orders": 1314,
+          "cancelled_orders": 186,
+          "vehicle_order_count_sum": 1314,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=009_supply",
+          "served_orders": 1310,
+          "cancelled_orders": 190,
+          "vehicle_order_count_sum": 1310,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=010_supply",
+          "served_orders": 1317,
+          "cancelled_orders": 183,
+          "vehicle_order_count_sum": 1317,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=011_av_penetration",
+          "served_orders": 1312,
+          "cancelled_orders": 188,
+          "vehicle_order_count_sum": 1312,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=012_av_penetration",
+          "served_orders": 1315,
+          "cancelled_orders": 185,
+          "vehicle_order_count_sum": 1315,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=013_av_penetration",
+          "served_orders": 1305,
+          "cancelled_orders": 195,
+          "vehicle_order_count_sum": 1305,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=014_odd_profile",
+          "served_orders": 1310,
+          "cancelled_orders": 190,
+          "vehicle_order_count_sum": 1310,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=015_odd_profile",
+          "served_orders": 1317,
+          "cancelled_orders": 183,
+          "vehicle_order_count_sum": 1317,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=016_odd_profile",
+          "served_orders": 1299,
+          "cancelled_orders": 201,
+          "vehicle_order_count_sum": 1299,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=017_odd_profile",
+          "served_orders": 1312,
+          "cancelled_orders": 188,
+          "vehicle_order_count_sum": 1312,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=018_pricing",
+          "served_orders": 1313,
+          "cancelled_orders": 187,
+          "vehicle_order_count_sum": 1313,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=019_pricing",
+          "served_orders": 1317,
+          "cancelled_orders": 183,
+          "vehicle_order_count_sum": 1317,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=020_pricing",
+          "served_orders": 1304,
+          "cancelled_orders": 196,
+          "vehicle_order_count_sum": 1304,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=021_pricing",
+          "served_orders": 1326,
+          "cancelled_orders": 174,
+          "vehicle_order_count_sum": 1326,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "1",
+          "experiment": "exp=022_pricing",
+          "served_orders": 1289,
+          "cancelled_orders": 211,
+          "vehicle_order_count_sum": 1289,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=000_strategy",
+          "served_orders": 1322,
+          "cancelled_orders": 178,
+          "vehicle_order_count_sum": 1322,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=001_strategy",
+          "served_orders": 1319,
+          "cancelled_orders": 181,
+          "vehicle_order_count_sum": 1319,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=002_strategy",
+          "served_orders": 1320,
+          "cancelled_orders": 180,
+          "vehicle_order_count_sum": 1320,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=003_strategy",
+          "served_orders": 1322,
+          "cancelled_orders": 178,
+          "vehicle_order_count_sum": 1322,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=004_strategy",
+          "served_orders": 1322,
+          "cancelled_orders": 178,
+          "vehicle_order_count_sum": 1322,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=005_strategy",
+          "served_orders": 1320,
+          "cancelled_orders": 180,
+          "vehicle_order_count_sum": 1320,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=006_strategy",
+          "served_orders": 1314,
+          "cancelled_orders": 186,
+          "vehicle_order_count_sum": 1314,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=007_strategy",
+          "served_orders": 1304,
+          "cancelled_orders": 196,
+          "vehicle_order_count_sum": 1304,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=008_strategy",
+          "served_orders": 1305,
+          "cancelled_orders": 195,
+          "vehicle_order_count_sum": 1305,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=009_supply",
+          "served_orders": 1299,
+          "cancelled_orders": 201,
+          "vehicle_order_count_sum": 1299,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=010_supply",
+          "served_orders": 1300,
+          "cancelled_orders": 200,
+          "vehicle_order_count_sum": 1300,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=011_av_penetration",
+          "served_orders": 1316,
+          "cancelled_orders": 184,
+          "vehicle_order_count_sum": 1316,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=012_av_penetration",
+          "served_orders": 1318,
+          "cancelled_orders": 182,
+          "vehicle_order_count_sum": 1318,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=013_av_penetration",
+          "served_orders": 1280,
+          "cancelled_orders": 220,
+          "vehicle_order_count_sum": 1280,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=014_odd_profile",
+          "served_orders": 1306,
+          "cancelled_orders": 194,
+          "vehicle_order_count_sum": 1306,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=015_odd_profile",
+          "served_orders": 1310,
+          "cancelled_orders": 190,
+          "vehicle_order_count_sum": 1310,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=016_odd_profile",
+          "served_orders": 1309,
+          "cancelled_orders": 191,
+          "vehicle_order_count_sum": 1309,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=017_odd_profile",
+          "served_orders": 1308,
+          "cancelled_orders": 192,
+          "vehicle_order_count_sum": 1308,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=018_pricing",
+          "served_orders": 1303,
+          "cancelled_orders": 197,
+          "vehicle_order_count_sum": 1303,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=019_pricing",
+          "served_orders": 1301,
+          "cancelled_orders": 199,
+          "vehicle_order_count_sum": 1301,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=020_pricing",
+          "served_orders": 1296,
+          "cancelled_orders": 204,
+          "vehicle_order_count_sum": 1296,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=021_pricing",
+          "served_orders": 1306,
+          "cancelled_orders": 194,
+          "vehicle_order_count_sum": 1306,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "2",
+          "experiment": "exp=022_pricing",
+          "served_orders": 1282,
+          "cancelled_orders": 218,
+          "vehicle_order_count_sum": 1282,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=000_strategy",
+          "served_orders": 1349,
+          "cancelled_orders": 151,
+          "vehicle_order_count_sum": 1349,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=001_strategy",
+          "served_orders": 1345,
+          "cancelled_orders": 155,
+          "vehicle_order_count_sum": 1345,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=002_strategy",
+          "served_orders": 1347,
+          "cancelled_orders": 153,
+          "vehicle_order_count_sum": 1347,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=003_strategy",
+          "served_orders": 1345,
+          "cancelled_orders": 155,
+          "vehicle_order_count_sum": 1345,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=004_strategy",
+          "served_orders": 1347,
+          "cancelled_orders": 153,
+          "vehicle_order_count_sum": 1347,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=005_strategy",
+          "served_orders": 1347,
+          "cancelled_orders": 153,
+          "vehicle_order_count_sum": 1347,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=006_strategy",
+          "served_orders": 1344,
+          "cancelled_orders": 156,
+          "vehicle_order_count_sum": 1344,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=007_strategy",
+          "served_orders": 1325,
+          "cancelled_orders": 175,
+          "vehicle_order_count_sum": 1325,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=008_strategy",
+          "served_orders": 1329,
+          "cancelled_orders": 171,
+          "vehicle_order_count_sum": 1329,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=009_supply",
+          "served_orders": 1320,
+          "cancelled_orders": 180,
+          "vehicle_order_count_sum": 1320,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=010_supply",
+          "served_orders": 1340,
+          "cancelled_orders": 160,
+          "vehicle_order_count_sum": 1340,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=011_av_penetration",
+          "served_orders": 1342,
+          "cancelled_orders": 158,
+          "vehicle_order_count_sum": 1342,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=012_av_penetration",
+          "served_orders": 1345,
+          "cancelled_orders": 155,
+          "vehicle_order_count_sum": 1345,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=013_av_penetration",
+          "served_orders": 1320,
+          "cancelled_orders": 180,
+          "vehicle_order_count_sum": 1320,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=014_odd_profile",
+          "served_orders": 1318,
+          "cancelled_orders": 182,
+          "vehicle_order_count_sum": 1318,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=015_odd_profile",
+          "served_orders": 1336,
+          "cancelled_orders": 164,
+          "vehicle_order_count_sum": 1336,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=016_odd_profile",
+          "served_orders": 1330,
+          "cancelled_orders": 170,
+          "vehicle_order_count_sum": 1330,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=017_odd_profile",
+          "served_orders": 1325,
+          "cancelled_orders": 175,
+          "vehicle_order_count_sum": 1325,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=018_pricing",
+          "served_orders": 1339,
+          "cancelled_orders": 161,
+          "vehicle_order_count_sum": 1339,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=019_pricing",
+          "served_orders": 1331,
+          "cancelled_orders": 169,
+          "vehicle_order_count_sum": 1331,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=020_pricing",
+          "served_orders": 1324,
+          "cancelled_orders": 176,
+          "vehicle_order_count_sum": 1324,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=021_pricing",
+          "served_orders": 1346,
+          "cancelled_orders": 154,
+          "vehicle_order_count_sum": 1346,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        },
+        {
+          "fold": "3",
+          "experiment": "exp=022_pricing",
+          "served_orders": 1310,
+          "cancelled_orders": 190,
+          "vehicle_order_count_sum": 1310,
+          "vehicle_order_count_matches_served": true,
+          "negative_pending_windows": 0,
+          "negative_vehicle_state_counts": 0
+        }
+      ]
+    },
+    "stage3_stage4_export": {
+      "status": "PASS",
+      "errors": [],
+      "rows": [
+        {
+          "fold": "1",
+          "rows": 15000,
+          "orders": 15000,
+          "missing_required": 0,
+          "forbidden_columns": 0,
+          "duplicate_orders": 0,
+          "decision_time_parse_success_rate": 1.0,
+          "decision_time_missing": 0,
+          "prediction_cutoff_missing": 0,
+          "origin_destination_missing": 0,
+          "invalid_coordinate_count": 0,
+          "decision_time_before_prediction_cutoff_count": 0,
+          "exported_order_coverage": 1.0
+        },
+        {
+          "fold": "2",
+          "rows": 15000,
+          "orders": 15000,
+          "missing_required": 0,
+          "forbidden_columns": 0,
+          "duplicate_orders": 0,
+          "decision_time_parse_success_rate": 1.0,
+          "decision_time_missing": 0,
+          "prediction_cutoff_missing": 0,
+          "origin_destination_missing": 0,
+          "invalid_coordinate_count": 0,
+          "decision_time_before_prediction_cutoff_count": 0,
+          "exported_order_coverage": 1.0
+        },
+        {
+          "fold": "3",
+          "rows": 15000,
+          "orders": 15000,
+          "missing_required": 0,
+          "forbidden_columns": 0,
+          "duplicate_orders": 0,
+          "decision_time_parse_success_rate": 1.0,
+          "decision_time_missing": 0,
+          "prediction_cutoff_missing": 0,
+          "origin_destination_missing": 0,
+          "invalid_coordinate_count": 0,
+          "decision_time_before_prediction_cutoff_count": 0,
+          "exported_order_coverage": 1.0
+        }
+      ]
+    },
+    "capability_mapping": {
+      "status": "PASS",
+      "errors": [],
+      "rows": [
+        {
+          "fold": "1",
+          "rows": 90000,
+          "orders": 15000,
+          "profiles": 6,
+          "feasible_rate": 0.8530888888888889
+        },
+        {
+          "fold": "2",
+          "rows": 90000,
+          "orders": 15000,
+          "profiles": 6,
+          "feasible_rate": 0.7116444444444444
+        },
+        {
+          "fold": "3",
+          "rows": 90000,
+          "orders": 15000,
+          "profiles": 6,
+          "feasible_rate": 0.8136222222222222
+        }
+      ]
+    }
+  }
+}

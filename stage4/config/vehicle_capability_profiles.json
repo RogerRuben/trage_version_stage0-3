@@ -6,8 +6,8 @@
     "conservative_av": {
       "vehicle_type": "AV",
       "dimension_sensitivity": {"lcs": 1.00, "pmis": 1.10, "rts": 1.20, "iis": 1.35},
-      "dimension_soft_threshold": {"lcs": 0.45, "pmis": 0.45, "rts": 0.45, "iis": 0.35},
-      "dimension_hard_threshold": {"lcs": 0.70, "pmis": 0.70, "rts": 0.68, "iis": 0.55},
+      "dimension_soft_threshold": {"lcs": 0.10, "pmis": 0.13, "rts": 0.15, "iis": 0.23},
+      "dimension_hard_threshold": {"lcs": 0.16, "pmis": 0.21, "rts": 0.23, "iis": 0.31},
       "uncertainty_tolerance": 0.30,
       "missing_modality_penalty": 0.08,
       "remote_assistance_cost_placeholder": 8.0,
@@ -16,8 +16,8 @@
     "moderate_av": {
       "vehicle_type": "AV",
       "dimension_sensitivity": {"lcs": 0.90, "pmis": 1.00, "rts": 1.00, "iis": 1.10},
-      "dimension_soft_threshold": {"lcs": 0.55, "pmis": 0.55, "rts": 0.55, "iis": 0.45},
-      "dimension_hard_threshold": {"lcs": 0.82, "pmis": 0.82, "rts": 0.80, "iis": 0.68},
+      "dimension_soft_threshold": {"lcs": 0.21, "pmis": 0.27, "rts": 0.31, "iis": 0.31},
+      "dimension_hard_threshold": {"lcs": 0.34, "pmis": 0.44, "rts": 0.50, "iis": 0.40},
       "uncertainty_tolerance": 0.42,
       "missing_modality_penalty": 0.05,
       "remote_assistance_cost_placeholder": 5.0,
@@ -26,8 +26,8 @@
     "mature_av": {
       "vehicle_type": "AV",
       "dimension_sensitivity": {"lcs": 0.75, "pmis": 0.85, "rts": 0.85, "iis": 0.90},
-      "dimension_soft_threshold": {"lcs": 0.65, "pmis": 0.65, "rts": 0.65, "iis": 0.55},
-      "dimension_hard_threshold": {"lcs": 0.92, "pmis": 0.92, "rts": 0.90, "iis": 0.82},
+      "dimension_soft_threshold": {"lcs": 0.35, "pmis": 0.45, "rts": 0.53, "iis": 0.45},
+      "dimension_hard_threshold": {"lcs": 0.48, "pmis": 0.58, "rts": 0.68, "iis": 0.56},
       "uncertainty_tolerance": 0.55,
       "missing_modality_penalty": 0.03,
       "remote_assistance_cost_placeholder": 3.0,
@@ -36,8 +36,8 @@
     "intersection_sensitive_av": {
       "vehicle_type": "AV",
       "dimension_sensitivity": {"lcs": 0.85, "pmis": 0.95, "rts": 0.95, "iis": 1.70},
-      "dimension_soft_threshold": {"lcs": 0.58, "pmis": 0.58, "rts": 0.55, "iis": 0.32},
-      "dimension_hard_threshold": {"lcs": 0.84, "pmis": 0.84, "rts": 0.80, "iis": 0.50},
+      "dimension_soft_threshold": {"lcs": 0.20, "pmis": 0.27, "rts": 0.31, "iis": 0.20},
+      "dimension_hard_threshold": {"lcs": 0.25, "pmis": 0.33, "rts": 0.38, "iis": 0.25},
       "uncertainty_tolerance": 0.40,
       "missing_modality_penalty": 0.10,
       "remote_assistance_cost_placeholder": 7.0,
@@ -46,9 +46,9 @@
     "uncertainty_sensitive_av": {
       "vehicle_type": "AV",
       "dimension_sensitivity": {"lcs": 0.90, "pmis": 0.95, "rts": 1.10, "iis": 1.10},
-      "dimension_soft_threshold": {"lcs": 0.55, "pmis": 0.55, "rts": 0.52, "iis": 0.45},
-      "dimension_hard_threshold": {"lcs": 0.82, "pmis": 0.82, "rts": 0.76, "iis": 0.65},
-      "uncertainty_tolerance": 0.22,
+      "dimension_soft_threshold": {"lcs": 0.16, "pmis": 0.21, "rts": 0.24, "iis": 0.27},
+      "dimension_hard_threshold": {"lcs": 0.22, "pmis": 0.28, "rts": 0.32, "iis": 0.32},
+      "uncertainty_tolerance": 0.12,
       "missing_modality_penalty": 0.12,
       "remote_assistance_cost_placeholder": 7.5,
       "fallback_cost_placeholder": 16.0

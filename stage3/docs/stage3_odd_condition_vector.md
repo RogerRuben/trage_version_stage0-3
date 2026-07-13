@@ -11,8 +11,8 @@ The vector represents trajectory-informed operational stress:
 - `lcs_uncertainty`, `pmis_uncertainty`, `rts_uncertainty`: predictive uncertainty proxies.
 - `intersection_applicability`, `intersection_severity`, `intersection_tail_probability`: optional IIS movement-derived context.
 - `composite_expected`: transparent aggregation of LCS/PMIS/RTS expected values.
-- `core_overall_high_stress_probability`: Stage3 probability for LCS OR PMIS OR RTS high stress. This is the main target.
-- `extended_overall_high_stress_probability`: core overall OR IIS tail. This is an extension target.
+- `core_overall_high_stress_probability`: Stage3 probability from a Core model trained on LCS OR PMIS OR RTS high stress. This is the main target.
+- `extended_overall_high_stress_probability`: Stage3 probability from a Core+IIS model trained on core overall OR IIS tail. It is not constructed by taking the maximum of core and IIS scores.
 - `overall_uncertainty`: predictive uncertainty proxy from Stage2/Stage3.
 - `modality_coverage_score`: availability of required/optional prediction modalities.
 - `route_prediction_confidence`: pre-dispatch route prediction confidence.

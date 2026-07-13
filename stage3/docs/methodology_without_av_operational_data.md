@@ -23,6 +23,11 @@ This calibration layer replaces or updates vehicle capability response functions
 
 Current Stage4 vehicle profiles are scenario priors, not empirical AV capability estimates.
 
+The first-layer condition vector is now frozen for the current Stage4
+experiments. Stage4 changes vehicle-specific capability response functions,
+pricing, compensation, and matching rules; it does not reinterpret Stage3
+outputs as empirical AV safety outcomes.
+
 ## Structural vs numerical conclusions
 
 The current framework can support structural counterfactuals: how ODD gates reshape assignment, whether AVs cream-skim lower-stress orders, how HV burden shifts, and how compensation/fairness constraints alter allocations.

@@ -1,0 +1,67 @@
+{
+  "version": "pricing_scenarios_v1",
+  "base_fare": 8.0,
+  "distance_fare_per_km": 1.8,
+  "time_fare_per_min": 0.35,
+  "surge_floor": 1.0,
+  "surge_cap": 1.8,
+  "stress_surcharge_cap": 12.0,
+  "pricing_scenarios": {
+    "P0_uniform": {
+      "label": "Uniform Pricing",
+      "av_vehicle_adjustment": 0.0,
+      "hv_vehicle_adjustment": 0.0,
+      "stress_surcharge_multiplier": 0.0,
+      "hv_compensation_multiplier": 0.0,
+      "compensation_passenger_share": 0.0,
+      "compensation_platform_share": 1.0
+    },
+    "P1_platform_funded_comp": {
+      "label": "Platform-Funded HV Compensation",
+      "av_vehicle_adjustment": 0.0,
+      "hv_vehicle_adjustment": 0.0,
+      "stress_surcharge_multiplier": 0.0,
+      "hv_compensation_multiplier": 8.0,
+      "compensation_passenger_share": 0.0,
+      "compensation_platform_share": 1.0
+    },
+    "P2_passenger_funded_comp": {
+      "label": "Passenger-Funded HV Compensation",
+      "av_vehicle_adjustment": 0.0,
+      "hv_vehicle_adjustment": 0.0,
+      "stress_surcharge_multiplier": 7.0,
+      "hv_compensation_multiplier": 8.0,
+      "compensation_passenger_share": 1.0,
+      "compensation_platform_share": 0.0
+    },
+    "P3_shared_comp": {
+      "label": "Shared Compensation",
+      "av_vehicle_adjustment": 0.0,
+      "hv_vehicle_adjustment": 0.0,
+      "stress_surcharge_multiplier": 4.0,
+      "hv_compensation_multiplier": 8.0,
+      "compensation_passenger_share": 0.5,
+      "compensation_platform_share": 0.5
+    },
+    "P4_av_discount_hv_comp": {
+      "label": "AV Discount + HV Stress Compensation",
+      "av_vehicle_adjustment": -2.0,
+      "hv_vehicle_adjustment": 0.0,
+      "stress_surcharge_multiplier": 3.0,
+      "hv_compensation_multiplier": 10.0,
+      "compensation_passenger_share": 0.3,
+      "compensation_platform_share": 0.7
+    },
+    "P5_three_stakeholder_balanced": {
+      "label": "Three-Stakeholder Balanced",
+      "av_vehicle_adjustment": -1.0,
+      "hv_vehicle_adjustment": 0.5,
+      "stress_surcharge_multiplier": 4.5,
+      "hv_compensation_multiplier": 11.0,
+      "compensation_passenger_share": 0.4,
+      "compensation_platform_share": 0.6,
+      "passenger_gc_cap": 90.0,
+      "minimum_driver_utility": 2.0
+    }
+  }
+}
