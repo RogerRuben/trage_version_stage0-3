@@ -31,7 +31,10 @@ def main() -> None:
     args.output_root.mkdir(parents=True, exist_ok=True)
     summary = pd.read_csv(args.summary)
 
-    strategy = summary[summary["experiment_family"].eq("strategy")].groupby("dispatch_strategy", as_index=False).agg(
+    strategy_source = summary[summary["experiment_family"].eq("main_mechanism")].copy()
+    if strategy_source.empty:
+        strategy_source = summary.copy()
+    strategy = strategy_source.groupby("mechanism_id", as_index=False).agg(
         match_rate=("match_rate", "mean"),
         cancel_rate=("cancel_rate", "mean"),
         platform_profit=("platform_profit", "mean"),
@@ -41,7 +44,7 @@ def main() -> None:
     )
     fig, axes = plt.subplots(2, 3, figsize=(15, 8))
     for ax, col, title in zip(axes.ravel(), ["match_rate", "cancel_rate", "platform_profit", "passenger_gc", "hv_stress", "av_stress"], ["Match rate", "Cancel rate", "Platform profit", "Passenger generalized cost", "HV stress burden", "AV stress exposure"]):
-        ax.barh(strategy["dispatch_strategy"], strategy[col])
+        ax.barh(strategy["mechanism_id"], strategy[col])
         ax.set_title(title)
     save(fig, args.output_root, "strategy_comparison")
 
@@ -57,7 +60,9 @@ def main() -> None:
         ax.legend()
         save(fig, args.output_root, "window_time_series")
 
-    order_paths = sorted(args.run_root.glob("fold=*/exp=*/order_log.parquet"))
+    order_paths = sorted(args.run_root.glob("fold=*/exp=*B3_odd_price_shared/order_log.parquet"))
+    if not order_paths:
+        order_paths = sorted(args.run_root.glob("fold=*/exp=*/order_log.parquet"))
     if order_paths:
         sample = pd.concat([pd.read_parquet(path) for path in order_paths[: min(12, len(order_paths))]], ignore_index=True)
         served = sample[sample.get("served", False).fillna(False)].copy()
@@ -71,7 +76,7 @@ def main() -> None:
             ax.set_xlabel("Stress decile")
             ax.set_ylabel("Fare")
             ax.legend()
-            save(fig, args.output_root, "fare_by_stress_decile")
+            save(fig, args.output_root, "fare_by_stress_decile_B3")
 
             flow = served.assign(stress_level=np.where(served["core_overall_high_stress_probability"].ge(0.5), "high", "normal"))
             flow = flow.groupby(["stress_level", "quoted_vehicle_type", "served"], as_index=False).size()
@@ -79,7 +84,7 @@ def main() -> None:
             labels = flow.apply(lambda r: f"{r['stress_level']}→{r['quoted_vehicle_type']}→served={r['served']}", axis=1)
             ax.barh(labels, flow["size"])
             ax.set_title("Stress → AV/HV assignment → served flow")
-            save(fig, args.output_root, "stress_assignment_alluvial")
+            save(fig, args.output_root, "stress_assignment_flow_bar")
 
             spatial = served.copy()
             if {"origin_lon", "origin_lat"}.issubset(spatial.columns):
@@ -131,9 +136,9 @@ def main() -> None:
     ax.set_title("Efficiency-fairness Pareto proxy")
     save(fig, args.output_root, "efficiency_fairness_pareto")
 
-    heat = summary[summary["experiment_family"].isin(["av_penetration", "odd_profile"])]
+    heat = summary[summary["experiment_family"].eq("penetration_odd_interaction")]
     if not heat.empty:
-        pivot = summary.pivot_table(index="av_penetration", columns="odd_profile", values="match_rate", aggfunc="mean")
+        pivot = heat.pivot_table(index="av_penetration", columns="odd_profile", values="match_rate", aggfunc="mean")
         fig, ax = plt.subplots(figsize=(8, 5))
         im = ax.imshow(pivot.fillna(np.nan), aspect="auto")
         ax.set_xticks(range(len(pivot.columns)))
@@ -143,6 +148,53 @@ def main() -> None:
         ax.set_title("AV penetration × ODD profile: match rate")
         fig.colorbar(im, ax=ax)
         save(fig, args.output_root, "av_penetration_odd_heatmap")
+
+    cancel_path = args.summary.parent / "cancellation_reason_summary.csv"
+    if cancel_path.exists():
+        cancel = pd.read_csv(cancel_path)
+        cancel = cancel.groupby("cancellation_reason", as_index=False)["orders"].sum()
+        fig, ax = plt.subplots(figsize=(10, 5))
+        ax.barh(cancel["cancellation_reason"].fillna("served_or_blank"), cancel["orders"])
+        ax.set_title("Cancellation reason composition")
+        save(fig, args.output_root, "cancellation_reason_composition")
+
+    comp_path = args.summary.parent / "compensation_accounting_summary.csv"
+    if comp_path.exists():
+        comp = pd.read_csv(comp_path)
+        comp = comp.groupby("mechanism_id", as_index=False).agg(HV_payout=("HV_payout", "mean"), HV_net_income=("HV_net_income", "mean"), fare=("mean_passenger_fare", "mean"))
+        fig, ax = plt.subplots(figsize=(12, 5))
+        x = np.arange(len(comp))
+        ax.bar(x - 0.2, comp["HV_payout"], width=0.2, label="HV payout")
+        ax.bar(x, comp["HV_net_income"], width=0.2, label="HV net income")
+        ax.bar(x + 0.2, comp["fare"], width=0.2, label="Mean fare")
+        ax.set_xticks(x)
+        ax.set_xticklabels(comp["mechanism_id"], rotation=45, ha="right")
+        ax.set_title("Compensation and fare decomposition")
+        ax.legend()
+        save(fig, args.output_root, "compensation_funding_decomposition")
+
+    profit_path = args.summary.parent / "profit_decomposition_summary.csv"
+    if profit_path.exists():
+        profit = pd.read_csv(profit_path)
+        profit = profit.groupby("mechanism_id", as_index=False).agg(served=("served_order_profit", "mean"), lost=("lost_demand_cost", "mean"), net=("net_platform_profit", "mean"), cap=("capability_cost", "mean"))
+        fig, ax = plt.subplots(figsize=(12, 5))
+        x = np.arange(len(profit))
+        ax.bar(x - 0.2, profit["served"], width=0.2, label="Served-order profit")
+        ax.bar(x, -profit["lost"], width=0.2, label="Lost-demand cost")
+        ax.bar(x + 0.2, profit["net"], width=0.2, label="Net profit")
+        ax.set_xticks(x)
+        ax.set_xticklabels(profit["mechanism_id"], rotation=45, ha="right")
+        ax.set_title("Platform profit decomposition")
+        ax.legend()
+        save(fig, args.output_root, "platform_profit_decomposition")
+
+        fig, ax = plt.subplots(figsize=(10, 5))
+        x = np.arange(len(profit))
+        ax.bar(x, profit["cap"])
+        ax.set_xticks(x)
+        ax.set_xticklabels(profit["mechanism_id"], rotation=45, ha="right")
+        ax.set_title("AV capability cost by mechanism")
+        save(fig, args.output_root, "av_capability_cost_distribution")
 
     catalog = pd.DataFrame({
         "figure": sorted([path.name for path in args.output_root.glob("*.png")]),

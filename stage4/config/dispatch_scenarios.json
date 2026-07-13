@@ -30,9 +30,10 @@
     "Simple Risk Penalty",
     "ODD Gate Only",
     "ODD-Gated Price-Aware Matching",
+    "Weighted Stakeholder Heuristic",
     "Three-Stakeholder Balanced"
   ],
-  "relocation_modes": ["none", "pending_demand"],
+  "relocation_modes": ["none"],
   "main_experiment": {
     "folds": [1, 2, 3],
     "supply_scenarios": ["abundant", "moderate", "tight"],
@@ -40,9 +41,20 @@
     "odd_profiles": ["conservative_av", "moderate_av", "mature_av", "intersection_sensitive_av", "uncertainty_sensitive_av"],
     "pricing_scenarios": ["P0_uniform", "P1_platform_funded_comp", "P2_passenger_funded_comp", "P3_shared_comp", "P4_av_discount_hv_comp", "P5_three_stakeholder_balanced"],
     "selected_strategy_grid": [
-      {"dispatch_strategy": "GlobalMatch-MinOperatingCost", "pricing_scenario": "P0_uniform", "supply_scenario": "moderate", "av_penetration": 0.5, "odd_profile": "moderate_av"},
-      {"dispatch_strategy": "ODD-Gated Price-Aware Matching", "pricing_scenario": "P3_shared_comp", "supply_scenario": "moderate", "av_penetration": 0.5, "odd_profile": "moderate_av"},
-      {"dispatch_strategy": "Three-Stakeholder Balanced", "pricing_scenario": "P5_three_stakeholder_balanced", "supply_scenario": "moderate", "av_penetration": 0.5, "odd_profile": "moderate_av"}
+      {"mechanism_id": "B0_minpickup_uniform", "dispatch_strategy": "GlobalMatch-MinPickup", "pricing_scenario": "P0_uniform", "supply_scenario": "moderate", "av_penetration": 0.5, "odd_profile": "moderate_av", "odd_policy": "none", "passenger_policy": "deterministic_gc_threshold", "driver_policy": "deterministic_utility_threshold"},
+      {"mechanism_id": "B1_mincost_uniform", "dispatch_strategy": "GlobalMatch-MinOperatingCost", "pricing_scenario": "P0_uniform", "supply_scenario": "moderate", "av_penetration": 0.5, "odd_profile": "moderate_av", "odd_policy": "none", "passenger_policy": "deterministic_gc_threshold", "driver_policy": "deterministic_utility_threshold"},
+      {"mechanism_id": "B2_oddgate_uniform", "dispatch_strategy": "ODD Gate Only", "pricing_scenario": "P0_uniform", "supply_scenario": "moderate", "av_penetration": 0.5, "odd_profile": "moderate_av", "odd_policy": "hard_gate_for_av", "passenger_policy": "deterministic_gc_threshold", "driver_policy": "deterministic_utility_threshold"},
+      {"mechanism_id": "B3_odd_price_shared", "dispatch_strategy": "ODD-Gated Price-Aware Matching", "pricing_scenario": "P3_shared_comp", "supply_scenario": "moderate", "av_penetration": 0.5, "odd_profile": "moderate_av", "odd_policy": "hard_gate_for_av", "passenger_policy": "deterministic_gc_threshold", "driver_policy": "deterministic_utility_threshold"},
+      {"mechanism_id": "B4_odd_price_avdiscount", "dispatch_strategy": "ODD-Gated Price-Aware Matching", "pricing_scenario": "P4_av_discount_hv_comp", "supply_scenario": "moderate", "av_penetration": 0.5, "odd_profile": "moderate_av", "odd_policy": "hard_gate_for_av", "passenger_policy": "deterministic_gc_threshold", "driver_policy": "deterministic_utility_threshold"},
+      {"mechanism_id": "B5_weighted_heuristic", "dispatch_strategy": "Weighted Stakeholder Heuristic", "pricing_scenario": "P5_three_stakeholder_balanced", "supply_scenario": "moderate", "av_penetration": 0.5, "odd_profile": "moderate_av", "odd_policy": "hard_gate_for_av", "passenger_policy": "deterministic_gc_threshold", "driver_policy": "deterministic_utility_threshold"},
+      {"mechanism_id": "B6_three_stakeholder_balanced", "dispatch_strategy": "Three-Stakeholder Balanced", "pricing_scenario": "P5_three_stakeholder_balanced", "supply_scenario": "moderate", "av_penetration": 0.5, "odd_profile": "moderate_av", "odd_policy": "hard_gate_for_av", "passenger_policy": "deterministic_gc_threshold", "driver_policy": "deterministic_utility_threshold"}
+    ],
+    "full_main_mechanisms": [
+      "B0_minpickup_uniform",
+      "B1_mincost_uniform",
+      "B2_oddgate_uniform",
+      "B3_odd_price_shared",
+      "B6_three_stakeholder_balanced"
     ]
   }
 }

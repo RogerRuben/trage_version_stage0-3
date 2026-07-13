@@ -36,10 +36,8 @@ def main() -> None:
         if len(served) and strategy in ODD_STRATEGIES and "quoted_vehicle_type" in served:
             av = served[served["quoted_vehicle_type"].eq("AV")]
             av_odd_violations = int((~av["ODD_feasible"].fillna(False)).sum()) if "ODD_feasible" in av else len(av)
-        pickup_violations = int(served["pickup_time_sec"].lt(0).sum()) if "pickup_time_sec" in served else 0
-        # Pickup distance is not stored directly; infeasible pickup should have
-        # been filtered before edge creation. We retain time-negativity and ODD
-        # checks here, and accounting audits cover the monetary fields.
+        pickup_violations = int(served["pickup_m"].gt(args.max_pickup_m + 1e-6).sum()) if "pickup_m" in served else len(served)
+        negative_pickup_time = int(served["pickup_time_sec"].lt(0).sum()) if "pickup_time_sec" in served else 0
         passenger_reject_served = int((~served.get("accepted", pd.Series(True, index=served.index)).fillna(False)).sum())
         hv_negative_utility = 0
         if len(served) and "quoted_vehicle_type" in served:
@@ -51,7 +49,8 @@ def main() -> None:
             "served_orders": len(served),
             "duplicate_served_orders": duplicate_served,
             "av_odd_violations": av_odd_violations,
-            "pickup_time_violations": pickup_violations,
+            "pickup_distance_violations": pickup_violations,
+            "pickup_time_violations": negative_pickup_time,
             "passenger_reject_served": passenger_reject_served,
             "hv_negative_utility_served": hv_negative_utility,
         })
@@ -62,7 +61,11 @@ def main() -> None:
         if passenger_reject_served:
             errors.append(f"{fold}/{exp}: served passenger rejection count={passenger_reject_served}")
         if pickup_violations:
-            errors.append(f"{fold}/{exp}: pickup time violation count={pickup_violations}")
+            errors.append(f"{fold}/{exp}: pickup distance violation count={pickup_violations}")
+        if negative_pickup_time:
+            errors.append(f"{fold}/{exp}: pickup time violation count={negative_pickup_time}")
+        if hv_negative_utility:
+            errors.append(f"{fold}/{exp}: HV negative utility served count={hv_negative_utility}")
     pd.DataFrame(rows).to_csv(args.output_root / "matching_feasibility_audit.csv", index=False)
     result = {"status": "PASS" if not errors else "FAIL", "errors": errors, "rows": rows}
     (args.output_root / "matching_feasibility_audit.json").write_text(json.dumps(result, indent=2), encoding="utf-8")

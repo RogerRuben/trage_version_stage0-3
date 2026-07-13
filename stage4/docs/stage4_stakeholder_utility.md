@@ -4,13 +4,16 @@
 
 ```text
 GC_om = quoted_fare
-      + value_of_wait_time * expected_waiting
+      + value_of_wait_time * accumulated_waiting
       + value_of_pickup_time * pickup_time
       + vehicle_preference_adjustment
 ```
 
-The simulator supports deterministic threshold acceptance. An order-vehicle edge
-is infeasible if passenger generalized cost exceeds the scenario threshold.
+Accumulated waiting is recomputed in every dispatch window as
+`current_window_time - order_decision_time`, so passenger generalized cost rises
+while an order remains pending. The simulator supports deterministic threshold
+acceptance. An order-vehicle edge is infeasible if passenger generalized cost
+exceeds the scenario threshold.
 
 ## HV driver utility
 
@@ -21,15 +24,16 @@ U_ov^HV = driver_payout
         - stress_disutility
 ```
 
-HV payout includes base payout, service-time payout, pickup compensation, stress
-compensation, and peak/scarcity bonus. HV acceptance is controlled by a minimum
-utility threshold.
+HV payout is explicitly decomposed into base payout, service-time payout, pickup
+compensation, scarcity bonus, and gross stress compensation. HV acceptance is
+controlled by a minimum utility threshold.
 
 ## AV operating cost
 
-AV cost includes pickup empty mileage, service distance/time, energy, capability
-cost, and placeholder remote-assistance/fallback terms. AVs have no driver
-payout.
+AV cost includes pickup empty mileage, service distance/time, energy,
+capability cost, and placeholder remote-assistance/fallback terms. AVs have no
+driver payout. Non-ODD baselines may serve ODD-infeasible AV edges, but those
+edges carry fallback cost and are recorded as ODD violations.
 
 ## Platform profit
 

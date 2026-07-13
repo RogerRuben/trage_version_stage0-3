@@ -4,19 +4,21 @@ Stage4 uses explicit passenger fares, HV driver payments, AV operating costs,
 and platform profit accounting. The pricing scenarios are configured in
 `stage4/config/pricing_scenarios.json`.
 
-Passenger fare for order `o` and vehicle mode `m` is:
+Passenger fare for order `o` and vehicle mode `m` is now accounted as:
 
 ```text
-fare_om = base_fare + distance_fare + time_fare
-        + surge_adjustment
+fare_om = base_fare_component
+        + surge_component
         + vehicle_type_adjustment
-        + passenger-funded stress surcharge
+        + passenger_funded_compensation
 ```
 
-Stress surcharge uses the deployable Stage3 condition vector:
+For HV edges, gross stress compensation uses the deployable Stage3 condition
+vector:
 
 ```text
-stress = mean(lcs_expected, pmis_expected, rts_expected)
+gross_stress_compensation = f(mean(lcs_expected, pmis_expected, rts_expected))
+gross_stress_compensation = passenger_funded_compensation + platform_funded_compensation
 ```
 
 IIS is optional and availability-aware; missing IIS is not interpreted as zero
@@ -32,4 +34,5 @@ The current experiment includes:
 - `P4_av_discount_hv_comp`
 - `P5_three_stakeholder_balanced`
 
-These are scenario mechanisms, not observed platform prices.
+P0 uniform pricing has zero gross stress compensation. These are scenario
+mechanisms, not observed platform prices.

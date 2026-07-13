@@ -1,147 +1,179 @@
-# Stage4 Joint Pricing and Dispatch Report
+# Stage4 Joint Pricing and Dynamic Matching Report
 
 ## Scope
 
-This stage implements ODD-constrained pricing-and-dispatch coordination for
-mixed AV/HV ride-hailing fleets. Stage3 outputs are interpreted as
-trajectory-informed operational stress and ODD-relevant condition vectors, not
-as AV crash risk or empirical ADS failure probabilities.
+This stage studies ODD-constrained pricing-and-dispatch coordination for mixed
+AV/HV ride-hailing fleets. Stage3 condition vectors remain frozen and are used
+only as technology-neutral operational-stress inputs. They are not interpreted
+as empirical AV crash risk, disengagement probability, or ADS failure
+probability.
 
-## Stage3 semantic freeze
+## Mechanism corrections in this revision
 
-The Stage3 export now separates:
+The Stage4 simulator was revised to address the credibility issues in the first
+prototype:
 
-- `core_overall_high_stress_probability`: Core model trained on LCS/PMIS/RTS
-  high-stress labels.
-- `extended_overall_high_stress_probability`: Core+IIS model trained on
-  extended labels that include IIS.
-- `*_expected`: continuous Stage3 `pred_raw`, not q90.
-- `decision_time`: first estimated route-link entry time with
-  `origin_timestamp` fallback.
+1. Initial fleets are generated once per `(fold, supply, AV penetration, seed)`
+   and saved as reusable snapshots with an `initial_fleet_hash`.
+2. HV compensation is decomposed into base driver payout, service-time payout,
+   pickup compensation, scarcity bonus, gross stress compensation,
+   passenger-funded compensation, and platform-funded compensation.
+3. Passenger generalized cost now uses accumulated waiting time plus pickup
+   time. It no longer reuses pickup time as waiting time.
+4. Candidate generation records spatial, ODD, passenger, and driver feasibility
+   separately, so cancellation reasons are no longer collapsed into match rate.
+5. `Weighted Stakeholder Heuristic` is separated from the true
+   `Three-Stakeholder Balanced` mechanism.
+6. `Three-Stakeholder Balanced` uses a lexicographic window-level matching
+   approximation: maximize feasible service count, then maximize platform
+   profit under passenger, driver, and AV ODD feasibility constraints.
+7. AV capability cost, remote-assistance placeholder cost, fallback placeholder
+   cost, and lost-demand cost are included in accounting.
+8. Free relocation is disabled in the main experiment.
 
-The Stage3 export audit passed for 45,000 orders across three folds.
+## Experiment design
 
-## Capability mapping
+The submitted sample experiment uses:
 
-AV capability mapping uses scenario-prior profiles. The final feasible shares
-over the Stage4 input rows are:
+- 3 rolling test folds;
+- 1,500 orders per fold;
+- 126 scenario rows;
+- main mechanisms B0-B6;
+- one-factor supply / AV penetration / ODD profile / pricing sweeps;
+- a true AV penetration × ODD profile interaction grid.
 
-| profile | feasible share |
+A limited full-fold robustness run was also completed:
+
+- 15,000 orders per fold;
+- 3 folds;
+- moderate supply, 50% AV, moderate AV profile;
+- mechanisms B0, B1, B2, B3, and B6 only.
+
+## Main mechanisms
+
+| ID | Dispatch | Pricing | ODD policy |
+| --- | --- | --- | --- |
+| B0 | GlobalMatch-MinPickup | P0 uniform | none |
+| B1 | GlobalMatch-MinOperatingCost | P0 uniform | none |
+| B2 | ODD Gate Only | P0 uniform | hard AV gate |
+| B3 | ODD-Gated Price-Aware Matching | P3 shared compensation | hard AV gate |
+| B4 | ODD-Gated Price-Aware Matching | P4 AV discount + HV compensation | hard AV gate |
+| B5 | Weighted Stakeholder Heuristic | P5 balanced parameters | hard AV gate |
+| B6 | Three-Stakeholder Balanced | P5 balanced parameters | hard AV gate |
+
+## 1,500-order multi-fold results
+
+Mean across three folds:
+
+| Mechanism | Match | Cancel | Passenger accept | Driver accept | Net profit | HV income | AV share | AV ODD violation |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| B0 MinPickup Uniform | 0.870 | 0.130 | 0.870 | 0.970 | 30,939 | 9,179 | 0.476 | 0.132 |
+| B1 MinCost Uniform | 0.869 | 0.131 | 0.869 | 0.970 | 35,596 | 7,256 | 0.571 | 0.003 |
+| B2 ODD Gate Uniform | 0.869 | 0.131 | 0.869 | 0.970 | 32,553 | 10,082 | 0.426 | 0.000 |
+| B3 ODD Price Shared | 0.868 | 0.132 | 0.868 | 0.970 | 35,430 | 9,165 | 0.567 | 0.000 |
+| B4 AV Discount + HV Comp | 0.873 | 0.127 | 0.874 | 0.970 | 33,685 | 9,333 | 0.582 | 0.000 |
+| B5 Weighted Heuristic | 0.852 | 0.148 | 0.855 | 0.970 | 32,117 | 12,195 | 0.487 | 0.000 |
+| B6 Three-Stakeholder Balanced | 0.852 | 0.148 | 0.854 | 0.970 | 33,211 | 9,253 | 0.581 | 0.000 |
+
+Interpretation: ODD-gated mechanisms remove AV hard violations. B3 preserves
+most of the B1 profit advantage while enforcing AV feasibility. B6 is more
+conservative in service level than B3 in this parameterization but keeps ODD
+violations at zero and uses a clean lexicographic objective rather than mixed
+unit weights.
+
+## Limited 15,000-order full-fold robustness
+
+Mean across three full folds:
+
+| Mechanism | Match | Cancel | Net profit | AV ODD violation |
+| --- | ---: | ---: | ---: | ---: |
+| B0 MinPickup Uniform | 0.827 | 0.173 | 365,234 | 0.133 |
+| B1 MinCost Uniform | 0.821 | 0.179 | 397,166 | 0.012 |
+| B2 ODD Gate Uniform | 0.826 | 0.174 | 384,359 | 0.000 |
+| B3 ODD Price Shared | 0.819 | 0.181 | 394,355 | 0.000 |
+| B6 Three-Stakeholder Balanced | 0.814 | 0.186 | 361,077 | 0.000 |
+
+The full-fold run supports the same qualitative conclusion: ODD-gated
+mechanisms enforce zero AV hard violations, and B3 remains close to the
+operating-cost benchmark in platform net profit.
+
+## Cancellation reasons
+
+Across the 1,500-order multi-fold experiment:
+
+| Reason | Orders |
 | --- | ---: |
-| intersection_sensitive_av | 0.609 |
-| conservative_av | 0.626 |
-| uncertainty_sensitive_av | 0.698 |
-| moderate_av | 0.869 |
-| mature_av | 0.955 |
-| reference_hv | 1.000 |
+| passenger rejection | 19,384 |
+| no available vehicle | 3,150 |
+| no spatial candidate | 2,479 |
+| no ODD-feasible AV | 1,990 |
+| patience timeout | 559 |
 
-The ODD margin is now `threshold - condition value` by dimension, combined with
-an uncertainty margin. Missing-modality penalties enter AV feasibility rather
-than only cost.
+`passenger_acceptance_rate` is no longer equal to match rate. It is computed
+from candidate-edge acceptability before matching.
 
-## Experiment run
+## Pricing and compensation
 
-The committed Stage4 result files use three folds, 1,500 orders per fold, and
-69 scenarios. Full-fold inputs are available and the simulator supports
-`--max-orders-per-fold 0`; the sample run is used here to keep repository
-iteration time bounded.
+Passenger fare is:
 
-## Strategy comparison
+```text
+base fare + surge component + vehicle adjustment + passenger-funded compensation
+```
 
-Mean across folds for strategy scenarios:
+HV driver total payout is:
 
-| Strategy | Match | Cancel | Platform profit | HV stress | AV share | AV ODD violation |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Random | 0.886 | 0.114 | 36,217 | 0.369 | 0.520 | 0.131 |
-| Nearest | 0.884 | 0.116 | 36,320 | 0.370 | 0.522 | 0.138 |
-| GlobalMatch-MinPickup | 0.886 | 0.114 | 36,419 | 0.369 | 0.523 | 0.135 |
-| GlobalMatch-MinOperatingCost | 0.886 | 0.114 | 44,995 | 0.375 | 0.958 | 0.134 |
-| Cost-only | 0.886 | 0.114 | 45,001 | 0.379 | 0.954 | 0.135 |
-| Simple Risk Penalty | 0.885 | 0.115 | 27,454 | 0.368 | 0.075 | 0.107 |
-| ODD Gate Only | 0.883 | 0.117 | 34,473 | 0.380 | 0.439 | 0.000 |
-| ODD-Gated Price-Aware | 0.877 | 0.123 | 41,634 | 0.433 | 0.824 | 0.000 |
-| Three-Stakeholder Balanced | 0.877 | 0.123 | 41,839 | 0.437 | 0.834 | 0.000 |
+```text
+base driver payout
++ service-time payout
++ pickup compensation
++ scarcity bonus
++ gross stress compensation
+```
 
-ODD-constrained strategies eliminate AV hard ODD violations by construction.
-They trade a small match-rate reduction for feasibility compliance and higher
-AV assignment share under price-aware matching.
+Gross stress compensation is exactly:
 
-## Supply scenarios
+```text
+passenger-funded compensation + platform-funded compensation
+```
 
-For the base ODD-Gated Price-Aware mechanism:
+Platform HV cost includes base driver components, platform-funded compensation,
+and platform variable cost. The accounting audit verifies all identities.
 
-| Supply | Match | Cancel | Platform profit |
-| --- | ---: | ---: | ---: |
-| abundant | 0.873 | 0.127 | 42,128 |
-| moderate | 0.877 | 0.123 | 41,634 |
-| tight | 0.879 | 0.121 | 41,367 |
+## Capability and lost-demand accounting
 
-The current reconstructed-supply sample does not produce a monotone supply
-curve; this is a known limitation of using scenario reconstruction rather than
-observed idle cruising traces.
+AV edge cost includes pickup, service, energy, capability cost,
+remote-assistance placeholder cost, and fallback expected cost. Non-ODD
+baselines may assign ODD-infeasible AV edges, but those edges carry fallback
+cost and are recorded as violations. ODD-gated mechanisms prohibit such edges.
 
-## AV penetration
+Scenario net profit is:
 
-| AV share | Match | Cancel | Platform profit | HV net income | AV assignment share |
-| ---: | ---: | ---: | ---: | ---: | ---: |
-| 0% | 0.882 | 0.118 | 25,800 | 21,630 | 0.000 |
-| 25% | 0.884 | 0.116 | 39,172 | 7,012 | 0.683 |
-| 75% | 0.868 | 0.132 | 42,143 | 2,687 | 0.875 |
-
-Higher AV penetration increases platform profit in this cost scenario but
-reduces HV income exposure. This is a scenario result, not a welfare conclusion
-about real platforms.
-
-## ODD profiles
-
-| ODD profile | Match | Cancel | Profit | HV income | AV share |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| conservative | 0.874 | 0.126 | 36,921 | 8,570 | 0.600 |
-| intersection-sensitive | 0.875 | 0.125 | 36,455 | 9,367 | 0.582 |
-| mature | 0.881 | 0.119 | 43,586 | 2,129 | 0.905 |
-| uncertainty-sensitive | 0.877 | 0.123 | 38,343 | 7,157 | 0.665 |
-
-ODD profile strictness changes the AV/HV feasible domain and therefore the
-residual burden assigned to HVs.
-
-## Pricing mechanisms
-
-| Pricing | Match | Cancel | Mean fare | Passenger GC | Profit | HV income |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| P0 uniform | 0.879 | 0.121 | 44.90 | 45.85 | 42,232 | 2,894 |
-| P1 platform-funded | 0.878 | 0.122 | 44.92 | 45.83 | 40,596 | 3,685 |
-| P2 passenger-funded | 0.872 | 0.128 | 46.96 | 47.92 | 43,833 | 3,854 |
-| P4 AV discount + HV comp | 0.884 | 0.116 | 43.80 | 44.72 | 39,143 | 4,002 |
-| P5 balanced | 0.862 | 0.138 | 43.88 | 44.82 | 38,785 | 3,844 |
-
-Passenger-funded compensation raises fares and generalized cost. Platform-funded
-and shared mechanisms shift burden between platform margin and HV compensation.
+```text
+served-order profit - lost-demand penalty
+```
 
 ## Audits
 
-All submitted audits passed:
+All audits passed for both the 1,500-order multi-fold experiment and the limited
+15,000-order full-fold robustness experiment:
 
 - Stage3 export audit
 - capability mapping audit
 - matching feasibility audit
 - pricing accounting audit
 - scenario comparability audit
-- dynamic state consistency audit
+- dynamic dispatch consistency audit
+
+## Output files
+
+Small committed result files live under `stage4/docs/results`. Figures live
+under `stage4/docs/figures`.
 
 ## Limitations
 
-1. The committed result run uses a 1,500-order-per-fold scenario sample for
-   runtime control; full inputs are available but require a longer foreground
-   run.
-2. Supply is reconstructed from observed service orders, not true idle vehicle
-   traces.
-3. AV capability profiles are scenario priors, not empirical ADS performance
-   estimates.
-4. ODD stress is an operational condition vector, not crash or disengagement
-   risk.
-
-## Next step
-
-If a longer machine run is acceptable, execute the same simulator with
-`--max-orders-per-fold 0` and regenerate `stage4/docs/results` and figures.
-The mechanism code and audits are now in place for that full-fold run.
+1. Supply is a reconstructed scenario, not observed idle cruising behavior.
+2. AV profiles are scenario priors, not empirical AV capability estimates.
+3. The main multi-scenario comparison uses 1,500 orders/fold for tractability;
+   the full-fold run is limited to five main mechanisms.
+4. The current candidate builder is distance-filtered with zone statistics. It
+   is not a full road-network travel-time candidate generator.

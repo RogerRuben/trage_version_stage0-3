@@ -6,10 +6,8 @@ coordination for mixed AV/HV ride-hailing fleets.
 ## Folds and sample
 
 The submitted run uses three Stage3 rolling test folds and a reproducible
-1,500-order sample per fold for the full 69-scenario mechanism matrix. The full
-15,000-order-per-fold input is available in `stage3/output/stage4_inputs_final`;
-running with `--max-orders-per-fold 0` reproduces the same design at full fold
-size but requires substantially longer runtime.
+1,500-order sample per fold for the full 126-row mechanism matrix. A limited
+15,000-order-per-fold robustness run is also included for five main mechanisms.
 
 ## Scenario axes
 
@@ -20,9 +18,12 @@ size but requires substantially longer runtime.
 - Pricing: uniform, platform-funded compensation, passenger-funded
   compensation, shared compensation, AV discount + HV compensation,
   three-stakeholder balanced
-- Dispatch: Random, Nearest, GlobalMatch-MinPickup,
-  GlobalMatch-MinOperatingCost, Cost-only, Simple Risk Penalty, ODD Gate Only,
-  ODD-Gated Price-Aware Matching, Three-Stakeholder Balanced
+- Main mechanisms: B0-B6 from `selected_strategy_grid`
+- One-factor analyses: supply, AV penetration, ODD profile, pricing
+- Joint interaction: AV penetration × ODD profile under B3
+
+The report distinguishes the 1,500-order multi-fold mechanism experiment from
+the limited 15,000-order main-mechanism robustness experiment.
 
 All strategies within a fold use the same sampled order stream and the same
 scenario parameter files.
