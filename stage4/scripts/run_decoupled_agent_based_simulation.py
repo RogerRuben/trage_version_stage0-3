@@ -1,4 +1,4 @@
-"""Run demand-supply decoupled single-day AV/HV ABM.
+"""Legacy prototype: run demand-supply decoupled single-day AV/HV ABM.
 
 The simulator uses pre-generated CRN environment files from
 ``build_decoupled_abm_environment.py``.  Matching is performed on sparse
@@ -8,6 +8,9 @@ dense cost matrix.
 This is a 30-second discrete-time sparse-matching simulator with event-state
 updates at each decision epoch.  It is not a full priority-queue event-driven
 simulator.
+
+For the request-plan-execution separated simulator, use
+``stage4/scripts/run_simulator_v3.py``.
 """
 
 from __future__ import annotations

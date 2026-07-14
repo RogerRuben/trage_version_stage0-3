@@ -40,3 +40,12 @@ P0 smoke status after the correction:
 - Three-Stakeholder Balanced currently has only a proxy HV-stress edge filter;
   formal zone-time stress budget and minimum zone service constraints remain
   required before it can be interpreted as the final balanced mechanism.
+
+Simulator v3 status:
+
+- `stage4/simulator_v3/` introduces the request-plan-execution separated kernel.
+- The previous v2 scripts are retained as legacy regression prototypes.
+- The first v3 Phase 1 smoke run validates request lifecycle, plan publication,
+  vehicle leg execution, RoutingEngine usage, and ODD checks on a 1,000-order
+  regression window.
+- Full-day v3 replication 1 and later phases remain intentionally pending.

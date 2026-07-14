@@ -1,0 +1,5 @@
+{
+  "pickup_cost_counted_once_status": "PASS_BY_EDGE_LEVEL_ONLY_IN_V3_PHASE1",
+  "scenario_fixed_cost_in_edge_objective_status": "NOT_USED_IN_EDGE_OBJECTIVE",
+  "scenario_net_profit_status": "PENDING_FULL_ECONOMY_PHASE"
+}

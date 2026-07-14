@@ -1,0 +1,2 @@
+orders,completed_orders,cancelled_orders,match_rate,av_assignment_share,routing_query_count,routing_cache_hit_count,routing_cache_hit_rate,vehicle_leg_count,plan_revision_count,offer_count,replication_id,strategy,operation,request_time_scenario,max_orders,max_vehicles,output_path
+1000,657,343,0.657,0.0,264215,229911,0.8701663418049694,1314,657,657,1,Safe GlobalMatch-MinPickup,O0,RT-Base,1000,2000,stage4\output\simulator_v3\replication=1\strategy=Safe_GlobalMatch-MinPickup\operation=O0\RT-Base

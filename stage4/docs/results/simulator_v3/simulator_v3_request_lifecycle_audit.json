@@ -1,0 +1,10 @@
+{
+  "orders": 1000,
+  "completed_orders": 657,
+  "cancelled_orders": 343,
+  "completed_plus_cancelled_pass": "PASS",
+  "duplicate_request_rows": 0,
+  "duplicate_request_rows_pass": "PASS",
+  "completed_without_assignment": 0,
+  "completed_without_assignment_pass": "PASS"
+}

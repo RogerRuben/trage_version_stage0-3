@@ -1,0 +1,9 @@
+{
+  "routing_query_count": 264215,
+  "routing_cache_hit_count": 229911,
+  "routing_cache_hit_rate": 0.8701663418049694,
+  "balltree_only_coarse_filter_status": "PASS_BY_DESIGN",
+  "fixed_haversine_8mps_final_eta_status": "REMOVED",
+  "mean_candidate_truncation_rate": 0.08744032304298802,
+  "candidate_truncation_pass": "PASS"
+}

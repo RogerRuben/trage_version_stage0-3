@@ -1,4 +1,8 @@
-"""Single-day full-order agent-based AV/HV dynamic dispatch simulation."""
+"""Legacy prototype: single-day full-order AV/HV dynamic dispatch simulation.
+
+For the request-plan-execution separated simulator, use
+``stage4/scripts/run_simulator_v3.py``.
+"""
 
 from __future__ import annotations
 

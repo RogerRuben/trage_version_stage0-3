@@ -1,0 +1,7 @@
+{
+  "unknown_condition_av_assignment_count": 0,
+  "av_odd_violation_count": 0,
+  "unknown_condition_av_assignment_pass": "PASS",
+  "av_odd_violation_pass": "PASS",
+  "odd_checked_in_plan_validator": "PASS"
+}

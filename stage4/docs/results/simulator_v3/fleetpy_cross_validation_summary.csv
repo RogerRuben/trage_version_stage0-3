@@ -1,0 +1,2 @@
+cross_validation_status,reason
+NOT_RUN,FleetPy cross-validation reserved for Phase 6 after v3 full kernel audits pass.

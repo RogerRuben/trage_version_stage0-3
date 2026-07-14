@@ -1,0 +1,134 @@
+"""Vehicle physical execution layer.
+
+Only this module mutates vehicle physical state: position, current leg,
+execution status, and cumulative movement counters.
+"""
+
+from __future__ import annotations
+
+import uuid
+
+import pandas as pd
+
+from .entities import RequestState, VehicleLeg, VehiclePlan, VehicleState
+from .enums import EventType, LegType, RequestStatus, StopType, VehicleExecutionStatus
+from .event_queue import EventQueue
+from .routing_engine import RoutingEngine
+
+
+class VehicleExecutor:
+    def __init__(self, routing_engine: RoutingEngine, event_queue: EventQueue):
+        self.routing = routing_engine
+        self.event_queue = event_queue
+
+    def publish_plan(self, vehicle: VehicleState, plan: VehiclePlan, requests: dict[str, RequestState], current_time: pd.Timestamp) -> VehicleLeg | None:
+        vehicle.active_plan = plan
+        vehicle.plan_version = plan.plan_version
+        return self._start_next_leg(vehicle, requests, current_time)
+
+    def _start_next_leg(self, vehicle: VehicleState, requests: dict[str, RequestState], current_time: pd.Timestamp) -> VehicleLeg | None:
+        if vehicle.current_leg is not None:
+            return None
+        if not vehicle.active_plan.stops:
+            vehicle.execution_status = VehicleExecutionStatus.IDLE if vehicle.online_start <= current_time <= vehicle.online_end else VehicleExecutionStatus.OFFLINE
+            return None
+        stop = vehicle.active_plan.stops.pop(0)
+        if stop.stop_type == StopType.PICKUP:
+            req = requests[str(stop.request_id)]
+            route = self.routing.query(
+                (vehicle.current_lon, vehicle.current_lat, vehicle.current_zone),
+                (req.origin_lon, req.origin_lat, req.origin_zone),
+                current_time,
+                vehicle.vehicle_type,
+                int(req.metadata.get("time_bin", 0)),
+            )
+            leg_type = LegType.PICKUP
+            status = VehicleExecutionStatus.PICKUP
+            req.status = RequestStatus.PICKUP_STARTED
+            req.pickup_start_time = current_time
+            vehicle.current_request_id = req.order_id
+        elif stop.stop_type == StopType.DROP_OFF:
+            req = requests[str(stop.request_id)]
+            route = self.routing.query(
+                (vehicle.current_lon, vehicle.current_lat, vehicle.current_zone),
+                (req.destination_lon, req.destination_lat, req.destination_zone),
+                current_time,
+                vehicle.vehicle_type,
+                int(req.metadata.get("time_bin", 0)),
+                realized_time_sec=req.realized_service_time_sec,
+                route_source_hint="stage2_service_eta_with_historical_duration_realization",
+            )
+            leg_type = LegType.SERVICE
+            status = VehicleExecutionStatus.SERVICE
+            req.status = RequestStatus.IN_SERVICE
+            req.service_start_time = current_time
+        elif stop.stop_type == StopType.HV_REPOSITION:
+            route = self.routing.query((vehicle.current_lon, vehicle.current_lat, vehicle.current_zone), (stop.lon, stop.lat, stop.zone), current_time, vehicle.vehicle_type)
+            leg_type = LegType.HV_REPOSITION
+            status = VehicleExecutionStatus.REPOSITIONING
+        elif stop.stop_type == StopType.AV_REBALANCE:
+            route = self.routing.query((vehicle.current_lon, vehicle.current_lat, vehicle.current_zone), (stop.lon, stop.lat, stop.zone), current_time, vehicle.vehicle_type)
+            leg_type = LegType.AV_REBALANCE
+            status = VehicleExecutionStatus.REBALANCING
+        else:
+            return self._start_next_leg(vehicle, requests, current_time)
+        duration = route.realized_travel_time_sec if route.realized_travel_time_sec is not None else route.expected_travel_time_sec
+        planned_end = current_time + pd.Timedelta(seconds=float(duration))
+        leg = VehicleLeg(
+            leg_id=f"LEG_{uuid.uuid4().hex[:16]}",
+            vehicle_id=vehicle.vehicle_id,
+            leg_type=leg_type,
+            request_id=stop.request_id,
+            start_lon=vehicle.current_lon,
+            start_lat=vehicle.current_lat,
+            end_lon=stop.lon,
+            end_lat=stop.lat,
+            planned_start=current_time,
+            planned_end=planned_end,
+            actual_start=current_time,
+            actual_end=None,
+            distance_m=route.road_distance_m,
+            expected_travel_time_sec=route.expected_travel_time_sec,
+            realized_travel_time_sec=float(duration),
+            route_source=route.route_source,
+            odd_feasible=None,
+            plan_version=vehicle.plan_version,
+        )
+        vehicle.current_leg = leg
+        vehicle.execution_status = status
+        self.event_queue.push(planned_end, EventType.LEG_COMPLETED, vehicle.vehicle_id, {"leg_id": leg.leg_id})
+        return leg
+
+    def complete_current_leg(self, vehicle: VehicleState, requests: dict[str, RequestState], current_time: pd.Timestamp) -> VehicleLeg | None:
+        leg = vehicle.current_leg
+        if leg is None:
+            return None
+        leg.actual_end = current_time
+        vehicle.current_lon = leg.end_lon
+        vehicle.current_lat = leg.end_lat
+        if leg.request_id and leg.request_id in requests:
+            req = requests[leg.request_id]
+            if leg.leg_type == LegType.PICKUP:
+                vehicle.current_zone = req.origin_zone
+                req.status = RequestStatus.BOARDED
+                req.boarding_time = current_time
+                vehicle.cumulative_pickup_distance_m += leg.distance_m
+            elif leg.leg_type == LegType.SERVICE:
+                vehicle.current_zone = req.destination_zone
+                req.status = RequestStatus.COMPLETED
+                req.dropoff_time = current_time
+                req.assigned_vehicle_id = vehicle.vehicle_id
+                vehicle.current_request_id = None
+                vehicle.cumulative_service_distance_m += leg.distance_m
+                vehicle.cumulative_stress_burden += req.stress_value
+        elif leg.leg_type == LegType.HV_REPOSITION:
+            vehicle.cumulative_reposition_distance_m += leg.distance_m
+        elif leg.leg_type == LegType.AV_REBALANCE:
+            vehicle.cumulative_rebalancing_distance_m += leg.distance_m
+        vehicle.cumulative_busy_time_sec += max(0.0, (current_time - leg.actual_start).total_seconds()) if leg.actual_start is not None else 0.0
+        vehicle.completed_legs += 1
+        vehicle.current_leg = None
+        vehicle.execution_status = VehicleExecutionStatus.IDLE if vehicle.online_start <= current_time <= vehicle.online_end else VehicleExecutionStatus.OFFLINE
+        self._start_next_leg(vehicle, requests, current_time)
+        return leg
+
