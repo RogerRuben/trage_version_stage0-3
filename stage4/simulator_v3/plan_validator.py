@@ -32,11 +32,14 @@ class PlanValidator:
         current_time: pd.Timestamp,
         pickup_arrival: pd.Timestamp,
         service_end: pd.Timestamp,
+        allow_preassignment: bool = False,
     ) -> ValidationResult:
         if current_time < vehicle.online_start or current_time > vehicle.online_end:
             return ValidationResult(False, "vehicle_offline")
-        if vehicle.execution_status not in {VehicleExecutionStatus.IDLE, VehicleExecutionStatus.WAITING}:
+        if not allow_preassignment and vehicle.execution_status not in {VehicleExecutionStatus.IDLE, VehicleExecutionStatus.WAITING}:
             return ValidationResult(False, "vehicle_not_controllable")
+        if allow_preassignment and vehicle.current_leg is None:
+            return ValidationResult(False, "preassignment_missing_current_leg")
         if pickup_arrival > request.latest_pickup_time:
             return ValidationResult(False, "pickup_deadline")
         if service_end > vehicle.online_end:
@@ -48,4 +51,3 @@ class PlanValidator:
         if not service_ok:
             return ValidationResult(False, service_reason, pickup_odd_feasible=pickup_ok, service_odd_feasible=False)
         return ValidationResult(True, "", pickup_odd_feasible=pickup_ok, service_odd_feasible=service_ok)
-

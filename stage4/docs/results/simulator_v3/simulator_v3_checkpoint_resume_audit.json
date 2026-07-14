@@ -1,0 +1,9 @@
+{
+  "completed_full": 654,
+  "completed_resumed": 654,
+  "cancelled_full": 346,
+  "cancelled_resumed": 346,
+  "request_assignment_dropoff_mismatch_count": 0,
+  "vehicle_total_distance_abs_diff_m": 0.0,
+  "checkpoint_resume_pass": "PASS"
+}

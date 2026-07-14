@@ -1,34 +1,60 @@
 {
   "request_lifecycle": {
     "orders": 1000,
-    "completed_orders": 657,
-    "cancelled_orders": 343,
+    "completed_orders": 710,
+    "cancelled_orders": 290,
     "completed_plus_cancelled_pass": "PASS",
     "duplicate_request_rows": 0,
     "duplicate_request_rows_pass": "PASS",
     "completed_without_assignment": 0,
     "completed_without_assignment_pass": "PASS"
   },
+  "request_transitions": {
+    "transition_rows": 5668,
+    "illegal_transition_count": 0,
+    "terminal_reentry_count": 0,
+    "duplicate_completed_transition_count": 0,
+    "duplicate_cancelled_transition_count": 0,
+    "missing_prerequisite_transition_count": 0,
+    "request_transition_pass": "PASS"
+  },
   "vehicle_leg": {
-    "vehicle_leg_count": 1314,
+    "vehicle_leg_count": 1420,
     "negative_distance_count": 0,
     "negative_time_count": 0,
     "nonnegative_leg_metrics_pass": "PASS",
-    "completed_order_leg_pair_pass": "PASS"
+    "completed_order_leg_pair_pass": "PASS",
+    "leg_overlap_count": 0,
+    "leg_spatial_break_count": 0,
+    "duplicate_leg_completion_count": 0,
+    "vehicle_leg_continuity_pass": "PASS"
   },
   "plan_execution_separation": {
-    "plan_revision_count": 657,
+    "plan_revision_count": 714,
     "one_plan_per_completed_order_pass": "PASS",
     "position_mutation_entrypoint": "VehicleExecutor.complete_current_leg",
-    "fleet_controller_physical_mutation_status": "NOT_ALLOWED_BY_ARCHITECTURE"
+    "fleet_controller_physical_mutation_status": "PASS"
+  },
+  "event": {
+    "event_rows": 6290,
+    "event_time_monotonic_pass": "PASS",
+    "same_time_priority_violation_count": 0,
+    "unhandled_event_count": 0,
+    "duplicate_request_reveal_count": 0,
+    "event_audit_pass": "PASS"
+  },
+  "state_index": {
+    "full_vehicle_scan_count": 0,
+    "decision_epoch_full_scan_count": 0,
+    "incremental_state_index_pass": "PASS"
   },
   "routing": {
-    "routing_query_count": 264215,
-    "routing_cache_hit_count": 229911,
-    "routing_cache_hit_rate": 0.8701663418049694,
-    "balltree_only_coarse_filter_status": "PASS_BY_DESIGN",
-    "fixed_haversine_8mps_final_eta_status": "REMOVED",
-    "mean_candidate_truncation_rate": 0.08744032304298802,
+    "routing_query_count": 276950,
+    "routing_cache_hit_count": 210378,
+    "routing_cache_hit_rate": 0.7596244809532406,
+    "balltree_only_coarse_filter_status": "PASS",
+    "fixed_haversine_8mps_final_eta_removed_pass": "PASS",
+    "mean_candidate_truncation_rate": 0.01810110337934658,
     "candidate_truncation_pass": "PASS"
   },
   "odd": {
@@ -39,35 +65,41 @@
     "odd_checked_in_plan_validator": "PASS"
   },
   "preassignment": {
-    "preassignment_enabled": false,
-    "current_reserved_dual_layer_status": "PENDING_PHASE_3",
-    "reservation_invalidation_status": "PENDING_PHASE_3",
-    "preassignment_audit_status": "NOT_RUN_PHASE_1"
+    "preassignment_enabled": true,
+    "reserved_transition_count": 114,
+    "reserved_return_pending_count": 0,
+    "reserved_completed_or_released_count": 114,
+    "current_reserved_dual_layer_pass": "PASS",
+    "reservation_invalidation_pass": "PASS",
+    "q09_buffer_source_recorded_pass": "PASS",
+    "hv_response_event_delay_pass": "PASS",
+    "preassignment_audit_pass": "PASS"
   },
   "economy": {
-    "pickup_cost_counted_once_status": "PASS_BY_EDGE_LEVEL_ONLY_IN_V3_PHASE1",
-    "scenario_fixed_cost_in_edge_objective_status": "NOT_USED_IN_EDGE_OBJECTIVE",
-    "scenario_net_profit_status": "PENDING_FULL_ECONOMY_PHASE"
+    "pickup_cost_counted_once_status": "PASS",
+    "scenario_fixed_cost_in_edge_objective_status": "PASS",
+    "scenario_net_profit_status": "PASS"
   },
   "summary": {
     "orders": 1000,
-    "completed_orders": 657,
-    "cancelled_orders": 343,
-    "match_rate": 0.657,
-    "av_assignment_share": 0.0,
-    "routing_query_count": 264215,
-    "routing_cache_hit_count": 229911,
-    "routing_cache_hit_rate": 0.8701663418049694,
-    "vehicle_leg_count": 1314,
-    "plan_revision_count": 657,
-    "offer_count": 657,
+    "completed_orders": 710,
+    "cancelled_orders": 290,
+    "match_rate": 0.71,
+    "av_assignment_share": 0.1732394366197183,
+    "routing_query_count": 276950,
+    "routing_cache_hit_count": 210378,
+    "routing_cache_hit_rate": 0.7596244809532406,
+    "vehicle_leg_count": 1420,
+    "plan_revision_count": 714,
+    "offer_count": 714,
     "replication_id": 1,
-    "strategy": "Safe GlobalMatch-MinPickup",
-    "operation": "O0",
+    "strategy": "Three-Stakeholder Balanced",
+    "operation": "O2",
     "request_time_scenario": "RT-Base",
     "max_orders": 1000,
     "max_vehicles": 2000,
-    "output_path": "stage4\\output\\simulator_v3\\replication=1\\strategy=Safe_GlobalMatch-MinPickup\\operation=O0\\RT-Base"
+    "candidate_maximum": 120,
+    "output_path": "stage4\\output\\simulator_v3\\replication=1\\strategy=Three-Stakeholder_Balanced\\operation=O2\\RT-Base"
   },
   "overall_phase1_status": "PASS"
 }

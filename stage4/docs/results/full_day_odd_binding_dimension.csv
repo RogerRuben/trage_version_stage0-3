@@ -2,9 +2,14 @@ vehicle_profile,binding_dimension,orders
 conservative_av,lcs,112160
 conservative_av,rts,5
 conservative_av,unknown_condition,2191
-moderate_av,lcs,112165
+moderate_av,lcs,79053
+moderate_av,pmis,20263
+moderate_av,rts,10015
+moderate_av,uncertainty,2834
 moderate_av,unknown_condition,2191
-mature_av,lcs,112165
+mature_av,lcs,79888
+mature_av,pmis,21893
+mature_av,rts,10384
 mature_av,unknown_condition,2191
 intersection_sensitive_av,lcs,112164
 intersection_sensitive_av,rts,1

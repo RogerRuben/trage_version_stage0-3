@@ -1,0 +1,9 @@
+{
+  "transition_rows": 5668,
+  "illegal_transition_count": 0,
+  "terminal_reentry_count": 0,
+  "duplicate_completed_transition_count": 0,
+  "duplicate_cancelled_transition_count": 0,
+  "missing_prerequisite_transition_count": 0,
+  "request_transition_pass": "PASS"
+}

@@ -99,7 +99,32 @@ class RoutingEngine:
         self._cache[key] = result
         return result
 
+    def query_pickup_route(
+        self,
+        origin: tuple[float, float, str],
+        destination: tuple[float, float, str],
+        departure_time: pd.Timestamp,
+        vehicle_type: str,
+        time_bin: int | None = None,
+    ) -> RouteResult:
+        return self.query(origin, destination, departure_time, vehicle_type, time_bin, route_source_hint="pickup_zone_time_proxy_backend")
+
+    def query_service_route(
+        self,
+        request,
+        departure_time: pd.Timestamp,
+        vehicle_type: str,
+    ) -> RouteResult:
+        self.query_count += 1
+        return RouteResult(
+            road_distance_m=float(request.route_length_m),
+            expected_travel_time_sec=float(request.predicted_service_time_sec),
+            realized_travel_time_sec=float(request.realized_service_time_sec),
+            route_nodes=[],
+            route_links=[],
+            route_source=str(request.metadata.get("eta_source", "stage2_or_train_eta_baseline")) + "+historical_service_backend",
+        )
+
     @property
     def cache_hit_rate(self) -> float:
         return self.cache_hit_count / self.query_count if self.query_count else 0.0
-

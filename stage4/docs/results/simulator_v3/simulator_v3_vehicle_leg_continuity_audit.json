@@ -1,8 +1,4 @@
 {
-  "plan_revision_count": 714,
-  "one_plan_per_completed_order_pass": "PASS",
-  "position_mutation_entrypoint": "VehicleExecutor.complete_current_leg",
-  "fleet_controller_physical_mutation_status": "PASS",
   "vehicle_leg_count": 1420,
   "negative_distance_count": 0,
   "negative_time_count": 0,

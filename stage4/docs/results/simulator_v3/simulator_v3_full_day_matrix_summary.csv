@@ -1,0 +1,6 @@
+replication_id,strategy,operation,orders,completed_orders,cancelled_orders,match_rate,av_assignment_share,av_completed_orders,unknown_condition_av_assignment_count,reserved_transition_count,routing_query_count,routing_cache_hit_rate,candidate_maximum,run_dir
+1,ODD-Gated Price-Aware,O0,114356,104655,9701,0.9151684214208262,0.030309110888156323,3172,0,0,14795085,0.645919033246514,120,stage4\output\simulator_v3\replication=1\strategy=ODD-Gated_Price-Aware\operation=O0\RT-Base
+1,ODD-Gated Price-Aware,O1,114356,104755,9601,0.9160428836265697,0.033554484272827076,3515,0,0,14094520,0.6325151903009113,120,stage4\output\simulator_v3\replication=1\strategy=ODD-Gated_Price-Aware\operation=O1\RT-Base
+1,ODD-Gated Price-Aware,O2,114356,105344,9012,0.9211934660183987,0.03828409781287971,4033,0,5799,16198357,0.605718036711995,120,stage4\output\simulator_v3\replication=1\strategy=ODD-Gated_Price-Aware\operation=O2\RT-Base
+1,ODD-Gated Price-Aware,O3,114356,105430,8926,0.9219455035153381,0.04217964526225932,4447,0,5713,15981451,0.6019422141331222,120,stage4\output\simulator_v3\replication=1\strategy=ODD-Gated_Price-Aware\operation=O3\RT-Base
+1,Safe GlobalMatch-MinPickup,O0,114356,105427,8929,0.9219192696491658,0.0287876919574682,3035,0,0,14312247,0.6402441908667451,120,stage4\output\simulator_v3\replication=1\strategy=Safe_GlobalMatch-MinPickup\operation=O0\RT-Base

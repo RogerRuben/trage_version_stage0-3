@@ -32,12 +32,13 @@ def sparse_max_cardinality_match(edges: list[CandidateEdge], objective: str) -> 
     start = time.perf_counter()
     graph = nx.Graph()
     lookup: dict[tuple[str, str], CandidateEdge] = {}
-    for edge in edges:
+    for edge in sorted(edges, key=lambda e: (e.request_id, e.vehicle_id)):
         if objective == "min_pickup":
             secondary = -edge.pickup_eta_sec
         else:
             secondary = edge.marginal_contribution
-        graph.add_edge(f"o:{edge.request_id}", f"v:{edge.vehicle_id}", weight=SERVICE_CARDINALITY_BONUS + int(round(secondary * 1_000)))
+        tie = sum(ord(c) for c in (edge.request_id + edge.vehicle_id)) % 997
+        graph.add_edge(f"o:{edge.request_id}", f"v:{edge.vehicle_id}", weight=SERVICE_CARDINALITY_BONUS + int(round(secondary * 1_000_000)) * 1_000 + tie)
         lookup[(edge.request_id, edge.vehicle_id)] = edge
     matching = nx.algorithms.matching.max_weight_matching(graph, maxcardinality=True, weight="weight")
     chosen: list[CandidateEdge] = []
@@ -69,4 +70,3 @@ def edges_to_frame(edges: list[CandidateEdge]) -> pd.DataFrame:
         }
         for e in edges
     ])
-

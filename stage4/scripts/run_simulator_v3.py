@@ -24,6 +24,7 @@ from stage4.simulator_v3.entities import RequestState, VehiclePlan, VehicleState
 from stage4.simulator_v3.enums import RequestStatus, VehicleExecutionStatus
 from stage4.simulator_v3.event_queue import EventQueue
 from stage4.simulator_v3.fleet_controller import FleetController
+from stage4.simulator_v3.idle_management import IdleMovementManager
 from stage4.simulator_v3.matching.candidate_generator import CandidatePolicy
 from stage4.simulator_v3.odd.pickup_odd import PickupODDChecker
 from stage4.simulator_v3.odd.service_odd import ServiceODDChecker
@@ -151,7 +152,7 @@ def load_odd(args: argparse.Namespace) -> tuple[PickupODDChecker, ServiceODDChec
     return PickupODDChecker(pickup_map), ServiceODDChecker(cap_map)
 
 
-def run(args: argparse.Namespace) -> dict:
+def build_engine(args: argparse.Namespace) -> tuple[SimulationEngine, pd.Timestamp]:
     requests = load_requests(args)
     vehicles = load_vehicles(args)
     if not requests:
@@ -161,6 +162,7 @@ def run(args: argparse.Namespace) -> dict:
     max_service = max(r.realized_service_time_sec for r in requests.values())
     end = latest_request.ceil(f"{args.decision_epoch_sec}s") + pd.Timedelta(seconds=480 + max_service + 1800)
     state = SystemState(current_time=start, requests=requests, vehicles=vehicles)
+    state.initialize_vehicle_indexes()
     events = EventQueue()
     routing = RoutingEngine(args.data_root)
     pickup_odd, service_odd = load_odd(args)
@@ -173,11 +175,23 @@ def run(args: argparse.Namespace) -> dict:
         economics,
         driver_response,
         CandidatePolicy(maximum_candidates=args.candidate_maximum),
+        preassignment_enabled=args.operation in {"O2", "O3"},
     )
-    executor = VehicleExecutor(routing, events)
-    engine = SimulationEngine(state, events, controller, executor, RequestManager(), decision_epoch_sec=args.decision_epoch_sec)
+    request_manager = RequestManager()
+    executor = VehicleExecutor(routing, events, request_manager, state)
+    idle_manager = None
+    if args.operation in {"O1", "O3"}:
+        zone_system_path = args.data_root / "operational_zone_system.json"
+        zone_system = json.loads(zone_system_path.read_text(encoding="utf-8"))
+        idle_manager = IdleMovementManager(zone_system)
+    engine = SimulationEngine(state, events, controller, executor, request_manager, decision_epoch_sec=args.decision_epoch_sec, idle_manager=idle_manager)
     engine.configure_strategy(args.strategy)
     engine.initialize_events(start, end)
+    return engine, end
+
+
+def run(args: argparse.Namespace) -> dict:
+    engine, end = build_engine(args)
     summary = engine.run(end)
     out = args.output_root / f"replication={args.replication}" / f"strategy={args.strategy.replace(' ', '_')}" / f"operation={args.operation}" / args.request_time_scenario
     if out.exists() and not args.overwrite:
@@ -191,6 +205,7 @@ def run(args: argparse.Namespace) -> dict:
         "request_time_scenario": args.request_time_scenario,
         "max_orders": args.max_orders,
         "max_vehicles": args.max_vehicles,
+        "candidate_maximum": args.candidate_maximum,
         "output_path": str(out),
     })
     summary_path = args.results_dir / "simulator_v3_strategy_summary.csv"

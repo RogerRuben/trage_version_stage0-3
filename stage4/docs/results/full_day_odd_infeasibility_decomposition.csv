@@ -1,6 +1,6 @@
 sample,vehicle_profile,orders,condition_known_orders,core_feasible_share,service_feasible_share,lcs_hard_violation,pmis_hard_violation,rts_hard_violation,core_uncertainty_violation,iis_violation,missing_iis_count,missing_iis_closes_av_count,multiple_violations
 full_day_conservative_av,conservative_av,114356,112165,0.0,0.0,112165,112165,112165,0,0,112165,0,112165
-full_day_112165_condition_known,moderate_av,114356,112165,0.0,0.0,112165,17134,18622,0,0,112165,0,31694
-full_day_mature_av,mature_av,114356,112165,0.0013462309989747247,0.0013462309989747247,112014,0,7,0,0,112165,0,7
+full_day_112165_condition_known,moderate_av,114356,112165,0.7213034369009941,0.7213034369009941,24990,6714,3790,0,0,112165,0,3844
+full_day_mature_av,mature_av,114356,112165,0.9690188561494227,0.9690188561494227,2288,492,821,0,0,112165,0,123
 full_day_intersection_sensitive_av,intersection_sensitive_av,114356,112165,0.0,0.0,112165,111909,110819,0,0,112165,0,112165
 full_day_uncertainty_sensitive_av,uncertainty_sensitive_av,114356,112165,0.0,0.0,112165,112163,111982,112165,0,112165,0,112165

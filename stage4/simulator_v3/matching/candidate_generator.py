@@ -8,7 +8,7 @@ import numpy as np
 from sklearn.neighbors import BallTree
 
 from ..entities import RequestState, VehicleState
-from ..enums import VehicleExecutionStatus
+from ..system_state import SystemState
 
 EARTH_M = 6_371_000.0
 
@@ -20,17 +20,17 @@ class CandidatePolicy:
     second_stage_candidates: int = 40
     maximum_candidates: int = 80
     minimum_av_candidates: int = 10
+    minimum_hv_candidates: int = 10
+    minimum_feasible_candidates: int = 10
 
 
 class CandidateGenerator:
     def __init__(self, policy: CandidatePolicy):
         self.policy = policy
 
-    def controllable_vehicles(self, vehicles: dict[str, VehicleState]) -> list[VehicleState]:
-        return [
-            v for v in vehicles.values()
-            if v.execution_status in {VehicleExecutionStatus.IDLE, VehicleExecutionStatus.WAITING}
-        ]
+    def controllable_vehicles(self, state: SystemState) -> list[VehicleState]:
+        ids = sorted(state.idle_hv_ids | state.idle_av_ids)
+        return [state.vehicles[vid] for vid in ids]
 
     def generate(self, requests: list[RequestState], vehicles: list[VehicleState], radius_by_order: dict[str, float]) -> tuple[dict[str, list[VehicleState]], dict]:
         if not requests or not vehicles:
@@ -58,4 +58,3 @@ class CandidateGenerator:
             "candidate_truncation_rate": max(0.0, trunc),
             "orders_hitting_candidate_cap": hit_cap,
         }
-
