@@ -49,8 +49,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--od-root", type=Path, default=Path("stage0/output/order_od_audited"))
     parser.add_argument("--order-base-root", type=Path, default=Path("stage0/output/order_base"))
     parser.add_argument("--stage3-inputs", type=Path, default=Path("stage3/output/full_day_20161023/stage4_inputs/stage4_inputs.parquet"))
+    parser.add_argument("--stage2-route-conditioned", type=Path, default=Path("stage2/output/route_conditioned_dataset_full_20161023/estimated_time_daily/day=20161023.parquet"))
     parser.add_argument("--profiles", type=Path, default=Path("stage4/config/vehicle_capability_profiles.json"))
     parser.add_argument("--capability-reference", type=Path, default=Path("stage3/output/stage4_inputs_final/fold=3/stage4_inputs.parquet"))
+    parser.add_argument("--capability-calibration-mode", choices=["none", "reference_quantile"], default="none")
     parser.add_argument("--output-root", type=Path, default=Path("stage4/output/decoupled_environment"))
     parser.add_argument("--data-root", type=Path, default=Path("stage4/data/decoupled_abm"))
     parser.add_argument("--results-dir", type=Path, default=Path("stage4/docs/results"))
@@ -201,7 +203,15 @@ def build_eta_baseline(train: dict[str, pd.DataFrame], spec: ZoneSpec) -> tuple[
     return zt, {"global_eta_sec": global_eta, "fallback_by_time": fallback_time.to_dict("records")}
 
 
-def attach_eta(demand: pd.DataFrame, eta_table: pd.DataFrame, eta_meta: dict, spec: ZoneSpec) -> pd.DataFrame:
+def load_stage2_eta(path: Path) -> pd.DataFrame:
+    if not path.exists():
+        return pd.DataFrame(columns=["order_id", "stage2_predicted_service_time_sec"])
+    frame = pd.read_parquet(path, columns=["order_id", "estimated_link_travel_time_sec"])
+    frame["estimated_link_travel_time_sec"] = pd.to_numeric(frame["estimated_link_travel_time_sec"], errors="coerce").fillna(0)
+    return frame.groupby("order_id", as_index=False).agg(stage2_predicted_service_time_sec=("estimated_link_travel_time_sec", "sum"))
+
+
+def attach_eta(demand: pd.DataFrame, eta_table: pd.DataFrame, eta_meta: dict, spec: ZoneSpec, stage2_eta: pd.DataFrame) -> pd.DataFrame:
     demand = demand.copy()
     demand["origin_zone"] = assign_zone(demand["origin_lon"], demand["origin_lat"], spec).to_numpy()
     demand["destination_zone"] = assign_zone(demand["destination_lon"], demand["destination_lat"], spec).to_numpy()
@@ -217,6 +227,13 @@ def attach_eta(demand: pd.DataFrame, eta_table: pd.DataFrame, eta_meta: dict, sp
     global_mask = demand["predicted_service_time_sec"].isna()
     demand.loc[global_mask, "predicted_service_time_sec"] = float(eta_meta["global_eta_sec"])
     demand.loc[global_mask, "eta_source"] = "train_global_eta_baseline"
+    if not stage2_eta.empty:
+        demand = demand.merge(stage2_eta, on="order_id", how="left")
+        stage2_mask = demand["stage2_predicted_service_time_sec"].notna() & demand["condition_available"].fillna(False)
+        demand.loc[stage2_mask, "predicted_service_time_sec"] = demand.loc[stage2_mask, "stage2_predicted_service_time_sec"]
+        demand.loc[stage2_mask, "eta_source"] = "stage2_estimated_route_eta"
+    else:
+        demand["stage2_predicted_service_time_sec"] = np.nan
     demand["predicted_service_time_sec"] = demand["predicted_service_time_sec"].clip(lower=60, upper=7_200)
     demand["realized_service_time_sec"] = pd.to_numeric(demand["duration_sec"], errors="coerce").fillna(demand["predicted_service_time_sec"])
     demand["eta_available"] = demand["predicted_service_time_sec"].notna()
@@ -256,26 +273,47 @@ def attach_stage3_conditions(demand: pd.DataFrame, stage3_path: Path) -> pd.Data
     return merged
 
 
+def stable_uniform(order_id: pd.Series, salt: str) -> pd.Series:
+    vals = []
+    for value in order_id.astype(str):
+        h = hashlib.md5(f"{salt}:{value}".encode("utf-8")).hexdigest()
+        vals.append(int(h[:12], 16) / float(16 ** 12 - 1))
+    return pd.Series(vals, index=order_id.index)
+
+
 def attach_request_times(demand: pd.DataFrame, chain_stats: dict, args: argparse.Namespace) -> dict[str, pd.DataFrame]:
     out = {}
     lower = max(float(args.matching_response_sec + args.minimum_pickup_sec), 60.0)
     q25 = max(lower + 60, min(float(chain_stats["gap_p25_sec"]), args.max_request_lead_sec))
     q50 = max(lower + 60, min(float(chain_stats["gap_p50_sec"]), args.max_request_lead_sec))
     q75 = max(lower + 60, min(float(chain_stats["gap_p75_sec"]), args.max_request_lead_sec))
-    scenario_targets = {"RT-Low": q25, "RT-Base": q50, "RT-High": q75}
+    scenario_fracs = {"RT-Low": 0.25, "RT-Base": 0.50, "RT-High": 0.75}
+    scenario_caps = {"RT-Low": q25, "RT-Base": q50, "RT-High": q75}
     business_lower = pd.Timestamp(f"{args.date[:4]}-{args.date[4:6]}-{args.date[6:]} 00:00:00", tz="UTC") - pd.Timedelta(minutes=args.warmup_minutes)
-    for scenario, target in scenario_targets.items():
+    for scenario, frac in scenario_fracs.items():
         frame = demand.copy()
+        # Order-level lower bound varies with a conservative minimum pickup
+        # proxy.  The training chain supplies only scenario bounds, not a true
+        # passenger request-time distribution.
+        od_dist = haversine_m(frame["origin_lon"], frame["origin_lat"], frame["destination_lon"], frame["destination_lat"])
+        order_lower = np.maximum(lower, args.matching_response_sec + np.minimum(600.0, np.maximum(args.minimum_pickup_sec, od_dist / 12.0)))
         seconds_since_boundary = (frame["observed_boarding_time"] - business_lower).dt.total_seconds().clip(lower=lower + 1)
-        frame["request_time_lower_bound_sec"] = lower
-        frame["request_time_upper_bound_sec"] = np.minimum(seconds_since_boundary - 1, max(target, lower + 60))
-        frame["request_time_upper_bound_sec"] = frame["request_time_upper_bound_sec"].clip(lower=lower + 1)
-        lead = np.minimum(target, frame["request_time_upper_bound_sec"])
-        frame["request_lead_clipped"] = lead.ne(target)
+        frame["request_time_lower_bound_sec"] = order_lower
+        cap = scenario_caps[scenario]
+        frame["request_time_upper_bound_sec"] = np.minimum(seconds_since_boundary - 1, np.maximum(cap, order_lower + 60))
+        frame["request_time_upper_bound_sec"] = frame["request_time_upper_bound_sec"].clip(lower=order_lower + 1)
+        u = stable_uniform(frame["order_id"], scenario)
+        jitter = (u - 0.5) * 0.20
+        position = np.clip(frac + jitter, 0.05, 0.95)
+        target_lead = frame["request_time_lower_bound_sec"] + position * (frame["request_time_upper_bound_sec"] - frame["request_time_lower_bound_sec"])
+        lead = target_lead.copy()
+        lead = np.minimum(lead, cap)
+        lead = np.maximum(lead, frame["request_time_lower_bound_sec"])
+        frame["request_lead_clipped"] = lead.ne(target_lead)
         frame["latent_request_lead_sec"] = lead.clip(lower=lower)
-        frame["simulated_request_time"] = frame["observed_boarding_time"] - pd.to_timedelta(frame["latent_request_lead_sec"], unit="s")
+        frame["simulated_request_time"] = (frame["observed_boarding_time"] - pd.to_timedelta(frame["latent_request_lead_sec"], unit="s")).dt.round("us")
         frame["request_time_scenario"] = scenario
-        frame["request_time_source"] = "scenario_with_training_chain_bounds"
+        frame["request_time_source"] = "order_level_scenario_with_training_chain_bounds"
         frame["request_lead_bound_source"] = "training_driver_chain_feasible_gap_bounds_clipped_to_business_day"
         frame["request_time_identification_status"] = "latent_scenario"
         out[scenario] = frame
@@ -445,19 +483,36 @@ def build_av_agents(depots: pd.DataFrame, args: argparse.Namespace, replication:
     return pd.DataFrame(rows)
 
 
-def build_pickup_calibration_and_odd(train: dict[str, pd.DataFrame], chain: pd.DataFrame, spec: ZoneSpec, results_dir: Path) -> tuple[pd.DataFrame, pd.DataFrame, dict]:
-    feasible = chain[chain["gap_sec"].between(120, 3_600) & chain["empty_dist_m"].gt(50)].copy()
-    feasible["time_bin"] = time_bin_index(feasible["observed_boarding_time"]).to_numpy()
-    feasible["empty_speed_mps"] = (feasible["empty_dist_m"] / feasible["gap_sec"]).clip(lower=1.0, upper=20.0)
-    speed = feasible.groupby(["prev_dest_zone", "time_bin"], as_index=False).agg(
-        empty_speed_mps=("empty_speed_mps", "median"),
-        sample_count=("empty_speed_mps", "size"),
-    ).rename(columns={"prev_dest_zone": "origin_zone"})
-    global_speed = float(feasible["empty_speed_mps"].median()) if len(feasible) else 6.0
+def build_pickup_calibration_and_odd(train: dict[str, pd.DataFrame], chain: pd.DataFrame, spec: ZoneSpec, results_dir: Path, order_base_root: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, dict]:
     all_orders = pd.concat(train.values(), ignore_index=True)
     all_orders["origin_zone"] = assign_zone(all_orders["origin_lon"], all_orders["origin_lat"], spec).to_numpy()
     all_orders["destination_zone"] = assign_zone(all_orders["destination_lon"], all_orders["destination_lat"], spec).to_numpy()
+    all_orders["time_bin"] = time_bin_index(all_orders["observed_boarding_time"]).to_numpy()
     all_orders["od_dist_m"] = haversine_m(all_orders["origin_lon"], all_orders["origin_lat"], all_orders["destination_lon"], all_orders["destination_lat"])
+    all_orders["loaded_speed_mps"] = (all_orders["od_dist_m"] / pd.to_numeric(all_orders["duration_sec"], errors="coerce")).replace([np.inf, -np.inf], np.nan)
+    speed = all_orders.groupby(["origin_zone", "time_bin"], as_index=False).agg(
+        loaded_speed_mps=("loaded_speed_mps", "median"),
+        sample_count=("loaded_speed_mps", "size"),
+    )
+    speed["empty_speed_mps"] = (speed["loaded_speed_mps"] * 1.15).clip(lower=4.0, upper=14.0)
+    global_speed = float((all_orders["loaded_speed_mps"].median() * 1.15))
+    global_speed = min(max(global_speed, 4.0), 14.0)
+    circ_parts = []
+    for date in train:
+        base_path = order_base_root / f"day={date}.parquet"
+        if base_path.exists():
+            base = pd.read_parquet(base_path, columns=["order_id", "matched_route_length_m"])
+            tmp = train[date][["order_id", "origin_lon", "origin_lat", "destination_lon", "destination_lat"]].merge(base, on="order_id", how="left")
+            tmp["origin_zone"] = assign_zone(tmp["origin_lon"], tmp["origin_lat"], spec).to_numpy()
+            tmp["od_dist_m"] = haversine_m(tmp["origin_lon"], tmp["origin_lat"], tmp["destination_lon"], tmp["destination_lat"])
+            tmp["circuity_factor"] = pd.to_numeric(tmp["matched_route_length_m"], errors="coerce") / tmp["od_dist_m"].replace(0, np.nan)
+            circ_parts.append(tmp[["origin_zone", "circuity_factor"]])
+    if circ_parts:
+        circ = pd.concat(circ_parts, ignore_index=True)
+        circuity = circ.groupby("origin_zone", as_index=False).agg(circuity_factor=("circuity_factor", "median"), sample_count=("circuity_factor", "count"))
+        circuity["circuity_factor"] = circuity["circuity_factor"].clip(lower=1.05, upper=2.5)
+    else:
+        circuity = pd.DataFrame({"origin_zone": speed["origin_zone"].unique(), "circuity_factor": 1.35, "sample_count": 0})
     all_orders["stress_proxy"] = pd.to_numeric(all_orders.get("duration_sec"), errors="coerce") / all_orders["od_dist_m"].replace(0, np.nan)
     zone_pair = all_orders.groupby(["origin_zone", "destination_zone"], as_index=False).agg(
         train_order_count=("order_id", "size"),
@@ -478,10 +533,11 @@ def build_pickup_calibration_and_odd(train: dict[str, pd.DataFrame], chain: pd.D
         "zone_pair_count": int(len(zone_pair)),
         "zone_pair_feasible_share": float(zone_pair["pickup_odd_feasible"].mean()) if len(zone_pair) else 0.0,
         "empty_speed_global_mps": global_speed,
-        "empty_speed_sample_count": int(len(feasible)),
+        "empty_speed_sample_count": int(speed["sample_count"].sum()) if len(speed) else 0,
+        "circuity_factor_median": float(circuity["circuity_factor"].median()) if len(circuity) else 1.35,
     }
     pd.DataFrame([summary]).to_csv(results_dir / "pickup_eta_calibration_summary.csv", index=False)
-    return speed, zone_pair, summary
+    return speed, circuity, zone_pair, summary
 
 
 def quantile_calibrate_to_reference(values: pd.Series, reference: pd.Series) -> pd.Series:
@@ -504,7 +560,7 @@ def quantile_calibrate_to_reference(values: pd.Series, reference: pd.Series) -> 
     return pd.Series(mapped, index=values.index)
 
 
-def build_capability(demand: pd.DataFrame, profiles_path: Path, reference_path: Path, output_root: Path, results_dir: Path) -> pd.DataFrame:
+def build_capability(demand: pd.DataFrame, profiles_path: Path, reference_path: Path, calibration_mode: str, output_root: Path, results_dir: Path) -> pd.DataFrame:
     doc = json.loads(profiles_path.read_text(encoding="utf-8"))
     profiles = doc["profiles"]
     reference = pd.read_parquet(reference_path) if reference_path.exists() else pd.DataFrame()
@@ -521,10 +577,15 @@ def build_capability(demand: pd.DataFrame, profiles_path: Path, reference_path: 
         pmis_raw = pd.to_numeric(demand["pmis_tail_probability"], errors="coerce")
         rts_raw = pd.to_numeric(demand["rts_tail_probability"], errors="coerce")
         unc_raw = pd.to_numeric(demand["overall_uncertainty"], errors="coerce")
-        lcs = quantile_calibrate_to_reference(lcs_raw, reference.get("lcs_tail_probability", lcs_raw))
-        pmis = quantile_calibrate_to_reference(pmis_raw, reference.get("pmis_tail_probability", pmis_raw))
-        rts = quantile_calibrate_to_reference(rts_raw, reference.get("rts_tail_probability", rts_raw))
-        unc = quantile_calibrate_to_reference(unc_raw, reference.get("overall_uncertainty", unc_raw))
+        if calibration_mode == "reference_quantile":
+            lcs = quantile_calibrate_to_reference(lcs_raw, reference.get("lcs_tail_probability", lcs_raw))
+            pmis = quantile_calibrate_to_reference(pmis_raw, reference.get("pmis_tail_probability", pmis_raw))
+            rts = quantile_calibrate_to_reference(rts_raw, reference.get("rts_tail_probability", rts_raw))
+            unc = quantile_calibrate_to_reference(unc_raw, reference.get("overall_uncertainty", unc_raw))
+            scale_label = "fold3_reference_quantile_calibrated_deprecated"
+        else:
+            lcs, pmis, rts, unc = lcs_raw, pmis_raw, rts_raw, unc_raw
+            scale_label = "raw_full_day_stage3_outputs_no_test_day_rank_remap"
         known = demand["condition_available"].fillna(False).astype(bool)
         lcs_v = known & lcs.gt(float(hard["lcs"]))
         pmis_v = known & pmis.gt(float(hard["pmis"]))
@@ -565,7 +626,7 @@ def build_capability(demand: pd.DataFrame, profiles_path: Path, reference_path: 
             "vehicle_type": "AV",
             "scenario_parameter_status": doc.get("parameter_status", "scenario_priors_not_empirical_av_estimates"),
             "condition_available": known,
-            "capability_score_scale": "fold3_reference_quantile_calibrated",
+            "capability_score_scale": scale_label,
             "raw_lcs_tail_probability": lcs_raw.astype("float32"),
             "raw_pmis_tail_probability": pmis_raw.astype("float32"),
             "raw_rts_tail_probability": rts_raw.astype("float32"),
@@ -636,7 +697,7 @@ def build_capability(demand: pd.DataFrame, profiles_path: Path, reference_path: 
                 "full_day_raw_p50": float(full.quantile(0.5)),
                 "fold3_reference_p95": float(ref.quantile(0.95)),
                 "full_day_raw_p95": float(full.quantile(0.95)),
-                "scale_action": "capability_scores_quantile_calibrated_to_fold3_reference",
+                "scale_action": "raw_full_day_stage3_outputs_used_for_capability_gate" if calibration_mode == "none" else "capability_scores_quantile_calibrated_to_fold3_reference",
             })
         pd.DataFrame(compare_rows).to_csv(results_dir / "full_day_stage3_scale_drift_audit.csv", index=False)
     (output_root / "manifest.json").write_text(json.dumps({
@@ -645,6 +706,7 @@ def build_capability(demand: pd.DataFrame, profiles_path: Path, reference_path: 
         "orders": int(demand["order_id"].nunique()),
         "profile_version": doc.get("profile_version"),
         "gate_version": "core_conditional_iis_v1",
+        "capability_calibration_mode": calibration_mode,
     }, indent=2), encoding="utf-8")
     return out
 
@@ -656,20 +718,23 @@ def main() -> None:
     args.results_dir.mkdir(parents=True, exist_ok=True)
     train = build_train_orders(args)
     historical = build_historical_orders(args)
-    spec = make_zone_spec(list(train.values()) + [historical], args.grid_size)
+    spec = make_zone_spec(list(train.values()), args.grid_size)
     zone_meta = {
         "zone_system": "fixed_lonlat_grid",
         "grid_size": args.grid_size,
         "min_lon": spec.min_lon,
         "min_lat": spec.min_lat,
         "uses_test_day_future_demand": False,
+        "zone_boundary_source": "training_days_only",
         "version": "operational_zone_grid_v1",
     }
     (args.data_root / "operational_zone_system.json").write_text(json.dumps(zone_meta, indent=2), encoding="utf-8")
     chain, chain_stats = build_training_chain_stats(train, spec)
-    eta_table, eta_meta = build_eta_baseline(train, spec)
-    demand = attach_eta(historical, eta_table, eta_meta, spec)
+    demand = historical.copy()
     demand = attach_stage3_conditions(demand, args.stage3_inputs)
+    eta_table, eta_meta = build_eta_baseline(train, spec)
+    stage2_eta = load_stage2_eta(args.stage2_route_conditioned)
+    demand = attach_eta(demand, eta_table, eta_meta, spec, stage2_eta)
     request_tables = attach_request_times(demand, chain_stats, args)
     for scenario, frame in request_tables.items():
         path = args.data_root / f"demand_{args.date}_{scenario}.parquet"
@@ -694,17 +759,19 @@ def main() -> None:
         "condition_known_orders": known,
         "condition_unknown_orders": int(len(historical) - known),
         "eta_available_orders": int(demand["eta_available"].sum()),
+        "eta_stage2_estimated_route_orders": int(demand["eta_source"].eq("stage2_estimated_route_eta").sum()),
         "eta_train_od_time_baseline_orders": int(demand["eta_source"].eq("train_od_time_eta_baseline").sum()),
         "eta_train_timebin_baseline_orders": int(demand["eta_source"].eq("train_timebin_eta_baseline").sum()),
         "eta_train_global_baseline_orders": int(demand["eta_source"].eq("train_global_eta_baseline").sum()),
     }]).to_csv(args.results_dir / "full_day_order_coverage.csv", index=False)
-    speed_table, pickup_odd, pickup_summary = build_pickup_calibration_and_odd(train, chain, spec, args.results_dir)
+    speed_table, circuity_table, pickup_odd, pickup_summary = build_pickup_calibration_and_odd(train, chain, spec, args.results_dir, args.order_base_root)
     speed_table.to_parquet(args.data_root / "pickup_empty_speed_by_zone_time.parquet", index=False, compression="zstd")
+    circuity_table.to_parquet(args.data_root / "pickup_circuity_by_zone.parquet", index=False, compression="zstd")
     pickup_odd.to_parquet(args.data_root / "pickup_odd_zone_pair_proxy.parquet", index=False, compression="zstd")
     train_sessions = {date: build_sessions_for_day(frame, spec, date) for date, frame in train.items()}
     (args.data_root / "training_supply_sessions.parquet").parent.mkdir(parents=True, exist_ok=True)
     pd.concat(train_sessions.values(), ignore_index=True).to_parquet(args.data_root / "training_supply_sessions.parquet", index=False, compression="zstd")
-    capability = build_capability(request_tables["RT-Base"], args.profiles, args.capability_reference, args.output_root / "capability_mapping", args.results_dir)
+    capability = build_capability(request_tables["RT-Base"], args.profiles, args.capability_reference, args.capability_calibration_mode, args.output_root / "capability_mapping", args.results_dir)
     env_manifest = []
     start = min(frame["simulated_request_time"].min() for frame in request_tables.values()).floor("30s")
     end = max(pd.to_datetime(historical["observed_dropoff_time"], utc=True, errors="coerce").max(), request_tables["RT-Base"]["simulated_request_time"].max()).ceil("30s")
@@ -750,11 +817,12 @@ def main() -> None:
     pd.concat([pd.read_csv(args.output_root / f"replication={r}" / "supply_curve_audit.csv").assign(replication_id=r) for r in range(1, args.replications + 1)], ignore_index=True).to_csv(args.results_dir / "decoupled_hv_supply_summary.csv", index=False)
     pd.concat([pd.read_csv(args.output_root / f"replication={r}" / "av_vehicle_hour_summary.csv") for r in range(1, args.replications + 1)], ignore_index=True).to_csv(args.results_dir / "av_vehicle_hour_summary.csv", index=False)
     pd.DataFrame([{
-        "service_time_realization_mode": "historical_duration_replay_mode",
+        "service_time_realization_mode": "stage2_eta_for_condition_known_else_train_eta_baseline; historical_duration_replay_realization",
         "orders": int(len(demand)),
         "mean_predicted_service_time_sec": float(demand["predicted_service_time_sec"].mean()),
         "mean_realized_service_time_sec": float(demand["realized_service_time_sec"].mean()),
         "eta_global_fallback_share": float(demand["eta_source"].eq("train_global_eta_baseline").mean()),
+        "eta_stage2_share": float(demand["eta_source"].eq("stage2_estimated_route_eta").mean()),
     }]).to_csv(args.results_dir / "service_time_residual_summary.csv", index=False)
     (args.output_root / "manifest.json").write_text(json.dumps({
         "status": "PASS",

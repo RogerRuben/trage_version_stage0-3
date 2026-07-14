@@ -18,27 +18,33 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def collect_summaries(root: Path) -> pd.DataFrame:
+def collect_summaries(root: Path, min_mtime: float = 0.0) -> pd.DataFrame:
     rows = []
     for path in root.glob("replication=*/**/summary.json"):
+        if path.stat().st_mtime < min_mtime:
+            continue
         doc = json.loads(path.read_text(encoding="utf-8"))
         doc["summary_path"] = str(path)
         rows.append(doc)
     return pd.DataFrame(rows)
 
 
-def read_order_logs(root: Path) -> pd.DataFrame:
+def read_order_logs(root: Path, min_mtime: float = 0.0) -> pd.DataFrame:
     parts = []
     for path in root.glob("replication=*/**/order_log.parquet"):
+        if path.stat().st_mtime < min_mtime:
+            continue
         frame = pd.read_parquet(path)
         frame["log_path"] = str(path)
         parts.append(frame)
     return pd.concat(parts, ignore_index=True) if parts else pd.DataFrame()
 
 
-def read_window_logs(root: Path) -> pd.DataFrame:
+def read_window_logs(root: Path, min_mtime: float = 0.0) -> pd.DataFrame:
     parts = []
     for path in root.glob("replication=*/**/window_log.parquet"):
+        if path.stat().st_mtime < min_mtime:
+            continue
         frame = pd.read_parquet(path)
         frame["log_path"] = str(path)
         parts.append(frame)
@@ -52,7 +58,9 @@ def status(ok: bool) -> str:
 def main() -> None:
     args = parse_args()
     args.results_dir.mkdir(parents=True, exist_ok=True)
-    summary = collect_summaries(args.output_root)
+    env_manifest_path = args.environment_root / "manifest.json"
+    env_manifest_mtime = env_manifest_path.stat().st_mtime if env_manifest_path.exists() else 0.0
+    summary = collect_summaries(args.output_root, min_mtime=env_manifest_mtime)
     if summary.empty:
         raise SystemExit("No decoupled ABM summary.json files found.")
     summary.to_csv(args.results_dir / "decoupled_dispatch_summary.csv", index=False)
@@ -80,11 +88,18 @@ def main() -> None:
         "mean_pickup_time_sec",
         "scenario_net_profit",
     ]].copy()
-    pre["preassignment_enabled"] = pre["operation_setting"].isin(["O2", "O3"])
-    pre["preassignment_implementation"] = "safe_release_proxy_on_busy_or_near_free_vehicle"
+    if "preassignment_enabled" in op.columns:
+        pre["preassignment_enabled"] = op["preassignment_enabled"].astype(bool).to_numpy()
+    else:
+        pre["preassignment_enabled"] = False
+    pre["preassignment_implementation"] = np.where(
+        pre["preassignment_enabled"],
+        "experimental_safe_release_proxy_enabled_by_flag",
+        "disabled_pending_two_layer_current_service_plus_reserved_next_order_state",
+    )
     pre.to_csv(args.results_dir / "preassignment_summary.csv", index=False)
-    orders = read_order_logs(args.output_root)
-    windows = read_window_logs(args.output_root)
+    orders = read_order_logs(args.output_root, min_mtime=env_manifest_mtime)
+    windows = read_window_logs(args.output_root, min_mtime=env_manifest_mtime)
     audit = {}
     if not orders.empty:
         grouped = orders.groupby(["replication_id", "strategy", "operation_setting", "request_time_scenario"])
@@ -109,14 +124,24 @@ def main() -> None:
         audit["peak_candidate_edge_count"] = int(pd.to_numeric(windows.get("peak_candidate_edge_count", pd.Series(0)), errors="coerce").max())
         audit["max_matching_runtime_sec"] = float(pd.to_numeric(windows.get("matching_runtime_sec", pd.Series(0)), errors="coerce").max())
         audit["mean_candidate_truncation_rate"] = float(pd.to_numeric(windows.get("candidate_truncation_rate", pd.Series(0)), errors="coerce").mean())
+        audit["candidate_truncation_rate_status"] = status(audit["mean_candidate_truncation_rate"] <= 0.50)
     env_manifest = json.loads((args.environment_root / "manifest.json").read_text(encoding="utf-8"))
+    summary_mtimes = [Path(p).stat().st_mtime for p in summary["summary_path"] if Path(p).exists()]
+    current_env_results = bool(summary_mtimes and min(summary_mtimes) >= env_manifest_mtime)
     audit["environment_manifest_status"] = env_manifest.get("status")
     audit["weekend_weight"] = env_manifest.get("weekend_weight")
     audit["condition_known_orders"] = env_manifest.get("condition_known_orders")
     audit["condition_unknown_orders"] = env_manifest.get("condition_unknown_orders")
     audit["crn_replications_available"] = len(env_manifest.get("replications", []))
     audit["crn_environment_files_pass"] = status(all((args.environment_root / f"replication={i}" / "simulation_fleet.parquet").exists() for i in range(1, 4)))
-    audit["balanced_differentiation_pass"] = status("Three-Stakeholder Balanced" in set(summary["strategy"]) and "ODD-Gated Price-Aware" in set(summary["strategy"]))
+    audit["result_files_current_environment_pass"] = status(current_env_results)
+    observed_reps = set(pd.to_numeric(summary.get("replication_id", pd.Series(dtype=int)), errors="coerce").dropna().astype(int))
+    audit["result_replications_observed"] = sorted(int(x) for x in observed_reps)
+    audit["formal_three_replication_results_complete_pass"] = status({1, 2, 3}.issubset(observed_reps) and current_env_results)
+    audit["preassignment_formal_status"] = "DISABLED_BY_DEFAULT_PENDING_TWO_LAYER_RESERVATION_STATE"
+    audit["simulator_type"] = "30_second_discrete_time_sparse_matching"
+    audit["balanced_differentiation_status"] = "PROXY_ONLY_HV_STRESS_EDGE_FILTER_NOT_FULL_ZONE_TIME_BUDGET"
+    audit["balanced_differentiation_pass"] = "FAIL"
     audit["overall_status"] = status(all(str(v) == "PASS" for k, v in audit.items() if k.endswith("_pass")))
     (args.results_dir / "decoupled_abm_audit_summary.json").write_text(json.dumps(audit, indent=2), encoding="utf-8")
     # Supply/demand endogeneity summary: keep it compact and explicit.

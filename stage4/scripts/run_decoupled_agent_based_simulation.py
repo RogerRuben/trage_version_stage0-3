@@ -4,6 +4,10 @@ The simulator uses pre-generated CRN environment files from
 ``build_decoupled_abm_environment.py``.  Matching is performed on sparse
 candidate edges only; the script never constructs an all-orders by all-vehicles
 dense cost matrix.
+
+This is a 30-second discrete-time sparse-matching simulator with event-state
+updates at each decision epoch.  It is not a full priority-queue event-driven
+simulator.
 """
 
 from __future__ import annotations
@@ -44,7 +48,7 @@ class Vehicle:
     busy_time_sec: float = 0.0
     stationary_idle_time_sec: float = 0.0
     repositioning_time_sec: float = 0.0
-    empty_km: float = 0.0
+    repositioning_km: float = 0.0
     pickup_km: float = 0.0
     service_km: float = 0.0
     income: float = 0.0
@@ -67,12 +71,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--results-dir", type=Path, default=Path("stage4/docs/results"))
     parser.add_argument("--profile", default="moderate_av")
     parser.add_argument("--matching-epoch-sec", type=int, default=30)
-    parser.add_argument("--max-candidates-per-order", type=int, default=20)
+    parser.add_argument("--max-candidates-per-order", type=int, default=80)
     parser.add_argument("--passenger-gc-cap", type=float, default=120.0)
     parser.add_argument("--driver-utility-min", type=float, default=-2.0)
     parser.add_argument("--hv-stress-budget-zone-epoch", type=float, default=60.0)
     parser.add_argument("--min-zone-service-bonus", type=float, default=1.0)
     parser.add_argument("--preassignment-horizon-sec", type=float, default=300.0)
+    parser.add_argument("--enable-preassignment", action="store_true", help="Disabled by default until two-layer reservation state is fully validated.")
     parser.add_argument("--overwrite", action="store_true")
     return parser.parse_args()
 
@@ -173,16 +178,27 @@ def load_maps(args: argparse.Namespace):
     speed = pd.read_parquet(args.data_root / "pickup_empty_speed_by_zone_time.parquet")
     speed_map = {(str(r.origin_zone), int(r.time_bin)): float(r.empty_speed_mps) for r in speed.itertuples(index=False)}
     global_speed = float(speed["empty_speed_mps"].median()) if len(speed) else 6.0
-    return cap_map, pickup_map, speed_map, global_speed
+    circ_path = args.data_root / "pickup_circuity_by_zone.parquet"
+    if circ_path.exists():
+        circ = pd.read_parquet(circ_path)
+        circ_map = {str(r.origin_zone): float(r.circuity_factor) for r in circ.itertuples(index=False)}
+        global_circuity = float(circ["circuity_factor"].median()) if len(circ) else 1.35
+    else:
+        circ_map = {}
+        global_circuity = 1.35
+    return cap_map, pickup_map, speed_map, global_speed, circ_map, global_circuity
 
 
-def pickup_eta(vehicle: Vehicle, order: pd.Series, speed_map: dict, global_speed: float) -> tuple[float, float, str]:
+def pickup_eta(vehicle: Vehicle, order: pd.Series, speed_map: dict, global_speed: float, circ_map: dict, global_circuity: float) -> tuple[float, float, str]:
     dist = float(haversine_m(vehicle.lon, vehicle.lat, float(order["origin_lon"]), float(order["origin_lat"])))
-    circuity = 1.35
+    circuity = circ_map.get(str(vehicle.zone), global_circuity)
+    circuity = min(max(float(circuity), 1.05), 2.50)
     speed = speed_map.get((str(vehicle.zone), int(order["time_bin"])), global_speed)
-    speed = min(max(speed, 2.0), 15.0)
+    speed = min(max(float(speed), 3.0), 15.0)
     road_dist = dist * circuity
-    return road_dist, road_dist / speed, "zone_time_empty_speed_prior" if (str(vehicle.zone), int(order["time_bin"])) in speed_map else "global_time_prior"
+    speed_source = "zone_time_empty_speed_prior" if (str(vehicle.zone), int(order["time_bin"])) in speed_map else "global_time_prior"
+    circuity_source = "zone_circuity_prior" if str(vehicle.zone) in circ_map else "global_circuity_prior"
+    return road_dist, road_dist / speed, f"{speed_source}+{circuity_source}"
 
 
 def maybe_idle_move(vehicles: dict[str, Vehicle], now: pd.Timestamp, operation_setting: str, rng: np.random.Generator) -> dict:
@@ -212,7 +228,7 @@ def maybe_idle_move(vehicles: dict[str, Vehicle], now: pd.Timestamp, operation_s
         vehicle.lat = new_lat
         vehicle.available_time = now + pd.Timedelta(seconds=move_time)
         vehicle.status = "REPOSITIONING"
-        vehicle.empty_km += dist / 1000.0
+        vehicle.repositioning_km += dist / 1000.0
         vehicle.repositioning_time_sec += move_time
         moved += 1
         km += dist / 1000.0
@@ -281,9 +297,22 @@ def edge_economics(order: pd.Series, vehicle: Vehicle, pickup_dist_m: float, pic
     }
 
 
-def build_edges(pending: pd.DataFrame, vehicles: dict[str, Vehicle], now: pd.Timestamp, cap_map: dict, pickup_odd_map: dict, speed_map: dict, global_speed: float, failure_stage: dict[str, int], args: argparse.Namespace, schedule: dict) -> tuple[pd.DataFrame, dict]:
+def build_edges(
+    pending: pd.DataFrame,
+    vehicles: dict[str, Vehicle],
+    now: pd.Timestamp,
+    cap_map: dict,
+    pickup_odd_map: dict,
+    speed_map: dict,
+    global_speed: float,
+    circ_map: dict,
+    global_circuity: float,
+    failure_stage: dict[str, int],
+    args: argparse.Namespace,
+    schedule: dict,
+) -> tuple[pd.DataFrame, dict]:
     available = []
-    preassignment_enabled = args.operation_setting in {"O2", "O3"}
+    preassignment_enabled = bool(args.enable_preassignment and args.operation_setting in {"O2", "O3"})
     for v in vehicles.values():
         if now < v.online_start or now > v.online_end:
             continue
@@ -292,7 +321,15 @@ def build_edges(pending: pd.DataFrame, vehicles: dict[str, Vehicle], now: pd.Tim
         elif preassignment_enabled and v.status in {"BUSY_UNRESERVED", "NEAR_FREE_UNRESERVED"} and v.available_time is not None and (v.available_time - now).total_seconds() <= args.preassignment_horizon_sec and v.reserved_order_id is None:
             available.append(v)
     if pending.empty or not available:
-        return pd.DataFrame(), {"candidate_edges": 0, "candidate_truncation_rate": 0.0, "orders_hitting_candidate_cap": 0, "peak_candidate_edge_count": 0, "radius_violation_count": 0}
+        return pd.DataFrame(), {
+            "candidate_edges": 0,
+            "candidate_truncation_rate": 0.0,
+            "orders_hitting_candidate_cap": 0,
+            "peak_candidate_edge_count": 0,
+            "radius_violation_count": 0,
+            "order_edge_counts": {},
+            "order_feasible_counts": {},
+        }
     coords = np.radians(np.array([[v.lat, v.lon] for v in available], dtype=float))
     tree = BallTree(coords, metric="haversine")
     order_coords = np.radians(pending[["origin_lat", "origin_lon"]].to_numpy(float))
@@ -300,8 +337,12 @@ def build_edges(pending: pd.DataFrame, vehicles: dict[str, Vehicle], now: pd.Tim
     hit_cap = 0
     possible_total = 0
     radius_violations = 0
+    order_edge_counts: dict[str, int] = {}
+    order_feasible_counts: dict[str, int] = {}
     for oi, (_, order) in enumerate(pending.iterrows()):
         oid = str(order["order_id"])
+        order_edge_counts[oid] = 0
+        order_feasible_counts[oid] = 0
         wait_sec = max(0.0, (now - order["simulated_request_time"]).total_seconds())
         stage, radius = radius_for_wait(wait_sec, failure_stage.get(oid, 0), schedule)
         idx, dist = tree.query_radius(order_coords[oi:oi + 1], r=radius / EARTH_M, return_distance=True, sort_results=True)
@@ -316,7 +357,7 @@ def build_edges(pending: pd.DataFrame, vehicles: dict[str, Vehicle], now: pd.Tim
             if pickup_dist > radius + 1e-6:
                 radius_violations += 1
                 continue
-            road_dist, pickup_time, pickup_eta_source = pickup_eta(vehicle, order, speed_map, global_speed)
+            road_dist, pickup_time, pickup_eta_source = pickup_eta(vehicle, order, speed_map, global_speed, circ_map, global_circuity)
             start_available = max(now, vehicle.available_time or now)
             deadline = order["simulated_request_time"] + pd.Timedelta(seconds=int(schedule.get("passenger_patience_seconds", 480)))
             safe_release_time = start_available
@@ -342,6 +383,9 @@ def build_edges(pending: pd.DataFrame, vehicles: dict[str, Vehicle], now: pd.Tim
                 # scenario costs as edge objectives.
                 if econ["stress"] > 0.85:
                     econ["feasible"] = False
+            order_edge_counts[oid] += 1
+            if bool(econ["feasible"]):
+                order_feasible_counts[oid] += 1
             row = {
                 "order_id": oid,
                 "vehicle_id": vehicle.vehicle_id,
@@ -367,6 +411,8 @@ def build_edges(pending: pd.DataFrame, vehicles: dict[str, Vehicle], now: pd.Tim
         "orders_hitting_candidate_cap": int(hit_cap),
         "peak_candidate_edge_count": int(len(edges)),
         "radius_violation_count": int(radius_violations),
+        "order_edge_counts": order_edge_counts,
+        "order_feasible_counts": order_feasible_counts,
     }
 
 
@@ -414,7 +460,7 @@ def run_simulation(args: argparse.Namespace) -> dict:
     args.results_dir.mkdir(parents=True, exist_ok=True)
     orders = load_orders(args)
     fleet = load_vehicles(rep_root / "simulation_fleet.parquet")
-    cap_map, pickup_odd_map, speed_map, global_speed = load_maps(args)
+    cap_map, pickup_odd_map, speed_map, global_speed, circ_map, global_circuity = load_maps(args)
     schedule = json.loads(args.radius_config.read_text(encoding="utf-8"))
     patience = int(schedule.get("passenger_patience_seconds", 480))
     rng_idle = np.random.default_rng(5000 + args.replication)
@@ -466,7 +512,20 @@ def run_simulation(args: argparse.Namespace) -> dict:
             })
         idle_stats = maybe_idle_move(fleet, now, args.operation_setting, rng_idle)
         pending_frame = order_lookup.loc[list(pending)].copy() if pending else orders.iloc[0:0].copy()
-        edges, edge_stats = build_edges(pending_frame, fleet, now, cap_map, pickup_odd_map, speed_map, global_speed, failure_stage, args, schedule)
+        edges, edge_stats = build_edges(
+            pending_frame,
+            fleet,
+            now,
+            cap_map,
+            pickup_odd_map,
+            speed_map,
+            global_speed,
+            circ_map,
+            global_circuity,
+            failure_stage,
+            args,
+            schedule,
+        )
         chosen, match_stats = solve_sparse_matching(edges, args.strategy, args) if not edges.empty else (edges, {"matching_solver": "sparse_networkx_max_weight_matching", "matched_edges": 0, "matching_runtime_sec": 0.0})
         matched_orders = 0
         for row in chosen.itertuples(index=False):
@@ -529,10 +588,12 @@ def run_simulation(args: argparse.Namespace) -> dict:
                 "pickup_eta_source": row.pickup_eta_source,
                 "pickup_odd_proxy_source": row.pickup_odd_proxy_source,
             })
+        order_edge_counts = edge_stats.pop("order_edge_counts", {})
+        order_feasible_counts = edge_stats.pop("order_feasible_counts", {})
         matched_set = set(chosen["order_id"].astype(str)) if len(chosen) else set()
         for oid in list(pending):
             dispatch_round[oid] = dispatch_round.get(oid, 0) + 1
-            if oid not in matched_set and edge_stats["candidate_edges"] == 0:
+            if oid not in matched_set and (order_edge_counts.get(oid, 0) == 0 or order_feasible_counts.get(oid, 0) == 0):
                 failure_stage[oid] = min(failure_stage.get(oid, 0) + 1, len(schedule["stages"]) - 1)
         epoch_stat = {
             "window_time": str(now),
@@ -591,7 +652,8 @@ def run_simulation(args: argparse.Namespace) -> dict:
         "busy_time_sec": v.busy_time_sec,
         "stationary_idle_time_sec": max(0.0, (v.online_end - v.online_start).total_seconds() - v.busy_time_sec - v.repositioning_time_sec),
         "repositioning_time_sec": v.repositioning_time_sec,
-        "empty_km": v.empty_km + v.pickup_km,
+        "repositioning_km": v.repositioning_km,
+        "empty_km": v.repositioning_km,
         "pickup_km": v.pickup_km,
         "service_km": v.service_km,
         "income": v.income,
@@ -606,7 +668,7 @@ def run_simulation(args: argparse.Namespace) -> dict:
     lost_demand_cost = float((~served).sum() * lost_demand_penalty)
     av_fixed_cost = float(vehicle_log["vehicle_type"].eq("AV").sum() * av_fixed_daily_cost)
     depot_cost = float(vehicle_log.loc[vehicle_log["vehicle_type"].eq("AV"), "depot_id"].nunique() * depot_daily_cost)
-    empty_cost = float(vehicle_log["empty_km"].sum() * 0.30)
+    empty_cost = float(vehicle_log["repositioning_km"].sum() * 0.30)
     operating = float(pd.to_numeric(served_log.get("operating_contribution", pd.Series(dtype=float)), errors="coerce").sum())
     net_profit = operating - lost_demand_cost - av_fixed_cost - depot_cost - empty_cost
     summary = {
@@ -630,7 +692,8 @@ def run_simulation(args: argparse.Namespace) -> dict:
         "hv_income": float(vehicle_log.loc[vehicle_log["vehicle_type"].eq("HV"), "income"].sum()),
         "hv_stress_burden": float(vehicle_log.loc[vehicle_log["vehicle_type"].eq("HV"), "stress_burden"].sum()),
         "av_vehicle_hour_share": float(vehicle_log.loc[vehicle_log["vehicle_type"].eq("AV"), "online_time_sec"].sum() / vehicle_log["online_time_sec"].sum()) if vehicle_log["online_time_sec"].sum() else 0.0,
-        "empty_vehicle_km": float(vehicle_log["empty_km"].sum()),
+        "empty_vehicle_km": float(vehicle_log["repositioning_km"].sum()),
+        "pickup_vehicle_km": float(vehicle_log["pickup_km"].sum()),
         "operating_contribution": operating,
         "lost_demand_cost": lost_demand_cost,
         "av_fixed_cost": av_fixed_cost,
@@ -638,6 +701,9 @@ def run_simulation(args: argparse.Namespace) -> dict:
         "empty_movement_cost": empty_cost,
         "preassignment_failure_cost": 0.0,
         "scenario_net_profit": net_profit,
+        "simulator_type": "30_second_discrete_time_sparse_matching",
+        "preassignment_enabled": bool(args.enable_preassignment and args.operation_setting in {"O2", "O3"}),
+        "balanced_constraints_status": "hv_stress_edge_filter_proxy_not_full_zone_budget" if args.strategy == "Three-Stakeholder Balanced" else "not_applicable",
         "matching_solver": "sparse_networkx_max_weight_matching",
         "max_matching_runtime_sec": float(window_log["matching_runtime_sec"].max()) if len(window_log) else 0.0,
         "peak_candidate_edge_count": int(window_log["peak_candidate_edge_count"].max()) if len(window_log) else 0,

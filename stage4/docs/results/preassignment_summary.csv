@@ -1,5 +1,1 @@
 replication_id,operation_setting,match_rate,mean_waiting_time_sec,mean_pickup_time_sec,scenario_net_profit,preassignment_enabled,preassignment_implementation
-1,O0,0.8516824652838504,31.408234508958365,134.53391018881462,822428.2014130243,False,safe_release_proxy_on_busy_or_near_free_vehicle
-1,O1,0.8745583965860996,27.40992490826009,132.05907892626712,884986.7255079882,False,safe_release_proxy_on_busy_or_near_free_vehicle
-1,O2,0.8458235685053692,24.67917291289739,105.45209071609501,806159.0840301716,True,safe_release_proxy_on_busy_or_near_free_vehicle
-1,O3,0.8728794291510721,22.576523507548664,103.6770149107644,879284.3680259946,True,safe_release_proxy_on_busy_or_near_free_vehicle
