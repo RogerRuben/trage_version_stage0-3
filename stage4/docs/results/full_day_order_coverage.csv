@@ -1,7 +1,2 @@
-stage,orders,share_of_raw
-raw_stage0_order_base,114356,1.0
-stage0_od_valid,114356,1.0
-route_conditioned_ready,112165,0.9808405330721606
-stage2_rc_mstnet_predicted,112165,0.9808405330721606
-stage3_stage4_exported,112165,0.9808405330721606
-not_route_conditioned,2191,0.019159466927839378
+raw_orders,stage0_valid_orders,condition_known_orders,condition_unknown_orders,eta_available_orders,eta_train_od_time_baseline_orders,eta_train_timebin_baseline_orders,eta_train_global_baseline_orders
+114356,112665,112165,2191,114356,113446,910,0

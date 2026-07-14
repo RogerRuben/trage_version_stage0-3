@@ -1,0 +1,23 @@
+{
+  "demand_order_count_pass": "PASS",
+  "served_plus_cancelled_pass": "PASS",
+  "duplicate_order_rows": 0,
+  "unknown_condition_total": 2191,
+  "gated_av_odd_violation_count": 0,
+  "gated_av_odd_pass": "PASS",
+  "unknown_condition_av_assignment_count": 0,
+  "unknown_condition_av_assignment_pass": "PASS",
+  "request_before_boarding_pass": "PASS",
+  "sparse_matching_solver_pass": "PASS",
+  "peak_candidate_edge_count": 1312,
+  "max_matching_runtime_sec": 0.5477310999995098,
+  "mean_candidate_truncation_rate": 0.7378996611570492,
+  "environment_manifest_status": "PASS",
+  "weekend_weight": 0.7,
+  "condition_known_orders": 112165,
+  "condition_unknown_orders": 2191,
+  "crn_replications_available": 3,
+  "crn_environment_files_pass": "PASS",
+  "balanced_differentiation_pass": "PASS",
+  "overall_status": "PASS"
+}

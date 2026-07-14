@@ -1,0 +1,8 @@
+{
+  "version": "preassignment_config_v1",
+  "preassignment_enabled_default": false,
+  "preassignment_horizon_sec": 300,
+  "max_reserved_orders_per_vehicle": 1,
+  "release_confidence_quantile": 0.9,
+  "implementation_status": "safe_release_proxy_on_busy_or_near_free_vehicle"
+}

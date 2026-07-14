@@ -1,0 +1,2 @@
+service_time_realization_mode,orders,mean_predicted_service_time_sec,mean_realized_service_time_sec,eta_global_fallback_share
+historical_duration_replay_mode,114356,744.6836414355172,753.2171901780405,0.0

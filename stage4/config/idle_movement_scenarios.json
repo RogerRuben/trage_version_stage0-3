@@ -1,0 +1,17 @@
+{
+  "version": "idle_movement_scenarios_v1",
+  "notes": "O1/O3 is a joint idle-management package, not a decomposition of HV and AV independent effects.",
+  "scenarios": {
+    "stay": {
+      "hv": "H0_stay_at_last_dropoff",
+      "av": "A0_stay_at_last_dropoff_or_depot",
+      "empty_movement_cost_per_km": 0.0
+    },
+    "joint_idle_management_proxy": {
+      "hv": "H1_empirical_idle_repositioning_proxy",
+      "av": "A1_platform_rebalancing_proxy",
+      "empty_movement_cost_per_km": 0.30,
+      "implementation_status": "lightweight_zone_proxy"
+    }
+  }
+}
