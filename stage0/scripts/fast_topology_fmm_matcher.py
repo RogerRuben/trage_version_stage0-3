@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import sys
 import time
 from functools import lru_cache
 from pathlib import Path
@@ -20,6 +21,12 @@ import numpy as np
 import pandas as pd
 import shapely
 from pyproj import Transformer
+
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from stage0.canonical.topology import build_multidigraph, minimum_parallel_edge
 
 
 def parse_args() -> argparse.Namespace:
@@ -50,23 +57,18 @@ class LocalRoadNetwork:
         self.link_lookup = pd.Series(np.arange(len(self.roads), dtype="int32"), index=self.roads.link_id.astype(str))
         self.forward = self.roads.oneway_code.fillna("B").astype(str).isin(["F", "B"]).to_numpy()
         self.reverse = self.roads.oneway_code.fillna("B").astype(str).isin(["T", "B"]).to_numpy()
-        self.graph = nx.DiGraph()
-        self.undirected_graph = nx.Graph()
-        for idx, row in self.roads.iterrows():
-            u, v = int(row.from_node), int(row.to_node)
-            length = float(self.lengths[idx])
-            if self.forward[idx]:
-                self._add_edge(self.graph, u, v, length, idx)
-            if self.reverse[idx]:
-                self._add_edge(self.graph, v, u, length, idx)
-            self._add_edge(self.undirected_graph, u, v, length, idx)
+        self.graph = build_multidigraph(
+            {
+                "road_idx": idx,
+                "from_node": int(row.from_node),
+                "to_node": int(row.to_node),
+                "length": float(self.lengths[idx]),
+                "oneway_code": str(row.oneway_code) if pd.notna(row.oneway_code) else "B",
+                "link_id": str(row.link_id),
+            }
+            for idx, row in self.roads.iterrows()
+        )
         self.to_wgs84 = Transformer.from_crs(32649, 4326, always_xy=True)
-
-    @staticmethod
-    def _add_edge(graph, u: int, v: int, length: float, road_idx: int) -> None:
-        existing = graph.get_edge_data(u, v)
-        if existing is None or length < existing["weight"]:
-            graph.add_edge(u, v, weight=length, road_idx=road_idx)
 
     def road_indices(self, link_ids: pd.Series) -> np.ndarray:
         values = link_ids.astype(str).map(self.link_lookup)
@@ -75,19 +77,19 @@ class LocalRoadNetwork:
             raise KeyError(f"unknown link_id values: {missing}")
         return values.to_numpy(dtype="int32")
 
-    def shared_node(self, a: np.ndarray, b: np.ndarray) -> np.ndarray:
-        from_node = self.roads.from_node.to_numpy()
-        to_node = self.roads.to_node.to_numpy()
-        return (
-            (from_node[a] == from_node[b]) | (from_node[a] == to_node[b])
-            | (to_node[a] == from_node[b]) | (to_node[a] == to_node[b])
-        )
+    def directed_transition(self, a: np.ndarray, b: np.ndarray) -> np.ndarray:
+        result = np.zeros(len(a), dtype=bool)
+        for index, (previous, following) in enumerate(zip(a, b)):
+            exits = {node for node, _ in self.exit_options(int(previous))}
+            entries = {node for node, _ in self.entry_options(int(following))}
+            result[index] = bool(exits & entries)
+        return result
 
     def local_gap_flags(self, roads: np.ndarray, gps_step: np.ndarray) -> np.ndarray:
         previous = np.roll(roads, 1)
         previous[0] = roads[0]
         changed = roads != previous
-        shared = self.shared_node(previous, roads)
+        shared = self.directed_transition(previous, roads)
         line_distance = np.zeros(len(roads), dtype=float)
         idx = np.flatnonzero(changed)
         if len(idx):
@@ -131,7 +133,7 @@ class LocalRoadNetwork:
     def link_path_indices(self, road_a: int, road_b: int) -> tuple[tuple[int, ...], str, float]:
         if road_a == road_b:
             return (road_a,), "same_link", 0.0
-        if self.shared_node(np.array([road_a], dtype="int32"), np.array([road_b], dtype="int32"))[0]:
+        if self.directed_transition(np.array([road_a], dtype="int32"), np.array([road_b], dtype="int32"))[0]:
             return (road_a, road_b), "direct_topology", 0.0
         best: tuple[float, int, int] | None = None
         for exit_node, exit_distance in self.exit_options(road_a):
@@ -143,36 +145,22 @@ class LocalRoadNetwork:
                     continue
                 if best is None or total < best[0]:
                     best = (total, exit_node, entry_node)
-        status = "fmm_directed"
-        graph = self.graph
-        if best is None:
-            for exit_node, exit_distance in self.exit_options(road_a):
-                for entry_node, entry_distance in self.entry_options(road_b):
-                    try:
-                        middle = nx.shortest_path_length(self.undirected_graph, exit_node, entry_node, weight="weight")
-                        total = float(exit_distance + middle * 1.25 + 25.0 + entry_distance)
-                    except (nx.NetworkXNoPath, nx.NodeNotFound):
-                        continue
-                    if best is None or total < best[0]:
-                        best = (total, exit_node, entry_node)
-            status = "fmm_undirected_relaxation"
-            graph = self.undirected_graph
         if best is None:
             return (road_a, road_b), "fmm_gap", math.inf
         total, source, target = best
         try:
-            nodes = nx.shortest_path(graph, source, target, weight="weight")
+            nodes = nx.shortest_path(self.graph, source, target, weight="weight")
         except (nx.NetworkXNoPath, nx.NodeNotFound):
             return (road_a, road_b), "fmm_gap", math.inf
         path = [road_a]
         for u, v in zip(nodes[:-1], nodes[1:]):
-            path.append(int(graph[u][v]["road_idx"]))
+            path.append(int(minimum_parallel_edge(self.graph, int(u), int(v))["road_idx"]))
         path.append(road_b)
         compact = [path[0]]
         for value in path[1:]:
             if value != compact[-1]:
                 compact.append(value)
-        return tuple(compact), status, total
+        return tuple(compact), "fmm_directed", total
 
 
 def enrich_points(

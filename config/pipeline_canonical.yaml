@@ -1,0 +1,74 @@
+pipeline_version: stage0_4_rebaseline_v2
+status: rebaseline_in_progress
+artifact_root: artifacts
+manifest_schema: config/artifact_manifest.schema.json
+run_registry: artifacts/run_registry.jsonl
+
+governance:
+  require_clean_config_hash: true
+  require_explicit_input_manifest: true
+  reject_exploratory_for_canonical: true
+  reject_deprecated_for_canonical: true
+  allow_automatic_file_discovery: false
+  formal_stage4_enabled: false
+
+smoke:
+  seed: 20260715
+  train_dates: ["20161020"]
+  validation_dates: ["20161022"]
+  test_dates: ["20161023"]
+  orders_per_day: 1000
+  stage4_orders: 1000
+  minimum_orders_per_day: 1000
+  maximum_orders_per_day: 5000
+  stage4_minimum_orders: 500
+  stage4_maximum_orders: 1000
+  output_root: artifacts/canonical/smoke_v2
+
+stage0:
+  contract: docs/pipeline_contract/stage0_contract.md
+  matcher_version: pending_stage0_reaudit
+  road_network_version: pending_stage0_reaudit
+  input_manifest: artifacts/canonical/raw_smoke_input.manifest.json
+  output_manifest: artifacts/canonical/stage0_smoke.manifest.json
+
+stage1:
+  contract: docs/pipeline_contract/stage1_contract.md
+  label_schema: stage1_label_schema_v2
+  fit_dates: ["20161020"]
+  normalization_version: pending_stage1_v2_audit
+  input_manifest: artifacts/canonical/stage0_smoke.manifest.json
+  output_manifest: artifacts/canonical/stage1_v2_smoke.manifest.json
+
+stage2:
+  contract: docs/pipeline_contract/stage2_contract.md
+  prediction_mode: dispatch_time
+  route_source: matched_route_as_assigned_route_proxy
+  folds:
+    train: ["20161020"]
+    validation: ["20161022"]
+    test: ["20161023"]
+  input_manifest: artifacts/canonical/stage1_v2_smoke.manifest.json
+  output_manifest: artifacts/canonical/stage2_dispatch_smoke.manifest.json
+
+stage3:
+  contract: docs/pipeline_contract/stage3_contract.md
+  model: pending_stage3_reaudit
+  calibration: validation_only
+  missing_modality_policy: availability_gated_no_zero_imputation
+  input_manifest: artifacts/canonical/stage2_dispatch_smoke.manifest.json
+  output_manifest: artifacts/canonical/stage3_smoke.manifest.json
+
+stage4:
+  contract: docs/pipeline_contract/stage4_contract.md
+  mode: counterfactual_smoke
+  service_time_source: predicted_distribution
+  strategy: Safe GlobalMatch-MinPickup
+  operation: O0
+  preassignment: false
+  idle_movement: Stay
+  replication: 1
+  av_profile_version: pending_exogenous_profile_reaudit
+  demand_manifest: artifacts/canonical/stage3_smoke.manifest.json
+  supply_manifest: artifacts/canonical/stage4_supply_smoke.manifest.json
+  output_manifest: artifacts/canonical/stage4_safe_o0_smoke.manifest.json

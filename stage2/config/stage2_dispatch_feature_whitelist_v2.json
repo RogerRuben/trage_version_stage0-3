@@ -1,0 +1,21 @@
+{
+  "schema_version": "stage2_dispatch_prediction_v2",
+  "prediction_mode": "dispatch_time",
+  "cutoff": "one order-level decision_time shared by every route link",
+  "planned_product": "stage2_dispatch_prediction_v2",
+  "revealed_product": "stage2_rolling_prediction_v2",
+  "stage4_may_consume": ["stage2_dispatch_prediction_v2"],
+  "forbidden_exact_fields": [
+    "actual_link_entry_time",
+    "actual_link_exit_time",
+    "enter_time",
+    "exit_time",
+    "realized_service_time",
+    "realized_service_time_sec",
+    "travel_time_sec",
+    "true_raw",
+    "true_tail",
+    "actual_route",
+    "future_traffic_state"
+  ]
+}

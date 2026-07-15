@@ -20,6 +20,15 @@
 /stage4/data/
 /tmp/
 
+# Canonical artifact payloads stay local; manifests, audits, and compact reports
+# remain version controlled. Raw source archives are also excluded globally.
+/artifacts/**/*.parquet
+/artifacts/**/*.feather
+/artifacts/**/*.arrow
+/artifacts/**/raw_smoke_source/
+/artifacts/canonical/raw_smoke/
+/artifacts/canonical/smoke_v2/
+
 # Local agent/application state
 /.agents/
 /.codex/

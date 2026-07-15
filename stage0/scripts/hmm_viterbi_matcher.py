@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import sys
 import time
 from functools import lru_cache
 from pathlib import Path
@@ -23,6 +24,12 @@ from pyproj import Transformer
 from scipy.spatial import cKDTree
 from scipy.sparse import coo_matrix
 from scipy.sparse.csgraph import dijkstra
+
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from stage0.canonical.topology import build_multidigraph, minimum_parallel_edge
 
 
 def parse_args() -> argparse.Namespace:
@@ -63,40 +70,32 @@ class HMMRoadNetwork:
         self.tree = cKDTree(self.sample_coords)
         self.to_wgs84 = Transformer.from_crs(32649, 4326, always_xy=True)
 
-        self.graph = nx.DiGraph()
-        self.undirected_graph = nx.Graph()
-        for i, row in self.roads.iterrows():
-            u, v, length = int(row.from_node), int(row.to_node), float(self.lengths[i])
-            existing_undirected = self.undirected_graph.get_edge_data(u, v)
-            if existing_undirected is None or length < existing_undirected["weight"]:
-                self.undirected_graph.add_edge(u, v, weight=length, road_idx=i)
-            if self.forward[i]:
-                self._add_graph_edge(u, v, length, i)
-            if self.reverse[i]:
-                self._add_graph_edge(v, u, length, i)
+        self.graph = build_multidigraph(
+            {
+                "road_idx": i,
+                "from_node": int(row.from_node),
+                "to_node": int(row.to_node),
+                "length": float(self.lengths[i]),
+                "oneway_code": str(row.oneway_code) if pd.notna(row.oneway_code) else "B",
+                "link_id": str(row.link_id),
+            }
+            for i, row in self.roads.iterrows()
+        )
         self.node_xy = {
             int(row.node_id): (float(row.geometry.x), float(row.geometry.y))
             for _, row in self.nodes.iterrows()
         }
         edge_rows, edge_cols, edge_weights = [], [], []
+        minimum_directed: dict[tuple[int, int], float] = {}
         for u, v, data in self.graph.edges(data=True):
-            edge_rows.append(int(u)); edge_cols.append(int(v)); edge_weights.append(float(data["weight"]))
+            key = (int(u), int(v))
+            minimum_directed[key] = min(minimum_directed.get(key, math.inf), float(data["weight"]))
+        for (u, v), weight in minimum_directed.items():
+            edge_rows.append(u); edge_cols.append(v); edge_weights.append(weight)
         node_count = max(max(self.graph.nodes, default=0), int(self.nodes.node_id.max())) + 1
         self.csgraph = coo_matrix(
             (edge_weights, (edge_rows, edge_cols)), shape=(node_count, node_count), dtype=float
         ).tocsr()
-        undirected_rows: list[int] = []; undirected_cols: list[int] = []; undirected_weights: list[float] = []
-        for i, row in self.roads.iterrows():
-            u, v, length = int(row.from_node), int(row.to_node), float(self.lengths[i])
-            undirected_rows.extend([u, v]); undirected_cols.extend([v, u]); undirected_weights.extend([length, length])
-        self.csgraph_undirected = coo_matrix(
-            (undirected_weights, (undirected_rows, undirected_cols)), shape=(node_count, node_count), dtype=float
-        ).tocsr()
-
-    def _add_graph_edge(self, u: int, v: int, length: float, road_idx: int) -> None:
-        existing = self.graph.get_edge_data(u, v)
-        if existing is None or length < existing["weight"]:
-            self.graph.add_edge(u, v, weight=length, road_idx=road_idx)
 
     def heuristic(self, a: int, b: int) -> float:
         pa = self.node_xy.get(int(a)); pb = self.node_xy.get(int(b))
@@ -112,14 +111,6 @@ class HMMRoadNetwork:
             dijkstra(self.csgraph, directed=True, indices=source, limit=3000.0, return_predecessors=False)
         )
 
-    @lru_cache(maxsize=256)
-    def undirected_distance_row(self, source: int) -> np.ndarray:
-        if source < 0 or source >= self.csgraph_undirected.shape[0]:
-            return np.full(self.csgraph_undirected.shape[0], np.inf)
-        return np.asarray(
-            dijkstra(self.csgraph_undirected, directed=False, indices=source, limit=3000.0, return_predecessors=False)
-        )
-
     def node_distance(self, source: int, target: int) -> float:
         if source == target:
             return 0.0
@@ -128,8 +119,16 @@ class HMMRoadNetwork:
         directed = float(self.distance_row(int(source))[int(target)])
         if math.isfinite(directed):
             return directed
-        relaxed = float(self.undirected_distance_row(int(source))[int(target)])
-        return relaxed * 1.25 + 25.0 if math.isfinite(relaxed) else math.inf
+        return math.inf
+
+    def direct_transition_node(self, road_a: int, road_b: int) -> int | None:
+        exits = {node for node, _ in self.exit_options(road_a, self.lengths[road_a] / 2)}
+        entries = {node for node, _ in self.entry_options(road_b, self.lengths[road_b] / 2)}
+        common = sorted(exits & entries)
+        return common[0] if common else None
+
+    def is_directed_link_transition(self, road_a: int, road_b: int) -> bool:
+        return self.direct_transition_node(road_a, road_b) is not None
 
     def candidate_arrays(self, x: np.ndarray, y: np.ndarray, k: int, radius: float):
         query_k = max(12, k * 4)
@@ -213,17 +212,11 @@ class HMMRoadNetwork:
         status = "directed"
         try:
             nodes = nx.shortest_path(self.graph, source, target, weight="weight")
-            graph = self.graph
         except (nx.NetworkXNoPath, nx.NodeNotFound):
-            status = "undirected_relaxation"
-            try:
-                nodes = nx.shortest_path(self.undirected_graph, source, target, weight="weight")
-                graph = self.undirected_graph
-            except (nx.NetworkXNoPath, nx.NodeNotFound):
-                return (road_a, road_b), "gap"
+            return (road_a, road_b), "gap"
         path = [road_a]
         for u, v in zip(nodes[:-1], nodes[1:]):
-            path.append(int(graph[u][v]["road_idx"]))
+            path.append(int(minimum_parallel_edge(self.graph, int(u), int(v))["road_idx"]))
         path.append(road_b)
         compact = [path[0]]
         for value in path[1:]:

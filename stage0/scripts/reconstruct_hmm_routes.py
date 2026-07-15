@@ -31,15 +31,10 @@ def expand_order(group: pd.DataFrame, network: HMMRoadNetwork, lookup: pd.Series
         "source_point_seq": int(states.point_seq.iloc[0]), "timestamp": int(states.timestamp.iloc[0]),
         "is_interpolated": False, "transition_path_status": "start",
     }]
-    from_node = network.roads.from_node.to_numpy(); to_node = network.roads.to_node.to_numpy()
     previous = states.iloc[0]
     for _, current in states.iloc[1:].iterrows():
         a = int(lookup[str(previous.link_id)]); b = int(lookup[str(current.link_id)])
-        shared = (
-            from_node[a] == from_node[b] or from_node[a] == to_node[b]
-            or to_node[a] == from_node[b] or to_node[a] == to_node[b]
-        )
-        if shared:
+        if network.is_directed_link_transition(a, b):
             path, status = (a, b), "direct_topology"
         else:
             path, status = network.link_path_indices(a, b)

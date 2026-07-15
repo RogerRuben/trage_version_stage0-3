@@ -93,10 +93,22 @@ def bucketize(args: argparse.Namespace, bucket_dir: Path) -> dict:
                 if extracted is None:
                     raise OSError(f"could not stream {members[0].name}")
                 source = stack.enter_context(extracted)
-            reader = pd.read_csv(
-                source, header=None, names=COLUMNS, chunksize=args.chunksize,
-                dtype={"driver_id": "string", "order_id": "string"},
-            )
+            if isinstance(source, Path) and source.suffix.lower() == ".parquet":
+                parquet = pq.ParquetFile(source)
+
+                def parquet_batches():
+                    for batch in parquet.iter_batches(batch_size=args.chunksize, columns=COLUMNS):
+                        frame = batch.to_pandas()
+                        frame["driver_id"] = frame["driver_id"].astype("string")
+                        frame["order_id"] = frame["order_id"].astype("string")
+                        yield frame
+
+                reader = parquet_batches()
+            else:
+                reader = pd.read_csv(
+                    source, header=None, names=COLUMNS, chunksize=args.chunksize,
+                    dtype={"driver_id": "string", "order_id": "string"},
+                )
             for chunk_no, chunk in enumerate(reader, start=1):
                 chunk["source_row"] = np.arange(source_offset, source_offset + len(chunk), dtype="int64")
                 source_offset += len(chunk)

@@ -38,6 +38,7 @@ def main() -> None:
     if not geometric.exists():
         raise FileNotFoundError(f"standardized geometric day missing: {geometric}")
     logs = output / "logs"
+    logs.mkdir(parents=True, exist_ok=True)
     processes: list[tuple[subprocess.Popen, object]] = []
     for worker in range(args.workers):
         log_handle = (logs / f"day={args.date}.hmm.worker={worker}.log").open("a", encoding="utf-8")
