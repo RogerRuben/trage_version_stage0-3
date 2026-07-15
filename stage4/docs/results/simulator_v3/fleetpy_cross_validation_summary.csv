@@ -1,2 +1,8 @@
-cross_validation_status,reason
-NOT_RUN,FleetPy cross-validation reserved for Phase 6 after v3 full kernel audits pass.
+metric,stage4_value,fleetpy_value,relative_error,threshold,status
+completed_orders,500.0,500.0,0.0,0.05,PASS
+cancelled_orders,0.0,0.0,0.0,0.05,PASS
+mean_pickup_time_sec,0.0,0.0,0.0,0.1,PASS
+mean_waiting_time_sec,0.0,0.0,0.0,0.1,PASS
+vehicle_busy_time_sec,258310.0937876463,258310.09378764025,2.3435385920216277e-14,0.1,PASS
+pickup_distance_m,0.0,0.0,0.0,0.1,PASS
+service_distance_m,2066480.7503011704,2066480.7503011231,2.2872035297134142e-14,0.1,PASS

@@ -1,5 +1,5 @@
 {
-  "version": "idle_movement_scenarios_v1",
+  "version": "idle_movement_scenarios_v2_training_prior",
   "notes": "O1/O3 is a joint idle-management package, not a decomposition of HV and AV independent effects.",
   "scenarios": {
     "stay": {
@@ -7,11 +7,18 @@
       "av": "A0_stay_at_last_dropoff_or_depot",
       "empty_movement_cost_per_km": 0.0
     },
-    "joint_idle_management_proxy": {
-      "hv": "H1_empirical_idle_repositioning_proxy",
-      "av": "A1_platform_rebalancing_proxy",
+    "joint_idle_management": {
+      "hv": "H1_training_day_empirical_idle_repositioning",
+      "av": "A1_training_demand_shortage_min_cost_rebalancing",
       "empty_movement_cost_per_km": 0.30,
-      "implementation_status": "lightweight_zone_proxy"
+      "interval_sec": 300,
+      "max_share_per_epoch": 0.02,
+      "minimum_hv_idle_sec": 300,
+      "hv_transition_table": "stage4/data/decoupled_abm/hv_idle_zone_transition.parquet",
+      "av_demand_prior": "stage4/data/decoupled_abm/av_rebalancing_demand_prior.parquet",
+      "training_source_dates": ["20161019", "20161020", "20161021", "20161022"],
+      "uses_test_day_future_demand": false,
+      "implementation_status": "implemented_training_prior_plan_leg_execution"
     }
   }
 }

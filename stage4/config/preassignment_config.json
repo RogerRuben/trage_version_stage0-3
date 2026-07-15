@@ -1,8 +1,19 @@
 {
-  "version": "preassignment_config_v1",
+  "version": "preassignment_config_v2_validation_q90",
   "preassignment_enabled_default": false,
   "preassignment_horizon_sec": 300,
   "max_reserved_orders_per_vehicle": 1,
   "release_confidence_quantile": 0.9,
-  "implementation_status": "safe_release_proxy_on_busy_or_near_free_vehicle"
+  "release_residual_definition": "predicted_service_time_sec_minus_realized_service_time_sec",
+  "release_residual_table": "stage4/data/decoupled_abm/service_time_validation_residual_q90.parquet",
+  "release_residual_validation_date": "20161022",
+  "release_residual_minimum_samples": 30,
+  "release_residual_fallback_hierarchy": [
+    "time-zone-stress",
+    "time-zone",
+    "time",
+    "global"
+  ],
+  "driver_response_delay_sec": 10,
+  "implementation_status": "validation_q90_safe_release_with_expiry_and_invalidation"
 }

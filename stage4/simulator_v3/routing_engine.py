@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from collections import OrderedDict
+import os
 from pathlib import Path
 from typing import Any
 
@@ -45,7 +47,11 @@ class RoutingEngine:
         self.data_root = data_root
         self.query_count = 0
         self.cache_hit_count = 0
-        self._cache: dict[tuple, RouteResult] = {}
+        # A full-day run can issue millions of distinct pickup queries.  Keep
+        # the cache bounded so six serial official runs do not trade CPU for
+        # an unbounded RAM footprint.  LRU eviction is deterministic.
+        self.max_cache_entries = max(0, int(os.environ.get("SIMULATOR_V3_ROUTE_CACHE_ENTRIES", "250000")))
+        self._cache: OrderedDict[tuple, RouteResult] = OrderedDict()
         speed = pd.read_parquet(data_root / "pickup_empty_speed_by_zone_time.parquet")
         self.speed_map = {(str(r.origin_zone), int(r.time_bin)): float(r.empty_speed_mps) for r in speed.itertuples(index=False)}
         self.global_speed = float(speed["empty_speed_mps"].median()) if len(speed) else 6.0
@@ -75,7 +81,8 @@ class RoutingEngine:
         self.query_count += 1
         if key in self._cache:
             self.cache_hit_count += 1
-            cached = self._cache[key]
+            cached = self._cache.pop(key)
+            self._cache[key] = cached
             return RouteResult(
                 road_distance_m=cached.road_distance_m,
                 expected_travel_time_sec=cached.expected_travel_time_sec,
@@ -96,7 +103,10 @@ class RoutingEngine:
             route_links=[],
             route_source=route_source_hint,
         )
-        self._cache[key] = result
+        if self.max_cache_entries:
+            self._cache[key] = result
+            if len(self._cache) > self.max_cache_entries:
+                self._cache.popitem(last=False)
         return result
 
     def query_pickup_route(

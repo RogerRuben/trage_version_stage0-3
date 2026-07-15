@@ -37,3 +37,15 @@ class DriverResponseModel:
             return DriverOfferResult(DriverResponse.REJECT, self.response_delay_sec, "utility_below_threshold")
         return DriverOfferResult(DriverResponse.ACCEPT, self.response_delay_sec, "")
 
+    def evaluate_delayed_response(
+        self,
+        vehicle: VehicleState,
+        driver_utility: float,
+        service_end_time: pd.Timestamp,
+    ) -> DriverOfferResult:
+        """Evaluate only when the scheduled DRIVER_RESPONSE event fires."""
+        if pd.Timestamp(service_end_time) > vehicle.online_end:
+            return DriverOfferResult(DriverResponse.REJECT, self.response_delay_sec, "session_constraint")
+        if float(driver_utility) < self.utility_threshold:
+            return DriverOfferResult(DriverResponse.REJECT, self.response_delay_sec, "utility_below_threshold")
+        return DriverOfferResult(DriverResponse.ACCEPT, self.response_delay_sec, "")

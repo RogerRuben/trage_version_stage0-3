@@ -6,6 +6,7 @@ execution status, and cumulative movement counters.
 
 from __future__ import annotations
 
+import os
 import uuid
 
 import pandas as pd
@@ -30,6 +31,10 @@ class VehicleExecutor:
         vehicle.plan_version = plan.plan_version
         return self._start_next_leg(vehicle, requests, current_time)
 
+    def start_next_leg(self, vehicle: VehicleState, requests: dict[str, RequestState], current_time: pd.Timestamp) -> VehicleLeg | None:
+        """Public execution entrypoint used after reservation revalidation."""
+        return self._start_next_leg(vehicle, requests, current_time)
+
     def _start_next_leg(self, vehicle: VehicleState, requests: dict[str, RequestState], current_time: pd.Timestamp) -> VehicleLeg | None:
         if vehicle.current_leg is not None:
             return None
@@ -51,6 +56,7 @@ class VehicleExecutor:
             if req.status == RequestStatus.RESERVED:
                 self.request_manager.transition(req, RequestStatus.ASSIGNED, current_time, trigger="RESERVED_PICKUP_RELEASED", vehicle_id=vehicle.vehicle_id, plan_version=vehicle.plan_version)
                 req.assigned_vehicle_id = vehicle.vehicle_id
+                req.reserved_vehicle_id = None
                 req.assignment_time = req.assignment_time or current_time
                 vehicle.reserved_request_id = None
                 self.state.reserved_request_ids.discard(req.order_id)
@@ -76,7 +82,11 @@ class VehicleExecutor:
         else:
             return self._start_next_leg(vehicle, requests, current_time)
         duration = route.realized_travel_time_sec if route.realized_travel_time_sec is not None else route.expected_travel_time_sec
-        duration = max(1.0, float(duration))
+        # Formal runs keep a one-second minimum so a decision epoch cannot
+        # causally create a higher-priority completion at the same timestamp.
+        # The FleetPy co-located kernel control explicitly sets this to zero.
+        minimum_duration = float(os.environ.get("SIMULATOR_V3_MIN_LEG_DURATION_SEC", "1"))
+        duration = max(minimum_duration, float(duration))
         planned_end = current_time + pd.Timedelta(seconds=float(duration))
         leg = VehicleLeg(
             leg_id=f"LEG_{uuid.uuid4().hex[:16]}",
@@ -133,5 +143,9 @@ class VehicleExecutor:
         vehicle.completed_legs += 1
         vehicle.current_leg = None
         self.state.set_vehicle_status(vehicle.vehicle_id, VehicleExecutionStatus.IDLE if vehicle.online_start <= current_time <= vehicle.online_end else VehicleExecutionStatus.OFFLINE)
-        self._start_next_leg(vehicle, requests, current_time)
+        # A reserved next request must be revalidated against the realized
+        # release time before its pickup leg can begin.  The event engine owns
+        # that check and calls ``start_next_leg`` explicitly on success.
+        if not (leg.leg_type == LegType.SERVICE and vehicle.reserved_request_id is not None):
+            self._start_next_leg(vehicle, requests, current_time)
         return leg

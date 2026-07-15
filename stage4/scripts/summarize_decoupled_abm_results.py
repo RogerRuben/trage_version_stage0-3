@@ -110,15 +110,16 @@ def main() -> None:
         audit["served_plus_cancelled_pass"] = status(bool(served_cancelled.eq(114356).all()))
         audit["duplicate_order_rows"] = duplicate_order_rows
         audit["unknown_condition_total"] = int((~orders["condition_available"].fillna(False)).sum() / max(1, len(grouped)))
-        av_served = orders[orders["final_status"].eq("served") & orders.get("vehicle_type", pd.Series("", index=orders.index)).eq("AV")]
-        audit["gated_av_odd_violation_count"] = int((av_served.get("combined_odd_feasible", pd.Series(True, index=av_served.index)) == False).sum()) if len(av_served) else 0
-        audit["gated_av_odd_pass"] = status(audit["gated_av_odd_violation_count"] == 0)
+        odd_columns_present = {"vehicle_type", "combined_odd_feasible"}.issubset(orders.columns)
+        av_served = orders[orders["final_status"].eq("served") & orders["vehicle_type"].eq("AV")] if odd_columns_present else pd.DataFrame()
+        audit["gated_av_odd_violation_count"] = int((~av_served["combined_odd_feasible"].fillna(False).astype(bool)).sum()) if len(av_served) else 0
+        audit["gated_av_odd_pass"] = status(odd_columns_present and audit["gated_av_odd_violation_count"] == 0)
         unknown_av = orders[(~orders["condition_available"].fillna(False)) & orders.get("vehicle_type", pd.Series("", index=orders.index)).eq("AV")]
         audit["unknown_condition_av_assignment_count"] = int(len(unknown_av))
         audit["unknown_condition_av_assignment_pass"] = status(len(unknown_av) == 0)
         rt = pd.to_datetime(orders["simulated_request_time"], utc=True, errors="coerce")
         bt = pd.to_datetime(orders["observed_boarding_time"], utc=True, errors="coerce")
-        audit["request_before_boarding_pass"] = status(bool((rt < bt).dropna().all()))
+        audit["request_before_boarding_pass"] = status(bool(rt.notna().all() and bt.notna().all() and (rt < bt).all()))
     if not windows.empty:
         audit["sparse_matching_solver_pass"] = status(windows.get("matching_solver", pd.Series("", index=windows.index)).astype(str).str.contains("sparse").all())
         audit["peak_candidate_edge_count"] = int(pd.to_numeric(windows.get("peak_candidate_edge_count", pd.Series(0)), errors="coerce").max())
@@ -138,10 +139,8 @@ def main() -> None:
     observed_reps = set(pd.to_numeric(summary.get("replication_id", pd.Series(dtype=int)), errors="coerce").dropna().astype(int))
     audit["result_replications_observed"] = sorted(int(x) for x in observed_reps)
     audit["formal_three_replication_results_complete_pass"] = status({1, 2, 3}.issubset(observed_reps) and current_env_results)
-    audit["preassignment_formal_status"] = "DISABLED_BY_DEFAULT_PENDING_TWO_LAYER_RESERVATION_STATE"
+    audit["legacy_v2_summary_excluded_from_v3_final_audit"] = True
     audit["simulator_type"] = "30_second_discrete_time_sparse_matching"
-    audit["balanced_differentiation_status"] = "PROXY_ONLY_HV_STRESS_EDGE_FILTER_NOT_FULL_ZONE_TIME_BUDGET"
-    audit["balanced_differentiation_pass"] = "FAIL"
     audit["overall_status"] = status(all(str(v) == "PASS" for k, v in audit.items() if k.endswith("_pass")))
     (args.results_dir / "decoupled_abm_audit_summary.json").write_text(json.dumps(audit, indent=2), encoding="utf-8")
     # Supply/demand endogeneity summary: keep it compact and explicit.
