@@ -1,0 +1,62 @@
+{
+  "manifest_version": "1.0",
+  "artifact_id": "stage0_noded_v3_diagnostic_20161023_smoke",
+  "schema_version": "stage0_route_quality_v3",
+  "stage": "stage0",
+  "status": "exploratory",
+  "created_at": "2026-07-16T12:54:48.417820+00:00",
+  "created_by_commit": "8ab5ee1da82c1e632664c236adbf0289fe804c2f",
+  "input_artifact_ids": [
+    "stage0_smoke_20161019_20_22_23_v2"
+  ],
+  "config_hash": "438e3dd5c4c33720fe68d31b7cdd7e63b3a521a457fd3bf83d3bea85624f1c9c",
+  "fit_dates": [],
+  "target_dates": [
+    "20161023"
+  ],
+  "decision_time_contract": "retrospective_observation_diagnostic_only",
+  "files": [
+    {
+      "role": "network_roads",
+      "path": "artifacts/exploratory/xian_2017_core_noded_v3/xian_2017_core_noded_v3_roads.parquet",
+      "sha256": "16d1996e9863ae79bcdb437957f13d8bce1a62c88d0c0a65c5431db906297e20",
+      "size_bytes": 2569639,
+      "row_count": 29375,
+      "schema_hash": "a78bcd742079a627c0c7f261998ec2a73b2d2f4ae509c8466117d8e29b4c77ca"
+    },
+    {
+      "role": "network_nodes",
+      "path": "artifacts/exploratory/xian_2017_core_noded_v3/xian_2017_core_noded_v3_nodes.parquet",
+      "sha256": "bcb2755eb5eac66fdfaf359994f7fe2778cd04d34eeda75960c996507e219ac2",
+      "size_bytes": 947109,
+      "row_count": 21333,
+      "schema_hash": "ba9a9efdd70bc757d59304e2db4ff78704ef87234cf3587a3bab383a879bc262"
+    },
+    {
+      "role": "order_route_quality",
+      "path": "artifacts/exploratory/stage0_noded_v3_route_quality_guarded_v1/order_route_quality/day=20161023.parquet",
+      "sha256": "cc3482873cc70810a0e3480207282bbccd5c8278e12822ea36ac034da6c63ff3",
+      "size_bytes": 41926,
+      "row_count": 984,
+      "schema_hash": "73744d0686d75873dfc723a6b0cd60da929bbbda2e63cd1c8f14906e2d16bdf9"
+    },
+    {
+      "role": "compact_summary",
+      "path": "docs/pipeline_rebaseline/stage0_noded_v3_route_quality_summary.csv",
+      "sha256": "30a19f37a1cc12e30e3b528752838515f88e408fb808205ee35803f0da130c6b",
+      "size_bytes": 457,
+      "row_count": 1,
+      "schema_hash": "4f4c17af6947a9db2b96f411f85580db0d0dc276b10a7e54e43476452e06122d"
+    }
+  ],
+  "audit": {
+    "status": "NOT_RUN",
+    "path": "docs/pipeline_rebaseline/stage0_noded_v3_route_quality_audit.json",
+    "sha256": "8343dce8fe911badc1086bd53bc6d7e5c9e4c80dd0b79c61f08164f768b5289b"
+  },
+  "known_limitations": [
+    "Only a fixed 1,000-order diagnostic sample has been rematched.",
+    "Manual route-truth review is not yet complete.",
+    "Sixteen orders explicitly failed because neither a complete HMM path nor a same-network fallback existed."
+  ]
+}
