@@ -63,7 +63,9 @@ def build_traversals(frame: pd.DataFrame, roads: pd.DataFrame, args: argparse.Na
     new_traversal = (~same_order | link_changed).astype(bool)
     frame["_traversal_id"] = new_traversal.cumsum().astype("int64")
     frame["link_seq"] = new_traversal.groupby(frame.order_id).cumsum().astype("int32") - 1
-    dt = frame.dt_s.fillna(0).clip(lower=0, upper=120).astype(float)
+    # Preserve every non-negative observed interval exactly. Long observation
+    # gaps are quality evidence, not time that may be silently discarded.
+    dt = frame.dt_s.fillna(0).clip(lower=0).astype(float)
     distance = frame.segment_distance_m.fillna(0).clip(lower=0).astype(float)
     # A changed-link interval is shared by its adjacent traversals instead of
     # being assigned wholesale to the later link.  When route-expanded mileage

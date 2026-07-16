@@ -28,6 +28,11 @@ from stage0.canonical.topology import (
     legal_entries,
     legal_exits,
 )
+from stage0.canonical.route_quality import (
+    core_threshold_flags,
+    projection_metrics,
+    route_sequence_metrics,
+)
 
 
 def arguments() -> argparse.Namespace:
@@ -44,9 +49,7 @@ def arguments() -> argparse.Namespace:
 
 
 def load_network(path: Path) -> tuple[pd.DataFrame, dict[str, dict], nx.DiGraph]:
-    roads = gpd.read_parquet(path)[
-        ["link_id", "from_node", "to_node", "oneway_code", "length_m"]
-    ].copy()
+    roads = gpd.read_parquet(path).copy()
     roads["link_id"] = roads.link_id.astype(str)
     roads["length_m"] = pd.to_numeric(roads.length_m, errors="coerce").fillna(0).clip(lower=0)
     lookup = {
@@ -54,6 +57,8 @@ def load_network(path: Path) -> tuple[pd.DataFrame, dict[str, dict], nx.DiGraph]
             "from_node": int(row.from_node),
             "to_node": int(row.to_node),
             "oneway_code": str(row.oneway_code) if pd.notna(row.oneway_code) else "B",
+            "length_m": float(row.length_m),
+            "source_link_id": str(getattr(row, "source_link_id", row.link_id)),
         }
         for row in roads.itertuples(index=False)
     }
@@ -154,23 +159,60 @@ def classify_day(
 ) -> tuple[pd.DataFrame, pd.DataFrame, dict]:
     routes = read_parts(
         stage0_root / "hmm_route_parts" / f"day={date}",
-        ["order_id", "link_id", "route_sequence", "transition_path_status"],
+        [
+            "order_id", "link_id", "route_sequence", "transition_path_status",
+            "is_interpolated",
+        ],
     )
     points = read_parts(
         stage0_root / "hmm_matched_points" / f"day={date}",
-        ["order_id", "match_confidence", "fallback_used", "matcher_version"],
+        [
+            "order_id", "point_seq", "match_confidence", "fallback_used",
+            "matcher_version", "proj_dist_m", "source_lon", "source_lat",
+            "lon", "lat", "proj_lon", "proj_lat", "segment_distance_m",
+            "unreasonable_detour_flag",
+        ],
     )
-    point_quality = points.groupby("order_id", as_index=False).agg(
-        mean_match_confidence=("match_confidence", "mean"),
-        fallback_point_share=("fallback_used", "mean"),
-        matcher_version=("matcher_version", lambda values: values.mode().iat[0] if len(values.mode()) else "unknown"),
-    )
+    point_rows = []
+    for order_id, group in points.groupby("order_id", sort=False):
+        ordered_points = group.sort_values("point_seq")
+        metrics = projection_metrics(
+            ordered_points.proj_dist_m.to_numpy(),
+            ordered_points.lon.to_numpy(),
+            ordered_points.lat.to_numpy(),
+            ordered_points.proj_lon.to_numpy(),
+            ordered_points.proj_lat.to_numpy(),
+        )
+        modes = ordered_points.matcher_version.mode()
+        point_rows.append({
+            "order_id": str(order_id),
+            "mean_match_confidence": float(ordered_points.match_confidence.mean()),
+            "fallback_point_share": float(ordered_points.fallback_used.mean()),
+            "matcher_version": modes.iat[0] if len(modes) else "unknown",
+            "gps_length_m": float(
+                pd.to_numeric(ordered_points.segment_distance_m, errors="coerce").fillna(0).clip(lower=0).sum()
+            ),
+            "unreasonable_detour_count": int(ordered_points.unreasonable_detour_flag.fillna(False).sum()),
+            **metrics,
+        })
+    point_quality = pd.DataFrame(point_rows)
+    point_metrics_by_order = {row["order_id"]: row for row in point_rows}
     extended_cfg = config["extended"]
+    link_lengths = {link: float(data["length_m"]) for link, data in lookup.items()}
+    source_link_ids = {link: str(data["source_link_id"]) for link, data in lookup.items()}
     gap_rows: list[dict] = []
     order_rows: list[dict] = []
     for order_id, group in routes.groupby("order_id", sort=False):
         ordered = group.sort_values("route_sequence")
         links = ordered.link_id.astype(str).tolist()
+        gps_length = point_metrics_by_order.get(str(order_id), {}).get("gps_length_m", np.nan)
+        sequence_metrics = route_sequence_metrics(
+            links,
+            ordered.is_interpolated.fillna(False).to_numpy(),
+            link_lengths,
+            source_link_ids,
+            float(gps_length),
+        )
         gaps: list[dict] = []
         for transition_index, (left_id, right_id) in enumerate(zip(links, links[1:]), start=1):
             left, right = lookup.get(left_id), lookup.get(right_id)
@@ -215,20 +257,42 @@ def classify_day(
             "all_gaps_bridgeable": bool(gap_count > 0 and all(row["bridge_repairable"] for row in gaps)),
             "maximum_bridge_distance_m": max((row["bridge_distance_m"] for row in gaps if pd.notna(row["bridge_distance_m"])), default=np.nan),
             "maximum_bridge_link_count": max((row["bridge_link_count"] for row in gaps if pd.notna(row["bridge_link_count"])), default=np.nan),
+            **sequence_metrics,
         })
     quality = pd.DataFrame(order_rows).merge(point_quality, on="order_id", how="left", validate="one_to_one")
     core_cfg = config["core"]
-    common_core = (
-        quality.route_link_count.ge(int(core_cfg["minimum_route_links"]))
-        & quality.mean_match_confidence.ge(float(core_cfg["minimum_mean_match_confidence"]))
-        & quality.fallback_point_share.le(float(core_cfg["maximum_fallback_point_share"]))
-    )
-    core = common_core & quality.direction_gap_count.le(int(core_cfg["maximum_direction_gaps"]))
-    extended_common = (
-        quality.route_link_count.ge(int(core_cfg["minimum_route_links"]))
-        & quality.mean_match_confidence.ge(float(extended_cfg["minimum_mean_match_confidence"]))
-        & quality.fallback_point_share.le(float(extended_cfg["maximum_fallback_point_share"]))
-    )
+    v4_metrics = "maximum_p90_projection_distance_m" in core_cfg
+    if v4_metrics:
+        flags = pd.DataFrame(
+            [core_threshold_flags(row, core_cfg) for row in quality.to_dict("records")],
+            index=quality.index,
+        )
+        quality = pd.concat([quality, flags], axis=1)
+        quality["core_route_link_count_ok"] = quality.route_link_count.ge(
+            int(core_cfg["minimum_route_links"])
+        )
+        core = quality.core_all_thresholds_pass & quality.core_route_link_count_ok
+        extended_flags = pd.DataFrame(
+            [core_threshold_flags(row, extended_cfg) for row in quality.to_dict("records")],
+            index=quality.index,
+        ).rename(columns=lambda column: column.replace("core_", "extended_"))
+        quality = pd.concat([quality, extended_flags], axis=1)
+        quality["extended_route_link_count_ok"] = quality.route_link_count.ge(
+            int(core_cfg["minimum_route_links"])
+        )
+        extended_common = quality.extended_all_thresholds_pass & quality.extended_route_link_count_ok
+    else:
+        common_core = (
+            quality.route_link_count.ge(int(core_cfg["minimum_route_links"]))
+            & quality.mean_match_confidence.ge(float(core_cfg["minimum_mean_match_confidence"]))
+            & quality.fallback_point_share.le(float(core_cfg["maximum_fallback_point_share"]))
+        )
+        core = common_core & quality.direction_gap_count.le(int(core_cfg["maximum_direction_gaps"]))
+        extended_common = (
+            quality.route_link_count.ge(int(core_cfg["minimum_route_links"]))
+            & quality.mean_match_confidence.ge(float(extended_cfg["minimum_mean_match_confidence"]))
+            & quality.fallback_point_share.le(float(extended_cfg["maximum_fallback_point_share"]))
+        )
     extended = (
         ~core
         & extended_common
@@ -239,24 +303,43 @@ def classify_day(
     quality["route_quality_class"] = np.select([core, extended], ["core", "extended"], default="rejected")
     quality["formal_training_eligible"] = core
     quality["robustness_only_eligible"] = extended
+    reason_conditions = [
+        core,
+        extended,
+        quality.mean_match_confidence.lt(float(extended_cfg["minimum_mean_match_confidence"])),
+        quality.fallback_point_share.gt(float(extended_cfg["maximum_fallback_point_share"])),
+        quality.direction_gap_count.gt(int(extended_cfg["maximum_direction_gaps"])),
+        quality.direction_gap_count.gt(0) & ~quality.all_gaps_bridgeable,
+    ]
+    reason_values = [
+        "fully_directed_continuous_and_quality_thresholds_passed",
+        "bounded_graph_bridgeable_gap",
+        "low_match_confidence",
+        "excessive_geometric_fallback",
+        "too_many_direction_gaps",
+        "unbridgeable_direction_gap",
+    ]
+    if v4_metrics:
+        reason_conditions.extend([
+            ~quality.core_projection_ok,
+            ~quality.core_route_length_ratio_ok,
+            ~quality.core_interpolation_ok,
+            ~(quality.core_origin_error_ok & quality.core_destination_error_ok),
+            ~quality.core_no_unreasonable_detour,
+            ~quality.core_u_turn_ok,
+            ~quality.core_repeated_link_ok,
+        ])
+        reason_values.extend([
+            "projection_distance_threshold_failure",
+            "route_length_ratio_threshold_failure",
+            "interpolated_distance_share_threshold_failure",
+            "od_endpoint_projection_threshold_failure",
+            "unreasonable_detour_detected",
+            "u_turn_detected",
+            "repeated_link_share_threshold_failure",
+        ])
     quality["quality_reason"] = np.select(
-        [
-            core,
-            extended,
-            quality.mean_match_confidence.lt(float(extended_cfg["minimum_mean_match_confidence"])),
-            quality.fallback_point_share.gt(float(extended_cfg["maximum_fallback_point_share"])),
-            quality.direction_gap_count.gt(int(extended_cfg["maximum_direction_gaps"])),
-            ~quality.all_gaps_bridgeable,
-        ],
-        [
-            "fully_directed_continuous",
-            "bounded_graph_bridgeable_gap",
-            "low_match_confidence",
-            "excessive_geometric_fallback",
-            "too_many_direction_gaps",
-            "unbridgeable_direction_gap",
-        ],
-        default="route_quality_threshold_failure",
+        reason_conditions, reason_values, default="route_quality_threshold_failure"
     )
     counts = quality.route_quality_class.value_counts().to_dict()
     failed_files = sorted((stage0_root / "failed_orders" / f"day={date}").glob("*.parquet"))
@@ -314,7 +397,7 @@ def main() -> None:
         "network": args.roads.as_posix(),
         "days": summaries,
         "gap_pair_cache_size": len(cache),
-        "manual_truth_audit": "NOT_RUN",
+        "manual_truth_audit": "AWAITING_HUMAN_REVIEW",
         "canonical_promotion_gate": "HOLD",
         "promotion_blockers": [
             "Full-data Core/Extended coverage has not been computed.",

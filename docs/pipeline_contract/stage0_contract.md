@@ -63,10 +63,15 @@ own quality value; it is never relabeled as an observed traversal.
 
 ## Version and downstream consumers
 
-Contract version: `stage0_canonical_contract_v2`. Consumers are Stage 1 label v2,
+Contract version: `stage0_canonical_contract_v4`. Consumers are Stage 1 label v2,
 Stage 2 planned-route construction, and lineage audits. No later stage may mutate
 the Stage 0 artifact.
 
-The paper-pipeline quality extension is `stage0_route_quality_v3`. Promotion of
-that extension is blocked until the full-data Core/Extended coverage and manual
-truth audit pass; the existing engineering smoke remains a separate artifact.
+The promotion candidate is `xian_2017_core_noded_v4` with
+`stage0_route_quality_v4`. Bridge/tunnel/layer values are normalized before
+topology operations; endpoints at incompatible levels are never clustered.
+Explicit, semantically compatible terminal transition connectors remain
+diagnostic until the grade-separation and manual-truth audits pass. Promotion is
+blocked until at least 300 independent reviews (500 recommended), a double-review
+subset, Core precision of at least 90%, full-date reconstruction, and interval /
+order conservation audits pass. The engineering smoke remains exploratory.

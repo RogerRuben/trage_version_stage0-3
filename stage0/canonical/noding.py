@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Iterable
+from typing import Iterable, Sequence
 
 import numpy as np
 from scipy.spatial import cKDTree
@@ -11,11 +11,91 @@ from shapely.geometry import GeometryCollection, MultiPoint, Point
 from shapely.ops import split
 
 
+TRUE_VALUES = {"1", "t", "true", "y", "yes"}
+FALSE_VALUES = {"0", "f", "false", "n", "no", "", "nan", "none", "null", "<na>"}
+
+
+def parse_bool(value: object) -> bool:
+    """Parse road-network booleans without treating non-empty 'F' as true."""
+
+    if value is None:
+        return False
+    if isinstance(value, (bool, np.bool_)):
+        return bool(value)
+    text = str(value).strip().lower()
+    if text in TRUE_VALUES:
+        return True
+    if text in FALSE_VALUES:
+        return False
+    raise ValueError(f"unsupported boolean encoding: {value!r}")
+
+
+def normalize_layer(value: object) -> str:
+    if value is None:
+        return "0"
+    text = str(value).strip().lower()
+    if text in {"", "nan", "none", "null", "<na>"}:
+        return "0"
+    try:
+        numeric = float(text)
+        if numeric.is_integer():
+            return str(int(numeric))
+    except ValueError:
+        pass
+    return text
+
+
 def topology_level(layer: object, bridge: object, tunnel: object) -> tuple[str, bool, bool]:
     """Return a conservative grade-separation key used for interior crossings."""
 
-    layer_value = "0" if layer is None or str(layer).lower() in {"nan", "none", ""} else str(layer)
-    return layer_value, bool(bridge), bool(tunnel)
+    return normalize_layer(layer), parse_bool(bridge), parse_bool(tunnel)
+
+
+def topology_levels_compatible(left: Sequence[object], right: Sequence[object]) -> bool:
+    return tuple(left) == tuple(right)
+
+
+def grade_transition_connector_eligible(
+    left_level: Sequence[object],
+    right_level: Sequence[object],
+    left_direction: Sequence[float],
+    right_direction: Sequence[float],
+    left_road_class: object,
+    right_road_class: object,
+    left_road_name: object = None,
+    right_road_name: object = None,
+    left_ref: object = None,
+    right_ref: object = None,
+    maximum_angle_degrees: float = 45.0,
+) -> bool:
+    """Allow an explicit cross-level terminal connector without merging nodes."""
+
+    if topology_levels_compatible(left_level, right_level):
+        return False
+    left_class, right_class = str(left_road_class), str(right_road_class)
+    same_class = left_class == right_class
+    ramp_transition = left_class.endswith("_link") or right_class.endswith("_link")
+    same_name = bool(
+        left_road_name
+        and right_road_name
+        and str(left_road_name).lower() not in {"nan", "none"}
+        and str(left_road_name) == str(right_road_name)
+    )
+    same_ref = bool(
+        left_ref
+        and right_ref
+        and str(left_ref).lower() not in {"nan", "none"}
+        and str(left_ref) == str(right_ref)
+    )
+    if not (same_class or ramp_transition or same_name or same_ref):
+        return False
+    left = np.asarray(left_direction, dtype=float)
+    right = np.asarray(right_direction, dtype=float)
+    left_norm, right_norm = np.linalg.norm(left), np.linalg.norm(right)
+    if left_norm <= 0 or right_norm <= 0:
+        return False
+    cosine = abs(float(np.dot(left / left_norm, right / right_norm)))
+    return cosine >= float(np.cos(np.deg2rad(maximum_angle_degrees)))
 
 
 def intersection_points(geometry: object) -> list[Point]:
@@ -84,3 +164,30 @@ def cluster_endpoints(coordinates: np.ndarray, tolerance_m: float) -> tuple[np.n
     node_ids = np.array([node_for_root[union.find(index)] for index in range(len(coordinates))], dtype="int64")
     return node_ids, representatives
 
+
+def cluster_endpoints_by_level(
+    coordinates: np.ndarray,
+    levels: Sequence[tuple[str, bool, bool]],
+    tolerance_m: float,
+) -> tuple[np.ndarray, np.ndarray, list[tuple[str, bool, bool]]]:
+    """Cluster endpoints spatially only within an identical topology level."""
+
+    if len(coordinates) != len(levels):
+        raise ValueError("coordinates and levels must have the same length")
+    if len(coordinates) == 0:
+        return np.empty(0, dtype="int64"), np.empty((0, 2), dtype=float), []
+    members: dict[tuple[str, bool, bool], list[int]] = defaultdict(list)
+    for index, level in enumerate(levels):
+        members[tuple(level)].append(index)
+    node_ids = np.empty(len(coordinates), dtype="int64")
+    representatives: list[np.ndarray] = []
+    representative_levels: list[tuple[str, bool, bool]] = []
+    offset = 0
+    for level in sorted(members, key=repr):
+        indices = np.asarray(members[level], dtype="int64")
+        local_ids, local_representatives = cluster_endpoints(coordinates[indices], tolerance_m)
+        node_ids[indices] = local_ids + offset
+        representatives.extend(local_representatives)
+        representative_levels.extend([level] * len(local_representatives))
+        offset += len(local_representatives)
+    return node_ids, np.asarray(representatives, dtype=float), representative_levels

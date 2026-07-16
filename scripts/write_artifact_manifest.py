@@ -32,10 +32,16 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--fit-dates", default="")
     parser.add_argument("--target-dates", default="")
     parser.add_argument("--decision-time-contract", required=True)
+    parser.add_argument("--created-by-commit")
+    parser.add_argument("--registered-by-commit")
     parser.add_argument("--file", action="append", default=[], help="role=workspace-relative-path")
     parser.add_argument("--file-list-json", type=Path, help="producer JSON containing explicit files[{role,path}]")
     parser.add_argument("--audit", type=Path, required=True)
-    parser.add_argument("--audit-status", required=True, choices=["PASS", "FAIL", "NOT_RUN"])
+    parser.add_argument(
+        "--audit-status",
+        required=True,
+        choices=["PASS", "DIAGNOSTIC_PASS", "FAIL", "NOT_RUN"],
+    )
     parser.add_argument("--known-limitation", action="append", default=[])
     parser.add_argument("--field-role-json", type=Path)
     parser.add_argument("--schema", type=Path, default=Path("config/artifact_manifest.schema.json"))
@@ -45,6 +51,11 @@ def arguments() -> argparse.Namespace:
 
 def split_dates(value: str) -> list[str]:
     return [item.strip() for item in value.split(",") if item.strip()]
+
+
+def validate_registration_status(status: str, audit_status: str) -> None:
+    if status == "canonical" and audit_status != "PASS":
+        raise ValueError("canonical artifact registration requires audit status PASS")
 
 
 def main() -> None:
@@ -61,6 +72,9 @@ def main() -> None:
         role, raw_path = item.split("=", 1)
         records.append(file_record(Path(raw_path), role, workspace))
     commit = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+    created_by_commit = args.created_by_commit or commit
+    registered_by_commit = args.registered_by_commit or commit
+    validate_registration_status(args.status, args.audit_status)
     audit_relative = args.audit.resolve().relative_to(workspace).as_posix()
     data = {
         "manifest_version": "1.0",
@@ -69,7 +83,8 @@ def main() -> None:
         "stage": args.stage,
         "status": args.status,
         "created_at": datetime.now(timezone.utc).isoformat(),
-        "created_by_commit": commit,
+        "created_by_commit": created_by_commit,
+        "registered_by_commit": registered_by_commit,
         "input_artifact_ids": args.input_artifact_id,
         "config_hash": config_sha256(args.config),
         "fit_dates": split_dates(args.fit_dates),

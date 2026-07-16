@@ -6,6 +6,7 @@
   "status": "exploratory",
   "created_at": "2026-07-16T12:54:48.417820+00:00",
   "created_by_commit": "8ab5ee1da82c1e632664c236adbf0289fe804c2f",
+  "registered_by_commit": "876ca61e88c8ad56c19e76c549e957ddb6e47bcb",
   "input_artifact_ids": [
     "stage0_smoke_20161019_20_22_23_v2"
   ],
@@ -50,7 +51,7 @@
     }
   ],
   "audit": {
-    "status": "NOT_RUN",
+    "status": "DIAGNOSTIC_PASS",
     "path": "docs/pipeline_rebaseline/stage0_noded_v3_route_quality_audit.json",
     "sha256": "8343dce8fe911badc1086bd53bc6d7e5c9e4c80dd0b79c61f08164f768b5289b"
   },

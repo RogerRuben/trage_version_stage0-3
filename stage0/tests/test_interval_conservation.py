@@ -18,3 +18,24 @@ def test_zero_projected_mileage_has_explicit_equal_fallback():
     assert np.allclose(allocated_time, [3, 3, 3])
     assert np.allclose(allocated_distance, [2, 2, 2])
 
+
+def test_time_allocation_conservation_many_links():
+    time, _ = allocate_by_projected_mileage(123.456, 500.0, [1.0] * 257)
+    assert np.isclose(time.sum(), 123.456, atol=1e-12)
+    assert (time >= 0).all()
+
+
+def test_distance_allocation_conservation_many_links():
+    _, distance = allocate_by_projected_mileage(100.0, 9876.543, [1.0] * 257)
+    assert np.isclose(distance.sum(), 9876.543, atol=1e-12)
+    assert (distance >= 0).all()
+
+
+def test_time_allocation_conservation():
+    time, _ = allocate_by_projected_mileage(10.0, 20.0, [1.0, 2.0])
+    assert np.isclose(time.sum(), 10.0)
+
+
+def test_distance_allocation_conservation():
+    _, distance = allocate_by_projected_mileage(10.0, 20.0, [1.0, 2.0])
+    assert np.isclose(distance.sum(), 20.0)

@@ -1,0 +1,22 @@
+{
+  "status": "AWAITING_HUMAN_REVIEW",
+  "review_sample_version": "stage0_route_truth_v1",
+  "sample_size": 500,
+  "seed": 20260716,
+  "source_quality_files": [
+    "artifacts/exploratory/stage0_noded_v4_trainval_route_quality/order_route_quality/day=20161019.parquet",
+    "artifacts/exploratory/stage0_noded_v4_trainval_route_quality/order_route_quality/day=20161020.parquet",
+    "artifacts/exploratory/stage0_noded_v4_trainval_route_quality/order_route_quality/day=20161022.parquet"
+  ],
+  "review_geometry": "docs/pipeline_rebaseline/manual_truth/stage0_route_truth_v1_review_geometries.geojson",
+  "double_review_file": "docs/pipeline_rebaseline/manual_truth/stage0_route_truth_v1_review_pack_double_review.csv",
+  "review_requirements": {
+    "minimum_completed_orders": 300,
+    "recommended_completed_orders": 500,
+    "double_review_subset_required": true,
+    "minimum_core_precision": 0.9,
+    "preferred_core_precision": 0.95
+  },
+  "canonical_promotion_gate": "HOLD",
+  "blocker": "Independent human judgments and adjudication are not yet present."
+}

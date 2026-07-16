@@ -69,7 +69,14 @@ class HMMRoadNetwork:
         self.link_ids = frozenset(self.roads.link_id.astype(str))
         coords: list[np.ndarray] = []
         road_ids: list[np.ndarray] = []
+        candidate_eligible = (
+            self.roads.candidate_eligible.fillna(True).astype(bool).to_numpy()
+            if "candidate_eligible" in self.roads
+            else np.ones(len(self.roads), dtype=bool)
+        )
         for i, line in enumerate(self.geoms):
+            if not candidate_eligible[i]:
+                continue
             distances = np.arange(0, max(line.length, 1.0) + spacing_m / 2, spacing_m)
             points = shapely.line_interpolate_point(line, distances)
             coords.append(np.column_stack([shapely.get_x(points), shapely.get_y(points)]))

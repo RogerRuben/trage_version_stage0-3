@@ -28,6 +28,7 @@
     "status": {"enum": ["canonical", "exploratory", "deprecated"]},
     "created_at": {"type": "string"},
     "created_by_commit": {"type": "string", "minLength": 7},
+    "registered_by_commit": {"type": "string", "minLength": 7},
     "input_artifact_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
     "config_hash": {"type": "string", "minLength": 8},
     "fit_dates": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
@@ -55,7 +56,7 @@
       "additionalProperties": false,
       "required": ["status", "path"],
       "properties": {
-        "status": {"enum": ["PASS", "FAIL", "NOT_RUN"]},
+        "status": {"enum": ["PASS", "DIAGNOSTIC_PASS", "FAIL", "NOT_RUN"]},
         "path": {"type": "string"},
         "sha256": {"type": ["string", "null"]}
       }

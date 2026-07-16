@@ -1,0 +1,48 @@
+{
+  "schema_version": "stage0_route_quality_v4",
+  "threshold_freeze_status": "pre_registered_before_manual_truth_review",
+  "threshold_policy": "external_engineering_bounds_then_validation_manual_truth_audit",
+  "test_date_threshold_tuning_allowed": false,
+  "core": {
+    "maximum_direction_gaps": 0,
+    "minimum_route_links": 2,
+    "minimum_mean_match_confidence": 0.35,
+    "maximum_fallback_point_share": 0.25,
+    "maximum_p90_projection_distance_m": 60.0,
+    "minimum_route_length_ratio": 0.50,
+    "maximum_route_length_ratio": 2.50,
+    "maximum_interpolated_distance_share": 0.50,
+    "maximum_od_projection_error_m": 100.0,
+    "maximum_unreasonable_detour_count": 0,
+    "maximum_u_turn_count": 0,
+    "maximum_repeated_link_share": 0.20
+  },
+  "extended": {
+    "maximum_direction_gaps": 2,
+    "maximum_gap_share": 0.10,
+    "maximum_bridge_links_per_gap": 3,
+    "maximum_bridge_distance_m_per_gap": 750.0,
+    "minimum_mean_match_confidence": 0.25,
+    "maximum_fallback_point_share": 0.40,
+    "maximum_p90_projection_distance_m": 80.0,
+    "minimum_route_length_ratio": 0.35,
+    "maximum_route_length_ratio": 3.00,
+    "maximum_interpolated_distance_share": 0.70,
+    "maximum_od_projection_error_m": 150.0,
+    "maximum_unreasonable_detour_count": 1,
+    "maximum_u_turn_count": 1,
+    "maximum_repeated_link_share": 0.35
+  },
+  "threshold_provenance": {
+    "projection_and_od_bounds": "external_urban_gps_engineering_scenario",
+    "route_ratio_and_interpolation_bounds": "broad_external_path_plausibility_scenario",
+    "direction_detour_uturn": "hard_topology_invariants",
+    "confidence_and_fallback": "carried_forward_pre_registered_v3_engineering_bounds",
+    "validation_rule": "must_be_checked_against_20161019_22_distribution_and_manual_truth_without_test_tuning"
+  },
+  "roles": {
+    "core": "formal_training_and_main_experiment_eligible_only_after_manual_truth_pass",
+    "extended": "coverage_and_robustness_only",
+    "rejected": "excluded_from_formal_stage1_to_stage3"
+  }
+}
