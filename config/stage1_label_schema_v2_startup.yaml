@@ -1,0 +1,28 @@
+stage1_startup_version: stage1_label_schema_v2_candidate
+status: hold_until_stage0_v4_canonical_promotion
+stage0_input:
+  canonical_manifest: artifacts/canonical/stage0_v4/stage0_v4.manifest.json
+  required_manifest_status: canonical
+  analysis_set_field: formal_analysis_eligible
+  strict_core_field: strict_evaluation_eligible
+  rejected_policy: exclude
+roles:
+  analysis_set: label_fitting_and_model_training
+  strict_core: high_confidence_evaluation_and_sensitivity
+  rejected: excluded
+label_dimensions:
+  - LCS
+  - GNS
+  - RTS
+  - PMIS
+  - IIS
+fit_policy:
+  reference_models_fit_on_training_dates_only: true
+  validation_and_development_apply_frozen_parameters: true
+  missing_iis_is_zero: false
+stage0_mutation_allowed: false
+startup_gate:
+  manual_route_audit: PASS
+  connector_audit: PASS
+  full_date_conservation_audit: PASS
+  stage0_canonical_manifest: present

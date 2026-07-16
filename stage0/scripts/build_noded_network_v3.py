@@ -22,6 +22,7 @@ if str(ROOT) not in sys.path:
 
 from stage0.canonical.noding import (
     cluster_endpoints_by_level,
+    connector_traversal_directions,
     grade_transition_connector_eligible,
     intersection_points,
     parse_bool,
@@ -175,7 +176,8 @@ def main() -> None:
     segments["candidate_eligible"] = True
     segments = segments.drop(columns=[column for column in ["_level"] if column in segments])
 
-    connector_pairs: set[tuple[int, int]] = set()
+    connector_directions: dict[tuple[int, int], set[tuple[int, int]]] = defaultdict(set)
+    connector_semantics: dict[tuple[int, int], set[str]] = defaultdict(set)
     cross_level_endpoint_pairs = 0
     rejected_connector_pairs = 0
     for left_endpoint, right_endpoint in cKDTree(endpoint_array).query_pairs(
@@ -206,16 +208,35 @@ def main() -> None:
         )
         left_node, right_node = int(endpoint_nodes[left_endpoint]), int(endpoint_nodes[right_endpoint])
         node_pair = tuple(sorted((left_node, right_node)))
-        if not eligible or left_node == right_node or node_pair in connector_pairs:
+        if not eligible or left_node == right_node:
             rejected_connector_pairs += 1
             continue
-        connector_pairs.add(node_pair)
+        left_to_right, right_to_left = connector_traversal_directions(
+            left_row.oneway_code,
+            left_endpoint % 2 == 0,
+            right_row.oneway_code,
+            right_endpoint % 2 == 0,
+        )
+        if left_to_right:
+            connector_directions[node_pair].add((left_node, right_node))
+        if right_to_left:
+            connector_directions[node_pair].add((right_node, left_node))
+        if not (left_to_right or right_to_left):
+            rejected_connector_pairs += 1
+            continue
+        connector_semantics[node_pair].add(
+            f"{left_level}->{right_level}|{left_row.road_class}->{right_row.road_class}"
+        )
 
-    if connector_pairs:
+    if connector_directions:
         connector_rows = []
         template = {column: None for column in segments.columns}
-        for connector_index, (left_node, right_node) in enumerate(sorted(connector_pairs)):
+        for connector_index, (left_node, right_node) in enumerate(sorted(connector_directions)):
             geometry = LineString([representatives[left_node], representatives[right_node]])
+            allowed = connector_directions[(left_node, right_node)]
+            forward = (left_node, right_node) in allowed
+            reverse = (right_node, left_node) in allowed
+            oneway_code = "B" if forward and reverse else "F" if forward else "T"
             connector_rows.append({
                 **template,
                 "link_id": f"grade_transition_connector__{connector_index}",
@@ -223,8 +244,8 @@ def main() -> None:
                 "segment_index": connector_index,
                 "from_node": left_node,
                 "to_node": right_node,
-                "oneway_code": "B",
-                "oneway_direction": "both",
+                "oneway_code": oneway_code,
+                "oneway_direction": "both" if oneway_code == "B" else "forward" if oneway_code == "F" else "reverse",
                 "road_class": "topology_connector",
                 "road_name": "grade_transition_connector",
                 "length_m": float(geometry.length),
@@ -234,6 +255,7 @@ def main() -> None:
                 "topology_version": args.network_version,
                 "topology_connector": True,
                 "candidate_eligible": False,
+                "connector_semantics": "||".join(sorted(connector_semantics[(left_node, right_node)])),
                 "geometry": geometry,
             })
         segments = pd.concat(
@@ -283,7 +305,13 @@ def main() -> None:
         "grade_separated_pairs_not_noded": grade_separated_pairs,
         "overlap_pairs_not_automatically_merged": overlap_pairs,
         "cross_level_endpoint_pairs": cross_level_endpoint_pairs,
-        "grade_transition_connectors": len(connector_pairs),
+        "grade_transition_connectors": len(connector_directions),
+        "bidirectional_grade_transition_connectors": int(sum(
+            len(directions) == 2 for directions in connector_directions.values()
+        )),
+        "unidirectional_grade_transition_connectors": int(sum(
+            len(directions) == 1 for directions in connector_directions.values()
+        )),
         "rejected_cross_level_connector_pairs": rejected_connector_pairs,
         "cross_level_connector_max_angle_deg": args.cross_level_connector_max_angle_deg,
         "endpoint_snap_tolerance_m": args.endpoint_snap_tolerance_m,

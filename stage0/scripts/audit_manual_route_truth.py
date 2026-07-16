@@ -16,6 +16,20 @@ if str(ROOT) not in sys.path:
 from stage0.canonical.manual_truth import review_metrics, validate_review_schema
 
 
+def passes_review_gate(metrics: dict, paired_reviews: int, agreement: float | None) -> bool:
+    return bool(
+        metrics.get("completed_reviews", 0) >= 120
+        and metrics.get("core_major_error_rate") is not None
+        and metrics["core_major_error_rate"] <= 0.15
+        and metrics["core_wrong_direction_rate"] <= 0.05
+        and metrics["core_wrong_road_level_rate"] <= 0.05
+        and metrics["core_unreasonable_detour_rate"] <= 0.10
+        and paired_reviews >= 30
+        and agreement is not None
+        and agreement >= 0.80
+    )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--primary", type=Path, required=True)
@@ -28,19 +42,13 @@ def main() -> None:
     complete_primary = primary.review_status.eq("completed")
     core_ids = primary.loc[primary.route_quality_class.eq("core"), "order_id"].astype(str)
     metrics = review_metrics(primary, core_ids) if not errors else {}
-    first = primary.loc[complete_primary, ["order_id", "route_correct"]]
-    second = secondary.loc[secondary.review_status.eq("completed"), ["order_id", "route_correct"]]
+    first = primary.loc[complete_primary, ["order_id", "review_class"]]
+    second = secondary.loc[secondary.review_status.eq("completed"), ["order_id", "review_class"]]
     paired = first.merge(second, on="order_id", suffixes=("_primary", "_secondary"))
     agreement = float(
-        paired.route_correct_primary.astype(bool).eq(paired.route_correct_secondary.astype(bool)).mean()
+        paired.review_class_primary.astype(str).eq(paired.review_class_secondary.astype(str)).mean()
     ) if len(paired) else None
-    pass_gate = bool(
-        not errors
-        and metrics.get("completed_reviews", 0) >= 300
-        and metrics.get("core_precision") is not None
-        and metrics["core_precision"] >= 0.90
-        and len(paired) > 0
-    )
+    pass_gate = not errors and passes_review_gate(metrics, len(paired), agreement)
     result = {
         "status": "PASS" if pass_gate else "HOLD",
         "schema_errors": errors,

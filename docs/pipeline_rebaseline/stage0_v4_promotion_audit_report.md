@@ -2,32 +2,38 @@
 
 ## Decision
 
-**HOLD — not canonical.** Stage 1--4 remain blocked.
+**HOLD — not canonical.** Stage 1 computation remains blocked; only its startup
+configuration is prepared.
 
 | Gate | Status | Evidence |
 |---|---|---|
-| Network topology diagnostic | Pass | `xian_2017_core_noded_v4/network_audit.json` |
-| Grade separation | Diagnostic pass | 4,689 incompatible intersections left un-noded |
-| Fixed 1,000-order comparison | Stop for review | `stage0_network_comparison_v4_audit.json` |
-| Expanded route-quality schema | Implemented | `stage0_route_quality_v4.json` and train/validation summaries |
-| Manual truth | **HOLD** | 0/500 reviews completed; 100-order second-review sheet pending |
-| Diagnostic conservation | Pass | 0 time failures, 0 distance failures on 19/20/22 samples |
-| Full-date chain | **Not authorized** | Must follow the manual-truth gate |
-| Canonical manifest | **Not generated** | Canonical registration guard requires all audits to pass |
+| Direction-aware connector implementation | Pass | 652 bidirectional and 1,615 unidirectional connectors |
+| Fixed 1,000-order directional rematch | Diagnostic pass | 984/1,000 reconstructed; no geometric fallback |
+| Connector usage and disabled ablation | Diagnostic pass | `stage0_v4_connector_audit_report.md` |
+| Connector human review | **HOLD** | 0/50 connector judgments completed |
+| Core failure decomposition | Complete | 3,938 reconstructed diagnostic orders |
+| Route human review | **HOLD** | 0/150 primary reviews and 0/40 double reviews completed |
+| Diagnostic conservation | Pass from the prior v4 milestone | zero registered time/distance failures |
+| Final quality rule | Candidate only | `stage0/config/route_quality_v4_final_candidate.json` |
+| Full-date chain | **Not authorized** | starts only after both human gates pass |
+| Canonical manifest | **Not generated** | requires manual and full-date audits |
 
-## Why processing stops here
+## Why processing stops before the full date chain
 
-The v4 graph preserves failure rate and route length relative to v3, but its
-strict route-quality Core share falls from 31.1% to 16.6% in the fixed diagnostic
-and graph-level directed OD reachability is 99.90%. The pre-registered task says
-such behavior must be located and manually reviewed before full-date execution.
-Running the complete date chain now would violate that sequence and would not
-convert missing human judgments into evidence.
+The previous all-bidirectional connector implementation was a systematic direction
+error. It has been corrected without creating a new road-network version. The
+corrected fixed sample retains 98.4% reconstruction coverage, but Strict Core falls
+to 13.9%, directed reachability remains 99.80%, and automated U-turn/detour flags
+dominate exclusions. These facts require the targeted independent review specified
+by the task; they do not authorize either threshold tuning or canonical promotion.
 
-## Reproduction
+The v2 review package now implements the revised, finite workload: 150 primary
+routes (78 Strict Core and 72 boundary/rejected), 40 double-review routes, and 50
+used connectors. Its acceptance rules are executable and have no Core-share gate.
 
-The compact comparison, review pack, review audit, conservation audit and
-promotion audit are committed. Large network/rematch payloads remain local under
-`artifacts/exploratory/` and are excluded from Git. Once independent reviews pass,
-rerun the promotion audit; only then start the fit/train/validation/development
-date chain and its full conservation and lineage audits.
+## Next authorized action
+
+Independent reviewers fill the registered CSVs without changing the matcher. Once
+at least 120 primary reviews, 30 paired reviews, and the error/agreement gates pass,
+the final quality configuration may be frozen exactly once. Only then may the full
+date chain run and `artifacts/canonical/stage0_v4/stage0_v4.manifest.json` be created.

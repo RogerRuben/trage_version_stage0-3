@@ -19,9 +19,9 @@
     {
       "name": "noded_v4",
       "roads": "artifacts/exploratory/xian_2017_core_noded_v4/roads.parquet",
-      "stage0_root": "artifacts/exploratory/stage0_noded_v4_engineering_rematch",
-      "quality": "artifacts/exploratory/stage0_noded_v4_engineering_route_quality/order_route_quality/day=20161023.parquet",
-      "summary": "artifacts/exploratory/stage0_noded_v4_engineering_route_quality/quality_summary.csv"
+      "stage0_root": "artifacts/exploratory/stage0_noded_v4_directional_rematch",
+      "quality": "artifacts/exploratory/stage0_noded_v4_directional_route_quality/order_route_quality/day=20161023.parquet",
+      "summary": "docs/pipeline_rebaseline/stage0_noded_v4_directional_route_quality_summary.csv"
     }
   ],
   "gates": {

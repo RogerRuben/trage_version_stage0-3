@@ -47,6 +47,13 @@
 /artifacts/exploratory/stage0_network_comparison_v4/
 /artifacts/exploratory/stage0_noded_v4_trainval_rematch/
 /artifacts/exploratory/stage0_noded_v4_trainval_route_quality/
+/artifacts/exploratory/xian_2017_core_noded_v4_no_connectors/
+/artifacts/exploratory/stage0_noded_v4_directional_rematch/
+/artifacts/exploratory/stage0_noded_v4_directional_route_quality/
+/artifacts/exploratory/stage0_noded_v4_no_connector_rematch/
+/artifacts/exploratory/stage0_noded_v4_no_connector_route_quality/
+/artifacts/exploratory/stage0_noded_v4_directional_trainval_rematch/
+/artifacts/exploratory/stage0_noded_v4_directional_trainval_route_quality/
 
 # Local agent/application state
 /.agents/

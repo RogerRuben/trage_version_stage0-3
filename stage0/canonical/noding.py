@@ -10,6 +10,8 @@ from scipy.spatial import cKDTree
 from shapely.geometry import GeometryCollection, MultiPoint, Point
 from shapely.ops import split
 
+from stage0.canonical.topology import allows_forward, allows_reverse
+
 
 TRUE_VALUES = {"1", "t", "true", "y", "yes"}
 FALSE_VALUES = {"0", "f", "false", "n", "no", "", "nan", "none", "null", "<na>"}
@@ -96,6 +98,29 @@ def grade_transition_connector_eligible(
         return False
     cosine = abs(float(np.dot(left / left_norm, right / right_norm)))
     return cosine >= float(np.cos(np.deg2rad(maximum_angle_degrees)))
+
+
+def endpoint_access(oneway_code: object, endpoint_is_start: bool) -> tuple[bool, bool]:
+    """Return (can_arrive, can_depart) for a physical link endpoint."""
+
+    forward = allows_forward(str(oneway_code))
+    reverse = allows_reverse(str(oneway_code))
+    if endpoint_is_start:
+        return reverse, forward
+    return forward, reverse
+
+
+def connector_traversal_directions(
+    left_oneway: object,
+    left_endpoint_is_start: bool,
+    right_oneway: object,
+    right_endpoint_is_start: bool,
+) -> tuple[bool, bool]:
+    """Return legal left->right and right->left transition directions."""
+
+    left_arrive, left_depart = endpoint_access(left_oneway, left_endpoint_is_start)
+    right_arrive, right_depart = endpoint_access(right_oneway, right_endpoint_is_start)
+    return left_arrive and right_depart, right_arrive and left_depart
 
 
 def intersection_points(geometry: object) -> list[Point]:

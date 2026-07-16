@@ -1,0 +1,36 @@
+{
+  "status": "DIAGNOSTIC_PASS",
+  "schema_version": "stage0_route_quality_v4",
+  "classification_config": "stage0/config/route_quality_v4.json",
+  "network": "artifacts/exploratory/xian_2017_core_noded_v4_no_connectors/roads.parquet",
+  "days": [
+    {
+      "date": "20161023",
+      "input_orders": 1000,
+      "successfully_reconstructed_orders": 984,
+      "failed_match_orders": 16,
+      "reconstruction_coverage": 0.984,
+      "orders": 984,
+      "core_orders": 136,
+      "extended_orders": 0,
+      "rejected_orders": 848,
+      "core_share_of_input": 0.136,
+      "failed_match_share_of_input": 0.016,
+      "core_share": 0.13821138211382114,
+      "extended_share": 0.0,
+      "rejected_share": 0.8617886178861789,
+      "orders_with_gap": 607,
+      "orders_with_all_gaps_bridgeable": 0,
+      "mean_direction_gaps": 2.6239837398373984,
+      "geometric_fallback_orders": 0
+    }
+  ],
+  "gap_pair_cache_size": 679,
+  "manual_truth_audit": "AWAITING_HUMAN_REVIEW",
+  "canonical_promotion_gate": "HOLD",
+  "promotion_blockers": [
+    "Full-data Core/Extended coverage has not been computed.",
+    "Versioned manual route truth sample has not been reviewed.",
+    "Bridge evidence is classification-only; no route is silently repaired."
+  ]
+}

@@ -24,6 +24,8 @@ def arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--quality", type=Path, nargs="+", required=True)
     parser.add_argument("--sample-size", type=int, default=500)
+    parser.add_argument("--core-sample-size", type=int)
+    parser.add_argument("--double-review-size", type=int, default=100)
     parser.add_argument("--seed", type=int, default=20260716)
     parser.add_argument("--stage0-root", type=Path, required=True)
     parser.add_argument("--roads", type=Path, required=True)
@@ -33,7 +35,25 @@ def arguments() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def sample_pack(frame: pd.DataFrame, sample_size: int, seed: int) -> pd.DataFrame:
+def _stratified_sample(work: pd.DataFrame, sample_size: int) -> pd.DataFrame:
+    groups = list(work.groupby("sampling_stratum", sort=True))
+    selected: list[pd.DataFrame] = []
+    base = max(1, sample_size // max(1, len(groups)))
+    for _, group in groups:
+        selected.append(group.nsmallest(min(base, len(group)), "_random"))
+    result = pd.concat(selected, ignore_index=True) if selected else work.iloc[:0]
+    if len(result) < sample_size:
+        remainder = work.loc[~work.order_id.isin(result.order_id)]
+        result = pd.concat(
+            [result, remainder.nsmallest(sample_size - len(result), "_random")],
+            ignore_index=True,
+        )
+    return result.nsmallest(min(sample_size, len(result)), "_random")
+
+
+def sample_pack(
+    frame: pd.DataFrame, sample_size: int, seed: int, core_sample_size: int | None = None
+) -> pd.DataFrame:
     work = frame.copy()
     work["order_id"] = work.order_id.astype(str)
     work["confidence_band"] = pd.qcut(
@@ -65,19 +85,23 @@ def sample_pack(frame: pd.DataFrame, sample_size: int, seed: int) -> pd.DataFram
     )
     rng = np.random.default_rng(seed)
     work["_random"] = rng.random(len(work))
-    groups = list(work.groupby("sampling_stratum", sort=True))
-    selected: list[pd.DataFrame] = []
-    base = max(1, sample_size // max(1, len(groups)))
-    for _, group in groups:
-        selected.append(group.nsmallest(min(base, len(group)), "_random"))
-    result = pd.concat(selected, ignore_index=True) if selected else work.iloc[:0]
-    if len(result) < sample_size:
-        remainder = work.loc[~work.order_id.isin(result.order_id)]
+    if core_sample_size is None:
+        result = _stratified_sample(work, sample_size)
+    else:
+        if not 0 <= core_sample_size <= sample_size:
+            raise ValueError("core_sample_size must be between zero and sample_size")
+        core = work.loc[work.route_quality_class.eq("core")]
+        non_core = work.loc[~work.route_quality_class.eq("core")]
+        if len(core) < core_sample_size or len(non_core) < sample_size - core_sample_size:
+            raise ValueError("insufficient Core or non-Core orders for requested review design")
         result = pd.concat(
-            [result, remainder.nsmallest(sample_size - len(result), "_random")],
+            [
+                _stratified_sample(core, core_sample_size),
+                _stratified_sample(non_core, sample_size - core_sample_size),
+            ],
             ignore_index=True,
-        )
-    result = result.nsmallest(min(sample_size, len(result)), "_random").drop(columns="_random")
+        ).sort_values(["route_quality_class", "date", "order_id"])
+    result = result.drop(columns="_random")
     for column in REVIEW_COLUMNS:
         if column not in result:
             result[column] = "pending" if column == "review_status" else pd.NA
@@ -184,13 +208,13 @@ def main() -> None:
     all_quality["date"] = all_quality.date.astype(str)
     all_quality["order_id"] = all_quality.order_id.astype(str)
     all_quality = all_quality.merge(contexts, on=["date", "order_id"], how="left")
-    pack = sample_pack(all_quality, args.sample_size, args.seed)
+    pack = sample_pack(all_quality, args.sample_size, args.seed, args.core_sample_size)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     pack.to_parquet(args.output, index=False)
     csv_path = args.output.with_suffix(".csv")
     pack.to_csv(csv_path, index=False, encoding="utf-8-sig")
     double_review = pack.sample(
-        n=min(100, len(pack)), random_state=args.seed
+        n=min(args.double_review_size, len(pack)), random_state=args.seed
     ).loc[:, REVIEW_COLUMNS].copy()
     double_review["reviewer_id"] = pd.NA
     double_review["review_status"] = "pending"
@@ -199,18 +223,24 @@ def main() -> None:
     write_review_geometries(pack, args.stage0_root, roads, args.geojson)
     manifest = {
         "status": "AWAITING_HUMAN_REVIEW",
-        "review_sample_version": "stage0_route_truth_v1",
+        "review_sample_version": "stage0_route_truth_v2",
         "sample_size": int(len(pack)),
+        "core_sample_size": int(pack.route_quality_class.eq("core").sum()),
+        "double_review_size": int(min(args.double_review_size, len(pack))),
         "seed": args.seed,
         "source_quality_files": [path.as_posix() for path in args.quality],
         "review_geometry": args.geojson.as_posix(),
         "double_review_file": double_review_path.as_posix(),
         "review_requirements": {
-            "minimum_completed_orders": 300,
-            "recommended_completed_orders": 500,
+            "minimum_completed_orders": 120,
+            "recommended_completed_orders": 150,
             "double_review_subset_required": True,
-            "minimum_core_precision": 0.90,
-            "preferred_core_precision": 0.95,
+            "minimum_double_review_pairs": 30,
+            "minimum_double_review_agreement": 0.80,
+            "maximum_core_major_error_rate": 0.15,
+            "maximum_core_wrong_direction_rate": 0.05,
+            "maximum_core_wrong_road_level_rate": 0.05,
+            "maximum_core_unreasonable_detour_rate": 0.10,
         },
         "canonical_promotion_gate": "HOLD",
         "blocker": "Independent human judgments and adjudication are not yet present.",

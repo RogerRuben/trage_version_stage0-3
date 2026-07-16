@@ -1,0 +1,2 @@
+﻿date,input_orders,successfully_reconstructed_orders,failed_match_orders,reconstruction_coverage,orders,core_orders,extended_orders,rejected_orders,core_share_of_input,failed_match_share_of_input,core_share,extended_share,rejected_share,orders_with_gap,orders_with_all_gaps_bridgeable,mean_direction_gaps,geometric_fallback_orders
+20161023,1000,984,16,0.984,984,136,0,848,0.136,0.016,0.13821138211382114,0.0,0.8617886178861789,607,0,2.6239837398373984,0

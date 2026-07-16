@@ -16,6 +16,7 @@ def main() -> None:
     parser.add_argument("--network-audit", type=Path, required=True)
     parser.add_argument("--comparison-audit", type=Path, required=True)
     parser.add_argument("--manual-audit", type=Path, required=True)
+    parser.add_argument("--connector-audit", type=Path, required=True)
     parser.add_argument("--conservation-audit", type=Path, required=True)
     parser.add_argument("--full-date-audit", type=Path)
     parser.add_argument("--output", type=Path, required=True)
@@ -23,12 +24,14 @@ def main() -> None:
     network = read(args.network_audit)
     comparison = read(args.comparison_audit)
     manual = read(args.manual_audit)
+    connector = read(args.connector_audit)
     conservation = read(args.conservation_audit)
     gates = {
         "network_topology_diagnostic": network.get("status") == "DIAGNOSTIC_PASS",
         "grade_separation_not_silently_noded": network.get("grade_separated_pairs_not_noded", 0) > 0,
         "fixed_1000_comparison_reviewed": comparison.get("status") in {"DIAGNOSTIC_PASS", "STOP_FOR_MANUAL_REVIEW"},
         "manual_truth": manual.get("status") == "PASS",
+        "connector_human_review": connector.get("status") == "PASS",
         "diagnostic_conservation": conservation.get("status") == "PASS",
         "full_date_chain": bool(args.full_date_audit and args.full_date_audit.is_file()),
     }

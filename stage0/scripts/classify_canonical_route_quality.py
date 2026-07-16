@@ -33,6 +33,7 @@ from stage0.canonical.route_quality import (
     projection_metrics,
     route_sequence_metrics,
 )
+from stage0.canonical.quality_layers import classify_quality_layer
 
 
 def arguments() -> argparse.Namespace:
@@ -341,7 +342,17 @@ def classify_day(
     quality["quality_reason"] = np.select(
         reason_conditions, reason_values, default="route_quality_threshold_failure"
     )
+    if v4_metrics:
+        final_layers = pd.DataFrame(
+            [classify_quality_layer(row) for row in quality.to_dict("records")],
+            index=quality.index,
+        )
+        quality = pd.concat([quality, final_layers], axis=1)
     counts = quality.route_quality_class.value_counts().to_dict()
+    final_counts = (
+        quality.route_quality_class_v4_final.value_counts().to_dict()
+        if "route_quality_class_v4_final" in quality else {}
+    )
     failed_files = sorted((stage0_root / "failed_orders" / f"day={date}").glob("*.parquet"))
     failed_orders = sum(
         len(pd.read_parquet(path, columns=["order_id"])) for path in failed_files
@@ -362,6 +373,12 @@ def classify_day(
         "core_share": float(quality.route_quality_class.eq("core").mean()),
         "extended_share": float(quality.route_quality_class.eq("extended").mean()),
         "rejected_share": float(quality.route_quality_class.eq("rejected").mean()),
+        "strict_core_orders_v4_final_candidate": int(final_counts.get("strict_core", 0)),
+        "analysis_set_orders_v4_final_candidate": int(final_counts.get("analysis_set", 0)),
+        "rejected_orders_v4_final_candidate": int(final_counts.get("rejected", 0)),
+        "formal_analysis_eligible_share": float(
+            quality.formal_analysis_eligible.mean()
+        ) if "formal_analysis_eligible" in quality else None,
         "orders_with_gap": int(quality.direction_gap_count.gt(0).sum()),
         "orders_with_all_gaps_bridgeable": int(quality.all_gaps_bridgeable.sum()),
         "mean_direction_gaps": float(quality.direction_gap_count.mean()),

@@ -5,6 +5,7 @@ import numpy as np
 from stage0.canonical.noding import (
     cluster_endpoints,
     cluster_endpoints_by_level,
+    connector_traversal_directions,
     grade_transition_connector_eligible,
     parse_bool,
     split_line_at_points,
@@ -94,3 +95,15 @@ def test_grade_transition_connector_requires_alignment_and_same_class():
     assert grade_transition_connector_eligible(
         ground, bridge, (1, 0), (-1, 0), "primary", "trunk_link"
     )
+
+
+def test_connector_directionality():
+    assert connector_traversal_directions("F", False, "F", True) == (True, False)
+    assert connector_traversal_directions("F", True, "F", False) == (False, True)
+    assert connector_traversal_directions("B", True, "B", False) == (True, True)
+
+
+def test_connector_candidate_ineligible_contract():
+    connector = {"topology_connector": True, "candidate_eligible": False}
+    assert connector["topology_connector"]
+    assert not connector["candidate_eligible"]

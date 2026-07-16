@@ -8,7 +8,15 @@ def review_frame():
     frame["order_id"] = ["a", "b"]
     frame["reviewer_id"] = ["r1", "r2"]
     frame["review_status"] = ["completed", "completed"]
+    frame["review_class"] = ["Correct", "Major error"]
     frame["route_correct"] = [True, False]
+    frame["major_error"] = [False, True]
+    for column in [
+        "minor_error", "wrong_road_level", "wrong_direction", "wrong_parallel_road",
+        "wrong_bridge_or_tunnel", "unreasonable_detour", "od_endpoint_error",
+        "data_limitation",
+    ]:
+        frame[column] = [False, False]
     return frame
 
 
@@ -25,3 +33,9 @@ def test_manual_truth_metrics_are_computed_not_assumed():
     metrics = review_metrics(review_frame(), ["a"])
     assert metrics["core_precision"] == 1.0
     assert metrics["rejected_correct_share"] == 0.0
+
+
+def test_manual_major_error_metrics_are_computed():
+    metrics = review_metrics(review_frame(), ["a"])
+    assert metrics["core_major_error_rate"] == 0.0
+    assert metrics["core_wrong_direction_rate"] == 0.0
