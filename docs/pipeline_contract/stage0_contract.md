@@ -20,6 +20,8 @@ and quality flags. It is measurement infrastructure, not a predictive model.
 - Valid `from_link -> node -> to_link` movements.
 - Order OD with explicit source and coordinate validity.
 - Order/link/movement quality flags and a Stage 0 output manifest.
+- An order-level route quality class: `core`, `extended`, or `rejected`, with
+  gap counts, graph-bridge evidence, confidence, fallback share, and reason.
 
 ## Allowed information
 
@@ -40,6 +42,10 @@ but this fact must be declared and must not be confused with dispatch-time input
 - Directed-edge, parallel-edge, link-continuity, OD-source, time-allocation, and
   distance-allocation audits are computed from outputs and pass.
 - Low-quality and unresolved orders remain explicit.
+- `core` contains only fully directed-continuous routes satisfying the frozen
+  confidence/fallback contract. `extended` may contain only bounded gaps that
+  are demonstrably bridgeable in the frozen directed graph; it is robustness-only.
+- `rejected` orders cannot enter formal Stage 1-3 fitting or primary evaluation.
 - A manually reviewed truth sample is versioned and reported.
 - Every output is reachable from one input manifest and one config hash.
 
@@ -60,3 +66,7 @@ own quality value; it is never relabeled as an observed traversal.
 Contract version: `stage0_canonical_contract_v2`. Consumers are Stage 1 label v2,
 Stage 2 planned-route construction, and lineage audits. No later stage may mutate
 the Stage 0 artifact.
+
+The paper-pipeline quality extension is `stage0_route_quality_v3`. Promotion of
+that extension is blocked until the full-data Core/Extended coverage and manual
+truth audit pass; the existing engineering smoke remains a separate artifact.

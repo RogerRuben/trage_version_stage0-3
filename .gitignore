@@ -29,6 +29,15 @@
 /artifacts/canonical/raw_smoke/
 /artifacts/canonical/smoke_v2/
 
+# Versioned Stage0 topology/rematch diagnostics are reproducible local payloads.
+# Compact audits and summaries are committed from docs/pipeline_rebaseline.
+/artifacts/exploratory/stage0_route_quality_diagnostic_v1/
+/artifacts/exploratory/stage0_noded_v3_rematch/
+/artifacts/exploratory/stage0_noded_v3_rematch_guarded/
+/artifacts/exploratory/stage0_noded_v3_route_quality_diagnostic_v1/
+/artifacts/exploratory/stage0_noded_v3_route_quality_guarded_v1/
+/artifacts/exploratory/xian_2017_core_noded_v3/
+
 # Local agent/application state
 /.agents/
 /.codex/

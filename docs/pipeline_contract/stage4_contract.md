@@ -2,8 +2,9 @@
 
 ## Research task
 
-Stage 4 runs counterfactual mixed AV/HV dispatch using a frozen Stage 3 condition
-vector. During pipeline rebaseline, the only allowed execution is a 500-1,000
+Stage 4 runs counterfactual mixed AV/HV dispatch using frozen Stage 3.5 HV/AV
+candidate routes and their Stage 3 risk/ODD attributes. During pipeline rebaseline,
+the only allowed execution is a 500-1,000
 order functional smoke: Safe GlobalMatch, O0, Stay, preassignment off,
 replication 1. Smoke metrics are not research results.
 
@@ -11,7 +12,10 @@ replication 1. Smoke metrics are not research results.
 
 - Canonical demand manifest.
 - Demand-supply-decoupled supply manifest.
-- Stage 3 canonical condition-vector manifest.
+- The v2 engineering smoke reads its frozen Stage 3 condition-vector manifest.
+- The v3 paper pipeline instead reads exactly one Stage 3.5 offline-route
+  manifest, which carries Stage 3 lineage; it does not separately discover a
+  Stage 3 directory or re-plan service routes online.
 - Dispatch-time predicted service-time distribution.
 - Exogenous, versioned AV capability scenario.
 - Frozen operational zones, costs, random environment, and Safe/O0 configuration.
@@ -36,6 +40,7 @@ Unknown condition-vector orders may form HV edges but never AV edges.
 - Test-day realized supply used to generate counterfactual supply.
 - Hard-coded or unaudited ODD PASS.
 - Automatic discovery of input parquet files.
+- Recomputing or changing an HV/AV service route inside a strategy comparison.
 - Full-day O0-O3, Balanced, sensitivity, or extra-replication runs before the
   end-to-end canonical audit passes.
 
@@ -65,3 +70,7 @@ fallback is allowed.
 
 Contract version: `stage4_counterfactual_smoke_v2`. The smoke is consumed only by
 the end-to-end audit, never by scientific comparison.
+
+The proposed formal execution kernel is FleetPy after a 500-2,000-order adapter
+validation. Simulator v3 remains a small-scale cross-validation tool; the two
+kernels must not be developed as competing formal pipelines.

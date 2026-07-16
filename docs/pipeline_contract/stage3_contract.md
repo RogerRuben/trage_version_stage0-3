@@ -2,8 +2,9 @@
 
 ## Research task
 
-Stage 3 aggregates held-out Stage 2 link/movement predictions into a calibrated,
-technology-neutral order condition vector.
+Stage 3 calibrates held-out Stage 2 predictions, aggregates link predictions for
+each declared candidate route, and applies pre-registered route-level ODD gates.
+It does not collapse the result to a single grade.
 
 ## Inputs
 
@@ -18,6 +19,9 @@ technology-neutral order condition vector.
 - RTS raw/tail/uncertainty.
 - IIS availability/applicability/conditional severity.
 - Separately named calibrated overall probability and continuous severity outputs.
+- Maximum-risk link, high-risk-link share, contiguous high-risk length, route
+  confidence, route ODD feasibility, violation count/length, binding dimension,
+  and remote-assistance requirement for each candidate route/profile.
 - Model, calibration, cutoff, missing-modality, and lineage metadata.
 
 ## Allowed information
@@ -33,6 +37,7 @@ are declared in the output schema.
 - Treating missing IIS severity as zero.
 - Naming q90 or another quantile as an expected value.
 - Naming an uncalibrated score as a probability.
+- Test-day tuning of an ODD threshold or route aggregation parameter.
 
 ## Acceptance rules
 
@@ -57,5 +62,7 @@ fit support, and version.
 
 ## Version and downstream consumers
 
-Contract version: `stage3_condition_vector_v2`. Consumer: Stage 4 counterfactual
-smoke and later formal experiments after the final gate passes.
+Contract version: `stage3_condition_vector_v2`; the paper route extension is
+`stage3_route_risk_v2`. Consumers are Stage 3.5 offline route generation and the
+existing Stage 4 engineering smoke. Formal Stage 4 must read Stage 3.5, not an
+unversioned Stage 3 directory.

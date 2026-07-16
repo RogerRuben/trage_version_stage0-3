@@ -1,0 +1,39 @@
+{
+  "status": "PASS",
+  "pipeline_version": "stage0_4_paper_pipeline_v3",
+  "promotion_status": "HOLD",
+  "first_blocking_stage": "stage0",
+  "checks": {
+    "definition_files_exist": true,
+    "formal_stage4_disabled": true,
+    "formal_stage4_gate_is_hold": true,
+    "stage4_reads_stage35_manifest": true,
+    "fleetpy_validation_is_bounded": true,
+    "test_date_not_in_upstream_fit_or_train": true,
+    "test_date_not_in_validation": true
+  },
+  "missing_definition_files": [],
+  "canonical_manifest_state": {
+    "stage0": {
+      "path": "artifacts/canonical/stage0_v2/stage0_v2.manifest.json",
+      "exists": false
+    },
+    "stage1": {
+      "path": "artifacts/canonical/stage1_v2/stage1_v2.manifest.json",
+      "exists": false
+    },
+    "stage2": {
+      "path": "artifacts/canonical/stage2_dispatch_v2/stage2_dispatch_v2.manifest.json",
+      "exists": false
+    },
+    "stage3": {
+      "path": "artifacts/canonical/stage3_route_risk_v2/stage3_route_risk_v2.manifest.json",
+      "exists": false
+    },
+    "stage35": {
+      "path": "artifacts/canonical/stage35_offline_routes_v1/stage35_offline_routes_v1.manifest.json",
+      "exists": false
+    }
+  },
+  "interpretation": "Governance PASS confirms that downstream execution is blocked correctly; it does not promote missing stage artifacts."
+}

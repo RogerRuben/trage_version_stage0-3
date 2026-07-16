@@ -50,6 +50,14 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+class IncompatibleGeometricFallbackError(RuntimeError):
+    """Raised when neither a complete HMM path nor same-network fallback exists."""
+
+
+def geometric_fallback_compatible(link_ids, network_link_ids: frozenset[str]) -> bool:
+    return all(str(link_id) in network_link_ids for link_id in link_ids)
+
+
 class HMMRoadNetwork:
     def __init__(self, roads_path: Path, nodes_path: Path, spacing_m: float = 15.0):
         self.roads = gpd.read_parquet(roads_path).to_crs(32649).reset_index(drop=True)
@@ -58,6 +66,7 @@ class HMMRoadNetwork:
         self.lengths = shapely.length(self.geoms).astype(float)
         self.forward = self.roads.oneway_code.fillna("B").astype(str).isin(["F", "B"]).to_numpy()
         self.reverse = self.roads.oneway_code.fillna("B").astype(str).isin(["T", "B"]).to_numpy()
+        self.link_ids = frozenset(self.roads.link_id.astype(str))
         coords: list[np.ndarray] = []
         road_ids: list[np.ndarray] = []
         for i, line in enumerate(self.geoms):
@@ -330,6 +339,17 @@ def viterbi_order(group: pd.DataFrame, network: HMMRoadNetwork, k: int, radius: 
     reason = "" if not fallback else (
         "low_matched_fraction" if matched_fraction < 0.85 else "low_hmm_confidence" if confidence < 0.03 else "candidate_gap"
     )
+    geometric_compatible = geometric_fallback_compatible(group.link_id, network.link_ids)
+    if fallback and not geometric_compatible:
+        # A geometric match from another network version cannot be copied into
+        # this artifact. Incomplete HMM states are explicit failures; a complete
+        # low-confidence state sequence can remain exploratory and auditable.
+        if not valid.all():
+            raise IncompatibleGeometricFallbackError(
+                "incomplete_hmm_and_geometric_fallback_from_other_network_version"
+            )
+        fallback = False
+        reason = "geometric_fallback_unavailable_for_network_version"
     if fallback:
         group["candidate_link_id"] = group.link_id
         group["matched_link_id"] = group.link_id
@@ -369,9 +389,9 @@ def viterbi_order(group: pd.DataFrame, network: HMMRoadNetwork, k: int, radius: 
         hmm_gap_count = int(group.topology_gap.sum())
         geometric_p90 = float(geometric.gps_to_link_dist_m.quantile(0.9))
         hmm_p90 = float(group.proj_dist_m.quantile(0.9))
-        if hmm_gap_count > geometric_gap_count or (
+        if geometric_compatible and (hmm_gap_count > geometric_gap_count or (
             hmm_gap_count == geometric_gap_count and hmm_p90 > geometric_p90 + 10.0
-        ):
+        )):
             fallback = True; reason = "non_degradation_guard"
             for column in geometric_columns:
                 group[column] = geometric[column].to_numpy()
@@ -452,28 +472,60 @@ def main() -> None:
             continue
         frame = pd.read_parquet(source)
         sigma, beta = calibrate(frame, args.sigma_z, args.beta)
-        matched_frames: list[pd.DataFrame] = []; quality_rows: list[dict] = []
+        matched_frames: list[pd.DataFrame] = []; quality_rows: list[dict] = []; failed_rows: list[dict] = []
         groups = frame.groupby("order_id", sort=False)
         for order_no, (_, group) in enumerate(groups, start=1):
             if args.max_orders_per_part and order_no > args.max_orders_per_part:
                 break
-            matched, quality = viterbi_order(group, network, args.candidates, args.candidate_radius_m, sigma, beta)
+            try:
+                matched, quality = viterbi_order(
+                    group, network, args.candidates, args.candidate_radius_m, sigma, beta
+                )
+            except IncompatibleGeometricFallbackError as exc:
+                failed_rows.append({
+                    "order_id": str(group.order_id.iloc[0]),
+                    "failure_stage": "hmm_viterbi_network_version_guard",
+                    "failure_reason": str(exc),
+                    "source_part": part,
+                })
+                continue
             matched_frames.append(matched); quality_rows.append(quality)
             if order_no % 100 == 0:
                 print(f"part={part} orders={order_no:,} elapsed={time.time()-started:.1f}s", flush=True)
-        result = pd.concat(matched_frames, ignore_index=True)
+        result = (
+            pd.concat(matched_frames, ignore_index=True)
+            if matched_frames
+            else frame.head(0).assign(point_seq=pd.Series(dtype="int32"))
+        )
         quality = pd.DataFrame(quality_rows)
+        if "fallback_used" not in quality:
+            quality["fallback_used"] = pd.Series(dtype=bool)
         routes = compact_routes(result)
         result.to_parquet(point_path, index=False, compression="zstd")
         routes.to_parquet(route_path, index=False, compression="zstd")
         quality.to_parquet(quality_path, index=False, compression="zstd")
+        failed_dir = args.output_root / "failed_orders" / f"day={args.date}"
+        failed_dir.mkdir(parents=True, exist_ok=True)
+        pd.DataFrame(
+            failed_rows,
+            columns=["order_id", "failure_stage", "failure_reason", "source_part"],
+        ).to_parquet(failed_dir / f"part={part}.parquet", index=False, compression="zstd")
         processed_orders += len(quality)
-        print(f"completed part={part} orders={len(quality):,} fallback={quality.fallback_used.mean():.2%}", flush=True)
+        fallback_share = float(quality.fallback_used.mean()) if len(quality) else 0.0
+        print(
+            f"completed part={part} orders={len(quality):,} failed={len(failed_rows):,} "
+            f"fallback={fallback_share:.2%}",
+            flush=True,
+        )
     manifest = {
         "date": args.date, "complete": len(list(point_dir.glob('bucket=*.parquet'))) == len(all_files),
         "processed_orders_this_run": processed_orders, "candidate_count": args.candidates,
         "candidate_radius_m": args.candidate_radius_m, "matcher_version": "hmm_viterbi",
         "worker_count": args.worker_count, "worker_index": args.worker_index,
+        "failed_orders": int(sum(
+            len(pd.read_parquet(path, columns=["order_id"]))
+            for path in (args.output_root / "failed_orders" / f"day={args.date}").glob("*.parquet")
+        )),
         "seconds": time.time() - started,
     }
     manifest_dir = args.output_root / "manifests"; manifest_dir.mkdir(parents=True, exist_ok=True)

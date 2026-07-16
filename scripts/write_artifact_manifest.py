@@ -21,7 +21,11 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--artifact-id", required=True)
     parser.add_argument("--schema-version", required=True)
-    parser.add_argument("--stage", required=True, choices=["raw", "stage0", "stage1", "stage2", "stage3", "stage4", "end_to_end"])
+    parser.add_argument(
+        "--stage",
+        required=True,
+        choices=["raw", "stage0", "stage1", "stage2", "stage3", "stage35", "stage4", "end_to_end"],
+    )
     parser.add_argument("--status", default="canonical", choices=["canonical", "exploratory", "deprecated"])
     parser.add_argument("--input-artifact-id", action="append", default=[])
     parser.add_argument("--config", type=Path, required=True)

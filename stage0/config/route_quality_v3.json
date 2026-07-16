@@ -1,0 +1,24 @@
+{
+  "schema_version": "stage0_route_quality_v3",
+  "core": {
+    "maximum_direction_gaps": 0,
+    "minimum_route_links": 2,
+    "minimum_mean_match_confidence": 0.35,
+    "maximum_fallback_point_share": 0.25
+  },
+  "extended": {
+    "maximum_direction_gaps": 2,
+    "maximum_gap_share": 0.10,
+    "maximum_bridge_links_per_gap": 3,
+    "maximum_bridge_distance_m_per_gap": 750.0,
+    "minimum_mean_match_confidence": 0.35,
+    "maximum_fallback_point_share": 0.25
+  },
+  "roles": {
+    "core": "formal_training_and_main_experiment_eligible_after_full_audit",
+    "extended": "coverage_and_robustness_only",
+    "rejected": "excluded_from_formal_stage1_to_stage3"
+  },
+  "status": "pre_registered_engineering_thresholds_pending_full_data_validation"
+}
+

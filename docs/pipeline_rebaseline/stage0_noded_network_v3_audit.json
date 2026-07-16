@@ -1,0 +1,38 @@
+{
+  "status": "DIAGNOSTIC_PASS",
+  "network_version": "xian_2017_core_noded_v3",
+  "source_network": "map_data/xian_2017/xian_2017_core_roads.parquet",
+  "source_links": 12707,
+  "noded_links": 29375,
+  "split_source_links": 5940,
+  "same_level_intersection_pairs": 21152,
+  "grade_separated_pairs_not_noded": 4139,
+  "overlap_pairs_not_automatically_merged": 6,
+  "endpoint_snap_tolerance_m": 0.75,
+  "original_graph": {
+    "nodes": 18332,
+    "directed_edges": 21201,
+    "weak_components": 6102,
+    "strong_components": 8694,
+    "largest_weak_component_nodes": 3373,
+    "largest_weak_component_share": 0.1839951996508837
+  },
+  "noded_graph": {
+    "nodes": 21333,
+    "directed_edges": 49723,
+    "weak_components": 46,
+    "strong_components": 524,
+    "largest_weak_component_nodes": 21111,
+    "largest_weak_component_share": 0.9895935873998031
+  },
+  "outputs": {
+    "roads": "artifacts/exploratory/xian_2017_core_noded_v3/xian_2017_core_noded_v3_roads.parquet",
+    "nodes": "artifacts/exploratory/xian_2017_core_noded_v3/xian_2017_core_noded_v3_nodes.parquet"
+  },
+  "canonical_promotion_gate": "HOLD",
+  "promotion_requirements": [
+    "Rematch the fixed train/validation/test chain against this version.",
+    "Run route-quality and manual-truth audits.",
+    "Verify grade-separated and overlapping-road exceptions."
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "registry_version": "odd_scenarios_v1",
+  "status": "pre_registered_scenario_priors_not_empirical_av_capability",
+  "test_population_calibration_allowed": false,
+  "profiles": [
+    {
+      "profile_id": "conservative_av_v1",
+      "ordinal_level": 1,
+      "threshold_source": "external_engineering_scenario",
+      "hard_gate_policy": "all_registered_dimensions_and_uncertainty"
+    },
+    {
+      "profile_id": "moderate_av_v1",
+      "ordinal_level": 2,
+      "threshold_source": "external_engineering_scenario",
+      "hard_gate_policy": "all_registered_dimensions_and_uncertainty"
+    },
+    {
+      "profile_id": "mature_av_v1",
+      "ordinal_level": 3,
+      "threshold_source": "external_engineering_scenario",
+      "hard_gate_policy": "all_registered_dimensions_and_uncertainty"
+    }
+  ],
+  "freeze_rule": "numeric thresholds must be supplied and audited before Stage3 full test inference"
+}
+

@@ -12,7 +12,10 @@ contract. Two modes are separate artifacts:
 
 ## Inputs
 
-- Versioned planned/matched-route proxy known at the declared decision time.
+- Versioned planned route derived from OD and a frozen network cost at the
+  declared decision time.
+- A separately named historical/revealed route for label alignment and oracle
+  analysis only; it cannot be called an assigned or planned route.
 - Stage 0 topology/route products and Stage 1 targets for training only.
 - Strictly backward profiles and traffic state with availability timestamps.
 - Fold manifest fixing train, validation, and test keys.
@@ -35,6 +38,7 @@ whose availability timestamp is no later than the order decision time.
 - In-sample predictions exported as held-out inputs.
 - Test labels used for thresholding, calibration, scaling, or fallback selection.
 - Mixing rolling predictions into a dispatch artifact.
+- Relabelling a completed historical route as a dispatch-time planned route.
 
 ## Acceptance rules
 
@@ -66,4 +70,4 @@ an exact whitelist plus role registry and exact-name blacklist.
 ## Version and downstream consumers
 
 Products: `stage2_dispatch_prediction_v2` and `stage2_rolling_prediction_v2`.
-Only the dispatch product is consumed by canonical Stage 3/4.
+Only the dispatch product is consumed by canonical Stage 3 and Stage 3.5.
