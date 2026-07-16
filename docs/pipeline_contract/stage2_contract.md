@@ -51,6 +51,11 @@ whose availability timestamp is no later than the order decision time.
 Estimated future link-entry time may be an output/position descriptor but cannot
 advance feature availability beyond `T_decision` in dispatch mode.
 
+For the canonical engineering smoke, 2016-10-19 is an upstream-only model-fit
+day. Predictions consumed by Stage 3 are produced for 2016-10-20, 2016-10-22,
+and 2016-10-23, so no Stage 3 input is an in-sample Stage 2 prediction. The
+extra fit day is not a fourth Stage 3 fold and must not be reported as one.
+
 ## Missing and fallback rules
 
 Every fallback records `requested_level_support_count`, `fallback_level`,

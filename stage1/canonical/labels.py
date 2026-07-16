@@ -12,7 +12,7 @@ DIMENSIONS = ("lcs", "iis", "gns", "rts", "pmis")
 # PMIS is an interaction descriptor derived partly from LCS/RTS.  It remains an
 # output dimension, but is excluded from the equal-weight core composite to avoid
 # counting the same behavior twice.
-CORE_DIMENSIONS = ("lcs", "iis", "gns", "rts")
+CORE_DIMENSIONS = ("lcs", "gns", "rts")
 
 
 def weighted_summary(values: np.ndarray, weights: np.ndarray, threshold: float) -> dict[str, float]:

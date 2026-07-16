@@ -1,0 +1,44 @@
+{
+  "status": "PASS",
+  "checks": {
+    "demand_balance": true,
+    "illegal_request_transitions": true,
+    "terminal_state_reopened": true,
+    "request_transition_chain": true,
+    "duplicate_completed": true,
+    "duplicate_cancelled": true,
+    "vehicle_leg_overlap": true,
+    "vehicle_leg_spatial_discontinuity": true,
+    "event_time_monotonic": true,
+    "unknown_condition_av_assignment": true,
+    "pickup_odd_violation": true,
+    "service_odd_violation": true,
+    "combined_odd_violation": true,
+    "historical_realized_duration_reads": true,
+    "operating_contribution_recomputes": true,
+    "scenario_net_profit_recomputes": true,
+    "profile_not_test_calibrated": true
+  },
+  "counts": {
+    "orders": 1000,
+    "completed": 1000,
+    "cancelled": 0,
+    "av_assignments": 12,
+    "illegal_transitions": 0,
+    "terminal_reopened": 0,
+    "transition_chain_mismatches": 0,
+    "duplicate_completed": 0,
+    "duplicate_cancelled": 0,
+    "leg_overlaps": 0,
+    "spatial_discontinuities": 0,
+    "unknown_condition_av_assignments": 0,
+    "pickup_odd_violations": 0,
+    "service_odd_violations": 0,
+    "combined_odd_violations": 0
+  },
+  "economy": {
+    "operating_contribution": 3704.343746594426,
+    "scenario_net_profit": 2954.343746594426,
+    "recalculation_error": 0.0
+  }
+}

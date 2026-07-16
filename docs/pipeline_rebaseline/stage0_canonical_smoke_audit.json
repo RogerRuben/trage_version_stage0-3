@@ -6,6 +6,21 @@
   "iis_influence_policy": "upstream_75m_prorated",
   "days": [
     {
+      "date": "20161019",
+      "orders": 1000,
+      "route_transitions": 18289,
+      "illegal_directed_transitions": 3443,
+      "flagged_direction_gaps": 3443,
+      "unflagged_illegal_directed_transitions": 0,
+      "unknown_road_link_transitions": 0,
+      "interval_orders": 1000,
+      "time_conservation_failures": 0,
+      "distance_conservation_failures": 0,
+      "maximum_time_error_sec": 0.0,
+      "maximum_distance_error_m": 1.8189894035458565e-12,
+      "status": "PASS"
+    },
+    {
       "date": "20161020",
       "orders": 1000,
       "route_transitions": 17925,

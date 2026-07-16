@@ -1,7 +1,7 @@
 {
   "schema_version": "stage1_label_schema_v2",
   "dimensions": ["lcs", "iis", "gns", "rts", "pmis"],
-  "core_composite_dimensions": ["lcs", "iis", "gns", "rts"],
+  "core_composite_dimensions": ["lcs", "gns", "rts"],
   "pmis_role": "interaction_output_excluded_from_core_composite",
   "missing_policy": "preserve_na_and_emit_dimension_availability_mask",
   "quantile_method": "fixed_global_edges_mergeable_histogram",

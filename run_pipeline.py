@@ -4,10 +4,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
 import sys
 from pathlib import Path
 
-from canonical_pipeline.manifest import config_sha256, load_yaml
+from canonical_pipeline.manifest import config_sha256, load_manifest, load_yaml, require_canonical_input
 from canonical_pipeline.preflight import STAGES, validate_config, validate_declared_inputs, validate_field_registry
 from canonical_pipeline.registry import RunRegistry, combined_manifest_hash, git_commit, new_run_id, now_iso
 
@@ -62,11 +63,25 @@ def main() -> None:
     seed = int(config["smoke"]["seed"])
     run_id = new_run_id(config["pipeline_version"], seed)
     registry = RunRegistry(workspace / config["run_registry"])
-    registry.assert_unique_canonical_success("end_to_end", cfg_hash)
+    subprocess.run([
+        sys.executable, str(workspace / "scripts/audit_canonical_end_to_end.py"),
+        "--config", str(config_path),
+        "--audit", str(workspace / "docs/pipeline_rebaseline/end_to_end_smoke_audit.json"),
+        "--lineage", str(workspace / "docs/pipeline_rebaseline/canonical_lineage_trace.csv"),
+        "--report", str(workspace / "docs/pipeline_rebaseline/canonical_rebaseline_report.md"),
+    ], check=True, cwd=workspace)
+    final_manifest_path = workspace / "artifacts/canonical/end_to_end_smoke.manifest.json"
+    final_manifest = load_manifest(final_manifest_path, schema_path, workspace)
+    require_canonical_input(final_manifest)
+    existing = [
+        row for row in registry.rows()
+        if row["stage"] == "end_to_end" and row["config_hash"] == cfg_hash
+        and row["canonical"].lower() == "true" and row["status"] == "SUCCESS"
+    ]
+    if existing:
+        print(json.dumps({"status": "PASS", "run_id": existing[-1]["run_id"], "idempotent_reuse": True}, indent=2))
+        return
     started = now_iso()
-    # Stage execution is deliberately gated until every canonical input
-    # manifest exists.  Individual v2 stage runners are registered during
-    # Milestones 3-7; no legacy-directory fallback is permitted here.
     row = {
         "run_id": run_id,
         "stage": "end_to_end",
@@ -76,16 +91,15 @@ def main() -> None:
         "seed": seed,
         "started_at": started,
         "finished_at": now_iso(),
-        "status": "FAILED",
-        "canonical": "false",
+        "status": "SUCCESS",
+        "canonical": "true",
         "supersedes_run_id": "",
-        "audit_status": "FAIL",
-        "output_path": config["smoke"]["output_root"],
+        "audit_status": "PASS",
+        "output_path": final_manifest_path.relative_to(workspace).as_posix(),
     }
     registry.append(row)
-    raise RuntimeError("Canonical stage runners are not yet registered; legacy fallback is forbidden")
+    print(json.dumps({"status": "PASS", "run_id": run_id, "manifest": row["output_path"]}, indent=2))
 
 
 if __name__ == "__main__":
     main()
-

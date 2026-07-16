@@ -10,8 +10,9 @@ overwrite v1 artifacts.
   support. Empty internal bins are interpolated, values below/above support map
   to the lower/upper tail, and missing raw values remain missing. There is no
   `fillna(0.5)` rule.
-- LCS, IIS, GNS and RTS form the equal-weight core composite. PMIS remains a
-  separately reported activity–behavior interaction descriptor and is excluded
+- LCS, GNS and RTS form the equal-weight core composite. IIS remains a
+  conditional movement-level modality and PMIS remains a
+  separately reported activity-behavior interaction descriptor; both are excluded
   from that composite, preventing its LCS/RTS inputs from being counted twice.
 - Missing modalities are not zero stress. Every order contains per-dimension
   availability, a JSON `dimension_mask`, `valid_dimension_count`, and an explicit

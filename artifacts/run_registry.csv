@@ -1,2 +1,3 @@
 run_id,stage,commit,config_hash,input_manifest_hash,seed,started_at,finished_at,status,canonical,supersedes_run_id,audit_status,output_path
-
+stage0_4_rebaseline_v2-20260715T111758Z-s20260715-a9c8c8d9fb,end_to_end,123905d7a8cf2ee675fe5e126017d2193b585c56,e74cd9c094c7d38f487f2f783c918d4b84520389d957168e9cf6637fb57304d2,333da1046d46d77e33f72e8dcf3258edc39abdafe5b742875c9e4e0dd81494ae,20260715,2026-07-15T11:17:58.751942+00:00,2026-07-15T11:18:00.773883+00:00,SUCCESS,true,,PASS,artifacts/canonical/end_to_end_smoke.manifest.json
+stage0_4_rebaseline_v2-20260715T113310Z-s20260715-a7cdb62eea,end_to_end,123905d7a8cf2ee675fe5e126017d2193b585c56,8b452c91e1ad8811e14bf66b56cd38f4a94643a7cb4a6bc4cd07c7f0ea0059d5,35750d24876e972d9d0208ccde2341558f0ba6a368433d0adb0cb227a5788cae,20260715,2026-07-15T11:33:10.660941+00:00,2026-07-15T11:33:12.569275+00:00,SUCCESS,true,,PASS,artifacts/canonical/end_to_end_smoke.manifest.json

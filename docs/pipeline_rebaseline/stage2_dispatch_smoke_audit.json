@@ -1,0 +1,69 @@
+{
+  "status": "PASS",
+  "schema_version": "stage2_dispatch_prediction_v2",
+  "fit_date": "20161019",
+  "prediction_dates": [
+    "20161020",
+    "20161022",
+    "20161023"
+  ],
+  "fit_date_outside_prediction_dates": true,
+  "single_order_cutoff_contract": true,
+  "actual_link_entry_used_as_feature": false,
+  "estimated_future_entry_unlocks_state": false,
+  "prediction_mode": "dispatch_time",
+  "model_role": "engineering_smoke_not_formal_rc_mstnet",
+  "days": [
+    {
+      "date": "20161020",
+      "orders": 1000,
+      "link_rows": 18925,
+      "service_orders": 1000,
+      "heldout_false_rows": 0,
+      "training_not_before_prediction": 0,
+      "availability_after_decision": 0,
+      "orders_with_multiple_cutoffs": 0,
+      "probability_range_failures": 0,
+      "expected_range_failures": 0,
+      "nonpositive_service_predictions": 0,
+      "realized_duration_permission_rows": 0,
+      "forbidden_features": "",
+      "outside_whitelist": "",
+      "status": "PASS"
+    },
+    {
+      "date": "20161022",
+      "orders": 1000,
+      "link_rows": 20064,
+      "service_orders": 1000,
+      "heldout_false_rows": 0,
+      "training_not_before_prediction": 0,
+      "availability_after_decision": 0,
+      "orders_with_multiple_cutoffs": 0,
+      "probability_range_failures": 0,
+      "expected_range_failures": 0,
+      "nonpositive_service_predictions": 0,
+      "realized_duration_permission_rows": 0,
+      "forbidden_features": "",
+      "outside_whitelist": "",
+      "status": "PASS"
+    },
+    {
+      "date": "20161023",
+      "orders": 1000,
+      "link_rows": 20031,
+      "service_orders": 1000,
+      "heldout_false_rows": 0,
+      "training_not_before_prediction": 0,
+      "availability_after_decision": 0,
+      "orders_with_multiple_cutoffs": 0,
+      "probability_range_failures": 0,
+      "expected_range_failures": 0,
+      "nonpositive_service_predictions": 0,
+      "realized_duration_permission_rows": 0,
+      "forbidden_features": "",
+      "outside_whitelist": "",
+      "status": "PASS"
+    }
+  ]
+}

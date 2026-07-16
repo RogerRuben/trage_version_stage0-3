@@ -1,0 +1,99 @@
+{
+  "status": "PASS",
+  "certification_scope": "canonical_engineering_smoke_only",
+  "pipeline_version": "stage0_4_rebaseline_v2",
+  "config_hash": "8b452c91e1ad8811e14bf66b56cd38f4a94643a7cb4a6bc4cd07c7f0ea0059d5",
+  "canonical_run_id": "stage0_4_rebaseline_v2-20260715T113310Z-s20260715-a7cdb62eea",
+  "stage_audits": {
+    "raw": true,
+    "stage0": true,
+    "stage1": true,
+    "stage2": true,
+    "stage3": true,
+    "stage4": true,
+    "end_to_end": true
+  },
+  "review_status": {
+    "information_leakage": "PASS",
+    "data_lineage": "PASS",
+    "mathematical_definitions": "PASS",
+    "counterfactual_inputs": "PASS",
+    "experiment_governance": "PASS"
+  },
+  "review_evidence": {
+    "information_leakage": {
+      "stage2_availability_after_decision_zero": true,
+      "stage2_realized_duration_permission_zero": true,
+      "stage3_realized_stage1_features_zero": true,
+      "stage3_validation_only_calibration": true,
+      "stage4_realized_duration_reads_zero": true,
+      "stage4_profile_not_test_calibrated": true
+    },
+    "data_lineage": {
+      "end_to_end_lineage_pass": true,
+      "all_manifests_load_and_hash": true,
+      "lineage_trace_rows": true
+    },
+    "mathematical_definitions": {
+      "partition_invariance": true,
+      "cdf_monotonic_and_tail": true,
+      "pmis_not_double_weighted": true,
+      "iis_missing_not_zero": true,
+      "stage3_expected_not_q90": true,
+      "stage3_extended_not_max_proxy": true
+    },
+    "counterfactual_inputs": {
+      "counterfactual_mode": true,
+      "predicted_distribution_service_time": true,
+      "historical_duration_reads_zero": true,
+      "unknown_condition_av_assignment_zero": true,
+      "av_odd_violation_zero": true
+    },
+    "experiment_governance": {
+      "config_contract_valid": true,
+      "field_registry_valid": true,
+      "all_inputs_explicit_canonical": true,
+      "all_manifest_audits_pass": true,
+      "single_config_hash": true,
+      "single_canonical_success_for_config": true,
+      "formal_stage4_disabled": true
+    }
+  },
+  "artifact_classification": [
+    {
+      "status": "canonical",
+      "artifact_count": 8,
+      "scope": "explicit manifests in pipeline_canonical.yaml"
+    },
+    {
+      "status": "exploratory",
+      "artifact_count": 166,
+      "scope": "frozen legacy inventory"
+    },
+    {
+      "status": "deprecated",
+      "artifact_count": 1,
+      "scope": "frozen legacy inventory"
+    },
+    {
+      "status": "unknown",
+      "artifact_count": 0,
+      "scope": "frozen legacy inventory"
+    }
+  ],
+  "formal_experiment_release_gate": "HOLD",
+  "formal_experiment_blockers": [
+    "Stage0 clipped-core directed route continuity is only 15.7%-17.5% in the smoke sample.",
+    "Stage2 and Stage3 smoke estimators are lightweight engineering models, not formal RC-MSTNet/DeepSets refits.",
+    "Canonical dispatch-time IIS is unavailable and remains NA.",
+    "Only one engineering smoke split and one Stage4 functional run have been audited."
+  ],
+  "stage4_functional_smoke": {
+    "orders": 1000,
+    "completed": 1000,
+    "cancelled": 0,
+    "av_assignments": 12,
+    "av_odd_violations": 0,
+    "realized_duration_reads": 0
+  }
+}

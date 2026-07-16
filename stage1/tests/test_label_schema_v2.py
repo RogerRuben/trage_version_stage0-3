@@ -42,7 +42,7 @@ def test_pmis_is_reported_but_not_double_counted_in_core_composite():
         "pmis_pct_link": [1.0],
     })
     row = aggregate_order_labels_v2(frame).iloc[0]
-    assert row.core_composite_mean == 0.5
+    assert np.isclose(row.core_composite_mean, (0.2 + 0.6 + 0.8) / 3)
     assert row.pmis_mean == 1.0
     assert row.pmis_role == "interaction_output_excluded_from_core_composite"
 

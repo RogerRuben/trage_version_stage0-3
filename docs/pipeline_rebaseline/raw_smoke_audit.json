@@ -1,0 +1,70 @@
+{
+  "status": "PASS",
+  "sampling_contract": "complete orders selected by stable SHA256 rank; no row sampling",
+  "days": [
+    {
+      "status": "PASS",
+      "date": "20161019",
+      "source": "artifacts/canonical/raw_smoke_source/22-4-8/10-19/fbad2096f8df451dace979af1d1c663a.tar.gz",
+      "member": "xian/gps_20161019",
+      "seed": 20260715,
+      "sampling": "smallest_sha256_order_rank_complete_order_two_pass",
+      "source_rows": 23332834,
+      "selected_orders": 1000,
+      "selected_rows": 228621,
+      "malformed_first_pass": 0,
+      "malformed_selected_rows": 0,
+      "minimum_timestamp": 1476806849,
+      "maximum_timestamp": 1476892800,
+      "peak_buffer_rows": 100000
+    },
+    {
+      "status": "PASS",
+      "date": "20161020",
+      "source": "artifacts/canonical/raw_smoke_source/22-4-8/10-20/cd04cb22b620424fbd5448bd13120129.tar.gz",
+      "member": "xian/gps_20161020",
+      "seed": 20260715,
+      "sampling": "smallest_sha256_order_rank_complete_order_two_pass",
+      "source_rows": 24229527,
+      "selected_orders": 1000,
+      "selected_rows": 227113,
+      "malformed_first_pass": 0,
+      "malformed_selected_rows": 0,
+      "minimum_timestamp": 1476893222,
+      "maximum_timestamp": 1476979200,
+      "peak_buffer_rows": 50000
+    },
+    {
+      "status": "PASS",
+      "date": "20161022",
+      "source": "artifacts/canonical/raw_smoke_source/22-4-8/10-22/b0bdedc44c534932b9b98fb5b1b21a76.tar.gz",
+      "member": "xian/gps_20161022",
+      "seed": 20260715,
+      "sampling": "smallest_sha256_order_rank_complete_order_two_pass",
+      "source_rows": 32434984,
+      "selected_orders": 1000,
+      "selected_rows": 275003,
+      "malformed_first_pass": 0,
+      "malformed_selected_rows": 0,
+      "minimum_timestamp": 1477065723,
+      "maximum_timestamp": 1477152000,
+      "peak_buffer_rows": 50000
+    },
+    {
+      "status": "PASS",
+      "date": "20161023",
+      "source": "artifacts/canonical/raw_smoke_source/22-4-8/10-23/50571842cff04226b33a58ae0ee64496.tar.gz",
+      "member": "xian/gps_20161023",
+      "seed": 20260715,
+      "sampling": "smallest_sha256_order_rank_complete_order_two_pass",
+      "source_rows": 26584502,
+      "selected_orders": 1000,
+      "selected_rows": 240068,
+      "malformed_first_pass": 0,
+      "malformed_selected_rows": 0,
+      "minimum_timestamp": 1477152323,
+      "maximum_timestamp": 1477238401,
+      "peak_buffer_rows": 50000
+    }
+  ]
+}

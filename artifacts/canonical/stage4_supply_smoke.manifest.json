@@ -1,0 +1,63 @@
+{
+  "manifest_version": "1.0",
+  "artifact_id": "stage4_decoupled_smoke_environment_train20_test23_v1",
+  "schema_version": "stage4_smoke_environment_v1",
+  "stage": "stage4",
+  "status": "canonical",
+  "created_at": "2026-07-15T11:15:25.152747+00:00",
+  "created_by_commit": "123905d7a8cf2ee675fe5e126017d2193b585c56",
+  "input_artifact_ids": [
+    "raw_smoke_20161019_20_22_23_v2",
+    "stage3_smoke_train20_validate22_test23_v2"
+  ],
+  "config_hash": "8b452c91e1ad8811e14bf66b56cd38f4a94643a7cb4a6bc4cd07c7f0ea0059d5",
+  "fit_dates": [
+    "20161020"
+  ],
+  "target_dates": [
+    "20161023"
+  ],
+  "decision_time_contract": "supply_from_train_day_and_residuals_pre_generated_before_strategy",
+  "files": [
+    {
+      "role": "stage4_demand",
+      "path": "artifacts/canonical/smoke_v2/stage4_environment/demand.parquet",
+      "sha256": "263d0fe919c8050c864f3d5d362b4d5ffa83c02b5988cac3171017220ac3a09a",
+      "size_bytes": 233941,
+      "row_count": 1000,
+      "schema_hash": "c88a731aaecc277a305c7e88d37e37c5652aad668d946ee8c5ff3117df740f37"
+    },
+    {
+      "role": "stage4_fleet",
+      "path": "artifacts/canonical/smoke_v2/stage4_environment/fleet.parquet",
+      "sha256": "b68185cac97be7736cb6607a5ecaec75640bab80dd43bdad78d676ccf2a0ad23",
+      "size_bytes": 10793,
+      "row_count": 100,
+      "schema_hash": "8e37b6865c730fa7525438f49bca8231895ddf3fc7b013e778a8bff805f41d27"
+    },
+    {
+      "role": "stage4_depots",
+      "path": "artifacts/canonical/smoke_v2/stage4_environment/depots.parquet",
+      "sha256": "39453b5041ba5536e8c698cba4b0ce267c368d344c02dd305dec380405908ddb",
+      "size_bytes": 4135,
+      "row_count": 5,
+      "schema_hash": "4f22d4dff360e4cb2a4df72d34ad711517edce7a67f84f94fa777b855ecbac90"
+    },
+    {
+      "role": "stage4_service_residuals",
+      "path": "artifacts/canonical/smoke_v2/stage4_environment/service_residuals.parquet",
+      "sha256": "2e740bc459dbaab984ff836944a7c5ad0578b035e8a92f46ea761e6f4ffb953b",
+      "size_bytes": 31529,
+      "row_count": 1000,
+      "schema_hash": "d22a954ac658d4458995c27ca0dbb747fa1da4c3aced182e74a9c3d50f6179ce"
+    }
+  ],
+  "audit": {
+    "status": "PASS",
+    "path": "artifacts/canonical/smoke_v2/stage4_environment/environment_audit.json",
+    "sha256": "c7cd4d204bbe174c99d9fbdc6d18ecaf07b1adc65dff01262921ad4eafa8e36b"
+  },
+  "known_limitations": [
+    "95 HV plus 5 AV with full-day online windows is an explicit functional-smoke scenario, not a fitted driver supply model."
+  ]
+}
