@@ -1,0 +1,100 @@
+{
+  "manifest_version": "1.0",
+  "artifact_id": "stage0_v4_promotion_candidate",
+  "schema_version": "stage0_route_quality_v4",
+  "stage": "stage0",
+  "status": "exploratory",
+  "created_at": "2026-07-16T15:02:54.179836+00:00",
+  "created_by_commit": "d46d38a",
+  "registered_by_commit": "d46d38a",
+  "input_artifact_ids": [
+    "stage0_smoke_20161019_20_22_23_v2"
+  ],
+  "config_hash": "d65b81c333777a9e12a37e4cf929b7e0739c32849af4521ec3753d9fa1718445",
+  "fit_dates": [
+    "20161019",
+    "20161020",
+    "20161021",
+    "20161022"
+  ],
+  "target_dates": [
+    "20161023"
+  ],
+  "decision_time_contract": "retrospective_observation_diagnostic_only",
+  "files": [
+    {
+      "role": "network_roads",
+      "path": "artifacts/exploratory/xian_2017_core_noded_v4/roads.parquet",
+      "sha256": "7560d9fb4c7fff8c1c075f719525e8761f0a0d475013a0930f8b2ce3c9211591",
+      "size_bytes": 2681996,
+      "row_count": 31647,
+      "schema_hash": "12dfbcc3402435f5ee3163cad0bb657c0108f4d6a7c6d81b874cd4c29a52c61a"
+    },
+    {
+      "role": "network_nodes",
+      "path": "artifacts/exploratory/xian_2017_core_noded_v4/nodes.parquet",
+      "sha256": "57a6b87274825e424e7a44df0c5b7c811d2333fc14594d881c39e3b832c0e641",
+      "size_bytes": 978524,
+      "row_count": 23658,
+      "schema_hash": "8adb6df29c65f5f094a56926b851fa5adea0d46e0a743c7f9e8de5785883cad2"
+    },
+    {
+      "role": "route_quality_config",
+      "path": "stage0/config/route_quality_v4.json",
+      "sha256": "9caa957c8dece1b4743be29e10fbc224728e49318ec32e68b6925ed2d0e39380",
+      "size_bytes": 2015,
+      "row_count": null,
+      "schema_hash": null
+    },
+    {
+      "role": "network_comparison",
+      "path": "docs/pipeline_rebaseline/stage0_network_comparison_v4.csv",
+      "sha256": "92ee6538ba66700ed9ce53caed5330a6cd8bc9f9f29e64459482cae3e331a142",
+      "size_bytes": 1586,
+      "row_count": 3,
+      "schema_hash": "a40b77424c8ab563450b7937d4ff503fa5336e8d0693b035836b7aa8eb5e8fc8"
+    },
+    {
+      "role": "manual_truth_pack",
+      "path": "docs/pipeline_rebaseline/manual_truth/stage0_route_truth_v1_review_pack.parquet",
+      "sha256": "980c4be5edbe67df418adc3b91b27135c6025288449b02c73568a3ecfcc8e313",
+      "size_bytes": 133396,
+      "row_count": 500,
+      "schema_hash": "58dbc65c729884dd8631c0c55310cdda3357bf72ef4f7fb1bb8c87ad73b88351"
+    },
+    {
+      "role": "manual_truth_manifest",
+      "path": "docs/pipeline_rebaseline/manual_truth/stage0_route_truth_v1_manifest.json",
+      "sha256": "e2aaec5c327abf2d2f5475b6548b9adb29d2a721b8fcd202133f8becb682bf32",
+      "size_bytes": 1087,
+      "row_count": null,
+      "schema_hash": null
+    },
+    {
+      "role": "diagnostic_conservation_audit",
+      "path": "docs/pipeline_rebaseline/stage0_noded_v4_trainval_conservation_audit.json",
+      "sha256": "ed52a37196074c41a55d8788d2eca514b4e301d9f5f602bf098043c8b1b46a3e",
+      "size_bytes": 1766,
+      "row_count": null,
+      "schema_hash": null
+    },
+    {
+      "role": "promotion_gate",
+      "path": "docs/pipeline_rebaseline/stage0_v4_promotion_gate_audit.json",
+      "sha256": "fe3659f74a441c8d71ee9a92de9d7142088ef78bf13bd8b371f560b48371b644",
+      "size_bytes": 485,
+      "row_count": null,
+      "schema_hash": null
+    }
+  ],
+  "audit": {
+    "status": "DIAGNOSTIC_PASS",
+    "path": "artifacts/exploratory/xian_2017_core_noded_v4/network_audit.json",
+    "sha256": "cce410f6d6b744d33448d18f28454270bed4a7f93ecffbad2c735ac7eb708840"
+  },
+  "known_limitations": [
+    "Manual route-truth review has zero completed judgments; promotion remains HOLD.",
+    "Full-date chain is prohibited until the manual-review stop gate passes.",
+    "2016-10-23 is a development diagnostic, not a blind test."
+  ]
+}
