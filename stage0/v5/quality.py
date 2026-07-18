@@ -53,14 +53,30 @@ def evaluate_order_quality(
     restriction = movements.get("restriction_status", pd.Series(dtype=str)).astype(str)
     restriction_count = int(restriction.str.startswith("forbidden").sum())
     illegal_uturn = int(((movement_type == "u_turn") & restriction.str.startswith("forbidden")).sum())
-    heading = pd.to_numeric(matched_points.get("edge_heading_difference_deg", pd.Series(dtype=float)), errors="coerce")
-    direction_count = int((heading > float(hard_cfg.get("maximum_heading_direction_difference_deg", 100.0))).sum())
+    ordered_points = matched_points.sort_values("point_seq", kind="stable") if len(matched_points) else matched_points
+    heading = pd.to_numeric(ordered_points.get("edge_heading_difference_deg", pd.Series(dtype=float)), errors="coerce")
+    reliable = ordered_points.get("heading_reliable", pd.Series(False, index=ordered_points.index)).fillna(False).astype(bool)
+    edge_values = ordered_points.get("edge_uid", pd.Series("", index=ordered_points.index)).astype(str)
+    movement_neighbourhood = edge_values.ne(edge_values.shift()) | edge_values.ne(edge_values.shift(-1))
+    raw_direction = reliable & ~movement_neighbourhood & heading.gt(
+        float(hard_cfg.get("maximum_heading_direction_difference_deg", 100.0))
+    )
     if len(matched_points) > 1 and {"edge_uid", "position_on_edge"} <= set(matched_points.columns):
-        ordered_points = matched_points.sort_values("point_seq", kind="stable")
         positions = pd.to_numeric(ordered_points.position_on_edge, errors="coerce")
-        same_edge = ordered_points.edge_uid.astype(str).eq(ordered_points.edge_uid.astype(str).shift())
-        severe_reverse = same_edge & positions.diff().lt(-float(hard_cfg.get("same_edge_reverse_tolerance_m", 10.0)))
-        direction_count += int(severe_reverse.sum())
+        observed_step = pd.to_numeric(ordered_points.get("observed_step_m", 0.0), errors="coerce").fillna(0.0)
+        same_edge = edge_values.eq(edge_values.shift())
+        severe_reverse = (
+            reliable & same_edge
+            & positions.diff().lt(-float(hard_cfg.get("same_edge_reverse_tolerance_m", 10.0)))
+            & observed_step.ge(float(hard_cfg.get("minimum_direction_displacement_m", 3.0)))
+        )
+        raw_direction |= severe_reverse
+    minimum_run = int(hard_cfg.get("minimum_consecutive_direction_conflicts", 2))
+    groups = raw_direction.ne(raw_direction.shift(fill_value=False)).cumsum()
+    run_lengths = raw_direction.groupby(groups).transform("sum") if len(raw_direction) else raw_direction
+    persistent_direction = raw_direction & run_lengths.ge(minimum_run)
+    direction_warning_count = int(raw_direction.sum())
+    direction_count = int(persistent_direction.sum())
     inferred_distance = float(route_parts.loc[route_parts.is_interpolated, "edge_uid"].map(edge_lookup.length_m).sum()) if successful else 0.0
     endpoint_error = float(max(projection.iloc[0], projection.iloc[-1])) if len(projection.dropna()) == len(projection) and len(projection) else math.inf
     confidence = float(np.exp(-projection.mean() / 30.0)) if len(projection.dropna()) else 0.0
@@ -68,6 +84,7 @@ def evaluate_order_quality(
     metrics = {
         "successful_reconstruction": successful,
         "direction_violation_count": direction_count,
+        "direction_warning_count": direction_warning_count,
         "topology_gap_count": gap_count,
         "unreasonable_detour_count": int(bool(np.isfinite(route_ratio) and route_ratio > float(soft_cfg["maximum_route_length_ratio"]) * 2)),
         "illegal_u_turn_count": illegal_uturn,

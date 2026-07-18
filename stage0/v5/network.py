@@ -249,6 +249,53 @@ def classify_parallel_edges(edges: gpd.GeoDataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def parallel_components(
+    edge_uids: pd.Series,
+    audit: pd.DataFrame,
+) -> tuple[dict[str, str], dict[str, str]]:
+    """Build transitive parallel groups and duplicate-only candidate aliases."""
+    values = [str(value) for value in edge_uids]
+
+    def components(rows: pd.DataFrame) -> dict[str, str]:
+        touched = set(rows.left_edge_uid.astype(str)) | set(rows.right_edge_uid.astype(str)) if len(rows) else set()
+        parent = {value: value for value in touched}
+
+        def find(value: str) -> str:
+            while parent[value] != value:
+                parent[value] = parent[parent[value]]
+                value = parent[value]
+            return value
+
+        def union(left: str, right: str) -> None:
+            root_left, root_right = find(left), find(right)
+            if root_left != root_right:
+                first, second = sorted((root_left, root_right))
+                parent[second] = first
+
+        for row in rows.itertuples():
+            union(str(row.left_edge_uid), str(row.right_edge_uid))
+        groups: dict[str, list[str]] = defaultdict(list)
+        for value in touched:
+            groups[find(value)].append(value)
+        result: dict[str, str] = {}
+        for number, members in enumerate(sorted((sorted(group) for group in groups.values()), key=lambda group: group[0])):
+            group_id = f"parallel_{number:07d}"
+            result.update({member: group_id for member in members})
+        return result
+
+    parallel_groups = components(audit) if len(audit) else {}
+    merge_rows = audit.loc[audit.merge_allowed.astype(bool)] if len(audit) else audit
+    duplicate_groups = components(merge_rows) if len(merge_rows) else {}
+    aliases: dict[str, str] = {value: value for value in values}
+    by_group: dict[str, list[str]] = defaultdict(list)
+    for edge_uid, group in duplicate_groups.items():
+        by_group[group].append(edge_uid)
+    for members in by_group.values():
+        alias = min(members)
+        aliases.update({member: alias for member in members})
+    return parallel_groups, aliases
+
+
 def build_movement_graph(edges: gpd.GeoDataFrame, restrictions: pd.DataFrame) -> pd.DataFrame:
     incoming: dict[int, list[int]] = defaultdict(list)
     outgoing: dict[int, list[int]] = defaultdict(list)
@@ -345,15 +392,9 @@ def build_network(config: Stage0Config, repo: Path, force: bool = False) -> dict
     edges["routing_cost_m"] = edges.length_m * edges.routing_penalty.astype(float)
     edges["network_snapshot_mismatch"] = edges.osm_timestamp.astype(str).str[:10].gt("2016-10-31")
     parallel = classify_parallel_edges(edges)
-    if len(parallel):
-        group_map: dict[str, str] = {}
-        for group_no, row in enumerate(parallel.itertuples()):
-            group_id = f"parallel_{group_no:07d}"
-            group_map.setdefault(row.left_edge_uid, group_id)
-            group_map.setdefault(row.right_edge_uid, group_id)
-        edges["parallel_group"] = edges.edge_uid.map(group_map)
-    else:
-        edges["parallel_group"] = pd.NA
+    group_map, candidate_alias = parallel_components(edges.edge_uid, parallel)
+    edges["parallel_group"] = edges.edge_uid.map(group_map)
+    edges["candidate_alias_uid"] = edges.edge_uid.astype(str).map(candidate_alias)
     node_rows = [
         {"node_id": node_id, "geometry": Point(lon, lat)}
         for node_id, (lon, lat) in handler.nodes.items()
@@ -380,6 +421,9 @@ def build_network(config: Stage0Config, repo: Path, force: bool = False) -> dict
         "status": "PASS", "source_snapshot": snapshot,
         "edge_count": len(edges), "node_count": len(nodes), "movement_count": len(movements),
         "parallel_pair_count": len(parallel), "restriction_count": len(restrictions),
+        "parallel_component_count": int(edges.parallel_group.nunique(dropna=True)),
+        "candidate_alias_edge_count": int(edges.candidate_alias_uid.ne(edges.edge_uid.astype(str)).sum()),
+        "candidate_state_count": int(edges.candidate_alias_uid.nunique()),
         "parsed_restriction_count": parsed_restrictions,
         "restriction_coverage": parsed_restrictions / len(restrictions) if len(restrictions) else None,
         "future_timestamp_edge_count": int(edges.network_snapshot_mismatch.sum()),
@@ -394,6 +438,8 @@ def build_network(config: Stage0Config, repo: Path, force: bool = False) -> dict
         f"- Directed edges: {len(edges):,}\n- Nodes: {len(nodes):,}\n- Legal/recorded movements: {len(movements):,}\n"
         f"- Turn restrictions: {len(restrictions):,}; parsed via-node: {parsed_restrictions:,}\n"
         f"- Parallel classifications: `{json.dumps(categories, ensure_ascii=False)}`\n"
+        f"- Parallel connected components: {int(edges.parallel_group.nunique(dropna=True)):,}\n"
+        f"- Duplicate/equivalent candidate aliases: {int(edges.candidate_alias_uid.ne(edges.edge_uid.astype(str)).sum()):,}\n"
         f"- Edges timestamped after 2016-10-31: {int(edges.network_snapshot_mismatch.sum()):,}\n\n"
         "The metric graph collapses node-pair distance alternatives only for bounded distance queries. "
         "Final route reconstruction always uses edge_uid states and the movement graph.\n",

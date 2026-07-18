@@ -45,13 +45,13 @@ after review and commit.
 
 | Metric | Baseline | P0 | Change |
 |---|---:|---:|---:|
-| Wall-clock runtime, one worker | 1,538.96 s | 284.20 s | 5.42x faster |
+| Wall-clock runtime, one worker | 1,538.96 s | 284.20 s | 5.42x lower end-to-end wall time |
 | Wall-clock seconds/order | 2.565 | 0.474 | -81.5% |
 | Peak RSS | 3,596.85 MB | 2,781.47 MB | -22.7% |
 | strict_core | 192 | 314 | +122 |
 | analysis_set | 40 | 71 | +31 |
 | rejected | 368 | 215 | -153 |
-| full_order_hmm share | 35.0% | 24.33% | -10.67 pp |
+| final full_order_hmm mode share | 35.0% | 24.33% | -10.67 pp |
 | local_hmm share | 40.17% | 48.83% | +8.66 pp |
 | geometric_fallback share | 24.50% | 26.50% | +2.00 pp |
 | topology-gap events | 1,049 | 372 | -64.5% |
@@ -59,7 +59,8 @@ after review and commit.
 | retained point rows | 121,941 | 17,212 | -85.9% |
 | output size (including network) | 78.98 MB | 72.73 MB | -7.9% |
 
-The quality-class change is evidence that the old graph semantics rejected valid shared-node
+The 5.42x end-to-end comparison includes the 85.9% reduction in retained point rows and therefore
+must not be interpreted as a pure matcher speedup. The quality-class change is evidence that the old graph semantics rejected valid shared-node
 level transitions; it is not presented as statistical model improvement. Geometric fallback and
 inferred-distance share did not improve and remain explicit risks for the next Gate 1 run.
 
@@ -81,8 +82,10 @@ The P0 performance table contains one row per order. Values below are mean / P95
 | Output I/O allocation | 5.33 | 8.89 |
 
 Across 600 orders, bounded movement routing made 171,937 source searches and expanded 5,522,922
-edge states. Median expanded states per order were 5,170. Full-order triggers were 233 raw-high-
-ambiguity orders and six orders with at least four failed local windows. There were 107 failed
+edge states. Median expanded states per order were 5,170. Full-order attempts were 239/600
+(39.83%): 233 raw-high-ambiguity orders and six orders with at least four failed local windows.
+Only 146 attempts succeeded and ended with `matching_mode=full_order_hmm` (24.33%); the other 93
+failed attempts ended in fallback. There were 107 failed
 local windows in total; isolated failures remained local/fallback and did not force a whole-order
 HMM.
 

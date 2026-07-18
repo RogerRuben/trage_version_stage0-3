@@ -11,6 +11,7 @@ from stage0.v5.network import (
     motor_vehicle_eligible,
     normalize_layer,
     normalize_oneway,
+    parallel_components,
     stable_edge_uid,
 )
 
@@ -66,6 +67,26 @@ def test_bridge_entry_at_shared_node_is_legal_and_classified():
     movements = build_movement_graph(edges, pd.DataFrame())
     assert bool(movements.layer_compatibility.iloc[0])
     assert movements.level_transition_type.iloc[0] == "bridge_exit"
+
+
+def test_parallel_group_is_transitive_connected_component():
+    audit = pd.DataFrame([
+        {"left_edge_uid": "a", "right_edge_uid": "b", "merge_allowed": False},
+        {"left_edge_uid": "a", "right_edge_uid": "c", "merge_allowed": False},
+        {"left_edge_uid": "b", "right_edge_uid": "c", "merge_allowed": False},
+    ])
+    groups, aliases = parallel_components(pd.Series(["a", "b", "c"]), audit)
+    assert len({groups[edge] for edge in ("a", "b", "c")}) == 1
+    assert aliases == {"a": "a", "b": "b", "c": "c"}
+
+
+def test_merge_allowed_parallel_component_has_one_candidate_alias():
+    audit = pd.DataFrame([
+        {"left_edge_uid": "a", "right_edge_uid": "b", "merge_allowed": True},
+        {"left_edge_uid": "b", "right_edge_uid": "c", "merge_allowed": True},
+    ])
+    _, aliases = parallel_components(pd.Series(["a", "b", "c"]), audit)
+    assert {aliases[edge] for edge in ("a", "b", "c")} == {"a"}
 
 
 def test_tunnel_default_layer_and_explicit_layer_are_normalized():

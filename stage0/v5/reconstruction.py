@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+import time
 from dataclasses import dataclass
 from typing import Any
 
@@ -32,6 +33,9 @@ class EdgeAwareRouter:
         self.edges = edges.set_index("edge_uid", drop=False)
         self.router = movement_router or CompactMovementRouter(edges, movements, config)
         self.maximum = float(config.get("max_route_distance_m", 6000.0))
+        self.last_bridge_search_ms = 0.0
+        self.last_precomputed_path_count = 0
+        self.last_path_search_count = 0
 
     def bridge(self, left: str, right: str) -> list[str] | None:
         if left == right:
@@ -39,7 +43,15 @@ class EdgeAwareRouter:
         result = self.router.bridge(left, right, self.maximum)
         return None if result is None else result[0]
 
-    def reconstruct(self, matched_points: pd.DataFrame) -> ReconstructedRoute:
+    def reconstruct(
+        self,
+        matched_points: pd.DataFrame,
+        precomputed_paths: dict[tuple[str, str], list[str]] | None = None,
+    ) -> ReconstructedRoute:
+        precomputed = precomputed_paths or {}
+        self.last_bridge_search_ms = 0.0
+        self.last_precomputed_path_count = 0
+        self.last_path_search_count = 0
         if matched_points.empty or matched_points.edge_uid.isna().any():
             return ReconstructedRoute([], [], "rejected", 1)
         states = matched_points.loc[matched_points.edge_uid.ne(matched_points.edge_uid.shift()), "edge_uid"].astype(str).tolist()
@@ -47,7 +59,16 @@ class EdgeAwareRouter:
         observed = [True]
         gaps = 0
         for left, right in zip(states[:-1], states[1:]):
-            path = self.bridge(left, right)
+            path = precomputed.get((left, right))
+            if path is not None:
+                self.last_precomputed_path_count += 1
+            elif self.router.movement(left, right) is not None:
+                path = [left, right]
+            else:
+                self.last_path_search_count += 1
+                search_started = time.perf_counter()
+                path = self.bridge(left, right)
+                self.last_bridge_search_ms += (time.perf_counter() - search_started) * 1000.0
             if path is None:
                 gaps += 1
                 route.append(right)

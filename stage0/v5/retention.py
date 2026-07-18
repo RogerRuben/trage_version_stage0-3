@@ -19,6 +19,7 @@ def prune_point_work(config: Stage0Config, repo: Path, execute: bool = False) ->
     if not any((output / "reports").glob("stage0_v5_run_summary__*.json")):
         missing.append("reports/stage0_v5_run_summary__*.json")
     candidates = sorted((work / "sampled_points").glob("*/day=*/part=*/*.parquet"))
+    candidates.extend(sorted((work / "matched_diagnostics").glob("*/day=*/*.parquet")))
     if execute and missing:
         raise RuntimeError(f"compact pruning blocked; missing products: {missing}")
     if execute:

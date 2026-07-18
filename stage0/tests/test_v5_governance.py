@@ -94,11 +94,23 @@ def test_rejected_case_traces_are_bounded_by_failure_reason(tmp_path):
     quality_path = tmp_path / "out/route_quality" / f"day={date}" / "part=000.parquet"
     quality_path.parent.mkdir(parents=True)
     quality.to_parquet(quality_path, index=False)
-    points = pd.DataFrame({"order_id": quality.order_id, "timestamp": range(30)})
-    point_path = tmp_path / "work/sampled_points" / run_id / f"day={date}" / "part=000" / "fragment=0.parquet"
+    route_path = tmp_path / "out/route_parts" / f"day={date}" / "part=000.parquet"
+    route_path.parent.mkdir(parents=True)
+    pd.DataFrame({
+        "order_id": quality.order_id, "edge_uid": "edge-a", "route_sequence": 0,
+        "route_source": "observed",
+    }).to_parquet(route_path, index=False)
+    points = pd.DataFrame({
+        "order_id": quality.order_id, "timestamp": range(30), "edge_uid": "edge-a",
+        "candidate_rank": 1, "gps_to_edge_distance_m": 2.0,
+    })
+    point_path = tmp_path / "work/matched_diagnostics" / run_id / f"day={date}" / "part=000.parquet"
     point_path.parent.mkdir(parents=True)
     points.to_parquet(point_path, index=False)
     result = export_case_traces(config, tmp_path, [date], run_id)
     assert result["case_trace_total"] == 7
     retained = pd.read_parquet(tmp_path / "out/case_traces" / run_id / f"day={date}" / "points.parquet")
     assert retained.order_id.nunique() == 7
+    assert {"edge_uid", "candidate_rank", "gps_to_edge_distance_m"} <= set(retained.columns)
+    retained_routes = pd.read_parquet(tmp_path / "out/case_traces" / run_id / f"day={date}" / "route_parts.parquet")
+    assert retained_routes.order_id.nunique() == 7

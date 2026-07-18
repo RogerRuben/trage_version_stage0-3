@@ -39,6 +39,8 @@ candidate:
   complex_candidates: 8
   max_candidates: 10
   ambiguity_distance_margin_m: 5.0
+  minimum_heading_displacement_m: 3.0
+  ordinary_candidates: 3
   heading_weight_m: 15.0
   access_penalty_m: 20.0
 hmm:
@@ -54,7 +56,6 @@ hmm:
   sigma_distance_m: 15.0
   beta_transition_m: 60.0
   max_route_distance_m: 6000.0
-  route_cache_sources: 256
   geometric_fallback_enabled: true
 quality:
   hard:
@@ -62,6 +63,8 @@ quality:
     maximum_topology_gaps: 0
     maximum_heading_direction_difference_deg: 100.0
     same_edge_reverse_tolerance_m: 10.0
+    minimum_direction_displacement_m: 3.0
+    minimum_consecutive_direction_conflicts: 2
     maximum_unreasonable_detours: 0
     maximum_illegal_u_turns: 0
     maximum_layer_violations: 0
