@@ -14,7 +14,7 @@ if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
 from stage0.v5.archive import build_inventory_and_samples  # noqa: E402
-from stage0.v5.config import Stage0Config  # noqa: E402
+from stage0.v5.config import Stage0Config, config_hash  # noqa: E402
 from stage0.v5.gates import freeze, gate1_readiness, preflight, require_test_freeze, run_gate0  # noqa: E402
 from stage0.v5.manual_review import export_review_pack  # noqa: E402
 from stage0.v5.network import build_network  # noqa: E402
@@ -29,6 +29,8 @@ GATE1_DATES = ["20161010", "20161014", "20161016"]
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, default=REPO / "stage0/config/stage0_v5.yaml")
+    parser.add_argument("--output-root", type=Path, default=None, help="Explicit isolated output root for benchmarks.")
+    parser.add_argument("--work-root", type=Path, default=None, help="Explicit isolated cache root for benchmarks.")
     parser.add_argument("--phase", required=True, choices=["precheck", "network", "poi", "inventory", "materialize", "gate0", "match", "gate1", "manual-review", "freeze", "prune"])
     parser.add_argument("--dates", nargs="*", default=None)
     parser.add_argument("--split", choices=["train", "validation", "test"])
@@ -59,6 +61,13 @@ def resolve_dates(args: argparse.Namespace, config: Stage0Config) -> list[str]:
 def main() -> int:
     args = parse_args()
     config = Stage0Config.load(args.config)
+    if args.output_root is not None or args.work_root is not None:
+        values = {**config.values, "paths": {**config.values["paths"]}}
+        if args.output_root is not None:
+            values["paths"]["output"] = str(args.output_root.resolve())
+        if args.work_root is not None:
+            values["paths"]["work"] = str(args.work_root.resolve())
+        config = Stage0Config(config.source, values, config_hash(values))
     logging.basicConfig(level=getattr(logging, config.section("runtime")["log_level"]), format="%(asctime)s %(levelname)s %(name)s %(message)s")
     dates = resolve_dates(args, config)
     buckets = args.buckets or int(config.section("runtime")["buckets"])

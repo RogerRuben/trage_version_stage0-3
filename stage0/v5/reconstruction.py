@@ -7,9 +7,10 @@ from dataclasses import dataclass
 from typing import Any
 
 import geopandas as gpd
-import networkx as nx
 import numpy as np
 import pandas as pd
+
+from .routing import CompactMovementRouter
 
 
 @dataclass
@@ -21,36 +22,22 @@ class ReconstructedRoute:
 
 
 class EdgeAwareRouter:
-    def __init__(self, edges: gpd.GeoDataFrame, movements: pd.DataFrame, config: dict[str, Any]):
+    def __init__(
+        self,
+        edges: gpd.GeoDataFrame,
+        movements: pd.DataFrame,
+        config: dict[str, Any],
+        movement_router: CompactMovementRouter | None = None,
+    ):
         self.edges = edges.set_index("edge_uid", drop=False)
-        self.graph = nx.DiGraph()
-        self.allowed = set()
-        for row in movements.itertuples():
-            allowed = bool(row.layer_compatibility) and not str(row.restriction_status).startswith("forbidden")
-            if not allowed:
-                continue
-            target = self.edges.loc[str(row.to_edge_uid)]
-            cost = float(target.length_m)
-            if str(row.movement_type) == "u_turn":
-                cost += float(config["u_turn_penalty_m"])
-            if str(row.road_class_transition).split("->")[0] != str(row.road_class_transition).split("->")[-1]:
-                cost += float(config["road_class_transition_penalty_m"])
-            cost += float(target.candidate_penalty)
-            self.graph.add_edge(str(row.from_edge_uid), str(row.to_edge_uid), weight=cost)
-            self.allowed.add((str(row.from_edge_uid), str(row.to_edge_uid)))
+        self.router = movement_router or CompactMovementRouter(edges, movements, config)
         self.maximum = float(config.get("max_route_distance_m", 6000.0))
 
     def bridge(self, left: str, right: str) -> list[str] | None:
         if left == right:
             return [left]
-        if (left, right) in self.allowed:
-            return [left, right]
-        try:
-            path = nx.shortest_path(self.graph, left, right, weight="weight")
-            distance = nx.path_weight(self.graph, path, weight="weight")
-        except (nx.NetworkXNoPath, nx.NodeNotFound):
-            return None
-        return [str(value) for value in path] if distance <= self.maximum else None
+        result = self.router.bridge(left, right, self.maximum)
+        return None if result is None else result[0]
 
     def reconstruct(self, matched_points: pd.DataFrame) -> ReconstructedRoute:
         if matched_points.empty or matched_points.edge_uid.isna().any():
@@ -144,10 +131,9 @@ def build_traversals(
 def build_movements(
     order_id: str,
     route_parts: pd.DataFrame,
-    movements: pd.DataFrame,
+    movement_router: CompactMovementRouter,
     matched_points: pd.DataFrame | None = None,
 ) -> pd.DataFrame:
-    lookup = movements.set_index(["from_edge_uid", "to_edge_uid"])
     rows = []
     movement_times: dict[tuple[str, str], float] = {}
     if matched_points is not None and len(matched_points) > 1:
@@ -169,17 +155,21 @@ def build_movements(
     consumed_pairs: set[tuple[str, str]] = set()
     for sequence, (left, right) in enumerate(zip(route_parts.itertuples(), route_parts.iloc[1:].itertuples())):
         key = (left.edge_uid, right.edge_uid)
-        if key in lookup.index:
-            movement = lookup.loc[key]
-            if isinstance(movement, pd.DataFrame):
-                movement = movement.iloc[0]
+        movement = movement_router.movement(str(left.edge_uid), str(right.edge_uid))
+        if movement is not None:
             row = {
                 "via_node": int(movement.via_node), "movement_type": movement.movement_type,
                 "turn_angle": float(movement.turn_angle), "restriction_status": movement.restriction_status,
-                "movement_quality": "valid" if movement.layer_compatibility else "layer_incompatible",
+                "level_transition_type": movement.level_transition_type,
+                "movement_quality": "valid",
             }
         else:
-            row = {"via_node": int(left.to_node), "movement_type": "gap", "turn_angle": math.nan, "restriction_status": "unknown", "movement_quality": "missing_movement"}
+            level_gap = int(left.to_node) == int(right.from_node)
+            row = {
+                "via_node": int(left.to_node), "movement_type": "gap", "turn_angle": math.nan,
+                "restriction_status": "unknown", "movement_quality": "missing_movement",
+                "level_transition_type": "unresolved_level_gap" if level_gap else "topology_gap",
+            }
         rows.append({
             "order_id": order_id, "movement_sequence": sequence,
             "from_edge_uid": left.edge_uid, "to_edge_uid": right.edge_uid,

@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import math
 import json
+import heapq
 import threading
+import time
 from collections import OrderedDict
 from dataclasses import dataclass
 from pathlib import Path
@@ -16,11 +18,10 @@ import numpy as np
 import pandas as pd
 from pyproj import Transformer
 from scipy.spatial import cKDTree
-from scipy.sparse import csr_matrix
-from scipy.sparse.csgraph import dijkstra as scipy_dijkstra
 from shapely import get_x, get_y, line_interpolate_point, line_locate_point, points
 
 from .coordinates import gcj02_to_wgs84
+from .routing import CompactMovementRouter, SearchStats
 
 
 def angular_difference(left: np.ndarray | float, right: np.ndarray | float) -> np.ndarray:
@@ -65,75 +66,56 @@ class Candidate:
 
 
 class BoundedSourceCache:
-    def __init__(self, graph: nx.DiGraph, max_sources: int, cutoff: float):
-        self.graph = graph
-        self.max_sources = int(max_sources)
-        self.cutoff = float(cutoff)
-        self._rows: OrderedDict[tuple[int, int], dict[int, float]] = OrderedDict()
-        self._lock = threading.RLock()
-        self.nodes = np.asarray(sorted(int(value) for value in graph.nodes), dtype="int64")
-        self.node_index = {int(value): index for index, value in enumerate(self.nodes)}
-        sparse = (
-            nx.to_scipy_sparse_array(graph, nodelist=self.nodes.tolist(), weight="weight", dtype=float, format="csr")
-            if len(self.nodes) else csr_matrix((0, 0), dtype=float)
-        )
-        self.matrix = csr_matrix(
-            (sparse.data, sparse.indices.astype("int32"), sparse.indptr.astype("int32")),
-            shape=sparse.shape,
-        )
+    """Compatibility utility implementing targeted bounded searches, never dense rows."""
 
-    def distances(self, source: int, requested_cutoff: float | None = None) -> dict[int, float]:
+    def __init__(self, graph: nx.DiGraph, max_sources: int, cutoff: float):
+        self.adjacency = {
+            int(node): [(int(target), float(data.get("weight", 1.0))) for _, target, data in graph.out_edges(node, data=True)]
+            for node in graph.nodes
+        }
+        self.max_sources = int(max_sources) * 32
+        self.cutoff = float(cutoff)
+        self._rows: OrderedDict[tuple[int, int, int], float] = OrderedDict()
+        self._lock = threading.RLock()
+
+    def distances(
+        self,
+        source: int,
+        targets: Iterable[int],
+        requested_cutoff: float | None = None,
+    ) -> dict[int, float]:
         source = int(source)
         cutoff = self.cutoff if requested_cutoff is None else min(self.cutoff, max(250.0, math.ceil(float(requested_cutoff) / 250.0) * 250.0))
-        cache_key = (source, int(cutoff))
+        requested = {int(target) for target in targets}
+        values: dict[int, float] = {}
         with self._lock:
-            if cache_key in self._rows:
-                self._rows.move_to_end(cache_key)
-                return self._rows[cache_key]
-        source_index = self.node_index.get(source)
-        if source_index is None:
-            values: dict[int, float] = {}
-        else:
-            distances = scipy_dijkstra(
-                self.matrix, directed=True, indices=source_index,
-                limit=cutoff, return_predecessors=False,
-            )
-            finite = np.flatnonzero(np.isfinite(distances))
-            values = {int(self.nodes[index]): float(distances[index]) for index in finite}
+            for target in list(requested):
+                key = (source, target, int(cutoff))
+                if key in self._rows:
+                    values[target] = self._rows[key]
+                    self._rows.move_to_end(key)
+                    requested.remove(target)
+        queue = [(0.0, source)]
+        distances = {source: 0.0}
+        remaining = set(requested)
+        while queue and remaining:
+            distance, node = heapq.heappop(queue)
+            if distance != distances.get(node) or distance > cutoff:
+                continue
+            if node in remaining:
+                values[node] = distance
+                remaining.remove(node)
+            for target, weight in self.adjacency.get(node, ()):
+                proposed = distance + weight
+                if proposed <= cutoff and proposed < distances.get(target, math.inf):
+                    distances[target] = proposed
+                    heapq.heappush(queue, (proposed, target))
         with self._lock:
-            existing = self._rows.get(cache_key)
-            if existing is not None:
-                self._rows.move_to_end(cache_key)
-                return existing
-            self._rows[cache_key] = values
-            if len(self._rows) > self.max_sources:
+            for target in requested:
+                self._rows[(source, target, int(cutoff))] = values.get(target, math.inf)
+            while len(self._rows) > self.max_sources:
                 self._rows.popitem(last=False)
-            return self._rows[cache_key]
-
-    def preload(self, sources: Iterable[int], requested_cutoff: float, batch_size: int = 16) -> None:
-        """Batch bounded Dijkstra sources for one HMM window into the same LRU."""
-        cutoff = min(self.cutoff, max(250.0, math.ceil(float(requested_cutoff) / 250.0) * 250.0))
-        unique = sorted({int(source) for source in sources if int(source) in self.node_index})
-        with self._lock:
-            missing = [source for source in unique if (source, int(cutoff)) not in self._rows]
-        for offset in range(0, len(missing), int(batch_size)):
-            source_nodes = missing[offset : offset + int(batch_size)]
-            source_indices = [self.node_index[source] for source in source_nodes]
-            matrix = scipy_dijkstra(
-                self.matrix, directed=True, indices=source_indices,
-                limit=cutoff, return_predecessors=False,
-            )
-            if matrix.ndim == 1:
-                matrix = matrix[np.newaxis, :]
-            with self._lock:
-                for source, distances in zip(source_nodes, matrix):
-                    finite = np.flatnonzero(np.isfinite(distances))
-                    self._rows[(source, int(cutoff))] = {
-                        int(self.nodes[index]): float(distances[index]) for index in finite
-                    }
-                    self._rows.move_to_end((source, int(cutoff)))
-                    while len(self._rows) > self.max_sources:
-                        self._rows.popitem(last=False)
+        return {target: value for target, value in values.items() if math.isfinite(value)}
 
     @property
     def size(self) -> int:
@@ -142,39 +124,73 @@ class BoundedSourceCache:
 
 
 class TransitionEngine:
-    def __init__(self, edges: gpd.GeoDataFrame, movements: pd.DataFrame, metric: pd.DataFrame, config: dict[str, Any]):
+    def __init__(
+        self,
+        edges: gpd.GeoDataFrame,
+        movements: pd.DataFrame,
+        metric: pd.DataFrame,
+        config: dict[str, Any],
+        movement_router: CompactMovementRouter | None = None,
+    ):
         self.edges = edges.reset_index(drop=True)
         self.lookup = {str(value): index for index, value in enumerate(self.edges.edge_uid)}
         self.lengths = self.edges.length_m.to_numpy(float)
         self.from_nodes = self.edges.from_node.to_numpy("int64")
         self.to_nodes = self.edges.to_node.to_numpy("int64")
-        graph = nx.DiGraph()
-        for row in metric.itertuples():
-            graph.add_edge(int(row.from_node), int(row.to_node), weight=float(row.routing_cost_m))
-        self.cache = BoundedSourceCache(graph, int(config["route_cache_sources"]), float(config["max_route_distance_m"]))
-        self.allowed_movements = {
-            (str(row.from_edge_uid), str(row.to_edge_uid))
-            for row in movements.itertuples()
-            if bool(row.layer_compatibility) and not str(row.restriction_status).startswith("forbidden")
-        }
+        self.router = movement_router or CompactMovementRouter(edges, movements, config)
+        self.jitter_tolerance = float(config.get("same_edge_jitter_tolerance_m", 0.0))
+        self.jitter_penalty_per_m = float(config.get("same_edge_jitter_penalty_per_m", 0.25))
 
     def distance(self, left: Candidate, right: Candidate, requested_cutoff: float | None = None) -> float:
         if left.edge_uid == right.edge_uid:
-            return right.position - left.position if right.position >= left.position else math.inf
-        if (left.edge_uid, right.edge_uid) in self.allowed_movements:
+            delta = right.position - left.position
+            return max(0.0, delta) if delta >= -self.jitter_tolerance else math.inf
+        if self.router.movement(left.edge_uid, right.edge_uid) is not None:
             return max(0.0, self.lengths[left.edge_index] - left.position) + right.position
-        middle = self.cache.distances(int(self.to_nodes[left.edge_index]), requested_cutoff).get(int(self.from_nodes[right.edge_index]), math.inf)
-        if not math.isfinite(middle):
+        result = self.router.bridge(left.edge_uid, right.edge_uid, requested_cutoff)
+        if result is None:
             return math.inf
-        return max(0.0, self.lengths[left.edge_index] - left.position) + middle + right.position
+        path, _ = result
+        intermediate = sum(self.lengths[self.lookup[edge_uid]] for edge_uid in path[1:-1])
+        return max(0.0, self.lengths[left.edge_index] - left.position) + intermediate + right.position
 
-    def preload_window(self, candidate_rows: list[list[Candidate]], cutoff: float) -> None:
-        sources = (
-            int(self.to_nodes[candidate.edge_index])
-            for row in candidate_rows[:-1]
-            for candidate in row
-        )
-        self.cache.preload(sources, cutoff)
+    def transition_matrices(
+        self,
+        previous: list[Candidate],
+        current: list[Candidate],
+        requested_cutoff: float,
+    ) -> tuple[np.ndarray, np.ndarray]:
+        distances = np.full((len(previous), len(current)), math.inf, dtype=float)
+        penalties = np.zeros_like(distances)
+        unresolved_left: list[str] = []
+        unresolved_right: list[str] = []
+        for left in previous:
+            for right in current:
+                if left.edge_uid != right.edge_uid and self.router.movement(left.edge_uid, right.edge_uid) is None:
+                    unresolved_left.append(left.edge_uid)
+                    unresolved_right.append(right.edge_uid)
+        bridges = self.router.multi_target_bridges(unresolved_left, unresolved_right, requested_cutoff)
+        for i, left in enumerate(previous):
+            for j, right in enumerate(current):
+                if left.edge_uid == right.edge_uid:
+                    delta = right.position - left.position
+                    if delta >= 0:
+                        distances[i, j] = delta
+                    elif delta >= -self.jitter_tolerance:
+                        distances[i, j] = 0.0
+                        penalties[i, j] = abs(delta) * self.jitter_penalty_per_m
+                    continue
+                direct = self.router.movement(left.edge_uid, right.edge_uid)
+                bridge = ([left.edge_uid, right.edge_uid], 0.0) if direct is not None else bridges.get((left.edge_uid, right.edge_uid))
+                if bridge is None:
+                    continue
+                path, _ = bridge
+                intermediate = sum(self.lengths[self.lookup[edge_uid]] for edge_uid in path[1:-1])
+                distances[i, j] = max(0.0, self.lengths[left.edge_index] - left.position) + intermediate + right.position
+        return distances, penalties
+
+    def stats(self) -> SearchStats:
+        return self.router.stats()
 
 
 class CandidateIndex:
@@ -274,34 +290,41 @@ def _gps_headings(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     return heading
 
 
-def _viterbi(candidate_rows: list[list[Candidate]], observed_step: np.ndarray, engine: TransitionEngine, config: dict[str, Any]) -> tuple[list[Candidate], float] | None:
+def _viterbi(
+    candidate_rows: list[list[Candidate]],
+    observed_step: np.ndarray,
+    engine: TransitionEngine,
+    config: dict[str, Any],
+) -> tuple[list[Candidate], float, float] | None:
     if any(not row for row in candidate_rows):
         return None
     sigma = float(config["sigma_distance_m"])
     beta = float(config["beta_transition_m"])
-    maximum_dynamic_cutoff = min(
-        float(config["max_route_distance_m"]),
-        max(300.0, float(np.nanmax(observed_step)) * 3.0 + 200.0),
-    )
-    engine.preload_window(candidate_rows, maximum_dynamic_cutoff)
     scores = np.array([-candidate.score**2 / (2 * sigma**2) for candidate in candidate_rows[0]], dtype=float)
     back: list[np.ndarray] = []
+    transition_search_ms = 0.0
     for point_index in range(1, len(candidate_rows)):
         current = candidate_rows[point_index]
         previous = candidate_rows[point_index - 1]
         next_scores = np.full(len(current), -np.inf)
         pointers = np.full(len(current), -1, dtype="int32")
+        dynamic_cutoff = min(
+            float(config["max_route_distance_m"]),
+            max(300.0, float(observed_step[point_index]) * 3.0 + 200.0),
+        )
+        search_started = time.perf_counter()
+        network_distances, jitter_penalties = engine.transition_matrices(previous, current, dynamic_cutoff)
+        transition_search_ms += (time.perf_counter() - search_started) * 1000.0
         for j, right in enumerate(current):
             emission = -right.score**2 / (2 * sigma**2)
             for i, left in enumerate(previous):
-                dynamic_cutoff = min(
-                    float(config["max_route_distance_m"]),
-                    max(300.0, float(observed_step[point_index]) * 3.0 + 200.0),
-                )
-                network_distance = engine.distance(left, right, dynamic_cutoff)
+                network_distance = float(network_distances[i, j])
                 if not math.isfinite(network_distance):
                     continue
-                transition = -abs(network_distance - float(observed_step[point_index])) / beta
+                transition = (
+                    -abs(network_distance - float(observed_step[point_index])) / beta
+                    - float(jitter_penalties[i, j])
+                )
                 value = scores[i] + emission + transition
                 if value > next_scores[j]:
                     next_scores[j] = value
@@ -318,7 +341,29 @@ def _viterbi(candidate_rows: list[list[Candidate]], observed_step: np.ndarray, e
             return None
         path_indices.append(end)
     path_indices.reverse()
-    return [candidate_rows[index][choice] for index, choice in enumerate(path_indices)], float(np.max(scores))
+    return (
+        [candidate_rows[index][choice] for index, choice in enumerate(path_indices)],
+        float(np.max(scores)),
+        transition_search_ms,
+    )
+
+
+def ambiguity_segment_count(flags: np.ndarray) -> int:
+    padded = np.r_[False, flags.astype(bool), False]
+    return int(np.sum(np.diff(padded.astype("int8")) == 1))
+
+
+def full_order_decision(flags: np.ndarray, config: dict[str, Any]) -> tuple[bool, str]:
+    if not len(flags):
+        return True, "empty_order"
+    share = float(flags.mean())
+    if share >= float(config["full_order_ambiguity_share"]):
+        return True, "raw_ambiguity_share"
+    return False, ""
+
+
+def local_failures_require_full_order(failed_windows: int, config: dict[str, Any]) -> bool:
+    return int(failed_windows) >= int(config.get("full_order_min_windows", 4))
 
 
 def _ambiguity_flags(
@@ -338,9 +383,11 @@ def _ambiguity_flags(
             close_candidates = b.score - a.score <= float(distance_margin_m)
             if close_candidates:
                 found.append("small_emission_margin")
-            if pd.notna(left.parallel_group) and left.parallel_group == right.parallel_group:
+            spatially_plausible = max(a.distance, b.distance) <= 30.0
+            headings_plausible = max(a.heading_difference, b.heading_difference) <= 75.0
+            if close_candidates and spatially_plausible and headings_plausible and pd.notna(left.parallel_group) and left.parallel_group == right.parallel_group:
                 found.append("parallel_group")
-            if (left.layer, left.bridge, left.tunnel) != (right.layer, right.bridge, right.tunnel):
+            if close_candidates and spatially_plausible and headings_plausible and (left.layer, left.bridge, left.tunnel) != (right.layer, right.bridge, right.tunnel):
                 found.append("grade_separation")
             if close_candidates and {str(left.highway), str(right.highway)} & {"service", "motorway_link", "trunk_link", "primary_link"}:
                 found.append("main_auxiliary")
@@ -360,6 +407,8 @@ def match_order(
     hmm_config: dict[str, Any],
     metric_crs: str,
 ) -> tuple[pd.DataFrame, dict[str, Any]]:
+    order_started = time.perf_counter()
+    stats_before = engine.stats()
     frame = frame.sort_values("timestamp", kind="stable").drop_duplicates("timestamp").copy()
     lon = pd.to_numeric(frame.lon, errors="coerce").to_numpy(float)
     lat = pd.to_numeric(frame.lat, errors="coerce").to_numpy(float)
@@ -371,24 +420,32 @@ def match_order(
     transformer = Transformer.from_crs(4326, metric_crs, always_xy=True)
     x, y = transformer.transform(lon, lat)
     headings = _gps_headings(np.asarray(x), np.asarray(y))
+    candidate_started = time.perf_counter()
     candidate_rows = [index.candidates(float(px), float(py), float(heading)) for px, py, heading in zip(x, y, headings)]
+    candidate_generation_ms = (time.perf_counter() - candidate_started) * 1000.0
+    ambiguity_started = time.perf_counter()
     flags, ambiguity_reasons = _ambiguity_flags(
         candidate_rows, edges, float(candidate_config["ambiguity_distance_margin_m"])
     )
+    ambiguity_detection_ms = (time.perf_counter() - ambiguity_started) * 1000.0
     geometric = [row[0] if row else None for row in candidate_rows]
     selected = list(geometric)
     observed_step = np.r_[0.0, np.hypot(np.diff(x), np.diff(y))]
     windows = local_hmm_windows(flags, int(hmm_config["local_context_points"]), int(hmm_config["merge_gap_points"]))
-    # Disjoint local windows remain local. Full-order HMM is reserved for pervasive
-    # ambiguity or a merged ambiguity window spanning almost the whole order.
-    dominant_window = bool(windows) and max(stop - start for start, stop in windows) / max(len(flags), 1) >= 0.8
-    full_order = flags.mean() >= float(hmm_config["full_order_ambiguity_share"]) or dominant_window
+    full_order, full_order_trigger_reason = full_order_decision(flags, hmm_config)
     hmm_score = math.nan
     fallback_reason = ""
+    local_hmm_ms = 0.0
+    full_hmm_ms = 0.0
+    transition_search_ms = 0.0
+    local_failed_windows = 0
     if full_order:
+        full_started = time.perf_counter()
         solved = _viterbi(candidate_rows, observed_step, engine, hmm_config)
+        full_hmm_ms += (time.perf_counter() - full_started) * 1000.0
         if solved:
-            selected, hmm_score = solved
+            selected, hmm_score, searched_ms = solved
+            transition_search_ms += searched_ms
             mode = "full_order_hmm"
         else:
             mode = "geometric_fallback" if hmm_config.get("geometric_fallback_enabled") else "rejected"
@@ -398,21 +455,49 @@ def match_order(
         local_failed = False
         local_scores: list[float] = []
         for start, stop in windows:
+            local_started = time.perf_counter()
             solved = _viterbi(candidate_rows[start:stop], observed_step[start:stop], engine, hmm_config)
+            local_hmm_ms += (time.perf_counter() - local_started) * 1000.0
             if not solved:
+                expanded_start = max(0, start - int(hmm_config.get("local_retry_context_points", 2)))
+                expanded_stop = min(len(candidate_rows), stop + int(hmm_config.get("local_retry_context_points", 2)))
+                retry_started = time.perf_counter()
+                solved = _viterbi(
+                    candidate_rows[expanded_start:expanded_stop],
+                    observed_step[expanded_start:expanded_stop],
+                    engine,
+                    hmm_config,
+                )
+                local_hmm_ms += (time.perf_counter() - retry_started) * 1000.0
+                if solved:
+                    local_path, local_score, searched_ms = solved
+                    selected[expanded_start:expanded_stop] = local_path
+                    local_scores.append(local_score)
+                    transition_search_ms += searched_ms
+                    continue
+                local_failed_windows += 1
                 local_failed = True
-                break
-            local_path, local_score = solved
+                continue
+            local_path, local_score, searched_ms = solved
             selected[start:stop] = local_path
             local_scores.append(local_score)
+            transition_search_ms += searched_ms
         if local_failed:
-            solved = _viterbi(candidate_rows, observed_step, engine, hmm_config)
-            if solved:
-                selected, hmm_score = solved
-                mode = "full_order_hmm"
+            if local_failures_require_full_order(local_failed_windows, hmm_config):
+                full_order_trigger_reason = "multiple_local_window_failures"
+                full_started = time.perf_counter()
+                solved = _viterbi(candidate_rows, observed_step, engine, hmm_config)
+                full_hmm_ms += (time.perf_counter() - full_started) * 1000.0
+                if solved:
+                    selected, hmm_score, searched_ms = solved
+                    transition_search_ms += searched_ms
+                    mode = "full_order_hmm"
+                else:
+                    mode = "geometric_fallback" if hmm_config.get("geometric_fallback_enabled") else "rejected"
+                    fallback_reason = "multiple_local_and_full_hmm_no_continuous_path"
             else:
                 mode = "geometric_fallback" if hmm_config.get("geometric_fallback_enabled") else "rejected"
-                fallback_reason = "local_and_full_hmm_no_continuous_path"
+                fallback_reason = "local_window_no_continuous_path"
         else:
             hmm_score = float(sum(local_scores))
     else:
@@ -433,12 +518,15 @@ def match_order(
         frame["position_on_edge"] = [value.position for value in selected]
         frame["gps_to_edge_distance_m"] = [value.distance for value in selected]
         frame["candidate_rank"] = [value.rank for value in selected]
+        frame["edge_heading_difference_deg"] = [value.heading_difference for value in selected]
         frame["emission_margin"] = [row[1].score-row[0].score if len(row)>1 else math.inf for row in candidate_rows]
     else:
-        for column in ["edge_uid", "position_on_edge", "gps_to_edge_distance_m", "candidate_rank", "emission_margin"]:
+        for column in ["edge_uid", "position_on_edge", "gps_to_edge_distance_m", "candidate_rank", "edge_heading_difference_deg", "emission_margin"]:
             frame[column] = pd.NA
     frame["viterbi_margin"] = math.nan
     frame["point_quality"] = np.where(flags, "ambiguous", "high_confidence")
+    stats_after = engine.stats()
+    stats_delta = stats_after.minus(stats_before)
     summary = {
         "order_id": str(frame.order_id.iloc[0]) if len(frame) else "",
         "matching_mode": mode, "fallback_used": mode == "geometric_fallback",
@@ -446,5 +534,17 @@ def match_order(
         "ambiguity_point_share": float(flags.mean()) if len(flags) else 1.0,
         "parallel_ambiguity_share": float(frame.parallel_ambiguity.mean()) if len(frame) else 0.0,
         "local_window_count": len(windows), "hmm_score": hmm_score,
+        "local_failed_window_count": local_failed_windows,
+        "full_order_trigger_reason": full_order_trigger_reason,
+        "candidate_generation_ms": candidate_generation_ms,
+        "ambiguity_detection_ms": ambiguity_detection_ms,
+        "local_hmm_ms": local_hmm_ms,
+        "full_hmm_ms": full_hmm_ms,
+        "transition_search_ms": transition_search_ms,
+        "matching_total_ms": (time.perf_counter() - order_started) * 1000.0,
+        "dijkstra_calls": stats_delta.calls,
+        "dijkstra_expanded_nodes": stats_delta.expanded_nodes,
+        "route_cache_hits": stats_delta.cache_hits,
+        "route_cache_misses": stats_delta.cache_misses,
     }
     return frame, summary

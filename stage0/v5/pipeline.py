@@ -20,17 +20,18 @@ from .archive import (
     sampled_orders_path,
     sampling_run_id,
 )
-from .config import Stage0Config
+from .config import Stage0Config, stable_hash
 from .manifest import base_manifest, write_manifest
 from .matching import CandidateIndex, TransitionEngine, match_order
 from .quality import conservation_summary, evaluate_order_quality
 from .reconstruction import EdgeAwareRouter, build_movements, build_traversals, route_parts_frame
+from .routing import CompactMovementRouter
 
 
 LOGGER = logging.getLogger("stage0.v5")
 
 
-PRODUCTS = ("order_base", "link_traversals", "turn_movements", "route_parts", "route_quality")
+PRODUCTS = ("order_base", "link_traversals", "turn_movements", "route_parts", "route_quality", "performance")
 
 
 def _write_frame(frame: pd.DataFrame, path: Path) -> None:
@@ -42,6 +43,68 @@ def _write_frame(frame: pd.DataFrame, path: Path) -> None:
 
 def _output_file(output: Path, product: str, date: str, bucket: int) -> Path:
     return output / product / f"day={date}" / f"part={bucket:03d}.parquet"
+
+
+def export_case_traces(
+    config: Stage0Config,
+    repo: Path,
+    dates: list[str],
+    sample_run_id: str,
+) -> dict[str, Any]:
+    """Reproducibly retain bounded examples, never every rejected point trace."""
+    output, work = config.path("output", repo), config.path("work", repo)
+    runtime = config.section("runtime")
+    failure_limit = int(runtime.get("case_trace_per_failure_reason_per_day", 5))
+    representative_limit = int(runtime.get("case_trace_representative_per_day", 10))
+    seed = int(config.section("sampling")["seed"])
+    counts: dict[str, int] = {}
+    for date in dates:
+        files = sorted((output / "route_quality" / f"day={date}").glob("*.parquet"))
+        if not files:
+            continue
+        quality = pd.concat([pd.read_parquet(path) for path in files], ignore_index=True)
+
+        def primary_reason(row: pd.Series) -> str:
+            for column in ("hard_error_flags", "soft_quality_flags"):
+                try:
+                    values = json.loads(str(row[column]))
+                except (json.JSONDecodeError, TypeError):
+                    values = []
+                if values:
+                    return str(values[0])
+            return "representative_pass"
+
+        quality["case_reason"] = quality.apply(primary_reason, axis=1)
+        quality["case_hash"] = quality.order_id.astype(str).map(
+            lambda order_id: stable_hash(date, order_id, seed=seed)
+        )
+        selected: list[pd.DataFrame] = []
+        rejected = quality.loc[quality.route_quality.eq("rejected")]
+        for reason, group in rejected.groupby("case_reason", sort=True):
+            chosen = group.nsmallest(failure_limit, "case_hash").copy()
+            chosen["stratum_population"] = len(group)
+            chosen["selection_probability"] = len(chosen) / max(len(group), 1)
+            selected.append(chosen)
+        passed = quality.loc[quality.route_quality.ne("rejected")]
+        if len(passed):
+            chosen = passed.nsmallest(representative_limit, "case_hash").copy()
+            chosen["stratum_population"] = len(passed)
+            chosen["selection_probability"] = len(chosen) / len(passed)
+            selected.append(chosen)
+        index = pd.concat(selected, ignore_index=True) if selected else pd.DataFrame(columns=quality.columns)
+        target = output / "case_traces" / sample_run_id / f"day={date}"
+        _write_frame(index, target / "case_trace_index.parquet")
+        selected_orders = set(index.order_id.astype(str))
+        traces: list[pd.DataFrame] = []
+        for path in (work / "sampled_points" / sample_run_id / f"day={date}").glob("part=*/*.parquet"):
+            frame = pd.read_parquet(path)
+            retained = frame.loc[frame.order_id.astype(str).isin(selected_orders)]
+            if len(retained):
+                traces.append(retained)
+        if traces:
+            _write_frame(pd.concat(traces, ignore_index=True), target / "points.parquet")
+        counts[date] = len(index)
+    return {"case_trace_counts": counts, "case_trace_total": int(sum(counts.values()))}
 
 
 def _partition_done(
@@ -71,6 +134,7 @@ def _empty_quality(order_id: str, reason: str) -> dict[str, Any]:
         "unreasonable_detour_count": 0,
         "illegal_u_turn_count": 0,
         "layer_violation_count": 0,
+        "restriction_violation_count": 0,
         "route_link_count": 0,
         "observed_distance_m": 0.0,
         "unallocated_observed_time_s": 0.0,
@@ -144,13 +208,13 @@ def run_dates(
     sample_run_id = sampling_run_id(dates, sample_count, int(config.section("sampling")["seed"]))
     edges = gpd.read_parquet(network / "canonical_edges.parquet")
     movements = pd.read_parquet(network / "movement_graph.parquet")
-    metric = pd.read_parquet(network / "metric_routing_graph.parquet")
     candidate_config = config.section("candidate")
     hmm_config = config.section("hmm")
     network_config = {**config.section("network"), **hmm_config}
     candidate_index = CandidateIndex(edges, candidate_config, str(work / "candidate_index" / config.digest))
-    transition_engine = TransitionEngine(edges, movements, metric, hmm_config)
-    edge_router = EdgeAwareRouter(edges, movements, network_config)
+    movement_router = CompactMovementRouter(edges, movements, network_config)
+    transition_engine = TransitionEngine(edges, movements, pd.DataFrame(), hmm_config, movement_router)
+    edge_router = EdgeAwareRouter(edges, movements, network_config, movement_router)
     edge_lookup = edges.set_index("edge_uid")
     run_rows: list[dict[str, Any]] = []
     process = psutil.Process()
@@ -180,27 +244,34 @@ def run_dates(
             traversal_frames: list[pd.DataFrame] = []
             movement_frames: list[pd.DataFrame] = []
             route_frames: list[pd.DataFrame] = []
-            case_frames: list[pd.DataFrame] = []
+            retained_point_frames: list[pd.DataFrame] = []
+            performance_rows: list[dict[str, Any]] = []
             failed_rows: list[dict[str, Any]] = []
-            representative_kept = False
 
             def process_order(item: tuple[Any, pd.DataFrame]) -> dict[str, Any]:
                 order_id, group = item
                 order_id = str(order_id)
                 failed = None
+                reconstruction_ms = movement_build_ms = quality_ms = 0.0
                 try:
                     matched, match_summary = match_order(
                         group, edges, candidate_index, transition_engine,
                         candidate_config, hmm_config, config.section("network")["metric_crs"],
                     )
+                    reconstruction_started = time.perf_counter()
                     route = edge_router.reconstruct(matched)
                     route_parts = route_parts_frame(order_id, route, edge_lookup) if route.edge_uids else pd.DataFrame()
                     traversals = build_traversals(order_id, matched, route_parts, edge_lookup) if len(route_parts) else pd.DataFrame()
-                    turns = build_movements(order_id, route_parts, movements, matched) if len(route_parts) > 1 else pd.DataFrame()
+                    reconstruction_ms = (time.perf_counter() - reconstruction_started) * 1000.0
+                    movement_started = time.perf_counter()
+                    turns = build_movements(order_id, route_parts, movement_router, matched) if len(route_parts) > 1 else pd.DataFrame()
+                    movement_build_ms = (time.perf_counter() - movement_started) * 1000.0
+                    quality_started = time.perf_counter()
                     quality = evaluate_order_quality(
                         order_id, matched, route_parts, traversals, turns, edge_lookup,
                         match_summary, config.section("quality"),
                     )
+                    quality_ms = (time.perf_counter() - quality_started) * 1000.0
                 except Exception as error:  # logged and accounted, never silently discarded
                     LOGGER.exception("date=%s bucket=%03d order=%s failed", date, bucket, order_id)
                     match_summary = {"matching_mode": "rejected", "fallback_used": False, "fallback_reason": "exception"}
@@ -240,6 +311,21 @@ def run_dates(
                     "route_parts": route_parts,
                     "matched": matched,
                     "failed": failed,
+                    "performance": {
+                        "date": date,
+                        "bucket": bucket,
+                        "order_id": order_id,
+                        **{key: match_summary.get(key, 0) for key in (
+                            "candidate_generation_ms", "ambiguity_detection_ms", "local_hmm_ms",
+                            "full_hmm_ms", "transition_search_ms", "matching_total_ms",
+                            "dijkstra_calls", "dijkstra_expanded_nodes", "route_cache_hits",
+                            "route_cache_misses", "local_window_count", "local_failed_window_count",
+                            "full_order_trigger_reason",
+                        )},
+                        "reconstruction_ms": reconstruction_ms,
+                        "movement_build_ms": movement_build_ms,
+                        "quality_ms": quality_ms,
+                    },
                 }
 
             grouped_orders = list(points.groupby("order_id", sort=False))
@@ -255,11 +341,10 @@ def run_dates(
                 if len(result["turns"]): movement_frames.append(result["turns"])
                 if len(result["route_parts"]): route_frames.append(result["route_parts"])
                 if result["failed"] is not None: failed_rows.append(result["failed"])
+                performance_rows.append(result["performance"])
                 matched = result["matched"]
-                quality = result["quality"]
-                if len(matched) and (retain_points or quality["route_quality"] == "rejected" or not representative_kept):
-                    case_frames.append(matched)
-                    representative_kept = representative_kept or quality["route_quality"] != "rejected"
+                if len(matched) and retain_points:
+                    retained_point_frames.append(matched)
             tables = {
                 "order_base": pd.DataFrame(order_base_rows),
                 "link_traversals": pd.concat(traversal_frames, ignore_index=True) if traversal_frames else pd.DataFrame(columns=["order_id"]),
@@ -267,12 +352,18 @@ def run_dates(
                 "route_parts": pd.concat(route_frames, ignore_index=True) if route_frames else pd.DataFrame(columns=["order_id"]),
                 "route_quality": pd.DataFrame(quality_rows),
             }
+            output_started = time.perf_counter()
             for product, table in tables.items():
                 _write_frame(table, _output_file(output, product, date, bucket))
-            if case_frames:
-                nonempty_cases = [frame for frame in case_frames if len(frame) and not frame.isna().all(axis=None)]
-                if nonempty_cases:
-                    _write_frame(pd.concat(nonempty_cases, ignore_index=True), output / "case_traces" / f"day={date}" / f"part={bucket:03d}.parquet")
+            output_io_ms = (time.perf_counter() - output_started) * 1000.0 / max(input_orders, 1)
+            performance = pd.DataFrame(performance_rows)
+            performance["output_io_ms"] = output_io_ms
+            _write_frame(performance, _output_file(output, "performance", date, bucket))
+            if retained_point_frames:
+                _write_frame(
+                    pd.concat(retained_point_frames, ignore_index=True),
+                    output / "matched_points_retained" / sample_run_id / f"day={date}" / f"part={bucket:03d}.parquet",
+                )
             if failed_rows:
                 _write_frame(pd.DataFrame(failed_rows), output / "failed_orders" / f"day={date}" / f"part={bucket:03d}.parquet")
             partition_manifest = {
@@ -290,14 +381,16 @@ def run_dates(
             write_manifest(output / "manifests" / "partitions" / f"day={date}" / f"part={bucket:03d}.json", partition_manifest)
             peak_rss = max(peak_rss, process.memory_info().rss)
             run_rows.append(partition_manifest)
-            del points, tables, order_base_rows, quality_rows, traversal_frames, movement_frames, route_frames, case_frames
+            del points, tables, order_base_rows, quality_rows, traversal_frames, movement_frames, route_frames, retained_point_frames, performance_rows
         LOGGER.info("date=%s processed_input_orders=%d", date, day_input_orders)
     summary = summarize_run(config, repo, dates, sample_count)
+    if int(bucket_shard_count) == 1 and summary.get("accounting_pass") and not retain_points:
+        summary.update(export_case_traces(config, repo, dates, sample_run_id))
     summary.update({
         "status": "SHARD_COMPLETE" if int(bucket_shard_count) > 1 else ("PASS" if summary["accounting_pass"] else "FAIL"),
         "runtime_sec": time.perf_counter() - started,
         "peak_memory_mb": peak_rss / (1024**2),
-        "routing_cache_sources": transition_engine.cache.size,
+        "routing_cache_pairs": movement_router.cache_size,
         "partition_runs": len(run_rows),
         "workers": int(workers),
         "bucket_shard_index": int(bucket_shard_index),
@@ -337,5 +430,7 @@ def summarize_run(config: Stage0Config, repo: Path, dates: list[str], orders_per
         "topology_gap_count": int(quality.topology_gap_count.sum()) if len(quality) else 0,
         "parallel_ambiguity_order_count": int((quality.parallel_ambiguity_share > 0).sum()) if len(quality) else 0,
         "direction_violation_count": int(quality.direction_violation_count.sum()) if len(quality) else 0,
+        "layer_violation_count": int(quality.layer_violation_count.sum()) if len(quality) else 0,
+        "restriction_violation_count": int(quality.restriction_violation_count.sum()) if len(quality) else 0,
         "mean_inferred_distance_share": float(quality.interpolated_distance_share.mean()) if len(quality) else float("nan"),
     }

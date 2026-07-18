@@ -19,21 +19,24 @@ function Assert-Gate1Pass {
 
 ```powershell
 & $py $runner --phase gate0
-& $py $runner --phase materialize --dates 20161010 20161014 20161016 --orders-per-day 2000 --buckets 128
-& $py $runner --phase gate1 --orders-per-day 2000 --buckets 128 --resume
+& $py $runner --phase materialize --dates 20161010 20161014 20161016 --orders-per-day 2000 --buckets 32
+& $py $runner --phase gate1 --orders-per-day 2000 --buckets 32 --resume
 ```
 
 For RAM-controlled partition sharding, materialize once and run mutually exclusive shards. Do
-not run two different shard counts concurrently.
+not run two different shard counts concurrently. The canonical default is one worker because the
+compact road and movement indexes consume about 2.8 GB RSS per process in the fixed benchmark.
+Only use the four-process example after confirming at least 12 GB of free RAM beyond the OS and
+other applications; otherwise run the single-process Gate 1 command above.
 
 ```powershell
 0..3 | ForEach-Object -Parallel {
   & $using:py $using:runner --phase match `
     --dates 20161010 20161014 20161016 `
-    --orders-per-day 2000 --buckets 128 --workers 1 --no-resume `
+    --orders-per-day 2000 --buckets 32 --workers 1 --no-resume `
     --bucket-shard-index $_ --bucket-shard-count 4
 } -ThrottleLimit 4
-& $py $runner --phase gate1 --orders-per-day 2000 --buckets 128 --resume
+& $py $runner --phase gate1 --orders-per-day 2000 --buckets 32 --resume
 ```
 
 ## Gate 2: three days, 10,000 complete orders/day
@@ -41,8 +44,8 @@ not run two different shard counts concurrently.
 ```powershell
 Assert-Gate1Pass
 & $py $runner --phase inventory --dates 20161010 20161014 20161016 --orders-per-day 10000
-& $py $runner --phase materialize --dates 20161010 20161014 20161016 --orders-per-day 10000 --buckets 128 --force
-& $py $runner --phase match --dates 20161010 20161014 20161016 --orders-per-day 10000 --buckets 128 --workers 1 --resume
+& $py $runner --phase materialize --dates 20161010 20161014 20161016 --orders-per-day 10000 --buckets 64 --force
+& $py $runner --phase match --dates 20161010 20161014 20161016 --orders-per-day 10000 --buckets 64 --workers 1 --resume
 ```
 
 Gate 2 must not start unless `stage0/output_v5/reports/gate1_readiness.json` is `PASS`.
@@ -52,8 +55,8 @@ Gate 2 must not start unless `stage0/output_v5/reports/gate1_readiness.json` is 
 ```powershell
 Assert-Gate1Pass
 & $py $runner --phase inventory --split train --orders-per-day 10000
-& $py $runner --phase materialize --split train --orders-per-day 10000 --buckets 128 --force
-& $py $runner --phase match --split train --orders-per-day 10000 --buckets 128 --workers 1 --resume
+& $py $runner --phase materialize --split train --orders-per-day 10000 --buckets 64 --force
+& $py $runner --phase match --split train --orders-per-day 10000 --buckets 64 --workers 1 --resume
 ```
 
 ## Gate 4: Validation
@@ -61,8 +64,8 @@ Assert-Gate1Pass
 ```powershell
 Assert-Gate1Pass
 & $py $runner --phase inventory --split validation --orders-per-day 10000
-& $py $runner --phase materialize --split validation --orders-per-day 10000 --buckets 128 --force
-& $py $runner --phase match --split validation --orders-per-day 10000 --buckets 128 --workers 1 --resume
+& $py $runner --phase materialize --split validation --orders-per-day 10000 --buckets 64 --force
+& $py $runner --phase match --split validation --orders-per-day 10000 --buckets 64 --workers 1 --resume
 & $py $runner --phase manual-review --review-pack development
 ```
 
@@ -73,8 +76,8 @@ $env:PYTEST_DISABLE_PLUGIN_AUTOLOAD = "1"
 & $py -m pytest -q stage0/tests
 & $py $runner --phase freeze
 & $py $runner --phase inventory --split test --orders-per-day 10000
-& $py $runner --phase materialize --split test --orders-per-day 10000 --buckets 128 --force
-& $py $runner --phase match --split test --orders-per-day 10000 --buckets 128 --workers 1 --resume
+& $py $runner --phase materialize --split test --orders-per-day 10000 --buckets 64 --force
+& $py $runner --phase match --split test --orders-per-day 10000 --buckets 64 --workers 1 --resume
 & $py $runner --phase manual-review --review-pack test
 ```
 

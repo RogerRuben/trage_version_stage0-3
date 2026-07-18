@@ -1,5 +1,10 @@
 # Stage 0 v5 Gate 0/1 execution record
 
+> Legacy pre-P0 result. This run predates the structural movement-routing,
+> level-transition, selective-HMM, and compact-retention fixes documented in
+> `stage0_v5_p0_structural_fix_report.md`. It remains a baseline audit record and is not Gate 2
+> readiness evidence. Corrected Gate 1 has not yet been run.
+
 ## Scope and provenance
 
 - Branch: `codex/stage0-v5`

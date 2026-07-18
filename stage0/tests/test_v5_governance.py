@@ -7,6 +7,7 @@ import pandas as pd
 from stage0.v5.archive import sampled_orders_path, sampling_run_id, stable_sample
 from stage0.v5.config import Stage0Config, stable_hash
 from stage0.v5.pipeline import _partition_done
+from stage0.v5.pipeline import export_case_traces
 from stage0.v5.retention import prune_point_work
 from stage0.v5.gates import require_test_freeze
 
@@ -66,3 +67,38 @@ def test_test_dates_require_current_frozen_manifest(tmp_path):
     manifest.write_text(json.dumps({"status": "FROZEN", "config_hash": config.digest}), encoding="utf-8")
     require_test_freeze(config, tmp_path, ["20161028"])
     require_test_freeze(config, tmp_path, ["20161010"])
+
+
+def test_rejected_case_traces_are_bounded_by_failure_reason(tmp_path):
+    source = __import__("pathlib").Path("stage0/config/stage0_v5.yaml")
+    loaded = Stage0Config.load(source)
+    values = {
+        **loaded.values,
+        "paths": {**loaded.values["paths"], "output": str(tmp_path / "out"), "work": str(tmp_path / "work")},
+        "runtime": {
+            **loaded.values["runtime"],
+            "case_trace_per_failure_reason_per_day": 2,
+            "case_trace_representative_per_day": 3,
+        },
+    }
+    from stage0.v5.config import config_hash
+    config = Stage0Config(source, values, config_hash(values))
+    date, run_id = "20161010", "sample-run"
+    quality = pd.DataFrame({
+        "date": [date] * 30,
+        "order_id": [f"o{i}" for i in range(30)],
+        "route_quality": ["rejected"] * 20 + ["strict_core"] * 10,
+        "hard_error_flags": ['["gap"]'] * 10 + ['["direction"]'] * 10 + ["[]"] * 10,
+        "soft_quality_flags": ["[]"] * 30,
+    })
+    quality_path = tmp_path / "out/route_quality" / f"day={date}" / "part=000.parquet"
+    quality_path.parent.mkdir(parents=True)
+    quality.to_parquet(quality_path, index=False)
+    points = pd.DataFrame({"order_id": quality.order_id, "timestamp": range(30)})
+    point_path = tmp_path / "work/sampled_points" / run_id / f"day={date}" / "part=000" / "fragment=0.parquet"
+    point_path.parent.mkdir(parents=True)
+    points.to_parquet(point_path, index=False)
+    result = export_case_traces(config, tmp_path, [date], run_id)
+    assert result["case_trace_total"] == 7
+    retained = pd.read_parquet(tmp_path / "out/case_traces" / run_id / f"day={date}" / "points.parquet")
+    assert retained.order_id.nunique() == 7

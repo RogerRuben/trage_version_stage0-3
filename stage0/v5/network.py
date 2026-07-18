@@ -271,9 +271,27 @@ def build_movement_graph(edges: gpd.GeoDataFrame, restrictions: pd.DataFrame) ->
             left = edges.loc[left_idx]
             for right_idx in outgoing[via_node]:
                 right = edges.loc[right_idx]
-                level_ok = (left.layer, bool(left.bridge), bool(left.tunnel)) == (
+                left_link = str(left.highway).endswith("_link")
+                right_link = str(right.highway).endswith("_link")
+                if left_link or right_link:
+                    level_transition = "ramp_transition"
+                elif not bool(left.bridge) and bool(right.bridge):
+                    level_transition = "bridge_entry"
+                elif bool(left.bridge) and not bool(right.bridge):
+                    level_transition = "bridge_exit"
+                elif not bool(left.tunnel) and bool(right.tunnel):
+                    level_transition = "tunnel_entry"
+                elif bool(left.tunnel) and not bool(right.tunnel):
+                    level_transition = "tunnel_exit"
+                elif (left.layer, bool(left.bridge), bool(left.tunnel)) == (
                     right.layer, bool(right.bridge), bool(right.tunnel)
-                ) or str(left.highway).endswith("_link") or str(right.highway).endswith("_link")
+                ):
+                    level_transition = "same_level"
+                else:
+                    # A shared directed OSM node is positive topological evidence.  Attribute
+                    # changes are diagnostic unless an independent audit proves the node false.
+                    level_transition = "suspicious_level_jump"
+                level_ok = True
                 restriction = "allowed"
                 key = (int(left.osm_way_id), via_node, int(right.osm_way_id))
                 if key in no_lookup:
@@ -289,6 +307,7 @@ def build_movement_graph(edges: gpd.GeoDataFrame, restrictions: pd.DataFrame) ->
                     "movement_type": movement_type(angle, is_uturn),
                     "turn_angle": angle, "restriction_status": restriction,
                     "layer_compatibility": bool(level_ok),
+                    "level_transition_type": level_transition,
                     "road_class_transition": f"{left.highway}->{right.highway}",
                     "merge_diverge_flag": len(incoming[via_node]) > 1 or len(outgoing[via_node]) > 1,
                 })

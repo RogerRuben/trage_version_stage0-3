@@ -47,21 +47,32 @@ def evaluate_order_quality(
     projection = pd.to_numeric(matched_points.get("gps_to_edge_distance_m"), errors="coerce")
     movement_quality = movements.get("movement_quality", pd.Series(dtype=str))
     gap_count = int((movement_quality == "missing_movement").sum())
-    layer_count = int((movement_quality == "layer_incompatible").sum())
+    transition_type = movements.get("level_transition_type", pd.Series(dtype=str)).astype(str)
+    layer_count = int(transition_type.eq("unresolved_level_gap").sum())
     movement_type = movements.get("movement_type", pd.Series(dtype=str))
     restriction = movements.get("restriction_status", pd.Series(dtype=str)).astype(str)
+    restriction_count = int(restriction.str.startswith("forbidden").sum())
     illegal_uturn = int(((movement_type == "u_turn") & restriction.str.startswith("forbidden")).sum())
+    heading = pd.to_numeric(matched_points.get("edge_heading_difference_deg", pd.Series(dtype=float)), errors="coerce")
+    direction_count = int((heading > float(hard_cfg.get("maximum_heading_direction_difference_deg", 100.0))).sum())
+    if len(matched_points) > 1 and {"edge_uid", "position_on_edge"} <= set(matched_points.columns):
+        ordered_points = matched_points.sort_values("point_seq", kind="stable")
+        positions = pd.to_numeric(ordered_points.position_on_edge, errors="coerce")
+        same_edge = ordered_points.edge_uid.astype(str).eq(ordered_points.edge_uid.astype(str).shift())
+        severe_reverse = same_edge & positions.diff().lt(-float(hard_cfg.get("same_edge_reverse_tolerance_m", 10.0)))
+        direction_count += int(severe_reverse.sum())
     inferred_distance = float(route_parts.loc[route_parts.is_interpolated, "edge_uid"].map(edge_lookup.length_m).sum()) if successful else 0.0
     endpoint_error = float(max(projection.iloc[0], projection.iloc[-1])) if len(projection.dropna()) == len(projection) and len(projection) else math.inf
     confidence = float(np.exp(-projection.mean() / 30.0)) if len(projection.dropna()) else 0.0
     route_ratio = _safe_ratio(route_distance, observed_distance)
     metrics = {
         "successful_reconstruction": successful,
-        "direction_violation_count": gap_count,
+        "direction_violation_count": direction_count,
         "topology_gap_count": gap_count,
         "unreasonable_detour_count": int(bool(np.isfinite(route_ratio) and route_ratio > float(soft_cfg["maximum_route_length_ratio"]) * 2)),
         "illegal_u_turn_count": illegal_uturn,
         "layer_violation_count": layer_count,
+        "restriction_violation_count": restriction_count,
         "route_link_count": int(len(route_parts)),
         "observed_distance_m": observed_distance,
         "unallocated_observed_time_s": unallocated_time,
@@ -80,10 +91,12 @@ def evaluate_order_quality(
     }
     hard = {
         "successful_reconstruction": successful,
-        "direction_continuity": gap_count <= int(hard_cfg["maximum_direction_violations"]),
+        "direction_continuity": direction_count <= int(hard_cfg["maximum_direction_violations"]),
+        "topology_continuity": gap_count <= int(hard_cfg.get("maximum_topology_gaps", 0)),
         "no_unreasonable_detour": metrics["unreasonable_detour_count"] <= int(hard_cfg["maximum_unreasonable_detours"]),
         "reasonable_od_endpoints": endpoint_error <= float(hard_cfg["maximum_od_endpoint_error_m"]),
         "no_illegal_u_turn": illegal_uturn <= int(hard_cfg["maximum_illegal_u_turns"]),
+        "no_restriction_violation": restriction_count == 0,
         "minimum_route_links": len(route_parts) >= int(hard_cfg["minimum_route_links"]),
         "time_distance_conservation": max(time_error, distance_error) <= float(hard_cfg["conservation_tolerance"]),
         "layer_continuity": layer_count <= int(hard_cfg["maximum_layer_violations"]),

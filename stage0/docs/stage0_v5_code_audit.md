@@ -15,8 +15,9 @@ The v5 branch starts from `origin/codex/pipeline-rebaseline` at
 
 ## Retained decisions
 
-V5 retains complete-order sampling, stable order hashing, Parquet streaming, 128 default
-buckets, completed-partition skipping, manifests, link traversals, turn movements, compact
+V5 retains complete-order sampling, stable order hashing, Parquet streaming, scale-aware
+bucket counts (32 for Gate 1, 64 for 10,000-order days), completed-partition skipping,
+manifests, link traversals, turn movements, compact
 retention, observed/inferred separation, and strict-core/analysis-set/rejected governance.
 
 ## Replaced decisions

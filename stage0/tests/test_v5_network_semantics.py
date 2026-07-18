@@ -58,13 +58,14 @@ def test_true_parallel_edges_are_retained_and_classified():
     assert not bool(audit.merge_allowed.iloc[0])
 
 
-def test_bridge_ground_movement_is_not_layer_compatible():
+def test_bridge_entry_at_shared_node_is_legal_and_classified():
     edges = gpd.GeoDataFrame([
         _edge("1:0:F", 1, 1, 2, [(0, 0), (10, 0)], layer=1, bridge=True),
         _edge("2:0:F", 2, 2, 3, [(10, 0), (20, 0)], layer=0),
     ], geometry="geometry", crs=3857)
     movements = build_movement_graph(edges, pd.DataFrame())
-    assert not bool(movements.layer_compatibility.iloc[0])
+    assert bool(movements.layer_compatibility.iloc[0])
+    assert movements.level_transition_type.iloc[0] == "bridge_exit"
 
 
 def test_tunnel_default_layer_and_explicit_layer_are_normalized():
