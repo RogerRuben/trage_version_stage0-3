@@ -10,6 +10,7 @@ from stage0.v5.network import (
     directed_directions,
     motor_vehicle_eligible,
     normalize_layer,
+    normalize_bool,
     normalize_oneway,
     parallel_components,
     stable_edge_uid,
@@ -80,18 +81,31 @@ def test_parallel_group_is_transitive_connected_component():
     assert aliases == {"a": "a", "b": "b", "c": "c"}
 
 
-def test_merge_allowed_parallel_component_has_one_candidate_alias():
+def test_merge_allowed_without_proven_alias_safety_does_not_merge_state():
     audit = pd.DataFrame([
         {"left_edge_uid": "a", "right_edge_uid": "b", "merge_allowed": True},
         {"left_edge_uid": "b", "right_edge_uid": "c", "merge_allowed": True},
     ])
     _, aliases = parallel_components(pd.Series(["a", "b", "c"]), audit)
-    assert {aliases[edge] for edge in ("a", "b", "c")} == {"a"}
+    assert aliases == {"a": "a", "b": "b", "c": "c"}
+
+
+def test_only_explicit_alias_safe_edges_share_candidate_state():
+    audit = pd.DataFrame([
+        {"left_edge_uid": "a", "right_edge_uid": "b", "alias_safe": True},
+        {"left_edge_uid": "b", "right_edge_uid": "c", "alias_safe": False},
+    ])
+    _, aliases = parallel_components(pd.Series(["a", "b", "c"]), audit)
+    assert aliases["a"] == aliases["b"]
+    assert aliases["c"] == "c"
 
 
 def test_tunnel_default_layer_and_explicit_layer_are_normalized():
     assert normalize_layer(None, tunnel="yes") == -1
     assert normalize_layer("-2", tunnel="yes") == -2
+    assert normalize_bool("viaduct")
+    assert normalize_bool("building_passage")
+    assert normalize_bool("culvert")
 
 
 def test_service_access_filter_is_selective_not_global():

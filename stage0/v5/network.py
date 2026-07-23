@@ -19,7 +19,11 @@ from .config import Stage0Config, sha256_file
 from .manifest import base_manifest, write_manifest
 
 
-TRUE = {"yes", "true", "1"}
+TRUE = {
+    "yes", "true", "1",
+    "viaduct", "movable", "aqueduct",
+    "culvert", "building_passage", "avalanche_protector",
+}
 FALSE = {"no", "false", "0", ""}
 
 
@@ -244,7 +248,10 @@ def classify_parallel_edges(edges: gpd.GeoDataFrame) -> pd.DataFrame:
                     "left_edge_uid": left.edge_uid, "right_edge_uid": right.edge_uid,
                     "parallel_category": category, "same_geometry": same_geometry,
                     "same_level": same_level, "same_semantics": same_semantics,
-                    "merge_allowed": category in {"exact_duplicate", "semantic_equivalent"},
+                    # Geometry equivalence alone is insufficient. Candidate
+                    # aliasing is decided later after movement and restriction
+                    # signatures are available.
+                    "merge_allowed": category == "exact_duplicate",
                 })
     return pd.DataFrame(rows)
 
@@ -284,7 +291,11 @@ def parallel_components(
         return result
 
     parallel_groups = components(audit) if len(audit) else {}
-    merge_rows = audit.loc[audit.merge_allowed.astype(bool)] if len(audit) else audit
+    merge_rows = (
+        audit.loc[audit.alias_safe.astype(bool)]
+        if len(audit) and "alias_safe" in audit.columns
+        else audit.iloc[0:0]
+    )
     duplicate_groups = components(merge_rows) if len(merge_rows) else {}
     aliases: dict[str, str] = {value: value for value in values}
     by_group: dict[str, list[str]] = defaultdict(list)
@@ -294,6 +305,65 @@ def parallel_components(
         alias = min(members)
         aliases.update({member: alias for member in members})
     return parallel_groups, aliases
+
+
+def audit_candidate_aliases(
+    edges: gpd.GeoDataFrame,
+    parallel: pd.DataFrame,
+    movements: pd.DataFrame,
+) -> pd.DataFrame:
+    """Prove exact duplicates safe before collapsing only their candidate state."""
+    if parallel.empty:
+        return pd.DataFrame(columns=[
+            "edge_uid", "alias_uid", "alias_reason", "geometry_equal",
+            "semantic_equal", "movement_signature_equal",
+            "restriction_signature_equal", "alias_safe",
+        ])
+    edge_lookup = edges.set_index("edge_uid", drop=False)
+    movement_rows: dict[str, set[tuple[Any, ...]]] = defaultdict(set)
+    restriction_rows: dict[str, set[tuple[str, str]]] = defaultdict(set)
+    for row in movements.itertuples(index=False):
+        outgoing = (
+            "out", str(row.to_edge_uid), str(row.movement_type),
+            str(row.level_transition_type), str(row.road_class_transition),
+        )
+        incoming = (
+            "in", str(row.from_edge_uid), str(row.movement_type),
+            str(row.level_transition_type), str(row.road_class_transition),
+        )
+        movement_rows[str(row.from_edge_uid)].add(outgoing)
+        movement_rows[str(row.to_edge_uid)].add(incoming)
+        restriction_rows[str(row.from_edge_uid)].add(("out", str(row.restriction_status)))
+        restriction_rows[str(row.to_edge_uid)].add(("in", str(row.restriction_status)))
+    rows: list[dict[str, Any]] = []
+    semantic_fields = (
+        "direction", "highway", "access", "motor_vehicle", "service",
+        "layer", "bridge", "tunnel", "junction", "maxspeed",
+    )
+    for pair in parallel.itertuples(index=False):
+        left_uid, right_uid = str(pair.left_edge_uid), str(pair.right_edge_uid)
+        left, right = edge_lookup.loc[left_uid], edge_lookup.loc[right_uid]
+        geometry_equal = bool(pair.same_geometry)
+        semantic_equal = all(str(left.get(name, "")) == str(right.get(name, "")) for name in semantic_fields)
+        movement_equal = movement_rows[left_uid] == movement_rows[right_uid]
+        restriction_equal = restriction_rows[left_uid] == restriction_rows[right_uid]
+        safe = (
+            str(pair.parallel_category) == "exact_duplicate"
+            and geometry_equal and semantic_equal and movement_equal and restriction_equal
+        )
+        rows.append({
+            "edge_uid": right_uid,
+            "alias_uid": min(left_uid, right_uid) if safe else right_uid,
+            "alias_reason": "proven_exact_duplicate" if safe else "not_aliased",
+            "geometry_equal": geometry_equal,
+            "semantic_equal": semantic_equal,
+            "movement_signature_equal": movement_equal,
+            "restriction_signature_equal": restriction_equal,
+            "alias_safe": safe,
+            "left_edge_uid": left_uid,
+            "right_edge_uid": right_uid,
+        })
+    return pd.DataFrame(rows)
 
 
 def build_movement_graph(edges: gpd.GeoDataFrame, restrictions: pd.DataFrame) -> pd.DataFrame:
@@ -312,6 +382,12 @@ def build_movement_graph(edges: gpd.GeoDataFrame, restrictions: pd.DataFrame) ->
     for row in restriction_rows.itertuples():
         if str(row.restriction).startswith("only_"):
             only_lookup[(int(row.from_way), int(row.via_node))].add(int(row.to_way))
+    unresolved_pairs = {
+        (int(row.from_way), int(row.to_way))
+        for row in restrictions.itertuples()
+        if str(row.parse_status) != "parsed_via_node"
+        and pd.notna(row.from_way) and pd.notna(row.to_way)
+    } if len(restrictions) else set()
     rows: list[dict[str, Any]] = []
     for via_node in sorted(set(incoming) & set(outgoing)):
         for left_idx in incoming[via_node]:
@@ -346,6 +422,11 @@ def build_movement_graph(edges: gpd.GeoDataFrame, restrictions: pd.DataFrame) ->
                 allowed_only = only_lookup.get((int(left.osm_way_id), via_node))
                 if allowed_only and int(right.osm_way_id) not in allowed_only:
                     restriction = "forbidden:only_restriction"
+                if (
+                    restriction == "allowed"
+                    and (int(left.osm_way_id), int(right.osm_way_id)) in unresolved_pairs
+                ):
+                    restriction = "unresolved_restriction"
                 is_uturn = left.from_node == right.to_node and left.to_node == right.from_node
                 angle = signed_turn_angle(left.geometry, right.geometry)
                 rows.append({
@@ -378,9 +459,20 @@ def build_network(config: Stage0Config, repo: Path, force: bool = False) -> dict
     output = config.path("output", repo) / "network"
     output.mkdir(parents=True, exist_ok=True)
     manifest_path = output / "network_manifest.json"
+    pbf_stat = pbf.stat()
+    pbf_identity = f"size={pbf_stat.st_size};mtime_ns={pbf_stat.st_mtime_ns}"
     if manifest_path.exists() and not force:
         existing = json.loads(manifest_path.read_text(encoding="utf-8"))
-        if existing.get("status") == "PASS" and existing.get("config_hash") == config.digest:
+        existing_inputs = existing.get("inputs", [])
+        recorded_pbf = next(
+            (row for row in existing_inputs if Path(str(row.get("path", ""))).resolve() == pbf.resolve()),
+            {},
+        )
+        if (
+            existing.get("status") == "PASS"
+            and existing.get("config_hash") == config.digest
+            and recorded_pbf.get("reproducible_identifier") == pbf_identity
+        ):
             return existing
     snapshot = _pbf_timestamp(pbf) or f"unknown;file_mtime={pbf.stat().st_mtime_ns}"
     handler = PbfRoadHandler(config.section("network"), snapshot)
@@ -392,9 +484,8 @@ def build_network(config: Stage0Config, repo: Path, force: bool = False) -> dict
     edges["routing_cost_m"] = edges.length_m * edges.routing_penalty.astype(float)
     edges["network_snapshot_mismatch"] = edges.osm_timestamp.astype(str).str[:10].gt("2016-10-31")
     parallel = classify_parallel_edges(edges)
-    group_map, candidate_alias = parallel_components(edges.edge_uid, parallel)
+    group_map, _ = parallel_components(edges.edge_uid, parallel)
     edges["parallel_group"] = edges.edge_uid.map(group_map)
-    edges["candidate_alias_uid"] = edges.edge_uid.astype(str).map(candidate_alias)
     node_rows = [
         {"node_id": node_id, "geometry": Point(lon, lat)}
         for node_id, (lon, lat) in handler.nodes.items()
@@ -404,6 +495,14 @@ def build_network(config: Stage0Config, repo: Path, force: bool = False) -> dict
     if restrictions.empty:
         restrictions = pd.DataFrame(columns=["relation_id", "restriction", "from_way", "to_way", "via_node", "raw_members", "parse_status"])
     movements = build_movement_graph(edges, restrictions)
+    alias_audit = audit_candidate_aliases(edges, parallel, movements)
+    _, candidate_alias = parallel_components(edges.edge_uid, alias_audit)
+    edges["candidate_alias_uid"] = edges.edge_uid.astype(str).map(candidate_alias)
+    allowed_movements = movements.loc[
+        ~movements.restriction_status.astype(str).str.startswith("forbidden")
+        & movements.restriction_status.ne("unresolved_restriction")
+        & movements.layer_compatibility.astype(bool)
+    ].copy()
     metric = (
         edges.sort_values(["from_node", "to_node", "routing_cost_m", "edge_uid"])
         .drop_duplicates(["from_node", "to_node"])
@@ -412,8 +511,11 @@ def build_network(config: Stage0Config, repo: Path, force: bool = False) -> dict
     edges.to_parquet(output / "canonical_edges.parquet", index=False, compression="zstd")
     nodes.to_parquet(output / "canonical_nodes.parquet", index=False, compression="zstd")
     movements.to_parquet(output / "movement_graph.parquet", index=False, compression="zstd")
+    movements.to_parquet(output / "raw_movement_audit_graph.parquet", index=False, compression="zstd")
+    allowed_movements.to_parquet(output / "allowed_movement_graph.parquet", index=False, compression="zstd")
     metric.to_parquet(output / "metric_routing_graph.parquet", index=False, compression="zstd")
     parallel.to_parquet(output / "parallel_edge_audit.parquet", index=False, compression="zstd")
+    alias_audit.to_parquet(output / "candidate_alias_audit.parquet", index=False, compression="zstd")
     restrictions.to_parquet(output / "turn_restrictions.parquet", index=False, compression="zstd")
     parsed_restrictions = int(restrictions.parse_status.eq("parsed_via_node").sum())
     manifest = {
@@ -424,6 +526,9 @@ def build_network(config: Stage0Config, repo: Path, force: bool = False) -> dict
         "parallel_component_count": int(edges.parallel_group.nunique(dropna=True)),
         "candidate_alias_edge_count": int(edges.candidate_alias_uid.ne(edges.edge_uid.astype(str)).sum()),
         "candidate_state_count": int(edges.candidate_alias_uid.nunique()),
+        "safe_candidate_alias_pair_count": int(alias_audit.alias_safe.sum()) if len(alias_audit) else 0,
+        "allowed_movement_count": int(len(allowed_movements)),
+        "raw_movement_audit_available": True,
         "parsed_restriction_count": parsed_restrictions,
         "restriction_coverage": parsed_restrictions / len(restrictions) if len(restrictions) else None,
         "future_timestamp_edge_count": int(edges.network_snapshot_mismatch.sum()),

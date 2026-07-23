@@ -19,7 +19,7 @@ from shapely import distance as shapely_distance
 from shapely import get_x, get_y, line_interpolate_point, line_locate_point, points
 
 from .coordinates import gcj02_to_wgs84
-from .routing import CompactMovementRouter, SearchStats
+from .routing import CompactMovementRouter, SearchStats, TransitionPath
 
 
 def angular_difference(left: np.ndarray | float, right: np.ndarray | float) -> np.ndarray:
@@ -63,6 +63,35 @@ class Candidate:
     rank: int
 
 
+@dataclass(frozen=True)
+class TransitionSelection:
+    point_index: int
+    from_edge_uid: str
+    to_edge_uid: str
+    observed_step_m: float
+    time_gap_s: float
+    transition_cutoff_m: float
+    selected_path_distance_m: float
+    generalized_routing_cost: float
+    path_identifier: str
+    edge_uids: tuple[str, ...]
+
+
+def transition_cutoff(observed_step_m: float, time_gap_s: float, config: dict[str, Any]) -> float:
+    """Return the frozen per-observation physical search boundary."""
+    spatial = (
+        float(config.get("transition_cutoff_alpha", 3.0)) * max(0.0, observed_step_m)
+        + float(config.get("transition_cutoff_base_m", 200.0))
+    )
+    # Time only expands the physical feasibility envelope; it never forces a
+    # path. The speed cap is an engineering safety bound recorded in config.
+    temporal = max(0.0, time_gap_s) * float(config.get("transition_max_speed_mps", 40.0))
+    return min(
+        float(config.get("transition_cutoff_max_m", config["max_route_distance_m"])),
+        max(float(config.get("transition_cutoff_min_m", 300.0)), min(spatial, temporal) if temporal > 0 else spatial),
+    )
+
+
 class TransitionEngine:
     def __init__(
         self,
@@ -87,13 +116,14 @@ class TransitionEngine:
             return max(0.0, delta) if delta >= -self.jitter_tolerance else math.inf
         if self.router.movement(left.edge_uid, right.edge_uid) is not None:
             return max(0.0, self.lengths[left.edge_index] - left.position) + right.position
-        middle = self.router.multi_target_distances(
-            [left.edge_uid], [right.edge_uid],
-            float(requested_cutoff or self.router.maximum),
-        ).get((left.edge_uid, right.edge_uid), math.inf)
-        if not math.isfinite(middle):
+        endpoint = max(0.0, self.lengths[left.edge_index] - left.position) + right.position
+        cutoff = float(requested_cutoff or self.router.maximum)
+        transition = self.router.transition_path(
+            left.edge_uid, right.edge_uid, max(0.0, cutoff - endpoint)
+        )
+        if transition is None:
             return math.inf
-        return max(0.0, self.lengths[left.edge_index] - left.position) + middle + right.position
+        return endpoint + transition.physical_distance_m
 
     def transition_matrices(
         self,
@@ -103,50 +133,80 @@ class TransitionEngine:
     ) -> tuple[np.ndarray, np.ndarray]:
         distances = np.full((len(previous), len(current)), math.inf, dtype=float)
         penalties = np.zeros_like(distances)
-        unresolved_left: list[str] = []
-        unresolved_right: list[str] = []
-        for left in previous:
-            for right in current:
-                if left.edge_uid != right.edge_uid and self.router.movement(left.edge_uid, right.edge_uid) is None:
-                    unresolved_left.append(left.edge_uid)
-                    unresolved_right.append(right.edge_uid)
-        middle_distances = self.router.multi_target_distances(
-            unresolved_left, unresolved_right, requested_cutoff,
-        )
         for i, left in enumerate(previous):
             for j, right in enumerate(current):
                 if left.edge_uid == right.edge_uid:
                     delta = right.position - left.position
                     if delta >= 0:
-                        distances[i, j] = delta
+                        distances[i, j] = delta if delta <= requested_cutoff else math.inf
                     elif delta >= -self.jitter_tolerance:
                         distances[i, j] = 0.0
                         penalties[i, j] = abs(delta) * self.jitter_penalty_per_m
                     continue
-                direct = self.router.movement(left.edge_uid, right.edge_uid)
-                middle = 0.0 if direct is not None else middle_distances.get((left.edge_uid, right.edge_uid), math.inf)
-                if not math.isfinite(middle):
+                endpoint_distance = (
+                    max(0.0, self.lengths[left.edge_index] - left.position)
+                    + right.position
+                )
+                remaining_cutoff = requested_cutoff - endpoint_distance
+                if remaining_cutoff < 0:
                     continue
-                distances[i, j] = max(0.0, self.lengths[left.edge_index] - left.position) + middle + right.position
+                transition = self.router.transition_path(
+                    left.edge_uid, right.edge_uid, remaining_cutoff
+                )
+                if transition is None:
+                    continue
+                distances[i, j] = (
+                    max(0.0, self.lengths[left.edge_index] - left.position)
+                    + transition.physical_distance_m
+                    + right.position
+                )
+                physical_full_edges = (
+                    transition.physical_distance_m + self.lengths[right.edge_index]
+                )
+                penalties[i, j] += max(
+                    0.0, transition.generalized_routing_cost - physical_full_edges
+                )
         return distances, penalties
 
-    def selected_bridge_paths(
-        self, selected: list[Candidate | None], cutoff: float,
-    ) -> tuple[dict[tuple[str, str], list[str]], int]:
-        paths: dict[tuple[str, str], list[str]] = {}
+    def selected_transition_paths(
+        self,
+        selected: list[Candidate | None],
+        observed_step: np.ndarray,
+        time_gap: np.ndarray,
+        config: dict[str, Any],
+    ) -> tuple[list[TransitionSelection], int]:
+        paths: list[TransitionSelection] = []
         requested = 0
-        for left, right in zip(selected, selected[1:]):
-            if left is None or right is None or left.edge_uid == right.edge_uid:
+        for point_index, (left, right) in enumerate(zip(selected, selected[1:]), start=1):
+            if left is None or right is None:
                 continue
-            if self.router.movement(left.edge_uid, right.edge_uid) is not None:
+            cutoff = transition_cutoff(
+                float(observed_step[point_index]), float(time_gap[point_index]), config
+            )
+            endpoint_distance = (
+                max(0.0, self.lengths[left.edge_index] - left.position)
+                + right.position
+            ) if left.edge_uid != right.edge_uid else max(0.0, right.position - left.position)
+            result = self.router.transition_path(
+                left.edge_uid, right.edge_uid, max(0.0, cutoff - endpoint_distance)
+            )
+            if result is None:
                 continue
-            key = (left.edge_uid, right.edge_uid)
-            if key in paths:
-                continue
-            requested += 1
-            result = self.router.bridge_path(*key, cutoff=cutoff)
-            if result is not None:
-                paths[key] = result[0]
+            if left.edge_uid != right.edge_uid and self.router.movement(left.edge_uid, right.edge_uid) is None:
+                requested += 1
+            full_distance = endpoint_distance + result.physical_distance_m
+            paths.append(TransitionSelection(
+                point_index=point_index,
+                from_edge_uid=left.edge_uid,
+                to_edge_uid=right.edge_uid,
+                observed_step_m=float(observed_step[point_index]),
+                time_gap_s=float(time_gap[point_index]),
+                transition_cutoff_m=cutoff,
+                selected_path_distance_m=full_distance,
+                generalized_routing_cost=result.generalized_routing_cost,
+                path_identifier=result.path_identifier,
+                edge_uids=result.edge_uids,
+            ))
         return paths, requested
 
     def stats(self) -> SearchStats:
@@ -168,6 +228,15 @@ class CandidateIndex:
         self.edge_uids = self.edges.edge_uid.astype(str).to_numpy()
         self.candidate_aliases = self.edges.get("candidate_alias_uid", self.edges.edge_uid).astype(str).to_numpy()
         self.alias_digest = hashlib.sha256("\n".join(self.candidate_aliases).encode("utf-8")).hexdigest()
+        identity = hashlib.sha256()
+        for edge_uid, geometry in zip(self.edge_uids, self.geometries):
+            identity.update(edge_uid.encode("utf-8"))
+            identity.update(b"\0")
+            identity.update(bytes(geometry.wkb))
+        self.edge_identity_digest = identity.hexdigest()
+        self.snapshot_mismatch = self.edges.get(
+            "network_snapshot_mismatch", pd.Series(False, index=self.edges.index)
+        ).fillna(False).astype(bool).to_numpy()
         self.cache_hit = False
         self.lengths = self.edges.length_m.to_numpy(float)
         self.parallel_groups = self.edges.parallel_group.to_numpy()
@@ -183,6 +252,7 @@ class CandidateIndex:
                 stored.get("edge_count") == len(self.edges)
                 and stored.get("config") == config
                 and stored.get("candidate_alias_digest") == self.alias_digest
+                and stored.get("edge_identity_digest") == self.edge_identity_digest
             ):
                 self.sample_xy = np.load(cache / "sample_xy.npy", mmap_mode="r")
                 self.sample_edges = np.load(cache / "sample_edges.npy", mmap_mode="r")
@@ -225,6 +295,7 @@ class CandidateIndex:
             temporary.write_text(json.dumps({
                 "edge_count": len(self.edges), "config": config,
                 "candidate_alias_digest": self.alias_digest,
+                "edge_identity_digest": self.edge_identity_digest,
             }, sort_keys=True), encoding="utf-8")
             temporary.replace(cache / "metadata.json")
         self.tree = cKDTree(self.sample_xy)
@@ -233,11 +304,17 @@ class CandidateIndex:
         x, y = self.transformer.transform(lon, lat)
         return np.asarray(x, dtype=float), np.asarray(y, dtype=float)
 
-    def candidates_batch(self, x: np.ndarray, y: np.ndarray, gps_headings: np.ndarray) -> list[list[Candidate]]:
+    def candidates_batch(
+        self,
+        x: np.ndarray,
+        y: np.ndarray,
+        gps_headings: np.ndarray,
+        radius_m: float | None = None,
+    ) -> list[list[Candidate]]:
         """Batch radius recall and vectorized exact point-to-edge projection for one order."""
         if not len(x):
             return []
-        radius = float(self.config["radius_m"])
+        radius = float(radius_m if radius_m is not None else self.config["radius_m"])
         maximum_spacing = max(float(self.config[name]) for name in (
             "spacing_complex_m", "spacing_curve_m", "spacing_straight_m", "spacing_urban_m"
         ))
@@ -335,14 +412,30 @@ def _gps_headings(x: np.ndarray, y: np.ndarray, minimum_displacement_m: float) -
 def _viterbi(
     candidate_rows: list[list[Candidate]],
     observed_step: np.ndarray,
+    time_gap: np.ndarray,
     engine: TransitionEngine,
     config: dict[str, Any],
+    start_anchor: Candidate | None = None,
+    end_anchor: Candidate | None = None,
 ) -> tuple[list[Candidate], float, float] | None:
     if any(not row for row in candidate_rows):
         return None
     sigma = float(config["sigma_distance_m"])
     beta = float(config["beta_transition_m"])
-    scores = np.array([-candidate.score**2 / (2 * sigma**2) for candidate in candidate_rows[0]], dtype=float)
+    def anchored(candidate: Candidate, anchor: Candidate | None) -> bool:
+        return anchor is None or (
+            candidate.edge_uid == anchor.edge_uid
+            and abs(candidate.position - anchor.position)
+            <= float(config.get("anchor_position_tolerance_m", 1.0))
+        )
+
+    scores = np.array([
+        -candidate.score**2 / (2 * sigma**2)
+        if anchored(candidate, start_anchor) else -np.inf
+        for candidate in candidate_rows[0]
+    ], dtype=float)
+    if not np.isfinite(scores).any():
+        return None
     back: list[np.ndarray] = []
     transition_search_ms = 0.0
     for point_index in range(1, len(candidate_rows)):
@@ -350,14 +443,15 @@ def _viterbi(
         previous = candidate_rows[point_index - 1]
         next_scores = np.full(len(current), -np.inf)
         pointers = np.full(len(current), -1, dtype="int32")
-        dynamic_cutoff = min(
-            float(config["max_route_distance_m"]),
-            max(300.0, float(observed_step[point_index]) * 3.0 + 200.0),
+        dynamic_cutoff = transition_cutoff(
+            float(observed_step[point_index]), float(time_gap[point_index]), config
         )
         search_started = time.perf_counter()
         network_distances, jitter_penalties = engine.transition_matrices(previous, current, dynamic_cutoff)
         transition_search_ms += (time.perf_counter() - search_started) * 1000.0
         for j, right in enumerate(current):
+            if point_index == len(candidate_rows) - 1 and not anchored(right, end_anchor):
+                continue
             emission = -right.score**2 / (2 * sigma**2)
             for i, left in enumerate(previous):
                 network_distance = float(network_distances[i, j])
@@ -366,6 +460,12 @@ def _viterbi(
                 transition = (
                     -abs(network_distance - float(observed_step[point_index])) / beta
                     - float(jitter_penalties[i, j])
+                    / float(config.get("beta_semantic_cost_m", 60.0))
+                )
+                delta_t = max(1.0, float(time_gap[point_index]))
+                transition -= (
+                    abs(network_distance - float(observed_step[point_index])) / delta_t
+                    / float(config.get("beta_speed_difference_mps", 5.0))
                 )
                 value = scores[i] + emission + transition
                 if value > next_scores[j]:
@@ -429,8 +529,6 @@ def _ambiguity_flags(
             a, b = candidates[:2]
             left, right = edges.iloc[a.edge_index], edges.iloc[b.edge_index]
             close_candidates = b.score - a.score <= float(distance_margin_m)
-            if close_candidates:
-                found.append("small_emission_margin")
             spatially_plausible = max(a.distance, b.distance) <= 30.0
             headings_plausible = max(a.heading_difference, b.heading_difference) <= 75.0
             if close_candidates and spatially_plausible and headings_plausible and pd.notna(left.parallel_group) and left.parallel_group == right.parallel_group:
@@ -439,11 +537,65 @@ def _ambiguity_flags(
                 found.append("grade_separation")
             if close_candidates and {str(left.highway), str(right.highway)} & {"service", "motorway_link", "trunk_link", "primary_link"}:
                 found.append("main_auxiliary")
-            if close_candidates and abs(a.heading_difference - b.heading_difference) <= 10:
+            if close_candidates and spatially_plausible and abs(a.heading_difference - b.heading_difference) <= 10 and (
+                pd.notna(left.parallel_group)
+                or str(left.highway) != str(right.highway)
+                or (left.layer, left.bridge, left.tunnel) != (right.layer, right.bridge, right.tunnel)
+            ):
                 found.append("heading_tie")
         flags[index] = bool(found)
         reasons[index] = "|".join(found)
     return flags, reasons
+
+
+def _transition_ambiguity_flags(
+    geometric: list[Candidate | None],
+    observed_step: np.ndarray,
+    time_gap: np.ndarray,
+    engine: TransitionEngine,
+    config: dict[str, Any],
+) -> tuple[np.ndarray, list[str], list[TransitionSelection]]:
+    """Flag only emission uncertainty that affects route continuity."""
+    flags = np.zeros(len(geometric), dtype=bool)
+    reasons = ["" for _ in geometric]
+    evidence: list[TransitionSelection] = []
+    for point_index, (left, right) in enumerate(zip(geometric, geometric[1:]), start=1):
+        found: list[str] = []
+        if left is None or right is None:
+            continue
+        cutoff = transition_cutoff(
+            float(observed_step[point_index]), float(time_gap[point_index]), config
+        )
+        endpoint_distance = (
+            max(0.0, engine.lengths[left.edge_index] - left.position) + right.position
+        ) if left.edge_uid != right.edge_uid else max(0.0, right.position - left.position)
+        path = engine.router.transition_path(
+            left.edge_uid, right.edge_uid, max(0.0, cutoff - endpoint_distance)
+        )
+        if path is None:
+            found.append("no_legal_transition")
+        else:
+            distance = endpoint_distance + path.physical_distance_m
+            ratio = distance / max(float(observed_step[point_index]), 1.0)
+            if ratio > float(config.get("transition_ambiguity_path_gps_ratio", 3.0)):
+                found.append("network_gps_ratio")
+            direct = engine.router.movement(left.edge_uid, right.edge_uid)
+            if (
+                left.edge_uid != right.edge_uid
+                and direct is None
+                and path.physical_distance_m
+                > float(config.get("transition_ambiguity_inferred_m", 250.0))
+            ):
+                found.append("long_inferred_bridge")
+            evidence.append(TransitionSelection(
+                point_index, left.edge_uid, right.edge_uid,
+                float(observed_step[point_index]), float(time_gap[point_index]), cutoff,
+                distance, path.generalized_routing_cost, path.path_identifier, path.edge_uids,
+            ))
+        if found:
+            flags[max(0, point_index - 1):min(len(flags), point_index + 1)] = True
+            reasons[point_index] = "|".join(found)
+    return flags, reasons, evidence
 
 
 def match_order(
@@ -473,18 +625,41 @@ def match_order(
     )
     candidate_started = time.perf_counter()
     candidate_rows = index.candidates_batch(x, y, headings)
+    no_candidate_initial = np.asarray([not row for row in candidate_rows], dtype=bool)
+    recovered_candidate_count = 0
+    if no_candidate_initial.any():
+        recovery_radius = min(
+            float(candidate_config.get("no_candidate_recovery_max_radius_m", 200.0)),
+            float(candidate_config["radius_m"])
+            * float(candidate_config.get("no_candidate_recovery_radius_multiplier", 2.0)),
+        )
+        recovered_rows = index.candidates_batch(x, y, headings, radius_m=recovery_radius)
+        for point_index in np.flatnonzero(no_candidate_initial):
+            if recovered_rows[int(point_index)]:
+                candidate_rows[int(point_index)] = recovered_rows[int(point_index)]
+                recovered_candidate_count += 1
     candidate_generation_ms = (time.perf_counter() - candidate_started) * 1000.0
+    timestamp_values = pd.to_numeric(frame.timestamp, errors="coerce").to_numpy(float)
+    time_gap = np.r_[0.0, np.maximum(np.diff(timestamp_values), 0.0)]
+    observed_step = np.r_[0.0, np.hypot(np.diff(x), np.diff(y))]
     ambiguity_started = time.perf_counter()
-    flags, ambiguity_reasons = _ambiguity_flags(
+    emission_flags, ambiguity_reasons = _ambiguity_flags(
         candidate_rows, edges, float(candidate_config["ambiguity_distance_margin_m"]), heading_reliable,
     )
-    ambiguity_detection_ms = (time.perf_counter() - ambiguity_started) * 1000.0
     geometric = [row[0] if row else None for row in candidate_rows]
+    transition_flags, transition_reasons, fast_transition_evidence = _transition_ambiguity_flags(
+        geometric, observed_step, time_gap, engine, hmm_config,
+    )
+    flags = emission_flags | transition_flags
+    ambiguity_reasons = [
+        "|".join(filter(None, (emission_reason, transition_reason)))
+        for emission_reason, transition_reason in zip(ambiguity_reasons, transition_reasons)
+    ]
+    ambiguity_detection_ms = (time.perf_counter() - ambiguity_started) * 1000.0
     selected = list(geometric)
-    observed_step = np.r_[0.0, np.hypot(np.diff(x), np.diff(y))]
     windows = local_hmm_windows(flags, int(hmm_config["local_context_points"]), int(hmm_config["merge_gap_points"]))
     no_candidate = np.asarray([not row for row in candidate_rows], dtype=bool)
-    ambiguity_eligible = heading_reliable | no_candidate
+    ambiguity_eligible = heading_reliable
     full_order, full_order_trigger_reason = full_order_decision(flags, hmm_config, ambiguity_eligible)
     hmm_score = math.nan
     fallback_reason = ""
@@ -495,10 +670,16 @@ def match_order(
     local_hmm_attempted = bool(windows) and not full_order
     full_hmm_attempted = False
     full_hmm_succeeded = False
-    if full_order:
+    local_patch_count = 0
+    if no_candidate.any():
+        mode = "rejected"
+        fallback_reason = "unrecoverable_no_candidate"
+        full_order = False
+        windows = []
+    elif full_order:
         full_hmm_attempted = True
         full_started = time.perf_counter()
-        solved = _viterbi(candidate_rows, observed_step, engine, hmm_config)
+        solved = _viterbi(candidate_rows, observed_step, time_gap, engine, hmm_config)
         full_hmm_ms += (time.perf_counter() - full_started) * 1000.0
         if solved:
             full_hmm_succeeded = True
@@ -506,30 +687,42 @@ def match_order(
             transition_search_ms += searched_ms
             mode = "full_order_hmm"
         else:
-            mode = "geometric_fallback" if hmm_config.get("geometric_fallback_enabled") else "rejected"
+            selected = list(geometric)
+            mode = "pure_geometric_fallback" if hmm_config.get("geometric_fallback_enabled") else "rejected"
             fallback_reason = "full_order_hmm_no_continuous_path"
     elif windows:
         mode = "local_hmm"
         local_failed = False
         local_scores: list[float] = []
+        pending_patches: list[tuple[int, int, list[Candidate]]] = []
         for start, stop in windows:
+            start_anchor = geometric[start] if start > 0 else None
+            end_anchor = geometric[stop - 1] if stop < len(candidate_rows) else None
             local_started = time.perf_counter()
-            solved = _viterbi(candidate_rows[start:stop], observed_step[start:stop], engine, hmm_config)
+            solved = _viterbi(
+                candidate_rows[start:stop], observed_step[start:stop], time_gap[start:stop],
+                engine, hmm_config, start_anchor=start_anchor, end_anchor=end_anchor,
+            )
             local_hmm_ms += (time.perf_counter() - local_started) * 1000.0
             if not solved:
                 expanded_start = max(0, start - int(hmm_config.get("local_retry_context_points", 2)))
                 expanded_stop = min(len(candidate_rows), stop + int(hmm_config.get("local_retry_context_points", 2)))
                 retry_started = time.perf_counter()
+                retry_start_anchor = geometric[expanded_start] if expanded_start > 0 else None
+                retry_end_anchor = geometric[expanded_stop - 1] if expanded_stop < len(candidate_rows) else None
                 solved = _viterbi(
                     candidate_rows[expanded_start:expanded_stop],
                     observed_step[expanded_start:expanded_stop],
+                    time_gap[expanded_start:expanded_stop],
                     engine,
                     hmm_config,
+                    start_anchor=retry_start_anchor,
+                    end_anchor=retry_end_anchor,
                 )
                 local_hmm_ms += (time.perf_counter() - retry_started) * 1000.0
                 if solved:
                     local_path, local_score, searched_ms = solved
-                    selected[expanded_start:expanded_stop] = local_path
+                    pending_patches.append((expanded_start, expanded_stop, local_path))
                     local_scores.append(local_score)
                     transition_search_ms += searched_ms
                     continue
@@ -537,15 +730,18 @@ def match_order(
                 local_failed = True
                 continue
             local_path, local_score, searched_ms = solved
-            selected[start:stop] = local_path
+            pending_patches.append((start, stop, local_path))
             local_scores.append(local_score)
             transition_search_ms += searched_ms
         if local_failed:
+            # Local updates are atomic. A later failure cannot leave an
+            # undocumented mixture of HMM and first-candidate states.
+            selected = list(geometric)
             if local_failures_require_full_order(local_failed_windows, hmm_config):
                 full_order_trigger_reason = "multiple_local_window_failures"
                 full_hmm_attempted = True
                 full_started = time.perf_counter()
-                solved = _viterbi(candidate_rows, observed_step, engine, hmm_config)
+                solved = _viterbi(candidate_rows, observed_step, time_gap, engine, hmm_config)
                 full_hmm_ms += (time.perf_counter() - full_started) * 1000.0
                 if solved:
                     full_hmm_succeeded = True
@@ -553,12 +749,15 @@ def match_order(
                     transition_search_ms += searched_ms
                     mode = "full_order_hmm"
                 else:
-                    mode = "geometric_fallback" if hmm_config.get("geometric_fallback_enabled") else "rejected"
+                    mode = "pure_geometric_fallback" if hmm_config.get("geometric_fallback_enabled") else "rejected"
                     fallback_reason = "multiple_local_and_full_hmm_no_continuous_path"
             else:
-                mode = "geometric_fallback" if hmm_config.get("geometric_fallback_enabled") else "rejected"
+                mode = "pure_geometric_fallback" if hmm_config.get("geometric_fallback_enabled") else "rejected"
                 fallback_reason = "local_window_no_continuous_path"
         else:
+            for start, stop, local_path in pending_patches:
+                selected[start:stop] = local_path
+                local_patch_count += 1
             hmm_score = float(sum(local_scores))
     else:
         mode = "fast_deterministic"
@@ -566,22 +765,29 @@ def match_order(
         mode = "rejected"
         fallback_reason = "one_or_more_points_without_candidate"
     selected_path_started = time.perf_counter()
-    selected_bridge_paths, selected_bridge_request_count = engine.selected_bridge_paths(
-        selected, float(hmm_config["max_route_distance_m"]),
+    selected_transitions, selected_bridge_request_count = engine.selected_transition_paths(
+        selected, observed_step, time_gap, hmm_config,
     )
     selected_path_search_ms = (time.perf_counter() - selected_path_started) * 1000.0
+    expected_transition_count = max(0, len(selected) - 1) if mode != "rejected" else 0
+    if mode != "rejected" and len(selected_transitions) != expected_transition_count:
+        selected = list(geometric)
+        mode = "failed_no_continuous_route"
+        fallback_reason = "selected_transition_exceeds_dynamic_cutoff"
     frame["point_seq"] = np.arange(len(frame), dtype="int32")
     frame["source_lon"], frame["source_lat"] = frame.lon, frame.lat
     frame["matching_lon"], frame["matching_lat"] = lon, lat
     frame["metric_x"], frame["metric_y"] = x, y
     frame["candidate_count"] = [len(row) for row in candidate_rows]
     frame["observed_step_m"] = observed_step
+    frame["time_gap_s"] = time_gap
     frame["heading_reliable"] = heading_reliable
     frame["stationary_or_low_motion"] = ~heading_reliable
     frame["parallel_ambiguity"] = ["parallel_group" in reason for reason in ambiguity_reasons]
     frame["ambiguity_reason"] = ambiguity_reasons
     frame["matching_mode"] = mode
-    if mode != "rejected":
+    accepted_mode = mode not in {"rejected", "failed_no_continuous_route"}
+    if accepted_mode:
         frame["edge_uid"] = [value.edge_uid for value in selected]
         frame["position_on_edge"] = [value.position for value in selected]
         frame["gps_to_edge_distance_m"] = [value.distance for value in selected]
@@ -592,12 +798,32 @@ def match_order(
         for column in ["edge_uid", "position_on_edge", "gps_to_edge_distance_m", "candidate_rank", "edge_heading_difference_deg", "emission_margin"]:
             frame[column] = pd.NA
     frame["viterbi_margin"] = math.nan
+    frame["transition_cutoff_m"] = np.nan
+    frame["selected_path_distance_m"] = np.nan
+    frame["selected_path_routing_cost"] = np.nan
+    frame["selected_path_identifier"] = ""
+    frame["selected_path_json"] = ""
+    for transition in selected_transitions if accepted_mode else []:
+        frame.loc[frame.index[transition.point_index], "transition_cutoff_m"] = transition.transition_cutoff_m
+        frame.loc[frame.index[transition.point_index], "selected_path_distance_m"] = transition.selected_path_distance_m
+        frame.loc[frame.index[transition.point_index], "selected_path_routing_cost"] = transition.generalized_routing_cost
+        frame.loc[frame.index[transition.point_index], "selected_path_identifier"] = transition.path_identifier
+        frame.loc[frame.index[transition.point_index], "selected_path_json"] = json.dumps(
+            transition.edge_uids, separators=(",", ":")
+        )
+    frame["path_to_gps_ratio"] = frame.selected_path_distance_m / frame.observed_step_m.clip(lower=1.0)
+    if accepted_mode:
+        selected_indices = [value.edge_index for value in selected]
+        frame["selected_network_snapshot_mismatch"] = index.snapshot_mismatch[selected_indices]
+    else:
+        frame["selected_network_snapshot_mismatch"] = pd.NA
     frame["point_quality"] = np.where(flags, "ambiguous", "high_confidence")
     stats_after = engine.stats()
     stats_delta = stats_after.minus(stats_before)
     summary = {
         "order_id": str(frame.order_id.iloc[0]) if len(frame) else "",
-        "matching_mode": mode, "fallback_used": mode == "geometric_fallback",
+        "matching_mode": mode,
+        "fallback_used": mode in {"pure_geometric_fallback", "partial_local_hmm_fallback"},
         "fallback_reason": fallback_reason, "point_count": len(frame),
         "ambiguity_point_share": float(flags.mean()) if len(flags) else 1.0,
         "eligible_ambiguity_point_share": float(flags[ambiguity_eligible].mean()) if ambiguity_eligible.any() else 0.0,
@@ -605,13 +831,16 @@ def match_order(
         "parallel_ambiguity_share": float(frame.parallel_ambiguity.mean()) if len(frame) else 0.0,
         "local_window_count": len(windows), "hmm_score": hmm_score,
         "local_failed_window_count": local_failed_windows,
+        "local_patch_count": local_patch_count,
+        "no_candidate_initial_count": int(no_candidate_initial.sum()),
+        "no_candidate_recovered_count": recovered_candidate_count,
         "full_order_trigger_reason": full_order_trigger_reason,
         "local_hmm_attempted": local_hmm_attempted,
         "full_hmm_attempted": full_hmm_attempted,
         "full_hmm_succeeded": full_hmm_succeeded,
         "full_hmm_failed": full_hmm_attempted and not full_hmm_succeeded,
         "selected_bridge_request_count": selected_bridge_request_count,
-        "selected_bridge_path_count": len(selected_bridge_paths),
+        "selected_bridge_path_count": len(selected_transitions),
         "selected_path_search_ms": selected_path_search_ms,
         "candidate_generation_ms": candidate_generation_ms,
         "coordinate_transform_ms": coordinate_transform_ms,
@@ -629,6 +858,7 @@ def match_order(
         "positive_cache_hits": stats_delta.positive_cache_hits,
         "negative_cache_hits": stats_delta.negative_cache_hits,
         "path_cache_hits": stats_delta.path_cache_hits,
-        "_selected_bridge_paths": selected_bridge_paths,
+        "_selected_transitions": selected_transitions,
+        "_fast_transition_evidence": fast_transition_evidence,
     }
     return frame, summary

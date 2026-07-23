@@ -8,7 +8,10 @@ from typing import Any
 from .config import Stage0Config
 
 
-REQUIRED = ("order_base", "link_traversals", "turn_movements", "route_parts", "route_quality", "performance")
+REQUIRED = (
+    "order_base", "link_traversals", "turn_movements", "unresolved_intervals",
+    "route_parts", "route_quality", "performance",
+)
 
 
 def prune_point_work(config: Stage0Config, repo: Path, execute: bool = False) -> dict[str, Any]:

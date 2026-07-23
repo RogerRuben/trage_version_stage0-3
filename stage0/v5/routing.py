@@ -1,9 +1,9 @@
 """Compact legal-movement routing shared by HMM transitions and reconstruction.
 
-The HMM API intentionally returns physical distances only.  It never constructs candidate-pair
-paths.  Concrete paths are recovered only for selected transitions through ``bridge_path``.
-Positive caches are cutoff independent; negative caches store the exact exhaustively searched
-cutoff, avoiding rounded-cutoff false negatives.
+Every candidate transition is represented by one :class:`TransitionPath`.  The
+same path supplies the HMM physical distance and semantic cost and is later
+written to the reconstructed route.  This prevents a physical-shortest HMM path
+from being silently replaced by a different penalty-shortest output path.
 """
 
 from __future__ import annotations
@@ -32,6 +32,16 @@ class MovementRecord:
     level_transition_type: str
     road_class_transition: str
     merge_diverge_flag: bool
+
+
+@dataclass(frozen=True)
+class TransitionPath:
+    """One cutoff-feasible edge path and both of its cost semantics."""
+
+    edge_uids: tuple[str, ...]
+    physical_distance_m: float
+    generalized_routing_cost: float
+    path_identifier: str
 
 
 @dataclass(frozen=True)
@@ -88,7 +98,7 @@ class CompactMovementRouter:
         self._lock = threading.RLock()
         self._distance_positive: OrderedDict[tuple[int, int], float] = OrderedDict()
         self._distance_negative: OrderedDict[tuple[int, int], float] = OrderedDict()
-        self._path_positive: OrderedDict[tuple[int, int], tuple[tuple[int, ...], float, float]] = OrderedDict()
+        self._path_positive: OrderedDict[tuple[int, int], list[TransitionPath]] = OrderedDict()
         self._path_negative: OrderedDict[tuple[int, int], float] = OrderedDict()
         self._distance_source_states: dict[int, _SourceDistanceState] = {}
         self._stats = SearchStats()
@@ -101,12 +111,12 @@ class CompactMovementRouter:
             ends[index] = coordinates[-1]
         self.start_xy, self.end_xy = starts, ends
 
+        raw_records: list[MovementRecord] = []
+        raw_rows: list[tuple[int, int, int]] = []
         records: list[MovementRecord] = []
         rows: list[tuple[int, int, float, float, int]] = []
         for row in movements.itertuples(index=False):
             restriction = str(row.restriction_status)
-            if restriction.startswith("forbidden") or not bool(row.layer_compatibility):
-                continue
             left = self.uid_to_index.get(str(row.from_edge_uid))
             right = self.uid_to_index.get(str(row.to_edge_uid))
             if left is None or right is None:
@@ -120,6 +130,15 @@ class CompactMovementRouter:
                 road_class_transition=str(row.road_class_transition),
                 merge_diverge_flag=bool(row.merge_diverge_flag),
             )
+            raw_record_index = len(raw_records)
+            raw_records.append(record)
+            raw_rows.append((left, right, raw_record_index))
+            if (
+                restriction.startswith("forbidden")
+                or restriction == "unresolved_restriction"
+                or not bool(row.layer_compatibility)
+            ):
+                continue
             movement_penalty = 0.0
             if record.movement_type == "u_turn":
                 movement_penalty += float(config.get("u_turn_penalty_m", 500.0))
@@ -133,6 +152,14 @@ class CompactMovementRouter:
                 float(self.edge_routing_costs[right] + movement_penalty), record_index,
             ))
         rows.sort(key=lambda value: (value[0], value[1], value[3]))
+        raw_rows.sort(key=lambda value: (value[0], value[1], value[2]))
+        self.raw_records = raw_records
+        self.raw_offsets = np.zeros(len(edge_frame) + 1, dtype="int64")
+        for left, *_ in raw_rows:
+            self.raw_offsets[left + 1] += 1
+        np.cumsum(self.raw_offsets, out=self.raw_offsets)
+        self.raw_targets = np.asarray([row[1] for row in raw_rows], dtype="int32")
+        self.raw_record_indices = np.asarray([row[2] for row in raw_rows], dtype="int32")
         self.records = records
         self.offsets = np.zeros(len(edge_frame) + 1, dtype="int64")
         for left, *_ in rows:
@@ -173,6 +200,180 @@ class CompactMovementRouter:
         start, stop = int(self.offsets[left]), int(self.offsets[left + 1])
         positions = np.flatnonzero(self.targets[start:stop] == right)
         return None if not len(positions) else self.records[int(self.record_indices[start + int(positions[0])])]
+
+    def raw_movement(self, left_uid: str, right_uid: str) -> MovementRecord | None:
+        """Return an audited movement even when it is forbidden or unresolved for routing."""
+        left = self.uid_to_index.get(str(left_uid))
+        right = self.uid_to_index.get(str(right_uid))
+        if left is None or right is None:
+            return None
+        start, stop = int(self.raw_offsets[left]), int(self.raw_offsets[left + 1])
+        positions = np.flatnonzero(self.raw_targets[start:stop] == right)
+        if not len(positions):
+            return None
+        return self.raw_records[int(self.raw_record_indices[start + int(positions[0])])]
+
+    @staticmethod
+    def _path_id(edge_uids: tuple[str, ...]) -> str:
+        import hashlib
+
+        return hashlib.sha256("\x1f".join(edge_uids).encode("utf-8")).hexdigest()[:24]
+
+    def _direct_transition_path(self, left_uid: str, right_uid: str) -> TransitionPath | None:
+        if left_uid == right_uid:
+            path = (str(left_uid),)
+            return TransitionPath(path, 0.0, 0.0, self._path_id(path))
+        movement = self.movement(left_uid, right_uid)
+        if movement is None:
+            return None
+        right = self.uid_to_index[str(right_uid)]
+        start, stop = int(self.offsets[self.uid_to_index[str(left_uid)]]), int(
+            self.offsets[self.uid_to_index[str(left_uid)] + 1]
+        )
+        positions = np.flatnonzero(self.targets[start:stop] == right)
+        if not len(positions):
+            return None
+        position = start + int(positions[0])
+        path = (str(left_uid), str(right_uid))
+        # Intermediate physical distance excludes the target edge; candidate
+        # positions are added by TransitionEngine.
+        return TransitionPath(
+            path,
+            0.0,
+            max(0.0, float(self.routing_costs[position]) - float(self.lengths[right])),
+            self._path_id(path),
+        )
+
+    def transition_path(
+        self, left_uid: str, right_uid: str, cutoff: float | None = None
+    ) -> TransitionPath | None:
+        """Return the minimum generalized-cost path under a physical cutoff.
+
+        A Pareto frontier over ``(physical distance, generalized cost)`` is
+        maintained for every edge state.  A single-label A* is not valid here:
+        a slightly more expensive but much shorter prefix may be the only path
+        capable of satisfying the downstream physical-distance budget.
+        """
+
+        direct = self._direct_transition_path(str(left_uid), str(right_uid))
+        if direct is not None:
+            return direct
+        left = self.uid_to_index.get(str(left_uid))
+        right = self.uid_to_index.get(str(right_uid))
+        if left is None or right is None:
+            return None
+        maximum = min(self.maximum, float(cutoff) if cutoff is not None else self.maximum)
+        key = (left, right)
+        with self._lock:
+            cached_paths = self._path_positive.get(key, [])
+            feasible_cached = [path for path in cached_paths if path.physical_distance_m <= maximum]
+            negative_cutoff = self._path_negative.get(key, -math.inf)
+            if feasible_cached:
+                chosen = min(
+                    feasible_cached,
+                    key=lambda path: (
+                        path.generalized_routing_cost,
+                        path.physical_distance_m,
+                        path.path_identifier,
+                    ),
+                )
+                self._path_positive.move_to_end(key)
+                self._increment(path_cache_hits=1)
+                return chosen
+            if maximum <= negative_cutoff:
+                self._path_negative.move_to_end(key)
+                self._increment(negative_cache_hits=1)
+                return None
+
+        self._increment(path_calls=1, cache_misses=1)
+        search_limit = maximum + float(self.lengths[right])
+        # label = (generalized cost, physical distance, state, parent_label_id)
+        label_state: list[int] = [left]
+        label_parent: list[int] = [-1]
+        label_physical: list[float] = [0.0]
+        label_cost: list[float] = [0.0]
+        frontiers: dict[int, list[int]] = {left: [0]}
+        queue: list[tuple[float, float, int]] = [
+            (self._heuristic(left, right), 0.0, 0)
+        ]
+        expanded = 0
+        chosen_label: int | None = None
+        while queue:
+            _, queued_cost, label_id = heapq.heappop(queue)
+            if queued_cost != label_cost[label_id]:
+                continue
+            current = label_state[label_id]
+            expanded += 1
+            if current == right:
+                chosen_label = label_id
+                break
+            start, stop = int(self.offsets[current]), int(self.offsets[current + 1])
+            for position in range(start, stop):
+                target = int(self.targets[position])
+                proposed_physical = label_physical[label_id] + float(self.physical_costs[position])
+                if proposed_physical > search_limit:
+                    continue
+                proposed_cost = label_cost[label_id] + float(self.routing_costs[position])
+                target_frontier = frontiers.setdefault(target, [])
+                if any(
+                    label_physical[existing] <= proposed_physical
+                    and label_cost[existing] <= proposed_cost
+                    for existing in target_frontier
+                ):
+                    continue
+                target_frontier[:] = [
+                    existing
+                    for existing in target_frontier
+                    if not (
+                        proposed_physical <= label_physical[existing]
+                        and proposed_cost <= label_cost[existing]
+                    )
+                ]
+                new_label = len(label_state)
+                label_state.append(target)
+                label_parent.append(label_id)
+                label_physical.append(proposed_physical)
+                label_cost.append(proposed_cost)
+                target_frontier.append(new_label)
+                heapq.heappush(
+                    queue,
+                    (
+                        proposed_cost + self._heuristic(target, right),
+                        proposed_cost,
+                        new_label,
+                    ),
+                )
+        self._increment(expanded_nodes=expanded)
+        if chosen_label is None:
+            with self._lock:
+                self._path_negative[key] = max(maximum, self._path_negative.get(key, 0.0))
+                self._path_negative.move_to_end(key)
+                self._trim(self._path_negative)
+            return None
+
+        indices: list[int] = []
+        cursor = chosen_label
+        while cursor >= 0:
+            indices.append(label_state[cursor])
+            cursor = label_parent[cursor]
+        indices.reverse()
+        middle_physical = max(
+            0.0, label_physical[chosen_label] - float(self.lengths[right])
+        )
+        edge_uids = tuple(str(self.edge_uids[index]) for index in indices)
+        result = TransitionPath(
+            edge_uids=edge_uids,
+            physical_distance_m=middle_physical,
+            generalized_routing_cost=float(label_cost[chosen_label]),
+            path_identifier=self._path_id(edge_uids),
+        )
+        with self._lock:
+            existing = self._path_positive.setdefault(key, [])
+            if all(path.path_identifier != result.path_identifier for path in existing):
+                existing.append(result)
+            self._path_positive.move_to_end(key)
+            self._trim(self._path_positive)
+        return result
 
     def _heuristic(self, edge_index: int, target_index: int) -> float:
         difference = self.end_xy[edge_index] - self.start_xy[target_index]
@@ -283,79 +484,11 @@ class CompactMovementRouter:
         return result
 
     def bridge_path(self, left_uid: str, right_uid: str, cutoff: float | None = None) -> tuple[list[str], float] | None:
-        """Recover one selected path using routing/access penalties, with cutoff-safe caches."""
-        left = self.uid_to_index.get(str(left_uid))
-        right = self.uid_to_index.get(str(right_uid))
-        if left is None or right is None:
+        """Compatibility API backed by the canonical transition path."""
+        result = self.transition_path(left_uid, right_uid, cutoff)
+        if result is None:
             return None
-        if left == right:
-            return [str(left_uid)], 0.0
-        if self.movement(str(left_uid), str(right_uid)) is not None:
-            return [str(left_uid), str(right_uid)], 0.0
-        maximum = min(self.maximum, float(cutoff) if cutoff is not None else self.maximum)
-        key = (left, right)
-        with self._lock:
-            cached = self._path_positive.get(key)
-            negative_cutoff = self._path_negative.get(key, -math.inf)
-            if cached is not None and cached[2] <= maximum:
-                self._path_positive.move_to_end(key)
-                self._increment(path_cache_hits=1)
-                return [str(self.edge_uids[index]) for index in cached[0]], cached[2]
-            if maximum <= negative_cutoff:
-                self._path_negative.move_to_end(key)
-                self._increment(negative_cache_hits=1)
-                return None
-        self._increment(path_calls=1, cache_misses=1)
-        # Routing cost chooses the path; physical distance enforces the search boundary.
-        queue: list[tuple[float, float, int]] = [(self._heuristic(left, right), 0.0, left)]
-        best_routing = {left: 0.0}
-        physical = {left: 0.0}
-        parent: dict[int, int] = {}
-        expanded = 0
-        found = False
-        search_limit = maximum + float(self.lengths[right])
-        while queue:
-            _, routing_cost, current = heapq.heappop(queue)
-            if routing_cost != best_routing.get(current) or physical[current] > search_limit:
-                continue
-            expanded += 1
-            if current == right:
-                found = True
-                break
-            start, stop = int(self.offsets[current]), int(self.offsets[current + 1])
-            for position in range(start, stop):
-                target = int(self.targets[position])
-                proposed_physical = physical[current] + float(self.physical_costs[position])
-                proposed_routing = routing_cost + float(self.routing_costs[position])
-                if proposed_physical > search_limit or proposed_routing >= best_routing.get(target, math.inf):
-                    continue
-                best_routing[target] = proposed_routing
-                physical[target] = proposed_physical
-                parent[target] = current
-                heapq.heappush(queue, (proposed_routing + self._heuristic(target, right), proposed_routing, target))
-        self._increment(expanded_nodes=expanded)
-        if not found:
-            with self._lock:
-                self._path_negative[key] = max(maximum, self._path_negative.get(key, 0.0))
-                self._path_negative.move_to_end(key)
-                self._trim(self._path_negative)
-            return None
-        path = [right]
-        while path[-1] != left:
-            path.append(parent[path[-1]])
-        path.reverse()
-        middle_physical = max(0.0, physical[right] - float(self.lengths[right]))
-        if middle_physical > maximum:
-            with self._lock:
-                self._path_negative[key] = max(maximum, self._path_negative.get(key, 0.0))
-                self._trim(self._path_negative)
-            return None
-        stored = (tuple(path), float(best_routing[right]), middle_physical)
-        with self._lock:
-            self._path_positive[key] = stored
-            self._path_positive.move_to_end(key)
-            self._trim(self._path_positive)
-        return [str(self.edge_uids[index]) for index in path], middle_physical
+        return list(result.edge_uids), result.physical_distance_m
 
     # Compatibility name used by older callers and external scripts.
     def bridge(self, left_uid: str, right_uid: str, cutoff: float | None = None) -> tuple[list[str], float] | None:

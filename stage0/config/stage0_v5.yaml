@@ -43,6 +43,8 @@ candidate:
   ordinary_candidates: 3
   heading_weight_m: 15.0
   access_penalty_m: 20.0
+  no_candidate_recovery_radius_multiplier: 2.0
+  no_candidate_recovery_max_radius_m: 200.0
 hmm:
   local_context_points: 2
   merge_gap_points: 2
@@ -55,7 +57,17 @@ hmm:
   jitter_calibration_sample_count: 1067
   sigma_distance_m: 15.0
   beta_transition_m: 60.0
+  beta_semantic_cost_m: 60.0
+  beta_speed_difference_mps: 5.0
   max_route_distance_m: 6000.0
+  transition_cutoff_alpha: 3.0
+  transition_cutoff_base_m: 200.0
+  transition_cutoff_min_m: 300.0
+  transition_cutoff_max_m: 6000.0
+  transition_max_speed_mps: 40.0
+  transition_ambiguity_path_gps_ratio: 3.0
+  transition_ambiguity_inferred_m: 250.0
+  anchor_position_tolerance_m: 1.0
   geometric_fallback_enabled: true
 quality:
   hard:
@@ -68,7 +80,7 @@ quality:
     maximum_unreasonable_detours: 0
     maximum_illegal_u_turns: 0
     maximum_layer_violations: 0
-    minimum_route_links: 2
+    minimum_route_links: 1
     maximum_od_endpoint_error_m: 150.0
     conservation_tolerance: 1.0e-6
   soft:
@@ -88,3 +100,5 @@ runtime:
   case_trace_representative_per_day: 10
   manifest_version: stage0_v5_manifest_v1
   log_level: INFO
+  log_progress_every_orders: 25
+  diagnostic_mode: sampled

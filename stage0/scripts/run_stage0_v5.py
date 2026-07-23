@@ -13,10 +13,10 @@ REPO = Path(__file__).resolve().parents[2]
 if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
-from stage0.v5.archive import build_inventory_and_samples  # noqa: E402
+from stage0.v5.archive import build_inventory_and_samples, sampling_run_id  # noqa: E402
 from stage0.v5.config import Stage0Config, config_hash  # noqa: E402
-from stage0.v5.gates import freeze, gate1_readiness, preflight, require_test_freeze, run_gate0  # noqa: E402
-from stage0.v5.manual_review import export_review_pack  # noqa: E402
+from stage0.v5.gates import freeze, gate1_readiness, preflight, require_test_freeze, run_gate0, sample_order_sha256  # noqa: E402
+from stage0.v5.manual_review import audit_development_review, export_review_pack  # noqa: E402
 from stage0.v5.network import build_network  # noqa: E402
 from stage0.v5.pipeline import prepare_day_points, run_dates  # noqa: E402
 from stage0.v5.poi import build_poi  # noqa: E402
@@ -31,7 +31,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--config", type=Path, default=REPO / "stage0/config/stage0_v5.yaml")
     parser.add_argument("--output-root", type=Path, default=None, help="Explicit isolated output root for benchmarks.")
     parser.add_argument("--work-root", type=Path, default=None, help="Explicit isolated cache root for benchmarks.")
-    parser.add_argument("--phase", required=True, choices=["precheck", "network", "poi", "inventory", "materialize", "gate0", "match", "gate1", "manual-review", "freeze", "prune"])
+    parser.add_argument("--phase", required=True, choices=["precheck", "network", "poi", "inventory", "materialize", "gate0", "match", "gate1", "manual-review", "manual-review-audit", "freeze", "prune"])
     parser.add_argument("--dates", nargs="*", default=None)
     parser.add_argument("--split", choices=["train", "validation", "test"])
     parser.add_argument("--orders-per-day", type=int, default=None)
@@ -40,12 +40,20 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--resume", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--retain-points", action="store_true")
+    parser.add_argument(
+        "--diagnostic-mode",
+        choices=["none", "sampled", "full"],
+        default="sampled",
+        help="Point-level diagnostics retention; Gate runs should use sampled.",
+    )
     parser.add_argument("--limit-orders", type=int, default=None)
     parser.add_argument("--force", action="store_true")
+    parser.add_argument("--expected-sample-sha256", default=None)
     parser.add_argument("--bucket-shard-index", type=int, default=0)
     parser.add_argument("--bucket-shard-count", type=int, default=1)
     parser.add_argument("--bucket-ids", nargs="*", type=int, default=None)
     parser.add_argument("--review-pack", choices=["development", "test", "both"], default="development")
+    parser.add_argument("--review-csv", type=Path, default=None)
     parser.add_argument("--execute", action="store_true", help="Required for point-work pruning.")
     return parser.parse_args()
 
@@ -97,6 +105,21 @@ def main() -> int:
         require_test_freeze(config, REPO, dates)
         if args.bucket_shard_count == 1:
             build_inventory_and_samples(config, REPO, dates=dates, orders_per_day=orders, force=False)
+        if args.expected_sample_sha256:
+            run_id = sampling_run_id(dates, orders, int(config.section("sampling")["seed"]))
+            sample_path = (
+                config.path("output", REPO) / "manifests" / "sampling_runs"
+                / run_id / "sampling_manifest.parquet"
+            )
+            import pandas as pd
+
+            observed_sha = sample_order_sha256(
+                pd.read_parquet(sample_path, columns=["date", "order_id"])
+            )
+            if observed_sha != args.expected_sample_sha256:
+                raise RuntimeError(
+                    f"sample SHA mismatch: expected {args.expected_sample_sha256}, got {observed_sha}"
+                )
         result = run_dates(
             config, REPO, dates, buckets=buckets, resume=args.resume,
             retain_points=args.retain_points, force=args.force, workers=workers,
@@ -104,6 +127,7 @@ def main() -> int:
             bucket_shard_count=args.bucket_shard_count,
             bucket_ids=set(args.bucket_ids) if args.bucket_ids else None,
             orders_per_day=orders,
+            diagnostic_mode=args.diagnostic_mode,
         )
     elif args.phase == "gate1":
         dates = GATE1_DATES
@@ -114,15 +138,20 @@ def main() -> int:
             config, REPO, dates, buckets=buckets, resume=args.resume,
             retain_points=args.retain_points, force=args.force, workers=workers,
             orders_per_day=2000,
+            diagnostic_mode=args.diagnostic_mode,
         )
         result = gate1_readiness(config, REPO, summary)
     elif args.phase == "manual-review":
-        result = {"status": "PASS"}
+        result = {"status": "PACK_CREATED"}
         if args.review_pack in {"development", "both"}:
             result["development"] = export_review_pack(config, REPO, "development", 300)
         if args.review_pack in {"test", "both"}:
             require_test_freeze(config, REPO, config.section("split")["test"])
             result["blind_test"] = export_review_pack(config, REPO, "test", 200)
+    elif args.phase == "manual-review-audit":
+        if args.review_csv is None:
+            raise ValueError("--review-csv is required for manual-review-audit")
+        result = audit_development_review(config, REPO, args.review_csv)
     elif args.phase == "freeze":
         result = freeze(config, REPO)
     elif args.phase == "prune":
@@ -130,7 +159,7 @@ def main() -> int:
     else:
         raise AssertionError(args.phase)
     print(json.dumps(result, ensure_ascii=False, indent=2, default=str))
-    return 0 if result.get("status", "PASS") in {"PASS", "FROZEN", "SHARD_COMPLETE"} else 2
+    return 0 if result.get("status", "PASS") in {"PASS", "FROZEN", "SHARD_COMPLETE", "PACK_CREATED"} else 2
 
 
 if __name__ == "__main__":

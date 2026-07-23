@@ -10,6 +10,8 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 
+from .reconstruction import projected_route_distance_m
+
 
 def _safe_ratio(numerator: float, denominator: float, default: float = math.nan) -> float:
     return float(numerator / denominator) if denominator > 0 else default
@@ -28,30 +30,82 @@ def evaluate_order_quality(
     edges: gpd.GeoDataFrame,
     match_summary: dict[str, Any],
     quality_config: dict[str, Any],
+    unresolved_intervals: pd.DataFrame | None = None,
 ) -> dict[str, Any]:
     """Calculate hard/soft predicates without test-dependent tuning."""
     hard_cfg, soft_cfg = quality_config["hard"], quality_config["soft"]
     edge_lookup = edges if edges.index.name == "edge_uid" else edges.set_index("edge_uid", drop=False)
-    successful = match_summary["matching_mode"] != "rejected" and len(route_parts) > 0
-    route_distance = float(route_parts.edge_uid.map(edge_lookup.length_m).sum()) if successful else 0.0
+    successful = str(match_summary["matching_mode"]) not in {
+        "rejected", "failed_no_continuous_route",
+    } and len(route_parts) > 0
+    route_distance = float(pd.to_numeric(
+        route_parts.get("allocated_distance_m", route_parts.edge_uid.map(edge_lookup.length_m)), errors="coerce"
+    ).fillna(0.0).sum()) if successful else 0.0
     xy = matched_points[["metric_x", "metric_y"]].to_numpy(float) if len(matched_points) else np.empty((0, 2))
     observed_distance = float(np.hypot(np.diff(xy[:, 0]), np.diff(xy[:, 1])).sum()) if len(xy) > 1 else 0.0
     raw_time = pd.to_numeric(matched_points.timestamp, errors="coerce") if len(matched_points) else pd.Series(dtype=float)
     duration = float(raw_time.max() - raw_time.min()) if len(raw_time) else 0.0
     traversal_time = float(pd.to_numeric(traversals.get("observed_interval_time_s", pd.Series(dtype=float)), errors="coerce").fillna(0).sum())
     movement_time = float(pd.to_numeric(movements.get("observed_interval_time_s", pd.Series(dtype=float)), errors="coerce").fillna(0).sum())
-    unallocated_time = max(0.0, duration - traversal_time - movement_time) if not successful else 0.0
-    time_error = abs(duration - traversal_time - movement_time - unallocated_time)
+    unresolved = unresolved_intervals if unresolved_intervals is not None else pd.DataFrame()
+    unresolved_time = float(pd.to_numeric(
+        unresolved.get("unresolved_interval_time_s", pd.Series(dtype=float)), errors="coerce"
+    ).fillna(0).sum())
+    unallocated_time = duration if not successful else 0.0
+    time_error = abs(duration - traversal_time - movement_time - unresolved_time - unallocated_time)
     allocated_distance = float(pd.to_numeric(traversals.get("allocated_distance_m", pd.Series(dtype=float)), errors="coerce").fillna(0).sum())
-    distance_error = abs(route_distance - allocated_distance)
+    internal_distance_error = abs(route_distance - allocated_distance)
+    projected_distance = projected_route_distance_m(matched_points, route_parts, edge_lookup) if successful else math.nan
+    projected_distance_error = abs(route_distance - projected_distance) if math.isfinite(projected_distance) else math.inf
+    invalid_position_count = int((~route_parts.get(
+        "position_distance_valid", pd.Series(False, index=route_parts.index)
+    ).fillna(False).astype(bool)).sum()) if successful else 1
+    alignment_valid = bool(route_parts.get(
+        "observed_run_alignment_valid", pd.Series(False, index=route_parts.index)
+    ).fillna(False).astype(bool).all()) if successful else False
     projection = pd.to_numeric(matched_points.get("gps_to_edge_distance_m"), errors="coerce")
     movement_quality = movements.get("movement_quality", pd.Series(dtype=str))
-    gap_count = int((movement_quality == "missing_movement").sum())
+    movement_reason = movements.get("movement_audit_reason", movement_quality).astype(str)
+    gap_count = int(movement_reason.eq("missing_topology").sum())
+    restriction_block_count = int(movement_reason.eq("restriction_block").sum())
+    unparsed_restriction_count = int(movement_reason.eq("unparsed_restriction_exposure").sum())
+    suspicious_level_count = int(movement_reason.eq("suspicious_level_transition").sum())
     transition_type = movements.get("level_transition_type", pd.Series(dtype=str)).astype(str)
-    layer_count = int(transition_type.eq("unresolved_level_gap").sum())
+    layer_count = int(transition_type.eq("true_layer_discontinuity").sum())
     movement_type = movements.get("movement_type", pd.Series(dtype=str))
     restriction = movements.get("restriction_status", pd.Series(dtype=str)).astype(str)
     restriction_count = int(restriction.str.startswith("forbidden").sum())
+    inferred_dynamic_count = int((
+        movements.get("movement_observed", pd.Series(False, index=movements.index)).fillna(False).astype(bool)
+        & movements.get("dynamic_time_source", pd.Series("", index=movements.index)).ne("observed_direct_movement")
+    ).sum())
+    path_mismatch_count = 0
+    if successful and "selected_path_json" in matched_points:
+        import json as _json
+
+        route_edges = route_parts.sort_values("route_sequence").edge_uid.astype(str).tolist()
+        ordered_points = matched_points.sort_values("point_seq", kind="stable").reset_index(drop=True)
+        cursor = 0
+        for point_index in range(1, len(ordered_points)):
+            left_uid = str(ordered_points.edge_uid.iloc[point_index - 1])
+            right_uid = str(ordered_points.edge_uid.iloc[point_index])
+            if left_uid == right_uid:
+                continue
+            try:
+                expected = [str(value) for value in _json.loads(
+                    str(ordered_points.selected_path_json.iloc[point_index])
+                )]
+            except (TypeError, ValueError, _json.JSONDecodeError):
+                path_mismatch_count += 1
+                continue
+            found = False
+            for start in range(cursor, len(route_edges)):
+                if route_edges[start:start + len(expected)] == expected:
+                    cursor = start + len(expected) - 1
+                    found = True
+                    break
+            if not found:
+                path_mismatch_count += 1
     illegal_uturn = int(((movement_type == "u_turn") & restriction.str.startswith("forbidden")).sum())
     ordered_points = matched_points.sort_values("point_seq", kind="stable") if len(matched_points) else matched_points
     heading = pd.to_numeric(ordered_points.get("edge_heading_difference_deg", pd.Series(dtype=float)), errors="coerce")
@@ -77,28 +131,60 @@ def evaluate_order_quality(
     persistent_direction = raw_direction & run_lengths.ge(minimum_run)
     direction_warning_count = int(raw_direction.sum())
     direction_count = int(persistent_direction.sum())
-    inferred_distance = float(route_parts.loc[route_parts.is_interpolated, "edge_uid"].map(edge_lookup.length_m).sum()) if successful else 0.0
+    inferred_distance = float(pd.to_numeric(
+        route_parts.loc[route_parts.is_interpolated, "allocated_distance_m"]
+        if successful and "allocated_distance_m" in route_parts else pd.Series(dtype=float), errors="coerce"
+    ).fillna(0.0).sum()) if successful else 0.0
     endpoint_error = float(max(projection.iloc[0], projection.iloc[-1])) if len(projection.dropna()) == len(projection) and len(projection) else math.inf
     confidence = float(np.exp(-projection.mean() / 30.0)) if len(projection.dropna()) else 0.0
     route_ratio = _safe_ratio(route_distance, observed_distance)
+    path_ratios = pd.to_numeric(
+        matched_points.get("path_to_gps_ratio", pd.Series(dtype=float)), errors="coerce"
+    ).replace([np.inf, -np.inf], np.nan).dropna()
     metrics = {
         "successful_reconstruction": successful,
         "direction_violation_count": direction_count,
         "direction_warning_count": direction_warning_count,
         "topology_gap_count": gap_count,
+        "restriction_block_count": restriction_block_count,
+        "unparsed_restriction_exposure_count": unparsed_restriction_count,
+        "suspicious_level_transition_count": suspicious_level_count,
+        "true_layer_discontinuity_count": layer_count,
         "unreasonable_detour_count": int(bool(np.isfinite(route_ratio) and route_ratio > float(soft_cfg["maximum_route_length_ratio"]) * 2)),
         "illegal_u_turn_count": illegal_uturn,
         "layer_violation_count": layer_count,
         "restriction_violation_count": restriction_count,
+        "observed_dynamic_label_on_inferred_edge_count": inferred_dynamic_count,
+        "hmm_path_distance_mismatch_count": path_mismatch_count,
+        "raw_movement_audit_available": "movement_audit_reason" in movements.columns,
+        "network_snapshot_mismatch_share": float(
+            matched_points.get(
+                "selected_network_snapshot_mismatch",
+                pd.Series(False, index=matched_points.index),
+            ).fillna(False).astype(bool).mean()
+        ) if len(matched_points) else 0.0,
+        "path_to_gps_ratio_q50": float(path_ratios.quantile(0.50)) if len(path_ratios) else math.nan,
+        "path_to_gps_ratio_q90": float(path_ratios.quantile(0.90)) if len(path_ratios) else math.nan,
+        "path_to_gps_ratio_q99": float(path_ratios.quantile(0.99)) if len(path_ratios) else math.nan,
         "route_link_count": int(len(route_parts)),
         "observed_distance_m": observed_distance,
         "unallocated_observed_time_s": unallocated_time,
+        "unresolved_interval_time_s": unresolved_time,
         "unallocated_observed_distance_m": observed_distance if not successful else 0.0,
         "matched_distance_m": route_distance,
+        "projected_matched_movement_distance_m": projected_distance,
         "od_endpoint_error_m": endpoint_error,
+        "time_allocation_error_s": time_error,
+        "internal_distance_error_m": internal_distance_error,
+        "projected_route_distance_error_m": projected_distance_error,
+        "invalid_position_aware_distance_count": invalid_position_count,
+        "observed_run_alignment_valid": alignment_valid,
         "time_conservation_error_s": time_error,
-        "distance_conservation_error_m": distance_error,
-        "fallback_share": float(match_summary["matching_mode"] == "geometric_fallback"),
+        "distance_conservation_error_m": internal_distance_error,
+        "fallback_share": float(
+            str(match_summary["matching_mode"])
+            in {"pure_geometric_fallback", "partial_local_hmm_fallback"}
+        ),
         "p90_projection_distance_m": float(projection.quantile(0.9)) if len(projection.dropna()) else math.inf,
         "route_length_ratio": route_ratio,
         "interpolated_distance_share": _safe_ratio(inferred_distance, route_distance, 0.0),
@@ -113,9 +199,14 @@ def evaluate_order_quality(
         "no_unreasonable_detour": metrics["unreasonable_detour_count"] <= int(hard_cfg["maximum_unreasonable_detours"]),
         "reasonable_od_endpoints": endpoint_error <= float(hard_cfg["maximum_od_endpoint_error_m"]),
         "no_illegal_u_turn": illegal_uturn <= int(hard_cfg["maximum_illegal_u_turns"]),
-        "no_restriction_violation": restriction_count == 0,
+        "no_restriction_violation": max(restriction_count, restriction_block_count, unparsed_restriction_count) == 0,
         "minimum_route_links": len(route_parts) >= int(hard_cfg["minimum_route_links"]),
-        "time_distance_conservation": max(time_error, distance_error) <= float(hard_cfg["conservation_tolerance"]),
+        "time_distance_conservation": max(time_error, internal_distance_error) <= float(hard_cfg["conservation_tolerance"]),
+        "projected_distance_consistency": projected_distance_error <= float(hard_cfg["conservation_tolerance"]),
+        "valid_position_aware_distance": invalid_position_count == 0,
+        "observed_run_alignment": alignment_valid,
+        "hmm_output_path_identity": path_mismatch_count == 0,
+        "dynamic_label_provenance": inferred_dynamic_count == 0,
         "layer_continuity": layer_count <= int(hard_cfg["maximum_layer_violations"]),
     }
     soft = {

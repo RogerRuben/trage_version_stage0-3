@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import logging
 import time
 from pathlib import Path
 from typing import Any
 
 import geopandas as gpd
+import numpy as np
 import pandas as pd
 import psutil
 
@@ -23,14 +25,24 @@ from .config import Stage0Config, stable_hash
 from .manifest import base_manifest, write_manifest
 from .matching import CandidateIndex, TransitionEngine, match_order
 from .quality import conservation_summary, evaluate_order_quality
-from .reconstruction import EdgeAwareRouter, build_movements, build_traversals, route_parts_frame
+from .reconstruction import (
+    EdgeAwareRouter,
+    add_position_aware_route_distances,
+    build_movements,
+    build_traversals,
+    build_unresolved_intervals,
+    route_parts_frame,
+)
 from .routing import CompactMovementRouter
 
 
 LOGGER = logging.getLogger("stage0.v5")
 
 
-PRODUCTS = ("order_base", "link_traversals", "turn_movements", "route_parts", "route_quality", "performance")
+PRODUCTS = (
+    "order_base", "link_traversals", "turn_movements", "unresolved_intervals",
+    "route_parts", "route_quality", "performance",
+)
 
 
 def _write_frame(frame: pd.DataFrame, path: Path) -> None:
@@ -136,6 +148,10 @@ def _empty_quality(order_id: str, reason: str) -> dict[str, Any]:
         "successful_reconstruction": False,
         "direction_violation_count": 1,
         "topology_gap_count": 1,
+        "restriction_block_count": 0,
+        "unparsed_restriction_exposure_count": 0,
+        "suspicious_level_transition_count": 0,
+        "true_layer_discontinuity_count": 0,
         "unreasonable_detour_count": 0,
         "illegal_u_turn_count": 0,
         "layer_violation_count": 0,
@@ -148,6 +164,16 @@ def _empty_quality(order_id: str, reason: str) -> dict[str, Any]:
         "od_endpoint_error_m": float("inf"),
         "time_conservation_error_s": 0.0,
         "distance_conservation_error_m": 0.0,
+        "time_allocation_error_s": 0.0,
+        "internal_distance_error_m": 0.0,
+        "projected_route_distance_error_m": float("inf"),
+        "invalid_position_aware_distance_count": 1,
+        "observed_run_alignment_valid": False,
+        "unresolved_interval_time_s": 0.0,
+        "projected_matched_movement_distance_m": float("nan"),
+        "path_to_gps_ratio_q50": float("nan"),
+        "path_to_gps_ratio_q90": float("nan"),
+        "path_to_gps_ratio_q99": float("nan"),
         "fallback_share": 0.0,
         "p90_projection_distance_m": float("inf"),
         "route_length_ratio": float("nan"),
@@ -205,7 +231,10 @@ def run_dates(
     bucket_shard_count: int = 1,
     bucket_ids: set[int] | None = None,
     orders_per_day: int | None = None,
+    diagnostic_mode: str = "sampled",
 ) -> dict[str, Any]:
+    if diagnostic_mode not in {"none", "sampled", "full"}:
+        raise ValueError("diagnostic_mode must be none, sampled, or full")
     if int(workers) != 1:
         raise ValueError(
             "Stage 0 v5 order-level threads are disabled: Python routing/dataframe work is GIL-bound. "
@@ -240,6 +269,7 @@ def run_dates(
     run_rows: list[dict[str, Any]] = []
     process = psutil.Process()
     peak_rss = process.memory_info().rss
+    diagnostic_counts: dict[tuple[str, str], int] = {}
     for date in dates:
         prepare_day_points(config, repo, date, buckets, sample_count, dates, force=force)
         sample_lookup = _sampling_lookup(output, sample_run_id, date)
@@ -266,6 +296,7 @@ def run_dates(
             quality_rows: list[dict[str, Any]] = []
             traversal_frames: list[pd.DataFrame] = []
             movement_frames: list[pd.DataFrame] = []
+            unresolved_frames: list[pd.DataFrame] = []
             route_frames: list[pd.DataFrame] = []
             retained_point_frames: list[pd.DataFrame] = []
             performance_rows: list[dict[str, Any]] = []
@@ -287,9 +318,7 @@ def run_dates(
                         candidate_config, hmm_config,
                     )
                     reconstruction_stats_before = movement_router.stats()
-                    route = edge_router.reconstruct(
-                        matched, match_summary.get("_selected_bridge_paths", {}),
-                    )
+                    route = edge_router.reconstruct(matched)
                     reconstruction_stats = movement_router.stats().minus(reconstruction_stats_before)
                     reconstruction_path_search_count = reconstruction_stats.path_calls
                     reconstruction_expanded_nodes = reconstruction_stats.expanded_nodes
@@ -299,17 +328,22 @@ def run_dates(
                     reconstruction_bridge_request_count = edge_router.last_path_search_count
                     parts_started = time.perf_counter()
                     route_parts = route_parts_frame(order_id, route, edge_lookup) if route.edge_uids else pd.DataFrame()
+                    if len(route_parts):
+                        route_parts = add_position_aware_route_distances(matched, route_parts, edge_lookup)
                     route_parts_build_ms = (time.perf_counter() - parts_started) * 1000.0
                     traversal_started = time.perf_counter()
                     traversals = build_traversals(order_id, matched, route_parts, edge_lookup) if len(route_parts) else pd.DataFrame()
                     traversal_build_ms = (time.perf_counter() - traversal_started) * 1000.0
                     movement_started = time.perf_counter()
                     turns = build_movements(order_id, route_parts, movement_router, matched) if len(route_parts) > 1 else pd.DataFrame()
+                    unresolved = build_unresolved_intervals(
+                        order_id, route_parts, movement_router, matched,
+                    ) if len(route_parts) else pd.DataFrame()
                     movement_build_ms = (time.perf_counter() - movement_started) * 1000.0
                     quality_started = time.perf_counter()
                     quality = evaluate_order_quality(
                         order_id, matched, route_parts, traversals, turns, edge_lookup,
-                        match_summary, config.section("quality"),
+                        match_summary, config.section("quality"), unresolved,
                     )
                     quality_ms = (time.perf_counter() - quality_started) * 1000.0
                 except Exception as error:  # logged and accounted, never silently discarded
@@ -318,7 +352,7 @@ def run_dates(
                     quality = _empty_quality(order_id, "processing_exception")
                     route_parts = pd.DataFrame()
                     matched = pd.DataFrame()
-                    traversals = turns = route_parts = pd.DataFrame()
+                    traversals = turns = unresolved = route_parts = pd.DataFrame()
                     failed = {"date": date, "bucket": bucket, "order_id": order_id, "exception_type": type(error).__name__, "reason": str(error)}
                 sample = sample_lookup.loc[order_id] if order_id in sample_lookup.index else None
                 timestamps = pd.to_numeric(group.timestamp, errors="coerce")
@@ -348,6 +382,7 @@ def run_dates(
                     "quality": {"date": date, "bucket": bucket, **quality},
                     "traversals": traversals,
                     "turns": turns,
+                    "unresolved": unresolved,
                     "route_parts": route_parts,
                     "matched": matched,
                     "failed": failed,
@@ -366,6 +401,8 @@ def run_dates(
                             "selected_bridge_path_count", "selected_path_search_ms",
                             "distance_search_calls", "path_search_calls", "positive_cache_hits",
                             "negative_cache_hits", "path_cache_hits",
+                            "local_patch_count", "no_candidate_initial_count",
+                            "no_candidate_recovered_count",
                         )},
                         "route_bridge_search_ms": route_bridge_search_ms,
                         "route_parts_build_ms": route_parts_build_ms,
@@ -381,19 +418,47 @@ def run_dates(
                 }
 
             groupby_started = time.perf_counter()
-            grouped_orders = list(points.groupby("order_id", sort=False))
+            grouped_orders = points.groupby("order_id", sort=False)
             bucket_groupby_ms = (time.perf_counter() - groupby_started) * 1000.0
-            results = [process_order(item) for item in grouped_orders]
-            for result in results:
+            mode_counts: dict[str, int] = {}
+            quality_counts: dict[str, int] = {}
+            progress_every = int(config.section("runtime").get("log_progress_every_orders", 25))
+            for processed_in_bucket, item in enumerate(grouped_orders, start=1):
+                result = process_order(item)
                 order_base_rows.append(result["order_base"])
                 quality_rows.append(result["quality"])
                 if len(result["traversals"]): traversal_frames.append(result["traversals"])
                 if len(result["turns"]): movement_frames.append(result["turns"])
+                if len(result["unresolved"]): unresolved_frames.append(result["unresolved"])
                 if len(result["route_parts"]): route_frames.append(result["route_parts"])
                 if result["failed"] is not None: failed_rows.append(result["failed"])
                 performance_rows.append(result["performance"])
                 matched = result["matched"]
-                if len(matched):
+                quality_name = str(result["quality"].get("route_quality", "unknown"))
+                mode_name = str(result["order_base"].get("matching_mode", "unknown"))
+                mode_counts[mode_name] = mode_counts.get(mode_name, 0) + 1
+                quality_counts[quality_name] = quality_counts.get(quality_name, 0) + 1
+                reasons = str(result["quality"].get("quality_reasons", "")) or "representative"
+                diagnostic_key = (date, reasons)
+                retain_diagnostic = diagnostic_mode == "full"
+                if diagnostic_mode == "sampled":
+                    failure_limit = int(config.section("runtime").get(
+                        "case_trace_per_failure_reason_per_day", 5
+                    ))
+                    representative_limit = int(config.section("runtime").get(
+                        "case_trace_representative_per_day", 10
+                    ))
+                    limit = representative_limit if reasons == "representative" else failure_limit
+                    # Stable hash chooses cases; the counter enforces a strict
+                    # per-day/reason cap without writing all points first.
+                    hash_value = stable_hash(date, result["order_base"]["order_id"], reasons, seed=20261009)
+                    retain_diagnostic = (
+                        diagnostic_counts.get(diagnostic_key, 0) < limit
+                        and hash_value % 10_000 < 2_500
+                    )
+                    if retain_diagnostic:
+                        diagnostic_counts[diagnostic_key] = diagnostic_counts.get(diagnostic_key, 0) + 1
+                if len(matched) and retain_diagnostic:
                     diagnostic_columns = [column for column in (
                         "order_id", "point_seq", "timestamp", "source_lon", "source_lat",
                         "matching_lon", "matching_lat", "edge_uid", "position_on_edge",
@@ -401,14 +466,35 @@ def run_dates(
                         "emission_margin", "viterbi_margin", "parallel_ambiguity",
                         "ambiguity_reason", "matching_mode", "point_quality", "observed_step_m",
                         "heading_reliable", "stationary_or_low_motion", "edge_heading_difference_deg",
+                        "time_gap_s", "transition_cutoff_m", "selected_path_distance_m",
+                        "selected_path_routing_cost", "selected_path_identifier",
+                        "selected_path_json", "path_to_gps_ratio",
+                        "selected_network_snapshot_mismatch",
                     ) if column in matched.columns]
                     matched_diagnostic_frames.append(matched[diagnostic_columns].copy())
                 if len(matched) and retain_points:
                     retained_point_frames.append(matched)
+                if progress_every > 0 and (
+                    processed_in_bucket % progress_every == 0
+                    or processed_in_bucket == input_orders
+                ):
+                    elapsed = time.perf_counter() - bucket_started
+                    recent = performance_rows[-min(progress_every, len(performance_rows)):]
+                    mean_match_ms = float(np.mean([
+                        float(row.get("matching_total_ms", 0.0)) for row in recent
+                    ])) if recent else 0.0
+                    LOGGER.info(
+                        "progress date=%s bucket=%03d orders=%d/%d elapsed_s=%.1f "
+                        "mean_recent_match_ms=%.1f modes=%s quality=%s rss_mb=%.1f",
+                        date, bucket, processed_in_bucket, input_orders, elapsed,
+                        mean_match_ms, mode_counts, quality_counts,
+                        process.memory_info().rss / 1024**2,
+                    )
             tables = {
                 "order_base": pd.DataFrame(order_base_rows),
                 "link_traversals": pd.concat(traversal_frames, ignore_index=True) if traversal_frames else pd.DataFrame(columns=["order_id"]),
                 "turn_movements": pd.concat(movement_frames, ignore_index=True) if movement_frames else pd.DataFrame(columns=["order_id"]),
+                "unresolved_intervals": pd.concat(unresolved_frames, ignore_index=True) if unresolved_frames else pd.DataFrame(columns=["order_id"]),
                 "route_parts": pd.concat(route_frames, ignore_index=True) if route_frames else pd.DataFrame(columns=["order_id"]),
                 "route_quality": pd.DataFrame(quality_rows),
             }
@@ -451,7 +537,7 @@ def run_dates(
             write_manifest(output / "manifests" / "partitions" / f"day={date}" / f"part={bucket:03d}.json", partition_manifest)
             peak_rss = max(peak_rss, process.memory_info().rss)
             run_rows.append(partition_manifest)
-            del points, tables, order_base_rows, quality_rows, traversal_frames, movement_frames, route_frames, retained_point_frames, performance_rows, matched_diagnostic_frames
+            del points, tables, order_base_rows, quality_rows, traversal_frames, movement_frames, unresolved_frames, route_frames, retained_point_frames, performance_rows, matched_diagnostic_frames
         LOGGER.info("date=%s processed_input_orders=%d", date, day_input_orders)
     summary_started = time.perf_counter()
     summary = summarize_run(config, repo, dates, sample_count)
@@ -504,19 +590,50 @@ def run_dates(
 
 def summarize_run(config: Stage0Config, repo: Path, dates: list[str], orders_per_day: int) -> dict[str, Any]:
     output = config.path("output", repo)
-    quality_files = [path for date in dates for path in (output / "route_quality" / f"day={date}").glob("*.parquet")]
-    order_files = [path for date in dates for path in (output / "order_base" / f"day={date}").glob("*.parquet")]
-    performance_files = [path for date in dates for path in (output / "performance" / f"day={date}").glob("*.parquet")]
+    run_id = sampling_run_id(dates, orders_per_day, int(config.section("sampling")["seed"]))
+    valid_parts: list[tuple[str, int]] = []
+    for date in dates:
+        for manifest_path in (
+            output / "manifests" / "partitions" / f"day={date}"
+        ).glob("part=*.json"):
+            try:
+                manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                continue
+            if (
+                manifest.get("status") == "PASS"
+                and manifest.get("config_hash") == config.digest
+                and manifest.get("sampling_run_id") == run_id
+            ):
+                valid_parts.append((date, int(manifest["bucket"])))
+    quality_files = [_output_file(output, "route_quality", date, bucket) for date, bucket in valid_parts]
+    order_files = [_output_file(output, "order_base", date, bucket) for date, bucket in valid_parts]
+    performance_files = [_output_file(output, "performance", date, bucket) for date, bucket in valid_parts]
+    traversal_files = [_output_file(output, "link_traversals", date, bucket) for date, bucket in valid_parts]
+    movement_files = [_output_file(output, "turn_movements", date, bucket) for date, bucket in valid_parts]
+    failed_files = [
+        output / "failed_orders" / f"day={date}" / f"part={bucket:03d}.parquet"
+        for date, bucket in valid_parts
+        if (output / "failed_orders" / f"day={date}" / f"part={bucket:03d}.parquet").exists()
+    ]
     quality = pd.concat([pd.read_parquet(path) for path in quality_files], ignore_index=True) if quality_files else pd.DataFrame()
     orders = pd.concat([pd.read_parquet(path) for path in order_files], ignore_index=True) if order_files else pd.DataFrame()
     performance = pd.concat([pd.read_parquet(path) for path in performance_files], ignore_index=True) if performance_files else pd.DataFrame()
-    run_id = sampling_run_id(dates, orders_per_day, int(config.section("sampling")["seed"]))
+    traversals = pd.concat([pd.read_parquet(path) for path in traversal_files], ignore_index=True) if traversal_files else pd.DataFrame()
+    movements = pd.concat([pd.read_parquet(path) for path in movement_files], ignore_index=True) if movement_files else pd.DataFrame()
+    failures = pd.concat([pd.read_parquet(path) for path in failed_files], ignore_index=True) if failed_files else pd.DataFrame()
     sampling_path = output / "manifests" / "sampling_runs" / run_id / "sampling_manifest.parquet"
     if sampling_path.exists():
         sampled = pd.read_parquet(sampling_path, columns=["date", "order_id"])
         expected_orders = int(len(sampled.loc[sampled.date.astype(str).isin(dates)]))
+        keys = sampled.loc[sampled.date.astype(str).isin(dates), ["date", "order_id"]].astype(str)
+        keys = keys.sort_values(["date", "order_id"], kind="stable")
+        sample_sha = hashlib.sha256("\n".join(
+            f"{date}|{order_id}" for date, order_id in keys.itertuples(index=False, name=None)
+        ).encode("utf-8")).hexdigest()
     else:
         expected_orders = len(orders)
+        sample_sha = None
     base = conservation_summary(quality, expected_orders) if len(quality) else {"accounting_pass": False, "input_orders": expected_orders, "output_orders": 0}
     modes = orders.matching_mode.value_counts(normalize=True).to_dict() if len(orders) else {}
     def numeric_sum(column: str) -> float:
@@ -533,21 +650,78 @@ def summarize_run(config: Stage0Config, repo: Path, dates: list[str], orders_per
     precomputed_paths = numeric_sum("precomputed_path_count")
     reconstruction_requests = numeric_sum("reconstruction_bridge_request_count")
     reconstruction_searches = numeric_sum("reconstruction_path_search_count")
+    duplicate_traversals = int(traversals.duplicated(["order_id", "traversal_id"]).sum()) if len(traversals) else 0
+    inferred_dynamic = int(pd.to_numeric(
+        quality.get("observed_dynamic_label_on_inferred_edge_count", pd.Series(dtype=float)),
+        errors="coerce",
+    ).fillna(0).sum())
+    mismatch_count = int(pd.to_numeric(
+        quality.get("hmm_path_distance_mismatch_count", pd.Series(dtype=float)),
+        errors="coerce",
+    ).fillna(0).sum())
+    non_rejected_gaps = int((
+        quality.get("topology_gap_count", pd.Series(0, index=quality.index)).gt(0)
+        & quality.route_quality.ne("rejected")
+    ).sum()) if len(quality) else 0
+    fallback_modes = {"pure_geometric_fallback", "partial_local_hmm_fallback"}
+    fallback_share = float(orders.matching_mode.isin(fallback_modes).mean()) if len(orders) else 0.0
+    percentile_columns = [
+        "coordinate_transform_ms", "candidate_generation_ms", "ambiguity_detection_ms",
+        "local_hmm_ms", "full_hmm_ms", "transition_search_ms",
+        "selected_path_search_ms", "matching_total_ms", "route_parts_build_ms",
+        "traversal_build_ms", "movement_build_ms", "quality_ms", "output_io_ms",
+        "diagnostic_io_ms",
+    ]
+    performance_percentiles = {}
+    for column in percentile_columns:
+        values = pd.to_numeric(performance.get(column, pd.Series(dtype=float)), errors="coerce").dropna()
+        performance_percentiles[column] = {
+            "mean": float(values.mean()) if len(values) else None,
+            **{
+                name: float(values.quantile(q)) if len(values) else None
+                for name, q in (("p50", 0.50), ("p90", 0.90), ("p95", 0.95), ("p99", 0.99))
+            },
+        }
+    inferred_values = pd.to_numeric(
+        quality.get("interpolated_distance_share", pd.Series(dtype=float)), errors="coerce"
+    ).dropna()
     return {
         **base,
         "dates": dates,
         "matching_mode_share": {str(k): float(v) for k, v in modes.items()},
+        "sampling_seed": int(config.section("sampling")["seed"]),
+        "sampling_run_id": run_id,
+        "sample_order_sha256": sample_sha,
+        "fallback_share": fallback_share,
         "topology_gap_count": int(quality.topology_gap_count.sum()) if len(quality) else 0,
         "parallel_ambiguity_order_count": int((quality.parallel_ambiguity_share > 0).sum()) if len(quality) else 0,
         "direction_violation_count": int(quality.direction_violation_count.sum()) if len(quality) else 0,
         "layer_violation_count": int(quality.layer_violation_count.sum()) if len(quality) else 0,
         "restriction_violation_count": int(quality.restriction_violation_count.sum()) if len(quality) else 0,
         "mean_inferred_distance_share": float(quality.interpolated_distance_share.mean()) if len(quality) else float("nan"),
+        "inferred_distance_share_distribution": {
+            name: float(inferred_values.quantile(q)) if len(inferred_values) else None
+            for name, q in (("q50", 0.50), ("q90", 0.90), ("q99", 0.99))
+        },
+        "path_to_gps_ratio_distribution": {
+            name: float(pd.to_numeric(
+                quality.get(column, pd.Series(dtype=float)), errors="coerce"
+            ).dropna().quantile(q)) if len(pd.to_numeric(
+                quality.get(column, pd.Series(dtype=float)), errors="coerce"
+            ).dropna()) else None
+            for name, column, q in (
+                ("q50", "path_to_gps_ratio_q50", 0.50),
+                ("q90", "path_to_gps_ratio_q90", 0.90),
+                ("q99", "path_to_gps_ratio_q99", 0.99),
+            )
+        },
         "full_hmm_attempt_count": full_attempts,
         "full_hmm_success_count": full_successes,
         "full_hmm_failure_count": full_attempts - full_successes,
         "full_hmm_attempt_share": full_attempts / len(performance) if len(performance) else 0.0,
+        "full_hmm_failure_share": (full_attempts - full_successes) / len(performance) if len(performance) else 0.0,
         "local_hmm_attempt_count": local_attempts,
+        "local_hmm_attempt_share": local_attempts / len(performance) if len(performance) else 0.0,
         "local_window_failure_count": int(numeric_sum("local_failed_window_count")),
         "pure_compute_ms": pure_compute_ms,
         "pure_compute_ms_per_order": pure_compute_ms / len(performance) if len(performance) else 0.0,
@@ -559,4 +733,19 @@ def summarize_run(config: Stage0Config, repo: Path, dates: list[str], orders_per
         "reconstruction_bridge_request_count": int(reconstruction_requests),
         "reconstruction_path_search_count": int(reconstruction_searches),
         "selected_path_reuse_share": precomputed_paths / max(precomputed_paths + reconstruction_requests, 1.0),
+        "processing_exception_count": int(len(failures)),
+        "internal_time_conservation_failures": int((quality.time_allocation_error_s > 1e-6).sum()) if len(quality) else 0,
+        "internal_distance_conservation_failures": int((quality.internal_distance_error_m > 1e-6).sum()) if len(quality) else 0,
+        "duplicate_traversal_instance_error_count": duplicate_traversals,
+        "invalid_position_aware_distance_count": int(quality.invalid_position_aware_distance_count.sum()) if len(quality) else 0,
+        "observed_dynamic_label_on_inferred_edge_count": inferred_dynamic,
+        "hmm_path_distance_mismatch_count": mismatch_count,
+        "final_forbidden_movement_count": int(movements.get(
+            "movement_audit_reason", pd.Series(dtype=str)
+        ).astype(str).eq("restriction_block").sum()) if len(movements) else 0,
+        "non_rejected_topology_gap_order_count": non_rejected_gaps,
+        "raw_movement_audit_available": bool(
+            len(movements) == 0 or "movement_audit_reason" in movements.columns
+        ),
+        "performance_percentiles_ms": performance_percentiles,
     }

@@ -8,9 +8,18 @@ from shapely.geometry import LineString
 
 from stage0.v5.matching import (
     Candidate, CandidateIndex, TransitionEngine, angular_difference,
-    _ambiguity_flags, _gps_headings, full_order_decision, local_failures_require_full_order, local_hmm_windows,
+    _ambiguity_flags, _gps_headings, _viterbi, full_order_decision,
+    local_failures_require_full_order, local_hmm_windows, transition_cutoff,
 )
-from stage0.v5.reconstruction import EdgeAwareRouter, build_movements, build_traversals, route_parts_frame
+from stage0.v5.reconstruction import (
+    EdgeAwareRouter,
+    add_position_aware_route_distances,
+    build_movements,
+    build_traversals,
+    build_unresolved_intervals,
+    projected_route_distance_m,
+    route_parts_frame,
+)
 from stage0.v5.routing import CompactMovementRouter
 
 
@@ -35,6 +44,16 @@ def _movements():
 
 def _candidate(uid, index, position, heading=0.0):
     return Candidate(uid, index, position, 1.0, heading, 1.0, 1)
+
+
+def _matched_ac() -> pd.DataFrame:
+    return pd.DataFrame({
+        "point_seq": [0, 1],
+        "edge_uid": ["a", "c"],
+        "selected_path_json": ["", '["a","b","c"]'],
+        "transition_cutoff_m": [math.nan, 100.0],
+        "selected_path_distance_m": [math.nan, 30.0],
+    })
 
 
 def test_candidate_preserves_edge_identity_and_heading_consistency():
@@ -148,7 +167,7 @@ def test_negative_path_cache_can_expand_to_larger_cutoff():
     assert router.bridge_path("a", "c", 20)[0] == ["a", "b", "c"]
 
 
-def test_hmm_distance_is_physical_but_selected_path_uses_routing_penalty():
+def test_hmm_and_output_use_the_same_generalized_transition_path():
     edges = gpd.GeoDataFrame([
         {**_edges().iloc[0].to_dict(), "edge_uid": "a", "from_node": 1, "to_node": 2, "length_m": 10.0, "routing_penalty": 1.0},
         {**_edges().iloc[0].to_dict(), "edge_uid": "low", "from_node": 2, "to_node": 3, "length_m": 5.0, "routing_penalty": 10.0},
@@ -161,8 +180,10 @@ def test_hmm_distance_is_physical_but_selected_path_uses_routing_penalty():
         for left, via, right in [("a", 2, "low"), ("low", 3, "d"), ("a", 2, "good1"), ("good1", 4, "good2"), ("good2", 3, "d")]
     ])
     router = CompactMovementRouter(edges, movements, {"max_route_distance_m": 100})
-    assert router.multi_target_distances(["a"], ["d"], 100)[("a", "d")] == 5.0
-    assert router.bridge_path("a", "d", 100)[0] == ["a", "good1", "good2", "d"]
+    selected = router.transition_path("a", "d", 100)
+    assert list(selected.edge_uids) == ["a", "good1", "good2", "d"]
+    assert router.bridge_path("a", "d", 100)[0] == list(selected.edge_uids)
+    assert router.bridge_path("a", "d", 100)[1] == selected.physical_distance_m
 
 
 def test_batch_candidate_projection_deduplicates_candidate_alias(tmp_path):
@@ -200,11 +221,54 @@ def test_hmm_and_reconstruction_share_forbidden_movement_semantics():
     engine = TransitionEngine(_edges(), movements, pd.DataFrame(), {"max_route_distance_m": 100}, router)
     assert math.isinf(engine.distance(_candidate("a", 0, 5), _candidate("b", 2, 5), 100))
     assert EdgeAwareRouter(_edges(), movements, {"max_route_distance_m": 100}, router).bridge("a", "b") is None
+    assert router.raw_movement("a", "b").restriction_status == "forbidden:no_left_turn"
+
+
+def test_local_viterbi_respects_fixed_endpoint_anchors():
+    edges = _edges()
+    router = CompactMovementRouter(edges, _movements(), {"max_route_distance_m": 100})
+    engine = TransitionEngine(
+        edges, _movements(), pd.DataFrame(),
+        {"max_route_distance_m": 100, "same_edge_jitter_tolerance_m": 10},
+        router,
+    )
+    start = _candidate("a", 0, 2)
+    end = _candidate("b", 2, 5)
+    rows = [[start, _candidate("a2", 1, 2)], [end]]
+    config = {
+        "sigma_distance_m": 15.0, "beta_transition_m": 60.0,
+        "beta_semantic_cost_m": 60.0, "beta_speed_difference_mps": 5.0,
+        "max_route_distance_m": 100.0, "transition_cutoff_min_m": 100.0,
+        "transition_cutoff_max_m": 100.0, "transition_cutoff_alpha": 3.0,
+        "transition_cutoff_base_m": 20.0, "transition_max_speed_mps": 40.0,
+        "anchor_position_tolerance_m": 1.0,
+    }
+    solved = _viterbi(
+        rows, pd.Series([0.0, 13.0]).to_numpy(),
+        pd.Series([0.0, 2.0]).to_numpy(), engine, config,
+        start_anchor=start, end_anchor=end,
+    )
+    assert solved is not None
+    assert solved[0][0].edge_uid == "a"
+    assert solved[0][-1].edge_uid == "b"
+
+
+def test_dynamic_transition_cutoff_records_spatial_and_time_bounds():
+    config = {
+        "max_route_distance_m": 6000.0,
+        "transition_cutoff_alpha": 3.0,
+        "transition_cutoff_base_m": 200.0,
+        "transition_cutoff_min_m": 300.0,
+        "transition_cutoff_max_m": 6000.0,
+        "transition_max_speed_mps": 40.0,
+    }
+    assert transition_cutoff(50.0, 10.0, config) == 350.0
+    assert transition_cutoff(5000.0, 1000.0, config) == 6000.0
 
 
 def test_edge_aware_reconstruction_returns_concrete_inferred_edge():
     router = EdgeAwareRouter(_edges(), _movements(), {"u_turn_penalty_m": 500, "road_class_transition_penalty_m": 30, "max_route_distance_m": 100})
-    matched = pd.DataFrame({"edge_uid": ["a", "c"]})
+    matched = _matched_ac()
     route = router.reconstruct(matched)
     assert route.edge_uids == ["a", "b", "c"]
     assert route.observed == [True, False, True]
@@ -212,21 +276,85 @@ def test_edge_aware_reconstruction_returns_concrete_inferred_edge():
 
 def test_inferred_path_has_no_realized_time_and_intervals_conserve():
     edges = _edges()
-    route = EdgeAwareRouter(edges, _movements(), {"u_turn_penalty_m": 500, "road_class_transition_penalty_m": 30, "max_route_distance_m": 100}).reconstruct(pd.DataFrame({"edge_uid": ["a", "c"]}))
+    route = EdgeAwareRouter(edges, _movements(), {"u_turn_penalty_m": 500, "road_class_transition_penalty_m": 30, "max_route_distance_m": 100}).reconstruct(_matched_ac())
     parts = route_parts_frame("o", route, edges)
-    matched = pd.DataFrame({"point_seq": [0, 1, 2], "timestamp": [0.0, 5.0, 12.0], "edge_uid": ["a", "a", "c"], "metric_x": [0.0, 5.0, 30.0], "metric_y": [0.0, 0.0, 0.0]})
+    matched = pd.DataFrame({
+        "point_seq": [0, 1, 2], "timestamp": [0.0, 5.0, 12.0],
+        "edge_uid": ["a", "a", "c"], "position_on_edge": [0.0, 5.0, 10.0],
+        "metric_x": [0.0, 5.0, 30.0], "metric_y": [0.0, 0.0, 0.0],
+    })
+    parts = add_position_aware_route_distances(matched, parts, edges)
     traversals = build_traversals("o", matched, parts, edges)
-    turns = build_movements("o", parts, CompactMovementRouter(edges, _movements(), {"max_route_distance_m": 100}), matched)
+    movement_router = CompactMovementRouter(edges, _movements(), {"max_route_distance_m": 100})
+    turns = build_movements("o", parts, movement_router, matched)
+    unresolved = build_unresolved_intervals("o", parts, movement_router, matched)
     assert traversals.loc[traversals.is_interpolated, "travel_time_s"].isna().all()
-    assert traversals.observed_interval_time_s.sum() + turns.observed_interval_time_s.sum() == 12.0
+    assert turns.observed_interval_time_s.sum() == 0.0
+    assert unresolved.unresolved_interval_time_s.sum() == 7.0
+    assert traversals.observed_interval_time_s.sum() + unresolved.unresolved_interval_time_s.sum() == 12.0
     assert abs(traversals.allocated_distance_m.sum() - 30.0) < 1e-9
+
+
+def test_repeated_edge_visits_create_distinct_traversals():
+    edges = gpd.GeoDataFrame([
+        {"edge_uid": uid, "from_node": i, "to_node": i + 1, "edge_key": uid,
+         "geometry": LineString([(i * 10, 0), ((i + 1) * 10, 0)]), "length_m": 10.0}
+        for i, uid in enumerate(["a", "b", "c", "d"])
+    ], geometry="geometry", crs=3857)
+    parts = pd.DataFrame({
+        "order_id": "o", "route_sequence": range(5), "edge_uid": ["a", "b", "c", "b", "d"],
+        "is_interpolated": False, "route_source": "observed",
+    })
+    matched = pd.DataFrame({
+        "point_seq": range(5), "timestamp": [0.0, 2.0, 5.0, 9.0, 14.0],
+        "edge_uid": ["a", "b", "c", "b", "d"], "position_on_edge": [2.0, 3.0, 4.0, 6.0, 7.0],
+        "metric_x": [2.0, 13.0, 24.0, 16.0, 37.0], "metric_y": 0.0,
+    })
+    parts = add_position_aware_route_distances(matched, parts, edges)
+    traversals = build_traversals("o", matched, parts, edges)
+    visits = traversals.loc[traversals.edge_uid.eq("b")]
+    assert visits.traversal_id.tolist() == [1, 3]
+    assert visits.route_sequence.tolist() == [1, 3]
+    assert visits.enter_time.tolist() == [2.0, 9.0]
+
+
+def test_first_and_last_edges_use_projected_positions():
+    edges = _edges()
+    route = EdgeAwareRouter(edges, _movements(), {"max_route_distance_m": 100}).reconstruct(
+        _matched_ac()
+    )
+    parts = route_parts_frame("o", route, edges)
+    matched = pd.DataFrame({
+        "point_seq": [0, 1, 2], "timestamp": [0.0, 2.0, 8.0],
+        "edge_uid": ["a", "a", "c"], "position_on_edge": [2.0, 8.0, 4.0],
+        "metric_x": [2.0, 8.0, 24.0], "metric_y": 0.0,
+    })
+    parts = add_position_aware_route_distances(matched, parts, edges)
+    assert parts.allocated_distance_m.tolist() == [8.0, 10.0, 4.0]
+    assert projected_route_distance_m(matched, parts, edges) == 22.0
+    traversals = build_traversals("o", matched, parts, edges)
+    assert traversals.allocated_distance_m.sum() == 22.0
+
+
+def test_same_edge_short_order_uses_position_delta():
+    edges = _edges()
+    route = EdgeAwareRouter(edges, _movements(), {"max_route_distance_m": 100}).reconstruct(
+        pd.DataFrame({"edge_uid": ["a", "a"]})
+    )
+    parts = route_parts_frame("o", route, edges)
+    matched = pd.DataFrame({
+        "point_seq": [0, 1], "timestamp": [0.0, 3.0], "edge_uid": ["a", "a"],
+        "position_on_edge": [2.0, 8.0], "metric_x": [2.0, 8.0], "metric_y": [0.0, 0.0],
+    })
+    parts = add_position_aware_route_distances(matched, parts, edges)
+    assert parts.allocated_distance_m.tolist() == [6.0]
 
 
 def test_movement_output_uses_prebuilt_router_not_per_order_dataframe_index(monkeypatch):
     edges = _edges()
     movements = _movements()
     router = CompactMovementRouter(edges, movements, {"max_route_distance_m": 100})
-    route = EdgeAwareRouter(edges, movements, {"max_route_distance_m": 100}, router).reconstruct(pd.DataFrame({"edge_uid": ["a", "c"]}))
+    route = EdgeAwareRouter(edges, movements, {"max_route_distance_m": 100}, router).reconstruct(_matched_ac())
     parts = route_parts_frame("o", route, edges)
     monkeypatch.setattr(pd.DataFrame, "set_index", lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("per-order index build")))
     built = build_movements("o", parts, router)
