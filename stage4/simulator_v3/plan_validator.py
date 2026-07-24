@@ -18,6 +18,8 @@ class ValidationResult:
     failure_reason: str = ""
     pickup_odd_feasible: bool = True
     service_odd_feasible: bool = True
+    capability_profile: str = ""
+    capability_mapping_version: str = ""
 
 
 class PlanValidator:
@@ -46,8 +48,27 @@ class PlanValidator:
             return ValidationResult(False, "session_constraint")
         pickup_ok, pickup_reason = self.pickup_odd.check(vehicle.vehicle_type, vehicle.current_zone, request.origin_zone, request.condition_available)
         service_ok, service_reason = self.service_odd.check(request.order_id, vehicle.vehicle_type, request.condition_available)
+        capability_metadata = self.service_odd.audit_metadata(request.order_id, vehicle.vehicle_type)
         if not pickup_ok:
-            return ValidationResult(False, pickup_reason, pickup_odd_feasible=False, service_odd_feasible=service_ok)
+            return ValidationResult(
+                False,
+                pickup_reason,
+                pickup_odd_feasible=False,
+                service_odd_feasible=service_ok,
+                **capability_metadata,
+            )
         if not service_ok:
-            return ValidationResult(False, service_reason, pickup_odd_feasible=pickup_ok, service_odd_feasible=False)
-        return ValidationResult(True, "", pickup_odd_feasible=pickup_ok, service_odd_feasible=service_ok)
+            return ValidationResult(
+                False,
+                service_reason,
+                pickup_odd_feasible=pickup_ok,
+                service_odd_feasible=False,
+                **capability_metadata,
+            )
+        return ValidationResult(
+            True,
+            "",
+            pickup_odd_feasible=pickup_ok,
+            service_odd_feasible=service_ok,
+            **capability_metadata,
+        )

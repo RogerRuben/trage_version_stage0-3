@@ -1,0 +1,4 @@
+candidate_maximum,orders,completed_orders,match_rate,av_assignment_share,scenario_net_profit
+40,5000,2050,0.41,1.0,38953.48265937634
+80,5000,2050,0.41,1.0,38953.48265937634
+120,5000,2050,0.41,1.0,38953.48265937634

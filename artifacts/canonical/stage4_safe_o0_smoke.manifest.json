@@ -1,0 +1,96 @@
+{
+  "manifest_version": "1.0",
+  "artifact_id": "stage4_safe_o0_1000_order_smoke_v2",
+  "schema_version": "stage4_counterfactual_smoke_v2",
+  "stage": "stage4",
+  "status": "canonical",
+  "created_at": "2026-07-15T11:15:25.864547+00:00",
+  "created_by_commit": "123905d7a8cf2ee675fe5e126017d2193b585c56",
+  "input_artifact_ids": [
+    "stage3_smoke_train20_validate22_test23_v2",
+    "stage4_decoupled_smoke_environment_train20_test23_v1"
+  ],
+  "config_hash": "8b452c91e1ad8811e14bf66b56cd38f4a94643a7cb4a6bc4cd07c7f0ea0059d5",
+  "fit_dates": [
+    "20161020",
+    "20161022"
+  ],
+  "target_dates": [
+    "20161023"
+  ],
+  "decision_time_contract": "counterfactual_predicted_service_distribution_no_realized_duration",
+  "files": [
+    {
+      "role": "av_profile",
+      "path": "stage4/config/canonical_smoke_av_profile.json",
+      "sha256": "13b0c8406932f86e898143739ae2817833bbef853f0ea07b591cb387684efadf",
+      "size_bytes": 510,
+      "row_count": null,
+      "schema_hash": null
+    },
+    {
+      "role": "request_log",
+      "path": "artifacts/canonical/smoke_v2/stage4_safe_o0/request_log.parquet",
+      "sha256": "f7dfe2102a90e57440d78cd6aaa8e02e9d4be180a1e7524986483b8c80169eaf",
+      "size_bytes": 66000,
+      "row_count": 1000,
+      "schema_hash": "8bb8d75e050dcecb044ff4773a25ace14fbe18f96c7b80236d84423bd0f44ca1"
+    },
+    {
+      "role": "request_transition_log",
+      "path": "artifacts/canonical/smoke_v2/stage4_safe_o0/request_transition_log.parquet",
+      "sha256": "c29b679b756330d4e7809553e02392863700aaf83c6391cb5babfb72c6d20603",
+      "size_bytes": 80310,
+      "row_count": 6000,
+      "schema_hash": "18015125dc843d154323703e5832f2dee8a18014bea13fa0b38d481f8c7f2e15"
+    },
+    {
+      "role": "vehicle_leg_log",
+      "path": "artifacts/canonical/smoke_v2/stage4_safe_o0/vehicle_leg_log.parquet",
+      "sha256": "467b88b7908c64acf46132c4215102822277802e67fe779bc0048fffb63f35cf",
+      "size_bytes": 153231,
+      "row_count": 2000,
+      "schema_hash": "293d31d91609add1ff572fad1b98f8656c4ed36be77d76e32d0fdec655c0aeb0"
+    },
+    {
+      "role": "event_execution_log",
+      "path": "artifacts/canonical/smoke_v2/stage4_safe_o0/event_execution_log.parquet",
+      "sha256": "1aa67a09caa20e9ccb69cde2a8834cc12a03b55fc02e1a2be19df6e2c846cc27",
+      "size_bytes": 70851,
+      "row_count": 6000,
+      "schema_hash": "62633ada0c0a6e09f50697c9dc5160367f4cc51e9b513362776986c402d633ae"
+    },
+    {
+      "role": "system_epoch_log",
+      "path": "artifacts/canonical/smoke_v2/stage4_safe_o0/system_epoch_log.parquet",
+      "sha256": "22beeb90c50d52d5c099c845fd5f35493dbc8c244120bc6f82c86449210ba418",
+      "size_bytes": 26990,
+      "row_count": 2882,
+      "schema_hash": "86f9583de72b1909440ae78441edc33b74ed328f1fd114b7943e6406b0c5b5fd"
+    },
+    {
+      "role": "assignment_ledger",
+      "path": "artifacts/canonical/smoke_v2/stage4_safe_o0/assignment_ledger.parquet",
+      "sha256": "61765ff7f25648f213ef6c27ee613ff2909ecc048a45259954ea30e148771631",
+      "size_bytes": 73027,
+      "row_count": 1000,
+      "schema_hash": "3f17126f23a8049e7f7da6825bd23a88ac9cd2bf963d9b5cc6b9077d90f62ba0"
+    },
+    {
+      "role": "economy_ledger",
+      "path": "artifacts/canonical/smoke_v2/stage4_safe_o0/economy_ledger.csv",
+      "sha256": "f2e6f401b6f2123b2faf80b616a9b0b9b8595cd13abc85b09bf6287f628216f1",
+      "size_bytes": 264,
+      "row_count": 1,
+      "schema_hash": "2b75573d5f1e144dd37890a3d0da67efede43624443a8bf7a8d1475df9a67606"
+    }
+  ],
+  "audit": {
+    "status": "PASS",
+    "path": "docs/pipeline_rebaseline/stage4_safe_o0_smoke_audit.json",
+    "sha256": "516a114a08df02e724106d6b3cf9ff26ca739c504af3afab7c5b0a5ce49874ee"
+  },
+  "known_limitations": [
+    "Functional smoke only; match rate, AV share, and profit are not research results."
+  ]
+}

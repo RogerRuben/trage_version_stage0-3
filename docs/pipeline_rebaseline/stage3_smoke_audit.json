@@ -1,0 +1,78 @@
+{
+  "status": "PASS",
+  "schema_version": "stage3_condition_vector_v2",
+  "temporal_order": "20161020 < 20161022 < 20161023",
+  "calibration_fit_date": "20161022",
+  "calibration_validation_only": true,
+  "stage1_realized_features": [],
+  "expected_semantics": "continuous_regression_expectation_not_q90",
+  "extended_probability_semantics": "unavailable_not_max_proxy",
+  "iis_missing_policy": "availability_gated_no_zero_imputation",
+  "days": [
+    {
+      "date": "20161020",
+      "orders": 1000,
+      "duplicate_orders": 0,
+      "cutoff_after_decision": 0,
+      "probability_range_failures": 0,
+      "expected_range_failures": 0,
+      "missing_iis_non_na_values": 0,
+      "realized_stage1_feature_count": 0,
+      "extended_probability_nonmissing": 0,
+      "condition_unavailable": 0,
+      "status": "PASS"
+    },
+    {
+      "date": "20161022",
+      "orders": 1000,
+      "duplicate_orders": 0,
+      "cutoff_after_decision": 0,
+      "probability_range_failures": 0,
+      "expected_range_failures": 0,
+      "missing_iis_non_na_values": 0,
+      "realized_stage1_feature_count": 0,
+      "extended_probability_nonmissing": 0,
+      "condition_unavailable": 0,
+      "status": "PASS"
+    },
+    {
+      "date": "20161023",
+      "orders": 1000,
+      "duplicate_orders": 0,
+      "cutoff_after_decision": 0,
+      "probability_range_failures": 0,
+      "expected_range_failures": 0,
+      "missing_iis_non_na_values": 0,
+      "realized_stage1_feature_count": 0,
+      "extended_probability_nonmissing": 0,
+      "condition_unavailable": 0,
+      "status": "PASS"
+    }
+  ],
+  "distribution_drift": [
+    {
+      "field": "lcs_expected",
+      "ks_statistic": 0.038,
+      "p_value": 0.4659595288557257,
+      "train_mean": 0.702692140215606,
+      "test_mean": 0.7020910696952134,
+      "status": "PASS"
+    },
+    {
+      "field": "pmis_expected",
+      "ks_statistic": 0.033,
+      "p_value": 0.647814872077161,
+      "train_mean": 0.6939119669114955,
+      "test_mean": 0.6933529710457867,
+      "status": "PASS"
+    },
+    {
+      "field": "rts_expected",
+      "ks_statistic": 0.042,
+      "p_value": 0.34112475112661245,
+      "train_mean": 0.56142411332293,
+      "test_mean": 0.5605864298719644,
+      "status": "PASS"
+    }
+  ]
+}

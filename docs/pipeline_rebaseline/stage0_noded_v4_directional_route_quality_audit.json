@@ -1,0 +1,40 @@
+{
+  "status": "DIAGNOSTIC_PASS",
+  "schema_version": "stage0_route_quality_v4",
+  "classification_config": "stage0/config/route_quality_v4.json",
+  "network": "artifacts/exploratory/xian_2017_core_noded_v4/roads.parquet",
+  "days": [
+    {
+      "date": "20161023",
+      "input_orders": 1000,
+      "successfully_reconstructed_orders": 984,
+      "failed_match_orders": 16,
+      "reconstruction_coverage": 0.984,
+      "orders": 984,
+      "core_orders": 139,
+      "extended_orders": 0,
+      "rejected_orders": 845,
+      "core_share_of_input": 0.139,
+      "failed_match_share_of_input": 0.016,
+      "core_share": 0.14126016260162602,
+      "extended_share": 0.0,
+      "rejected_share": 0.858739837398374,
+      "strict_core_orders_v4_final_candidate": 139,
+      "analysis_set_orders_v4_final_candidate": 15,
+      "rejected_orders_v4_final_candidate": 830,
+      "formal_analysis_eligible_share": 0.1565040650406504,
+      "orders_with_gap": 169,
+      "orders_with_all_gaps_bridgeable": 0,
+      "mean_direction_gaps": 0.22357723577235772,
+      "geometric_fallback_orders": 0
+    }
+  ],
+  "gap_pair_cache_size": 83,
+  "manual_truth_audit": "AWAITING_HUMAN_REVIEW",
+  "canonical_promotion_gate": "HOLD",
+  "promotion_blockers": [
+    "Full-data Core/Extended coverage has not been computed.",
+    "Versioned manual route truth sample has not been reviewed.",
+    "Bridge evidence is classification-only; no route is silently repaired."
+  ]
+}

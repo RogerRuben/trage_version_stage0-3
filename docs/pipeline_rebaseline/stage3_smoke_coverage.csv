@@ -1,0 +1,4 @@
+date,orders,duplicate_orders,cutoff_after_decision,probability_range_failures,expected_range_failures,missing_iis_non_na_values,realized_stage1_feature_count,extended_probability_nonmissing,condition_unavailable,status
+20161020,1000,0,0,0,0,0,0,0,0,PASS
+20161022,1000,0,0,0,0,0,0,0,0,PASS
+20161023,1000,0,0,0,0,0,0,0,0,PASS

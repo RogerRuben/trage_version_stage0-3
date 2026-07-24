@@ -1,0 +1,93 @@
+{
+  "manifest_version": "1.0",
+  "artifact_id": "raw_smoke_20161019_20_22_23_v2",
+  "schema_version": "raw_complete_order_smoke_v2",
+  "stage": "raw",
+  "status": "canonical",
+  "created_at": "2026-07-15T11:15:21.275406+00:00",
+  "created_by_commit": "123905d7a8cf2ee675fe5e126017d2193b585c56",
+  "input_artifact_ids": [],
+  "config_hash": "8b452c91e1ad8811e14bf66b56cd38f4a94643a7cb4a6bc4cd07c7f0ea0059d5",
+  "fit_dates": [],
+  "target_dates": [
+    "20161019",
+    "20161020",
+    "20161022",
+    "20161023"
+  ],
+  "decision_time_contract": "raw_observation_post_trip_not_dispatch_feature",
+  "files": [
+    {
+      "role": "source_20161019",
+      "path": "artifacts/canonical/raw_smoke_source/22-4-8/10-19/fbad2096f8df451dace979af1d1c663a.tar.gz",
+      "sha256": "55a0c5f2d81e46584bf53e875faeb11faaf640e6634dde33acd4c32d1ca34a05",
+      "size_bytes": 171320662,
+      "row_count": null,
+      "schema_hash": null
+    },
+    {
+      "role": "sample_20161019",
+      "path": "artifacts/canonical/raw_smoke/day=20161019.parquet",
+      "sha256": "15fa4aa1b202b7cfd7c8ad8a6128fc5d1de6f05d107b58a0a8ae1ad4505172f1",
+      "size_bytes": 1667496,
+      "row_count": 228621,
+      "schema_hash": "df0a06be29071a3e456c648121fbd88818f848f5044289b82860899f5b18f421"
+    },
+    {
+      "role": "source_20161020",
+      "path": "artifacts/canonical/raw_smoke_source/22-4-8/10-20/cd04cb22b620424fbd5448bd13120129.tar.gz",
+      "sha256": "8113e5b4dd0e703976822d61d350c4f21ab0324db032a92763ec648f9c0bf40e",
+      "size_bytes": 178052695,
+      "row_count": null,
+      "schema_hash": null
+    },
+    {
+      "role": "sample_20161020",
+      "path": "artifacts/canonical/raw_smoke/day=20161020.parquet",
+      "sha256": "c7cb4f33ea72e0bb8027d941bac5736b0e28c74da70b641e0ce2aacfce3e5b09",
+      "size_bytes": 1854668,
+      "row_count": 227113,
+      "schema_hash": "df0a06be29071a3e456c648121fbd88818f848f5044289b82860899f5b18f421"
+    },
+    {
+      "role": "source_20161022",
+      "path": "artifacts/canonical/raw_smoke_source/22-4-8/10-22/b0bdedc44c534932b9b98fb5b1b21a76.tar.gz",
+      "sha256": "cfdc2131fb19b52d8b329e732856312b84d233d67209013e9e53a646a3af6698",
+      "size_bytes": 232472931,
+      "row_count": null,
+      "schema_hash": null
+    },
+    {
+      "role": "sample_20161022",
+      "path": "artifacts/canonical/raw_smoke/day=20161022.parquet",
+      "sha256": "36a44145235ba58305ba72ce1b7e96168793273e19a5c6761510973360fcb63f",
+      "size_bytes": 2243797,
+      "row_count": 275003,
+      "schema_hash": "df0a06be29071a3e456c648121fbd88818f848f5044289b82860899f5b18f421"
+    },
+    {
+      "role": "source_20161023",
+      "path": "artifacts/canonical/raw_smoke_source/22-4-8/10-23/50571842cff04226b33a58ae0ee64496.tar.gz",
+      "sha256": "5e8a560b88d614e8bbd5ccc8037fa79c24759834ef159346205c9b5f36f97480",
+      "size_bytes": 194753424,
+      "row_count": null,
+      "schema_hash": null
+    },
+    {
+      "role": "sample_20161023",
+      "path": "artifacts/canonical/raw_smoke/day=20161023.parquet",
+      "sha256": "ab83781518b2508e038f5294b0d4105b67de5e55be61683ec2f72c9eefc403f4",
+      "size_bytes": 1930238,
+      "row_count": 240068,
+      "schema_hash": "df0a06be29071a3e456c648121fbd88818f848f5044289b82860899f5b18f421"
+    }
+  ],
+  "audit": {
+    "status": "PASS",
+    "path": "docs/pipeline_rebaseline/raw_smoke_audit.json",
+    "sha256": "0d7ae7fac2805a50c4a9a610129b1206fd6783e6c27a802af442f9233881b3a1"
+  },
+  "known_limitations": [
+    "Engineering smoke contains 1000 deterministic complete orders per day, not a population estimate."
+  ]
+}

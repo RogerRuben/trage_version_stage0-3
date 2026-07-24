@@ -1,0 +1,13 @@
+{
+  "status": "HOLD",
+  "schema_errors": [],
+  "completed_reviews": 0,
+  "core_completed_reviews": 0,
+  "core_precision": null,
+  "core_false_positive_rate": null,
+  "rejected_correct_share": null,
+  "double_review_pairs": 0,
+  "double_review_agreement": null,
+  "canonical_promotion_gate": "HOLD",
+  "blocker": "Complete independent review and adjudication first."
+}

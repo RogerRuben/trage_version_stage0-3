@@ -1,0 +1,52 @@
+pipeline_version: stage0_4_paper_pipeline_v3
+status: definition_frozen_stage0_hold
+formal_stage4_enabled: false
+
+dates:
+  upstream_fit: ["20161019"]
+  train: ["20161020", "20161021"]
+  validation: ["20161022"]
+  test: ["20161023"]
+
+stage0:
+  contract: docs/pipeline_contract/stage0_contract.md
+  route_quality_config: stage0/config/route_quality_v3.json
+  core_set_required: true
+  extended_set_role: robustness_only
+  output_manifest: artifacts/canonical/stage0_v2/stage0_v2.manifest.json
+
+stage1:
+  contract: docs/pipeline_contract/stage1_contract.md
+  label_schema: stage1_label_schema_v2
+  reference_fit_dates: ["20161019", "20161020", "20161021"]
+  validation_dates: ["20161022"]
+  test_dates: ["20161023"]
+  output_manifest: artifacts/canonical/stage1_v2/stage1_v2.manifest.json
+
+stage2:
+  contract: docs/pipeline_contract/stage2_contract.md
+  mode: dispatch_time
+  formal_model: rc_mstnet
+  planned_route_product: required
+  revealed_route_product: oracle_only
+  output_manifest: artifacts/canonical/stage2_dispatch_v2/stage2_dispatch_v2.manifest.json
+
+stage3:
+  contract: docs/pipeline_contract/stage3_contract.md
+  calibration_fit: validation_only
+  odd_scenarios: stage3/config/odd_scenarios_v1.json
+  output_manifest: artifacts/canonical/stage3_route_risk_v2/stage3_route_risk_v2.manifest.json
+
+stage35:
+  contract: docs/pipeline_contract/stage35_contract.md
+  route_config: stage35/config/offline_route_selection_v1.json
+  output_manifest: artifacts/canonical/stage35_offline_routes_v1/stage35_offline_routes_v1.manifest.json
+
+stage4:
+  contract: docs/pipeline_contract/stage4_contract.md
+  execution_kernel_candidate: fleetpy
+  simulator_v3_role: small_scale_cross_validation_only
+  input_manifest: artifacts/canonical/stage35_offline_routes_v1/stage35_offline_routes_v1.manifest.json
+  maximum_technical_validation_orders: 2000
+  formal_full_day_gate: HOLD
+

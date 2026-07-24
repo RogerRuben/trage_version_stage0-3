@@ -1,0 +1,41 @@
+{
+  "schema_version": "stage0_route_quality_v4_final_candidate",
+  "status": "awaiting_independent_manual_review",
+  "threshold_search_allowed": false,
+  "map_matching_changes_allowed": false,
+  "strict_core": {
+    "rule": "all frozen v4 hard and soft conditions pass",
+    "use": ["high_confidence_evaluation", "label_sensitivity", "manual_precision_reporting"]
+  },
+  "analysis_set": {
+    "rule": "all hard structural conditions pass; one or more soft quality conditions may fail",
+    "hard_conditions": [
+      "successful_reconstruction",
+      "direction_continuity",
+      "no_unreasonable_detour",
+      "reasonable_od_endpoints",
+      "no_u_turn",
+      "minimum_route_links",
+      "time_distance_conservation"
+    ],
+    "soft_conditions": [
+      "fallback_share",
+      "projection_distance",
+      "route_length_ratio",
+      "interpolated_distance_share",
+      "match_confidence",
+      "repeated_link_share"
+    ],
+    "use": ["stage1_labels", "stage2_training", "stage3_training", "main_scale_analysis"]
+  },
+  "rejected": {
+    "rule": "reconstruction failure or any hard structural condition fails",
+    "formal_stage1_to_stage3_use": false
+  },
+  "quality_weight": {
+    "strict_core": 1.0,
+    "analysis_set_formula": "max(0.50, 1 - 0.08 * failed_soft_condition_count)",
+    "rejected": 0.0
+  },
+  "freeze_gate": "manual route review PASS is required before renaming this candidate to route_quality_v4_final.json"
+}

@@ -1,0 +1,17 @@
+{
+  "status": "HOLD",
+  "schema_errors": [],
+  "sampled_connectors": 50,
+  "completed_connectors": 0,
+  "major_error_rate": null,
+  "wrong_direction_rate": null,
+  "wrong_level_transition_rate": null,
+  "data_limitation_rate": null,
+  "requirements": {
+    "minimum_completed_connectors": 30,
+    "maximum_major_error_rate": 0.15,
+    "maximum_wrong_direction_rate": 0.05,
+    "maximum_wrong_level_transition_rate": 0.05
+  },
+  "blocker": "Complete targeted independent connector review."
+}

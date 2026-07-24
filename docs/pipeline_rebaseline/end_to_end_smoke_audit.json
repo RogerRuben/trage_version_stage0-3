@@ -1,0 +1,49 @@
+{
+  "status": "PASS",
+  "pipeline_version": "stage0_4_rebaseline_v2",
+  "config_hash": "8b452c91e1ad8811e14bf66b56cd38f4a94643a7cb4a6bc4cd07c7f0ea0059d5",
+  "checks": {
+    "contracts": true,
+    "field_availability_registry": true,
+    "all_manifests_load_and_hash": true,
+    "all_inputs_canonical": true,
+    "all_manifest_audits_pass": true,
+    "single_config_hash": true,
+    "lineage_dependencies": true,
+    "stage0_audit": true,
+    "stage1_v2_audit": true,
+    "stage2_dispatch_time_audit": true,
+    "stage3_calibration_leakage_audit": true,
+    "stage4_counterfactual_audit": true,
+    "formal_stage4_disabled": true,
+    "stage4_smoke_size": true,
+    "stage4_allowed_strategy_only": true,
+    "realized_duration_reads_zero": true,
+    "av_odd_violations_zero": true,
+    "av_execution_path_covered": true
+  },
+  "errors": [],
+  "artifact_ids": {
+    "raw": "raw_smoke_20161019_20_22_23_v2",
+    "stage0": "stage0_smoke_20161019_20_22_23_v2",
+    "stage1": "stage1_v2_smoke_20161019_20_22_23",
+    "stage2": "stage2_dispatch_smoke_fit20161019_predict20_22_23",
+    "stage3": "stage3_smoke_train20_validate22_test23_v2",
+    "stage4_supply": "stage4_decoupled_smoke_environment_train20_test23_v1",
+    "stage4": "stage4_safe_o0_1000_order_smoke_v2"
+  },
+  "review": {
+    "information_leakage": "PASS",
+    "data_lineage": "PASS",
+    "mathematical_definitions": "PASS_WITH_ENGINEERING_SMOKE_LIMITATIONS",
+    "counterfactual_inputs": "PASS",
+    "experiment_governance": "PASS"
+  },
+  "formal_inference_gate": "HOLD",
+  "formal_inference_blockers": [
+    "Stage0 clipped-core directed route continuity is only 15.7%-17.5% in the smoke sample.",
+    "Stage2 and Stage3 smoke estimators are lightweight engineering models, not formal RC-MSTNet/DeepSets refits.",
+    "Canonical dispatch-time IIS is unavailable and remains NA.",
+    "Only one engineering smoke split and one Stage4 functional run have been audited."
+  ]
+}

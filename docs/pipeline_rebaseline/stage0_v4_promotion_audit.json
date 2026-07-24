@@ -1,0 +1,21 @@
+{
+  "status": "HOLD",
+  "canonical_promotion_allowed": false,
+  "gates": {
+    "network_topology_diagnostic": true,
+    "grade_separation_not_silently_noded": true,
+    "fixed_1000_comparison_reviewed": true,
+    "manual_truth": false,
+    "connector_human_review": false,
+    "diagnostic_conservation": true,
+    "full_date_chain": false
+  },
+  "stop_rule_active": true,
+  "blockers": [
+    "manual_truth",
+    "connector_human_review",
+    "full_date_chain"
+  ],
+  "canonical_manifest": null,
+  "downstream_stage_status": "HOLD"
+}

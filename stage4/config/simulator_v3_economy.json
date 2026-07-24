@@ -1,0 +1,10 @@
+{
+  "version": "simulator_v3_economy_v1",
+  "lost_demand_cost_per_order": 5.0,
+  "av_fixed_daily_cost_per_vehicle": 80.0,
+  "depot_daily_cost": 150.0,
+  "hv_reposition_cost_per_km": 0.30,
+  "av_rebalancing_cost_per_km": 0.30,
+  "preassignment_failure_cost": 1.0,
+  "fixed_costs_enter_edge_objective": false
+}

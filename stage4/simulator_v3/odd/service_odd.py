@@ -17,3 +17,15 @@ class ServiceODDChecker:
             return False, "missing_capability_row"
         return bool(row.get("service_feasible", False)), "service_capability_mapping"
 
+    def audit_metadata(self, order_id: str, vehicle_type: str) -> dict:
+        """Return immutable mapping provenance for assignment logging."""
+        if vehicle_type != "AV":
+            return {
+                "capability_profile": "not_applicable_hv",
+                "capability_mapping_version": "not_applicable_hv",
+            }
+        row = self.capability_rows.get(str(order_id), {})
+        return {
+            "capability_profile": str(row.get("vehicle_profile", "missing_capability_row")),
+            "capability_mapping_version": str(row.get("capability_mapping_version", "missing_capability_mapping_version")),
+        }

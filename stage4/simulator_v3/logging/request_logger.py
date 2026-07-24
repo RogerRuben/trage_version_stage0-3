@@ -24,6 +24,11 @@ def request_to_record(req: RequestState) -> dict:
         "reserved_vehicle_id": req.reserved_vehicle_id or "",
         "assigned_vehicle_id": req.assigned_vehicle_id or "",
         "condition_available": req.condition_available,
+        "assigned_vehicle_type": str(req.metadata.get("assigned_vehicle_type", "")),
+        "pickup_odd_feasible": req.metadata.get("pickup_odd_feasible"),
+        "service_odd_feasible": req.metadata.get("service_odd_feasible"),
+        "combined_odd_feasible": req.metadata.get("combined_odd_feasible"),
+        "capability_profile": str(req.metadata.get("capability_profile", "")),
+        "capability_mapping_version": str(req.metadata.get("capability_mapping_version", "")),
         "last_failure_reason": req.last_failure_reason or "",
     }
-

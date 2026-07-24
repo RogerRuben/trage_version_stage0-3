@@ -1,0 +1,9 @@
+{
+  "version": "balanced_zone_time_constraints_v1",
+  "stress_budget_share_of_observable_pending_load": 0.55,
+  "minimum_zone_service_rate_per_epoch": 0.10,
+  "maximum_zone_service_target_per_epoch": 5,
+  "passenger_gc_cap": 120.0,
+  "hv_utility_min": -2.0,
+  "fixed_scenario_costs_enter_edge_objective": false
+}

@@ -1,0 +1,11 @@
+{
+  "pipeline_version": "stage0_4_rebaseline_v2",
+  "config_hash": "8b452c91e1ad8811e14bf66b56cd38f4a94643a7cb4a6bc4cd07c7f0ea0059d5",
+  "mode": "smoke",
+  "resume_from": "stage0",
+  "contract_preflight": "PASS",
+  "field_availability_registry": "PASS",
+  "manifest_preflight": "PASS",
+  "errors": [],
+  "status": "PASS"
+}

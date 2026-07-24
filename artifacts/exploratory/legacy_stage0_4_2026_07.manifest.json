@@ -1,0 +1,29 @@
+{
+  "manifest_version": "1.0",
+  "artifact_id": "legacy_stage0_4_2026_07",
+  "schema_version": "pre_audit_rebaseline_2026_07",
+  "stage": "end_to_end",
+  "status": "exploratory",
+  "created_at": "2026-07-15T00:00:00+08:00",
+  "created_by_commit": "fb38799",
+  "input_artifact_ids": [],
+  "config_hash": "legacy-unfrozen-config",
+  "fit_dates": ["20161009-20161022"],
+  "target_dates": ["20161023"],
+  "decision_time_contract": "mixed legacy contracts; not approved for formal inference",
+  "files": [],
+  "field_roles": {},
+  "audit": {
+    "status": "FAIL",
+    "path": "docs/pipeline_contract/end_to_end_contract.md",
+    "sha256": null
+  },
+  "supersedes_artifact_id": null,
+  "known_limitations": [
+    "Legacy Stage 1 labels have not passed the v2 mathematical audit.",
+    "Legacy Stage 2 dispatch-time and rolling semantics require full field-level re-audit.",
+    "Legacy Stage 3 vectors and full-day scaling require canonical scale/calibration re-audit.",
+    "Legacy Stage 4 O0-O3 and calibrated AV profiles are exploratory and not for formal inference.",
+    "Interrupted O2 full-day output on 2026-07-15 is invalid and excluded."
+  ]
+}

@@ -12,6 +12,8 @@
 /stage0/stage0_output/
 /stage0/full_day_output/
 /stage0/output/
+/stage0/output_v5/
+/stage0/work_v5/
 /stage1/output/
 /stage2/output/
 /stage3/output/
@@ -19,6 +21,41 @@
 /stage4/output/
 /stage4/data/
 /tmp/
+
+# Canonical artifact payloads stay local; manifests, audits, and compact reports
+# remain version controlled. Raw source archives are also excluded globally.
+/artifacts/**/*.parquet
+/artifacts/**/*.feather
+/artifacts/**/*.arrow
+/artifacts/**/raw_smoke_source/
+/artifacts/canonical/raw_smoke/
+/artifacts/canonical/smoke_v2/
+
+# Versioned Stage0 topology/rematch diagnostics are reproducible local payloads.
+# Compact audits and summaries are committed from docs/pipeline_rebaseline.
+/artifacts/exploratory/stage0_route_quality_diagnostic_v1/
+/artifacts/exploratory/stage0_noded_v3_rematch/
+/artifacts/exploratory/stage0_noded_v3_rematch_guarded/
+/artifacts/exploratory/stage0_noded_v3_route_quality_diagnostic_v1/
+/artifacts/exploratory/stage0_noded_v3_route_quality_guarded_v1/
+/artifacts/exploratory/xian_2017_core_noded_v3/
+/artifacts/exploratory/xian_2017_core_noded_v4/
+/artifacts/exploratory/stage0_noded_v4_rematch_guarded/
+/artifacts/exploratory/stage0_noded_v4_route_quality/
+/artifacts/exploratory/stage0_noded_v4_connector_rematch/
+/artifacts/exploratory/stage0_noded_v4_connector_route_quality/
+/artifacts/exploratory/stage0_noded_v4_engineering_rematch/
+/artifacts/exploratory/stage0_noded_v4_engineering_route_quality/
+/artifacts/exploratory/stage0_network_comparison_v4/
+/artifacts/exploratory/stage0_noded_v4_trainval_rematch/
+/artifacts/exploratory/stage0_noded_v4_trainval_route_quality/
+/artifacts/exploratory/xian_2017_core_noded_v4_no_connectors/
+/artifacts/exploratory/stage0_noded_v4_directional_rematch/
+/artifacts/exploratory/stage0_noded_v4_directional_route_quality/
+/artifacts/exploratory/stage0_noded_v4_no_connector_rematch/
+/artifacts/exploratory/stage0_noded_v4_no_connector_route_quality/
+/artifacts/exploratory/stage0_noded_v4_directional_trainval_rematch/
+/artifacts/exploratory/stage0_noded_v4_directional_trainval_route_quality/
 
 # Local agent/application state
 /.agents/

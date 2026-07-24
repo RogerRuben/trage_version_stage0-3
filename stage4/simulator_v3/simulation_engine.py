@@ -8,7 +8,15 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from sklearn.neighbors import BallTree
 
+from .economy_ledger import (
+    ScenarioCostParameters,
+    assignment_ledger_row,
+    audit_ledger,
+    build_scenario_ledger,
+)
+from .entities import VehiclePlan
 from .enums import EventType, RequestStatus, VehicleExecutionStatus
 from .event_queue import EventQueue
 from .fleet_controller import FleetController
@@ -33,6 +41,7 @@ class SimulationEngine:
         request_manager: RequestManager,
         decision_epoch_sec: int = 30,
         idle_manager: IdleMovementManager | None = None,
+        scenario_cost_parameters: ScenarioCostParameters | None = None,
     ):
         self.state = state
         self.events = event_queue
@@ -51,6 +60,9 @@ class SimulationEngine:
         self.pending_offers: dict[str, dict] = {}
         self.reservations = ReservationManager()
         self.idle_manager = idle_manager
+        self.scenario_cost_parameters = scenario_cost_parameters or ScenarioCostParameters()
+        self.economy_ledger_records: list[dict] = []
+        self.economy_audit: dict = {}
 
     def initialize_events(self, start: pd.Timestamp, end: pd.Timestamp) -> None:
         for req in self.state.requests.values():
@@ -98,7 +110,19 @@ class SimulationEngine:
                             if req.status == RequestStatus.COMPLETED:
                                 self.state.completed_request_ids.add(req.order_id)
                                 self.state.reserved_request_ids.discard(req.order_id)
-                                self.reservations.complete(req.order_id)
+                                self.reservations.complete(req.order_id, event.event_time)
+                        if vehicle.current_leg is None and vehicle.reserved_request_id is not None:
+                            reserved_request_id = vehicle.reserved_request_id
+                            validation_result = self._revalidate_vehicle_reservation(vehicle.vehicle_id, event.event_time)
+                            if validation_result == "PASS":
+                                # The reservation has now been consumed into the
+                                # executable plan.  Close it before the executor
+                                # clears ``reserved_request_id`` so the scheduled
+                                # expiry event becomes a harmless stale event.
+                                self.reservations.complete(reserved_request_id, event.event_time)
+                                self.executor.start_next_leg(vehicle, self.state.requests, event.event_time)
+                            else:
+                                result = validation_result
                     else:
                         result = "NO_ACTIVE_LEG"
                 elif event.event_type == EventType.DECISION_EPOCH:
@@ -107,6 +131,12 @@ class SimulationEngine:
                 elif event.event_type == EventType.DRIVER_RESPONSE:
                     handler = "SimulationEngine._driver_response"
                     result = self._driver_response(event.entity_id, event.event_time)
+                elif event.event_type == EventType.RESERVATION_EXPIRED:
+                    handler = "SimulationEngine._reservation_expired"
+                    result = self._reservation_expired(event.entity_id, event.event_time)
+                elif event.event_type == EventType.PLAN_INVALIDATED:
+                    handler = "SimulationEngine._plan_invalidated"
+                    result = self._plan_invalidated(event.entity_id, event.event_time, str(event.payload.get("reason", "PLAN_INVALIDATED")))
                 else:
                     handled = False
                     result = "NO_HANDLER"
@@ -121,6 +151,7 @@ class SimulationEngine:
                     "event_priority": event.priority,
                     "event_type": event.event_type.value,
                     "entity_id": event.entity_id,
+                    "event_payload": json.dumps(event.payload, sort_keys=True, default=str),
                     "handled": handled,
                     "handler": handler,
                     "result": result,
@@ -171,7 +202,7 @@ class SimulationEngine:
                 self.plan_revision_records.append(plan_revision_record(old_plan, decision.plan, now, "PASS"))
                 idle_moves += 1
         edges, edge_stats = self.controller.build_edges(self.state, now, self.strategy)
-        chosen, match_stats = self.controller.choose_edges(edges, self.strategy)
+        chosen, match_stats = self.controller.choose_edges(edges, self.strategy, self.state, now)
         plans = self.controller.publish_assignment_plans(self.state, chosen, now)
         for vehicle, req, plan, edge in plans:
             old_plan = vehicle.active_plan
@@ -179,7 +210,9 @@ class SimulationEngine:
                 if vehicle.vehicle_type == "HV":
                     self.requests.offer(self.state, req, vehicle.vehicle_id, now, trigger="PREASSIGNMENT_OFFER")
                     offer_id = f"{req.order_id}:{vehicle.vehicle_id}:{req.offer_round}"
-                    response_time = now + pd.Timedelta(seconds=10)
+                    response_time = now + pd.Timedelta(
+                        seconds=self.controller.driver_response.response_delay_sec
+                    )
                     self.pending_offers[offer_id] = {
                         "request_id": req.order_id,
                         "vehicle_id": vehicle.vehicle_id,
@@ -194,7 +227,7 @@ class SimulationEngine:
                 else:
                     self.requests.reserve(self.state, req, vehicle.vehicle_id, now)
                     vehicle.reserved_request_id = req.order_id
-                    self.reservations.create(req.order_id, vehicle.vehicle_id, now, req.latest_pickup_time)
+                    self._create_reservation(req, vehicle, edge, now)
                     vehicle.active_plan = plan
                     vehicle.plan_version = plan.plan_version
                     self.plan_revision_records.append(plan_revision_record(old_plan, plan, now, "PASS"))
@@ -213,7 +246,9 @@ class SimulationEngine:
                 self.requests.offer(self.state, req, vehicle.vehicle_id, now)
                 self.state.set_vehicle_status(vehicle.vehicle_id, VehicleExecutionStatus.WAITING)
                 offer_id = f"{req.order_id}:{vehicle.vehicle_id}:{req.offer_round}"
-                response_time = now + pd.Timedelta(seconds=10)
+                response_time = now + pd.Timedelta(
+                    seconds=self.controller.driver_response.response_delay_sec
+                )
                 self.pending_offers[offer_id] = {
                     "request_id": req.order_id,
                     "vehicle_id": vehicle.vehicle_id,
@@ -241,6 +276,7 @@ class SimulationEngine:
                     "driver_utility": edge.driver_utility,
                     "response": "ACCEPT",
                     "rejection_reason": "",
+                    **self._offer_odd_fields(edge),
                 })
         preassignment_offers = 0
         if self.controller.preassignment_enabled:
@@ -257,6 +293,26 @@ class SimulationEngine:
             "orders_hitting_candidate_cap": edge_stats.get("orders_hitting_candidate_cap", 0),
             "idle_movement_plans": idle_moves,
             "preassignment_offers": preassignment_offers,
+            "stress_constraint_active": match_stats.get("stress_constraint_active", False),
+            "zone_service_constraint_active": match_stats.get("zone_service_constraint_active", False),
+            "stress_constraint_binding": match_stats.get("stress_constraint_binding", False),
+            "zone_service_constraint_binding": match_stats.get("zone_service_constraint_binding", False),
+            "zone_service_deficit_total": match_stats.get("zone_service_deficit_total", 0),
+            "stress_budget_violation_total": match_stats.get("stress_budget_violation_total", 0.0),
+            "balanced_constraint_source": match_stats.get("balanced_constraint_source", ""),
+            "balanced_constraint_table_hash": match_stats.get("balanced_constraint_table_hash", ""),
+            "remaining_stress_budget_total": match_stats.get("remaining_stress_budget_total", 0.0),
+            "minimum_zone_service_target_total": match_stats.get("minimum_zone_service_target_total", 0),
+            "served_zone_count_total": match_stats.get("served_zone_count_total", 0),
+            "pending_order_count_in_constraint_table": match_stats.get("pending_order_count_in_constraint_table", 0),
+            "maximum_cardinality_before_constraints": match_stats.get("maximum_cardinality_before_constraints", 0),
+            "stress_replacement_count": match_stats.get("stress_replacement_count", 0),
+            "stress_cardinality_reduction_count": match_stats.get("stress_cardinality_reduction_count", 0),
+            "zone_fairness_swap_count": match_stats.get("zone_fairness_swap_count", 0),
+            "constraint_relaxation_used": match_stats.get("constraint_relaxation_used", False),
+            "balanced_price_aware_equivalent": match_stats.get("price_aware_equivalent", True),
+            "balanced_edge_objective": match_stats.get("edge_objective", ""),
+            "balanced_constraint_model": match_stats.get("constraint_model", ""),
         }))
 
     def _driver_response(self, offer_id: str, now: pd.Timestamp) -> str:
@@ -269,16 +325,88 @@ class SimulationEngine:
         if req.status != RequestStatus.OFFERED:
             self.state.set_vehicle_status(vehicle.vehicle_id, VehicleExecutionStatus.IDLE if vehicle.online_start <= now <= vehicle.online_end else VehicleExecutionStatus.OFFLINE)
             return f"REQUEST_NOT_OFFERED:{req.status.value}"
+        if now >= req.latest_pickup_time:
+            self.requests.reject_offer(self.state, req, vehicle.vehicle_id, now, "response_after_pickup_deadline")
+            if not offer.get("preassigned", False):
+                self.state.set_vehicle_status(
+                    vehicle.vehicle_id,
+                    VehicleExecutionStatus.IDLE if vehicle.online_start <= now <= vehicle.online_end else VehicleExecutionStatus.OFFLINE,
+                )
+            self.offer_records.append({
+                "offer_id": offer_id,
+                "request_id": req.order_id,
+                "vehicle_id": vehicle.vehicle_id,
+                "offer_time": str(offer["offer_time"]),
+                "response_deadline": str(offer["response_deadline"]),
+                "response_time": str(now),
+                "driver_utility": edge.driver_utility,
+                "response": "TIMEOUT",
+                "rejection_reason": "response_after_pickup_deadline",
+                **self._offer_odd_fields(edge),
+            })
+            return "TIMEOUT"
         if not offer.get("preassigned", False) and (vehicle.current_leg is not None or vehicle.execution_status != VehicleExecutionStatus.WAITING):
             self.requests.reject_offer(self.state, req, vehicle.vehicle_id, now, "vehicle_no_longer_waiting")
             return "VEHICLE_NOT_WAITING"
+        service_end = offer["plan"].stops[-1].planned_arrival if offer["plan"].stops else now
+        response = self.controller.driver_response.evaluate_delayed_response(
+            vehicle,
+            edge.driver_utility,
+            service_end,
+        )
+        if response.response.value != "ACCEPT":
+            self.requests.reject_offer(self.state, req, vehicle.vehicle_id, now, response.reason or response.response.value.lower())
+            if not offer.get("preassigned", False):
+                self.state.set_vehicle_status(
+                    vehicle.vehicle_id,
+                    VehicleExecutionStatus.IDLE if vehicle.online_start <= now <= vehicle.online_end else VehicleExecutionStatus.OFFLINE,
+                )
+            self.offer_records.append({
+                "offer_id": offer_id,
+                "request_id": req.order_id,
+                "vehicle_id": vehicle.vehicle_id,
+                "offer_time": str(offer["offer_time"]),
+                "response_deadline": str(offer["response_deadline"]),
+                "response_time": str(now),
+                "driver_utility": edge.driver_utility,
+                "response": response.response.value,
+                "rejection_reason": response.reason,
+                **self._offer_odd_fields(edge),
+            })
+            return response.response.value
         if offer.get("preassigned", False):
+            # The vehicle may finish its locked task during the asynchronous
+            # HV response delay.  The insertion plan was built against the old
+            # locked leg and must not be installed after that leg disappears.
+            # Return the request to pending; the now-idle vehicle can be paired
+            # by the normal matcher at the next decision epoch.
+            if vehicle.current_leg is None:
+                self.requests.reject_offer(
+                    self.state,
+                    req,
+                    vehicle.vehicle_id,
+                    now,
+                    "vehicle_released_before_preassignment_response",
+                )
+                self.offer_records.append({
+                    "offer_id": offer_id,
+                    "request_id": req.order_id,
+                    "vehicle_id": vehicle.vehicle_id,
+                    "offer_time": str(offer["offer_time"]),
+                    "response_deadline": str(offer["response_deadline"]),
+                    "response_time": str(now),
+                    "driver_utility": edge.driver_utility,
+                    "response": "REJECT",
+                    "rejection_reason": "vehicle_released_before_preassignment_response",
+                    **self._offer_odd_fields(edge),
+                })
+                return "VEHICLE_RELEASED_BEFORE_PREASSIGNMENT_RESPONSE"
             if vehicle.vehicle_id in self.reservations.vehicle_to_request:
                 self.requests.reject_offer(self.state, req, vehicle.vehicle_id, now, "vehicle_already_reserved")
                 return "VEHICLE_ALREADY_RESERVED"
             self.requests.reserve(self.state, req, vehicle.vehicle_id, now)
             vehicle.reserved_request_id = req.order_id
-            self.reservations.create(req.order_id, vehicle.vehicle_id, now, req.latest_pickup_time)
+            self._create_reservation(req, vehicle, edge, now)
             vehicle.active_plan = offer["plan"]
             vehicle.plan_version = offer["plan"].plan_version
         else:
@@ -296,6 +424,7 @@ class SimulationEngine:
             "driver_utility": edge.driver_utility,
             "response": "ACCEPT",
             "rejection_reason": "",
+            **self._offer_odd_fields(edge),
         })
         return "ACCEPT"
 
@@ -315,24 +444,38 @@ class SimulationEngine:
         if not candidate_vehicles:
             return 0
         pending = [self.state.requests[oid] for oid in sorted(self.state.pending_request_ids) if self.state.requests[oid].status == RequestStatus.PENDING]
+        if not pending:
+            return 0
+        pending_coords = np.radians(np.asarray(
+            [[float(req.origin_lat), float(req.origin_lon)] for req in pending], dtype=float
+        ))
+        pending_tree = BallTree(pending_coords, metric="haversine")
         offers = 0
         for vehicle in candidate_vehicles:
             if offers >= max_offers:
                 break
             release_lon = float(vehicle.current_leg.end_lon)
             release_lat = float(vehicle.current_leg.end_lat)
-            coarse: list[tuple[float, object]] = []
-            for req in pending:
-                dx = (float(req.origin_lon) - release_lon) * 91_000.0
-                dy = (float(req.origin_lat) - release_lat) * 111_000.0
-                dist = float(np.hypot(dx, dy))
-                if dist <= 6_000.0:
-                    coarse.append((dist, req))
-            coarse.sort(key=lambda item: item[0])
-            for _, req in coarse[:40]:
+            idx, _ = pending_tree.query_radius(
+                np.radians([[release_lat, release_lon]]),
+                r=6_000.0 / 6_371_000.0,
+                return_distance=True,
+                sort_results=True,
+            )
+            for pending_index in idx[0][:40]:
+                req = pending[int(pending_index)]
                 if req.status != RequestStatus.PENDING:
                     continue
-                release_time = vehicle.current_leg.planned_end + pd.Timedelta(seconds=30)
+                resolver = self.controller.safe_release_resolver
+                if resolver is None:
+                    raise RuntimeError("Preassignment requires a validation residual resolver")
+                resolution = resolver.resolve(
+                    vehicle.current_leg.planned_end,
+                    int(req.metadata.get("time_bin", 0)),
+                    vehicle.current_zone,
+                    str(req.metadata.get("stress_bucket", "unknown")),
+                )
+                release_time = max(now, resolution.safe_release_time)
                 pickup_route = self.controller.routing.query_pickup_route(
                     (vehicle.current_leg.end_lon, vehicle.current_leg.end_lat, vehicle.current_zone),
                     (req.origin_lon, req.origin_lat, req.origin_zone),
@@ -347,6 +490,10 @@ class SimulationEngine:
                 validation = self.controller.validator.validate(vehicle, req, now, pickup_arrival, service_end, allow_preassignment=True)
                 if not validation.feasible:
                     continue
+                capability = (
+                    self.controller.validator.service_odd.capability_rows.get(str(req.order_id), {})
+                    if vehicle.vehicle_type == "AV" else {}
+                )
                 econ = self.controller.economics.evaluate(
                     req,
                     vehicle,
@@ -354,6 +501,8 @@ class SimulationEngine:
                     pickup_route.expected_travel_time_sec,
                     (now - req.request_time).total_seconds(),
                     self.strategy,
+                    capability_cost=float(capability.get("capability_cost", 0.0) or 0.0),
+                    remote_assistance_cost=float(capability.get("remote_assistance_cost", 0.0) or 0.0),
                 )
                 from .matching.sparse_matcher import CandidateEdge
                 from .vehicle_plan import insert_request_after_locked_stops
@@ -372,8 +521,22 @@ class SimulationEngine:
                         "origin_zone": req.origin_zone,
                         "preassigned": True,
                         "pickup_distance_m": pickup_route.road_distance_m,
-                        "release_buffer_sec": 30.0,
-                        "buffer_source": "global_q90_validation_residual_fallback",
+                        "pickup_odd_feasible": bool(validation.pickup_odd_feasible),
+                        "service_odd_feasible": bool(validation.service_odd_feasible),
+                        "combined_odd_feasible": bool(validation.pickup_odd_feasible and validation.service_odd_feasible),
+                        "capability_profile": validation.capability_profile,
+                        "capability_mapping_version": validation.capability_mapping_version,
+                        "fare_revenue": econ.fare_revenue,
+                        "driver_payout": econ.driver_payout,
+                        "pickup_variable_cost": econ.pickup_variable_cost,
+                        "service_variable_cost": econ.service_variable_cost,
+                        "capability_cost": econ.capability_cost,
+                        "remote_assistance_cost": econ.remote_assistance_cost,
+                        "platform_variable_cost": econ.platform_variable_cost,
+                        **resolution.to_metadata(),
+                        "raw_safe_release_time": str(resolution.safe_release_time),
+                        "safe_release_time": str(release_time),
+                        "safe_release_clamped_to_now": bool(release_time != resolution.safe_release_time),
                     },
                 )
                 plan = insert_request_after_locked_stops(
@@ -387,9 +550,56 @@ class SimulationEngine:
                     "preassignment",
                 )
                 old_plan = vehicle.active_plan
+                req.metadata.update({
+                    "assigned_vehicle_type": vehicle.vehicle_type,
+                    "pickup_odd_feasible": bool(validation.pickup_odd_feasible),
+                    "service_odd_feasible": bool(validation.service_odd_feasible),
+                    "combined_odd_feasible": bool(validation.pickup_odd_feasible and validation.service_odd_feasible),
+                    "capability_profile": validation.capability_profile,
+                    "capability_mapping_version": validation.capability_mapping_version,
+                    "selected_edge_economics": {
+                        key: float(edge.metadata.get(key, 0.0) or 0.0)
+                        for key in [
+                            "fare_revenue", "driver_payout", "pickup_variable_cost",
+                            "service_variable_cost", "capability_cost",
+                            "remote_assistance_cost", "platform_variable_cost",
+                        ]
+                    },
+                })
+                if vehicle.vehicle_type == "AV":
+                    # AV reservations are platform-controlled and therefore do
+                    # not fabricate a driver response event.  Physical state is
+                    # unchanged until the current locked service completes.
+                    self.requests.reserve(self.state, req, vehicle.vehicle_id, now)
+                    vehicle.reserved_request_id = req.order_id
+                    self._create_reservation(req, vehicle, edge, now)
+                    vehicle.active_plan = plan
+                    vehicle.plan_version = plan.plan_version
+                    self.plan_revision_records.append(plan_revision_record(old_plan, plan, now, "PASS"))
+                    self.offer_records.append({
+                        "offer_id": f"{req.order_id}:{vehicle.vehicle_id}:{req.offer_round}",
+                        "request_id": req.order_id,
+                        "vehicle_id": vehicle.vehicle_id,
+                        "offer_time": str(now),
+                        "response_deadline": str(now),
+                        "response_time": str(now),
+                        "driver_utility": edge.driver_utility,
+                        "response": "RESERVED",
+                        "rejection_reason": "",
+                        **self._offer_odd_fields(edge),
+                    })
+                    active_offer_vehicles.add(vehicle.vehicle_id)
+                    offers += 1
+                    break
+
                 self.requests.offer(self.state, req, vehicle.vehicle_id, now, trigger="PREASSIGNMENT_OFFER")
                 offer_id = f"{req.order_id}:{vehicle.vehicle_id}:{req.offer_round}"
-                response_time = now + pd.Timedelta(seconds=10)
+                response_time = now + pd.Timedelta(seconds=self.controller.driver_response.response_delay_sec)
+                if response_time >= req.latest_pickup_time:
+                    # The offer cannot be accepted before the passenger's
+                    # deadline, so leave the request pending for another edge.
+                    self.requests.reject_offer(self.state, req, vehicle.vehicle_id, now, "offer_response_after_deadline")
+                    continue
                 self.pending_offers[offer_id] = {
                     "request_id": req.order_id,
                     "vehicle_id": vehicle.vehicle_id,
@@ -406,6 +616,126 @@ class SimulationEngine:
                 break
         return offers
 
+    @staticmethod
+    def _offer_odd_fields(edge) -> dict:
+        return {
+            "pickup_odd_feasible": bool(edge.metadata.get("pickup_odd_feasible", False)),
+            "service_odd_feasible": bool(edge.metadata.get("service_odd_feasible", False)),
+            "combined_odd_feasible": bool(edge.metadata.get("combined_odd_feasible", False)),
+            "capability_profile": str(edge.metadata.get("capability_profile", "")),
+            "capability_mapping_version": str(edge.metadata.get("capability_mapping_version", "")),
+        }
+
+    def _create_reservation(self, req, vehicle, edge, now: pd.Timestamp) -> None:
+        expected_text = edge.metadata.get("expected_release_time") or edge.metadata.get("safe_release_time")
+        expected = pd.Timestamp(expected_text) if expected_text else vehicle.current_leg.planned_end
+        safe_text = edge.metadata.get("safe_release_time")
+        safe = pd.Timestamp(safe_text) if safe_text else expected
+        self.reservations.create(
+            req.order_id,
+            vehicle.vehicle_id,
+            now,
+            req.latest_pickup_time,
+            expected_release_time=expected,
+            safe_release_time=safe,
+            buffer_source=str(edge.metadata.get("buffer_source", "")),
+            buffer_sample_count=int(edge.metadata.get("buffer_sample_count", 0) or 0),
+            buffer_quantile=float(edge.metadata.get("buffer_quantile", 0.9) or 0.9),
+            residual_quantile_sec=float(edge.metadata.get("release_residual_quantile_sec", 0.0) or 0.0),
+        )
+        self.events.push(req.latest_pickup_time, EventType.RESERVATION_EXPIRED, req.order_id)
+
+    def _release_reservation_state(self, request_id: str, now: pd.Timestamp, reason: str) -> str:
+        req = self.state.requests[request_id]
+        vehicle_id = req.reserved_vehicle_id or self.reservations.request_to_vehicle.get(request_id)
+        if vehicle_id and vehicle_id in self.state.vehicles:
+            vehicle = self.state.vehicles[vehicle_id]
+            old_plan = vehicle.active_plan
+            kept = [stop for stop in old_plan.stops if str(stop.request_id or "") != str(request_id)]
+            new_plan = VehiclePlan(
+                vehicle_id=vehicle.vehicle_id,
+                plan_version=vehicle.plan_version + 1,
+                stops=kept,
+                created_time=now,
+                trigger=reason,
+                feasible=True,
+                objective_value=old_plan.objective_value,
+                assigned_request_ids=[oid for oid in old_plan.assigned_request_ids if oid != request_id],
+                reserved_request_ids=[oid for oid in old_plan.reserved_request_ids if oid != request_id],
+            )
+            vehicle.active_plan = new_plan
+            vehicle.plan_version = new_plan.plan_version
+            vehicle.reserved_request_id = None
+            self.plan_revision_records.append(plan_revision_record(old_plan, new_plan, now, "PASS"))
+        req.reserved_vehicle_id = None
+        if req.status == RequestStatus.RESERVED:
+            self.requests.transition(req, RequestStatus.PENDING, now, reason=reason, trigger=reason, vehicle_id=vehicle_id)
+            self.state.reserved_request_ids.discard(request_id)
+            self.state.pending_request_ids.add(request_id)
+        req.metadata["reservation_failure_count"] = int(req.metadata.get("reservation_failure_count", 0)) + 1
+        req.last_failure_reason = reason
+        return reason
+
+    def _reservation_expired(self, request_id: str, now: pd.Timestamp) -> str:
+        record = self.reservations.active_for_request(request_id)
+        if record is None:
+            return "STALE_RESERVATION_EXPIRY"
+        if now < record.expiry_time:
+            return "EARLY_RESERVATION_EXPIRY_IGNORED"
+        self.reservations.expire(request_id, now, "RESERVATION_EXPIRED")
+        return self._release_reservation_state(request_id, now, "RESERVATION_EXPIRED")
+
+    def _plan_invalidated(self, request_id: str, now: pd.Timestamp, reason: str) -> str:
+        if self.reservations.active_for_request(request_id) is not None:
+            self.reservations.invalidate(request_id, now, reason)
+        return self._release_reservation_state(request_id, now, reason)
+
+    def _revalidate_vehicle_reservation(self, vehicle_id: str, now: pd.Timestamp) -> str:
+        vehicle = self.state.vehicles[vehicle_id]
+        request_id = vehicle.reserved_request_id
+        if not request_id:
+            return "NO_RESERVATION"
+        req = self.state.requests[request_id]
+        if self.reservations.active_for_request(request_id) is None:
+            # Expiry/invalidation may close the authoritative reservation at
+            # the same timestamp as the locked current leg completes.  Clear
+            # the stale plan/vehicle pointer before any further validation.
+            return self._release_reservation_state(
+                request_id, now, "STALE_RESERVATION_STATE_RELEASED"
+            )
+        resolver = self.controller.safe_release_resolver
+        if resolver is None:
+            self.events.push(now, EventType.PLAN_INVALIDATED, request_id, {"reason": "PLAN_INVALIDATED:NO_VALIDATION_RESIDUAL"})
+            return "PLAN_INVALIDATED:NO_VALIDATION_RESIDUAL"
+        resolution = resolver.resolve(
+            now,
+            int(req.metadata.get("time_bin", 0)),
+            vehicle.current_zone,
+            str(req.metadata.get("stress_bucket", "unknown")),
+        )
+        safe_release = max(now, resolution.safe_release_time)
+        pickup = self.controller.routing.query_pickup_route(
+            (vehicle.current_lon, vehicle.current_lat, vehicle.current_zone),
+            (req.origin_lon, req.origin_lat, req.origin_zone),
+            safe_release,
+            vehicle.vehicle_type,
+            int(req.metadata.get("time_bin", 0)),
+        )
+        validation = self.reservations.revalidate(
+            request_id,
+            now,
+            safe_release,
+            pickup.expected_travel_time_sec,
+            req.latest_pickup_time,
+            vehicle_online_end=vehicle.online_end,
+            projected_service_time_sec=req.predicted_service_time_sec,
+            release_metadata=resolution.to_metadata(),
+        )
+        if not validation.feasible:
+            self.events.push(now, EventType.PLAN_INVALIDATED, request_id, {"reason": validation.reason})
+            return validation.reason
+        return "PASS"
+
     def configure_strategy(self, strategy: str) -> None:
         self.strategy = strategy
 
@@ -418,8 +748,52 @@ class SimulationEngine:
         pd.DataFrame(self.requests.transition_records).to_parquet(out_dir / "request_transition_log.parquet", index=False, compression="zstd")
         pd.DataFrame(self.event_execution_records).to_parquet(out_dir / "event_execution_log.parquet", index=False, compression="zstd")
         pd.DataFrame(self.system_epoch_records).to_parquet(out_dir / "system_epoch_log.parquet", index=False, compression="zstd")
+        pd.DataFrame([{
+            "vehicle_id": vehicle.vehicle_id,
+            "vehicle_type": vehicle.vehicle_type,
+            "online_start": vehicle.online_start,
+            "online_end": vehicle.online_end,
+            "final_execution_status": vehicle.execution_status.value,
+            "final_lon": vehicle.current_lon,
+            "final_lat": vehicle.current_lat,
+            "final_zone": vehicle.current_zone,
+            "cumulative_pickup_distance_m": vehicle.cumulative_pickup_distance_m,
+            "cumulative_service_distance_m": vehicle.cumulative_service_distance_m,
+            "cumulative_reposition_distance_m": vehicle.cumulative_reposition_distance_m,
+            "cumulative_rebalancing_distance_m": vehicle.cumulative_rebalancing_distance_m,
+        } for vehicle in self.state.vehicles.values()]).to_parquet(
+            out_dir / "vehicle_state_log.parquet", index=False, compression="zstd"
+        )
         if self.idle_manager is not None:
             pd.DataFrame(self.idle_manager.records).to_parquet(out_dir / "idle_movement_log.parquet", index=False, compression="zstd")
+        served_rows = []
+        for req in self.state.requests.values():
+            if req.status != RequestStatus.COMPLETED or not req.assigned_vehicle_id:
+                continue
+            vehicle = self.state.vehicles[req.assigned_vehicle_id]
+            served_rows.append(assignment_ledger_row(
+                req.order_id,
+                vehicle.vehicle_id,
+                vehicle.vehicle_type,
+                req.metadata.get("selected_edge_economics", {}),
+            ))
+        legs = pd.DataFrame(self.vehicle_leg_records)
+        av_count = sum(v.vehicle_type == "AV" for v in self.state.vehicles.values())
+        depot_count = len({v.depot_id for v in self.state.vehicles.values() if v.vehicle_type == "AV" and v.depot_id})
+        ledger = build_scenario_ledger(
+            served_rows,
+            [r.order_id for r in self.state.requests.values() if r.status == RequestStatus.CANCELLED],
+            legs,
+            av_count,
+            depot_count,
+            len(self.reservations.failure_records),
+            self.scenario_cost_parameters,
+        )
+        self.economy_ledger_records = ledger.to_dict("records")
+        self.economy_audit = audit_ledger(ledger)
+        ledger.to_csv(out_dir / "economy_ledger.csv", index=False)
+        pd.DataFrame([record.__dict__ for record in self.reservations.records]).to_parquet(out_dir / "reservation_log.parquet", index=False, compression="zstd")
+        pd.DataFrame(self.reservations.failure_records).to_parquet(out_dir / "preassignment_failure_log.parquet", index=False, compression="zstd")
         (out_dir / "summary.json").write_text(json.dumps(self.summary(), indent=2), encoding="utf-8")
 
     def summary(self) -> dict:
@@ -427,7 +801,7 @@ class SimulationEngine:
         completed = sum(r.status == RequestStatus.COMPLETED for r in self.state.requests.values())
         cancelled = sum(r.status == RequestStatus.CANCELLED for r in self.state.requests.values())
         av_completed = sum(r.status == RequestStatus.COMPLETED and r.assigned_vehicle_id and self.state.vehicles[r.assigned_vehicle_id].vehicle_type == "AV" for r in self.state.requests.values())
-        return {
+        summary = {
             "orders": total,
             "completed_orders": completed,
             "cancelled_orders": cancelled,
@@ -440,3 +814,10 @@ class SimulationEngine:
             "plan_revision_count": len(self.plan_revision_records),
             "offer_count": len(self.offer_records),
         }
+        if self.economy_audit:
+            summary.update({
+                "operating_contribution": self.economy_audit.get("operating_contribution", 0.0),
+                "scenario_net_profit": self.economy_audit.get("scenario_net_profit", 0.0),
+                "economy_audit_status": self.economy_audit.get("economy_audit_status", "FAIL"),
+            })
+        return summary

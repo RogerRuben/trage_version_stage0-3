@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Stage 3.5 offline HV/AV route output row",
+  "type": "object",
+  "required": [
+    "order_id", "hv_route_id", "hv_route_source", "hv_link_sequence",
+    "hv_route_time_sec", "hv_route_distance_m", "hv_route_risk_vector",
+    "av_route_available", "odd_profile_id", "prediction_cutoff_time",
+    "network_version", "stage2_model_version", "stage3_model_version",
+    "stage35_version"
+  ],
+  "properties": {
+    "order_id": {"type": "string"},
+    "hv_route_id": {"type": "string"},
+    "hv_route_source": {"enum": ["historical_route_replay_baseline", "shortest_expected_time"]},
+    "hv_link_sequence": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "av_route_id": {"type": ["string", "null"]},
+    "av_link_sequence": {
+      "oneOf": [
+        {"type": "null"},
+        {"type": "array", "items": {"type": "string"}, "minItems": 1}
+      ]
+    },
+    "hv_route_time_sec": {"type": "number", "exclusiveMinimum": 0},
+    "av_route_time_sec": {"type": ["number", "null"], "exclusiveMinimum": 0},
+    "hv_route_distance_m": {"type": "number", "minimum": 0},
+    "av_route_distance_m": {"type": ["number", "null"], "minimum": 0},
+    "hv_route_risk": {"type": ["number", "null"]},
+    "av_route_risk": {"type": ["number", "null"]},
+    "hv_route_risk_vector": {"type": "object"},
+    "av_route_risk_vector": {"type": ["object", "null"]},
+    "av_route_available": {"type": "boolean"},
+    "av_detour_ratio": {"type": ["number", "null"], "minimum": 0},
+    "av_time_penalty_ratio": {"type": ["number", "null"], "minimum": 0},
+    "binding_dimension": {"type": ["string", "null"]},
+    "minimum_achievable_risk": {"type": ["number", "null"]},
+    "remote_assistance_requirement": {"type": ["boolean", "null"]},
+    "odd_profile_id": {"type": "string"},
+    "prediction_cutoff_time": {"type": "string"},
+    "network_version": {"type": "string"},
+    "stage2_model_version": {"type": "string"},
+    "stage3_model_version": {"type": "string"},
+    "stage35_version": {"const": "stage35_offline_route_selection_v1"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"av_route_available": {"const": true}}},
+      "then": {
+        "required": [
+          "av_route_id", "av_link_sequence", "av_route_time_sec",
+          "av_route_distance_m", "av_route_risk_vector", "av_detour_ratio",
+          "av_time_penalty_ratio"
+        ],
+        "properties": {
+          "av_route_id": {"type": "string"},
+          "av_link_sequence": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+          "av_route_time_sec": {"type": "number", "exclusiveMinimum": 0},
+          "av_route_distance_m": {"type": "number", "minimum": 0},
+          "av_route_risk_vector": {"type": "object"}
+        }
+      }
+    }
+  ],
+  "additionalProperties": true
+}

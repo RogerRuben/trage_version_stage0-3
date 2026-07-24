@@ -1,0 +1,120 @@
+schema_version: stage0_v5.0
+paths:
+  raw_root: D:/pycodes/didi_xian_raw
+  archive: D:/pycodes/didi_xian_raw/22-4-8.rar
+  pbf: D:/pycodes/didi_xian_raw/map_data/xian_roadmap_update.osm.pbf
+  poi: D:/pycodes/didi_xian_raw/map_data/西安市POI数据.csv
+  output: stage0/output_v5
+  work: stage0/work_v5
+  seven_zip: C:/Program Files/7-Zip/7z.exe
+split:
+  train: [20161009, 20161010, 20161011, 20161012, 20161013, 20161014, 20161015, 20161016, 20161017, 20161018, 20161019, 20161020, 20161021, 20161022, 20161023, 20161024]
+  validation: [20161025, 20161026, 20161027]
+  test: [20161028, 20161029, 20161030, 20161031]
+sampling:
+  orders_per_day: 10000
+  seed: 20261009
+  minimum_points: 3
+network:
+  endpoint_tolerance_m: 0.5
+  metric_crs: EPSG:32649
+  excluded_highways: [footway, steps, cycleway, corridor, elevator, proposed, construction]
+  disallowed_access: [no, private]
+  low_priority_highways: [service, living_street, track]
+  service_penalty: 1.4
+  track_penalty: 2.0
+  living_street_penalty: 1.25
+  u_turn_penalty_m: 500.0
+  road_class_transition_penalty_m: 30.0
+  bridge_cache_pairs: 50000
+  pareto_epsilon_m: 0.25
+  pareto_max_labels_per_state: 12
+  pareto_search_mode: approximate
+candidate:
+  trajectory_coordinate_interpretation: gcj02
+  radius_m: 80.0
+  spacing_straight_m: 22.5
+  spacing_urban_m: 15.0
+  spacing_curve_m: 9.0
+  spacing_complex_m: 6.0
+  min_candidates: 2
+  dense_candidates: 5
+  complex_candidates: 8
+  max_candidates: 10
+  absolute_max_candidates: 20
+  ambiguity_emission_margin_cost: 0.5
+  minimum_heading_displacement_m: 3.0
+  ordinary_candidates: 3
+  heading_weight_m: 15.0
+  heading_log_cost_max: 1.0
+  edge_prior_scale_m: 30.0
+  complex_candidate_probe_count: 8
+  access_penalty_m: 20.0
+  no_candidate_recovery_radius_multiplier: 2.0
+  no_candidate_recovery_max_radius_m: 200.0
+  transition_recovery_radius_m: 200.0
+  transition_recovery_max_candidates: 20
+hmm:
+  local_context_points: 2
+  merge_gap_points: 2
+  full_order_ambiguity_share: 0.45
+  full_order_min_windows: 4
+  local_retry_context_points: 2
+  boundary_repair_context_points: 1
+  boundary_repair_merge_gap_points: 1
+  same_edge_jitter_tolerance_m: 10.0
+  same_edge_jitter_penalty_per_m: 0.25
+  jitter_calibration_source: gate1_train_case_traces_low_displacement_p95
+  jitter_calibration_sample_count: 1067
+  sigma_distance_m: 15.0
+  beta_transition_m: 60.0
+  beta_semantic_cost_m: 60.0
+  max_route_distance_m: 6000.0
+  transition_cutoff_alpha: 3.0
+  transition_cutoff_base_m: 200.0
+  transition_cutoff_min_m: 300.0
+  transition_cutoff_max_m: 6000.0
+  transition_max_speed_mps: 40.0
+  transition_ambiguity_path_gps_ratio: 3.0
+  transition_ambiguity_inferred_m: 250.0
+  transition_retry_multiplier: 4.0
+  transition_retry_max_m: 1200.0
+  transition_retry_candidate_subset: 3
+  transition_retry_soft_penalty_m: 300.0
+  anchor_position_tolerance_m: 1.0
+  geometric_fallback_enabled: true
+quality:
+  hard:
+    maximum_direction_violations: 0
+    maximum_topology_gaps: 0
+    maximum_heading_direction_difference_deg: 100.0
+    same_edge_reverse_tolerance_m: 10.0
+    same_edge_jitter_penalty_per_m: 0.25
+    minimum_direction_displacement_m: 3.0
+    minimum_consecutive_direction_conflicts: 2
+    maximum_unreasonable_detours: 0
+    maximum_illegal_u_turns: 0
+    maximum_layer_violations: 0
+    minimum_route_links: 1
+    maximum_od_endpoint_error_m: 150.0
+    conservation_tolerance: 1.0e-6
+    hmm_path_distance_tolerance_m: 1.0e-3
+  soft:
+    maximum_fallback_share: 0.25
+    maximum_p90_projection_distance_m: 60.0
+    minimum_route_length_ratio: 0.5
+    maximum_route_length_ratio: 2.5
+    maximum_interpolated_distance_share: 0.5
+    minimum_match_confidence: 0.35
+    maximum_repeated_link_share: 0.2
+    maximum_parallel_ambiguity_share: 0.25
+runtime:
+  buckets: 64
+  workers: 1
+  gate1_buckets: 32
+  case_trace_per_failure_reason_per_day: 5
+  case_trace_representative_per_day: 10
+  manifest_version: stage0_v5_manifest_v1
+  log_level: INFO
+  log_progress_every_orders: 25
+  diagnostic_mode: sampled

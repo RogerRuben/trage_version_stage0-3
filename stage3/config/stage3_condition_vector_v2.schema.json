@@ -1,0 +1,28 @@
+{
+  "schema_version": "stage3_condition_vector_v2",
+  "roles": {
+    "order_id": "identifier",
+    "decision_time": "metadata",
+    "prediction_cutoff_time": "metadata",
+    "lcs_expected": "predicted_output",
+    "lcs_tail_probability": "predicted_output",
+    "lcs_uncertainty": "predicted_output",
+    "pmis_expected": "predicted_output",
+    "pmis_tail_probability": "predicted_output",
+    "pmis_uncertainty": "predicted_output",
+    "rts_expected": "predicted_output",
+    "rts_tail_probability": "predicted_output",
+    "rts_uncertainty": "predicted_output",
+    "core_overall_high_stress_probability": "predicted_output",
+    "extended_overall_high_stress_probability": "predicted_output",
+    "iis_availability": "predicted_output",
+    "iis_applicability_probability": "predicted_output",
+    "iis_conditional_severity": "predicted_output",
+    "iis_tail_probability": "predicted_output",
+    "predicted_service_time_sec": "predicted_output",
+    "service_time_uncertainty_sec": "predicted_output"
+  },
+  "missing_modality_policy": "availability_gated_no_zero_imputation",
+  "extended_probability_policy": "NA unless trained against extended label; max(core,IIS) is forbidden",
+  "expected_value_policy": "continuous regression output; q90 may not be named expected"
+}

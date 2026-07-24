@@ -1,0 +1,26 @@
+{
+  "schema_version": "stage35_offline_route_selection_v1",
+  "candidate_generators": [
+    "shortest_expected_time",
+    "shortest_distance",
+    "k_shortest_expected_time",
+    "risk_averse_weighted_path"
+  ],
+  "k_shortest_paths": 5,
+  "maximum_candidates_per_order": 10,
+  "av_objective": {
+    "expected_time_weight": 1.0,
+    "risk_weight": 1.0,
+    "uncertainty_weight": 0.5
+  },
+  "constraints": {
+    "hard_odd_violation_count": 0,
+    "maximum_distance_detour_ratio": 1.30,
+    "maximum_expected_time_ratio": 1.30
+  },
+  "hv_primary_route": "historical_route_replay_baseline",
+  "hv_robustness_route": "shortest_expected_time",
+  "test_tuning_allowed": false,
+  "status": "definition_frozen_pending_stage0_to_stage3_formal_artifacts"
+}
+

@@ -1,0 +1,8 @@
+﻿stage4_field,stage3_source,stage2_source,stage1_source,stage0_source
+Stage4.lcs_expected,Stage3.lcs_expected,Stage2.lcs_expected_raw,Stage1.lcs_raw target,Stage0 link traversal
+Stage4.pmis_expected,Stage3.pmis_expected,Stage2.pmis_expected_raw,Stage1.pmis_raw target,Stage0 link/POI traversal
+Stage4.rts_expected,Stage3.rts_expected,Stage2.rts_expected_raw,Stage1.rts_raw target,Stage0 link traversal
+Stage4.predicted_service_time,Stage3 passthrough,Stage2 service-time prediction,Stage0 travel-time target,Stage0 link traversal
+Stage4.origin_destination,canonical raw endpoint export,not a model feature,not a label,raw complete order
+Stage4.AV capability,external scenario prior,not learned,not learned,not applicable
+Stage4.supply,training-day environment,not learned by Stage2,not a label,20161020 raw sample

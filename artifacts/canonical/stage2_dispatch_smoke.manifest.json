@@ -1,0 +1,98 @@
+{
+  "manifest_version": "1.0",
+  "artifact_id": "stage2_dispatch_smoke_fit20161019_predict20_22_23",
+  "schema_version": "stage2_dispatch_prediction_v2",
+  "stage": "stage2",
+  "status": "canonical",
+  "created_at": "2026-07-15T11:15:23.701131+00:00",
+  "created_by_commit": "123905d7a8cf2ee675fe5e126017d2193b585c56",
+  "input_artifact_ids": [
+    "stage0_smoke_20161019_20_22_23_v2",
+    "stage1_v2_smoke_20161019_20_22_23"
+  ],
+  "config_hash": "8b452c91e1ad8811e14bf66b56cd38f4a94643a7cb4a6bc4cd07c7f0ea0059d5",
+  "fit_dates": [
+    "20161019"
+  ],
+  "target_dates": [
+    "20161020",
+    "20161022",
+    "20161023"
+  ],
+  "decision_time_contract": "one_order_level_cutoff_all_route_links_dispatch_time",
+  "files": [
+    {
+      "role": "stage2_dispatch_model",
+      "path": "artifacts/canonical/smoke_v2/stage2_dispatch/models/stage2_dispatch_smoke.joblib",
+      "sha256": "ba3ee2cc163191e5a6e06d448e1622066ce54b0ecf9d0f33c84b758029f7d46f",
+      "size_bytes": 1452475,
+      "row_count": null,
+      "schema_hash": null
+    },
+    {
+      "role": "link_predictions_20161020",
+      "path": "artifacts/canonical/smoke_v2/stage2_dispatch/link_predictions/day=20161020.parquet",
+      "sha256": "601d92d3f42870e9416db4253cda4bf594618023d53b5ed91201ceda5199221f",
+      "size_bytes": 1582951,
+      "row_count": 18925,
+      "schema_hash": "6e8bacee0bf29d4a37cd86f14e10b6614ecb20bda56d0e42cd889b97d31a7e2e"
+    },
+    {
+      "role": "service_time_predictions_20161020",
+      "path": "artifacts/canonical/smoke_v2/stage2_dispatch/service_time_predictions/day=20161020.parquet",
+      "sha256": "c27678b4ef48fc6eed528204c0f8c77810a7b86d111b6d56e5e0b61703a64c05",
+      "size_bytes": 61543,
+      "row_count": 1000,
+      "schema_hash": "cf96bb0ab95cf7c54cfe1fefab850df4f4514e93b37a0f82c8eec0b1796b4e6b"
+    },
+    {
+      "role": "link_predictions_20161022",
+      "path": "artifacts/canonical/smoke_v2/stage2_dispatch/link_predictions/day=20161022.parquet",
+      "sha256": "c2f499fa0ee93ee53299bf26c3902a6d749a8555ccf92fbb46946f41b563edbb",
+      "size_bytes": 1682729,
+      "row_count": 20064,
+      "schema_hash": "6e8bacee0bf29d4a37cd86f14e10b6614ecb20bda56d0e42cd889b97d31a7e2e"
+    },
+    {
+      "role": "service_time_predictions_20161022",
+      "path": "artifacts/canonical/smoke_v2/stage2_dispatch/service_time_predictions/day=20161022.parquet",
+      "sha256": "88cc564bd40e144791aa18a69ed1b4f0b735a636cd0c6e3bca5f2e51e5b73035",
+      "size_bytes": 62459,
+      "row_count": 1000,
+      "schema_hash": "cf96bb0ab95cf7c54cfe1fefab850df4f4514e93b37a0f82c8eec0b1796b4e6b"
+    },
+    {
+      "role": "link_predictions_20161023",
+      "path": "artifacts/canonical/smoke_v2/stage2_dispatch/link_predictions/day=20161023.parquet",
+      "sha256": "3420a1140586c0c5768a837c1d6e7e755466b770fd1c24cd48d9ba783fa7c221",
+      "size_bytes": 1684435,
+      "row_count": 20031,
+      "schema_hash": "6e8bacee0bf29d4a37cd86f14e10b6614ecb20bda56d0e42cd889b97d31a7e2e"
+    },
+    {
+      "role": "service_time_predictions_20161023",
+      "path": "artifacts/canonical/smoke_v2/stage2_dispatch/service_time_predictions/day=20161023.parquet",
+      "sha256": "f80afbfe85b01bf69d1d02c5387f97a2904304456eea4f300db02bdd9e1ff3e5",
+      "size_bytes": 61335,
+      "row_count": 1000,
+      "schema_hash": "cf96bb0ab95cf7c54cfe1fefab850df4f4514e93b37a0f82c8eec0b1796b4e6b"
+    },
+    {
+      "role": "stage2_metrics",
+      "path": "artifacts/canonical/smoke_v2/stage2_dispatch/metrics.csv",
+      "sha256": "44773b2a66b8c343c45314b19951f3406a313def22d7a7d0ba671ed95c5f8e5c",
+      "size_bytes": 1453,
+      "row_count": 12,
+      "schema_hash": "d5803dd0f1c700f0dcff4b85accf61a7acb3eab712bd035c934b912b3643d315"
+    }
+  ],
+  "audit": {
+    "status": "PASS",
+    "path": "docs/pipeline_rebaseline/stage2_dispatch_smoke_audit.json",
+    "sha256": "18954ec11b96ef1343623a0a055b1df9d0d79772d6a3145d0da4a3bbdc740a69"
+  },
+  "known_limitations": [
+    "Engineering smoke uses a lightweight static-route ensemble rather than the formal RC-MSTNet; it validates timing and lineage only.",
+    "Only 15.7%-17.5% of routes are fully connected in the clipped core network; route_direction_valid is retained as an explicit input quality flag."
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "manifest_version": "1.0",
+  "artifact_id": "end_to_end_canonical_smoke_v2",
+  "schema_version": "stage0_4_canonical_smoke_v2",
+  "stage": "end_to_end",
+  "status": "canonical",
+  "created_at": "2026-07-15T11:33:44.344478+00:00",
+  "created_by_commit": "123905d7a8cf2ee675fe5e126017d2193b585c56",
+  "input_artifact_ids": [
+    "stage0_smoke_20161019_20_22_23_v2",
+    "stage1_v2_smoke_20161019_20_22_23",
+    "stage2_dispatch_smoke_fit20161019_predict20_22_23",
+    "stage3_smoke_train20_validate22_test23_v2",
+    "stage4_decoupled_smoke_environment_train20_test23_v1",
+    "stage4_safe_o0_1000_order_smoke_v2"
+  ],
+  "config_hash": "8b452c91e1ad8811e14bf66b56cd38f4a94643a7cb4a6bc4cd07c7f0ea0059d5",
+  "fit_dates": [
+    "20161019",
+    "20161020",
+    "20161022"
+  ],
+  "target_dates": [
+    "20161023"
+  ],
+  "decision_time_contract": "end_to_end_dispatch_time_counterfactual_smoke",
+  "files": [
+    {
+      "role": "audit",
+      "path": "docs/pipeline_rebaseline/end_to_end_smoke_audit.json",
+      "sha256": "a34d9b490fff31521bbf9426f85acdfe2c0c05a78ca2348bc84fce08044f1efb",
+      "size_bytes": 1983,
+      "row_count": null,
+      "schema_hash": null
+    },
+    {
+      "role": "final_audit",
+      "path": "docs/pipeline_rebaseline/final_pipeline_audit.json",
+      "sha256": "bba9b03b56f2ea496913a3d0cd7c5b18b164bf88ce4f99a7d4567d70ef8ef727",
+      "size_bytes": 3272,
+      "row_count": null,
+      "schema_hash": null
+    },
+    {
+      "role": "lineage",
+      "path": "docs/pipeline_rebaseline/canonical_lineage_trace.csv",
+      "sha256": "1a41ff0d21b09493981c4767abe18a6d3dda9ade318cab49993ba6b6fff5ffcb",
+      "size_bytes": 824,
+      "row_count": 7,
+      "schema_hash": "a12087710da8a0a3955e23454e1ef9c8e8253f8b0d05044337ec7f7f3df49399"
+    },
+    {
+      "role": "report",
+      "path": "docs/pipeline_rebaseline/canonical_rebaseline_report.md",
+      "sha256": "6987a0056b9128f6bf7ae37d1ea7cc1753d51ae7bb130451ac0a491f02d9a845",
+      "size_bytes": 1884,
+      "row_count": null,
+      "schema_hash": null
+    },
+    {
+      "role": "final_report",
+      "path": "docs/pipeline_rebaseline/final_pipeline_audit.md",
+      "sha256": "7052dc4a340b51948773ab72847fb48214342045a4e3217c029a8efe93094ff2",
+      "size_bytes": 2772,
+      "row_count": null,
+      "schema_hash": null
+    },
+    {
+      "role": "reproduction",
+      "path": "docs/pipeline_rebaseline/reproduction_commands.md",
+      "sha256": "7b2515e4f8d5dc888b4897ef50cfea5ea3fb5922dbc32350986e34c46b3891bb",
+      "size_bytes": 1703,
+      "row_count": null,
+      "schema_hash": null
+    },
+    {
+      "role": "artifact_summary",
+      "path": "docs/pipeline_rebaseline/artifact_classification_summary.csv",
+      "sha256": "24e53ee2a4c0143570f18e898d807804b0c4be99fbd2047ddf76b345785c417f",
+      "size_bytes": 205,
+      "row_count": 4,
+      "schema_hash": "c9fdbd46822b62aff3cebede30874432c9140e9eae20d08ef2eff7c3edff4257"
+    },
+    {
+      "role": "stage1_comparison",
+      "path": "docs/pipeline_rebaseline/stage1_v1_v2_comparison.csv",
+      "sha256": "fb49fbcc3a0bf18dddd85c31ca61213d1464f3b2b45915a9553ad50f2738cdd1",
+      "size_bytes": 1031,
+      "row_count": 4,
+      "schema_hash": "4866e25d5ed36aa931b507d2deb1320954d6094194652a1d5fa51f9d2a06ad33"
+    },
+    {
+      "role": "stage1_comparison_report",
+      "path": "docs/pipeline_rebaseline/stage1_v1_v2_distribution_report.md",
+      "sha256": "2ef446dfc098785a6192bb65b804b2beacc0e3080491e324cf3e61f00a920fe3",
+      "size_bytes": 679,
+      "row_count": null,
+      "schema_hash": null
+    }
+  ],
+  "audit": {
+    "status": "PASS",
+    "path": "docs/pipeline_rebaseline/end_to_end_smoke_audit.json",
+    "sha256": "a34d9b490fff31521bbf9426f85acdfe2c0c05a78ca2348bc84fce08044f1efb"
+  },
+  "known_limitations": [
+    "Formal inference remains HOLD; this manifest certifies only the canonical engineering smoke."
+  ]
+}

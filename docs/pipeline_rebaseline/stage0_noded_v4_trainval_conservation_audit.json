@@ -1,0 +1,53 @@
+{
+  "status": "PASS",
+  "days": [
+    {
+      "date": "20161019",
+      "expected_orders": 1000,
+      "reconstructed_orders": 982,
+      "explicit_failed_orders": 18,
+      "reconstructed_failed_overlap": 0,
+      "failure_accounting_complete": true,
+      "negative_time_count": 0,
+      "negative_distance_count": 0,
+      "time_conservation_failures": 0,
+      "distance_conservation_failures": 0,
+      "maximum_absolute_time_error_sec": 0.0,
+      "maximum_absolute_distance_error_m": 1.8189894035458565e-12,
+      "movement_rows": 25433,
+      "movement_time_duplicated": false
+    },
+    {
+      "date": "20161020",
+      "expected_orders": 1000,
+      "reconstructed_orders": 990,
+      "explicit_failed_orders": 10,
+      "reconstructed_failed_overlap": 0,
+      "failure_accounting_complete": true,
+      "negative_time_count": 0,
+      "negative_distance_count": 0,
+      "time_conservation_failures": 0,
+      "distance_conservation_failures": 0,
+      "maximum_absolute_time_error_sec": 0.0,
+      "maximum_absolute_distance_error_m": 1.8189894035458565e-12,
+      "movement_rows": 25832,
+      "movement_time_duplicated": false
+    },
+    {
+      "date": "20161022",
+      "expected_orders": 1000,
+      "reconstructed_orders": 982,
+      "explicit_failed_orders": 18,
+      "reconstructed_failed_overlap": 0,
+      "failure_accounting_complete": true,
+      "negative_time_count": 0,
+      "negative_distance_count": 0,
+      "time_conservation_failures": 0,
+      "distance_conservation_failures": 0,
+      "maximum_absolute_time_error_sec": 0.0,
+      "maximum_absolute_distance_error_m": 1.8189894035458565e-12,
+      "movement_rows": 26563,
+      "movement_time_duplicated": false
+    }
+  ]
+}

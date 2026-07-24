@@ -20,15 +20,18 @@ if str(REPO_ROOT) not in sys.path:
 
 from stage4.simulator_v3.behavior.driver_response import DriverResponseModel
 from stage4.simulator_v3.economics import EconomicsModel
+from stage4.simulator_v3.economy_ledger import ScenarioCostParameters
 from stage4.simulator_v3.entities import RequestState, VehiclePlan, VehicleState
 from stage4.simulator_v3.enums import RequestStatus, VehicleExecutionStatus
 from stage4.simulator_v3.event_queue import EventQueue
 from stage4.simulator_v3.fleet_controller import FleetController
-from stage4.simulator_v3.idle_management import IdleMovementManager
+from stage4.simulator_v3.idle_management import IdleMovementManager, IdleMovementPolicy
 from stage4.simulator_v3.matching.candidate_generator import CandidatePolicy
+from stage4.simulator_v3.matching.balanced_match import BalancedEpochState
 from stage4.simulator_v3.odd.pickup_odd import PickupODDChecker
 from stage4.simulator_v3.odd.service_odd import ServiceODDChecker
 from stage4.simulator_v3.plan_validator import PlanValidator
+from stage4.simulator_v3.preassignment.safe_release_buffer import SafeReleaseBufferResolver
 from stage4.simulator_v3.request_manager import RequestManager
 from stage4.simulator_v3.routing_engine import RoutingEngine
 from stage4.simulator_v3.simulation_engine import SimulationEngine
@@ -48,11 +51,20 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-root", type=Path, default=Path("stage4/output/simulator_v3"))
     parser.add_argument("--results-dir", type=Path, default=Path("stage4/docs/results/simulator_v3"))
     parser.add_argument("--profile", default="moderate_av")
+    parser.add_argument(
+        "--allow-test-day-derived-profile",
+        action="store_true",
+        help="Explicitly allow a sensitivity-only profile whose thresholds used the test day; prohibited by default.",
+    )
     parser.add_argument("--decision-epoch-sec", type=int, default=30)
     parser.add_argument("--max-orders", type=int, default=0, help="0 means full demand stream; positive values are regression smoke subsets.")
     parser.add_argument("--max-vehicles", type=int, default=0, help="0 means full fleet; positive values are regression smoke subsets.")
     parser.add_argument("--min-request-time", default="", help="Optional ISO timestamp for regression smoke windows; full default uses all requests.")
     parser.add_argument("--candidate-maximum", type=int, default=80)
+    parser.add_argument("--preassignment-config", type=Path, default=Path("stage4/config/preassignment_config.json"))
+    parser.add_argument("--idle-config", type=Path, default=Path("stage4/config/idle_movement_scenarios.json"))
+    parser.add_argument("--balanced-config", type=Path, default=Path("stage4/config/simulator_v3_balanced.json"))
+    parser.add_argument("--economy-config", type=Path, default=Path("stage4/config/simulator_v3_economy.json"))
     parser.add_argument("--overwrite", action="store_true")
     return parser.parse_args()
 
@@ -95,7 +107,15 @@ def load_requests(args: argparse.Namespace) -> dict[str, RequestState]:
             realized_service_time_sec=float(row.realized_service_time_sec),
             route_length_m=float(row.route_length_m),
             stress_value=stress_value(pd.Series(row._asdict())),
-            metadata={"time_bin": int(row.time_bin), "eta_source": str(row.eta_source)},
+            metadata={
+                "time_bin": int(row.time_bin),
+                "eta_source": str(row.eta_source),
+                "stress_bucket": (
+                    "high" if stress_value(pd.Series(row._asdict())) >= 2.0 / 3.0
+                    else "medium" if stress_value(pd.Series(row._asdict())) >= 1.0 / 3.0
+                    else "low"
+                ),
+            },
         )
         requests[oid] = req
     return requests
@@ -144,8 +164,29 @@ def load_vehicles(args: argparse.Namespace) -> dict[str, VehicleState]:
 
 
 def load_odd(args: argparse.Namespace) -> tuple[PickupODDChecker, ServiceODDChecker]:
-    cap = pd.read_parquet(args.capability)
-    cap = cap[(cap["vehicle_profile"].eq(args.profile)) & cap["vehicle_type"].eq("AV")]
+    # Column/filter pushdown avoids materialising the ~840 MB six-profile
+    # mapping during each full-day run.  The service gate needs only these
+    # immutable audit/provenance fields.
+    cap_columns = [
+        "order_id", "vehicle_profile", "vehicle_type", "service_feasible",
+        "capability_mapping_version", "test_day_used_for_thresholds",
+    ]
+    cap = pd.read_parquet(
+        args.capability,
+        columns=cap_columns,
+        filters=[("vehicle_profile", "==", args.profile), ("vehicle_type", "==", "AV")],
+    )
+    if cap.empty:
+        raise ValueError(f"No capability mapping rows for AV profile {args.profile}")
+    if (
+        "test_day_used_for_thresholds" in cap.columns
+        and cap["test_day_used_for_thresholds"].fillna(False).astype(bool).any()
+        and not args.allow_test_day_derived_profile
+    ):
+        raise ValueError(
+            f"Profile {args.profile} is test-day-derived and sensitivity-only; "
+            "pass --allow-test-day-derived-profile only for an explicitly labelled sensitivity run"
+        )
     cap_map = {str(r.order_id): r._asdict() for r in cap.itertuples(index=False)}
     pickup = pd.read_parquet(args.data_root / "pickup_odd_zone_pair_proxy.parquet")
     pickup_map = {(str(r.origin_zone), str(r.destination_zone)): bool(r.pickup_odd_feasible) for r in pickup.itertuples(index=False)}
@@ -168,14 +209,41 @@ def build_engine(args: argparse.Namespace) -> tuple[SimulationEngine, pd.Timesta
     pickup_odd, service_odd = load_odd(args)
     validator = PlanValidator(pickup_odd, service_odd)
     economics = EconomicsModel()
-    driver_response = DriverResponseModel()
+    pre_cfg = json.loads(args.preassignment_config.read_text(encoding="utf-8"))
+    driver_response = DriverResponseModel(response_delay_sec=float(pre_cfg.get("driver_response_delay_sec", 10)))
+    preassignment_enabled = args.operation in {"O2", "O3"}
+    safe_release_resolver = None
+    if preassignment_enabled:
+        residual_path = Path(pre_cfg["release_residual_table"])
+        safe_release_resolver = SafeReleaseBufferResolver.from_parquet(
+            residual_path,
+            minimum_samples=int(pre_cfg.get("release_residual_minimum_samples", 30)),
+        )
+    balanced_doc = json.loads(args.balanced_config.read_text(encoding="utf-8"))
+    balanced_state = BalancedEpochState(
+        stress_budget_share_of_pending_load=float(
+            balanced_doc.get("stress_budget_share_of_observable_pending_load", 0.55)
+        ),
+        minimum_zone_service_rate=float(
+            balanced_doc.get("minimum_zone_service_rate_per_epoch", 0.10)
+        ),
+        maximum_zone_service_target_per_epoch=int(
+            balanced_doc.get("maximum_zone_service_target_per_epoch", 5)
+        ),
+        constraint_source=str(
+            balanced_doc.get("constraint_source", "observable_pending_load_scenario_policy_v1")
+        ),
+    )
     controller = FleetController(
         routing,
         validator,
         economics,
         driver_response,
         CandidatePolicy(maximum_candidates=args.candidate_maximum),
-        preassignment_enabled=args.operation in {"O2", "O3"},
+        preassignment_enabled=preassignment_enabled,
+        preassignment_horizon_sec=float(pre_cfg.get("preassignment_horizon_sec", 300)),
+        safe_release_resolver=safe_release_resolver,
+        balanced_state=balanced_state,
     )
     request_manager = RequestManager()
     executor = VehicleExecutor(routing, events, request_manager, state)
@@ -183,8 +251,34 @@ def build_engine(args: argparse.Namespace) -> tuple[SimulationEngine, pd.Timesta
     if args.operation in {"O1", "O3"}:
         zone_system_path = args.data_root / "operational_zone_system.json"
         zone_system = json.loads(zone_system_path.read_text(encoding="utf-8"))
-        idle_manager = IdleMovementManager(zone_system)
-    engine = SimulationEngine(state, events, controller, executor, request_manager, decision_epoch_sec=args.decision_epoch_sec, idle_manager=idle_manager)
+        idle_doc = json.loads(args.idle_config.read_text(encoding="utf-8"))
+        idle_cfg = idle_doc["scenarios"]["joint_idle_management"]
+        idle_manager = IdleMovementManager.from_data_root(
+            zone_system,
+            args.data_root,
+            policy=IdleMovementPolicy(
+                interval_sec=int(idle_cfg.get("interval_sec", 300)),
+                max_share_per_epoch=float(idle_cfg.get("max_share_per_epoch", 0.02)),
+                min_hv_idle_sec=float(idle_cfg.get("minimum_hv_idle_sec", 300)),
+                random_seed=41_031 + int(args.replication),
+            ),
+            rng=np.random.default_rng(41_031 + int(args.replication)),
+        )
+    economy_doc = json.loads(args.economy_config.read_text(encoding="utf-8"))
+    scenario_costs = ScenarioCostParameters(
+        lost_demand_cost_per_order=float(economy_doc["lost_demand_cost_per_order"]),
+        av_fixed_daily_cost_per_vehicle=float(economy_doc["av_fixed_daily_cost_per_vehicle"]),
+        depot_daily_cost=float(economy_doc["depot_daily_cost"]),
+        hv_reposition_cost_per_km=float(economy_doc["hv_reposition_cost_per_km"]),
+        av_rebalancing_cost_per_km=float(economy_doc["av_rebalancing_cost_per_km"]),
+        preassignment_failure_cost=float(economy_doc["preassignment_failure_cost"]),
+    )
+    engine = SimulationEngine(
+        state, events, controller, executor, request_manager,
+        decision_epoch_sec=args.decision_epoch_sec,
+        idle_manager=idle_manager,
+        scenario_cost_parameters=scenario_costs,
+    )
     engine.configure_strategy(args.strategy)
     engine.initialize_events(start, end)
     return engine, end
@@ -192,11 +286,12 @@ def build_engine(args: argparse.Namespace) -> tuple[SimulationEngine, pd.Timesta
 
 def run(args: argparse.Namespace) -> dict:
     engine, end = build_engine(args)
-    summary = engine.run(end)
+    engine.run(end)
     out = args.output_root / f"replication={args.replication}" / f"strategy={args.strategy.replace(' ', '_')}" / f"operation={args.operation}" / args.request_time_scenario
     if out.exists() and not args.overwrite:
         raise FileExistsError(f"{out} exists; pass --overwrite")
     engine.write_outputs(out)
+    summary = engine.summary()
     args.results_dir.mkdir(parents=True, exist_ok=True)
     summary.update({
         "replication_id": args.replication,

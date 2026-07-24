@@ -1,0 +1,28 @@
+{
+  "status": "PASS",
+  "quantile": 0.9,
+  "minimum_samples": 30,
+  "validation_dates": [
+    "20161022"
+  ],
+  "source_datasets": [
+    "route=stage2/output/route_conditioned_dataset_15k/estimated_time_daily/day=20161022.parquet;orders=stage0/output/order_od_audited/day=20161022.parquet;stress=stage2/output/deep_v3_stage3_rolling_100k/predictions/rc_mstnet/fold=7/validation_predictions.parquet"
+  ],
+  "residual_definition": "predicted_service_time_sec_minus_realized_service_time_sec",
+  "level_row_counts": {
+    "global": 1,
+    "time": 48,
+    "time-zone": 1105,
+    "time-zone-stress": 2728
+  },
+  "global_fallback_rows": 1,
+  "validation_date": "20161022",
+  "test_date": "20161023",
+  "test_date_used": false,
+  "validation_order_rows": 15000,
+  "output": "stage4\\data\\decoupled_abm\\service_time_validation_residual_q90.parquet",
+  "raw_output": "stage4\\output\\decoupled_environment\\validation_service_time_residual_rows.parquet",
+  "residual_q10_sec": 366.4639959369627,
+  "residual_q50_sec": 1647.4789125284703,
+  "residual_q90_sec": 4494.316235355805
+}

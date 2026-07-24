@@ -1,0 +1,16 @@
+{
+  "profile_id": "canonical_smoke_exogenous_moderate_v1",
+  "status": "engineering_scenario_prior",
+  "threshold_source": "external_engineering_smoke_assumption_not_test_day_calibration",
+  "lcs_expected_max": 0.8,
+  "pmis_expected_max": 0.8,
+  "rts_expected_max": 0.8,
+  "uncertainty_max": 0.5,
+  "pickup_distance_max_m": 4000.0,
+  "require_direction_valid_route": true,
+  "forbidden_uses": [
+    "empirical AV capability claim",
+    "test-day threshold calibration",
+    "formal scientific inference"
+  ]
+}

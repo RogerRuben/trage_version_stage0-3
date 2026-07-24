@@ -5,12 +5,20 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import sys
 from pathlib import Path
 
 import geopandas as gpd
 import numpy as np
 import pandas as pd
 import shapely
+
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from stage0.canonical.intersection import prorate_to_upstream_influence
+from stage0.canonical.intervals import allocate_by_projected_mileage
 
 
 def parse_args() -> argparse.Namespace:
@@ -50,15 +58,44 @@ def road_vectors(roads: gpd.GeoDataFrame) -> dict[str, np.ndarray]:
 
 def build_traversals(frame: pd.DataFrame, roads: pd.DataFrame, args: argparse.Namespace) -> pd.DataFrame:
     frame = frame.sort_values(["order_id", "timestamp", "source_row"], kind="stable").reset_index(drop=True)
-    same_order = frame.order_id.eq(frame.order_id.shift())
-    new_traversal = ~same_order | frame.link_id.ne(frame.link_id.shift())
+    same_order = frame.order_id.astype("string").eq(frame.order_id.astype("string").shift()).fillna(False)
+    link_changed = frame.link_id.astype("string").ne(frame.link_id.astype("string").shift()).fillna(True)
+    new_traversal = (~same_order | link_changed).astype(bool)
     frame["_traversal_id"] = new_traversal.cumsum().astype("int64")
     frame["link_seq"] = new_traversal.groupby(frame.order_id).cumsum().astype("int32") - 1
-    dt = frame.dt_s.fillna(0).clip(lower=0, upper=120)
+    # Preserve every non-negative observed interval exactly. Long observation
+    # gaps are quality evidence, not time that may be silently discarded.
+    dt = frame.dt_s.fillna(0).clip(lower=0).astype(float)
+    distance = frame.segment_distance_m.fillna(0).clip(lower=0).astype(float)
+    # A changed-link interval is shared by its adjacent traversals instead of
+    # being assigned wholesale to the later link.  When route-expanded mileage
+    # is available it should be supplied as ``transition_mileage_prev_m`` and
+    # ``transition_mileage_next_m``; the deterministic equal split is an
+    # explicit low-support fallback, and totals remain exactly conserved.
+    changed = same_order & new_traversal
+    prev_extra_time: dict[int, float] = {}
+    prev_extra_distance: dict[int, float] = {}
+    prev_exit_time: dict[int, float] = {}
+    for idx in np.flatnonzero(changed.to_numpy()):
+        mileage = [
+            float(frame.at[idx, "transition_mileage_prev_m"])
+            if "transition_mileage_prev_m" in frame.columns and pd.notna(frame.at[idx, "transition_mileage_prev_m"])
+            else 1.0,
+            float(frame.at[idx, "transition_mileage_next_m"])
+            if "transition_mileage_next_m" in frame.columns and pd.notna(frame.at[idx, "transition_mileage_next_m"])
+            else 1.0,
+        ]
+        allocated_t, allocated_d = allocate_by_projected_mileage(dt.iat[idx], distance.iat[idx], mileage)
+        previous_id = int(frame.at[idx - 1, "_traversal_id"])
+        prev_extra_time[previous_id] = prev_extra_time.get(previous_id, 0.0) + float(allocated_t[0])
+        prev_extra_distance[previous_id] = prev_extra_distance.get(previous_id, 0.0) + float(allocated_d[0])
+        prev_exit_time[previous_id] = float(frame.at[idx, "timestamp"] - allocated_t[1])
+        dt.iat[idx] = float(allocated_t[1])
+        distance.iat[idx] = float(allocated_d[1])
     frame["_interval_s"] = dt
     frame["_interval_start"] = frame.timestamp - dt
     frame["_low_s"] = dt.where(frame.speed_kmh.lt(args.low_speed_kmh), 0.0)
-    frame["_distance_m"] = frame.segment_distance_m.fillna(0).clip(lower=0)
+    frame["_distance_m"] = distance
 
     same_traversal = frame._traversal_id.eq(frame._traversal_id.shift())
     speed_mps = frame.speed_kmh / 3.6
@@ -87,6 +124,17 @@ def build_traversals(frame: pd.DataFrame, roads: pd.DataFrame, args: argparse.Na
         mean_match_dist=("gps_to_link_dist_m", "mean"),
         p90_match_dist=("gps_to_link_dist_m", lambda x: x.quantile(0.9)),
     )
+    if prev_extra_time:
+        extra_t = pd.Series(prev_extra_time)
+        extra_d = pd.Series(prev_extra_distance)
+        exit_t = pd.Series(prev_exit_time)
+        indexes = traversals.index.intersection(extra_t.index)
+        traversals.loc[indexes, "travel_time_sec"] += extra_t.loc[indexes]
+        traversals.loc[indexes, "observed_distance_m"] += extra_d.loc[indexes]
+        traversals.loc[indexes, "exit_time"] = np.maximum(
+            traversals.loc[indexes, "exit_time"].to_numpy(dtype=float),
+            exit_t.loc[indexes].to_numpy(dtype=float),
+        )
     traversals["stop_count"] = stop_count.reindex(traversals.index, fill_value=0).astype("int32")
     traversals["stop_time_sec"] = stop_time.reindex(traversals.index, fill_value=0.0)
     road_length = roads.set_index("link_id").length_m
@@ -143,6 +191,15 @@ def build_movements(traversals: pd.DataFrame, roads: gpd.GeoDataFrame, vectors: 
     degree = pd.concat([roads.from_node, roads.to_node]).value_counts()
     node_degree = pd.Series(node).map(degree).fillna(0).to_numpy(dtype="int16")
     quality = np.where((node >= 0) & current.traversal_quality.ne("low"), "usable", "low")
+    influence_distance_m = 75.0
+    intersection_low = np.array([
+        prorate_to_upstream_influence(value, length, influence_distance_m)
+        for value, length in zip(current.low_speed_time_sec, current.link_length_m)
+    ])
+    intersection_stop = np.array([
+        prorate_to_upstream_influence(value, length, influence_distance_m)
+        for value, length in zip(current.stop_time_sec, current.link_length_m)
+    ])
     return pd.DataFrame({
         "order_id": current.order_id.to_numpy(),
         "from_link_id": current.link_id.to_numpy(), "to_link_id": current.to_link_id.to_numpy(),
@@ -151,8 +208,10 @@ def build_movements(traversals: pd.DataFrame, roads: gpd.GeoDataFrame, vectors: 
         "turn_angle": angle, "turn_type": turn_type, "node_degree": node_degree,
         "junction_complexity": np.log1p(node_degree),
         "approach_delay_sec": current.low_speed_time_sec.to_numpy(),
-        "intersection_low_speed_time": current.low_speed_time_sec.to_numpy(),
-        "intersection_stop_time": current.stop_time_sec.to_numpy(),
+        "intersection_low_speed_time": intersection_low,
+        "intersection_stop_time": intersection_stop,
+        "intersection_influence_distance_m": influence_distance_m,
+        "intersection_measurement_method": "upstream_length_prorated_75m",
         "movement_quality": quality,
     })
 

@@ -1,0 +1,4 @@
+﻿date,input_orders,successfully_reconstructed_orders,failed_match_orders,reconstruction_coverage,orders,core_orders,extended_orders,rejected_orders,core_share_of_input,failed_match_share_of_input,core_share,extended_share,rejected_share,strict_core_orders_v4_final_candidate,analysis_set_orders_v4_final_candidate,rejected_orders_v4_final_candidate,formal_analysis_eligible_share,orders_with_gap,orders_with_all_gaps_bridgeable,mean_direction_gaps,geometric_fallback_orders
+20161019,1000,982,18,0.982,982,160,0,822,0.16,0.018,0.1629327902240326,0.0,0.8370672097759674,160,16,806,0.17922606924643583,162,0,0.20875763747454176,0
+20161020,1000,990,10,0.99,990,159,0,831,0.159,0.01,0.1606060606060606,0.0,0.8393939393939394,159,10,821,0.1707070707070707,162,0,0.2202020202020202,0
+20161022,1000,982,18,0.982,982,131,0,851,0.131,0.018,0.1334012219959267,0.0,0.8665987780040734,131,13,838,0.14663951120162932,167,0,0.22810590631364563,0

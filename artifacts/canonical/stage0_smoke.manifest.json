@@ -1,0 +1,183 @@
+{
+  "manifest_version": "1.0",
+  "artifact_id": "stage0_smoke_20161019_20_22_23_v2",
+  "schema_version": "stage0_canonical_v2",
+  "stage": "stage0",
+  "status": "canonical",
+  "created_at": "2026-07-15T11:15:21.998191+00:00",
+  "created_by_commit": "123905d7a8cf2ee675fe5e126017d2193b585c56",
+  "input_artifact_ids": [
+    "raw_smoke_20161019_20_22_23_v2"
+  ],
+  "config_hash": "8b452c91e1ad8811e14bf66b56cd38f4a94643a7cb4a6bc4cd07c7f0ea0059d5",
+  "fit_dates": [],
+  "target_dates": [
+    "20161019",
+    "20161020",
+    "20161022",
+    "20161023"
+  ],
+  "decision_time_contract": "retrospective_observation_only",
+  "files": [
+    {
+      "role": "roads",
+      "path": "map_data/xian_2017/xian_2017_core_roads.parquet",
+      "sha256": "dcf0630800fc256f07a1ca1b2a8a344cabf6ef0f61c80a2acc0464d26a23a82f",
+      "size_bytes": 1828328,
+      "row_count": 12707,
+      "schema_hash": "e0257f2de6c2ac841d45a1a0cf197530ceec99844482071bfc95349122640c89"
+    },
+    {
+      "role": "nodes",
+      "path": "map_data/xian_2017/xian_2017_core_nodes.parquet",
+      "sha256": "5f2011c4d67253e1ffea4c7be8d8abdc5616e2cb6635050cca8e8a3eea7e1418",
+      "size_bytes": 816534,
+      "row_count": 18332,
+      "schema_hash": "088c6ffe3777328cb7b1b98422af5db3a3194741ec937243c59257bb772674ad"
+    },
+    {
+      "role": "poi_exposure",
+      "path": "artifacts/canonical/smoke_v2/stage0/poi/stage0_link_poi_exposure.parquet",
+      "sha256": "414b49a795e29ba2fd1f8309f2789c36eab78e4f75cf842ccb6bb4cc49c7d109",
+      "size_bytes": 1333173,
+      "row_count": 12707,
+      "schema_hash": "b7fb5e141b020d1af1293d9d4d4b0824548521efad43d315a1ab7508ac377882"
+    },
+    {
+      "role": "link_traversals_20161019",
+      "path": "artifacts/canonical/smoke_v2/stage0_packaged/link_traversals/day=20161019.parquet",
+      "sha256": "a5d0086cb6992fb5f27eaf33d2d60a19694df4318ca69b24f8bc431d9da2f0b7",
+      "size_bytes": 1438058,
+      "row_count": 19289,
+      "schema_hash": "2631f9dcc5394669f0d185608f6724774dfae7e54b7213f7c71dc091acc91972"
+    },
+    {
+      "role": "turn_movements_20161019",
+      "path": "artifacts/canonical/smoke_v2/stage0_packaged/turn_movements/day=20161019.parquet",
+      "sha256": "82d9228acbccaea1e9acf70ec3c9786e726ae48ae4317549ad34dd37925f78e3",
+      "size_bytes": 388941,
+      "row_count": 18289,
+      "schema_hash": "1eefe4c8d24543e4ab6bbc9f155700c1d6d2daa390fdbf446d9affad8a2f30ac"
+    },
+    {
+      "role": "routes_20161019",
+      "path": "artifacts/canonical/smoke_v2/stage0_packaged/routes/day=20161019.parquet",
+      "sha256": "2af904d700211d297aa7d5f0b49e094bb241522ecda925dc3cac83592ef1c43b",
+      "size_bytes": 139927,
+      "row_count": 19289,
+      "schema_hash": "94ae08e7569e66e7071d81c00b595bcea5d459ddfb77e49b006666e9028a4b85"
+    },
+    {
+      "role": "orders_20161019",
+      "path": "artifacts/canonical/smoke_v2/stage0_packaged/orders/day=20161019.parquet",
+      "sha256": "31092dfbc358942a61565225e125ff5f6578bb5ca3fc6fdbcb48bf1b8d8203d6",
+      "size_bytes": 221493,
+      "row_count": 1000,
+      "schema_hash": "3802cc78c4fa544a10a814cfe1950e6b5486b6aeb91b452caa6a094aa93253d3"
+    },
+    {
+      "role": "link_traversals_20161020",
+      "path": "artifacts/canonical/smoke_v2/stage0_packaged/link_traversals/day=20161020.parquet",
+      "sha256": "b3e8e164e821c68162463034d37c18fb1f300999b312f1ae94690c3072ed4b98",
+      "size_bytes": 1439854,
+      "row_count": 18925,
+      "schema_hash": "2631f9dcc5394669f0d185608f6724774dfae7e54b7213f7c71dc091acc91972"
+    },
+    {
+      "role": "turn_movements_20161020",
+      "path": "artifacts/canonical/smoke_v2/stage0_packaged/turn_movements/day=20161020.parquet",
+      "sha256": "f6155f690d50182ee98cb0daaf72af69acc5da4a71de6c8fa3fbc80a84c224fe",
+      "size_bytes": 385061,
+      "row_count": 17925,
+      "schema_hash": "1eefe4c8d24543e4ab6bbc9f155700c1d6d2daa390fdbf446d9affad8a2f30ac"
+    },
+    {
+      "role": "routes_20161020",
+      "path": "artifacts/canonical/smoke_v2/stage0_packaged/routes/day=20161020.parquet",
+      "sha256": "1aa61be9e037975ba5423c0e3f37bfb61f7547f752b1e7f86eb67ead37acfaef",
+      "size_bytes": 137874,
+      "row_count": 18925,
+      "schema_hash": "94ae08e7569e66e7071d81c00b595bcea5d459ddfb77e49b006666e9028a4b85"
+    },
+    {
+      "role": "orders_20161020",
+      "path": "artifacts/canonical/smoke_v2/stage0_packaged/orders/day=20161020.parquet",
+      "sha256": "99081ddf69899761653441bc8f2061083c9b6d2a0ffe2e94eefdec49efd26444",
+      "size_bytes": 221906,
+      "row_count": 1000,
+      "schema_hash": "3802cc78c4fa544a10a814cfe1950e6b5486b6aeb91b452caa6a094aa93253d3"
+    },
+    {
+      "role": "link_traversals_20161022",
+      "path": "artifacts/canonical/smoke_v2/stage0_packaged/link_traversals/day=20161022.parquet",
+      "sha256": "b4b424bdb7d9e57736868fda3625b697b45de2a81d1724df3c283595f44b09ec",
+      "size_bytes": 1524294,
+      "row_count": 20064,
+      "schema_hash": "2631f9dcc5394669f0d185608f6724774dfae7e54b7213f7c71dc091acc91972"
+    },
+    {
+      "role": "turn_movements_20161022",
+      "path": "artifacts/canonical/smoke_v2/stage0_packaged/turn_movements/day=20161022.parquet",
+      "sha256": "353ac804f36b54d7cf4746361a1de54674822c714ce74d6cb7da4b04a778c63f",
+      "size_bytes": 401787,
+      "row_count": 19064,
+      "schema_hash": "1eefe4c8d24543e4ab6bbc9f155700c1d6d2daa390fdbf446d9affad8a2f30ac"
+    },
+    {
+      "role": "routes_20161022",
+      "path": "artifacts/canonical/smoke_v2/stage0_packaged/routes/day=20161022.parquet",
+      "sha256": "274c1f265c7aefce13025327c45f56e16b71c18d4ef39576a85e700b8c707e81",
+      "size_bytes": 145928,
+      "row_count": 20064,
+      "schema_hash": "94ae08e7569e66e7071d81c00b595bcea5d459ddfb77e49b006666e9028a4b85"
+    },
+    {
+      "role": "orders_20161022",
+      "path": "artifacts/canonical/smoke_v2/stage0_packaged/orders/day=20161022.parquet",
+      "sha256": "b0b00de3c33b405d656f3440513de78e62b6f91325d0bc77a83a852fbe93c223",
+      "size_bytes": 224155,
+      "row_count": 1000,
+      "schema_hash": "3802cc78c4fa544a10a814cfe1950e6b5486b6aeb91b452caa6a094aa93253d3"
+    },
+    {
+      "role": "link_traversals_20161023",
+      "path": "artifacts/canonical/smoke_v2/stage0_packaged/link_traversals/day=20161023.parquet",
+      "sha256": "d3d3a886ccd8b67fa2814faab520e83114696e6ab029bbafcc080ea101e39177",
+      "size_bytes": 1506894,
+      "row_count": 20031,
+      "schema_hash": "2631f9dcc5394669f0d185608f6724774dfae7e54b7213f7c71dc091acc91972"
+    },
+    {
+      "role": "turn_movements_20161023",
+      "path": "artifacts/canonical/smoke_v2/stage0_packaged/turn_movements/day=20161023.parquet",
+      "sha256": "637406206926f3b29848b06c153bb90ba8d13a939d00eced939af7f38acc8753",
+      "size_bytes": 398802,
+      "row_count": 19031,
+      "schema_hash": "1eefe4c8d24543e4ab6bbc9f155700c1d6d2daa390fdbf446d9affad8a2f30ac"
+    },
+    {
+      "role": "routes_20161023",
+      "path": "artifacts/canonical/smoke_v2/stage0_packaged/routes/day=20161023.parquet",
+      "sha256": "3ef7c5ef1dafcac99f8aad88866d64fb964a6f64d51a29020e445f5fa6ae9dc3",
+      "size_bytes": 145582,
+      "row_count": 20031,
+      "schema_hash": "94ae08e7569e66e7071d81c00b595bcea5d459ddfb77e49b006666e9028a4b85"
+    },
+    {
+      "role": "orders_20161023",
+      "path": "artifacts/canonical/smoke_v2/stage0_packaged/orders/day=20161023.parquet",
+      "sha256": "361be4c9f098bedf8bfe23b7e74bdeb0a3dde4939fddef594fc0f8c8b5681c90",
+      "size_bytes": 221862,
+      "row_count": 1000,
+      "schema_hash": "3802cc78c4fa544a10a814cfe1950e6b5486b6aeb91b452caa6a094aa93253d3"
+    }
+  ],
+  "audit": {
+    "status": "PASS",
+    "path": "docs/pipeline_rebaseline/stage0_canonical_smoke_audit.json",
+    "sha256": "219c29348c39c4e71af7365bf564b713654ff1e610a72d75217d5c2d7f603842"
+  },
+  "known_limitations": [
+    "15.7%-17.5% of sampled orders have a fully connected directed route in the clipped core network; every disconnected transition is explicitly flagged and must not be treated as valid topology."
+  ]
+}

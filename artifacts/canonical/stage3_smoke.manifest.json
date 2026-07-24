@@ -1,0 +1,81 @@
+{
+  "manifest_version": "1.0",
+  "artifact_id": "stage3_smoke_train20_validate22_test23_v2",
+  "schema_version": "stage3_condition_vector_v2",
+  "stage": "stage3",
+  "status": "canonical",
+  "created_at": "2026-07-15T11:15:24.431915+00:00",
+  "created_by_commit": "123905d7a8cf2ee675fe5e126017d2193b585c56",
+  "input_artifact_ids": [
+    "stage2_dispatch_smoke_fit20161019_predict20_22_23",
+    "stage1_v2_smoke_20161019_20_22_23"
+  ],
+  "config_hash": "8b452c91e1ad8811e14bf66b56cd38f4a94643a7cb4a6bc4cd07c7f0ea0059d5",
+  "fit_dates": [
+    "20161020",
+    "20161022"
+  ],
+  "target_dates": [
+    "20161023"
+  ],
+  "decision_time_contract": "heldout_stage2_dispatch_predictions_only_validation_calibration",
+  "files": [
+    {
+      "role": "stage3_model",
+      "path": "artifacts/canonical/smoke_v2/stage3/models/stage3_smoke.joblib",
+      "sha256": "56e15a28921dbc020b9e5739885ac4a5c16a9f745f8155dbfb4578b130bdff49",
+      "size_bytes": 18262,
+      "row_count": null,
+      "schema_hash": null
+    },
+    {
+      "role": "stage3_calibration_selection",
+      "path": "artifacts/canonical/smoke_v2/stage3/calibration_selection.csv",
+      "sha256": "d35e9402759e32a19f1572e28e8556052f65eb3e40d0aaa2f7f1ed6d32ea6a7b",
+      "size_bytes": 441,
+      "row_count": 4,
+      "schema_hash": "ca15e6ab4546fd00e58303487f756d5a74a8f6babfe038d710a91b6a3d202117"
+    },
+    {
+      "role": "condition_vector_20161020",
+      "path": "artifacts/canonical/smoke_v2/stage3/condition_vectors/day=20161020.parquet",
+      "sha256": "d21e6e5b02af2b5eac8cd6570cec6a5bee8173371cae5cd06c220b859857b392",
+      "size_bytes": 170857,
+      "row_count": 1000,
+      "schema_hash": "f0f451719189cd32ee90e7d363df8f3b557e61416490706ca872508663b9bdba"
+    },
+    {
+      "role": "condition_vector_20161022",
+      "path": "artifacts/canonical/smoke_v2/stage3/condition_vectors/day=20161022.parquet",
+      "sha256": "d17945631e19bddcc170fbba599d8d0fb1f0688573f87943dfec04bb04724a00",
+      "size_bytes": 170562,
+      "row_count": 1000,
+      "schema_hash": "f0f451719189cd32ee90e7d363df8f3b557e61416490706ca872508663b9bdba"
+    },
+    {
+      "role": "condition_vector_20161023",
+      "path": "artifacts/canonical/smoke_v2/stage3/condition_vectors/day=20161023.parquet",
+      "sha256": "f1354c11fe246cac88278e2b821de7299cb5e6cbaa34dbb3eb3c7e906f4168bc",
+      "size_bytes": 171236,
+      "row_count": 1000,
+      "schema_hash": "f0f451719189cd32ee90e7d363df8f3b557e61416490706ca872508663b9bdba"
+    },
+    {
+      "role": "stage3_metrics",
+      "path": "artifacts/canonical/smoke_v2/stage3/metrics.csv",
+      "sha256": "d3afffa9821d5a542b885259b1c47c90d1171a7399e6f647fa08b92da3aa6c27",
+      "size_bytes": 1609,
+      "row_count": 12,
+      "schema_hash": "1d06aa00238bc62481554e39962fe8ce2b7f891989270ec5ce1d57a0ee44bef6"
+    }
+  ],
+  "audit": {
+    "status": "PASS",
+    "path": "docs/pipeline_rebaseline/stage3_smoke_audit.json",
+    "sha256": "3d86ee9b348ca453053a91014e52896f84064af6b90add62fba76ed89b649c07"
+  },
+  "known_limitations": [
+    "Engineering smoke uses lightweight bootstrap linear models; it validates Stage3 semantics and leakage controls, not formal model selection.",
+    "No canonical dispatch-time IIS model is present, so IIS and extended overall probability remain unavailable rather than imputed."
+  ]
+}

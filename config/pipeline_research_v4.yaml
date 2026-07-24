@@ -1,0 +1,36 @@
+pipeline_version: stage0_formalization_v4
+status: stage0_promotion_candidate_hold
+formal_stage4_enabled: false
+
+dates:
+  reference_fit: ["20161019"]
+  train: ["20161020", "20161021"]
+  validation: ["20161022"]
+  development_diagnostic: ["20161023"]
+  blind_test: []
+  fallback_evaluation: retrospective_rolling_origin
+
+stage0:
+  contract: docs/pipeline_contract/stage0_contract.md
+  data_split: docs/pipeline_contract/data_split_v4.md
+  network_version: xian_2017_core_noded_v4
+  network_status: exploratory
+  network_manifest: artifacts/exploratory/xian_2017_core_noded_v4/network_manifest.json
+  matcher_version: hmm_viterbi_directional_v4
+  route_quality_schema: stage0_route_quality_v4
+  route_quality_config: stage0/config/route_quality_v4.json
+  manual_truth_version: stage0_route_truth_v1
+  manual_truth_manifest: docs/pipeline_rebaseline/manual_truth/stage0_route_truth_v1_manifest.json
+  minimum_manual_reviews: 300
+  recommended_manual_reviews: 500
+  minimum_core_precision: 0.90
+  canonical_output: artifacts/canonical/stage0_v4
+  canonical_manifest: artifacts/canonical/stage0_v4/stage0_v4.manifest.json
+  canonical_promotion_gate: HOLD
+
+downstream:
+  stage1: HOLD
+  stage2: HOLD
+  stage3: HOLD
+  stage35: HOLD
+  stage4: HOLD

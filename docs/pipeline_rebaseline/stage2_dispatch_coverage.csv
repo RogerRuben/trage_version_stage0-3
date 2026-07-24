@@ -1,0 +1,4 @@
+date,orders,link_rows,service_orders,heldout_false_rows,training_not_before_prediction,availability_after_decision,orders_with_multiple_cutoffs,probability_range_failures,expected_range_failures,nonpositive_service_predictions,realized_duration_permission_rows,forbidden_features,outside_whitelist,status
+20161020,1000,18925,1000,0,0,0,0,0,0,0,0,,,PASS
+20161022,1000,20064,1000,0,0,0,0,0,0,0,0,,,PASS
+20161023,1000,20031,1000,0,0,0,0,0,0,0,0,,,PASS

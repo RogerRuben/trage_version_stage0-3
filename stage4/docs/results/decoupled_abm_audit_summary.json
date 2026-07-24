@@ -24,9 +24,7 @@
     1
   ],
   "formal_three_replication_results_complete_pass": "FAIL",
-  "preassignment_formal_status": "DISABLED_BY_DEFAULT_PENDING_TWO_LAYER_RESERVATION_STATE",
   "simulator_type": "30_second_discrete_time_sparse_matching",
-  "balanced_differentiation_status": "PROXY_ONLY_HV_STRESS_EDGE_FILTER_NOT_FULL_ZONE_TIME_BUDGET",
-  "balanced_differentiation_pass": "FAIL",
+  "legacy_v2_summary_excluded_from_v3_final_audit": true,
   "overall_status": "FAIL"
 }

@@ -563,7 +563,31 @@ def quantile_calibrate_to_reference(values: pd.Series, reference: pd.Series) -> 
 def build_capability(demand: pd.DataFrame, profiles_path: Path, reference_path: Path, calibration_mode: str, output_root: Path, results_dir: Path) -> pd.DataFrame:
     doc = json.loads(profiles_path.read_text(encoding="utf-8"))
     profiles = doc["profiles"]
+    threshold_policy = doc.get("threshold_policy", {})
+    main_profile_names = list(threshold_policy.get("main_profiles", ["conservative_av", "moderate_av", "mature_av"]))
+    for profile_name in main_profile_names:
+        profile = profiles.get(profile_name)
+        if profile is None:
+            raise ValueError(f"Missing required main capability profile: {profile_name}")
+        if bool(profile.get("test_day_used_for_thresholds", True)):
+            raise ValueError(f"Main capability profile {profile_name} uses test-day-derived thresholds")
+        if str(profile.get("threshold_source_type", "")) not in {
+            "training_data",
+            "validation_data",
+            "external_engineering_assumption",
+            "explicit_exogenous_scenario",
+        }:
+            raise ValueError(f"Unsupported threshold source for main profile {profile_name}: {profile.get('threshold_source_type')}")
+    for lower, upper in zip(main_profile_names, main_profile_names[1:]):
+        low = profiles[lower]
+        high = profiles[upper]
+        for dim in ["lcs", "pmis", "rts", "iis"]:
+            if float(low["dimension_hard_threshold"][dim]) > float(high["dimension_hard_threshold"][dim]):
+                raise ValueError(f"Non-monotone hard threshold for {dim}: {lower} > {upper}")
+        if float(low["uncertainty_tolerance"]) > float(high["uncertainty_tolerance"]):
+            raise ValueError(f"Non-monotone uncertainty tolerance: {lower} > {upper}")
     reference = pd.read_parquet(reference_path) if reference_path.exists() else pd.DataFrame()
+    results_dir.mkdir(parents=True, exist_ok=True)
     rows = []
     binding_rows = []
     decomp_rows = []
@@ -624,6 +648,11 @@ def build_capability(demand: pd.DataFrame, profiles_path: Path, reference_path: 
             "date": demand["date"].astype(str),
             "vehicle_profile": profile_name,
             "vehicle_type": "AV",
+            "capability_mapping_version": doc.get("profile_version", "unknown"),
+            "profile_role": profile.get("profile_role", "unspecified"),
+            "threshold_source": profile.get("threshold_source", "unspecified"),
+            "threshold_source_type": profile.get("threshold_source_type", "unspecified"),
+            "test_day_used_for_thresholds": bool(profile.get("test_day_used_for_thresholds", False)),
             "scenario_parameter_status": doc.get("parameter_status", "scenario_priors_not_empirical_av_estimates"),
             "condition_available": known,
             "capability_score_scale": scale_label,
@@ -661,8 +690,12 @@ def build_capability(demand: pd.DataFrame, profiles_path: Path, reference_path: 
         })
         rows.append(cap)
         decomp_rows.append({
-            "sample": "full_day_112165_condition_known" if profile_name == "moderate_av" else f"full_day_{profile_name}",
+            "sample": "full_day_112165_condition_known",
             "vehicle_profile": profile_name,
+            "profile_role": profile.get("profile_role", "unspecified"),
+            "threshold_source": profile.get("threshold_source", "unspecified"),
+            "threshold_source_type": profile.get("threshold_source_type", "unspecified"),
+            "test_day_used_for_thresholds": bool(profile.get("test_day_used_for_thresholds", False)),
             "orders": int(len(cap)),
             "condition_known_orders": int(known.sum()),
             "core_feasible_share": float(core_feasible[known].mean()) if known.any() else 0.0,
@@ -684,6 +717,26 @@ def build_capability(demand: pd.DataFrame, profiles_path: Path, reference_path: 
     out.to_parquet(fold_root / "vehicle_capability_mapping.parquet", index=False, compression="zstd")
     pd.DataFrame(decomp_rows).to_csv(results_dir / "full_day_odd_infeasibility_decomposition.csv", index=False)
     pd.concat(binding_rows, ignore_index=True).to_csv(results_dir / "full_day_odd_binding_dimension.csv", index=False)
+    feasibility = pd.DataFrame(decomp_rows)[[
+        "vehicle_profile",
+        "profile_role",
+        "threshold_source",
+        "threshold_source_type",
+        "test_day_used_for_thresholds",
+        "condition_known_orders",
+        "core_feasible_share",
+        "service_feasible_share",
+        "iis_violation",
+        "missing_iis_closes_av_count",
+    ]].copy()
+    order_rank = {name: index for index, name in enumerate(main_profile_names)}
+    main_feasible = feasibility[feasibility["vehicle_profile"].isin(main_profile_names)].copy()
+    main_feasible["profile_order"] = main_feasible["vehicle_profile"].map(order_rank)
+    main_feasible = main_feasible.sort_values("profile_order")
+    shares = main_feasible["service_feasible_share"].to_numpy(dtype=float)
+    monotone_feasible = bool(len(shares) == len(main_profile_names) and np.all(np.diff(shares) >= -1e-12))
+    feasibility["main_profile_feasible_order_pass"] = monotone_feasible
+    feasibility.to_csv(results_dir / "vehicle_capability_profile_feasibility.csv", index=False)
     if not reference.empty:
         compare_rows = []
         for column in ["lcs_tail_probability", "pmis_tail_probability", "rts_tail_probability", "overall_uncertainty"]:
@@ -701,10 +754,14 @@ def build_capability(demand: pd.DataFrame, profiles_path: Path, reference_path: 
             })
         pd.DataFrame(compare_rows).to_csv(results_dir / "full_day_stage3_scale_drift_audit.csv", index=False)
     (output_root / "manifest.json").write_text(json.dumps({
-        "status": "PASS",
+        "status": "PASS" if monotone_feasible else "FAIL",
         "rows": int(len(out)),
         "orders": int(demand["order_id"].nunique()),
         "profile_version": doc.get("profile_version"),
+        "main_profiles": main_profile_names,
+        "main_threshold_source": threshold_policy.get("main_profile_source"),
+        "test_day_used_for_main_thresholds": bool(threshold_policy.get("test_day_used_for_main_thresholds", True)),
+        "main_profile_feasible_order_pass": monotone_feasible,
         "gate_version": "core_conditional_iis_v1",
         "capability_calibration_mode": calibration_mode,
     }, indent=2), encoding="utf-8")

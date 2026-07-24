@@ -1,0 +1,33 @@
+{
+  "date": "20161023",
+  "fixed_sample_definition": "artifacts/canonical/raw_smoke_source/22-4-8/10-23/50571842cff04226b33a58ae0ee64496.tar.gz",
+  "variants": [
+    {
+      "name": "old_network",
+      "roads": "map_data/xian_2017/xian_2017_core_roads.parquet",
+      "stage0_root": "artifacts/canonical/smoke_v2/stage0",
+      "quality": "artifacts/exploratory/stage0_network_comparison_v4/old/order_route_quality/day=20161023.parquet",
+      "summary": "artifacts/exploratory/stage0_network_comparison_v4/old/summary.csv"
+    },
+    {
+      "name": "noded_v3",
+      "roads": "artifacts/exploratory/xian_2017_core_noded_v3/xian_2017_core_noded_v3_roads.parquet",
+      "stage0_root": "artifacts/exploratory/stage0_noded_v3_rematch",
+      "quality": "artifacts/exploratory/stage0_network_comparison_v4/v3/order_route_quality/day=20161023.parquet",
+      "summary": "artifacts/exploratory/stage0_network_comparison_v4/v3/summary.csv"
+    },
+    {
+      "name": "noded_v4",
+      "roads": "artifacts/exploratory/xian_2017_core_noded_v4/roads.parquet",
+      "stage0_root": "artifacts/exploratory/stage0_noded_v4_directional_rematch",
+      "quality": "artifacts/exploratory/stage0_noded_v4_directional_route_quality/order_route_quality/day=20161023.parquet",
+      "summary": "docs/pipeline_rebaseline/stage0_noded_v4_directional_route_quality_summary.csv"
+    }
+  ],
+  "gates": {
+    "maximum_core_drop": 0.03,
+    "maximum_failed_order_increase": 5,
+    "maximum_mean_route_inflation": 0.05,
+    "suspicious_reachability": 0.995
+  }
+}

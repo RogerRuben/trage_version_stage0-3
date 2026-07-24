@@ -1,0 +1,5 @@
+﻿status,artifact_count,scope
+canonical,8,explicit manifests in pipeline_canonical.yaml
+exploratory,166,frozen legacy inventory
+deprecated,1,frozen legacy inventory
+unknown,0,frozen legacy inventory
