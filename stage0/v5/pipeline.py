@@ -156,6 +156,11 @@ def _empty_quality(order_id: str, reason: str) -> dict[str, Any]:
         "illegal_u_turn_count": 0,
         "layer_violation_count": 0,
         "restriction_violation_count": 0,
+        "observed_dynamic_label_on_inferred_edge_count": 0,
+        "hmm_output_path_identity_mismatch_count": 0,
+        "hmm_path_distance_mismatch_count": 0,
+        "same_edge_jitter_mismatch_count": 0,
+        "raw_movement_audit_available": False,
         "route_link_count": 0,
         "observed_distance_m": 0.0,
         "unallocated_observed_time_s": 0.0,
@@ -263,6 +268,7 @@ def run_dates(
         candidate_config,
         str(work / "candidate_index" / config_hash(candidate_config)),
         config.section("network")["metric_crs"],
+        hmm_config,
     )
     candidate_index_init_ms = (time.perf_counter() - initialization_started) * 1000.0
     initialization_started = time.perf_counter()
@@ -429,11 +435,21 @@ def run_dates(
                             "dijkstra_calls", "dijkstra_expanded_nodes", "route_cache_hits",
                             "route_cache_misses", "local_window_count", "local_failed_window_count",
                             "full_order_trigger_reason", "local_hmm_attempted", "full_hmm_attempted",
+                            "local_hmm_order_attempt_count",
+                            "local_hmm_window_attempt_count",
+                            "local_hmm_retry_window_count",
+                            "boundary_repair_viterbi_count",
                             "full_hmm_succeeded", "full_hmm_failed", "stationary_point_share",
+                            "effective_ambiguity_point_share",
                             "eligible_ambiguity_point_share", "selected_bridge_request_count",
                             "selected_bridge_path_count", "selected_path_search_ms",
                             "distance_search_calls", "path_search_calls", "positive_cache_hits",
                             "negative_cache_hits", "path_cache_hits",
+                            "exact_path_search_calls",
+                            "approximate_path_search_calls",
+                            "approximate_search_unresolved_count",
+                            "order_transition_evidence_cache_hits",
+                            "order_transition_evidence_cache_misses",
                             "local_patch_count", "no_candidate_initial_count",
                             "no_candidate_recovered_count",
                             "under_minimum_candidate_expansion_count",
@@ -517,11 +533,17 @@ def run_dates(
                         "heading_reliable", "stationary_or_low_motion", "edge_heading_difference_deg",
                         "time_gap_s", "transition_cutoff_m", "selected_path_distance_m",
                         "selected_path_routing_cost", "selected_path_identifier",
-                        "selected_path_json", "path_to_gps_ratio",
+                        "selected_path_json", "selected_path_search_exact",
+                        "selected_jitter_penalty_m", "path_to_gps_ratio",
+                        "legacy_candidate_score", "projection_emission_cost",
+                        "heading_emission_cost", "edge_prior_cost",
+                        "total_emission_cost",
                         "selected_network_snapshot_mismatch",
                         "provisional_edge_uid", "provisional_position_on_edge",
                         "transition_failure_reason",
                         "transition_failure_raw_movement_status",
+                        "transition_failure_search_exact",
+                        "transition_failure_diagnostic_class",
                         "transition_retry_used", "transition_initial_cutoff_m",
                     ) if column in matched.columns]
                     matched_diagnostic_frames.append(matched[diagnostic_columns].copy())
@@ -712,6 +734,12 @@ def summarize_run(config: Stage0Config, repo: Path, dates: list[str], orders_per
         quality.get("hmm_path_distance_mismatch_count", pd.Series(dtype=float)),
         errors="coerce",
     ).fillna(0).sum())
+    same_edge_jitter_mismatch_count = int(pd.to_numeric(
+        quality.get(
+            "same_edge_jitter_mismatch_count", pd.Series(dtype=float)
+        ),
+        errors="coerce",
+    ).fillna(0).sum())
     non_rejected_gaps = int((
         quality.get("topology_gap_count", pd.Series(0, index=quality.index)).gt(0)
         & quality.route_quality.ne("rejected")
@@ -802,10 +830,17 @@ def summarize_run(config: Stage0Config, repo: Path, dates: list[str], orders_per
         dtype=float,
     )
     raw_failure_status_counts: dict[str, int] = {}
+    failure_diagnostic_class_counts: dict[str, int] = {}
     for event in failed_transition_events:
         status = str(event.get("raw_movement_status", "unknown"))
         raw_failure_status_counts[status] = (
             raw_failure_status_counts.get(status, 0) + 1
+        )
+        diagnostic_class = str(
+            event.get("diagnostic_class", "unclassified")
+        )
+        failure_diagnostic_class_counts[diagnostic_class] = (
+            failure_diagnostic_class_counts.get(diagnostic_class, 0) + 1
         )
     return {
         **base,
@@ -854,6 +889,15 @@ def summarize_run(config: Stage0Config, repo: Path, dates: list[str], orders_per
         "full_hmm_failure_share": (full_attempts - full_successes) / len(performance) if len(performance) else 0.0,
         "local_hmm_attempt_count": local_attempts,
         "local_hmm_attempt_share": local_attempts / len(performance) if len(performance) else 0.0,
+        "local_hmm_window_attempt_count": int(
+            numeric_sum("local_hmm_window_attempt_count")
+        ),
+        "local_hmm_retry_window_count": int(
+            numeric_sum("local_hmm_retry_window_count")
+        ),
+        "boundary_repair_viterbi_count": int(
+            numeric_sum("boundary_repair_viterbi_count")
+        ),
         "local_window_failure_count": int(numeric_sum("local_failed_window_count")),
         "orders_by_failed_local_window_count": {
             "1": int((failed_windows == 1).sum()),
@@ -876,6 +920,14 @@ def summarize_run(config: Stage0Config, repo: Path, dates: list[str], orders_per
             ),
         },
         "failed_transition_raw_movement_status_counts": raw_failure_status_counts,
+        "failed_transition_raw_movement_status_semantics": (
+            "no_direct_raw_movement_record means the candidate pair has no "
+            "single direct movement record; it does not imply that no "
+            "multi-edge network path exists"
+        ),
+        "failed_transition_diagnostic_class_counts": (
+            failure_diagnostic_class_counts
+        ),
         "failed_transition_point_index_distribution": {
             name: float(failed_point_indices.quantile(q))
             if len(failed_point_indices)
@@ -909,6 +961,19 @@ def summarize_run(config: Stage0Config, repo: Path, dates: list[str], orders_per
             name: float(expanded_values.quantile(q)) if len(expanded_values) else None
             for name, q in (("p50", 0.50), ("p90", 0.90), ("p99", 0.99))
         },
+        "exact_path_search_calls": int(numeric_sum("exact_path_search_calls")),
+        "approximate_path_search_calls": int(
+            numeric_sum("approximate_path_search_calls")
+        ),
+        "approximate_search_unresolved_count": int(
+            numeric_sum("approximate_search_unresolved_count")
+        ),
+        "order_transition_evidence_cache_hits": int(
+            numeric_sum("order_transition_evidence_cache_hits")
+        ),
+        "order_transition_evidence_cache_misses": int(
+            numeric_sum("order_transition_evidence_cache_misses")
+        ),
         "pure_compute_ms": pure_compute_ms,
         "pure_compute_ms_per_order": pure_compute_ms / len(performance) if len(performance) else 0.0,
         "bucket_input_ms": numeric_sum("bucket_input_ms_per_order"),
@@ -941,6 +1006,7 @@ def summarize_run(config: Stage0Config, repo: Path, dates: list[str], orders_per
         ).fillna(0).sum()),
         "observed_dynamic_label_on_inferred_edge_count": inferred_dynamic,
         "hmm_path_distance_mismatch_count": mismatch_count,
+        "same_edge_jitter_mismatch_count": same_edge_jitter_mismatch_count,
         "final_forbidden_movement_count": int(movements.get(
             "movement_audit_reason", pd.Series(dtype=str)
         ).astype(str).eq("restriction_block").sum()) if len(movements) else 0,

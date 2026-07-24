@@ -92,6 +92,7 @@ def evaluate_order_quality(
     ).sum())
     path_identity_mismatch_count = 0
     path_distance_mismatch_count = 0
+    same_edge_jitter_mismatch_count = 0
     if successful and "selected_path_json" in matched_points:
         import json as _json
 
@@ -101,8 +102,6 @@ def evaluate_order_quality(
         for point_index in range(1, len(ordered_points)):
             left_uid = str(ordered_points.edge_uid.iloc[point_index - 1])
             right_uid = str(ordered_points.edge_uid.iloc[point_index])
-            if left_uid == right_uid:
-                continue
             try:
                 expected = [str(value) for value in _json.loads(
                     str(ordered_points.selected_path_json.iloc[point_index])
@@ -133,6 +132,33 @@ def evaluate_order_quality(
             ))
             if left_uid == right_uid:
                 reconstructed_distance = max(0.0, right_position - left_position)
+                observed_jitter_penalty = float(pd.to_numeric(
+                    ordered_points.get(
+                        "selected_jitter_penalty_m",
+                        pd.Series(np.nan, index=ordered_points.index),
+                    ).iloc[point_index],
+                    errors="coerce",
+                ))
+                expected_jitter_penalty = (
+                    max(0.0, left_position - right_position)
+                    * float(
+                        hard_cfg.get(
+                            "same_edge_jitter_penalty_per_m", 0.25
+                        )
+                    )
+                )
+                if (
+                    not math.isfinite(observed_jitter_penalty)
+                    or abs(
+                        observed_jitter_penalty - expected_jitter_penalty
+                    )
+                    > float(
+                        hard_cfg.get(
+                            "hmm_path_distance_tolerance_m", 1e-6
+                        )
+                    )
+                ):
+                    same_edge_jitter_mismatch_count += 1
             elif expected and expected[0] in edge_lookup.index and expected[-1] in edge_lookup.index:
                 reconstructed_distance = (
                     max(0.0, float(edge_lookup.loc[left_uid].length_m) - left_position)
@@ -207,6 +233,7 @@ def evaluate_order_quality(
         "observed_dynamic_label_on_inferred_edge_count": inferred_dynamic_count,
         "hmm_output_path_identity_mismatch_count": path_identity_mismatch_count,
         "hmm_path_distance_mismatch_count": path_distance_mismatch_count,
+        "same_edge_jitter_mismatch_count": same_edge_jitter_mismatch_count,
         "raw_movement_audit_available": "movement_audit_reason" in movements.columns,
         "network_snapshot_mismatch_share": float(
             matched_points.get(
@@ -265,6 +292,7 @@ def evaluate_order_quality(
         "observed_run_alignment": alignment_valid,
         "hmm_output_path_identity": path_identity_mismatch_count == 0,
         "hmm_output_path_distance": path_distance_mismatch_count == 0,
+        "same_edge_jitter_consistency": same_edge_jitter_mismatch_count == 0,
         "dynamic_label_provenance": inferred_dynamic_count == 0,
         "layer_continuity": layer_count <= int(hard_cfg["maximum_layer_violations"]),
     }

@@ -9,7 +9,7 @@ from shapely.geometry import LineString
 from stage0.v5.matching import (
     Candidate, CandidateIndex, TransitionEngine, angular_difference,
     _ambiguity_flags, _gps_headings, _transition_ambiguity_flags, _viterbi,
-    full_order_decision,
+    candidate_emission_cost, effective_ambiguity_flags, full_order_decision,
     local_failures_require_full_order, local_hmm_windows, transition_cutoff,
 )
 from stage0.v5.reconstruction import (
@@ -58,6 +58,37 @@ def _matched_ac() -> pd.DataFrame:
     })
 
 
+def _quality_config() -> dict:
+    return {
+        "hard": {
+            "maximum_heading_direction_difference_deg": 100,
+            "same_edge_reverse_tolerance_m": 10,
+            "same_edge_jitter_penalty_per_m": 0.25,
+            "minimum_direction_displacement_m": 3,
+            "minimum_consecutive_direction_conflicts": 2,
+            "maximum_direction_violations": 0,
+            "maximum_topology_gaps": 0,
+            "maximum_unreasonable_detours": 0,
+            "maximum_od_endpoint_error_m": 150,
+            "maximum_illegal_u_turns": 0,
+            "minimum_route_links": 1,
+            "conservation_tolerance": 1e-6,
+            "hmm_path_distance_tolerance_m": 1e-6,
+            "maximum_layer_violations": 0,
+        },
+        "soft": {
+            "maximum_route_length_ratio": 2.5,
+            "maximum_fallback_share": 0.25,
+            "maximum_p90_projection_distance_m": 60,
+            "minimum_route_length_ratio": 0.5,
+            "maximum_interpolated_distance_share": 0.5,
+            "minimum_match_confidence": 0.35,
+            "maximum_repeated_link_share": 0.2,
+            "maximum_parallel_ambiguity_share": 0.25,
+        },
+    }
+
+
 def test_candidate_preserves_edge_identity_and_heading_consistency():
     assert _candidate("a", 0, 2).edge_uid != _candidate("a2", 1, 2).edge_uid
     assert float(angular_difference(359, 1)) == 2.0
@@ -87,10 +118,10 @@ def test_grade_signature_difference_requires_close_plausible_candidates():
     edges = _edges()
     edges.loc[1, "layer"] = 1
     rows = [[
-        Candidate("a", 0, 2, 2, 5, 2, 1),
-        Candidate("a2", 1, 2, 40, 5, 40, 2),
+        Candidate("a", 0, 2, 2, 5, 2, 1, total_emission_cost=0.1),
+        Candidate("a2", 1, 2, 40, 5, 40, 2, total_emission_cost=10.0),
     ]]
-    flags, reasons = _ambiguity_flags(rows, edges, distance_margin_m=5)
+    flags, reasons = _ambiguity_flags(rows, edges, emission_margin_cost=0.5)
     assert not flags[0]
     assert "grade_separation" not in reasons[0]
 
@@ -103,9 +134,170 @@ def test_same_edge_transition_distance_uses_positions():
 
 def test_same_edge_small_projection_jitter_is_allowed_with_penalty():
     engine = TransitionEngine(_edges(), _movements(), pd.DataFrame(), {"route_cache_sources": 2, "max_route_distance_m": 100.0, "same_edge_jitter_tolerance_m": 3.0, "same_edge_jitter_penalty_per_m": 0.5})
-    distances, penalties = engine.transition_matrices([_candidate("a", 0, 8)], [_candidate("a", 0, 6)], 100)
+    distances, penalties, retry_attempted = engine.transition_matrices(
+        [_candidate("a", 0, 8)], [_candidate("a", 0, 6)], 100
+    )
     assert distances[0, 0] == 0
     assert penalties[0, 0] == 1.0
+    assert not retry_attempted
+
+
+def test_same_edge_selected_distance_and_jitter_are_independently_audited():
+    edges = _edges()
+    matched = pd.DataFrame({
+        "point_seq": [0, 1],
+        "timestamp": [0.0, 2.0],
+        "edge_uid": ["a", "a"],
+        "position_on_edge": [8.0, 6.0],
+        "metric_x": [8.0, 6.0],
+        "metric_y": [0.0, 0.0],
+        "gps_to_edge_distance_m": [1.0, 1.0],
+        "parallel_ambiguity": [False, False],
+        "selected_path_json": ["", '["a"]'],
+        "selected_path_distance_m": [math.nan, 0.0],
+        # Two metres of reverse jitter at 0.5 cost/metre deliberately
+        # disagrees with the frozen audit rate of 0.25.
+        "selected_jitter_penalty_m": [math.nan, 1.0],
+        "heading_reliable": [False, False],
+        "edge_heading_difference_deg": [0.0, 0.0],
+        "observed_step_m": [0.0, 2.0],
+    })
+    route = EdgeAwareRouter(
+        edges, _movements(), {"max_route_distance_m": 100}
+    ).reconstruct(matched)
+    parts = route_parts_frame("o", route, edges)
+    parts = add_position_aware_route_distances(matched, parts, edges)
+    quality = evaluate_order_quality(
+        "o",
+        matched,
+        parts,
+        build_traversals("o", matched, parts, edges),
+        pd.DataFrame(),
+        edges,
+        {"matching_mode": "local_hmm"},
+        _quality_config(),
+    )
+    assert quality["hmm_path_distance_mismatch_count"] == 0
+    assert quality["same_edge_jitter_mismatch_count"] == 1
+
+
+def test_transition_ambiguity_is_not_masked_by_unreliable_heading():
+    effective = effective_ambiguity_flags(
+        pd.Series([True, False]).to_numpy(),
+        pd.Series([False, True]).to_numpy(),
+        pd.Series([False, False]).to_numpy(),
+    )
+    assert effective.tolist() == [False, True]
+
+
+def test_context_expansion_remerges_overlapping_local_windows():
+    flags = pd.Series([False] * 10).to_numpy()
+    flags[[2, 6]] = True
+    assert local_hmm_windows(flags, context_points=2, merge_gap_points=2) == [
+        (0, 9)
+    ]
+
+
+def test_transition_matrix_evidence_is_reused_within_an_order():
+    engine = TransitionEngine(
+        _edges(),
+        _movements(),
+        pd.DataFrame(),
+        {"max_route_distance_m": 100, "same_edge_jitter_tolerance_m": 3},
+    )
+    engine.begin_order()
+    previous = [_candidate("a", 0, 5)]
+    current = [_candidate("c", 3, 5)]
+    first = engine.transition_matrices(previous, current, 100)
+    calls_after_first = engine.router.stats().path_calls
+    second = engine.transition_matrices(previous, current, 100)
+    assert first[0].tolist() == second[0].tolist()
+    assert engine.router.stats().path_calls == calls_after_first
+    assert engine.evidence_cache_stats() == (1, 1)
+
+
+def test_viterbi_does_not_repeat_retry_already_done_by_matrix_builder(
+    monkeypatch,
+):
+    engine = TransitionEngine(
+        _edges(),
+        _movements(),
+        pd.DataFrame(),
+        {
+            "max_route_distance_m": 100,
+            "transition_retry_max_m": 100,
+            "transition_retry_multiplier": 1.5,
+            "transition_retry_candidate_subset": 3,
+        },
+    )
+    calls = 0
+    original = engine.transition_matrices
+
+    def counted(*args, **kwargs):
+        nonlocal calls
+        calls += 1
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(engine, "transition_matrices", counted)
+    config = {
+        "sigma_distance_m": 15.0,
+        "beta_transition_m": 60.0,
+        "beta_semantic_cost_m": 60.0,
+        "transition_cutoff_min_m": 20.0,
+        "transition_cutoff_max_m": 20.0,
+        "transition_cutoff_alpha": 0.0,
+        "transition_cutoff_base_m": 20.0,
+        "transition_max_speed_mps": 40.0,
+    }
+    assert _viterbi(
+        [[_candidate("c", 3, 5)], [_candidate("a", 0, 5)]],
+        pd.Series([0.0, 1.0]).to_numpy(),
+        pd.Series([0.0, 1.0]).to_numpy(),
+        engine,
+        config,
+    ) is None
+    assert calls == 1
+
+
+def test_selected_transition_range_does_not_revalidate_whole_order():
+    engine = TransitionEngine(
+        _edges(),
+        _movements(),
+        pd.DataFrame(),
+        {
+            "max_route_distance_m": 100,
+            "same_edge_jitter_tolerance_m": 3,
+            "transition_cutoff_min_m": 100,
+            "transition_cutoff_max_m": 100,
+            "transition_cutoff_alpha": 0,
+            "transition_cutoff_base_m": 100,
+            "transition_max_speed_mps": 100,
+        },
+    )
+    paths, _, failures = engine.selected_transition_paths(
+        [
+            _candidate("a", 0, 1),
+            _candidate("a", 0, 5),
+            _candidate("b", 2, 5),
+            _candidate("c", 3, 5),
+        ],
+        pd.Series([0.0, 4.0, 10.0, 10.0]).to_numpy(),
+        pd.Series([0.0, 1.0, 1.0, 1.0]).to_numpy(),
+        engine.router.config,
+        from_point_index=2,
+        to_point_index=2,
+    )
+    assert not failures
+    assert [path.point_index for path in paths] == [2]
+
+
+def test_nonadjacent_pair_is_not_mislabeled_as_missing_topology():
+    engine = TransitionEngine(
+        _edges(), _movements(), pd.DataFrame(), {"max_route_distance_m": 100}
+    )
+    assert engine.raw_movement_status("a", "c") == (
+        "no_direct_raw_movement_record"
+    )
 
 
 def test_adjacent_movement_distance_avoids_dijkstra():
@@ -206,6 +398,38 @@ def test_multi_target_path_search_stops_after_all_targets_are_settled():
     # is exhausted.  This assertion guards against reverting to a full-cutoff
     # Pareto expansion.
     assert router.stats().expanded_nodes < 10
+
+
+def test_approximate_unresolved_path_is_not_negative_cached():
+    router = CompactMovementRouter(
+        _edges(),
+        _movements(),
+        {
+            "max_route_distance_m": 100,
+            "pareto_search_mode": "approximate",
+            "pareto_epsilon_m": 0.25,
+            "pareto_max_labels_per_state": 1,
+        },
+    )
+    assert router.transition_paths_from_source("c", {"a": 100.0})["a"] is None
+    assert not router._path_negative
+    assert router.stats().approximate_unresolved == 1
+
+
+def test_exact_unresolved_path_can_be_negative_cached():
+    router = CompactMovementRouter(
+        _edges(),
+        _movements(),
+        {
+            "max_route_distance_m": 100,
+            "pareto_search_mode": "exact",
+            "pareto_epsilon_m": 0.25,
+            "pareto_max_labels_per_state": 1,
+        },
+    )
+    assert router.transition_paths_from_source("c", {"a": 100.0})["a"] is None
+    assert router._path_negative
+    assert router.stats().exact_path_calls == 1
 
 
 def test_order_local_source_frontier_is_reused_for_new_targets():
@@ -343,6 +567,108 @@ def test_batch_candidate_projection_deduplicates_candidate_alias(tmp_path):
     assert len(rows[0]) == 1
 
 
+def test_candidate_rank_and_truncation_use_hmm_emission_cost(tmp_path):
+    template = _edges().iloc[0].to_dict()
+    edges = gpd.GeoDataFrame([
+        {
+            **template,
+            "edge_uid": "legacy_winner",
+            "edge_key": "legacy_winner",
+            "geometry": LineString([(0, 20), (20, 20)]),
+            "length_m": 20.0,
+            "candidate_penalty": 0.0,
+            "parallel_group": None,
+        },
+        {
+            **template,
+            "edge_uid": "emission_winner",
+            "edge_key": "emission_winner",
+            "geometry": LineString([(0, 10), (20, 10)]),
+            "length_m": 20.0,
+            "candidate_penalty": 15.0,
+            "parallel_group": None,
+        },
+    ], geometry="geometry", crs=3857)
+    config = {
+        "spacing_complex_m": 6.0,
+        "spacing_curve_m": 9.0,
+        "spacing_straight_m": 22.5,
+        "spacing_urban_m": 15.0,
+        "radius_m": 80.0,
+        "heading_weight_m": 15.0,
+        "heading_log_cost_max": 1.0,
+        "edge_prior_scale_m": 30.0,
+        "max_candidates": 1,
+        "absolute_max_candidates": 20,
+        "complex_candidates": 1,
+        "dense_candidates": 1,
+        "ordinary_candidates": 1,
+    }
+    index = CandidateIndex(
+        edges,
+        config,
+        str(tmp_path / "emission_candidate"),
+        metric_crs="EPSG:3857",
+        emission_config={"sigma_distance_m": 15.0},
+    )
+    candidates = index.candidates_batch(
+        pd.Series([5.0]).to_numpy(),
+        pd.Series([0.0]).to_numpy(),
+        pd.Series([0.0]).to_numpy(),
+    )[0]
+    assert candidates[0].edge_uid == "emission_winner"
+    assert candidates[0].score > 20.0
+    assert candidates[0].total_emission_cost < 0.8
+    assert candidate_emission_cost(candidates[0], 15.0) == (
+        candidates[0].total_emission_cost
+    )
+
+
+def test_recovery_candidate_override_is_not_clipped_by_normal_limit(tmp_path):
+    template = _edges().iloc[0].to_dict()
+    edges = gpd.GeoDataFrame([
+        {
+            **template,
+            "edge_uid": f"edge_{index}",
+            "edge_key": f"edge_{index}",
+            "geometry": LineString([(0, index), (20, index)]),
+            "length_m": 20.0,
+            "candidate_penalty": 0.0,
+            "parallel_group": None,
+        }
+        for index in range(15)
+    ], geometry="geometry", crs=3857)
+    config = {
+        "spacing_complex_m": 6.0,
+        "spacing_curve_m": 9.0,
+        "spacing_straight_m": 22.5,
+        "spacing_urban_m": 15.0,
+        "radius_m": 80.0,
+        "heading_weight_m": 15.0,
+        "heading_log_cost_max": 1.0,
+        "edge_prior_scale_m": 30.0,
+        "max_candidates": 10,
+        "absolute_max_candidates": 20,
+        "complex_candidates": 8,
+        "dense_candidates": 5,
+        "ordinary_candidates": 3,
+    }
+    index = CandidateIndex(
+        edges,
+        config,
+        str(tmp_path / "recovery_candidate"),
+        metric_crs="EPSG:3857",
+        emission_config={"sigma_distance_m": 15.0},
+    )
+    candidates = index.candidates_batch(
+        pd.Series([5.0]).to_numpy(),
+        pd.Series([0.0]).to_numpy(),
+        pd.Series([0.0]).to_numpy(),
+        candidate_limit_override=20,
+    )[0]
+    assert len(candidates) == 15
+
+
 def test_stationary_heading_contributes_no_direction_evidence():
     headings, reliable = _gps_headings(
         pd.Series([0.0, 5.0, 5.1, 5.2, 10.0]).to_numpy(),
@@ -351,8 +677,17 @@ def test_stationary_heading_contributes_no_direction_evidence():
     )
     assert not reliable[2]
     assert headings[2] == 0.0
-    flags = pd.Series([False, False, True, False, False]).to_numpy()
-    assert full_order_decision(flags, {"full_order_ambiguity_share": 0.45}, reliable) == (False, "")
+    emission_flags = pd.Series(
+        [False, False, True, False, False]
+    ).to_numpy()
+    flags = effective_ambiguity_flags(
+        emission_flags,
+        pd.Series([False] * 5).to_numpy(),
+        reliable,
+    )
+    assert full_order_decision(
+        flags, {"full_order_ambiguity_share": 0.45}
+    ) == (False, "")
 
 
 def test_direct_movement_returns_complete_generalized_cost():

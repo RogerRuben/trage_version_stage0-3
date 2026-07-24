@@ -29,6 +29,7 @@ network:
   bridge_cache_pairs: 50000
   pareto_epsilon_m: 0.25
   pareto_max_labels_per_state: 12
+  pareto_search_mode: approximate
 candidate:
   trajectory_coordinate_interpretation: gcj02
   radius_m: 80.0
@@ -40,7 +41,8 @@ candidate:
   dense_candidates: 5
   complex_candidates: 8
   max_candidates: 10
-  ambiguity_distance_margin_m: 5.0
+  absolute_max_candidates: 20
+  ambiguity_emission_margin_cost: 0.5
   minimum_heading_displacement_m: 3.0
   ordinary_candidates: 3
   heading_weight_m: 15.0
@@ -87,6 +89,7 @@ quality:
     maximum_topology_gaps: 0
     maximum_heading_direction_difference_deg: 100.0
     same_edge_reverse_tolerance_m: 10.0
+    same_edge_jitter_penalty_per_m: 0.25
     minimum_direction_displacement_m: 3.0
     minimum_consecutive_direction_conflicts: 2
     maximum_unreasonable_detours: 0

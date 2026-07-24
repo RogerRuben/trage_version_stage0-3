@@ -49,7 +49,20 @@ def local_hmm_windows(
             segments[-1][1] = int(value)
         else:
             segments.append([int(value), int(value)])
-    return [(max(0, left - context_points), min(len(flags), right + context_points + 1)) for left, right in segments]
+    expanded = [
+        [
+            max(0, left - context_points),
+            min(len(flags), right + context_points + 1),
+        ]
+        for left, right in segments
+    ]
+    merged: list[list[int]] = []
+    for start, stop in expanded:
+        if merged and start <= merged[-1][1]:
+            merged[-1][1] = max(merged[-1][1], stop)
+        else:
+            merged.append([start, stop])
+    return [(start, stop) for start, stop in merged]
 
 
 @dataclass(frozen=True)
@@ -64,6 +77,20 @@ class Candidate:
     heading_log_cost: float = 0.0
     edge_prior_log_cost: float = 0.0
     heading_used: bool = True
+    projection_emission_cost: float = math.nan
+    total_emission_cost: float = math.nan
+
+
+def candidate_emission_cost(candidate: Candidate, sigma_distance_m: float) -> float:
+    """Return the single emission model used by ranking and Viterbi."""
+    if math.isfinite(candidate.total_emission_cost):
+        return float(candidate.total_emission_cost)
+    projection = candidate.distance**2 / (2.0 * sigma_distance_m**2)
+    return float(
+        projection
+        + (candidate.heading_log_cost if candidate.heading_used else 0.0)
+        + candidate.edge_prior_log_cost
+    )
 
 
 @dataclass(frozen=True)
@@ -80,6 +107,8 @@ class TransitionSelection:
     edge_uids: tuple[str, ...]
     retry_used: bool = False
     initial_cutoff_m: float | None = None
+    search_exact: bool = True
+    jitter_penalty_m: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -92,6 +121,8 @@ class TransitionFailure:
     endpoint_distance_m: float
     reason: str
     raw_movement_status: str
+    search_exact: bool = True
+    diagnostic_class: str = "unclassified"
 
 
 def transition_cutoff(observed_step_m: float, time_gap_s: float, config: dict[str, Any]) -> float:
@@ -103,8 +134,14 @@ def transition_cutoff(observed_step_m: float, time_gap_s: float, config: dict[st
     # Time only expands the physical feasibility envelope; it never forces a
     # path. The speed cap is an engineering safety bound recorded in config.
     temporal = max(0.0, time_gap_s) * float(config.get("transition_max_speed_mps", 40.0))
+    maximum = float(
+        config.get(
+            "transition_cutoff_max_m",
+            config.get("max_route_distance_m", 6_000.0),
+        )
+    )
     return min(
-        float(config.get("transition_cutoff_max_m", config["max_route_distance_m"])),
+        maximum,
         max(float(config.get("transition_cutoff_min_m", 300.0)), min(spatial, temporal) if temporal > 0 else spatial),
     )
 
@@ -126,6 +163,27 @@ class TransitionEngine:
         self.router = movement_router or CompactMovementRouter(edges, movements, config)
         self.jitter_tolerance = float(config.get("same_edge_jitter_tolerance_m", 0.0))
         self.jitter_penalty_per_m = float(config.get("same_edge_jitter_penalty_per_m", 0.25))
+        self._matrix_cache: dict[
+            tuple[Any, ...], tuple[np.ndarray, np.ndarray, bool]
+        ] = {}
+        self._matrix_cache_hits = 0
+        self._matrix_cache_misses = 0
+
+    def begin_order(self) -> None:
+        self.router.begin_order()
+        self._matrix_cache.clear()
+        self._matrix_cache_hits = 0
+        self._matrix_cache_misses = 0
+
+    @staticmethod
+    def _candidate_signature(candidates: list[Candidate]) -> tuple[tuple[str, float], ...]:
+        return tuple(
+            (candidate.edge_uid, round(float(candidate.position), 6))
+            for candidate in candidates
+        )
+
+    def evidence_cache_stats(self) -> tuple[int, int]:
+        return self._matrix_cache_hits, self._matrix_cache_misses
 
     def distance(self, left: Candidate, right: Candidate, requested_cutoff: float | None = None) -> float:
         if left.edge_uid == right.edge_uid:
@@ -148,9 +206,21 @@ class TransitionEngine:
         current: list[Candidate],
         requested_cutoff: float,
         force_retry: bool = False,
-    ) -> tuple[np.ndarray, np.ndarray]:
+    ) -> tuple[np.ndarray, np.ndarray, bool]:
+        cache_key = (
+            self._candidate_signature(previous),
+            self._candidate_signature(current),
+            round(float(requested_cutoff), 6),
+            bool(force_retry),
+        )
+        cached = self._matrix_cache.get(cache_key)
+        if cached is not None:
+            self._matrix_cache_hits += 1
+            return cached[0].copy(), cached[1].copy(), cached[2]
+        self._matrix_cache_misses += 1
         distances = np.full((len(previous), len(current)), math.inf, dtype=float)
         penalties = np.zeros_like(distances)
+        retry_attempted = False
         for i, left in enumerate(previous):
             target_cutoffs: dict[str, float] = {}
             for j, right in enumerate(current):
@@ -203,6 +273,7 @@ class TransitionEngine:
                     0.0, transition.generalized_routing_cost - physical_full_edges
                 )
         if force_retry or not np.isfinite(distances).any():
+            retry_attempted = True
             retry_cutoff = min(
                 self.router.maximum,
                 float(self.router_config_value(
@@ -263,10 +334,23 @@ class TransitionEngine:
                             "transition_retry_soft_penalty_m", 180.0
                         ))
                     )
-        return distances, penalties
+        self._matrix_cache[cache_key] = (
+            distances.copy(),
+            penalties.copy(),
+            retry_attempted,
+        )
+        return distances, penalties, retry_attempted
 
     def router_config_value(self, name: str, default: Any) -> Any:
         return getattr(self.router, "config", {}).get(name, default)
+
+    def raw_movement_status(self, left_uid: str, right_uid: str) -> str:
+        raw = self.router.raw_movement(left_uid, right_uid)
+        return (
+            str(raw.restriction_status)
+            if raw is not None
+            else "no_direct_raw_movement_record"
+        )
 
     def selected_transition_paths(
         self,
@@ -274,11 +358,19 @@ class TransitionEngine:
         observed_step: np.ndarray,
         time_gap: np.ndarray,
         config: dict[str, Any],
+        from_point_index: int = 1,
+        to_point_index: int | None = None,
     ) -> tuple[list[TransitionSelection], int, list[TransitionFailure]]:
         paths: list[TransitionSelection] = []
         failures: list[TransitionFailure] = []
         requested = 0
-        for point_index, (left, right) in enumerate(zip(selected, selected[1:]), start=1):
+        first = max(1, int(from_point_index))
+        last = min(
+            len(selected) - 1,
+            int(to_point_index) if to_point_index is not None else len(selected) - 1,
+        )
+        for point_index in range(first, last + 1):
+            left, right = selected[point_index - 1], selected[point_index]
             if left is None or right is None:
                 continue
             cutoff = transition_cutoff(
@@ -291,14 +383,22 @@ class TransitionEngine:
                         point_index, left.edge_uid, right.edge_uid,
                         float(observed_step[point_index]), cutoff, abs(delta),
                         "same_edge_reverse_exceeds_jitter", "same_edge",
+                        True,
+                        "candidate_state_direction_mismatch",
                     ))
                     continue
                 endpoint_distance = max(0.0, delta)
+                jitter_penalty = (
+                    abs(delta) * self.jitter_penalty_per_m
+                    if delta < 0
+                    else 0.0
+                )
             else:
                 endpoint_distance = (
                     max(0.0, self.lengths[left.edge_index] - left.position)
                     + right.position
                 )
+                jitter_penalty = 0.0
             initial_cutoff = cutoff
             retry_used = False
             if endpoint_distance > cutoff:
@@ -317,11 +417,11 @@ class TransitionEngine:
                         point_index, left.edge_uid, right.edge_uid,
                         float(observed_step[point_index]), cutoff, endpoint_distance,
                         "endpoint_distance_exceeds_retry_cutoff",
-                        str(getattr(
-                            self.router.raw_movement(left.edge_uid, right.edge_uid),
-                            "restriction_status",
-                            "missing_topology",
-                        )),
+                        self.raw_movement_status(
+                            left.edge_uid, right.edge_uid
+                        ),
+                        True,
+                        "cutoff_too_small_or_candidate_state_mismatch",
                     ))
                     continue
                 cutoff = retry_cutoff
@@ -352,12 +452,21 @@ class TransitionEngine:
                             remaining_retry,
                         )
                 if result is None:
-                    raw = self.router.raw_movement(left.edge_uid, right.edge_uid)
                     failures.append(TransitionFailure(
                         point_index, left.edge_uid, right.edge_uid,
                         float(observed_step[point_index]), cutoff, endpoint_distance,
                         "no_movement_path_within_retry_cutoff",
-                        str(getattr(raw, "restriction_status", "missing_topology")),
+                        self.raw_movement_status(
+                            left.edge_uid, right.edge_uid
+                        ),
+                        True,
+                        (
+                            "restriction_barrier"
+                            if self.raw_movement_status(
+                                left.edge_uid, right.edge_uid
+                            ).startswith("forbidden")
+                            else "no_path_within_exact_cutoff"
+                        ),
                     ))
                     continue
                 if result is not None:
@@ -374,11 +483,15 @@ class TransitionEngine:
                 time_gap_s=float(time_gap[point_index]),
                 transition_cutoff_m=cutoff,
                 selected_path_distance_m=full_distance,
-                generalized_routing_cost=result.generalized_routing_cost,
+                generalized_routing_cost=(
+                    result.generalized_routing_cost + jitter_penalty
+                ),
                 path_identifier=result.path_identifier,
                 edge_uids=result.edge_uids,
                 retry_used=retry_used,
                 initial_cutoff_m=initial_cutoff,
+                search_exact=result.search_exact,
+                jitter_penalty_m=jitter_penalty,
             ))
         return paths, requested, failures
 
@@ -393,9 +506,17 @@ class CandidateIndex:
         config: dict[str, Any],
         cache_dir: str | None = None,
         metric_crs: str = "EPSG:32649",
+        emission_config: dict[str, Any] | None = None,
     ):
         self.edges = edges.reset_index(drop=True)
         self.config = config
+        emission_values = emission_config or config
+        self.emission_sigma_distance_m = float(
+            emission_values.get(
+                "sigma_distance_m",
+                config.get("emission_sigma_distance_m", 15.0),
+            )
+        )
         self.transformer = Transformer.from_crs(4326, metric_crs, always_xy=True)
         self.geometries = self.edges.geometry.to_numpy()
         self.edge_uids = self.edges.edge_uid.astype(str).to_numpy()
@@ -531,6 +652,16 @@ class CandidateIndex:
             self.candidate_penalties[edge_index_array]
             / max(float(self.config.get("edge_prior_scale_m", 30.0)), 1e-9)
         )
+        projection_emission_cost = (
+            distances**2 / (2.0 * self.emission_sigma_distance_m**2)
+        )
+        total_emission_cost = (
+            projection_emission_cost
+            + np.where(reliable[point_index_array], heading_log_cost, 0.0)
+            + edge_prior_log_cost
+        )
+        # Retained only as a legacy diagnostic.  It no longer determines
+        # candidate identity, truncation, rank, or the fast state.
         scores = (
             distances
             + heading_delta / 180.0 * float(self.config["heading_weight_m"])
@@ -553,12 +684,23 @@ class CandidateIndex:
                     float(heading_log_cost[pair_position]),
                     float(edge_prior_log_cost[pair_position]),
                     bool(reliable[point_index]),
+                    float(projection_emission_cost[pair_position]),
+                    float(total_emission_cost[pair_position]),
                 )
                 alias = str(self.candidate_aliases[edge_index])
                 previous = by_alias.get(alias)
-                if previous is None or (candidate.score, candidate.edge_uid) < (previous.score, previous.edge_uid):
+                if previous is None or (
+                    candidate.total_emission_cost,
+                    candidate.edge_uid,
+                ) < (
+                    previous.total_emission_cost,
+                    previous.edge_uid,
+                ):
                     by_alias[alias] = candidate
-            raw = sorted(by_alias.values(), key=lambda value: (value.score, value.edge_uid))
+            raw = sorted(
+                by_alias.values(),
+                key=lambda value: (value.total_emission_cost, value.edge_uid),
+            )
             if not raw:
                 continue
             probe_count = min(
@@ -583,7 +725,21 @@ class CandidateIndex:
                     else "ordinary_candidates"
                 ])
             )
-            retained = min(retained, int(self.config["max_candidates"]))
+            if candidate_limit_override is None:
+                retained = min(retained, int(self.config["max_candidates"]))
+            else:
+                retained = min(
+                    retained,
+                    int(
+                        self.config.get(
+                            "absolute_max_candidates",
+                            max(
+                                int(self.config["max_candidates"]),
+                                int(candidate_limit_override),
+                            ),
+                        )
+                    ),
+                )
             rows[point_index] = [
                 Candidate(**{**candidate.__dict__, "rank": rank + 1})
                 for rank, candidate in enumerate(raw[:retained])
@@ -623,14 +779,7 @@ def _viterbi(
     sigma = float(config["sigma_distance_m"])
     beta = float(config["beta_transition_m"])
     def emission(candidate: Candidate) -> float:
-        # Projection, direction evidence and road prior are independent terms.
-        # Squaring a pre-summed "equivalent metres" score creates cross terms
-        # with no probabilistic interpretation.
-        return -(
-            candidate.distance**2 / (2 * sigma**2)
-            + (candidate.heading_log_cost if candidate.heading_used else 0.0)
-            + candidate.edge_prior_log_cost
-        )
+        return -candidate_emission_cost(candidate, sigma)
 
     def anchored(candidate: Candidate, anchor: Candidate | None) -> bool:
         return anchor is None or (
@@ -657,13 +806,22 @@ def _viterbi(
             float(observed_step[point_index]), float(time_gap[point_index]), config
         )
         search_started = time.perf_counter()
-        network_distances, jitter_penalties = engine.transition_matrices(previous, current, dynamic_cutoff)
+        (
+            network_distances,
+            jitter_penalties,
+            retry_already_attempted,
+        ) = engine.transition_matrices(previous, current, dynamic_cutoff)
         reachable_previous = np.isfinite(scores)
         if (
             reachable_previous.any()
             and not np.isfinite(network_distances[reachable_previous, :]).any()
+            and not retry_already_attempted
         ):
-            network_distances, jitter_penalties = engine.transition_matrices(
+            (
+                network_distances,
+                jitter_penalties,
+                _,
+            ) = engine.transition_matrices(
                 previous,
                 current,
                 dynamic_cutoff,
@@ -714,15 +872,28 @@ def ambiguity_segment_count(flags: np.ndarray) -> int:
 def full_order_decision(
     flags: np.ndarray,
     config: dict[str, Any],
-    ambiguity_eligible: np.ndarray | None = None,
 ) -> tuple[bool, str]:
     if not len(flags):
         return True, "empty_order"
-    eligible = np.ones(len(flags), dtype=bool) if ambiguity_eligible is None else np.asarray(ambiguity_eligible, dtype=bool)
-    share = float(flags[eligible].mean()) if eligible.any() else 0.0
+    # ``flags`` is already the union of heading-reliable emission ambiguity
+    # and unmasked transition ambiguity.  Accepting another eligibility mask
+    # here would allow low-speed transition failures to disappear again.
+    share = float(np.asarray(flags, dtype=bool).mean())
     if share >= float(config["full_order_ambiguity_share"]):
         return True, "raw_ambiguity_share"
     return False, ""
+
+
+def effective_ambiguity_flags(
+    emission_flags: np.ndarray,
+    transition_flags: np.ndarray,
+    heading_reliable: np.ndarray,
+) -> np.ndarray:
+    """Mask heading-dependent ambiguity without masking route discontinuity."""
+    return (
+        np.asarray(emission_flags, dtype=bool)
+        & np.asarray(heading_reliable, dtype=bool)
+    ) | np.asarray(transition_flags, dtype=bool)
 
 
 def local_failures_require_full_order(failed_windows: int, config: dict[str, Any]) -> bool:
@@ -732,7 +903,7 @@ def local_failures_require_full_order(failed_windows: int, config: dict[str, Any
 def _ambiguity_flags(
     candidate_rows: list[list[Candidate]],
     edges: gpd.GeoDataFrame,
-    distance_margin_m: float,
+    emission_margin_cost: float,
     heading_reliable: np.ndarray | None = None,
 ) -> tuple[np.ndarray, list[str]]:
     flags = np.zeros(len(candidate_rows), dtype=bool)
@@ -744,7 +915,10 @@ def _ambiguity_flags(
         elif len(candidates) > 1 and (heading_reliable is None or bool(heading_reliable[index])):
             a, b = candidates[:2]
             left, right = edges.iloc[a.edge_index], edges.iloc[b.edge_index]
-            close_candidates = b.score - a.score <= float(distance_margin_m)
+            close_candidates = (
+                b.total_emission_cost - a.total_emission_cost
+                <= float(emission_margin_cost)
+            )
             spatially_plausible = max(a.distance, b.distance) <= 30.0
             headings_plausible = max(a.heading_difference, b.heading_difference) <= 75.0
             if close_candidates and spatially_plausible and headings_plausible and pd.notna(left.parallel_group) and left.parallel_group == right.parallel_group:
@@ -838,7 +1012,7 @@ def match_order(
     hmm_config: dict[str, Any],
 ) -> tuple[pd.DataFrame, dict[str, Any]]:
     order_started = time.perf_counter()
-    engine.router.begin_order()
+    engine.begin_order()
     stats_before = engine.stats()
     frame = frame.sort_values("timestamp", kind="stable").drop_duplicates("timestamp").copy()
     lon = pd.to_numeric(frame.lon, errors="coerce").to_numpy(float)
@@ -890,7 +1064,10 @@ def match_order(
     observed_step = np.r_[0.0, np.hypot(np.diff(x), np.diff(y))]
     ambiguity_started = time.perf_counter()
     emission_flags, ambiguity_reasons = _ambiguity_flags(
-        candidate_rows, edges, float(candidate_config["ambiguity_distance_margin_m"]), heading_reliable,
+        candidate_rows,
+        edges,
+        float(candidate_config["ambiguity_emission_margin_cost"]),
+        heading_reliable,
     )
     geometric = [row[0] if row else None for row in candidate_rows]
     transition_flags, transition_reasons, fast_transition_evidence = _transition_ambiguity_flags(
@@ -926,7 +1103,7 @@ def match_order(
             emission_flags, ambiguity_reasons = _ambiguity_flags(
                 candidate_rows,
                 edges,
-                float(candidate_config["ambiguity_distance_margin_m"]),
+                float(candidate_config["ambiguity_emission_margin_cost"]),
                 heading_reliable,
             )
             geometric = [row[0] if row else None for row in candidate_rows]
@@ -937,7 +1114,12 @@ def match_order(
             ) = _transition_ambiguity_flags(
                 geometric, observed_step, time_gap, engine, hmm_config,
             )
-    flags = emission_flags | transition_flags
+    # Unreliable headings suppress only emission ambiguity.  A physical
+    # transition failure near a stationary/slow point remains valid evidence
+    # and must participate in both local windows and full-order escalation.
+    flags = effective_ambiguity_flags(
+        emission_flags, transition_flags, heading_reliable
+    )
     ambiguity_reasons = [
         "|".join(filter(None, (emission_reason, transition_reason)))
         for emission_reason, transition_reason in zip(ambiguity_reasons, transition_reasons)
@@ -946,8 +1128,9 @@ def match_order(
     selected = list(geometric)
     windows = local_hmm_windows(flags, int(hmm_config["local_context_points"]), int(hmm_config["merge_gap_points"]))
     no_candidate = np.asarray([not row for row in candidate_rows], dtype=bool)
-    ambiguity_eligible = heading_reliable
-    full_order, full_order_trigger_reason = full_order_decision(flags, hmm_config, ambiguity_eligible)
+    full_order, full_order_trigger_reason = full_order_decision(
+        flags, hmm_config
+    )
     hmm_score = math.nan
     fallback_reason = ""
     local_hmm_ms = 0.0
@@ -957,7 +1140,10 @@ def match_order(
     local_boundary_failure_count = 0
     local_internal_failure_count = 0
     failed_window_details: list[dict[str, Any]] = []
-    local_hmm_attempted = bool(windows) and not full_order
+    local_hmm_attempted = False
+    local_hmm_window_attempt_count = 0
+    local_hmm_retry_window_count = 0
+    boundary_repair_viterbi_count = 0
     full_hmm_attempted = False
     full_hmm_succeeded = False
     local_patch_count = 0
@@ -991,6 +1177,8 @@ def match_order(
             start_anchor = geometric[solve_start] if start > 0 else None
             end_anchor = geometric[solve_stop - 1] if stop < len(candidate_rows) else None
             local_started = time.perf_counter()
+            local_hmm_attempted = True
+            local_hmm_window_attempt_count += 1
             solved = _viterbi(
                 candidate_rows[solve_start:solve_stop],
                 observed_step[solve_start:solve_stop],
@@ -1004,6 +1192,7 @@ def match_order(
                 retry_solve_start = max(0, expanded_start - 1)
                 retry_solve_stop = min(len(candidate_rows), expanded_stop + 1)
                 retry_started = time.perf_counter()
+                local_hmm_retry_window_count += 1
                 retry_start_anchor = (
                     geometric[retry_solve_start] if expanded_start > 0 else None
                 )
@@ -1026,7 +1215,33 @@ def match_order(
                     local_path, local_score, searched_ms = solved
                     left_offset = expanded_start - retry_solve_start
                     right_offset = left_offset + (expanded_stop - expanded_start)
-                    selected[expanded_start:expanded_stop] = local_path[left_offset:right_offset]
+                    trial = list(selected)
+                    trial[expanded_start:expanded_stop] = local_path[
+                        left_offset:right_offset
+                    ]
+                    _, _, patch_failures = engine.selected_transition_paths(
+                        trial,
+                        observed_step,
+                        time_gap,
+                        hmm_config,
+                        from_point_index=max(1, expanded_start),
+                        to_point_index=min(
+                            len(trial) - 1, expanded_stop
+                        ),
+                    )
+                    if patch_failures:
+                        local_failed_windows += 1
+                        local_boundary_failure_count += 1
+                        failed_window_details.append({
+                            "start": start,
+                            "stop": stop,
+                            "failure_stage": "expanded_patch_boundary",
+                            "failure_reasons": [
+                                failure.reason for failure in patch_failures
+                            ],
+                        })
+                        continue
+                    selected = trial
                     local_patch_count += 1
                     local_scores.append(local_score)
                     transition_search_ms += searched_ms
@@ -1051,7 +1266,29 @@ def match_order(
             local_path, local_score, searched_ms = solved
             left_offset = start - solve_start
             right_offset = left_offset + (stop - start)
-            selected[start:stop] = local_path[left_offset:right_offset]
+            trial = list(selected)
+            trial[start:stop] = local_path[left_offset:right_offset]
+            _, _, patch_failures = engine.selected_transition_paths(
+                trial,
+                observed_step,
+                time_gap,
+                hmm_config,
+                from_point_index=max(1, start),
+                to_point_index=min(len(trial) - 1, stop),
+            )
+            if patch_failures:
+                local_failed_windows += 1
+                local_boundary_failure_count += 1
+                failed_window_details.append({
+                    "start": start,
+                    "stop": stop,
+                    "failure_stage": "patch_boundary",
+                    "failure_reasons": [
+                        failure.reason for failure in patch_failures
+                    ],
+                })
+                continue
+            selected = trial
             local_patch_count += 1
             local_scores.append(local_score)
             transition_search_ms += searched_ms
@@ -1108,6 +1345,7 @@ def match_order(
             )
             for start, stop in repair_windows:
                 boundary_repair_attempt_count += 1
+                boundary_repair_viterbi_count += 1
                 solve_start = max(0, start - 1)
                 solve_stop = min(len(candidate_rows), stop + 1)
                 solved = _viterbi(
@@ -1132,13 +1370,14 @@ def match_order(
                 trial = list(selected)
                 trial[start:stop] = candidate_patch
                 _, _, trial_failures = engine.selected_transition_paths(
-                    trial, observed_step, time_gap, hmm_config,
+                    trial,
+                    observed_step,
+                    time_gap,
+                    hmm_config,
+                    from_point_index=max(1, start),
+                    to_point_index=min(len(trial) - 1, stop),
                 )
-                affected = range(max(1, start), min(len(trial), stop + 1))
-                if any(
-                    failure.point_index in affected
-                    for failure in trial_failures
-                ):
+                if trial_failures:
                     continue
                 selected = trial
                 boundary_repair_success_count += 1
@@ -1185,11 +1424,19 @@ def match_order(
     ]
     frame["transition_failure_reason"] = ""
     frame["transition_failure_raw_movement_status"] = ""
+    frame["transition_failure_search_exact"] = pd.NA
+    frame["transition_failure_diagnostic_class"] = ""
     for failure in selected_transition_failures:
         row_index = frame.index[failure.point_index]
         frame.loc[row_index, "transition_failure_reason"] = failure.reason
         frame.loc[row_index, "transition_failure_raw_movement_status"] = (
             failure.raw_movement_status
+        )
+        frame.loc[row_index, "transition_failure_search_exact"] = (
+            failure.search_exact
+        )
+        frame.loc[row_index, "transition_failure_diagnostic_class"] = (
+            failure.diagnostic_class
         )
     accepted_mode = mode not in {"rejected", "failed_no_continuous_route"}
     if accepted_mode:
@@ -1198,9 +1445,38 @@ def match_order(
         frame["gps_to_edge_distance_m"] = [value.distance for value in selected]
         frame["candidate_rank"] = [value.rank for value in selected]
         frame["edge_heading_difference_deg"] = [value.heading_difference for value in selected]
-        frame["emission_margin"] = [row[1].score-row[0].score if len(row)>1 else math.inf for row in candidate_rows]
+        frame["legacy_candidate_score"] = [value.score for value in selected]
+        frame["projection_emission_cost"] = [
+            value.projection_emission_cost for value in selected
+        ]
+        frame["heading_emission_cost"] = [
+            value.heading_log_cost if value.heading_used else 0.0
+            for value in selected
+        ]
+        frame["edge_prior_cost"] = [value.edge_prior_log_cost for value in selected]
+        frame["total_emission_cost"] = [
+            value.total_emission_cost for value in selected
+        ]
+        frame["emission_margin"] = [
+            row[1].total_emission_cost - row[0].total_emission_cost
+            if len(row) > 1
+            else math.inf
+            for row in candidate_rows
+        ]
     else:
-        for column in ["edge_uid", "position_on_edge", "gps_to_edge_distance_m", "candidate_rank", "edge_heading_difference_deg", "emission_margin"]:
+        for column in [
+            "edge_uid",
+            "position_on_edge",
+            "gps_to_edge_distance_m",
+            "candidate_rank",
+            "edge_heading_difference_deg",
+            "legacy_candidate_score",
+            "projection_emission_cost",
+            "heading_emission_cost",
+            "edge_prior_cost",
+            "total_emission_cost",
+            "emission_margin",
+        ]:
             frame[column] = pd.NA
     frame["viterbi_margin"] = math.nan
     frame["transition_cutoff_m"] = np.nan
@@ -1210,6 +1486,8 @@ def match_order(
     frame["selected_path_json"] = ""
     frame["transition_retry_used"] = False
     frame["transition_initial_cutoff_m"] = np.nan
+    frame["selected_path_search_exact"] = pd.NA
+    frame["selected_jitter_penalty_m"] = np.nan
     for transition in selected_transitions if accepted_mode else []:
         frame.loc[frame.index[transition.point_index], "transition_cutoff_m"] = transition.transition_cutoff_m
         frame.loc[frame.index[transition.point_index], "selected_path_distance_m"] = transition.selected_path_distance_m
@@ -1221,6 +1499,12 @@ def match_order(
         frame.loc[
             frame.index[transition.point_index], "transition_initial_cutoff_m"
         ] = transition.initial_cutoff_m
+        frame.loc[
+            frame.index[transition.point_index], "selected_path_search_exact"
+        ] = transition.search_exact
+        frame.loc[
+            frame.index[transition.point_index], "selected_jitter_penalty_m"
+        ] = transition.jitter_penalty_m
         frame.loc[frame.index[transition.point_index], "selected_path_json"] = json.dumps(
             transition.edge_uids, separators=(",", ":")
         )
@@ -1233,6 +1517,7 @@ def match_order(
     frame["point_quality"] = np.where(flags, "ambiguous", "high_confidence")
     stats_after = engine.stats()
     stats_delta = stats_after.minus(stats_before)
+    evidence_cache_hits, evidence_cache_misses = engine.evidence_cache_stats()
     summary = {
         "order_id": str(frame.order_id.iloc[0]) if len(frame) else "",
         "matching_mode": mode,
@@ -1240,7 +1525,16 @@ def match_order(
         "fallback_used": mode in {"pure_geometric_fallback", "partial_local_hmm_fallback"},
         "fallback_reason": fallback_reason, "point_count": len(frame),
         "ambiguity_point_share": float(flags.mean()) if len(flags) else 1.0,
-        "eligible_ambiguity_point_share": float(flags[ambiguity_eligible].mean()) if ambiguity_eligible.any() else 0.0,
+        "effective_ambiguity_point_share": (
+            float(flags.mean()) if len(flags) else 1.0
+        ),
+        "eligible_ambiguity_point_share": float(flags.mean()) if len(flags) else 0.0,
+        "emission_ambiguity_reliable_point_share": float(
+            (emission_flags & heading_reliable).mean()
+        ) if len(flags) else 0.0,
+        "transition_ambiguity_point_share": float(
+            transition_flags.mean()
+        ) if len(flags) else 0.0,
         "stationary_point_share": float((~heading_reliable).mean()) if len(heading_reliable) else 1.0,
         "parallel_ambiguity_share": float(frame.parallel_ambiguity.mean()) if len(frame) else 0.0,
         "local_window_count": len(windows), "hmm_score": hmm_score,
@@ -1260,6 +1554,10 @@ def match_order(
         "under_minimum_candidate_expansion_count": recovered_candidate_count,
         "full_order_trigger_reason": full_order_trigger_reason,
         "local_hmm_attempted": local_hmm_attempted,
+        "local_hmm_order_attempt_count": int(local_hmm_attempted),
+        "local_hmm_window_attempt_count": local_hmm_window_attempt_count,
+        "local_hmm_retry_window_count": local_hmm_retry_window_count,
+        "boundary_repair_viterbi_count": boundary_repair_viterbi_count,
         "full_hmm_attempted": full_hmm_attempted,
         "full_hmm_succeeded": full_hmm_succeeded,
         "full_hmm_failed": full_hmm_attempted and not full_hmm_succeeded,
@@ -1300,9 +1598,16 @@ def match_order(
         "route_cache_misses": stats_delta.cache_misses,
         "distance_search_calls": stats_delta.distance_calls,
         "path_search_calls": stats_delta.path_calls,
+        "exact_path_search_calls": stats_delta.exact_path_calls,
+        "approximate_path_search_calls": stats_delta.approximate_path_calls,
+        "approximate_search_unresolved_count": (
+            stats_delta.approximate_unresolved
+        ),
         "positive_cache_hits": stats_delta.positive_cache_hits,
         "negative_cache_hits": stats_delta.negative_cache_hits,
         "path_cache_hits": stats_delta.path_cache_hits,
+        "order_transition_evidence_cache_hits": evidence_cache_hits,
+        "order_transition_evidence_cache_misses": evidence_cache_misses,
         "_selected_transitions": selected_transitions,
         "_selected_transition_failures": selected_transition_failures,
         "_fast_transition_evidence": fast_transition_evidence,

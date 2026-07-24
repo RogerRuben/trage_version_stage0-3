@@ -42,6 +42,7 @@ class TransitionPath:
     physical_distance_m: float
     generalized_routing_cost: float
     path_identifier: str
+    search_exact: bool = True
 
 
 @dataclass(frozen=True)
@@ -53,6 +54,9 @@ class SearchStats:
     negative_cache_hits: int = 0
     path_cache_hits: int = 0
     cache_misses: int = 0
+    exact_path_calls: int = 0
+    approximate_path_calls: int = 0
+    approximate_unresolved: int = 0
 
     @property
     def calls(self) -> int:
@@ -98,6 +102,12 @@ class CompactMovementRouter:
         self.cache_limit = int(config.get("bridge_cache_pairs", 50_000))
         self.frontier_epsilon_m = float(config.get("pareto_epsilon_m", 0.25))
         self.max_labels_per_state = int(config.get("pareto_max_labels_per_state", 12))
+        self.search_exact = str(
+            config.get("pareto_search_mode", "approximate")
+        ).lower() == "exact"
+        if self.search_exact:
+            self.frontier_epsilon_m = 0.0
+            self.max_labels_per_state = 0
         self._lock = threading.RLock()
         self._distance_positive: OrderedDict[tuple[int, int], float] = OrderedDict()
         self._distance_negative: OrderedDict[tuple[int, int], float] = OrderedDict()
@@ -309,7 +319,7 @@ class CompactMovementRouter:
                 self._increment(negative_cache_hits=1)
                 return None
 
-        self._increment(path_calls=1, cache_misses=1)
+        self._increment(path_calls=1, exact_path_calls=1, cache_misses=1)
         search_limit = maximum + float(self.lengths[right])
         # label = (generalized cost, physical distance, state, parent_label_id)
         label_state: list[int] = [left]
@@ -474,7 +484,12 @@ class CompactMovementRouter:
         if not unresolved:
             return result
 
-        self._increment(path_calls=1, cache_misses=len(unresolved))
+        self._increment(
+            path_calls=1,
+            exact_path_calls=1 if self.search_exact else 0,
+            approximate_path_calls=0 if self.search_exact else 1,
+            cache_misses=len(unresolved),
+        )
         search_limit = max(
             cutoff + float(self.lengths[right])
             for right, (_, cutoff) in unresolved.items()
@@ -535,7 +550,10 @@ class CompactMovementRouter:
                         and proposed_cost <= label_cost[existing] + epsilon
                     )
                 ]
-                if len(target_frontier) >= self.max_labels_per_state:
+                if (
+                    self.max_labels_per_state > 0
+                    and len(target_frontier) >= self.max_labels_per_state
+                ):
                     worst = max(
                         target_frontier,
                         key=lambda existing: (
@@ -580,6 +598,7 @@ class CompactMovementRouter:
                     ),
                     generalized_routing_cost=float(label_cost[label_id]),
                     path_identifier=self._path_id(edge_uids),
+                    search_exact=self.search_exact,
                 ))
             key = (left, right)
             with self._lock:
@@ -588,24 +607,28 @@ class CompactMovementRouter:
                 existing.extend(
                     path for path in paths if path.path_identifier not in known
                 )
-                self._path_searched_cutoff[key] = max(
-                    maximum, self._path_searched_cutoff.get(key, 0.0)
-                )
+                if paths or self.search_exact:
+                    self._path_searched_cutoff[key] = max(
+                        maximum, self._path_searched_cutoff.get(key, 0.0)
+                    )
                 # Early termination proves the selected label optimal for the
                 # exact requested cutoff, but does not enumerate a complete
                 # Pareto frontier for smaller cutoffs.  Only an exhausted
                 # search may advance the reusable frontier watermark.
-                if search_exhausted:
+                if self.search_exact and search_exhausted:
                     self._path_frontier_complete_cutoff[key] = max(
                         maximum,
                         self._path_frontier_complete_cutoff.get(key, 0.0),
                     )
-                if not paths:
+                if not paths and self.search_exact:
                     self._path_negative[key] = max(
                         maximum, self._path_negative.get(key, 0.0)
                     )
+                elif not paths:
+                    self._increment(approximate_unresolved=1)
                 self._path_positive.move_to_end(key)
-                self._path_searched_cutoff.move_to_end(key)
+                if key in self._path_searched_cutoff:
+                    self._path_searched_cutoff.move_to_end(key)
                 if key in self._path_frontier_complete_cutoff:
                     self._path_frontier_complete_cutoff.move_to_end(key)
                 if key in self._path_negative:

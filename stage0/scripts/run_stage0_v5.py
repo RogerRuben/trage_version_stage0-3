@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import logging
 import sys
@@ -53,6 +54,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--bucket-shard-count", type=int, default=1)
     parser.add_argument("--bucket-ids", nargs="*", type=int, default=None)
     parser.add_argument(
+        "--pareto-search-mode",
+        choices=["approximate", "exact"],
+        default=None,
+        help="Override constrained path search mode; exact is intended for failed-order audit.",
+    )
+    parser.add_argument(
         "--log-file",
         type=Path,
         default=None,
@@ -75,6 +82,10 @@ def resolve_dates(args: argparse.Namespace, config: Stage0Config) -> list[str]:
 def main() -> int:
     args = parse_args()
     config = Stage0Config.load(args.config)
+    if args.pareto_search_mode is not None:
+        values = copy.deepcopy(config.values)
+        values["network"]["pareto_search_mode"] = args.pareto_search_mode
+        config = Stage0Config(config.source, values, config_hash(values))
     if args.output_root is not None or args.work_root is not None:
         values = {**config.values, "paths": {**config.values["paths"]}}
         if args.output_root is not None:
