@@ -1,0 +1,59 @@
+schema_version: stage0_v6_valhalla.1
+
+paths:
+  pbf: D:/pycodes/didi_xian_raw/map_data/xian_roadmap_update.osm.pbf
+  valhalla_data: D:/pycodes/didi_xian_raw/valhalla_data
+  valhalla_config: D:/pycodes/didi_xian_raw/valhalla_data/valhalla.json
+  valhalla_tiles: D:/pycodes/didi_xian_raw/valhalla_data/tiles
+  output: stage0/output_v6
+  work: stage0/work_v6
+  fixed_sample_points: D:/pycodes/didi_xian_raw/.worktrees/stage0-v5/stage0/work_v5/sampled_points/orders=200__dates=31ff44387df7
+  fixed_sample_manifest: D:/pycodes/didi_xian_raw/.worktrees/stage0-v5/stage0/output_v5/manifests/sampling_runs/orders=200__dates=31ff44387df7/sampling_manifest.parquet
+  canonical_edges: D:/pycodes/didi_xian_raw/.worktrees/stage0-v5/stage0/output_v5/network/canonical_edges.parquet
+  v5_output: D:/pycodes/didi_xian_raw/.worktrees/stage0-v5/stage0/output_v5
+
+sample:
+  dates: ["20161010", "20161014", "20161016"]
+  orders_per_day: 200
+  seed: 20261009
+  expected_sha256: 160241c6f54f6c8083144a7c9ff052072e222f10ab4373fb9aca1b951c69746b
+
+preprocess:
+  coordinate_system: gcj02
+  maximum_time_gap_s: 300
+  maximum_speed_mps: 75
+  minimum_subtrace_points: 3
+
+valhalla:
+  backend: python
+  service_url: http://127.0.0.1:8002
+  costing: auto
+  shape_match: map_snap
+  search_radius_m: 80
+  retry_search_radius_m: 160
+  gps_accuracy_m: 20
+  breakage_distance_m: 1000
+  interpolation_distance_m: 10
+  request_timeout_s: 120
+  controlled_retry: true
+
+quality:
+  strict:
+    minimum_matched_interval_share: 0.90
+    maximum_snap_distance_p90_m: 40
+    minimum_canonical_mapping_share: 0.99
+    maximum_inferred_distance_share: 0.25
+    maximum_od_endpoint_error_m: 100
+    minimum_route_gps_ratio: 0.50
+    maximum_route_gps_ratio: 2.50
+  analysis:
+    minimum_matched_interval_share: 0.50
+    minimum_canonical_mapping_share: 0.50
+    maximum_od_endpoint_error_m: 300
+    minimum_route_gps_ratio: 0.25
+    maximum_route_gps_ratio: 4.00
+
+runtime:
+  diagnostic_response_sample_count: 20
+  manual_audit_sample_count: 100
+  parquet_compression: zstd
