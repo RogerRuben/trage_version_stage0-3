@@ -80,6 +80,33 @@ def test_parser_normalizes_valhalla_uint64_edge_sentinel_to_missing():
     assert pd.isna(matched.loc[0, "edge_index"])
 
 
+def test_parser_converts_cumulative_elapsed_time_to_edge_increments():
+    source = pd.DataFrame(
+        {"original_point_seq": [0, 1], "timestamp": [0, 12]}
+    )
+    raw = {
+        "edges": [
+            {
+                "id": index,
+                "way_id": index,
+                "node_id": index,
+                "end_node": {"node_id": index + 1, "elapsed_time": elapsed},
+            }
+            for index, elapsed in enumerate([3, 8, 12])
+        ],
+        "matched_points": [
+            {"type": "matched", "edge_index": 0},
+            {"type": "matched", "edge_index": 2},
+        ],
+    }
+    _, routes = parse_trace_attributes(
+        raw, source, order_id="o", subtrace_id="o:000"
+    )
+    assert routes.valhalla_cumulative_elapsed_time_s.tolist() == [3, 8, 12]
+    assert routes.valhalla_edge_elapsed_time_s.tolist() == [3, 5, 4]
+    assert routes.engine_allocated_travel_time_s.isna().all()
+
+
 def _canonical_edges():
     return pd.DataFrame(
         {

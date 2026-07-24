@@ -16,10 +16,21 @@ class PreprocessResult:
     points: pd.DataFrame
     subtraces: list[pd.DataFrame]
     mapping: pd.DataFrame
+    preprocess_breaks: pd.DataFrame
     metrics: dict[str, Any]
 
 
 REQUIRED_COLUMNS = {"order_id", "timestamp", "lon", "lat"}
+BREAK_COLUMNS = [
+    "order_id",
+    "from_original_point_seq",
+    "to_original_point_seq",
+    "from_timestamp",
+    "to_timestamp",
+    "time_gap_s",
+    "distance_gap_m",
+    "break_reason",
+]
 
 
 def preprocess_order(
@@ -40,6 +51,7 @@ def preprocess_order(
             pd.DataFrame(),
             [],
             pd.DataFrame(columns=["order_id", "subtrace_id", "original_point_seq", "usable"]),
+            pd.DataFrame(columns=BREAK_COLUMNS),
             {"input_point_count": 0, "valid_point_count": 0, "subtrace_count": 0},
         )
 
@@ -97,6 +109,12 @@ def preprocess_order(
     )
     if len(split_before):
         split_before.iloc[0] = False
+    break_reason = pd.Series(pd.NA, index=frame.index, dtype="object")
+    break_reason.loc[frame.time_gap_anomaly] = "preprocess_time_gap"
+    break_reason.loc[frame.spatial_jump_anomaly] = "preprocess_spatial_jump"
+    break_reason.loc[frame.nonpositive_time_anomaly] = "preprocess_nonpositive_time"
+    frame["preprocess_break_before"] = split_before
+    frame["preprocess_break_reason"] = break_reason
     frame["subtrace_number"] = split_before.astype("int64").cumsum()
     order_id = str(frame.order_id.iloc[0]) if len(frame) else str(points.order_id.iloc[0])
     frame["subtrace_id"] = frame.subtrace_number.map(lambda value: f"{order_id}:{int(value):03d}")
@@ -110,6 +128,25 @@ def preprocess_order(
     mapping = frame[
         ["order_id", "subtrace_id", "original_point_seq", "usable_subtrace"]
     ].rename(columns={"usable_subtrace": "usable"})
+    break_rows: list[dict[str, Any]] = []
+    for index in frame.index[frame.preprocess_break_before]:
+        if index <= 0:
+            continue
+        left = frame.iloc[index - 1]
+        right = frame.iloc[index]
+        break_rows.append(
+            {
+                "order_id": order_id,
+                "from_original_point_seq": int(left.original_point_seq),
+                "to_original_point_seq": int(right.original_point_seq),
+                "from_timestamp": float(left.timestamp),
+                "to_timestamp": float(right.timestamp),
+                "time_gap_s": float(right.timestamp - left.timestamp),
+                "distance_gap_m": float(right.step_distance_m),
+                "break_reason": str(right.preprocess_break_reason),
+            }
+        )
+    preprocess_breaks = pd.DataFrame(break_rows, columns=BREAK_COLUMNS)
     metrics = {
         "input_point_count": int(len(points)),
         "invalid_point_count": invalid_count,
@@ -121,5 +158,16 @@ def preprocess_order(
         "spatial_jump_anomaly_count": int(frame.spatial_jump_anomaly.sum()),
         "subtrace_count": int(frame.subtrace_id.nunique()) if len(frame) else 0,
         "usable_subtrace_count": len(subtraces),
+        "preprocess_break_count": int(len(preprocess_breaks)),
+        "raw_order_gps_distance_m": float(frame.step_distance_m.sum()),
+        "resolved_subtrace_gps_distance_m": float(
+            frame.loc[~frame.preprocess_break_before, "step_distance_m"].sum()
+        ),
     }
-    return PreprocessResult(frame, subtraces, mapping.reset_index(drop=True), metrics)
+    return PreprocessResult(
+        frame,
+        subtraces,
+        mapping.reset_index(drop=True),
+        preprocess_breaks,
+        metrics,
+    )

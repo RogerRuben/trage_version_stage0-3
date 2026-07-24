@@ -47,7 +47,9 @@ ROUTE_PART_COLUMNS = [
     "bridge",
     "tunnel",
     "speed_limit",
-    "edge_elapsed_time_s",
+    "valhalla_cumulative_elapsed_time_s",
+    "valhalla_edge_elapsed_time_s",
+    "engine_allocated_travel_time_s",
     "is_interpolated",
     "route_source",
 ]
@@ -139,9 +141,21 @@ def parse_trace_attributes(
     for path_id, path in enumerate(paths):
         if not isinstance(path, dict):
             continue
+        previous_elapsed = 0.0
         for edge_index, edge in enumerate(path.get("edges") or []):
             edge_id, way_id, begin_node, end_node = _edge_identifiers(edge)
             observed = path_id == 0 and edge_index in actual_matched_edges
+            elapsed = pd.to_numeric(
+                pd.Series([(edge.get("end_node") or {}).get("elapsed_time")]),
+                errors="coerce",
+            ).iloc[0]
+            edge_elapsed = (
+                float(elapsed) - previous_elapsed
+                if pd.notna(elapsed) and float(elapsed) >= previous_elapsed
+                else np.nan
+            )
+            if pd.notna(elapsed):
+                previous_elapsed = float(elapsed)
             route_rows.append(
                 {
                     "order_id": str(order_id),
@@ -163,9 +177,11 @@ def parse_trace_attributes(
                     "bridge": bool(edge.get("bridge", False)),
                     "tunnel": bool(edge.get("tunnel", False)),
                     "speed_limit": edge.get("speed_limit"),
-                    "edge_elapsed_time_s": (edge.get("end_node") or {}).get(
-                        "elapsed_time", np.nan
+                    "valhalla_cumulative_elapsed_time_s": (
+                        float(elapsed) if pd.notna(elapsed) else np.nan
                     ),
+                    "valhalla_edge_elapsed_time_s": edge_elapsed,
+                    "engine_allocated_travel_time_s": np.nan,
                     "is_interpolated": not observed,
                     "route_source": "observed" if observed else "inferred",
                 }

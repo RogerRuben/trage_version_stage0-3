@@ -21,7 +21,7 @@ from .config import Stage0V6Config
 from .parser import parse_trace_attributes
 from .preprocess import preprocess_order
 from .products import build_order_products
-from .quality import evaluate_order_quality
+from .quality import evaluate_dynamic_measurement_quality, evaluate_route_quality
 from .valhalla_client import ValhallaMatcher
 
 PRODUCTS = (
@@ -30,10 +30,14 @@ PRODUCTS = (
     "link_traversals",
     "turn_movements",
     "unresolved_intervals",
+    "interval_measurements",
+    "interval_accounting",
     "order_base",
     "route_quality",
+    "dynamic_measurement_quality",
     "performance",
     "subtrace_mapping",
+    "preprocess_breaks",
 )
 
 
@@ -127,7 +131,12 @@ def _write_product(
 
 def _concat(frames: list[pd.DataFrame]) -> pd.DataFrame:
     nonempty = [frame for frame in frames if frame is not None and len(frame)]
-    return pd.concat(nonempty, ignore_index=True) if nonempty else pd.DataFrame()
+    if nonempty:
+        return pd.concat(nonempty, ignore_index=True)
+    for frame in frames:
+        if frame is not None:
+            return frame.iloc[0:0].copy()
+    return pd.DataFrame()
 
 
 def _percentiles(values: pd.Series) -> dict[str, float | None]:
@@ -168,11 +177,16 @@ def _order_base(
                 "duration_s": float(
                     clean_points.timestamp.max() - clean_points.timestamp.min()
                 ),
-                "observed_distance_m": float(quality["gps_distance_m"]),
+                "observed_distance_m": float(
+                    quality["raw_order_gps_distance_m"]
+                ),
                 "matched_distance_m": float(quality["route_distance_m"]),
                 "matching_mode": "valhalla_trace_attributes",
                 "matching_confidence": float(quality["matched_interval_share"]),
                 "route_quality": quality["route_quality"],
+                "dynamic_measurement_quality": quality[
+                    "dynamic_measurement_quality"
+                ],
                 "quality_reasons": quality["quality_reasons"],
                 "backend": match_metrics.get("backend"),
                 "retry_count": int(match_metrics.get("retry_count", 0)),
@@ -188,15 +202,15 @@ def run_fixed_sample(
     matcher: ValhallaMatcher | None = None,
     actor_init_ms: float | None = None,
 ) -> tuple[dict[str, Any], ValhallaMatcher]:
-    """Run and account for exactly the frozen 600-order development sample."""
+    """Run the frozen sample and flush each date/bucket atomically."""
 
     sample = load_fixed_sample(config)
     output_root = config.path("output") / run_label
-    valhalla_config = config.path("valhalla_config")
     if matcher is None:
         init_started = time.perf_counter()
         matcher = ValhallaMatcher(
-            config.section("valhalla"), valhalla_config_path=valhalla_config
+            config.section("valhalla"),
+            valhalla_config_path=config.path("valhalla_config"),
         )
         actor_init_ms = (time.perf_counter() - init_started) * 1000
     elif actor_init_ms is None:
@@ -205,242 +219,435 @@ def run_fixed_sample(
     mapper = CanonicalEdgeMapper.from_parquet(config.path("canonical_edges"))
     mapper_init_ms = (time.perf_counter() - mapper_started) * 1000
 
-    frames: dict[str, list[pd.DataFrame]] = {name: [] for name in PRODUCTS}
-    raw_samples_remaining = int(
-        config.section("runtime").get("diagnostic_response_sample_count", 20)
-    )
+    runtime = config.section("runtime")
+    orders_per_bucket = int(runtime.get("orders_per_bucket", 200))
+    compression = str(runtime.get("parquet_compression", "zstd"))
+    product_options = config.section("products")
+    raw_samples_remaining = int(runtime.get("diagnostic_response_sample_count", 20))
     process = psutil.Process()
     peak_rss = process.memory_info().rss
     wall_started = time.perf_counter()
     processing_exceptions = 0
+    parquet_write_s = 0.0
+    route_quality_frames: list[pd.DataFrame] = []
+    dynamic_quality_frames: list[pd.DataFrame] = []
+    performance_frames: list[pd.DataFrame] = []
+    snap_values: list[float] = []
+    bucket_peak_values: list[float] = []
 
-    order_groups = sample.points.groupby(["date", "order_id"], sort=True)
-    for (date, order_id), raw_order in order_groups:
-        order_started = time.perf_counter()
-        preprocess_ms = match_ms = parse_ms = mapping_ms = product_ms = quality_ms = 0.0
-        exception_message = None
-        match_metrics_total: dict[str, Any] = {
-            "backend": matcher.backend,
-            "request_point_count": 0,
-            "matched_edge_count": 0,
-            "matched_point_count": 0,
-            "unmatched_point_count": 0,
-            "interpolated_point_count": 0,
-            "discontinuity_count": 0,
-            "retry_count": 0,
-            "response_ms": 0.0,
-        }
-        try:
-            started = time.perf_counter()
-            prep = preprocess_order(raw_order, **config.section("preprocess"))
-            preprocess_ms = (time.perf_counter() - started) * 1000
-            clean = prep.points
-            frames["subtrace_mapping"].append(prep.mapping.assign(date=str(date)))
-            matched_frames: list[pd.DataFrame] = []
-            route_frames: list[pd.DataFrame] = []
-            for subtrace_id, subtrace in clean.groupby("subtrace_id", sort=False):
-                usable = bool(subtrace.usable_subtrace.iloc[0])
-                if usable:
-                    started = time.perf_counter()
-                    match_result = matcher.match_order(subtrace.reset_index(drop=True))
-                    match_ms += (time.perf_counter() - started) * 1000
-                    for key in (
-                        "request_point_count",
-                        "matched_edge_count",
-                        "matched_point_count",
-                        "unmatched_point_count",
-                        "interpolated_point_count",
-                        "discontinuity_count",
-                        "retry_count",
-                        "response_ms",
-                    ):
-                        match_metrics_total[key] += match_result.get(key, 0) or 0
-                    raw_response = match_result.get("raw_response") or {}
-                    if match_result.get("status") == "error":
-                        exception_message = match_result.get("error_message")
-                    if raw_samples_remaining > 0 and raw_response:
-                        _write_json(
-                            output_root
-                            / "diagnostics"
-                            / "raw_response_samples"
-                            / f"{date}_{order_id}_{subtrace_id.rsplit(':', 1)[-1]}.json",
-                            raw_response,
-                        )
-                        raw_samples_remaining -= 1
-                else:
-                    raw_response = {}
-                    match_metrics_total["unmatched_point_count"] += len(subtrace)
-                started = time.perf_counter()
-                matched, routes = parse_trace_attributes(
-                    raw_response,
-                    subtrace.reset_index(drop=True),
-                    order_id=str(order_id),
-                    subtrace_id=str(subtrace_id),
-                )
-                parse_ms += (time.perf_counter() - started) * 1000
-                matched_frames.append(matched)
-                route_frames.append(routes)
-            matched_points = _concat(matched_frames)
-            valhalla_routes = _concat(route_frames)
-            started = time.perf_counter()
-            mapped_routes, _ = mapper.map_route_parts(valhalla_routes)
-            mapping_ms = (time.perf_counter() - started) * 1000
-            started = time.perf_counter()
-            products = build_order_products(clean, matched_points, mapped_routes)
-            product_ms = (time.perf_counter() - started) * 1000
-            started = time.perf_counter()
-            quality = evaluate_order_quality(
-                clean,
-                matched_points,
-                mapped_routes,
-                products["unresolved_intervals"],
-                config.section("quality"),
-                processing_exception=exception_message,
-            )
-            quality_ms = (time.perf_counter() - started) * 1000
-        except Exception as exc:
-            processing_exceptions += 1
-            exception_message = f"{type(exc).__name__}: {exc}"
-            clean = raw_order.copy().reset_index(drop=True)
-            clean["original_point_seq"] = np.arange(len(clean))
-            clean["subtrace_id"] = f"{order_id}:000"
-            clean["step_distance_m"] = 0.0
-            matched_points, valhalla_routes = parse_trace_attributes(
-                {}, clean, order_id=str(order_id), subtrace_id=f"{order_id}:000"
-            )
-            mapped_routes, _ = mapper.map_route_parts(valhalla_routes)
-            products = build_order_products(clean, matched_points, mapped_routes)
-            quality = evaluate_order_quality(
-                clean,
-                matched_points,
-                mapped_routes,
-                products["unresolved_intervals"],
-                config.section("quality"),
-                processing_exception=exception_message,
-            )
-
-        for product in (
-            "route_parts",
-            "link_traversals",
-            "turn_movements",
-            "unresolved_intervals",
+    for date, day_points in sample.points.groupby("date", sort=True):
+        order_ids = sorted(day_points.order_id.astype(str).unique())
+        for bucket_id, start_index in enumerate(
+            range(0, len(order_ids), orders_per_bucket)
         ):
-            frame = products[product].copy()
-            if len(frame):
-                frame.insert(0, "date", str(date))
-            frames[product].append(frame)
-        matched_output = matched_points.copy()
-        if len(matched_output):
-            matched_output.insert(0, "date", str(date))
-        frames["matched_points"].append(matched_output)
-        quality_frame = pd.DataFrame([{**quality, "date": str(date)}])
-        frames["route_quality"].append(quality_frame)
-        frames["order_base"].append(
-            _order_base(clean, products, quality, match_metrics_total)
-        )
-        total_ms = (time.perf_counter() - order_started) * 1000
-        frames["performance"].append(
-            pd.DataFrame(
-                [
-                    {
-                        "date": str(date),
-                        "order_id": str(order_id),
-                        "preprocess_ms": preprocess_ms,
-                        "matching_ms": match_ms,
-                        "parsing_ms": parse_ms,
-                        "canonical_mapping_ms": mapping_ms,
-                        "product_build_ms": product_ms,
-                        "quality_ms": quality_ms,
-                        "total_ms": total_ms,
-                        "request_point_count": match_metrics_total[
-                            "request_point_count"
-                        ],
-                        "matched_edge_count": match_metrics_total["matched_edge_count"],
-                        "matched_point_count": match_metrics_total[
-                            "matched_point_count"
-                        ],
-                        "unmatched_point_count": match_metrics_total[
-                            "unmatched_point_count"
-                        ],
-                        "interpolated_point_count": match_metrics_total[
-                            "interpolated_point_count"
-                        ],
-                        "discontinuity_count": match_metrics_total[
-                            "discontinuity_count"
-                        ],
-                        "retry_count": match_metrics_total["retry_count"],
-                        "processing_exception": exception_message,
-                        "rss_bytes": process.memory_info().rss,
-                    }
-                ]
-            )
-        )
-        peak_rss = max(peak_rss, process.memory_info().rss)
+            bucket_started = time.perf_counter()
+            bucket_peak = process.memory_info().rss
+            bucket_exceptions = 0
+            bucket_ids = set(order_ids[start_index : start_index + orders_per_bucket])
+            bucket_frames: dict[str, list[pd.DataFrame]] = {
+                name: [] for name in PRODUCTS
+            }
+            for order_id in sorted(bucket_ids):
+                raw_order = day_points.loc[
+                    day_points.order_id.astype(str).eq(order_id)
+                ].copy()
+                order_started = time.perf_counter()
+                preprocess_ms = match_ms = parse_ms = mapping_ms = 0.0
+                product_ms = quality_ms = 0.0
+                exception_message = None
+                match_metrics_total: dict[str, Any] = {
+                    "backend": matcher.backend,
+                    "request_point_count": 0,
+                    "matched_edge_count": 0,
+                    "matched_point_count": 0,
+                    "unmatched_point_count": 0,
+                    "interpolated_point_count": 0,
+                    "discontinuity_count": 0,
+                    "retry_count": 0,
+                    "response_ms": 0.0,
+                }
+                prep = None
+                try:
+                    started = time.perf_counter()
+                    prep = preprocess_order(raw_order, **config.section("preprocess"))
+                    preprocess_ms = (time.perf_counter() - started) * 1000
+                    clean = prep.points
+                    matched_frames: list[pd.DataFrame] = []
+                    route_frames: list[pd.DataFrame] = []
+                    for subtrace_id, subtrace in clean.groupby(
+                        "subtrace_id", sort=False
+                    ):
+                        usable = bool(subtrace.usable_subtrace.iloc[0])
+                        if usable:
+                            started = time.perf_counter()
+                            match_result = matcher.match_order(
+                                subtrace.reset_index(drop=True)
+                            )
+                            match_ms += (time.perf_counter() - started) * 1000
+                            for key in (
+                                "request_point_count",
+                                "matched_edge_count",
+                                "matched_point_count",
+                                "unmatched_point_count",
+                                "interpolated_point_count",
+                                "discontinuity_count",
+                                "retry_count",
+                                "response_ms",
+                            ):
+                                match_metrics_total[key] += (
+                                    match_result.get(key, 0) or 0
+                                )
+                            raw_response = match_result.get("raw_response") or {}
+                            if match_result.get("status") == "error":
+                                exception_message = match_result.get("error_message")
+                            if raw_samples_remaining > 0 and raw_response:
+                                _write_json(
+                                    output_root
+                                    / "diagnostics"
+                                    / "raw_response_samples"
+                                    / (
+                                        f"{date}_{order_id}_"
+                                        f"{subtrace_id.rsplit(':', 1)[-1]}.json"
+                                    ),
+                                    raw_response,
+                                )
+                                raw_samples_remaining -= 1
+                        else:
+                            raw_response = {}
+                            match_metrics_total["unmatched_point_count"] += len(
+                                subtrace
+                            )
+                        started = time.perf_counter()
+                        matched, routes = parse_trace_attributes(
+                            raw_response,
+                            subtrace.reset_index(drop=True),
+                            order_id=str(order_id),
+                            subtrace_id=str(subtrace_id),
+                        )
+                        parse_ms += (time.perf_counter() - started) * 1000
+                        matched_frames.append(matched)
+                        route_frames.append(routes)
+                    matched_points = _concat(matched_frames)
+                    valhalla_routes = _concat(route_frames)
+                    started = time.perf_counter()
+                    mapped_routes, _ = mapper.map_route_parts(valhalla_routes)
+                    mapping_ms = (time.perf_counter() - started) * 1000
+                    started = time.perf_counter()
+                    products = build_order_products(
+                        clean,
+                        matched_points,
+                        mapped_routes,
+                        preprocess_breaks=prep.preprocess_breaks,
+                        position_backtrack_tolerance=float(
+                            product_options.get("position_backtrack_tolerance", 0.01)
+                        ),
+                        enable_engine_allocation=bool(
+                            product_options.get("enable_engine_allocation", False)
+                        ),
+                    )
+                    product_ms = (time.perf_counter() - started) * 1000
+                    started = time.perf_counter()
+                    route_quality = evaluate_route_quality(
+                        clean,
+                        matched_points,
+                        products["route_parts"],
+                        products["interval_measurements"],
+                        config.section("quality"),
+                        processing_exception=exception_message,
+                    )
+                    dynamic_quality = evaluate_dynamic_measurement_quality(
+                        products["route_parts"],
+                        products["link_traversals"],
+                        products["interval_measurements"],
+                        products["interval_accounting"],
+                        config.section("quality"),
+                    )
+                    quality_ms = (time.perf_counter() - started) * 1000
+                except Exception as exc:
+                    processing_exceptions += 1
+                    bucket_exceptions += 1
+                    exception_message = f"{type(exc).__name__}: {exc}"
+                    if prep is None:
+                        prep = preprocess_order(
+                            raw_order, **config.section("preprocess")
+                        )
+                    clean = prep.points
+                    matched_frames = []
+                    for subtrace_id, subtrace in clean.groupby(
+                        "subtrace_id", sort=False
+                    ):
+                        matched, _ = parse_trace_attributes(
+                            {},
+                            subtrace.reset_index(drop=True),
+                            order_id=str(order_id),
+                            subtrace_id=str(subtrace_id),
+                        )
+                        matched_frames.append(matched)
+                    matched_points = _concat(matched_frames)
+                    mapped_routes, _ = mapper.map_route_parts(pd.DataFrame())
+                    products = build_order_products(
+                        clean,
+                        matched_points,
+                        mapped_routes,
+                        preprocess_breaks=prep.preprocess_breaks,
+                    )
+                    route_quality = evaluate_route_quality(
+                        clean,
+                        matched_points,
+                        products["route_parts"],
+                        products["interval_measurements"],
+                        config.section("quality"),
+                        processing_exception=exception_message,
+                    )
+                    dynamic_quality = evaluate_dynamic_measurement_quality(
+                        products["route_parts"],
+                        products["link_traversals"],
+                        products["interval_measurements"],
+                        products["interval_accounting"],
+                        config.section("quality"),
+                    )
 
-    combined = {name: _concat(items) for name, items in frames.items()}
-    compression = str(config.section("runtime").get("parquet_compression", "zstd"))
-    for product, frame in combined.items():
-        if frame.empty:
-            continue
-        if "date" in frame:
-            for date, daily in frame.groupby("date", sort=True):
+                dated_products = {
+                    "matched_points": matched_points,
+                    "route_parts": products["route_parts"],
+                    "link_traversals": products["link_traversals"],
+                    "turn_movements": products["turn_movements"],
+                    "unresolved_intervals": products["unresolved_intervals"],
+                    "interval_measurements": products["interval_measurements"],
+                    "interval_accounting": products["interval_accounting"],
+                    "subtrace_mapping": prep.mapping,
+                    "preprocess_breaks": prep.preprocess_breaks,
+                }
+                for product, frame in dated_products.items():
+                    output_frame = frame.copy()
+                    if "date" not in output_frame:
+                        output_frame.insert(0, "date", str(date))
+                    bucket_frames[product].append(output_frame)
+                route_frame = pd.DataFrame([{**route_quality, "date": str(date)}])
+                dynamic_frame = pd.DataFrame(
+                    [{**dynamic_quality, "date": str(date)}]
+                )
+                bucket_frames["route_quality"].append(route_frame)
+                bucket_frames["dynamic_measurement_quality"].append(dynamic_frame)
+                bucket_frames["order_base"].append(
+                    _order_base(
+                        clean,
+                        products,
+                        {**route_quality, **dynamic_quality},
+                        match_metrics_total,
+                    )
+                )
+                total_ms = (time.perf_counter() - order_started) * 1000
+                performance_frame = pd.DataFrame(
+                    [
+                        {
+                            "date": str(date),
+                            "order_id": str(order_id),
+                            "preprocess_ms": preprocess_ms,
+                            "matching_ms": match_ms,
+                            "parsing_ms": parse_ms,
+                            "canonical_mapping_ms": mapping_ms,
+                            "product_build_ms": product_ms,
+                            "quality_ms": quality_ms,
+                            "total_ms": total_ms,
+                            "request_point_count": match_metrics_total[
+                                "request_point_count"
+                            ],
+                            "matched_edge_count": match_metrics_total[
+                                "matched_edge_count"
+                            ],
+                            "matched_point_count": match_metrics_total[
+                                "matched_point_count"
+                            ],
+                            "unmatched_point_count": match_metrics_total[
+                                "unmatched_point_count"
+                            ],
+                            "interpolated_point_count": match_metrics_total[
+                                "interpolated_point_count"
+                            ],
+                            "discontinuity_count": match_metrics_total[
+                                "discontinuity_count"
+                            ],
+                            "retry_count": match_metrics_total["retry_count"],
+                            "processing_exception": exception_message,
+                            "rss_bytes": process.memory_info().rss,
+                        }
+                    ]
+                )
+                bucket_frames["performance"].append(performance_frame)
+                route_quality_frames.append(route_frame)
+                dynamic_quality_frames.append(dynamic_frame)
+                performance_frames.append(performance_frame)
+                snap_values.extend(
+                    pd.to_numeric(
+                        matched_points.get(
+                            "distance_from_trace_point_m",
+                            pd.Series(dtype=float),
+                        ),
+                        errors="coerce",
+                    ).dropna().astype(float).tolist()
+                )
+                bucket_peak = max(bucket_peak, process.memory_info().rss)
+                peak_rss = max(peak_rss, bucket_peak)
+
+            combined_bucket = {
+                name: _concat(items) for name, items in bucket_frames.items()
+            }
+            write_started = time.perf_counter()
+            product_row_counts: dict[str, int] = {}
+            for product, frame in combined_bucket.items():
+                product_row_counts[product] = int(len(frame))
                 _write_product(
-                    daily.reset_index(drop=True),
-                    output_root / product / f"day={date}" / "part=000.parquet",
+                    frame.reset_index(drop=True),
+                    output_root
+                    / product
+                    / f"day={date}"
+                    / f"part={bucket_id:03d}.parquet",
                     compression,
                 )
-        else:
-            _write_product(
-                frame.reset_index(drop=True),
-                output_root / product / "part=000.parquet",
-                compression,
+            bucket_write_s = time.perf_counter() - write_started
+            parquet_write_s += bucket_write_s
+            bucket_keys = pd.DataFrame(
+                {
+                    "date": [str(date)] * len(bucket_ids),
+                    "order_id": sorted(bucket_ids),
+                }
             )
+            bucket_manifest = {
+                "schema_version": "stage0_v6_bucket.1",
+                "run_label": run_label,
+                "date": str(date),
+                "bucket_id": bucket_id,
+                "input_order_count": len(bucket_ids),
+                "output_order_count": int(
+                    len(combined_bucket["route_quality"])
+                ),
+                "processing_exception_count": bucket_exceptions,
+                "peak_rss_mb": bucket_peak / (1024**2),
+                "runtime_s": time.perf_counter() - bucket_started,
+                "parquet_write_s": bucket_write_s,
+                "product_row_counts": product_row_counts,
+                "sample_key_sha256": sample_order_sha256(bucket_keys),
+                "status": (
+                    "PASS"
+                    if len(combined_bucket["route_quality"]) == len(bucket_ids)
+                    and bucket_exceptions == 0
+                    else "FAIL"
+                ),
+            }
+            _write_json(
+                output_root
+                / "manifests"
+                / f"day={date}"
+                / f"bucket={bucket_id:03d}.json",
+                bucket_manifest,
+            )
+            bucket_peak_values.append(bucket_peak / (1024**2))
+            del combined_bucket, bucket_frames
 
     wall_s = time.perf_counter() - wall_started
-    quality = combined["route_quality"]
-    performance = combined["performance"]
-    counts = quality.route_quality.value_counts().to_dict()
+    quality = _concat(route_quality_frames)
+    dynamic = _concat(dynamic_quality_frames)
+    performance = _concat(performance_frames)
+    route_counts = quality.route_quality.value_counts().to_dict()
+    dynamic_counts = (
+        dynamic.dynamic_measurement_quality.value_counts().to_dict()
+    )
     summary = {
-        "schema_version": "stage0_v6_valhalla_run.1",
+        "schema_version": "stage0_v6_valhalla_run.2",
         "run_label": run_label,
-        "status": "PASS"
-        if len(quality) == len(sample.orders) and processing_exceptions == 0
-        else "FAIL",
+        "status": (
+            "PASS"
+            if len(quality) == len(sample.orders) and processing_exceptions == 0
+            else "FAIL"
+        ),
         "sample_order_sha256": sample.sample_sha256,
         "input_orders": int(len(sample.orders)),
         "output_orders": int(len(quality)),
         "accounting_pass": len(quality) == len(sample.orders),
         "processing_exception_count": processing_exceptions,
-        "quality_counts": {str(key): int(value) for key, value in counts.items()},
+        "quality_counts": {
+            str(key): int(value) for key, value in route_counts.items()
+        },
+        "dynamic_quality_counts": {
+            str(key): int(value) for key, value in dynamic_counts.items()
+        },
         "complete_match_orders": int(quality.matched_point_share.eq(1.0).sum()),
         "partial_match_orders": int(
             quality.matched_point_share.between(0, 1, inclusive="neither").sum()
         ),
-        "no_valid_match_orders": int(quality.matched_point_share.eq(0).sum()),
         "successful_reconstruction_orders": int(
             quality.successful_reconstruction.fillna(False).sum()
         ),
         "no_valid_route_orders": int(
             (~quality.successful_reconstruction.fillna(False)).sum()
         ),
-        "orders_with_valid_subtrace": int(quality.subtrace_count.gt(0).sum()),
+        "route_formal_eligible_orders": int(
+            quality.formal_analysis_eligible.fillna(False).sum()
+        ),
+        "dynamic_usable_orders": int(
+            dynamic.dynamic_measurement_quality.isin(
+                ["dynamic_strict", "dynamic_partial"]
+            ).sum()
+        ),
+        "static_only_orders": int(
+            (
+                quality.formal_analysis_eligible.fillna(False)
+                & dynamic.dynamic_measurement_quality.eq("dynamic_unusable")
+            ).sum()
+        ),
         "mean_route_parts": float(quality.route_part_count.mean()),
         "mean_matched_point_share": float(quality.matched_point_share.mean()),
-        "mean_matched_interval_share": float(quality.matched_interval_share.mean()),
-        "mean_inferred_distance_share": float(quality.inferred_distance_share.mean()),
-        "mean_unresolved_time_share": float(quality.unresolved_time_share.mean()),
+        "mean_matched_interval_share": float(
+            quality.matched_interval_share.mean()
+        ),
+        "mean_inferred_distance_share": float(
+            quality.inferred_distance_share.mean()
+        ),
+        "mean_preprocess_break_count": float(
+            quality.preprocess_break_count.mean()
+        ),
+        "mean_direct_observed_interval_time_share": float(
+            dynamic.direct_observed_interval_time_share.mean()
+        ),
+        "mean_direct_observed_distance_share": float(
+            dynamic.direct_observed_distance_share.mean()
+        ),
+        "mean_interval_supported_time_share": float(
+            dynamic.interval_supported_time_share.mean()
+        ),
+        "mean_engine_allocated_time_share": float(
+            dynamic.engine_allocated_time_share.mean()
+        ),
+        "mean_unresolved_time_share": float(dynamic.unresolved_time_share.mean()),
+        "mean_timed_traversal_share": float(
+            dynamic.timed_traversal_share.mean()
+        ),
+        "mean_valid_timed_traversal_count": float(
+            dynamic.valid_timed_traversal_count.mean()
+        ),
+        "time_conservation_failure_count": int(
+            (~dynamic.time_conservation_valid.fillna(False)).sum()
+        ),
+        "timestamp_anchor_failure_order_count": int(
+            (~dynamic.timestamp_anchor_valid.fillna(False)).sum()
+        ),
+        "inferred_edge_observed_time_violation_count": int(
+            dynamic.inferred_edge_observed_time_violation_count.sum()
+        ),
+        "unresolved_duplicate_allocation_count": int(
+            dynamic.unresolved_duplicate_allocation_count.sum()
+        ),
         "canonical_edge_mapping_share": float(
             quality.canonical_edge_mapping_share.mean()
         ),
         "od_endpoint_error_m": _percentiles(quality.od_endpoint_error_m),
-        "snap_distance_m": _percentiles(
-            pd.to_numeric(
-                combined["matched_points"]["distance_from_trace_point_m"],
-                errors="coerce",
-            ).dropna()
+        "snap_distance_m": _percentiles(pd.Series(snap_values, dtype=float)),
+        "route_resolved_gps_distance_ratio": _percentiles(
+            quality.route_resolved_gps_distance_ratio
         ),
-        "route_gps_distance_ratio": _percentiles(
-            quality.route_gps_distance_ratio
+        "route_raw_gps_distance_ratio": _percentiles(
+            quality.route_raw_gps_distance_ratio
         ),
         "discontinuity_count": _percentiles(quality.discontinuity_count),
         "unmatched_point_share": _percentiles(quality.unmatched_point_share),
@@ -449,9 +656,15 @@ def run_fixed_sample(
         "canonical_mapper_init_ms": mapper_init_ms,
         "pure_matching_s": float(performance.matching_ms.sum() / 1000),
         "parsing_s": float(performance.parsing_ms.sum() / 1000),
+        "canonical_mapping_s": float(
+            performance.canonical_mapping_ms.sum() / 1000
+        ),
         "product_build_s": float(performance.product_build_ms.sum() / 1000),
+        "quality_evaluation_s": float(performance.quality_ms.sum() / 1000),
+        "parquet_write_s": parquet_write_s,
         "order_latency_ms": _percentiles(performance.total_ms),
         "matching_latency_ms": _percentiles(performance.matching_ms),
+        "bucket_peak_rss_mb": _percentiles(pd.Series(bucket_peak_values)),
         "peak_rss_mb": peak_rss / (1024**2),
         "python_version": platform.python_version(),
         "pyvalhalla_version": metadata.version("pyvalhalla"),

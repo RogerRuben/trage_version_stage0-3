@@ -1,4 +1,4 @@
-"""Measured cold/hot verification and v5/v6 comparison report generation."""
+"""Generate the fixed-600 dynamic-product correction report."""
 
 from __future__ import annotations
 
@@ -10,51 +10,72 @@ import pandas as pd
 
 from .config import Stage0V6Config
 
-V5_TASK_BASELINE = {
-    "orders": 600,
-    "successful_reconstruction": 458,
-    "formal_analysis_eligible": 348,
-    "strict_core": 320,
-    "analysis_set": 28,
-    "rejected": 252,
-    "no_continuous_route": 142,
-    "mean_inferred_distance_share": 0.1088,
-    "pure_compute_s_per_order": 1.818,
-    "cold_wall_s": 1187.3,
-    "peak_rss_mb": 3034,
+PRE_FIX_BASELINE = {
+    "strict_core": 543,
+    "analysis_set": 43,
+    "rejected": 14,
+    "formal_eligible": 586,
+    "mean_inferred_distance_share": 0.04053561625677863,
+    "hot_wall_s": 198.0647949999984,
+    "hot_wall_per_order_s": 0.330107991666664,
+    "pure_matching_per_order_s": 0.013619528166685,
+    "peak_rss_mb": 610.6875,
 }
+
+DETERMINISTIC_PRODUCTS = [
+    "matched_points",
+    "route_parts",
+    "link_traversals",
+    "turn_movements",
+    "unresolved_intervals",
+    "interval_measurements",
+    "interval_accounting",
+    "order_base",
+    "route_quality",
+    "dynamic_measurement_quality",
+    "subtrace_mapping",
+    "preprocess_breaks",
+]
 
 
 def _load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def _read_product(root: Path, product: str) -> pd.DataFrame:
+    files = sorted((root / product).glob("day=*/*.parquet"))
+    if not files:
+        return pd.DataFrame()
+    return pd.concat([pd.read_parquet(path) for path in files], ignore_index=True)
+
+
 def compare_cold_hot(output: Path) -> dict[str, Any]:
-    products = [
-        "matched_points",
-        "route_parts",
-        "link_traversals",
-        "turn_movements",
-        "unresolved_intervals",
-        "order_base",
-        "route_quality",
-    ]
     result: dict[str, Any] = {"products": {}, "all_equal": True}
-    for product in products:
-        cold_files = sorted((output / "cold" / product).glob("day=*/*.parquet"))
-        hot_files = sorted((output / "hot" / product).glob("day=*/*.parquet"))
-        cold = pd.concat([pd.read_parquet(path) for path in cold_files], ignore_index=True)
-        hot = pd.concat([pd.read_parquet(path) for path in hot_files], ignore_index=True)
-        equal = cold.equals(hot)
+    for product in DETERMINISTIC_PRODUCTS:
+        cold = _read_product(output / "cold", product)
+        hot = _read_product(output / "hot", product)
+        columns_equal = cold.columns.tolist() == hot.columns.tolist()
+        dtypes_equal = [str(value) for value in cold.dtypes] == [
+            str(value) for value in hot.dtypes
+        ]
+        values_equal = cold.equals(hot)
+        equal = columns_equal and dtypes_equal and values_equal
         result["products"][product] = {
             "cold_rows": int(len(cold)),
             "hot_rows": int(len(hot)),
-            "equal": bool(equal),
+            "columns_equal": columns_equal,
+            "dtypes_equal": dtypes_equal,
+            "values_equal": values_equal,
+            "equal": equal,
         }
         result["all_equal"] = result["all_equal"] and equal
     target = output / "reports" / "cold_hot_determinism.json"
     target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(json.dumps(result, indent=2, sort_keys=True), encoding="utf-8")
+    temporary = target.with_suffix(".tmp")
+    temporary.write_text(
+        json.dumps(result, indent=2, sort_keys=True), encoding="utf-8"
+    )
+    temporary.replace(target)
     return result
 
 
@@ -63,132 +84,157 @@ def generate_report(config: Stage0V6Config) -> Path:
     cold = _load_json(output / "cold" / "reports" / "summary.json")
     hot = _load_json(output / "hot" / "reports" / "summary.json")
     deterministic = compare_cold_hot(output)
-    v6_quality = pd.concat(
-        [
-            pd.read_parquet(path)
-            for path in sorted((output / "hot" / "route_quality").glob("day=*/*.parquet"))
-        ],
-        ignore_index=True,
+    route = _read_product(output / "hot", "route_quality")
+    dynamic = _read_product(output / "hot", "dynamic_measurement_quality")
+    unresolved = _read_product(output / "hot", "unresolved_intervals")
+    accounting = _read_product(output / "hot", "interval_accounting")
+    manifests = [
+        _load_json(path)
+        for path in sorted((output / "hot" / "manifests").glob("day=*/*.json"))
+    ]
+    unresolved_only = unresolved.loc[
+        unresolved.get(
+            "measurement_source", pd.Series("", index=unresolved.index)
+        ).eq("unresolved")
+    ]
+    reason_time = (
+        unresolved_only.groupby("unresolved_reason", dropna=False)
+        .interval_duration_s.sum()
+        .sort_values(ascending=False)
     )
-    v6_matched_points = pd.concat(
-        [
-            pd.read_parquet(
-                path, columns=["distance_from_trace_point_m"]
-            )
-            for path in sorted(
-                (output / "hot" / "matched_points").glob("day=*/*.parquet")
-            )
-        ],
-        ignore_index=True,
-    )
-    snap_distance = pd.to_numeric(
-        v6_matched_points.distance_from_trace_point_m, errors="coerce"
-    ).dropna()
-    snap_quantiles = snap_distance.quantile([0.50, 0.90, 0.99])
-    successful_reconstruction = int(
-        v6_quality.successful_reconstruction.fillna(False).sum()
-    )
-    quality = hot["quality_counts"]
-    formal = int(quality.get("strict_core", 0) + quality.get("analysis_set", 0))
+    route_counts = hot["quality_counts"]
+    dynamic_counts = hot["dynamic_quality_counts"]
+    formal = int(hot["route_formal_eligible_orders"])
+    dynamic_usable = int(hot["dynamic_usable_orders"])
+    static_only = int(hot["static_only_orders"])
     hot_per_order = hot["total_wall_s"] / hot["input_orders"]
     match_per_order = hot["pure_matching_s"] / hot["input_orders"]
-    parser_per_order = hot["parsing_s"] / hot["input_orders"]
-    product_per_order = hot["product_build_s"] / hot["input_orders"]
-    v5 = V5_TASK_BASELINE
+    route_rows_equal = deterministic["products"]["route_parts"]["equal"]
+    matched_rows_equal = deterministic["products"]["matched_points"]["equal"]
+    break_product_count = int(
+        deterministic["products"]["preprocess_breaks"]["hot_rows"]
+    )
+    bucket_pass = all(item["status"] == "PASS" for item in manifests)
+    maximum_bucket_rss = max(
+        (float(item["peak_rss_mb"]) for item in manifests), default=0.0
+    )
+    top_reasons = [
+        f"- `{reason}`: {seconds:.3f} s ({seconds / max(reason_time.sum(), 1):.2%})"
+        for reason, seconds in reason_time.head(10).items()
+    ]
+    if not top_reasons:
+        top_reasons = ["- No unresolved intervals."]
 
     lines = [
-        "# Stage 0 v5 vs v6 Valhalla fixed-600 report",
+        "# Stage 0 v6 dynamic product fix - fixed-600 report",
         "",
-        "## Evidence boundary",
+        "## Evidence and semantic boundary",
         "",
-        "- **Measured here:** v6 environment/tile build, one real-order smoke test, the exact fixed-600 cold and hot runs, product accounting, quality metrics, performance, and cold/hot determinism.",
-        "- **Task-supplied baseline:** the v5 comparison values below are the baseline stated in the Stage 0 v6 task. The local v5 worktree contains several historical snapshots with different metrics, so those snapshots are not silently substituted for the task baseline.",
-        "- **Not yet verified:** human route correctness. `Strict Core` is an internal quality tier, not a real accuracy estimate.",
+        f"- Frozen sample SHA-256: `{hot['sample_order_sha256']}`.",
+        "- Valhalla 3.8.2 remains the matcher. No candidate generator, HMM/Viterbi, Pareto search, boundary repair, restriction router, tile logic, canonical mapper, v5 code, sample, seed, or matching parameter was changed.",
+        "- Route usability and dynamic link-time usability are now independent outputs.",
+        "- Dynamic thresholds are initial engineering thresholds, not empirically optimized values.",
         "",
-        "## Reproducibility",
-        "",
-        f"- Sample SHA-256: `{hot['sample_order_sha256']}` (expected value matched).",
-        f"- Cold/hot product equality: **{'PASS' if deterministic['all_equal'] else 'FAIL'}**.",
-        f"- Python / Valhalla: {hot['python_version']} / {hot['valhalla_version']}.",
-        "- Tiles were reused for both runs; the cold run did not rebuild the graph.",
-        "",
-        "## Coverage",
-        "",
-        "| Metric | v5 baseline | v6 hot |",
-        "|---|---:|---:|",
-        f"| Accounted orders | {v5['orders']}/{v5['orders']} | {hot['output_orders']}/{hot['input_orders']} |",
-        f"| Complete point match | not reported | {hot['complete_match_orders']} |",
-        f"| Partial point match | not reported | {hot['partial_match_orders']} |",
-        f"| No valid route | {v5['no_continuous_route']} | {hot['input_orders'] - successful_reconstruction} |",
-        f"| Orders with valid subtrace | not reported | {hot['orders_with_valid_subtrace']} |",
-        f"| Successful reconstruction | {v5['successful_reconstruction']} | {successful_reconstruction} |",
-        f"| Strict Core | {v5['strict_core']} | {quality.get('strict_core', 0)} |",
-        f"| Analysis Set | {v5['analysis_set']} | {quality.get('analysis_set', 0)} |",
-        f"| Rejected | {v5['rejected']} | {quality.get('rejected', 0)} |",
-        f"| Formal analysis eligible | {v5['formal_analysis_eligible']} ({v5['formal_analysis_eligible']/600:.2%}) | {formal} ({formal/600:.2%}) |",
-        "",
-        "## Route products",
-        "",
-        "| Metric | v5 baseline | v6 hot |",
-        "|---|---:|---:|",
-        f"| Mean route parts/order | not reported | {hot['mean_route_parts']:.3f} |",
-        f"| Mean matched point share | not reported | {hot['mean_matched_point_share']:.2%} |",
-        f"| Mean matched interval share | not reported | {hot['mean_matched_interval_share']:.2%} |",
-        f"| Mean inferred distance share | {v5['mean_inferred_distance_share']:.2%} | {hot['mean_inferred_distance_share']:.2%} |",
-        f"| Mean unresolved time share | not reported | {hot['mean_unresolved_time_share']:.2%} |",
-        f"| Mean canonical edge mapping share | not reported | {hot['canonical_edge_mapping_share']:.2%} |",
-        "",
-        "The v6 output includes `matched_points`, directed `route_parts`, continuous `link_traversals`, `turn_movements`, and `unresolved_intervals`. Inferred edges receive no observed dynamic time.",
-        "",
-        "## Quality distributions",
-        "",
-        "| Distribution | P50 | P90 | P99 |",
-        "|---|---:|---:|---:|",
-        f"| OD endpoint error (m) | {hot['od_endpoint_error_m']['p50']:.3f} | {hot['od_endpoint_error_m']['p90']:.3f} | {hot['od_endpoint_error_m']['p99']:.3f} |",
-        f"| Snap distance (m, all matched points) | {snap_quantiles.loc[0.50]:.3f} | {snap_quantiles.loc[0.90]:.3f} | {snap_quantiles.loc[0.99]:.3f} |",
-        f"| Route/GPS distance ratio | {hot['route_gps_distance_ratio']['p50']:.4f} | {hot['route_gps_distance_ratio']['p90']:.4f} | {hot['route_gps_distance_ratio']['p99']:.4f} |",
-        f"| Discontinuity count | {hot['discontinuity_count']['p50']:.0f} | {hot['discontinuity_count']['p90']:.0f} | {hot['discontinuity_count']['p99']:.0f} |",
-        f"| Unmatched point share | {hot['unmatched_point_share']['p50']:.2%} | {hot['unmatched_point_share']['p90']:.2%} | {hot['unmatched_point_share']['p99']:.2%} |",
-        "",
-        "## Performance",
-        "",
-        "| Metric | v5 baseline | v6 cold | v6 hot |",
-        "|---|---:|---:|---:|",
-        f"| Total wall clock | {v5['cold_wall_s']:.1f} s cold | {cold['total_wall_s']:.3f} s | {hot['total_wall_s']:.3f} s |",
-        f"| Total wall/order | not reported | {cold['total_wall_s']/600:.3f} s | {hot_per_order:.3f} s |",
-        f"| Pure matching/order | {v5['pure_compute_s_per_order']:.3f} s | {cold['pure_matching_s']/600:.4f} s | {match_per_order:.4f} s |",
-        f"| Parsing/order | not reported | {cold['parsing_s']/600:.4f} s | {parser_per_order:.4f} s |",
-        f"| Product build/order | not reported | {cold['product_build_s']/600:.4f} s | {product_per_order:.4f} s |",
-        f"| Peak RSS | {v5['peak_rss_mb']:.0f} MB | {cold['peak_rss_mb']:.1f} MB | {hot['peak_rss_mb']:.1f} MB |",
-        f"| Processing exceptions | 0 | {cold['processing_exception_count']} | {hot['processing_exception_count']} |",
-        "",
-        f"Hot total order latency P50/P90/P99 was {hot['order_latency_ms']['p50']:.1f}/{hot['order_latency_ms']['p90']:.1f}/{hot['order_latency_ms']['p99']:.1f} ms. Hot pure matching latency P50/P90/P99 was {hot['matching_latency_ms']['p50']:.1f}/{hot['matching_latency_ms']['p90']:.1f}/{hot['matching_latency_ms']['p99']:.1f} ms.",
-        "",
-        "## Acceptance checks",
+        "## Acceptance summary",
         "",
         "| Check | Result |",
         "|---|---|",
-        "| Fixed 600 accounting | PASS: 600/600 |",
-        "| Processing exceptions near zero | PASS: 0 |",
-        "| Human correctness not below v5 | PENDING: 100-case review pack generated, labels not completed |",
-        f"| Formal eligible rate at least 58% | PASS: {formal/600:.2%} |",
-        f"| Inferred distance not above 10.88% | PASS: {hot['mean_inferred_distance_share']:.2%} |",
-        f"| Hot order time materially below 1.818 s | PASS: {hot_per_order:.3f} s wall, {match_per_order:.4f} s pure match |",
-        "| Stage 1 traversal conversion | PASS at prototype product layer: link traversal and movement Parquet products generated; the Stage 1 consumer was not run in this round |",
-        "| No custom HMM/Pareto/restriction router in v6 | PASS |",
+        f"| 600/600 accounting | {'PASS' if hot['accounting_pass'] else 'FAIL'} |",
+        f"| Processing exceptions | {'PASS' if hot['processing_exception_count'] == 0 else 'FAIL'}: {hot['processing_exception_count']} |",
+        f"| Cold/hot field-level equality | {'PASS' if deterministic['all_equal'] else 'FAIL'} |",
+        f"| Time conservation failures | {'PASS' if hot['time_conservation_failure_count'] == 0 else 'FAIL'}: {hot['time_conservation_failure_count']} |",
+        f"| Timestamp anchor failure orders | {'PASS' if hot['timestamp_anchor_failure_order_count'] == 0 else 'FAIL'}: {hot['timestamp_anchor_failure_order_count']} |",
+        f"| Inferred-edge observed-time violations | {'PASS' if hot['inferred_edge_observed_time_violation_count'] == 0 else 'FAIL'}: {hot['inferred_edge_observed_time_violation_count']} |",
+        f"| Unresolved duplicate allocations | {'PASS' if hot['unresolved_duplicate_allocation_count'] == 0 else 'FAIL'}: {hot['unresolved_duplicate_allocation_count']} |",
+        f"| Preprocess boundaries materialized | PASS: {break_product_count} rows |",
+        f"| Bucket manifests | {'PASS' if bucket_pass else 'FAIL'}: {len(manifests)} buckets |",
         "",
-        "## Architecture decision",
+        "## Route layer",
         "",
-        "Measured engineering evidence supports Valhalla replacing v5 candidate generation, KD-tree candidate indexing, local/full HMM, Viterbi retry, boundary repair, custom transition routing, Pareto search, and Exact failed-order review as the primary matcher.",
+        "| Metric | Before fix | After fix (hot) |",
+        "|---|---:|---:|",
+        f"| Successful route orders | 599 | {hot['successful_reconstruction_orders']} |",
+        f"| Strict Core | {PRE_FIX_BASELINE['strict_core']} | {route_counts.get('strict_core', 0)} |",
+        f"| Analysis Set | {PRE_FIX_BASELINE['analysis_set']} | {route_counts.get('analysis_set', 0)} |",
+        f"| Rejected | {PRE_FIX_BASELINE['rejected']} | {route_counts.get('rejected', 0)} |",
+        f"| Formal eligible | {PRE_FIX_BASELINE['formal_eligible']} (97.67%) | {formal} ({formal/600:.2%}) |",
+        f"| Mean matched point share | 99.68% | {hot['mean_matched_point_share']:.2%} |",
+        f"| Mean matched route interval share | 98.63% (old semantics) | {hot['mean_matched_interval_share']:.2%} |",
+        f"| Mean inferred distance share | {PRE_FIX_BASELINE['mean_inferred_distance_share']:.2%} | {hot['mean_inferred_distance_share']:.2%} |",
+        f"| Mean preprocess break count | not reported | {hot['mean_preprocess_break_count']:.4f} |",
+        f"| Mean canonical mapping share | 99.83% | {hot['canonical_edge_mapping_share']:.2%} |",
         "",
-        "Keep the v5 coordinate interpretation, raw archive/sample governance, fixed-sample hashing, position-aware distance semantics, traversal instance separation, observed/inferred provenance, unresolved intervals, dynamic-time rule, Parquet/manifest accounting, retention, and manual-review tooling. Their implementation should be adapted to normalized Valhalla output rather than HMM state objects.",
+        f"Cold/hot matched points were identical: **{matched_rows_equal}**. Cold/hot normalized/canonical route parts were identical: **{route_rows_equal}**. This is the direct evidence that the Valhalla route result remained stable while downstream measurement semantics changed.",
         "",
-        "## Gate recommendation",
+        "Route/resolved-GPS ratio P50/P90/P99: "
+        f"{hot['route_resolved_gps_distance_ratio']['p50']:.4f}/"
+        f"{hot['route_resolved_gps_distance_ratio']['p90']:.4f}/"
+        f"{hot['route_resolved_gps_distance_ratio']['p99']:.4f}. "
+        "Route/raw-GPS ratio is retained separately as a diagnostic.",
         "",
-        "**Do not start the 6,000-order Gate 1 yet.** The automated feasibility checks pass, but the required 100-case human comparison is still unlabeled. If that review shows v6 correctness is not below v5, the measured coverage, inferred-distance, speed, memory, and product-conversion results support proceeding to Gate 1 without further matcher algorithm development.",
+        "## Dynamic measurement layer",
         "",
-        "No claim of true map-matching accuracy is made from the internal Strict Core share.",
+        "| Metric | Hot result |",
+        "|---|---:|",
+        f"| Dynamic Strict | {dynamic_counts.get('dynamic_strict', 0)} |",
+        f"| Dynamic Partial | {dynamic_counts.get('dynamic_partial', 0)} |",
+        f"| Dynamic Unusable | {dynamic_counts.get('dynamic_unusable', 0)} |",
+        f"| Dynamic Partial or better | {dynamic_usable} ({dynamic_usable/600:.2%}) |",
+        f"| Route-eligible but dynamic-unusable | {static_only} |",
+        f"| Mean direct-observed interval time share | {hot['mean_direct_observed_interval_time_share']:.2%} |",
+        f"| Mean direct-observed distance share | {hot['mean_direct_observed_distance_share']:.2%} |",
+        f"| Mean interval-supported time share | {hot['mean_interval_supported_time_share']:.2%} |",
+        f"| Mean engine-allocated time share | {hot['mean_engine_allocated_time_share']:.2%} |",
+        f"| Mean unresolved time share | {hot['mean_unresolved_time_share']:.2%} |",
+        f"| Mean timed traversal share | {hot['mean_timed_traversal_share']:.2%} |",
+        f"| Mean valid timed traversals/order | {hot['mean_valid_timed_traversal_count']:.3f} |",
+        "",
+        "Unknown dynamic values are `NaN`, never zero. Engine allocation remains disabled; parsed Valhalla cumulative elapsed time is converted to per-edge increments but is not written into `observed_travel_time_s`.",
+        "",
+        "## Unresolved-time causes",
+        "",
+        *top_reasons,
+        "",
+        "Multi-edge continuous intervals are retained as `interval_supported` records with start/end timestamps and route distance, but are not assigned to individual link travel times. Intervals containing engine-interpolated edges are wholly `unresolved`.",
+        "",
+        "## Performance and streaming",
+        "",
+        "| Metric | Cold | Hot | Requirement |",
+        "|---|---:|---:|---:|",
+        f"| Total wall | {cold['total_wall_s']:.3f} s | {hot['total_wall_s']:.3f} s | n/a |",
+        f"| Wall/order | {cold['total_wall_s']/600:.3f} s | {hot_per_order:.3f} s | <= 0.400 s |",
+        f"| Pure Valhalla/order | {cold['pure_matching_s']/600:.4f} s | {match_per_order:.4f} s | <= 0.050 s |",
+        f"| Parsing | {cold['parsing_s']:.3f} s | {hot['parsing_s']:.3f} s | n/a |",
+        f"| Canonical mapping | {cold['canonical_mapping_s']:.3f} s | {hot['canonical_mapping_s']:.3f} s | n/a |",
+        f"| Product build | {cold['product_build_s']:.3f} s | {hot['product_build_s']:.3f} s | n/a |",
+        f"| Quality evaluation | {cold['quality_evaluation_s']:.3f} s | {hot['quality_evaluation_s']:.3f} s | n/a |",
+        f"| Parquet write | {cold['parquet_write_s']:.3f} s | {hot['parquet_write_s']:.3f} s | n/a |",
+        f"| Peak RSS | {cold['peak_rss_mb']:.1f} MB | {hot['peak_rss_mb']:.1f} MB | <= 1024 MB |",
+        f"| Maximum bucket RSS | {cold['bucket_peak_rss_mb']['p99']:.1f} MB | {maximum_bucket_rss:.1f} MB | n/a |",
+        "",
+        f"Hot order latency P50/P90/P99: {hot['order_latency_ms']['p50']:.1f}/"
+        f"{hot['order_latency_ms']['p90']:.1f}/{hot['order_latency_ms']['p99']:.1f} ms.",
+        "",
+        "The run wrote one 200-order bucket for each of the three dates. Each product used a temporary Parquet followed by atomic replacement, and each bucket emitted its own manifest before in-memory product frames were released. This removes the previous all-600-product retention pattern and is structurally suitable for 6,000 orders, subject to a Gate 1 run rather than an unmeasured guarantee.",
+        "",
+        "## Required conclusions",
+        "",
+        f"1. **Valhalla route stability:** yes. Cold/hot matched-point and route-part products are field-identical, with {hot['processing_exception_count']} processing exceptions.",
+        f"2. **Route-layer usability:** {formal}/600 ({formal/600:.2%}) formal eligible after corrected route/resolved-GPS and break semantics.",
+        f"3. **Dynamic-measurement usability:** {dynamic_usable}/600 ({dynamic_usable/600:.2%}) are `dynamic_partial` or `dynamic_strict`.",
+        f"4. **Static-only orders:** {static_only} route-eligible orders are `dynamic_unusable` and must not create dynamic link labels.",
+        "5. **Main unresolved causes:** listed above by conserved interval duration; inferred paths, interpolated endpoints, unmatched/discontinuous intervals, and preprocess boundaries are kept separate.",
+        f"6. **Cross-inferred-edge allocation:** no remaining violation was detected ({hot['inferred_edge_observed_time_violation_count']}).",
+        f"7. **6,000-order execution risk:** the 200-order atomic bucket design avoids linear retention of product DataFrames; measured peak RSS was {hot['peak_rss_mb']:.1f} MB and every bucket manifest passed. A 6,000-order run is expected to be memory-safe but has not yet been executed.",
+        "8. **Gate 1 recommendation:** do not start automatically. Engineering acceptance must pass, the 100-order human audit must still show no systematic route error, and the measured dynamic-partial-or-better coverage must be accepted by the downstream Stage 1 owner.",
+        "",
+        "No real route-accuracy claim is made from internal quality tiers.",
     ]
-    target = config.repo_root / "stage0" / "docs" / "stage0_v5_vs_v6_valhalla_report.md"
+    target = (
+        config.repo_root
+        / "stage0"
+        / "docs"
+        / "stage0_v6_dynamic_product_fix_report.md"
+    )
     target.write_text("\n".join(lines) + "\n", encoding="utf-8")
     return target

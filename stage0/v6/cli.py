@@ -53,13 +53,22 @@ def _single(config_path: Path) -> dict:
     routes = pd.concat(route_frames, ignore_index=True)
     mapper = CanonicalEdgeMapper.from_parquet(config.path("canonical_edges"))
     mapped, mapping = mapper.map_route_parts(routes)
-    products = build_order_products(prep.points, matched, mapped)
+    products = build_order_products(
+        prep.points,
+        matched,
+        mapped,
+        preprocess_breaks=prep.preprocess_breaks,
+        **config.section("products"),
+    )
     quality = evaluate_order_quality(
         prep.points,
         matched,
         mapped,
         products["unresolved_intervals"],
         config.section("quality"),
+        interval_measurements=products["interval_measurements"],
+        link_traversals=products["link_traversals"],
+        interval_accounting=products["interval_accounting"],
     )
     return {
         "order_id": str(order_id),

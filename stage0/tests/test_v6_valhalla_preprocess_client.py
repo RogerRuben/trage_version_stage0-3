@@ -31,6 +31,52 @@ def test_preprocess_keeps_equal_timestamp_different_coordinates_and_deduplicates
     assert "original_point_seq" in result.points
 
 
+def test_preprocess_records_time_gap_boundary():
+    points = pd.DataFrame(
+        {
+            "order_id": ["o"] * 3,
+            "timestamp": [0, 10, 1000],
+            "lon": [108.0, 108.0001, 108.0002],
+            "lat": [34.0, 34.0001, 34.0002],
+            "point_seq": [0, 1, 2],
+        }
+    )
+    result = preprocess_order(
+        points,
+        coordinate_system="wgs84",
+        maximum_time_gap_s=300,
+        maximum_speed_mps=1_000_000,
+        minimum_subtrace_points=1,
+    )
+    assert len(result.preprocess_breaks) == 1
+    assert result.preprocess_breaks.iloc[0].break_reason == "preprocess_time_gap"
+    assert result.preprocess_breaks.iloc[0].from_original_point_seq == 1
+    assert result.preprocess_breaks.iloc[0].to_original_point_seq == 2
+
+
+def test_preprocess_records_spatial_jump_boundary():
+    points = pd.DataFrame(
+        {
+            "order_id": ["o"] * 3,
+            "timestamp": [0, 10, 20],
+            "lon": [108.0, 108.0001, 109.0],
+            "lat": [34.0, 34.0001, 35.0],
+            "point_seq": [0, 1, 2],
+        }
+    )
+    result = preprocess_order(
+        points,
+        coordinate_system="wgs84",
+        maximum_time_gap_s=300,
+        maximum_speed_mps=75,
+        minimum_subtrace_points=1,
+    )
+    assert len(result.preprocess_breaks) == 1
+    assert result.preprocess_breaks.iloc[0].break_reason == (
+        "preprocess_spatial_jump"
+    )
+
+
 class FakeActor:
     def __init__(self, responses):
         self.responses = iter(responses)

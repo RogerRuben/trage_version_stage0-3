@@ -46,14 +46,26 @@ quality:
     maximum_od_endpoint_error_m: 100
     minimum_route_gps_ratio: 0.50
     maximum_route_gps_ratio: 2.50
+    maximum_preprocess_break_time_share: 0.10
   analysis:
     minimum_matched_interval_share: 0.50
     minimum_canonical_mapping_share: 0.50
     maximum_od_endpoint_error_m: 300
     minimum_route_gps_ratio: 0.25
     maximum_route_gps_ratio: 4.00
+    maximum_preprocess_break_time_share: 0.50
+  dynamic_strict:
+    minimum_direct_observed_interval_time_share: 0.70
+    maximum_unresolved_time_share: 0.20
+  dynamic_partial:
+    minimum_direct_observed_interval_time_share: 0.0
+
+products:
+  position_backtrack_tolerance: 0.01
+  enable_engine_allocation: false
 
 runtime:
+  orders_per_bucket: 200
   diagnostic_response_sample_count: 20
   manual_audit_sample_count: 100
   parquet_compression: zstd
