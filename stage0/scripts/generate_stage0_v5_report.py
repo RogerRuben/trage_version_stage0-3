@@ -54,7 +54,16 @@ def main() -> int:
         f"- Local-HMM attempt share: {summary.get('local_hmm_attempt_share')}",
         f"- Fallback share: {summary.get('fallback_share')}",
         f"- Topology gaps: {summary.get('topology_gap_count')}",
-        f"- Inferred-distance mean: {summary.get('mean_inferred_distance_share')}",
+        f"- Inferred-distance by scope: `{json.dumps(summary.get('inferred_distance_share_by_scope', {}), sort_keys=True)}`",
+        f"- Position audit applicable / N-A / actual failures: "
+        f"{summary.get('position_audit_applicable_order_count')} / "
+        f"{summary.get('position_audit_not_applicable_match_failure_count')} / "
+        f"{summary.get('actual_invalid_position_event_count')}",
+        f"- Failed-transition reasons: `{json.dumps(summary.get('failed_transition_reason_counts', {}), sort_keys=True)}`",
+        f"- Failed-transition raw movement status: `{json.dumps(summary.get('failed_transition_raw_movement_status_counts', {}), sort_keys=True)}`",
+        f"- Pre-validation to final mode: `{json.dumps(summary.get('pre_validation_to_final_mode_cross_tab', {}), sort_keys=True)}`",
+        f"- Path searches/order: `{json.dumps(summary.get('path_searches_per_order_distribution', {}), sort_keys=True)}`",
+        f"- Expanded states/order: `{json.dumps(summary.get('expanded_states_per_order_distribution', {}), sort_keys=True)}`",
         f"- Processing exceptions: {summary.get('processing_exception_count')}",
         f"- HMM/output path mismatches: {summary.get('hmm_path_distance_mismatch_count')}",
         "",

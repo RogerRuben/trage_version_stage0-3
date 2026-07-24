@@ -82,6 +82,7 @@ class CompactMovementRouter:
     """CSR edge-state graph with distance-only Dijkstra and selected-path A*."""
 
     def __init__(self, edges: gpd.GeoDataFrame, movements: pd.DataFrame, config: dict[str, Any]) -> None:
+        self.config = dict(config)
         edge_frame = edges.reset_index(drop=True)
         self.edge_uids = edge_frame.edge_uid.astype(str).to_numpy()
         self.uid_to_index = {uid: index for index, uid in enumerate(self.edge_uids)}
@@ -95,11 +96,21 @@ class CompactMovementRouter:
         self.edge_routing_costs = self.lengths * routing_penalty + candidate_penalty
         self.maximum = float(config.get("max_route_distance_m", 6000.0))
         self.cache_limit = int(config.get("bridge_cache_pairs", 50_000))
+        self.frontier_epsilon_m = float(config.get("pareto_epsilon_m", 0.25))
+        self.max_labels_per_state = int(config.get("pareto_max_labels_per_state", 12))
         self._lock = threading.RLock()
         self._distance_positive: OrderedDict[tuple[int, int], float] = OrderedDict()
         self._distance_negative: OrderedDict[tuple[int, int], float] = OrderedDict()
         self._path_positive: OrderedDict[tuple[int, int], list[TransitionPath]] = OrderedDict()
         self._path_negative: OrderedDict[tuple[int, int], float] = OrderedDict()
+        # A positive frontier is reusable only when it was searched to at
+        # least the requested physical cutoff.  Without this watermark a path
+        # found under a small cutoff can incorrectly mask a lower-cost path
+        # that becomes feasible under a larger cutoff.
+        self._path_searched_cutoff: OrderedDict[tuple[int, int], float] = OrderedDict()
+        self._path_frontier_complete_cutoff: OrderedDict[
+            tuple[int, int], float
+        ] = OrderedDict()
         self._distance_source_states: dict[int, _SourceDistanceState] = {}
         self._stats = SearchStats()
 
@@ -240,7 +251,7 @@ class CompactMovementRouter:
         return TransitionPath(
             path,
             0.0,
-            max(0.0, float(self.routing_costs[position]) - float(self.lengths[right])),
+            float(self.routing_costs[position]),
             self._path_id(path),
         )
 
@@ -268,7 +279,16 @@ class CompactMovementRouter:
             cached_paths = self._path_positive.get(key, [])
             feasible_cached = [path for path in cached_paths if path.physical_distance_m <= maximum]
             negative_cutoff = self._path_negative.get(key, -math.inf)
-            if feasible_cached:
+            searched_cutoff = self._path_searched_cutoff.get(key, -math.inf)
+            complete_cutoff = self._path_frontier_complete_cutoff.get(
+                key, -math.inf
+            )
+            if feasible_cached and (
+                complete_cutoff >= maximum
+                or math.isclose(
+                    searched_cutoff, maximum, rel_tol=0.0, abs_tol=1e-9
+                )
+            ):
                 chosen = min(
                     feasible_cached,
                     key=lambda path: (
@@ -278,9 +298,13 @@ class CompactMovementRouter:
                     ),
                 )
                 self._path_positive.move_to_end(key)
+                if key in self._path_searched_cutoff:
+                    self._path_searched_cutoff.move_to_end(key)
+                if key in self._path_frontier_complete_cutoff:
+                    self._path_frontier_complete_cutoff.move_to_end(key)
                 self._increment(path_cache_hits=1)
                 return chosen
-            if maximum <= negative_cutoff:
+            if maximum <= negative_cutoff and not feasible_cached:
                 self._path_negative.move_to_end(key)
                 self._increment(negative_cache_hits=1)
                 return None
@@ -347,8 +371,13 @@ class CompactMovementRouter:
         if chosen_label is None:
             with self._lock:
                 self._path_negative[key] = max(maximum, self._path_negative.get(key, 0.0))
+                self._path_searched_cutoff[key] = max(
+                    maximum, self._path_searched_cutoff.get(key, 0.0)
+                )
                 self._path_negative.move_to_end(key)
+                self._path_searched_cutoff.move_to_end(key)
                 self._trim(self._path_negative)
+                self._trim(self._path_searched_cutoff)
             return None
 
         indices: list[int] = []
@@ -372,10 +401,236 @@ class CompactMovementRouter:
             if all(path.path_identifier != result.path_identifier for path in existing):
                 existing.append(result)
             self._path_positive.move_to_end(key)
+            self._path_searched_cutoff[key] = max(
+                maximum, self._path_searched_cutoff.get(key, 0.0)
+            )
+            self._path_searched_cutoff.move_to_end(key)
             self._trim(self._path_positive)
+            self._trim(self._path_searched_cutoff)
+        return result
+
+    def transition_paths_from_source(
+        self,
+        left_uid: str,
+        target_cutoffs: dict[str, float],
+    ) -> dict[str, TransitionPath | None]:
+        """Resolve many target edges with one constrained label search.
+
+        The returned path for each target is the minimum generalized-cost
+        member of its physical-distance-feasible Pareto frontier.  Direct
+        movements are handled without graph search.  Search watermarks are
+        recorded per pair so a frontier computed for a smaller cutoff is never
+        reused as if it were complete for a larger cutoff.
+        """
+        result: dict[str, TransitionPath | None] = {}
+        left_uid = str(left_uid)
+        left = self.uid_to_index.get(left_uid)
+        if left is None:
+            return {str(uid): None for uid in target_cutoffs}
+        unresolved: dict[int, tuple[str, float]] = {}
+        for raw_uid, raw_cutoff in target_cutoffs.items():
+            right_uid = str(raw_uid)
+            maximum = min(self.maximum, max(0.0, float(raw_cutoff)))
+            direct = self._direct_transition_path(left_uid, right_uid)
+            if direct is not None:
+                result[right_uid] = direct
+                continue
+            right = self.uid_to_index.get(right_uid)
+            if right is None:
+                result[right_uid] = None
+                continue
+            key = (left, right)
+            with self._lock:
+                searched = self._path_searched_cutoff.get(key, -math.inf)
+                complete = self._path_frontier_complete_cutoff.get(
+                    key, -math.inf
+                )
+                cached = [
+                    path
+                    for path in self._path_positive.get(key, [])
+                    if path.physical_distance_m <= maximum
+                ]
+                if complete >= maximum or math.isclose(
+                    searched, maximum, rel_tol=0.0, abs_tol=1e-9
+                ):
+                    result[right_uid] = (
+                        min(
+                            cached,
+                            key=lambda path: (
+                                path.generalized_routing_cost,
+                                path.physical_distance_m,
+                                path.path_identifier,
+                            ),
+                        )
+                        if cached
+                        else None
+                    )
+                    self._increment(
+                        path_cache_hits=1 if cached else 0,
+                        negative_cache_hits=0 if cached else 1,
+                    )
+                    continue
+            unresolved[right] = (right_uid, maximum)
+        if not unresolved:
+            return result
+
+        self._increment(path_calls=1, cache_misses=len(unresolved))
+        search_limit = max(
+            cutoff + float(self.lengths[right])
+            for right, (_, cutoff) in unresolved.items()
+        )
+        label_state: list[int] = [left]
+        label_parent: list[int] = [-1]
+        label_physical: list[float] = [0.0]
+        label_cost: list[float] = [0.0]
+        frontiers: dict[int, list[int]] = {left: [0]}
+        queue: list[tuple[float, float, int]] = [(0.0, 0.0, 0)]
+        # The queue is ordered by generalized cost and all routing costs are
+        # non-negative.  Consequently, the first popped label that reaches a
+        # target within that target's physical-distance budget is its
+        # minimum-generalized-cost feasible path.  Retaining that label lets
+        # the multi-target query stop as soon as every requested target has
+        # been resolved instead of exhausting the largest cutoff ball.
+        chosen_labels: dict[int, int] = {}
+        expanded = 0
+        while queue:
+            _, queued_cost, label_id = heapq.heappop(queue)
+            if queued_cost != label_cost[label_id]:
+                continue
+            current = label_state[label_id]
+            target_request = unresolved.get(current)
+            if target_request is not None and current not in chosen_labels:
+                _, target_cutoff = target_request
+                middle_distance = max(
+                    0.0,
+                    label_physical[label_id] - float(self.lengths[current]),
+                )
+                if middle_distance <= target_cutoff:
+                    chosen_labels[current] = label_id
+                    if len(chosen_labels) == len(unresolved):
+                        break
+            expanded += 1
+            start, stop = int(self.offsets[current]), int(self.offsets[current + 1])
+            for position in range(start, stop):
+                target = int(self.targets[position])
+                proposed_physical = (
+                    label_physical[label_id] + float(self.physical_costs[position])
+                )
+                if proposed_physical > search_limit:
+                    continue
+                proposed_cost = label_cost[label_id] + float(self.routing_costs[position])
+                target_frontier = frontiers.setdefault(target, [])
+                epsilon = self.frontier_epsilon_m
+                if any(
+                    label_physical[existing] <= proposed_physical + epsilon
+                    and label_cost[existing] <= proposed_cost + epsilon
+                    for existing in target_frontier
+                ):
+                    continue
+                target_frontier[:] = [
+                    existing
+                    for existing in target_frontier
+                    if not (
+                        proposed_physical <= label_physical[existing] + epsilon
+                        and proposed_cost <= label_cost[existing] + epsilon
+                    )
+                ]
+                if len(target_frontier) >= self.max_labels_per_state:
+                    worst = max(
+                        target_frontier,
+                        key=lambda existing: (
+                            label_cost[existing], label_physical[existing]
+                        ),
+                    )
+                    if (
+                        proposed_cost,
+                        proposed_physical,
+                    ) >= (label_cost[worst], label_physical[worst]):
+                        continue
+                    target_frontier.remove(worst)
+                new_label = len(label_state)
+                label_state.append(target)
+                label_parent.append(label_id)
+                label_physical.append(proposed_physical)
+                label_cost.append(proposed_cost)
+                target_frontier.append(new_label)
+                heapq.heappush(
+                    queue, (proposed_cost, proposed_cost, new_label)
+                )
+        self._increment(expanded_nodes=expanded)
+
+        search_exhausted = not queue
+        for right, (right_uid, maximum) in unresolved.items():
+            chosen_label = chosen_labels.get(right)
+            feasible_labels = [chosen_label] if chosen_label is not None else []
+            paths: list[TransitionPath] = []
+            for label_id in feasible_labels:
+                indices: list[int] = []
+                cursor = label_id
+                while cursor >= 0:
+                    indices.append(label_state[cursor])
+                    cursor = label_parent[cursor]
+                indices.reverse()
+                edge_uids = tuple(str(self.edge_uids[index]) for index in indices)
+                paths.append(TransitionPath(
+                    edge_uids=edge_uids,
+                    physical_distance_m=max(
+                        0.0,
+                        label_physical[label_id] - float(self.lengths[right]),
+                    ),
+                    generalized_routing_cost=float(label_cost[label_id]),
+                    path_identifier=self._path_id(edge_uids),
+                ))
+            key = (left, right)
+            with self._lock:
+                existing = self._path_positive.setdefault(key, [])
+                known = {path.path_identifier for path in existing}
+                existing.extend(
+                    path for path in paths if path.path_identifier not in known
+                )
+                self._path_searched_cutoff[key] = max(
+                    maximum, self._path_searched_cutoff.get(key, 0.0)
+                )
+                # Early termination proves the selected label optimal for the
+                # exact requested cutoff, but does not enumerate a complete
+                # Pareto frontier for smaller cutoffs.  Only an exhausted
+                # search may advance the reusable frontier watermark.
+                if search_exhausted:
+                    self._path_frontier_complete_cutoff[key] = max(
+                        maximum,
+                        self._path_frontier_complete_cutoff.get(key, 0.0),
+                    )
+                if not paths:
+                    self._path_negative[key] = max(
+                        maximum, self._path_negative.get(key, 0.0)
+                    )
+                self._path_positive.move_to_end(key)
+                self._path_searched_cutoff.move_to_end(key)
+                if key in self._path_frontier_complete_cutoff:
+                    self._path_frontier_complete_cutoff.move_to_end(key)
+                if key in self._path_negative:
+                    self._path_negative.move_to_end(key)
+                self._trim(self._path_positive)
+                self._trim(self._path_searched_cutoff)
+                self._trim(self._path_frontier_complete_cutoff)
+                self._trim(self._path_negative)
+            result[right_uid] = (
+                min(
+                    paths,
+                    key=lambda path: (
+                        path.generalized_routing_cost,
+                        path.physical_distance_m,
+                        path.path_identifier,
+                    ),
+                )
+                if paths
+                else None
+            )
         return result
 
     def _heuristic(self, edge_index: int, target_index: int) -> float:
+        if edge_index == target_index:
+            return 0.0
         difference = self.end_xy[edge_index] - self.start_xy[target_index]
         return float(np.hypot(difference[0], difference[1]))
 

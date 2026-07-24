@@ -21,7 +21,7 @@ from .archive import (
     sampled_orders_path,
     sampling_run_id,
 )
-from .config import Stage0Config, stable_hash
+from .config import Stage0Config, config_hash, stable_hash
 from .manifest import base_manifest, write_manifest
 from .matching import CandidateIndex, TransitionEngine, match_order
 from .quality import conservation_summary, evaluate_order_quality
@@ -166,8 +166,11 @@ def _empty_quality(order_id: str, reason: str) -> dict[str, Any]:
         "distance_conservation_error_m": 0.0,
         "time_allocation_error_s": 0.0,
         "internal_distance_error_m": 0.0,
-        "projected_route_distance_error_m": float("inf"),
-        "invalid_position_aware_distance_count": 1,
+        "projected_route_distance_error_m": float("nan"),
+        "invalid_position_aware_distance_count": 0,
+        "actual_invalid_position_event_count": 0,
+        "position_audit_applicable_order_count": 0,
+        "position_audit_not_applicable_match_failure_count": 1,
         "observed_run_alignment_valid": False,
         "unresolved_interval_time_s": 0.0,
         "projected_matched_movement_distance_m": float("nan"),
@@ -177,7 +180,7 @@ def _empty_quality(order_id: str, reason: str) -> dict[str, Any]:
         "fallback_share": 0.0,
         "p90_projection_distance_m": float("inf"),
         "route_length_ratio": float("nan"),
-        "interpolated_distance_share": 0.0,
+        "interpolated_distance_share": float("nan"),
         "matching_confidence": 0.0,
         "repeated_link_share": 1.0,
         "parallel_ambiguity_share": 1.0,
@@ -256,7 +259,9 @@ def run_dates(
     network_config = {**config.section("network"), **hmm_config}
     initialization_started = time.perf_counter()
     candidate_index = CandidateIndex(
-        edges, candidate_config, str(work / "candidate_index" / config.digest),
+        edges,
+        candidate_config,
+        str(work / "candidate_index" / config_hash(candidate_config)),
         config.section("network")["metric_crs"],
     )
     candidate_index_init_ms = (time.perf_counter() - initialization_started) * 1000.0
@@ -369,6 +374,12 @@ def run_dates(
                     "observed_distance_m": quality["observed_distance_m"],
                     "matched_distance_m": quality["matched_distance_m"],
                     "matching_mode": match_summary["matching_mode"],
+                    "pre_transition_validation_mode": str(
+                        match_summary.get(
+                            "pre_transition_validation_mode",
+                            match_summary["matching_mode"],
+                        )
+                    ),
                     "matching_confidence": quality["matching_confidence"],
                     "route_quality": quality["route_quality"],
                     "quality_reasons": quality["quality_reasons"],
@@ -376,6 +387,19 @@ def run_dates(
                     "sampling_weight": float(sample.sampling_weight) if sample is not None else float("nan"),
                     "fallback_used": bool(match_summary.get("fallback_used", False)),
                     "fallback_reason": str(match_summary.get("fallback_reason", "")),
+                }
+                string_performance_fields = {
+                    "full_order_trigger_reason",
+                    "local_failed_window_details",
+                    "pre_transition_validation_mode",
+                    "failed_transition_reasons",
+                    "provisional_edge_sequence",
+                }
+                boolean_performance_fields = {
+                    "local_hmm_attempted",
+                    "full_hmm_attempted",
+                    "full_hmm_succeeded",
+                    "full_hmm_failed",
                 }
                 return {
                     "order_base": order_base,
@@ -390,7 +414,16 @@ def run_dates(
                         "date": date,
                         "bucket": bucket,
                         "order_id": order_id,
-                        **{key: match_summary.get(key, 0) for key in (
+                        **{
+                            key: match_summary.get(
+                                key,
+                                ""
+                                if key in string_performance_fields
+                                else False
+                                if key in boolean_performance_fields
+                                else 0,
+                            )
+                            for key in (
                             "coordinate_transform_ms", "candidate_generation_ms", "ambiguity_detection_ms", "local_hmm_ms",
                             "full_hmm_ms", "transition_search_ms", "matching_total_ms",
                             "dijkstra_calls", "dijkstra_expanded_nodes", "route_cache_hits",
@@ -403,7 +436,23 @@ def run_dates(
                             "negative_cache_hits", "path_cache_hits",
                             "local_patch_count", "no_candidate_initial_count",
                             "no_candidate_recovered_count",
-                        )},
+                            "under_minimum_candidate_expansion_count",
+                            "under_minimum_candidate_initial_count",
+                            "transition_candidate_expansion_count",
+                            "local_boundary_failure_count",
+                            "local_internal_failure_count",
+                            "boundary_repair_attempt_count",
+                            "boundary_repair_success_count",
+                            "local_failed_window_details",
+                            "pre_transition_validation_mode",
+                            "selected_transition_failure_count",
+                            "transition_retry_used_count",
+                            "endpoint_distance_exceeds_cutoff_count",
+                            "no_movement_path_within_cutoff_count",
+                            "failed_transition_reasons",
+                            "provisional_edge_sequence",
+                            )
+                        },
                         "route_bridge_search_ms": route_bridge_search_ms,
                         "route_parts_build_ms": route_parts_build_ms,
                         "traversal_build_ms": traversal_build_ms,
@@ -470,6 +519,10 @@ def run_dates(
                         "selected_path_routing_cost", "selected_path_identifier",
                         "selected_path_json", "path_to_gps_ratio",
                         "selected_network_snapshot_mismatch",
+                        "provisional_edge_uid", "provisional_position_on_edge",
+                        "transition_failure_reason",
+                        "transition_failure_raw_movement_status",
+                        "transition_retry_used", "transition_initial_cutoff_m",
                     ) if column in matched.columns]
                     matched_diagnostic_frames.append(matched[diagnostic_columns].copy())
                 if len(matched) and retain_points:
@@ -685,6 +738,75 @@ def summarize_run(config: Stage0Config, repo: Path, dates: list[str], orders_per
     inferred_values = pd.to_numeric(
         quality.get("interpolated_distance_share", pd.Series(dtype=float)), errors="coerce"
     ).dropna()
+    def inferred_summary(mask: pd.Series) -> dict[str, Any]:
+        values = pd.to_numeric(
+            quality.loc[mask, "interpolated_distance_share"],
+            errors="coerce",
+        ).dropna()
+        return {
+            "applicable_orders": int(len(values)),
+            "mean": float(values.mean()) if len(values) else None,
+            **{
+                name: float(values.quantile(q)) if len(values) else None
+                for name, q in (("q50", 0.50), ("q90", 0.90), ("q99", 0.99))
+            },
+        }
+    successful_mask = quality.get(
+        "successful_reconstruction", pd.Series(False, index=quality.index)
+    ).fillna(False).astype(bool)
+    strict_mask = quality.get(
+        "strict_evaluation_eligible", pd.Series(False, index=quality.index)
+    ).fillna(False).astype(bool)
+    analysis_mask = quality.get(
+        "formal_analysis_eligible", pd.Series(False, index=quality.index)
+    ).fillna(False).astype(bool)
+    failure_cross_tab = {}
+    if len(orders) and "pre_transition_validation_mode" in orders:
+        failure_cross_tab = {
+            f"{before}->{after}": int(count)
+            for (before, after), count in orders.groupby(
+                ["pre_transition_validation_mode", "matching_mode"],
+                dropna=False,
+            ).size().items()
+        }
+    search_values = pd.to_numeric(
+        performance.get("path_search_calls", pd.Series(dtype=float)),
+        errors="coerce",
+    ).dropna()
+    expanded_values = pd.to_numeric(
+        performance.get("dijkstra_expanded_nodes", pd.Series(dtype=float)),
+        errors="coerce",
+    ).dropna()
+    failed_windows = pd.to_numeric(
+        performance.get("local_failed_window_count", pd.Series(dtype=float)),
+        errors="coerce",
+    ).fillna(0).astype(int)
+    failed_transition_events: list[dict[str, Any]] = []
+    for encoded in performance.get(
+        "failed_transition_reasons", pd.Series(dtype=str)
+    ).fillna("[]"):
+        try:
+            decoded = json.loads(str(encoded))
+        except (TypeError, ValueError, json.JSONDecodeError):
+            continue
+        if isinstance(decoded, list):
+            failed_transition_events.extend(
+                item for item in decoded if isinstance(item, dict)
+            )
+    failed_point_indices = pd.Series(
+        [
+            event.get("point_index")
+            for event in failed_transition_events
+            if event.get("point_index") is not None
+        ],
+        dtype=float,
+    )
+    raw_failure_status_counts: dict[str, int] = {}
+    for event in failed_transition_events:
+        status = str(event.get("raw_movement_status", "unknown"))
+        raw_failure_status_counts[status] = (
+            raw_failure_status_counts.get(status, 0) + 1
+        )
     return {
         **base,
         "dates": dates,
@@ -698,7 +820,17 @@ def summarize_run(config: Stage0Config, repo: Path, dates: list[str], orders_per
         "direction_violation_count": int(quality.direction_violation_count.sum()) if len(quality) else 0,
         "layer_violation_count": int(quality.layer_violation_count.sum()) if len(quality) else 0,
         "restriction_violation_count": int(quality.restriction_violation_count.sum()) if len(quality) else 0,
-        "mean_inferred_distance_share": float(quality.interpolated_distance_share.mean()) if len(quality) else float("nan"),
+        "mean_inferred_distance_share": (
+            float(inferred_values.mean()) if len(inferred_values) else None
+        ),
+        "inferred_distance_scope_note": (
+            "Failed reconstructions are N/A, never zero-filled."
+        ),
+        "inferred_distance_share_by_scope": {
+            "successfully_reconstructed": inferred_summary(successful_mask),
+            "strict_core": inferred_summary(strict_mask),
+            "analysis_eligible": inferred_summary(analysis_mask),
+        },
         "inferred_distance_share_distribution": {
             name: float(inferred_values.quantile(q)) if len(inferred_values) else None
             for name, q in (("q50", 0.50), ("q90", 0.90), ("q99", 0.99))
@@ -723,6 +855,60 @@ def summarize_run(config: Stage0Config, repo: Path, dates: list[str], orders_per
         "local_hmm_attempt_count": local_attempts,
         "local_hmm_attempt_share": local_attempts / len(performance) if len(performance) else 0.0,
         "local_window_failure_count": int(numeric_sum("local_failed_window_count")),
+        "orders_by_failed_local_window_count": {
+            "1": int((failed_windows == 1).sum()),
+            "2": int((failed_windows == 2).sum()),
+            "3": int((failed_windows == 3).sum()),
+            "4_plus": int((failed_windows >= 4).sum()),
+        },
+        "local_boundary_transition_failure_count": int(
+            numeric_sum("local_boundary_failure_count")
+        ),
+        "local_internal_transition_failure_count": int(
+            numeric_sum("local_internal_failure_count")
+        ),
+        "failed_transition_reason_counts": {
+            "endpoint_distance_exceeds_cutoff": int(
+                numeric_sum("endpoint_distance_exceeds_cutoff_count")
+            ),
+            "no_movement_path_within_cutoff": int(
+                numeric_sum("no_movement_path_within_cutoff_count")
+            ),
+        },
+        "failed_transition_raw_movement_status_counts": raw_failure_status_counts,
+        "failed_transition_point_index_distribution": {
+            name: float(failed_point_indices.quantile(q))
+            if len(failed_point_indices)
+            else None
+            for name, q in (("p50", 0.50), ("p90", 0.90), ("p99", 0.99))
+        },
+        "candidate_true_state_missing_proxy": {
+            "orders_with_under_minimum_initial_candidates": int((
+                pd.to_numeric(
+                    performance.get(
+                        "under_minimum_candidate_initial_count",
+                        pd.Series(dtype=float),
+                    ),
+                    errors="coerce",
+                ).fillna(0) > 0
+            ).sum()),
+            "under_minimum_candidate_point_count": int(
+                numeric_sum("under_minimum_candidate_initial_count")
+            ),
+            "unrecovered_no_candidate_point_count": int(
+                numeric_sum("no_candidate_initial_count")
+                - numeric_sum("no_candidate_recovered_count")
+            ),
+        },
+        "pre_validation_to_final_mode_cross_tab": failure_cross_tab,
+        "path_searches_per_order_distribution": {
+            name: float(search_values.quantile(q)) if len(search_values) else None
+            for name, q in (("p50", 0.50), ("p90", 0.90), ("p99", 0.99))
+        },
+        "expanded_states_per_order_distribution": {
+            name: float(expanded_values.quantile(q)) if len(expanded_values) else None
+            for name, q in (("p50", 0.50), ("p90", 0.90), ("p99", 0.99))
+        },
         "pure_compute_ms": pure_compute_ms,
         "pure_compute_ms_per_order": pure_compute_ms / len(performance) if len(performance) else 0.0,
         "bucket_input_ms": numeric_sum("bucket_input_ms_per_order"),
@@ -738,6 +924,21 @@ def summarize_run(config: Stage0Config, repo: Path, dates: list[str], orders_per
         "internal_distance_conservation_failures": int((quality.internal_distance_error_m > 1e-6).sum()) if len(quality) else 0,
         "duplicate_traversal_instance_error_count": duplicate_traversals,
         "invalid_position_aware_distance_count": int(quality.invalid_position_aware_distance_count.sum()) if len(quality) else 0,
+        "position_audit_applicable_order_count": int(pd.to_numeric(
+            quality.get("position_audit_applicable_order_count", pd.Series(dtype=float)),
+            errors="coerce",
+        ).fillna(0).sum()),
+        "position_audit_not_applicable_match_failure_count": int(pd.to_numeric(
+            quality.get(
+                "position_audit_not_applicable_match_failure_count",
+                pd.Series(dtype=float),
+            ),
+            errors="coerce",
+        ).fillna(0).sum()),
+        "actual_invalid_position_event_count": int(pd.to_numeric(
+            quality.get("actual_invalid_position_event_count", pd.Series(dtype=float)),
+            errors="coerce",
+        ).fillna(0).sum()),
         "observed_dynamic_label_on_inferred_edge_count": inferred_dynamic,
         "hmm_path_distance_mismatch_count": mismatch_count,
         "final_forbidden_movement_count": int(movements.get(

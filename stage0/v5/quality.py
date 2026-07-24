@@ -56,14 +56,25 @@ def evaluate_order_quality(
     allocated_distance = float(pd.to_numeric(traversals.get("allocated_distance_m", pd.Series(dtype=float)), errors="coerce").fillna(0).sum())
     internal_distance_error = abs(route_distance - allocated_distance)
     projected_distance = projected_route_distance_m(matched_points, route_parts, edge_lookup) if successful else math.nan
-    projected_distance_error = abs(route_distance - projected_distance) if math.isfinite(projected_distance) else math.inf
+    projected_distance_error = (
+        abs(route_distance - projected_distance)
+        if math.isfinite(projected_distance)
+        else math.nan
+    )
     invalid_position_count = int((~route_parts.get(
         "position_distance_valid", pd.Series(False, index=route_parts.index)
-    ).fillna(False).astype(bool)).sum()) if successful else 1
+    ).fillna(False).astype(bool)).sum()) if successful else 0
+    position_audit_applicable = bool(successful)
     alignment_valid = bool(route_parts.get(
         "observed_run_alignment_valid", pd.Series(False, index=route_parts.index)
     ).fillna(False).astype(bool).all()) if successful else False
-    projection = pd.to_numeric(matched_points.get("gps_to_edge_distance_m"), errors="coerce")
+    projection = pd.to_numeric(
+        matched_points.get(
+            "gps_to_edge_distance_m",
+            pd.Series(np.nan, index=matched_points.index),
+        ),
+        errors="coerce",
+    )
     movement_quality = movements.get("movement_quality", pd.Series(dtype=str))
     movement_reason = movements.get("movement_audit_reason", movement_quality).astype(str)
     gap_count = int(movement_reason.eq("missing_topology").sum())
@@ -79,7 +90,8 @@ def evaluate_order_quality(
         movements.get("movement_observed", pd.Series(False, index=movements.index)).fillna(False).astype(bool)
         & movements.get("dynamic_time_source", pd.Series("", index=movements.index)).ne("observed_direct_movement")
     ).sum())
-    path_mismatch_count = 0
+    path_identity_mismatch_count = 0
+    path_distance_mismatch_count = 0
     if successful and "selected_path_json" in matched_points:
         import json as _json
 
@@ -96,7 +108,8 @@ def evaluate_order_quality(
                     str(ordered_points.selected_path_json.iloc[point_index])
                 )]
             except (TypeError, ValueError, _json.JSONDecodeError):
-                path_mismatch_count += 1
+                path_identity_mismatch_count += 1
+                path_distance_mismatch_count += 1
                 continue
             found = False
             for start in range(cursor, len(route_edges)):
@@ -105,9 +118,46 @@ def evaluate_order_quality(
                     found = True
                     break
             if not found:
-                path_mismatch_count += 1
+                path_identity_mismatch_count += 1
+            selected_distance = float(pd.to_numeric(
+                ordered_points.selected_path_distance_m.iloc[point_index],
+                errors="coerce",
+            ))
+            left_position = float(pd.to_numeric(
+                ordered_points.position_on_edge.iloc[point_index - 1],
+                errors="coerce",
+            ))
+            right_position = float(pd.to_numeric(
+                ordered_points.position_on_edge.iloc[point_index],
+                errors="coerce",
+            ))
+            if left_uid == right_uid:
+                reconstructed_distance = max(0.0, right_position - left_position)
+            elif expected and expected[0] in edge_lookup.index and expected[-1] in edge_lookup.index:
+                reconstructed_distance = (
+                    max(0.0, float(edge_lookup.loc[left_uid].length_m) - left_position)
+                    + sum(
+                        float(edge_lookup.loc[edge_uid].length_m)
+                        for edge_uid in expected[1:-1]
+                        if edge_uid in edge_lookup.index
+                    )
+                    + max(0.0, right_position)
+                )
+            else:
+                reconstructed_distance = math.nan
+            if (
+                not math.isfinite(selected_distance)
+                or not math.isfinite(reconstructed_distance)
+                or abs(selected_distance - reconstructed_distance)
+                > float(hard_cfg.get("hmm_path_distance_tolerance_m", 1e-6))
+            ):
+                path_distance_mismatch_count += 1
     illegal_uturn = int(((movement_type == "u_turn") & restriction.str.startswith("forbidden")).sum())
-    ordered_points = matched_points.sort_values("point_seq", kind="stable") if len(matched_points) else matched_points
+    ordered_points = (
+        matched_points.sort_values("point_seq", kind="stable")
+        if len(matched_points) and "point_seq" in matched_points
+        else matched_points
+    )
     heading = pd.to_numeric(ordered_points.get("edge_heading_difference_deg", pd.Series(dtype=float)), errors="coerce")
     reliable = ordered_points.get("heading_reliable", pd.Series(False, index=ordered_points.index)).fillna(False).astype(bool)
     edge_values = ordered_points.get("edge_uid", pd.Series("", index=ordered_points.index)).astype(str)
@@ -155,13 +205,14 @@ def evaluate_order_quality(
         "layer_violation_count": layer_count,
         "restriction_violation_count": restriction_count,
         "observed_dynamic_label_on_inferred_edge_count": inferred_dynamic_count,
-        "hmm_path_distance_mismatch_count": path_mismatch_count,
+        "hmm_output_path_identity_mismatch_count": path_identity_mismatch_count,
+        "hmm_path_distance_mismatch_count": path_distance_mismatch_count,
         "raw_movement_audit_available": "movement_audit_reason" in movements.columns,
         "network_snapshot_mismatch_share": float(
             matched_points.get(
                 "selected_network_snapshot_mismatch",
-                pd.Series(False, index=matched_points.index),
-            ).fillna(False).astype(bool).mean()
+                pd.Series(False, index=matched_points.index, dtype="boolean"),
+            ).astype("boolean").fillna(False).mean()
         ) if len(matched_points) else 0.0,
         "path_to_gps_ratio_q50": float(path_ratios.quantile(0.50)) if len(path_ratios) else math.nan,
         "path_to_gps_ratio_q90": float(path_ratios.quantile(0.90)) if len(path_ratios) else math.nan,
@@ -178,6 +229,9 @@ def evaluate_order_quality(
         "internal_distance_error_m": internal_distance_error,
         "projected_route_distance_error_m": projected_distance_error,
         "invalid_position_aware_distance_count": invalid_position_count,
+        "position_audit_applicable_order_count": int(position_audit_applicable),
+        "position_audit_not_applicable_match_failure_count": int(not position_audit_applicable),
+        "actual_invalid_position_event_count": invalid_position_count,
         "observed_run_alignment_valid": alignment_valid,
         "time_conservation_error_s": time_error,
         "distance_conservation_error_m": internal_distance_error,
@@ -187,7 +241,7 @@ def evaluate_order_quality(
         ),
         "p90_projection_distance_m": float(projection.quantile(0.9)) if len(projection.dropna()) else math.inf,
         "route_length_ratio": route_ratio,
-        "interpolated_distance_share": _safe_ratio(inferred_distance, route_distance, 0.0),
+        "interpolated_distance_share": _safe_ratio(inferred_distance, route_distance),
         "matching_confidence": confidence,
         "repeated_link_share": _repeated_share(route_parts.edge_uid) if successful else 1.0,
         "parallel_ambiguity_share": float(matched_points.parallel_ambiguity.mean()) if len(matched_points) else 1.0,
@@ -202,10 +256,15 @@ def evaluate_order_quality(
         "no_restriction_violation": max(restriction_count, restriction_block_count, unparsed_restriction_count) == 0,
         "minimum_route_links": len(route_parts) >= int(hard_cfg["minimum_route_links"]),
         "time_distance_conservation": max(time_error, internal_distance_error) <= float(hard_cfg["conservation_tolerance"]),
-        "projected_distance_consistency": projected_distance_error <= float(hard_cfg["conservation_tolerance"]),
+        "projected_distance_consistency": bool(
+            successful
+            and math.isfinite(projected_distance_error)
+            and projected_distance_error <= float(hard_cfg["conservation_tolerance"])
+        ),
         "valid_position_aware_distance": invalid_position_count == 0,
         "observed_run_alignment": alignment_valid,
-        "hmm_output_path_identity": path_mismatch_count == 0,
+        "hmm_output_path_identity": path_identity_mismatch_count == 0,
+        "hmm_output_path_distance": path_distance_mismatch_count == 0,
         "dynamic_label_provenance": inferred_dynamic_count == 0,
         "layer_continuity": layer_count <= int(hard_cfg["maximum_layer_violations"]),
     }

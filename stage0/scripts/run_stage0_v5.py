@@ -52,6 +52,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--bucket-shard-index", type=int, default=0)
     parser.add_argument("--bucket-shard-count", type=int, default=1)
     parser.add_argument("--bucket-ids", nargs="*", type=int, default=None)
+    parser.add_argument(
+        "--log-file",
+        type=Path,
+        default=None,
+        help="Optional UTF-8 run log for long/background executions.",
+    )
     parser.add_argument("--review-pack", choices=["development", "test", "both"], default="development")
     parser.add_argument("--review-csv", type=Path, default=None)
     parser.add_argument("--execute", action="store_true", help="Required for point-work pruning.")
@@ -76,7 +82,17 @@ def main() -> int:
         if args.work_root is not None:
             values["paths"]["work"] = str(args.work_root.resolve())
         config = Stage0Config(config.source, values, config_hash(values))
-    logging.basicConfig(level=getattr(logging, config.section("runtime")["log_level"]), format="%(asctime)s %(levelname)s %(name)s %(message)s")
+    log_handlers: list[logging.Handler] = [logging.StreamHandler()]
+    if args.log_file is not None:
+        log_path = args.log_file.resolve()
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        log_handlers.append(logging.FileHandler(log_path, encoding="utf-8"))
+    logging.basicConfig(
+        level=getattr(logging, config.section("runtime")["log_level"]),
+        format="%(asctime)s %(levelname)s %(name)s %(message)s",
+        handlers=log_handlers,
+        force=True,
+    )
     dates = resolve_dates(args, config)
     buckets = args.buckets or int(config.section("runtime")["buckets"])
     workers = args.workers or int(config.section("runtime")["workers"])

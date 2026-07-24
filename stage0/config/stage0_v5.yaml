@@ -27,6 +27,8 @@ network:
   u_turn_penalty_m: 500.0
   road_class_transition_penalty_m: 30.0
   bridge_cache_pairs: 50000
+  pareto_epsilon_m: 0.25
+  pareto_max_labels_per_state: 12
 candidate:
   trajectory_coordinate_interpretation: gcj02
   radius_m: 80.0
@@ -42,15 +44,22 @@ candidate:
   minimum_heading_displacement_m: 3.0
   ordinary_candidates: 3
   heading_weight_m: 15.0
+  heading_log_cost_max: 1.0
+  edge_prior_scale_m: 30.0
+  complex_candidate_probe_count: 8
   access_penalty_m: 20.0
   no_candidate_recovery_radius_multiplier: 2.0
   no_candidate_recovery_max_radius_m: 200.0
+  transition_recovery_radius_m: 200.0
+  transition_recovery_max_candidates: 20
 hmm:
   local_context_points: 2
   merge_gap_points: 2
   full_order_ambiguity_share: 0.45
   full_order_min_windows: 4
   local_retry_context_points: 2
+  boundary_repair_context_points: 1
+  boundary_repair_merge_gap_points: 1
   same_edge_jitter_tolerance_m: 10.0
   same_edge_jitter_penalty_per_m: 0.25
   jitter_calibration_source: gate1_train_case_traces_low_displacement_p95
@@ -58,7 +67,6 @@ hmm:
   sigma_distance_m: 15.0
   beta_transition_m: 60.0
   beta_semantic_cost_m: 60.0
-  beta_speed_difference_mps: 5.0
   max_route_distance_m: 6000.0
   transition_cutoff_alpha: 3.0
   transition_cutoff_base_m: 200.0
@@ -67,6 +75,10 @@ hmm:
   transition_max_speed_mps: 40.0
   transition_ambiguity_path_gps_ratio: 3.0
   transition_ambiguity_inferred_m: 250.0
+  transition_retry_multiplier: 4.0
+  transition_retry_max_m: 1200.0
+  transition_retry_candidate_subset: 3
+  transition_retry_soft_penalty_m: 300.0
   anchor_position_tolerance_m: 1.0
   geometric_fallback_enabled: true
 quality:
@@ -83,6 +95,7 @@ quality:
     minimum_route_links: 1
     maximum_od_endpoint_error_m: 150.0
     conservation_tolerance: 1.0e-6
+    hmm_path_distance_tolerance_m: 1.0e-3
   soft:
     maximum_fallback_share: 0.25
     maximum_p90_projection_distance_m: 60.0

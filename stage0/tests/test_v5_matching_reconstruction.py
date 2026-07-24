@@ -8,7 +8,8 @@ from shapely.geometry import LineString
 
 from stage0.v5.matching import (
     Candidate, CandidateIndex, TransitionEngine, angular_difference,
-    _ambiguity_flags, _gps_headings, _viterbi, full_order_decision,
+    _ambiguity_flags, _gps_headings, _transition_ambiguity_flags, _viterbi,
+    full_order_decision,
     local_failures_require_full_order, local_hmm_windows, transition_cutoff,
 )
 from stage0.v5.reconstruction import (
@@ -21,6 +22,7 @@ from stage0.v5.reconstruction import (
     route_parts_frame,
 )
 from stage0.v5.routing import CompactMovementRouter
+from stage0.v5.quality import evaluate_order_quality
 
 
 def _edges():
@@ -121,6 +123,91 @@ def test_multi_target_search_runs_once_per_source_and_stops_at_targets():
     assert router.stats().path_calls == 0
 
 
+def test_transition_ambiguity_probe_uses_distance_frontier_not_path_search():
+    engine = TransitionEngine(
+        _edges(),
+        _movements(),
+        pd.DataFrame(),
+        {
+            "max_route_distance_m": 100.0,
+            "transition_cutoff_alpha": 3.0,
+            "transition_cutoff_base_m": 20.0,
+            "transition_cutoff_max_m": 100.0,
+            "transition_max_speed_mps": 40.0,
+            "transition_ambiguity_path_gps_ratio": 3.0,
+            "transition_ambiguity_inferred_m": 250.0,
+        },
+    )
+    flags, _, evidence = _transition_ambiguity_flags(
+        [_candidate("a", 0, 8), _candidate("c", 3, 2)],
+        pd.Series([0.0, 20.0]).to_numpy(),
+        pd.Series([0.0, 5.0]).to_numpy(),
+        engine,
+        engine.router.config,
+    )
+    assert not flags.any()
+    assert evidence[0].edge_uids == ()
+    assert engine.router.stats().distance_calls == 1
+    assert engine.router.stats().path_calls == 0
+
+
+def test_multi_target_path_search_stops_after_all_targets_are_settled():
+    edges = _edges()
+    extra_edges = []
+    extra_movements = []
+    previous = "a"
+    previous_node = 2
+    for index in range(20):
+        uid = f"branch_{index}"
+        next_node = 100 + index
+        extra_edges.append({
+            "edge_uid": uid,
+            "from_node": previous_node,
+            "to_node": next_node,
+            "edge_key": uid,
+            "geometry": LineString([(10 + index, 5), (11 + index, 5)]),
+            "length_m": 50.0,
+            "candidate_penalty": 100.0,
+            "parallel_group": None,
+            "bridge": False,
+            "tunnel": False,
+            "layer": 0,
+            "highway": "service",
+        })
+        extra_movements.append({
+            "from_edge_uid": previous,
+            "via_node": previous_node,
+            "to_edge_uid": uid,
+            "movement_type": "straight",
+            "turn_angle": 0.0,
+            "restriction_status": "allowed",
+            "layer_compatibility": True,
+            "road_class_transition": "primary->service",
+            "merge_diverge_flag": False,
+        })
+        previous = uid
+        previous_node = next_node
+    edges = pd.concat([
+        edges,
+        gpd.GeoDataFrame(extra_edges, geometry="geometry", crs=3857),
+    ], ignore_index=True)
+    movements = pd.concat(
+        [_movements(), pd.DataFrame(extra_movements)], ignore_index=True
+    )
+    router = CompactMovementRouter(edges, movements, {
+        "max_route_distance_m": 2000,
+        "pareto_epsilon_m": 0.25,
+        "pareto_max_labels_per_state": 12,
+    })
+    result = router.transition_paths_from_source("a", {"c": 100.0})
+    assert result["c"] is not None
+    assert list(result["c"].edge_uids) == ["a", "b", "c"]
+    # The low-cost target is settled before the expensive service-road branch
+    # is exhausted.  This assertion guards against reverting to a full-cutoff
+    # Pareto expansion.
+    assert router.stats().expanded_nodes < 10
+
+
 def test_order_local_source_frontier_is_reused_for_new_targets():
     edges = pd.concat([
         _edges(),
@@ -154,17 +241,71 @@ def test_negative_distance_cache_uses_actual_exhausted_cutoff():
     assert router.multi_target_distances(["a"], ["c"], 20)[("a", "c")] == 10
 
 
-def test_positive_selected_path_cache_is_cutoff_independent():
+def test_positive_selected_path_cache_researches_larger_cutoff():
     router = CompactMovementRouter(_edges(), _movements(), {"max_route_distance_m": 100})
     assert router.bridge_path("a", "c", 20)[0] == ["a", "b", "c"]
     assert router.bridge_path("a", "c", 100)[0] == ["a", "b", "c"]
-    assert router.stats().path_cache_hits == 1
+    assert router.stats().path_calls == 2
 
 
 def test_negative_path_cache_can_expand_to_larger_cutoff():
     router = CompactMovementRouter(_edges(), _movements(), {"max_route_distance_m": 100})
     assert router.bridge_path("a", "c", 5) is None
     assert router.bridge_path("a", "c", 20)[0] == ["a", "b", "c"]
+
+
+def _cutoff_choice_router() -> CompactMovementRouter:
+    template = _edges().iloc[0].to_dict()
+    specs = [
+        ("a", 1, 2, 10.0, 1.0),
+        ("short", 2, 3, 10.0, 10.0),
+        ("long1", 2, 4, 20.0, 1.0),
+        ("long2", 4, 3, 20.0, 1.0),
+        ("d", 3, 5, 10.0, 1.0),
+    ]
+    rows = []
+    for index, (uid, start, end, length, penalty) in enumerate(specs):
+        rows.append({
+            **template,
+            "edge_uid": uid,
+            "from_node": start,
+            "to_node": end,
+            "length_m": length,
+            "routing_penalty": penalty,
+            "geometry": LineString([(index * 10, 0), (index * 10 + length, 0)]),
+        })
+    edges = gpd.GeoDataFrame(rows, geometry="geometry", crs=3857)
+    movements = pd.DataFrame([
+        {
+            "from_edge_uid": left, "via_node": via, "to_edge_uid": right,
+            "movement_type": "straight", "turn_angle": 0.0,
+            "restriction_status": "allowed", "layer_compatibility": True,
+            "road_class_transition": "primary->primary",
+            "merge_diverge_flag": False,
+        }
+        for left, via, right in [
+            ("a", 2, "short"), ("short", 3, "d"),
+            ("a", 2, "long1"), ("long1", 4, "long2"), ("long2", 3, "d"),
+        ]
+    ])
+    return CompactMovementRouter(edges, movements, {"max_route_distance_m": 100})
+
+
+def test_path_cache_small_then_large_matches_fresh_large():
+    cached = _cutoff_choice_router()
+    assert list(cached.transition_path("a", "d", 15).edge_uids) == ["a", "short", "d"]
+    large_after_small = cached.transition_path("a", "d", 50)
+    fresh_large = _cutoff_choice_router().transition_path("a", "d", 50)
+    assert large_after_small == fresh_large
+    assert list(large_after_small.edge_uids) == ["a", "long1", "long2", "d"]
+
+
+def test_path_cache_large_then_small_matches_fresh_small():
+    cached = _cutoff_choice_router()
+    cached.transition_path("a", "d", 50)
+    small_after_large = cached.transition_path("a", "d", 15)
+    fresh_small = _cutoff_choice_router().transition_path("a", "d", 15)
+    assert small_after_large == fresh_small
 
 
 def test_hmm_and_output_use_the_same_generalized_transition_path():
@@ -202,16 +343,92 @@ def test_batch_candidate_projection_deduplicates_candidate_alias(tmp_path):
     assert len(rows[0]) == 1
 
 
-def test_stationary_heading_is_inherited_but_not_ambiguity_eligible():
+def test_stationary_heading_contributes_no_direction_evidence():
     headings, reliable = _gps_headings(
         pd.Series([0.0, 5.0, 5.1, 5.2, 10.0]).to_numpy(),
         pd.Series([0.0, 0.0, 0.0, 0.0, 0.0]).to_numpy(),
         2.0,
     )
     assert not reliable[2]
-    assert math.isfinite(headings[2])
+    assert headings[2] == 0.0
     flags = pd.Series([False, False, True, False, False]).to_numpy()
     assert full_order_decision(flags, {"full_order_ambiguity_share": 0.45}, reliable) == (False, "")
+
+
+def test_direct_movement_returns_complete_generalized_cost():
+    edges = _edges()
+    edges["routing_penalty"] = 1.0
+    edges.loc[edges.edge_uid.eq("b"), "routing_penalty"] = 2.0
+    router = CompactMovementRouter(edges, _movements(), {"max_route_distance_m": 100})
+    direct = router.transition_path("a", "b", 0)
+    assert direct is not None
+    assert direct.physical_distance_m == 0.0
+    assert direct.generalized_routing_cost == 20.0
+
+
+def test_selected_direct_transition_respects_endpoint_cutoff():
+    engine = TransitionEngine(
+        _edges(), _movements(), pd.DataFrame(),
+        {"max_route_distance_m": 100, "transition_cutoff_min_m": 5,
+         "transition_cutoff_max_m": 5, "transition_cutoff_alpha": 0,
+         "transition_cutoff_base_m": 5, "transition_max_speed_mps": 100},
+    )
+    selected = [_candidate("a", 0, 1), _candidate("b", 2, 9)]
+    paths, _, failures = engine.selected_transition_paths(
+        selected,
+        pd.Series([0.0, 1.0]).to_numpy(),
+        pd.Series([0.0, 1.0]).to_numpy(),
+        {"max_route_distance_m": 100, "transition_cutoff_min_m": 5,
+         "transition_cutoff_max_m": 5, "transition_cutoff_alpha": 0,
+         "transition_cutoff_base_m": 5, "transition_max_speed_mps": 100},
+    )
+    assert not paths
+    assert failures[0].reason == "endpoint_distance_exceeds_retry_cutoff"
+
+
+def test_failed_match_position_and_inferred_audits_are_not_applicable():
+    quality = evaluate_order_quality(
+        "o",
+        pd.DataFrame({
+            "metric_x": [0.0, 1.0], "metric_y": [0.0, 0.0],
+            "timestamp": [0.0, 1.0], "parallel_ambiguity": [False, False],
+        }),
+        pd.DataFrame(),
+        pd.DataFrame(),
+        pd.DataFrame(),
+        _edges(),
+        {"matching_mode": "failed_no_continuous_route"},
+        {
+            "hard": {
+                "maximum_heading_direction_difference_deg": 100,
+                "same_edge_reverse_tolerance_m": 10,
+                "minimum_direction_displacement_m": 3,
+                "minimum_consecutive_direction_conflicts": 2,
+                "maximum_direction_violations": 0,
+                "maximum_topology_gaps": 0,
+                "maximum_unreasonable_detours": 0,
+                "maximum_od_endpoint_error_m": 150,
+                "maximum_illegal_u_turns": 0,
+                "minimum_route_links": 1,
+                "conservation_tolerance": 1e-6,
+                "maximum_layer_violations": 0,
+            },
+            "soft": {
+                "maximum_route_length_ratio": 2.5,
+                "maximum_fallback_share": 0.25,
+                "maximum_p90_projection_distance_m": 60,
+                "minimum_route_length_ratio": 0.5,
+                "maximum_interpolated_distance_share": 0.5,
+                "minimum_match_confidence": 0.35,
+                "maximum_repeated_link_share": 0.2,
+                "maximum_parallel_ambiguity_share": 0.25,
+            },
+        },
+    )
+    assert quality["position_audit_applicable_order_count"] == 0
+    assert quality["position_audit_not_applicable_match_failure_count"] == 1
+    assert quality["actual_invalid_position_event_count"] == 0
+    assert math.isnan(quality["interpolated_distance_share"])
 
 
 def test_hmm_and_reconstruction_share_forbidden_movement_semantics():
