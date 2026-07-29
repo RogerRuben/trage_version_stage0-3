@@ -1,0 +1,944 @@
+{
+  "schema_version": "stage1_label_schema_v3",
+  "status": "review_candidate",
+  "supersedes_for_stage0_v6": [
+    "stage1_label_schema_v1",
+    "stage1_label_schema_v2"
+  ],
+  "upstream_contract": {
+    "product_schema": "stage1_input_v1",
+    "required_stage0_schema": "stage0_v6_valhalla.1",
+    "required_freeze_status": "FROZEN",
+    "partition_layout": "split={split}/date={date}/bucket={bucket}/{product}.parquet",
+    "required_products": [
+      "order_base",
+      "route_segments",
+      "route_parts",
+      "link_traversals",
+      "link_interval_observations",
+      "interval_measurements",
+      "turn_movements",
+      "gps_quality",
+      "route_quality",
+      "dynamic_quality",
+      "canonical_quality"
+    ],
+    "lineage_only_products": [
+      "route_segments"
+    ],
+    "deprecated_for_features": {
+      "route_segments.segment_route_distance_m": "component_distance_not_local_segment_distance"
+    },
+    "allowed_order_status": {
+      "stage1_core_eligible": true,
+      "route_status": [
+        "route_pass"
+      ],
+      "gps_status": [
+        "clean",
+        "local_outlier"
+      ],
+      "dynamic_status": [
+        "dynamic_strict",
+        "dynamic_partial"
+      ],
+      "canonical_status": [
+        "unique",
+        "chain_resolved"
+      ]
+    }
+  },
+  "stage0_release": {
+    "stage0_tag": "stage0-v6-final",
+    "stage0_tag_commit": "729275d81ec5dc224ac0967a6e600457764607b8",
+    "stage0_source_content_hash": "a5e482f4a0d2b607"
+  },
+  "time": {
+    "timezone": "Asia/Shanghai"
+  },
+  "label_temporality": "retrospective_post_trip_realized_label",
+  "split": {
+    "train_dates": [
+      "20161009",
+      "20161010",
+      "20161011",
+      "20161012",
+      "20161013",
+      "20161014",
+      "20161015",
+      "20161016",
+      "20161017",
+      "20161018",
+      "20161019",
+      "20161020",
+      "20161021",
+      "20161022",
+      "20161023",
+      "20161024"
+    ],
+    "validation_dates": [
+      "20161025",
+      "20161026",
+      "20161027"
+    ],
+    "test_date": "20161031",
+    "reference_fit_dates": [
+      "20161009",
+      "20161010",
+      "20161011",
+      "20161012",
+      "20161013",
+      "20161014",
+      "20161015",
+      "20161016",
+      "20161017",
+      "20161018",
+      "20161019",
+      "20161020",
+      "20161021",
+      "20161022",
+      "20161023",
+      "20161024"
+    ],
+    "fit_scope": "train_only",
+    "validation_policy": "apply_frozen_train_objects_only",
+    "test_policy": "apply_frozen_train_objects_only",
+    "forbidden_fit_sources": [
+      "validation",
+      "test"
+    ]
+  },
+  "keys": {
+    "order": [
+      "split",
+      "date",
+      "order_id"
+    ],
+    "route_part": [
+      "split",
+      "date",
+      "order_id",
+      "route_sequence"
+    ],
+    "traversal": [
+      "split",
+      "date",
+      "order_id",
+      "traversal_id"
+    ],
+    "gps_interval": [
+      "split",
+      "date",
+      "order_id",
+      "gps_interval_id"
+    ],
+    "movement": [
+      "split",
+      "date",
+      "order_id",
+      "movement_sequence"
+    ],
+    "canonical_edge": [
+      "canonical_edge_uid"
+    ]
+  },
+  "direct": {
+    "threshold_status": "review_candidate",
+    "source_product": "link_interval_observations",
+    "predicate": {
+      "measurement_source": "direct_observed",
+      "label_valid": true,
+      "canonical_edge_uid_not_null": true,
+      "observed_directed_edge_uid_not_null": true,
+      "observed_direction_in": [
+        "F",
+        "R"
+      ],
+      "interval_start_time_finite": true,
+      "interval_end_time_finite": true,
+      "interval_end_after_start": true,
+      "observed_travel_time_s_gt": 0.0,
+      "observed_distance_m_gte": 0.0
+    },
+    "duration_tolerance_s": 1e-06,
+    "distance_identity_tolerance_m": 1e-06,
+    "speed_tolerance_mps": 1e-06,
+    "interval_time_rel": 1e-12,
+    "interval_speed_rel": 1e-09,
+    "dynamic_time_rel": 1e-12,
+    "dynamic_distance_rel": 1e-12,
+    "authoritative_dynamic_fields": [
+      "interval_start_time",
+      "interval_end_time",
+      "observed_travel_time_s",
+      "observed_distance_m",
+      "observed_speed_mps"
+    ],
+    "non_authoritative_as_direct_predicates": [
+      "link_traversals.time_observation_valid",
+      "link_traversals.travel_time_s",
+      "link_traversals.valhalla_edge_elapsed_time_s",
+      "route_parts.time_observation_valid",
+      "route_parts.travel_time_s"
+    ],
+    "non_direct_policy": "preserve_na_never_zero_impute",
+    "traversal_aggregation": {
+      "group_key": [
+        "split",
+        "date",
+        "order_id",
+        "traversal_id"
+      ],
+      "observed_time": "sum_direct_interval_observed_travel_time_s",
+      "observed_distance": "sum_direct_interval_observed_distance_m",
+      "enter_time": "minimum_direct_interval_start_time",
+      "exit_time": "maximum_direct_interval_end_time",
+      "interpretation": "direct_evidence_window_not_full_link_boundary_time"
+    }
+  },
+  "input_validation": {
+    "interval_measurements": {
+      "primary_key": [
+        "split",
+        "date",
+        "order_id",
+        "gps_interval_id"
+      ],
+      "allowed_measurement_sources": [
+        "direct_observed",
+        "interval_supported",
+        "engine_interpolated",
+        "unresolved"
+      ],
+      "exactly_one_class_per_gps_interval": true,
+      "direct_observation_relationship": "one_to_one_when_measurement_source_is_direct_observed",
+      "non_direct_observation_relationship": "no_link_interval_observation_row",
+      "non_direct_realized_time_policy": "forbidden",
+      "unresolved_label_policy": "forbidden"
+    },
+    "turn_movements": {
+      "primary_key": [
+        "split",
+        "date",
+        "order_id",
+        "movement_sequence"
+      ],
+      "required_identity_fields": [
+        "from_edge_uid",
+        "via_node",
+        "to_edge_uid",
+        "movement_source",
+        "movement_quality"
+      ],
+      "canonical_edge_foreign_keys_required": true,
+      "movement_dynamic_label_policy": "unavailable",
+      "movement_travel_time_s_must_be_null": true,
+      "movement_delay_s_must_be_null": true,
+      "observed_interval_time_s_must_be_null": true
+    }
+  },
+  "dimension_names": [
+    "lcs",
+    "rts",
+    "gns",
+    "iis",
+    "pmis"
+  ],
+    "lcs": {
+      "name": "longitudinal_control_stress",
+      "status": "review_candidate",
+      "threshold_status": "review_candidate",
+      "source_scope": "direct_observed_intervals_within_traversal",
+      "minimum_direct_intervals_per_traversal": 3,
+      "minimum_observed_time_s": 6.0,
+      "minimum_direct_observed_distance_m": 10.0,
+      "maximum_adjacent_gap_s": 6.0,
+      "low_speed_mps": 5.0,
+      "stop_speed_mps": 1.0,
+      "speed_cv_scale": 1.0,
+      "acceleration_rms_scale_mps2": 1.0,
+      "minimum_acceleration_pairs": 2,
+      "maximum_physical_speed_mps": 75.0,
+      "maximum_absolute_acceleration_mps2": 8.0,
+      "components": {
+        "low_speed_time_share": {
+          "weight": 0.25,
+          "range": [
+            0.0,
+            1.0
+          ]
+        },
+        "stop_time_share": {
+          "weight": 0.25,
+          "range": [
+            0.0,
+            1.0
+          ]
+        },
+        "speed_cv_bounded": {
+          "weight": 0.25,
+          "transform": "x/(x+speed_cv_scale)",
+          "input_lower_bound": 0.0
+        },
+        "acceleration_rms_bounded": {
+          "weight": 0.25,
+          "transform": "x/(x+acceleration_rms_scale_mps2)",
+          "input_lower_bound": 0.0
+        }
+      },
+      "raw_formula": "weighted_mean_of_available_components_only_if_all_four_components_available",
+      "missing_policy": "lcs_available_false_and_lcs_values_na",
+      "review_requirements": [
+        "threshold_sensitivity",
+        "repeat_traversal_reliability",
+        "sampling_interval_sensitivity",
+        "manual_stop_go_case_review"
+      ]
+    },
+    "rts": {
+      "name": "reliability_tail_delay_stress",
+      "status": "review_candidate",
+      "threshold_status": "review_candidate",
+      "source_scope": "direct_observed_intervals_with_train_fitted_reference",
+      "minimum_direct_observed_time_s": 3.0,
+      "minimum_direct_observed_distance_m": 10.0,
+      "minimum_reference_sample_size": 100,
+      "sec_per_m_clip": [
+        0.01,
+        10.0
+      ],
+      "excess_time_ratio_formula": "max((observed_sec_per_m-reference_sec_per_m)/reference_sec_per_m,0)",
+      "raw_formula": "excess_time_ratio/(excess_time_ratio+1)",
+      "tail_event_percentile_threshold": 0.9,
+      "missing_policy": "rts_available_false_and_rts_values_na",
+      "review_requirements": [
+        "train_only_reference_audit",
+        "fallback_support_audit",
+        "temporal_holdout_stability",
+        "reference_bin_sensitivity"
+      ]
+    },
+    "reference": {
+      "status": "review_candidate",
+      "threshold_status": "review_candidate",
+      "fit_dates_source": "split.reference_fit_dates",
+      "minimum_observed_distance_m": 10.0,
+      "histogram_min_sec_per_m": 0.01,
+      "histogram_max_sec_per_m": 10.0,
+      "histogram_bins": 4096,
+      "quantile": 0.5,
+      "minimum_cohort_support": 100
+    },
+    "normalization": {
+      "status": "review_candidate",
+      "threshold_status": "review_candidate",
+      "fit_dates_source": "split.reference_fit_dates",
+      "raw_bins": 1000,
+      "minimum_cohort_support": 100,
+      "cdf_method": "monotone_ordered_support_interpolation",
+      "missing_policy": "preserve_na"
+    },
+    "gns": {
+      "name": "geometry_navigation_stress",
+      "status": "external_static_extension",
+      "source_scope": "frozen_canonical_edge_static_features",
+      "dynamic_observation_required": false,
+      "output_product": "edge_static_features",
+      "join_key": "canonical_edge_uid",
+      "route_aggregation_weight": "route_parts.length_m",
+      "required_external_hashes": [
+        "canonical_edges_sha",
+        "canonical_edges_schema_sha",
+        "gns_config_sha"
+      ],
+      "invariant": "same_canonical_edge_uid_has_identical_gns_across_all_dates_splits_and_orders",
+      "core_label_role": "excluded"
+    },
+    "iis": {
+      "name": "intersection_interaction_stress",
+      "status": "unavailable",
+      "available": false,
+      "severity_value": null,
+      "unavailable_reason": "STAGE0_V6_MOVEMENT_DYNAMIC_EVIDENCE_NOT_AVAILABLE",
+      "allowed_output": "movement_identity_topology_and_provenance_only",
+      "required_before_enablement": [
+        "frozen_intersection_influence_zone",
+        "direct_interval_spatial_allocation",
+        "movement_applicability_definition",
+        "dynamic_severity_evidence",
+        "independent_audit"
+      ]
+    },
+    "pmis": {
+      "name": "poi_mediated_interaction_stress",
+      "status": "unavailable",
+      "available": false,
+      "value": null,
+      "unavailable_reason": "CURRENT_CANONICAL_POI_EXPOSURE_EXTENSION_NOT_FROZEN",
+      "required_before_enablement": [
+        "canonical_edge_aligned_poi_exposure",
+        "poi_source_sha",
+        "poi_exposure_schema_sha",
+        "available_lcs_or_rts_dynamic_evidence",
+        "incremental_validity_review"
+      ]
+    },
+  "aggregation": {
+    "status": "review_candidate",
+    "threshold_status": "review_candidate",
+    "tail_percentile_threshold": 0.9
+  },
+  "core_composite_status": "disabled",
+  "cohort_reference": {
+    "threshold_status": "review_candidate",
+    "fit_dates_source": "split.reference_fit_dates",
+    "fit_rows": "rts_available_true_train_rows_only",
+    "time_bin_minutes": 30,
+    "peak_windows_local": [
+      [
+        "07:00",
+        "09:30"
+      ],
+      [
+        "17:00",
+        "19:30"
+      ]
+    ],
+    "minimum_sample_size": 100,
+    "train_reference_application": "leave_one_out",
+    "validation_test_reference_application": "full_train_frozen",
+    "raw_cdf_application": "full_train_empirical_self_rank_for_train",
+    "quantile_method": "fixed_global_edges_mergeable_histogram",
+    "cdf_method": "monotone_ordered_support_interpolation",
+    "fallback": [
+      {
+        "level": 1,
+        "name": "edge_time_weekday",
+        "key": [
+          "canonical_edge_uid",
+          "time_bin_30m",
+          "weekday_type"
+        ]
+      },
+      {
+        "level": 2,
+        "name": "edge_peak",
+        "key": [
+          "canonical_edge_uid",
+          "peak_offpeak"
+        ]
+      },
+      {
+        "level": 3,
+        "name": "edge",
+        "key": [
+          "canonical_edge_uid"
+        ]
+      },
+      {
+        "level": 4,
+        "name": "highway_time_weekday",
+        "key": [
+          "canonical_highway",
+          "time_bin_30m",
+          "weekday_type"
+        ]
+      },
+      {
+        "level": 5,
+        "name": "highway",
+        "key": [
+          "canonical_highway"
+        ]
+      },
+      {
+        "level": 6,
+        "name": "global",
+        "key": [
+          "global"
+        ]
+      }
+    ],
+    "fallback_policy": "first_level_meeting_minimum_sample_size_else_global_if_nonempty_else_na",
+    "required_output_fields": [
+      "reference_level_used",
+      "reference_sample_size",
+      "reference_model_id",
+      "reference_fit_manifest_id"
+    ]
+  },
+  "coverage": {
+    "threshold_status": "review_candidate",
+    "minimum_direct_interval_count": 8,
+    "minimum_unique_timed_edge_count": 5,
+    "minimum_observed_time_share": 0.0,
+    "minimum_observed_distance_share": 0.0,
+    "dimension_coverage_policy": "report_not_zero_impute",
+    "required_slices": [
+      "split",
+      "date",
+      "hour",
+      "time_bin_30m",
+      "canonical_highway",
+      "canonical_edge_uid",
+      "reference_level_used",
+      "availability_reason"
+    ],
+    "required_distributions": [
+      "direct_intervals_per_order",
+      "direct_intervals_per_traversal",
+      "direct_observed_time_share_per_order",
+      "direct_observed_distance_share_per_order",
+      "observations_per_edge",
+      "observations_per_edge_time_bin",
+      "reference_sample_size",
+      "label_availability"
+    ],
+    "release_threshold_status": "review_candidate_no_scientific_release_threshold_frozen"
+  },
+  "support": {
+    "threshold_status": "review_candidate",
+    "fit_scope": "train_only",
+    "minimum_edge_observations": 20,
+    "minimum_edge_hour_observations": 5,
+    "minimum_fallback_observations": 20,
+    "fallback_order": [
+      "road_class_hour",
+      "spatial_neighbor",
+      "upper_spatial_region",
+      "global_hour"
+    ],
+    "validation_test_policy": "apply_frozen_train_support_only"
+  },
+  "preflight": {
+    "expected_order_count": 220000,
+    "expected_split_counts": {
+      "train": 160000,
+      "validation": 30000,
+      "test": 30000
+    },
+    "expected_direction_audit": {
+      "direct_observation_count": 18604112,
+      "actual_F_count": 16894460,
+      "actual_R_count": 1709652,
+      "uid_direction_mismatch_count": 711914,
+      "legacy_osm_against_count": 789379
+    },
+    "expected_unmapped_traversal_count": 956
+  },
+  "hash_and_resume": {
+    "required_input_hashes": [
+      "stage0_freeze_manifest_sha",
+      "stage0_git_commit_sha",
+      "stage0_config_sha",
+      "pbf_sha",
+      "valhalla_tiles_sha",
+      "fixed600_sample_sha",
+      "fixed600_summary_sha",
+      "source_manifest_id"
+    ],
+    "required_product_content_hashes": [
+      "order_base_sha",
+      "route_segments_sha",
+      "route_parts_sha",
+      "link_traversals_sha",
+      "link_interval_observations_sha",
+      "interval_measurements_sha",
+      "turn_movements_sha",
+      "gps_quality_sha",
+      "route_quality_sha",
+      "dynamic_quality_sha",
+      "canonical_quality_sha"
+    ],
+    "required_product_schema_hashes": [
+      "order_base_schema_sha",
+      "route_segments_schema_sha",
+      "route_parts_schema_sha",
+      "link_traversals_schema_sha",
+      "link_interval_observations_schema_sha",
+      "interval_measurements_schema_sha",
+      "turn_movements_schema_sha",
+      "gps_quality_schema_sha",
+      "route_quality_schema_sha",
+      "dynamic_quality_schema_sha",
+      "canonical_quality_schema_sha"
+    ],
+    "required_stage1_hashes": [
+      "stage1_code_content_sha",
+      "stage1_config_sha",
+      "model_id",
+      "model_file_hashes"
+    ],
+    "single_identity_invariants": [
+      "one_stage0_code_identity",
+      "one_stage0_config_sha",
+      "one_tiles_sha",
+      "clean_stage0_worktree",
+      "stage1_executable_content_hash_matches"
+    ],
+    "resume": {
+      "unit": "split_date_bucket",
+      "skip_condition": "manifest_status_pass_and_all_output_hashes_match",
+      "write_policy": "atomic_temp_then_rename",
+      "partial_output_policy": "fail_closed_require_explicit_operator_cleanup",
+      "completed_bucket_mutation": "forbidden"
+    }
+  },
+  "outputs": {
+    "partition_layout": "split={split}/date={date}/bucket={bucket}/{product}.parquet",
+    "interval_labels": {
+      "primary_key": [
+        "split",
+        "date",
+        "order_id",
+        "gps_interval_id"
+      ],
+      "required_fields": [
+        "split",
+        "date",
+        "order_id",
+        "gps_interval_id",
+        "traversal_id",
+        "route_sequence",
+        "canonical_edge_uid",
+        "observed_directed_edge_uid",
+        "observed_from_node",
+        "observed_to_node",
+        "observed_direction",
+        "synthetic_reverse_edge",
+        "osm_direction_disagreement",
+        "canonical_mapping_available",
+        "mapping_status",
+        "osm_oneway",
+        "canonical_highway",
+        "allocated_distance_m",
+        "route_part_distance_m",
+        "interval_start_time",
+        "interval_end_time",
+        "observed_travel_time_s",
+        "observed_distance_m",
+        "observed_speed_mps",
+        "measurement_source",
+        "label_valid",
+        "interval_duration_s",
+        "previous_direct_gps_interval_id",
+        "adjacent_gap_s",
+        "speed_delta_mps",
+        "acceleration_mps2",
+        "is_low_speed",
+        "is_stop",
+        "kinematic_sequence_valid",
+        "lcs_component_available",
+        "lcs_component_unavailable_reason",
+        "label_schema_version"
+      ]
+    },
+    "traversal_labels": {
+      "primary_key": [
+        "split",
+        "date",
+        "order_id",
+        "traversal_id"
+      ],
+      "required_fields": [
+        "split",
+        "date",
+        "order_id",
+        "traversal_id",
+        "route_sequence",
+        "canonical_edge_uid",
+        "observed_directed_edge_uid",
+        "observed_from_node",
+        "observed_to_node",
+        "observed_direction",
+        "synthetic_reverse_edge",
+        "osm_direction_disagreement",
+        "canonical_mapping_available",
+        "mapping_status",
+        "osm_oneway",
+        "canonical_highway",
+        "direct_interval_count",
+        "direct_observed_time_s",
+        "direct_observed_distance_m",
+        "allocated_distance_m",
+        "direct_distance_coverage_share",
+        "direct_distance_exceeds_allocated",
+        "observation_window_start_time",
+        "observation_window_end_time",
+        "time_weighted_speed_mean_mps",
+        "maximum_internal_gap_s",
+        "discontinuous_direct_window",
+        "low_speed_time_share",
+        "stop_time_share",
+        "time_weighted_speed_cv",
+        "speed_cv_bounded",
+        "acceleration_pair_count",
+        "acceleration_rms_mps2",
+        "acceleration_rms_bounded",
+        "maximum_absolute_acceleration_mps2",
+        "lcs_available",
+        "lcs_unavailable_reason",
+        "lcs_raw",
+        "lcs_pct",
+        "lcs_cdf_level_used",
+        "lcs_cdf_sample_size",
+        "rts_available",
+        "rts_unavailable_reason",
+        "rts_raw",
+        "rts_pct",
+        "rts_tail_event",
+        "rts_cdf_level_used",
+        "rts_cdf_sample_size",
+        "reference_sec_per_m",
+        "excess_time_ratio",
+        "reference_level_used",
+        "reference_sample_size",
+        "reference_model_id",
+        "reference_fit_manifest_id",
+        "edge_observation_count",
+        "edge_hour_observation_count",
+        "edge_support_level",
+        "edge_hour_support_level",
+        "observed_sec_per_m",
+        "time_bin_30m",
+        "weekday_type",
+        "peak_offpeak",
+        "measurement_source",
+        "gns_available",
+        "gns_raw",
+        "gns_pct",
+        "gns_unavailable_reason",
+        "iis_available",
+        "iis_raw",
+        "iis_pct",
+        "iis_unavailable_reason",
+        "pmis_available",
+        "pmis_raw",
+        "pmis_pct",
+        "pmis_unavailable_reason",
+        "label_schema_version"
+      ]
+    },
+    "route_sequence_context": {
+      "primary_key": [
+        "split",
+        "date",
+        "order_id",
+        "route_sequence"
+      ],
+      "required_fields": [
+        "split",
+        "date",
+        "order_id",
+        "route_sequence",
+        "canonical_edge_uid",
+        "observed_directed_edge_uid",
+        "observed_from_node",
+        "observed_to_node",
+        "observed_direction",
+        "canonical_mapping_available",
+        "route_lineage_status",
+        "sequence_feature_mask",
+        "synthetic_reverse_edge",
+        "osm_direction_disagreement",
+        "mapping_status",
+        "osm_oneway",
+        "route_part_length_m",
+        "canonical_length_m",
+        "canonical_highway",
+        "road_class",
+        "bridge",
+        "tunnel"
+      ]
+    },
+    "edge_static_features": {
+      "status": "external_static_extension",
+      "primary_key": [
+        "canonical_edge_uid"
+      ],
+      "required_fields": [
+        "canonical_edge_uid",
+        "canonical_network_sha",
+        "length_m",
+        "highway",
+        "bridge",
+        "tunnel",
+        "layer",
+        "curvature",
+        "endpoint_degree",
+        "junction_complexity",
+        "gns_available",
+        "gns_raw",
+        "gns_schema_version"
+      ]
+    },
+    "movement_context": {
+      "primary_key": [
+        "split",
+        "date",
+        "order_id",
+        "movement_sequence"
+      ],
+      "required_fields": [
+        "split",
+        "date",
+        "order_id",
+        "movement_sequence",
+        "from_edge_uid",
+        "via_node",
+        "to_edge_uid",
+        "movement_source",
+        "movement_quality",
+        "iis_available",
+        "iis_unavailable_reason"
+      ]
+    },
+    "order_labels": {
+      "primary_key": [
+        "split",
+        "date",
+        "order_id"
+      ],
+      "required_fields": [
+        "split",
+        "date",
+        "order_id",
+        "lcs_available",
+        "lcs_unavailable_reason",
+        "lcs_mean",
+        "lcs_max",
+        "lcs_tail",
+        "lcs_persistence",
+        "lcs_coverage_share",
+        "rts_available",
+        "rts_unavailable_reason",
+        "rts_mean",
+        "rts_max",
+        "rts_tail",
+        "rts_persistence",
+        "rts_coverage_share",
+        "gns_available",
+        "gns_unavailable_reason",
+        "gns_mean",
+        "gns_max",
+        "gns_tail",
+        "gns_persistence",
+        "gns_coverage_share",
+        "iis_available",
+        "iis_unavailable_reason",
+        "iis_mean",
+        "iis_max",
+        "iis_tail",
+        "iis_persistence",
+        "iis_coverage_share",
+        "pmis_available",
+        "pmis_unavailable_reason",
+        "pmis_mean",
+        "pmis_max",
+        "pmis_tail",
+        "pmis_persistence",
+        "pmis_coverage_share",
+        "all_dimension_mask",
+        "valid_core_dimension_count",
+        "core_composition_signature",
+        "composition_signature",
+        "core_composite_status"
+      ],
+      "composite_output_policy": "status_only_numeric_composite_fields_forbidden"
+    },
+    "order_label_quality": {
+      "primary_key": [
+        "split",
+        "date",
+        "order_id"
+      ],
+      "required_fields": [
+        "split",
+        "date",
+        "order_id",
+        "direct_interval_count",
+        "unique_timed_edge_count",
+        "direct_observed_time_s",
+        "direct_observed_distance_m",
+        "order_duration_s",
+        "route_distance_m",
+        "observed_time_share",
+        "observed_distance_share",
+        "observed_time_exceeds_order_duration",
+        "observed_distance_exceeds_route_distance",
+        "direct_coverage_pass",
+        "lcs_missing_reason",
+        "rts_missing_reason",
+        "gns_missing_reason",
+        "lcs_coverage_share",
+        "rts_coverage_share",
+        "gns_coverage_share",
+        "iis_coverage_share",
+        "pmis_coverage_share"
+      ]
+    },
+    "reference_models": {
+      "required_metadata": [
+        "model_id",
+        "fit_dates",
+        "source_manifest_id",
+        "source_schema_sha",
+        "cohort_definition",
+        "cohort_fallback",
+        "global_support_count",
+        "maximum_histogram_bin_width",
+        "train_reference_application",
+        "validation_test_reference_application",
+        "raw_cdf_application",
+        "timezone",
+        "files"
+      ]
+    },
+    "manifest": {
+      "artifacts": [
+        "model_root/model_manifest.json",
+        "split/date/bucket/manifest.json",
+        "stage1_v3_summary.json",
+        "stage1_v3_audit.json"
+      ],
+      "audit_report_is_written_by": [
+        "verify --report"
+      ]
+    }
+  },
+  "acceptance": {
+    "input": [
+      "all_expected_dates_present",
+      "no_illegal_split_date",
+      "all_primary_keys_unique",
+      "all_foreign_keys_valid",
+      "no_cross_split_order_overlap",
+      "uniform_product_schemas",
+      "processing_exception_count_zero"
+    ],
+    "direct_observation": [
+      "all_rows_satisfy_direct_predicate",
+      "duplicate_gps_interval_allocation_zero",
+      "orphan_traversal_reference_zero",
+      "canonical_edge_mismatch_zero",
+      "non_direct_observed_time_violation_zero",
+      "interval_to_traversal_time_error_within_tolerance",
+      "interval_to_traversal_distance_error_within_tolerance"
+    ],
+    "missingness": [
+      "missing_evidence_with_nonmissing_dynamic_label_zero",
+      "non_direct_zero_imputation_zero",
+      "iis_nonmissing_severity_zero",
+      "pmis_nonmissing_value_zero",
+      "gns_nonmissing_value_zero_in_dynamic_pipeline",
+      "external_gns_consistency_audit_required_only_when_extension_is_built"
+    ],
+    "leakage": [
+      "reference_fit_dates_are_train_only",
+      "validation_rows_in_fit_zero",
+      "test_rows_in_fit_zero",
+      "label_temporality_declared_retrospective_post_trip"
+    ],
+    "release": "candidate_pass_does_not_equal_scientific_validation_or_frozen_release"
+  }
+}
