@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 import pandas as pd
 import requests
 
@@ -85,7 +86,13 @@ class ValhallaMatcher:
         else:
             raise ValueError(f"unsupported Valhalla backend: {self.backend}")
 
-    def _request(self, points: pd.DataFrame, search_radius_m: float) -> dict[str, Any]:
+    def _request(
+        self,
+        points: pd.DataFrame,
+        search_radius_m: float,
+        *,
+        ignore_oneways: bool | None = None,
+    ) -> dict[str, Any]:
         lon_column = "matching_lon" if "matching_lon" in points else "lon"
         lat_column = "matching_lat" if "matching_lat" in points else "lat"
         shape = [
@@ -94,9 +101,10 @@ class ValhallaMatcher:
                 [lon_column, lat_column, "timestamp"]
             ].itertuples(index=False, name=None)
         ]
-        return {
+        costing = str(self.config.get("costing", "auto"))
+        request = {
             "shape": shape,
-            "costing": str(self.config.get("costing", "auto")),
+            "costing": costing,
             "shape_match": str(self.config.get("shape_match", "map_snap")),
             "use_timestamps": True,
             "trace_options": {
@@ -109,6 +117,11 @@ class ValhallaMatcher:
             },
             "filters": {"action": "include", "attributes": TRACE_ATTRIBUTES},
         }
+        if ignore_oneways is None:
+            ignore_oneways = bool(self.config.get("ignore_oneways", False))
+        if ignore_oneways:
+            request["costing_options"] = {costing: {"ignore_oneways": True}}
+        return request
 
     def _call(self, request: dict[str, Any]) -> dict[str, Any]:
         if self.backend == "python":
@@ -147,9 +160,9 @@ class ValhallaMatcher:
             "discontinuity_count": int(discontinuities),
         }
 
-    def match_order(self, points: pd.DataFrame) -> dict[str, Any]:
-        if len(points) < 2:
-            raise ValueError("Valhalla requires at least two trace points")
+    def _match_candidate(
+        self, points: pd.DataFrame, *, ignore_oneways: bool
+    ) -> dict[str, Any]:
         radii = [float(self.config.get("search_radius_m", 80))]
         retry_radius = float(self.config.get("retry_search_radius_m", radii[0]))
         if bool(self.config.get("controlled_retry", True)) and retry_radius > radii[0]:
@@ -158,7 +171,9 @@ class ValhallaMatcher:
         final_request: dict[str, Any] = {}
         last_error: Exception | None = None
         for attempt, radius in enumerate(radii):
-            final_request = self._request(points, radius)
+            final_request = self._request(
+                points, radius, ignore_oneways=ignore_oneways
+            )
             try:
                 response = self._call(final_request)
                 counts = self._response_counts(response)
@@ -199,6 +214,113 @@ class ValhallaMatcher:
             error_message=str(last_error),
             soft_timeout_exceeded=elapsed_ms > self.timeout_s * 1000,
         ).as_dict()
+
+    @staticmethod
+    def _candidate_quality(result: dict[str, Any]) -> dict[str, float | int]:
+        response = result.get("raw_response") or {}
+        edges = list(response.get("edges") or [])
+        topology_gaps = 0
+        for left, right in zip(edges, edges[1:]):
+            left_end = (left.get("end_node") or {}).get("node_id")
+            right_begin = right.get("node_id")
+            if (
+                left_end is None
+                or right_begin is None
+                or int(left_end) != int(right_begin)
+            ):
+                topology_gaps += 1
+        distances = pd.to_numeric(
+            pd.Series(
+                [
+                    point.get("distance_from_trace_point")
+                    for point in response.get("matched_points") or []
+                    if str(point.get("type", "unmatched")) != "unmatched"
+                ]
+            ),
+            errors="coerce",
+        ).dropna()
+        return {
+            "topology_gaps": topology_gaps,
+            "discontinuities": int(result.get("discontinuity_count", 0) or 0),
+            "snap_p90_m": (
+                float(distances.quantile(0.90)) if len(distances) else float("inf")
+            ),
+            "snap_max_m": float(distances.max()) if len(distances) else float("inf"),
+        }
+
+    def _candidate_is_risky(self, quality: dict[str, float | int]) -> bool:
+        return bool(
+            int(quality["topology_gaps"]) > 0
+            or int(quality["discontinuities"]) > 0
+            or float(quality["snap_p90_m"])
+            > float(self.config.get("oneway_compare_snap_p90_m", 12.0))
+            or float(quality["snap_max_m"])
+            > float(self.config.get("oneway_compare_snap_max_m", 40.0))
+        )
+
+    def _select_candidate(
+        self,
+        preferred: dict[str, Any],
+        alternative: dict[str, Any],
+    ) -> tuple[dict[str, Any], str]:
+        preferred_quality = self._candidate_quality(preferred)
+        alternative_quality = self._candidate_quality(alternative)
+        preferred_ok = preferred.get("status") == "success"
+        alternative_ok = alternative.get("status") == "success"
+        if preferred_ok != alternative_ok:
+            return (
+                (preferred, "preferred") if preferred_ok else (alternative, "alternative")
+            )
+        for key in ("topology_gaps", "discontinuities"):
+            left = int(preferred_quality[key])
+            right = int(alternative_quality[key])
+            if left != right:
+                return (
+                    (preferred, "preferred")
+                    if left < right
+                    else (alternative, "alternative")
+                )
+        minimum_improvement = float(
+            self.config.get("oneway_selection_minimum_snap_improvement_m", 2.0)
+        )
+        preferred_snap = float(preferred_quality["snap_p90_m"])
+        alternative_snap = float(alternative_quality["snap_p90_m"])
+        if (
+            np.isfinite(alternative_snap)
+            and alternative_snap + minimum_improvement < preferred_snap
+        ):
+            return alternative, "alternative"
+        return preferred, "preferred"
+
+    def match_order(self, points: pd.DataFrame) -> dict[str, Any]:
+        if len(points) < 2:
+            raise ValueError("Valhalla requires at least two trace points")
+        configured_ignore = bool(self.config.get("ignore_oneways", False))
+        preferred = self._match_candidate(
+            points, ignore_oneways=configured_ignore
+        )
+        compared = False
+        selected_label = "preferred"
+        chosen = preferred
+        strategy = str(self.config.get("oneway_candidate_selection", "disabled"))
+        preferred_quality = self._candidate_quality(preferred)
+        if strategy == "compare_on_risk" and self._candidate_is_risky(
+            preferred_quality
+        ):
+            compared = True
+            alternative = self._match_candidate(
+                points, ignore_oneways=not configured_ignore
+            )
+            chosen, selected_label = self._select_candidate(preferred, alternative)
+        chosen = dict(chosen)
+        chosen["oneway_candidate_compared"] = compared
+        chosen["selected_ignore_oneways"] = bool(
+            configured_ignore
+            if selected_label == "preferred"
+            else not configured_ignore
+        )
+        chosen["configured_ignore_oneways"] = configured_ignore
+        return chosen
 
     def match_batch(
         self, orders: list[pd.DataFrame] | tuple[pd.DataFrame, ...]

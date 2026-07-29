@@ -18,6 +18,8 @@ import psutil
 
 from .canonical_mapper import CanonicalEdgeMapper
 from .config import Stage0V6Config
+from .eligibility import evaluate_modeling_eligibility
+from .final_quality import CanonicalGeometryStore, build_final_quality
 from .parser import parse_trace_attributes
 from .preprocess import preprocess_order
 from .products import build_order_products
@@ -28,6 +30,7 @@ PRODUCTS = (
     "matched_points",
     "route_parts",
     "link_traversals",
+    "link_interval_observations",
     "turn_movements",
     "unresolved_intervals",
     "interval_measurements",
@@ -38,6 +41,10 @@ PRODUCTS = (
     "performance",
     "subtrace_mapping",
     "preprocess_breaks",
+    "modeling_eligibility",
+    "route_segments",
+    "point_route_distances",
+    "final_quality",
 )
 
 
@@ -155,6 +162,8 @@ def _order_base(
     products: dict[str, pd.DataFrame],
     quality: dict[str, Any],
     match_metrics: dict[str, Any],
+    eligibility: dict[str, Any],
+    final_quality: dict[str, Any],
 ) -> pd.DataFrame:
     route_parts = products["route_parts"]
     return pd.DataFrame(
@@ -181,15 +190,33 @@ def _order_base(
                     quality["raw_order_gps_distance_m"]
                 ),
                 "matched_distance_m": float(quality["route_distance_m"]),
-                "matching_mode": "valhalla_trace_attributes",
+                "matching_mode": (
+                    "valhalla_trace_attributes"
+                    if eligibility["modeling_eligible"]
+                    else "excluded_low_information"
+                ),
                 "matching_confidence": float(quality["matched_interval_share"]),
                 "route_quality": quality["route_quality"],
                 "dynamic_measurement_quality": quality[
                     "dynamic_measurement_quality"
                 ],
+                "gps_status": final_quality["gps_status"],
+                "route_status": final_quality["route_status"],
+                "dynamic_status": final_quality["dynamic_status"],
+                "canonical_status": final_quality["canonical_status"],
                 "quality_reasons": quality["quality_reasons"],
                 "backend": match_metrics.get("backend"),
                 "retry_count": int(match_metrics.get("retry_count", 0)),
+                "modeling_eligible": bool(eligibility["modeling_eligible"]),
+                "modeling_exclusion_reasons": eligibility[
+                    "modeling_exclusion_reasons"
+                ],
+                "selected_ignore_oneways_count": int(
+                    match_metrics.get("selected_ignore_oneways_count", 0)
+                ),
+                "oneway_candidate_compared_count": int(
+                    match_metrics.get("oneway_candidate_compared_count", 0)
+                ),
             }
         ]
     )
@@ -217,6 +244,7 @@ def run_fixed_sample(
         actor_init_ms = 0.0
     mapper_started = time.perf_counter()
     mapper = CanonicalEdgeMapper.from_parquet(config.path("canonical_edges"))
+    geometry_store = CanonicalGeometryStore(config.path("canonical_edges"))
     mapper_init_ms = (time.perf_counter() - mapper_started) * 1000
 
     runtime = config.section("runtime")
@@ -232,6 +260,9 @@ def run_fixed_sample(
     route_quality_frames: list[pd.DataFrame] = []
     dynamic_quality_frames: list[pd.DataFrame] = []
     performance_frames: list[pd.DataFrame] = []
+    eligibility_frames: list[pd.DataFrame] = []
+    final_quality_frames: list[pd.DataFrame] = []
+    accounting_frames: list[pd.DataFrame] = []
     snap_values: list[float] = []
     bucket_peak_values: list[float] = []
 
@@ -265,19 +296,31 @@ def run_fixed_sample(
                     "discontinuity_count": 0,
                     "retry_count": 0,
                     "response_ms": 0.0,
+                    "oneway_candidate_compared_count": 0,
+                    "selected_ignore_oneways_count": 0,
                 }
                 prep = None
+                eligibility = None
+                final_result = None
                 try:
                     started = time.perf_counter()
                     prep = preprocess_order(raw_order, **config.section("preprocess"))
                     preprocess_ms = (time.perf_counter() - started) * 1000
                     clean = prep.points
+                    eligibility = evaluate_modeling_eligibility(
+                        clean,
+                        prep.metrics,
+                        **config.section("modeling_eligibility"),
+                    )
                     matched_frames: list[pd.DataFrame] = []
                     route_frames: list[pd.DataFrame] = []
                     for subtrace_id, subtrace in clean.groupby(
                         "subtrace_id", sort=False
                     ):
-                        usable = bool(subtrace.usable_subtrace.iloc[0])
+                        usable = bool(
+                            eligibility["modeling_eligible"]
+                            and subtrace.usable_subtrace.iloc[0]
+                        )
                         if usable:
                             started = time.perf_counter()
                             match_result = matcher.match_order(
@@ -298,6 +341,24 @@ def run_fixed_sample(
                                     match_result.get(key, 0) or 0
                                 )
                             raw_response = match_result.get("raw_response") or {}
+                            match_metrics_total[
+                                "oneway_candidate_compared_count"
+                            ] += int(
+                                bool(
+                                    match_result.get(
+                                        "oneway_candidate_compared", False
+                                    )
+                                )
+                            )
+                            match_metrics_total[
+                                "selected_ignore_oneways_count"
+                            ] += int(
+                                bool(
+                                    match_result.get(
+                                        "selected_ignore_oneways", False
+                                    )
+                                )
+                            )
                             if match_result.get("status") == "error":
                                 exception_message = match_result.get("error_message")
                             if raw_samples_remaining > 0 and raw_response:
@@ -362,6 +423,15 @@ def run_fixed_sample(
                         products["interval_accounting"],
                         config.section("quality"),
                     )
+                    final_result = build_final_quality(
+                        clean,
+                        matched_points,
+                        products["route_parts"],
+                        products["interval_measurements"],
+                        geometry_store,
+                        eligibility,
+                        config.section("final_quality"),
+                    )
                     quality_ms = (time.perf_counter() - started) * 1000
                 except Exception as exc:
                     processing_exceptions += 1
@@ -372,6 +442,12 @@ def run_fixed_sample(
                             raw_order, **config.section("preprocess")
                         )
                     clean = prep.points
+                    if eligibility is None:
+                        eligibility = evaluate_modeling_eligibility(
+                            clean,
+                            prep.metrics,
+                            **config.section("modeling_eligibility"),
+                        )
                     matched_frames = []
                     for subtrace_id, subtrace in clean.groupby(
                         "subtrace_id", sort=False
@@ -406,17 +482,33 @@ def run_fixed_sample(
                         products["interval_accounting"],
                         config.section("quality"),
                     )
+                    final_result = build_final_quality(
+                        clean,
+                        matched_points,
+                        products["route_parts"],
+                        products["interval_measurements"],
+                        geometry_store,
+                        eligibility,
+                        config.section("final_quality"),
+                    )
 
                 dated_products = {
                     "matched_points": matched_points,
                     "route_parts": products["route_parts"],
                     "link_traversals": products["link_traversals"],
+                    "link_interval_observations": products[
+                        "link_interval_observations"
+                    ],
                     "turn_movements": products["turn_movements"],
                     "unresolved_intervals": products["unresolved_intervals"],
                     "interval_measurements": products["interval_measurements"],
                     "interval_accounting": products["interval_accounting"],
                     "subtrace_mapping": prep.mapping,
                     "preprocess_breaks": prep.preprocess_breaks,
+                    "modeling_eligibility": pd.DataFrame([eligibility]),
+                    "route_segments": final_result.route_segments,
+                    "point_route_distances": final_result.point_route_distances,
+                    "final_quality": pd.DataFrame([final_result.order_quality]),
                 }
                 for product, frame in dated_products.items():
                     output_frame = frame.copy()
@@ -435,6 +527,8 @@ def run_fixed_sample(
                         products,
                         {**route_quality, **dynamic_quality},
                         match_metrics_total,
+                        eligibility,
+                        final_result.order_quality,
                     )
                 )
                 total_ms = (time.perf_counter() - order_started) * 1000
@@ -469,6 +563,15 @@ def run_fixed_sample(
                                 "discontinuity_count"
                             ],
                             "retry_count": match_metrics_total["retry_count"],
+                            "modeling_eligible": bool(
+                                eligibility["modeling_eligible"]
+                            ),
+                            "selected_ignore_oneways_count": match_metrics_total[
+                                "selected_ignore_oneways_count"
+                            ],
+                            "oneway_candidate_compared_count": match_metrics_total[
+                                "oneway_candidate_compared_count"
+                            ],
                             "processing_exception": exception_message,
                             "rss_bytes": process.memory_info().rss,
                         }
@@ -478,6 +581,17 @@ def run_fixed_sample(
                 route_quality_frames.append(route_frame)
                 dynamic_quality_frames.append(dynamic_frame)
                 performance_frames.append(performance_frame)
+                eligibility_frames.append(
+                    pd.DataFrame([{**eligibility, "date": str(date)}])
+                )
+                final_quality_frames.append(
+                    pd.DataFrame(
+                        [{**final_result.order_quality, "date": str(date)}]
+                    )
+                )
+                accounting_frames.append(
+                    products["interval_accounting"].assign(date=str(date))
+                )
                 snap_values.extend(
                     pd.to_numeric(
                         matched_points.get(
@@ -549,6 +663,9 @@ def run_fixed_sample(
     quality = _concat(route_quality_frames)
     dynamic = _concat(dynamic_quality_frames)
     performance = _concat(performance_frames)
+    eligibility = _concat(eligibility_frames)
+    final_quality = _concat(final_quality_frames)
+    accounting = _concat(accounting_frames)
     route_counts = quality.route_quality.value_counts().to_dict()
     dynamic_counts = (
         dynamic.dynamic_measurement_quality.value_counts().to_dict()
@@ -558,12 +675,29 @@ def run_fixed_sample(
         "run_label": run_label,
         "status": (
             "PASS"
-            if len(quality) == len(sample.orders) and processing_exceptions == 0
+            if (
+                len(quality) == len(sample.orders)
+                and processing_exceptions == 0
+                and bool(accounting.time_conservation_valid.fillna(False).all())
+                and bool(accounting.distance_conservation_valid.fillna(False).all())
+                and int(accounting.duplicate_interval_allocation_count.sum()) == 0
+                and int(
+                    accounting.non_direct_observed_time_violation_count.sum()
+                )
+                == 0
+                and int(accounting.traversal_duplicate_distance_count.sum()) == 0
+            )
             else "FAIL"
         ),
         "sample_order_sha256": sample.sample_sha256,
         "input_orders": int(len(sample.orders)),
         "output_orders": int(len(quality)),
+        "modeling_eligible_orders": int(
+            eligibility.modeling_eligible.fillna(False).sum()
+        ),
+        "excluded_low_information_orders": int(
+            (~eligibility.modeling_eligible.fillna(False)).sum()
+        ),
         "accounting_pass": len(quality) == len(sample.orders),
         "processing_exception_count": processing_exceptions,
         "quality_counts": {
@@ -572,12 +706,49 @@ def run_fixed_sample(
         "dynamic_quality_counts": {
             str(key): int(value) for key, value in dynamic_counts.items()
         },
+        "gps_status_counts": {
+            str(key): int(value)
+            for key, value in final_quality.gps_status.value_counts().items()
+        },
+        "route_status_counts": {
+            str(key): int(value)
+            for key, value in final_quality.route_status.value_counts().items()
+        },
+        "dynamic_status_counts": {
+            str(key): int(value)
+            for key, value in final_quality.dynamic_status.value_counts().items()
+        },
+        "canonical_status_counts": {
+            str(key): int(value)
+            for key, value in final_quality.canonical_status.value_counts().items()
+        },
+        "time_conservation_failure_count": int(
+            (~accounting.time_conservation_valid.fillna(False)).sum()
+        ),
+        "distance_conservation_failure_count": int(
+            (~accounting.distance_conservation_valid.fillna(False)).sum()
+        ),
+        "duplicate_interval_allocation_count": int(
+            accounting.duplicate_interval_allocation_count.fillna(0).sum()
+        ),
+        "non_direct_observed_time_violation_count": int(
+            accounting.non_direct_observed_time_violation_count.fillna(0).sum()
+        ),
+        "traversal_duplicate_distance_count": int(
+            accounting.traversal_duplicate_distance_count.fillna(0).sum()
+        ),
         "complete_match_orders": int(quality.matched_point_share.eq(1.0).sum()),
         "partial_match_orders": int(
             quality.matched_point_share.between(0, 1, inclusive="neither").sum()
         ),
         "successful_reconstruction_orders": int(
             quality.successful_reconstruction.fillna(False).sum()
+        ),
+        "eligible_successful_reconstruction_orders": int(
+            (
+                quality.successful_reconstruction.fillna(False)
+                & eligibility.modeling_eligible.fillna(False).reset_index(drop=True)
+            ).sum()
         ),
         "no_valid_route_orders": int(
             (~quality.successful_reconstruction.fillna(False)).sum()
@@ -625,9 +796,6 @@ def run_fixed_sample(
         ),
         "mean_valid_timed_traversal_count": float(
             dynamic.valid_timed_traversal_count.mean()
-        ),
-        "time_conservation_failure_count": int(
-            (~dynamic.time_conservation_valid.fillna(False)).sum()
         ),
         "timestamp_anchor_failure_order_count": int(
             (~dynamic.timestamp_anchor_valid.fillna(False)).sum()

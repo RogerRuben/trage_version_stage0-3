@@ -33,6 +33,7 @@ ROUTE_PART_COLUMNS = [
     "order_id",
     "subtrace_id",
     "path_id",
+    "valhalla_path_id",
     "route_sequence",
     "valhalla_edge_index",
     "valhalla_edge_id",
@@ -52,6 +53,7 @@ ROUTE_PART_COLUMNS = [
     "engine_allocated_travel_time_s",
     "is_interpolated",
     "route_source",
+    "valhalla_topology_gap_before",
 ]
 
 
@@ -138,13 +140,25 @@ def parse_trace_attributes(
     paths = [raw, *list(raw.get("alternate_paths") or [])]
     route_rows: list[dict[str, Any]] = []
     route_sequence = 0
-    for path_id, path in enumerate(paths):
+    normalized_path_id = 0
+    primary_edge_components: dict[int, int] = {}
+    for valhalla_path_id, path in enumerate(paths):
         if not isinstance(path, dict):
             continue
         previous_elapsed = 0.0
+        previous_end_node = None
         for edge_index, edge in enumerate(path.get("edges") or []):
             edge_id, way_id, begin_node, end_node = _edge_identifiers(edge)
-            observed = path_id == 0 and edge_index in actual_matched_edges
+            topology_gap_before = (
+                edge_index > 0
+                and previous_end_node is not None
+                and begin_node is not None
+                and int(previous_end_node) != int(begin_node)
+            )
+            if topology_gap_before:
+                normalized_path_id += 1
+                previous_elapsed = 0.0
+            observed = valhalla_path_id == 0 and edge_index in actual_matched_edges
             elapsed = pd.to_numeric(
                 pd.Series([(edge.get("end_node") or {}).get("elapsed_time")]),
                 errors="coerce",
@@ -160,7 +174,8 @@ def parse_trace_attributes(
                 {
                     "order_id": str(order_id),
                     "subtrace_id": str(subtrace_id),
-                    "path_id": path_id,
+                    "path_id": normalized_path_id,
+                    "valhalla_path_id": valhalla_path_id,
                     "route_sequence": route_sequence,
                     "valhalla_edge_index": edge_index,
                     "valhalla_edge_id": str(edge_id) if edge_id is not None else pd.NA,
@@ -184,8 +199,39 @@ def parse_trace_attributes(
                     "engine_allocated_travel_time_s": np.nan,
                     "is_interpolated": not observed,
                     "route_source": "observed" if observed else "inferred",
+                    "valhalla_topology_gap_before": topology_gap_before,
                 }
             )
+            if valhalla_path_id == 0:
+                primary_edge_components[edge_index] = normalized_path_id
+            previous_end_node = end_node
             route_sequence += 1
+        normalized_path_id += 1
     route_parts = pd.DataFrame(route_rows, columns=ROUTE_PART_COLUMNS)
+
+    # A graph discontinuity is a hard boundary even when Valhalla omitted its
+    # matched-point flags. Mark both observations around the boundary so the
+    # interval product cannot imply a direct link transition across a gap.
+    previous_point_index = None
+    previous_component = None
+    for point_index, edge_index in enumerate(matched_points.edge_index):
+        if pd.isna(edge_index):
+            continue
+        component = primary_edge_components.get(int(edge_index))
+        if (
+            previous_point_index is not None
+            and component is not None
+            and previous_component is not None
+            and component != previous_component
+        ):
+            matched_points.loc[
+                previous_point_index,
+                ["route_discontinuity", "end_route_discontinuity"],
+            ] = True
+            matched_points.loc[
+                point_index,
+                ["route_discontinuity", "begin_route_discontinuity"],
+            ] = True
+        previous_point_index = point_index
+        previous_component = component
     return matched_points, route_parts

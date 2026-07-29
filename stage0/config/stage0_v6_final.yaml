@@ -1,12 +1,16 @@
 schema_version: stage0_v6_valhalla.1
 
 paths:
+  raw_root: D:/pycodes/didi_xian_raw
+  archive: D:/pycodes/didi_xian_raw/22-4-8.rar
+  seven_zip: C:/Program Files/7-Zip/7z.exe
   pbf: D:/pycodes/didi_xian_raw/map_data/xian_roadmap_update.osm.pbf
   valhalla_data: D:/pycodes/didi_xian_raw/valhalla_data
   valhalla_config: D:/pycodes/didi_xian_raw/valhalla_data/valhalla.json
   valhalla_tiles: D:/pycodes/didi_xian_raw/valhalla_data/tiles
-  output: stage0/output_v6
-  work: stage0/work_v6
+  output: stage0/output_v6/final600
+  work: stage0/work_v6_final
+  stage1_input: stage1/input_v1
   fixed_sample_points: D:/pycodes/didi_xian_raw/.worktrees/stage0-v5/stage0/work_v5/sampled_points/orders=200__dates=31ff44387df7
   fixed_sample_manifest: D:/pycodes/didi_xian_raw/.worktrees/stage0-v5/stage0/output_v5/manifests/sampling_runs/orders=200__dates=31ff44387df7/sampling_manifest.parquet
   canonical_edges: D:/pycodes/didi_xian_raw/.worktrees/stage0-v5/stage0/output_v5/network/canonical_edges.parquet
@@ -89,6 +93,8 @@ final_quality:
   order_pass_minimum_buffer20_share: 0.97
   order_partial_raw_gps_p99_m: 30
   route_fail_catastrophic_outlier_gap_distance_m: 250
+  route_fail_unsupported_interval_distance_m: 250
+  gps_unresolved_gap_distance_m: 300
   inferred_corridor_minimum_points: 20
   inferred_corridor_minimum_interpolated_point_share: 0.50
   inferred_corridor_minimum_route_distance_share: 0.20
@@ -108,6 +114,57 @@ final_quality:
   parallel_fail_distance_m: 400
   parallel_uncertain_distance_m: 250
 
+stage1_core:
+  maximum_local_outlier_time_share: 0.05
+  maximum_local_outlier_distance_share: 0.05
+  minimum_valid_direct_interval_count: 8
+  minimum_unique_timed_edge_count: 5
+
+production:
+  selection_seed: 20261009
+  candidate_bucket_size: 2000
+  raw_chunk_size: 500000
+  train_dates:
+    - "20161009"
+    - "20161010"
+    - "20161011"
+    - "20161012"
+    - "20161013"
+    - "20161014"
+    - "20161015"
+    - "20161016"
+    - "20161017"
+    - "20161018"
+    - "20161019"
+    - "20161020"
+    - "20161021"
+    - "20161022"
+    - "20161023"
+    - "20161024"
+  validation_dates: ["20161025", "20161026", "20161027"]
+  test_date: "20161031"
+  train_daily_target: 10000
+  validation_daily_target: 10000
+  test_target: 30000
+  prefilter:
+    minimum_valid_points: 10
+    minimum_duration_s: 30
+    maximum_invalid_coordinate_share: 0.10
+    maximum_reverse_timestamp_share: 0.05
+    maximum_duplicate_point_share: 0.90
+    minimum_od_distance_m: 50
+    maximum_impossible_speed_interval_share: 0.50
+    impossible_speed_mps: 75
+
+fixed600_regression:
+  route_fail: [29, 32]
+  no_route_review: [13, 17, 18, 19, 20, 24, 25, 27, 28]
+  discontinuity_not_fail: [33, 34, 35, 36, 37]
+  gps_local_outlier: [4, 14, 16, 34]
+  parallel_fail_or_improved: [1, 2, 3, 7]
+  route_partial: [6]
+  route_uncertain_if_not_improved: [23]
+
 audit:
   route_buffer_m: 40
   speed_violation_mps: 50
@@ -116,12 +173,12 @@ audit:
   hard_speed_violation_count: 4
   hard_topology_violations: 5
   hard_valhalla_discontinuities: 3
-  manual_image_limit: 30
-  auto_fail_image_limit: 10
-  total_image_limit: 40
+  manual_image_limit: 600
+  auto_fail_image_limit: 600
+  total_image_limit: 600
 
 runtime:
   orders_per_bucket: 200
-  diagnostic_response_sample_count: 20
+  diagnostic_response_sample_count: 0
   manual_audit_sample_count: 100
   parquet_compression: zstd

@@ -56,6 +56,20 @@ UNRESOLVED_COLUMNS = [
     "unresolved_reason",
 ]
 
+LINK_INTERVAL_OBSERVATION_COLUMNS = [
+    "order_id",
+    "gps_interval_id",
+    "traversal_id",
+    "canonical_edge_uid",
+    "interval_start_time",
+    "interval_end_time",
+    "observed_travel_time_s",
+    "observed_distance_m",
+    "observed_speed_mps",
+    "measurement_source",
+    "label_valid",
+]
+
 
 def _empty(columns: list[str]) -> pd.DataFrame:
     return pd.DataFrame(columns=columns)
@@ -156,6 +170,34 @@ def _direct_distance(
     return max(float(right.get("step_distance_m", 0.0)), 0.0)
 
 
+def _canonical_anchor(
+    routes: list[dict[str, Any]], percent_along: float
+) -> tuple[dict[str, Any] | None, float]:
+    """Locate a Valhalla anchor on its expanded canonical chain."""
+
+    if not routes:
+        return None, float("nan")
+    source = float(routes[0].get("source_percent_along", 0.0))
+    target = float(routes[0].get("target_percent_along", 1.0))
+    span = target - source
+    if span <= 0:
+        return None, float("nan")
+    lengths = np.asarray(
+        [max(float(route.get("length_m", 0.0)), 0.0) for route in routes],
+        dtype=float,
+    )
+    total = float(lengths.sum())
+    if total <= 0:
+        return None, float("nan")
+    fraction = float(np.clip((percent_along - source) / span, 0.0, 1.0))
+    position = fraction * total
+    cumulative = np.cumsum(lengths)
+    index = int(np.searchsorted(cumulative, position, side="right"))
+    index = min(index, len(routes) - 1)
+    previous = float(cumulative[index - 1]) if index else 0.0
+    return routes[index], float(np.clip(position - previous, 0.0, lengths[index]))
+
+
 def build_order_products(
     source_points: pd.DataFrame,
     matched_points: pd.DataFrame,
@@ -173,11 +215,21 @@ def build_order_products(
     source = source_points.sort_values(
         ["timestamp", "original_point_seq"], kind="stable"
     ).reset_index(drop=True)
+    # ``path_id`` is a topology-continuous component after parsing. Keep every
+    # component of Valhalla's primary response, while still excluding true
+    # alternate paths.
+    primary_selector = route_parts.get(
+        "valhalla_path_id",
+        route_parts.get(
+            "path_id", pd.Series(index=route_parts.index, dtype=float)
+        ),
+    )
     primary_routes = route_parts.loc[
-        route_parts.get("path_id", pd.Series(index=route_parts.index, dtype=float))
-        .fillna(0)
-        .eq(0)
+        pd.to_numeric(primary_selector, errors="coerce").fillna(0).eq(0)
     ].copy()
+    for column in ("subtrace_id", "route_sequence"):
+        if column not in primary_routes:
+            primary_routes[column] = pd.Series(dtype=object)
     primary_routes.sort_values(
         ["subtrace_id", "route_sequence"], kind="stable", inplace=True
     )
@@ -318,13 +370,6 @@ def build_order_products(
                 reason = "missing_route_parts"
             elif from_edge == to_edge:
                 exact = candidates
-                canonical_count = len(
-                    {
-                        str(route.get("canonical_edge_uid"))
-                        for route in exact
-                        if pd.notna(route.get("canonical_edge_uid"))
-                    }
-                )
                 positions_valid = _finite(left.get("percent_along")) and _finite(
                     right.get("percent_along")
                 )
@@ -336,23 +381,40 @@ def build_order_products(
                     str(left["matched_point_status"]) == "matched"
                     and str(right["matched_point_status"]) == "matched"
                 )
+                left_anchor = right_anchor = None
+                left_chain_position = right_chain_position = float("nan")
+                if positions_valid:
+                    left_anchor, left_chain_position = _canonical_anchor(
+                        exact, float(left["percent_along"])
+                    )
+                    right_anchor, right_chain_position = _canonical_anchor(
+                        exact, float(right["percent_along"])
+                    )
                 if (
-                    len(exact) == 1
-                    and canonical_count == 1
-                    and endpoints_direct
+                    endpoints_direct
                     and direction_valid
+                    and left_anchor is not None
+                    and right_anchor is not None
+                    and int(left_anchor["route_sequence"])
+                    == int(right_anchor["route_sequence"])
+                    and pd.notna(left_anchor.get("canonical_edge_uid"))
                 ):
-                    route = exact[0]
+                    route = left_anchor
                     direct_sequence = int(route["route_sequence"])
-                    direct_distance = _direct_distance(left, right, route)
+                    direct_distance = max(
+                        right_chain_position - left_chain_position, 0.0
+                    )
                     source_type = "direct_observed"
-                    reason = "same_canonical_edge_gps_pair"
+                    reason = "same_canonical_chain_segment_gps_pair"
                 elif not endpoints_direct:
                     reason = "engine_interpolated_endpoint"
                 elif not direction_valid:
                     reason = "same_edge_position_backtrack"
+                elif left_anchor is not None and right_anchor is not None:
+                    source_type = "interval_supported"
+                    reason = "same_valhalla_edge_crosses_canonical_segments"
                 else:
-                    reason = "same_valhalla_edge_not_unique_canonical_edge"
+                    reason = "canonical_chain_anchor_unresolved"
             else:
                 if candidate_inferred:
                     reason = "inferred_path_between_gps_anchors"
@@ -469,6 +531,7 @@ def build_order_products(
         else {}
     )
     traversal_rows: list[dict[str, Any]] = []
+    route_sequence_to_traversal: dict[int, int] = {}
     for route in route_output.itertuples(index=False):
         link_id = (
             route.canonical_edge_uid
@@ -478,72 +541,109 @@ def build_order_products(
         assigned_intervals = direct_intervals_by_sequence.get(
             int(route.route_sequence), []
         )
-        observations = assigned_intervals or [None]
-        for observation_sequence, interval in enumerate(observations):
-            if interval is not None:
-                enter_time = interval["interval_start_time"]
-                exit_time = interval["interval_end_time"]
-                observed_time = interval["direct_observed_travel_time_s"]
-                observed_distance = interval["direct_observed_distance_m"]
-                observed_speed = (
-                    observed_distance / observed_time
-                    if observed_time > 0
+        observed_time = float(
+            sum(item["direct_observed_travel_time_s"] for item in assigned_intervals)
+        ) if assigned_intervals else np.nan
+        observed_distance = float(
+            sum(item["direct_observed_distance_m"] for item in assigned_intervals)
+        ) if assigned_intervals else np.nan
+        traversal_id = len(traversal_rows)
+        route_sequence_to_traversal[int(route.route_sequence)] = traversal_id
+        traversal_rows.append(
+            {
+                "order_id": order_id,
+                "subtrace_id": str(route.subtrace_id),
+                "path_id": getattr(route, "path_id", pd.NA),
+                "traversal_id": traversal_id,
+                "route_sequence": int(route.route_sequence),
+                "route_sequence_end": int(route.route_sequence),
+                "edge_uid": link_id,
+                "canonical_edge_uid": route.canonical_edge_uid,
+                "valhalla_edge_id": route.valhalla_edge_id,
+                "enter_time": (
+                    min(item["interval_start_time"] for item in assigned_intervals)
+                    if assigned_intervals
                     else np.nan
-                )
-                measurement_source = "direct_observed"
-                time_source = "raw_gps_interval"
-                travel_time = observed_time
-                observation_valid = True
-            else:
-                enter_time = exit_time = observed_time = observed_distance = np.nan
-                observed_speed = np.nan
-                measurement_source = route.measurement_source
-                time_source = route.time_source
-                travel_time = route.travel_time_s
-                observation_valid = bool(route.time_observation_valid)
-            traversal_rows.append(
+                ),
+                "exit_time": (
+                    max(item["interval_end_time"] for item in assigned_intervals)
+                    if assigned_intervals
+                    else np.nan
+                ),
+                "observed_travel_time_s": observed_time,
+                "engine_allocated_travel_time_s": (
+                    route.engine_allocated_travel_time_s
+                ),
+                "travel_time_s": observed_time,
+                "time_source": (
+                    "raw_gps_interval" if assigned_intervals else pd.NA
+                ),
+                "time_observation_valid": True,
+                "measurement_source": route.measurement_source,
+                "entry_position_m": getattr(route, "entry_position_m", np.nan),
+                "exit_position_m": getattr(route, "exit_position_m", np.nan),
+                "observed_distance_m": observed_distance,
+                "allocated_distance_m": float(route.length_m),
+                "observed_speed_mps": (
+                    observed_distance / observed_time
+                    if assigned_intervals and observed_time > 0
+                    else np.nan
+                ),
+                "observed_point_count": int(
+                    observed_point_counts.get(
+                        (str(route.subtrace_id), route.valhalla_edge_index), 0
+                    )
+                ),
+                "traversal_source": route.measurement_source,
+                "traversal_quality": route.mapping_status,
+                "is_interpolated": bool(route.is_interpolated),
+                "interpolated_distance_share": (
+                    1.0
+                    if route.measurement_source == "engine_interpolated"
+                    else 0.0
+                ),
+                "observed_interval_time_s": observed_time,
+                "valhalla_edge_elapsed_time_s": getattr(
+                    route, "valhalla_edge_elapsed_time_s", np.nan
+                ),
+            }
+        )
+    traversals = pd.DataFrame(traversal_rows)
+    observation_rows: list[dict[str, Any]] = []
+    for route_sequence, assigned in direct_intervals_by_sequence.items():
+        traversal_id = route_sequence_to_traversal.get(int(route_sequence))
+        if traversal_id is None:
+            continue
+        traversal = traversal_rows[traversal_id]
+        for interval in assigned:
+            observed_time = float(interval["direct_observed_travel_time_s"])
+            observed_distance = float(interval["direct_observed_distance_m"])
+            observation_rows.append(
                 {
                     "order_id": order_id,
-                    "subtrace_id": str(route.subtrace_id),
-                    "traversal_id": len(traversal_rows),
-                    "traversal_observation_sequence": observation_sequence,
-                    "route_sequence": int(route.route_sequence),
-                    "edge_uid": link_id,
-                    "canonical_edge_uid": route.canonical_edge_uid,
-                    "valhalla_edge_id": route.valhalla_edge_id,
-                    "enter_time": enter_time,
-                    "exit_time": exit_time,
+                    "gps_interval_id": int(interval["gps_interval_id"]),
+                    "traversal_id": traversal_id,
+                    "canonical_edge_uid": traversal["canonical_edge_uid"],
+                    "interval_start_time": float(interval["interval_start_time"]),
+                    "interval_end_time": float(interval["interval_end_time"]),
                     "observed_travel_time_s": observed_time,
-                    "engine_allocated_travel_time_s": (
-                        route.engine_allocated_travel_time_s
-                    ),
-                    "travel_time_s": travel_time,
-                    "time_source": time_source,
-                    "time_observation_valid": observation_valid,
-                    "measurement_source": measurement_source,
-                    "entry_position_m": getattr(route, "entry_position_m", np.nan),
-                    "exit_position_m": getattr(route, "exit_position_m", np.nan),
                     "observed_distance_m": observed_distance,
-                    "allocated_distance_m": float(route.length_m),
-                    "observed_speed_mps": observed_speed,
-                    "observed_point_count": int(
-                        observed_point_counts.get(
-                            (str(route.subtrace_id), route.valhalla_edge_index), 0
-                        )
+                    "observed_speed_mps": (
+                        observed_distance / observed_time
+                        if observed_time > 0
+                        else np.nan
                     ),
-                    "traversal_source": measurement_source,
-                    "traversal_quality": route.mapping_status,
-                    "is_interpolated": bool(route.is_interpolated),
-                    "interpolated_distance_share": (
-                        1.0 if measurement_source == "engine_interpolated" else 0.0
-                    ),
-                    "observed_interval_time_s": observed_time,
-                    "valhalla_edge_elapsed_time_s": getattr(
-                        route, "valhalla_edge_elapsed_time_s", np.nan
+                    "measurement_source": "direct_observed",
+                    "label_valid": bool(
+                        observed_time > 0
+                        and observed_distance >= 0
+                        and pd.notna(traversal["canonical_edge_uid"])
                     ),
                 }
             )
-    traversals = pd.DataFrame(traversal_rows)
+    observations = pd.DataFrame(
+        observation_rows, columns=LINK_INTERVAL_OBSERVATION_COLUMNS
+    )
 
     movement_rows: list[dict[str, Any]] = []
     directly_observed_transitions: set[tuple[int, int]] = set()
@@ -680,34 +780,51 @@ def build_order_products(
         + unresolved_time_total
         - total_time
     )
-    timed = traversals.loc[
-        pd.to_numeric(
-            traversals.get("observed_travel_time_s", pd.Series(dtype=float)),
-            errors="coerce",
-        ).notna()
-    ]
+    timed = observations.loc[observations.label_valid] if len(observations) else observations
     anchor_failures = int(
         (
-            timed.enter_time.isna()
-            | timed.exit_time.isna()
+            timed.interval_start_time.isna()
+            | timed.interval_end_time.isna()
             | (
                 (
-                    pd.to_numeric(timed.exit_time, errors="coerce")
-                    - pd.to_numeric(timed.enter_time, errors="coerce")
+                    pd.to_numeric(timed.interval_end_time, errors="coerce")
+                    - pd.to_numeric(timed.interval_start_time, errors="coerce")
                     - pd.to_numeric(timed.observed_travel_time_s, errors="coerce")
                 ).abs()
                 > 1e-6
             )
         ).sum()
     ) if len(timed) else 0
-    inferred_time_violations = int(
+    non_direct_time_violations = int(
         (
-            traversals.measurement_source.eq("engine_interpolated")
+            ~interval_frame.measurement_source.eq("direct_observed")
             & pd.to_numeric(
-                traversals.observed_travel_time_s, errors="coerce"
+                interval_frame.direct_observed_travel_time_s, errors="coerce"
             ).notna()
         ).sum()
-    ) if len(traversals) else 0
+    ) if len(interval_frame) else 0
+    duplicate_interval_allocations = int(
+        observations.gps_interval_id.duplicated(keep=False).sum()
+    ) if len(observations) else 0
+    unresolved_ids = set(
+        interval_frame.loc[
+            interval_frame.measurement_source.eq("unresolved"),
+            "gps_interval_id",
+        ].astype(int)
+    )
+    unresolved_duplicate_allocations = int(
+        observations.gps_interval_id.astype(int).isin(unresolved_ids).sum()
+    ) if len(observations) else 0
+    route_distance_total = float(
+        pd.to_numeric(route_output.length_m, errors="coerce").fillna(0).sum()
+    )
+    traversal_distance_total = float(
+        pd.to_numeric(
+            traversals.get("allocated_distance_m", pd.Series(dtype=float)),
+            errors="coerce",
+        ).fillna(0).sum()
+    )
+    traversal_distance_error = traversal_distance_total - route_distance_total
     raw_distance = float(
         pd.to_numeric(source.step_distance_m, errors="coerce").fillna(0).sum()
     )
@@ -750,11 +867,35 @@ def build_order_products(
                 "time_conservation_valid": abs(conservation_error) <= 1e-6,
                 "timestamp_anchor_failure_count": anchor_failures,
                 "timestamp_anchor_valid": anchor_failures == 0,
-                "unresolved_duplicate_allocation_count": 0,
-                "inferred_edge_observed_time_violation_count": inferred_time_violations,
-                "valid_timed_traversal_count": int(len(timed)),
+                "duplicate_interval_allocation_count": duplicate_interval_allocations,
+                "non_direct_observed_time_violation_count": non_direct_time_violations,
+                "unresolved_duplicate_allocation_count": unresolved_duplicate_allocations,
+                "inferred_edge_observed_time_violation_count": non_direct_time_violations,
+                "traversal_distance_conservation_error_m": traversal_distance_error,
+                "distance_conservation_valid": abs(traversal_distance_error) <= 1e-6,
+                "traversal_duplicate_distance_count": 0,
+                "valid_direct_interval_count": int(
+                    observations.label_valid.sum()
+                ) if len(observations) else 0,
+                "unique_timed_edge_count": int(
+                    observations.loc[
+                        observations.label_valid, "canonical_edge_uid"
+                    ].nunique()
+                ) if len(observations) else 0,
+                "valid_timed_traversal_count": int(
+                    observations.loc[
+                        observations.label_valid, "traversal_id"
+                    ].nunique()
+                ) if len(observations) else 0,
                 "timed_traversal_share": (
-                    float(len(timed) / len(traversals)) if len(traversals) else 0.0
+                    float(
+                        observations.loc[
+                            observations.label_valid, "traversal_id"
+                        ].nunique()
+                        / len(traversals)
+                    )
+                    if len(traversals)
+                    else 0.0
                 ),
                 "direct_observed_distance_m": direct_distance_total,
                 "raw_order_gps_distance_m": raw_distance,
@@ -766,6 +907,7 @@ def build_order_products(
     return {
         "route_parts": route_output.reset_index(drop=True),
         "link_traversals": traversals.reset_index(drop=True),
+        "link_interval_observations": observations.reset_index(drop=True),
         "turn_movements": movements.reset_index(drop=True),
         "unresolved_intervals": unresolved_frame.reset_index(drop=True),
         "interval_measurements": interval_frame.reset_index(drop=True),

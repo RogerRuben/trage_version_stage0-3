@@ -120,6 +120,7 @@ def _canonical_edges():
             "highway": ["primary"] * 5,
             "bridge": [False] * 5,
             "tunnel": [False] * 5,
+            "oneway": ["forward"] * 3 + ["both"] * 2,
         }
     )
 
@@ -173,3 +174,68 @@ def test_mapper_refuses_ambiguous_way_and_unmapped_edge():
     missing["osm_way_id"] = 999
     assert mapper.resolve(ambiguous) == ("ambiguous_mapping", [])
     assert mapper.resolve(missing) == ("unmapped", [])
+
+
+def test_parser_splits_unannounced_topology_gap_and_marks_point_boundary():
+    source = pd.DataFrame(
+        {"original_point_seq": [0, 1], "timestamp": [0, 10]}
+    )
+    raw = {
+        "edges": [
+            {
+                "id": 1,
+                "way_id": 10,
+                "node_id": 1,
+                "end_node": {"node_id": 2, "elapsed_time": 4},
+            },
+            {
+                "id": 2,
+                "way_id": 20,
+                "node_id": 9,
+                "end_node": {"node_id": 10, "elapsed_time": 10},
+            },
+        ],
+        "matched_points": [
+            {"type": "matched", "edge_index": 0},
+            {"type": "matched", "edge_index": 1},
+        ],
+    }
+    matched, routes = parse_trace_attributes(
+        raw, source, order_id="o", subtrace_id="o:000"
+    )
+    assert routes.path_id.tolist() == [0, 1]
+    assert routes.valhalla_topology_gap_before.tolist() == [False, True]
+    assert matched.route_discontinuity.tolist() == [True, True]
+    assert matched.end_route_discontinuity.tolist() == [True, False]
+    assert matched.begin_route_discontinuity.tolist() == [False, True]
+
+
+def test_mapper_maps_reverse_traversal_over_forward_oneway():
+    mapper = CanonicalEdgeMapper(_canonical_edges())
+    route = pd.DataFrame(
+        [
+            {
+                "order_id": "o",
+                "subtrace_id": "o:000",
+                "path_id": 0,
+                "route_sequence": 0,
+                "osm_way_id": 10,
+                "begin_osm_node_id": 4,
+                "end_osm_node_id": 1,
+                "forward": False,
+                "source_percent_along": 0.0,
+                "target_percent_along": 1.0,
+                "length_m": 60.0,
+            }
+        ]
+    )
+    mapped, summary = mapper.map_route_parts(route)
+    assert mapped.canonical_edge_uid.tolist() == ["10:2:F", "10:1:F", "10:0:F"]
+    assert mapped.canonical_from_node.tolist() == [4, 3, 2]
+    assert mapped.canonical_to_node.tolist() == [3, 2, 1]
+    assert mapped.canonical_traversal_direction.eq("R").all()
+    assert mapped.traversed_against_osm_oneway.all()
+    assert mapped.entry_position_m.tolist() == [30.0, 20.0, 10.0]
+    assert mapped.exit_position_m.tolist() == [0.0, 0.0, 0.0]
+    assert mapped.length_m.sum() == 60.0
+    assert summary.status_counts == {"way_and_node_mapping_reverse_oneway": 1}

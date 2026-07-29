@@ -77,6 +77,29 @@ def test_preprocess_records_spatial_jump_boundary():
     )
 
 
+def test_preprocess_marks_local_speed_spike_without_dropping_point():
+    points = pd.DataFrame(
+        {
+            "order_id": ["o"] * 7,
+            "timestamp": [0, 3, 6, 9, 12, 15, 18],
+            "lon": [108.0, 108.0002, 108.0004, 108.0012, 108.0014, 108.0016, 108.0018],
+            "lat": [34.0] * 7,
+            "point_seq": list(range(7)),
+        }
+    )
+    result = preprocess_order(
+        points,
+        coordinate_system="wgs84",
+        maximum_speed_mps=75,
+        minimum_subtrace_points=1,
+    )
+    assert len(result.points) == len(points)
+    assert result.points.gps_outlier.any()
+    assert "local_speed_acceleration_spike" in set(
+        result.points.gps_outlier_reason.dropna()
+    )
+
+
 class FakeActor:
     def __init__(self, responses):
         self.responses = iter(responses)
@@ -100,6 +123,8 @@ def test_python_actor_is_reused_and_retry_is_bounded():
     matcher = ValhallaMatcher(
         {
             "backend": "python",
+            "costing": "auto",
+            "ignore_oneways": True,
             "search_radius_m": 80,
             "retry_search_radius_m": 160,
             "controlled_retry": True,
@@ -124,6 +149,76 @@ def test_python_actor_is_reused_and_retry_is_bounded():
     assert actor.calls[0]["trace_options"]["search_radius"] == 80
     assert actor.calls[1]["trace_options"]["search_radius"] == 160
     assert actor.calls[0]["use_timestamps"] is True
+    assert actor.calls[0]["costing_options"] == {
+        "auto": {"ignore_oneways": True}
+    }
+
+
+def test_ignore_oneways_is_omitted_when_disabled():
+    actor = FakeActor([{"edges": [{"id": 1}], "matched_points": []}])
+    matcher = ValhallaMatcher(
+        {
+            "backend": "python",
+            "costing": "auto",
+            "ignore_oneways": False,
+            "controlled_retry": False,
+        },
+        actor=actor,
+    )
+    points = pd.DataFrame(
+        {
+            "timestamp": [1, 2],
+            "matching_lon": [108.0, 108.1],
+            "matching_lat": [34.0, 34.1],
+        }
+    )
+    matcher.match_order(points)
+    assert "costing_options" not in actor.calls[0]
+
+
+def test_compare_on_risk_falls_back_to_strict_candidate_when_snap_improves():
+    poor = {
+        "edges": [
+            {"id": 1, "node_id": 1, "end_node": {"node_id": 2}},
+        ],
+        "matched_points": [
+            {"type": "matched", "distance_from_trace_point": 30},
+            {"type": "matched", "distance_from_trace_point": 30},
+        ],
+    }
+    good = {
+        "edges": [
+            {"id": 2, "node_id": 1, "end_node": {"node_id": 2}},
+        ],
+        "matched_points": [
+            {"type": "matched", "distance_from_trace_point": 2},
+            {"type": "matched", "distance_from_trace_point": 2},
+        ],
+    }
+    actor = FakeActor([poor, good])
+    matcher = ValhallaMatcher(
+        {
+            "backend": "python",
+            "costing": "auto",
+            "ignore_oneways": True,
+            "oneway_candidate_selection": "compare_on_risk",
+            "controlled_retry": False,
+        },
+        actor=actor,
+    )
+    points = pd.DataFrame(
+        {
+            "timestamp": [1, 2],
+            "matching_lon": [108.0, 108.1],
+            "matching_lat": [34.0, 34.1],
+        }
+    )
+    result = matcher.match_order(points)
+    assert result["oneway_candidate_compared"] is True
+    assert result["selected_ignore_oneways"] is False
+    assert result["raw_response"]["edges"][0]["id"] == 2
+    assert actor.calls[0]["costing_options"]["auto"]["ignore_oneways"] is True
+    assert "costing_options" not in actor.calls[1]
 
 
 def test_http_client_uses_service_url_and_hard_timeout():

@@ -115,6 +115,15 @@ def test_same_edge_consecutive_gps_points_create_direct_observed_time():
     assert traversal.enter_time == 0.0
     assert traversal.exit_time == 10.0
     assert traversal.observed_travel_time_s == 10.0
+    observation = products["link_interval_observations"].iloc[0]
+    assert observation.gps_interval_id == 0
+    assert observation.traversal_id == traversal.traversal_id
+    assert observation.measurement_source == "direct_observed"
+    assert observation.label_valid
+    accounting = products["interval_accounting"].iloc[0]
+    assert accounting.duplicate_interval_allocation_count == 0
+    assert accounting.non_direct_observed_time_violation_count == 0
+    assert accounting.distance_conservation_valid
     assert products["unresolved_intervals"].empty
 
 
@@ -210,6 +219,12 @@ def test_time_categories_are_mutually_exclusive_and_conserved():
         ]
     ].notna().sum(axis=1)
     assert categories.eq(1).all()
+    assert products["link_interval_observations"].gps_interval_id.is_unique
+    assert (
+        products["link_interval_observations"].measurement_source
+        .eq("direct_observed")
+        .all()
+    )
 
 
 def test_route_quality_and_dynamic_quality_can_differ():
@@ -276,6 +291,18 @@ def test_movement_provenance_has_no_synthetic_delay():
     assert movement.movement_source == "directly_observed_transition"
     assert pd.isna(movement.movement_travel_time_s)
     assert pd.isna(movement.movement_delay_s)
+
+
+def test_primary_topology_components_are_kept_without_cross_gap_movement():
+    routes = _routes([0, 1])
+    routes["valhalla_path_id"] = [0, 0]
+    routes["path_id"] = [0, 1]
+    matched = _matched([0, 1])
+    matched["route_discontinuity"] = [True, True]
+    products = build_order_products(_source(), matched, routes)
+    assert products["route_parts"].canonical_edge_uid.tolist() == ["e0", "e1"]
+    assert products["link_traversals"].edge_uid.tolist() == ["e0", "e1"]
+    assert products["turn_movements"].empty
 
 
 def test_inferred_and_unknown_dynamic_fields_are_nan_not_zero():

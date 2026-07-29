@@ -97,6 +97,16 @@ def preprocess_order(
             wgs_lon[:-1], wgs_lat[:-1], wgs_lon[1:], wgs_lat[1:]
         )
     frame["step_distance_m"] = distances
+    next_distances = np.zeros(len(frame), dtype=float)
+    if len(frame) > 1:
+        next_distances[:-1] = distances[1:]
+    frame["next_step_distance_m"] = next_distances
+    bridge_distances = np.full(len(frame), np.nan, dtype=float)
+    if len(frame) > 2:
+        bridge_distances[1:-1] = haversine_m(
+            wgs_lon[:-2], wgs_lat[:-2], wgs_lon[2:], wgs_lat[2:]
+        )
+    frame["neighbor_bridge_distance_m"] = bridge_distances
     positive_dt = frame.time_gap_s.where(frame.time_gap_s > 0)
     frame["step_speed_mps"] = frame.step_distance_m / positive_dt
     frame["time_gap_anomaly"] = frame.time_gap_s.gt(maximum_time_gap_s).fillna(False)
@@ -104,8 +114,52 @@ def preprocess_order(
         frame.time_gap_s.le(0) & frame.step_distance_m.gt(0)
     ).fillna(False)
     frame["spatial_jump_anomaly"] = frame.step_speed_mps.gt(maximum_speed_mps).fillna(False)
+    isolated_out_and_back = (
+        frame.step_distance_m.ge(15.0)
+        & frame.next_step_distance_m.ge(15.0)
+        & frame.neighbor_bridge_distance_m.le(
+            np.maximum(
+                5.0,
+                0.30
+                * (
+                    frame.step_distance_m
+                    + frame.next_step_distance_m
+                ),
+            )
+        )
+    ).fillna(False)
+    repeated_time_move = (
+        frame.time_gap_s.le(0) & frame.step_distance_m.gt(20.0)
+    ).fillna(False)
+    local_speed_baseline = (
+        frame.step_speed_mps.rolling(5, center=True, min_periods=3).median()
+    )
+    previous_speed = frame.step_speed_mps.shift()
+    next_speed = frame.step_speed_mps.shift(-1)
+    local_speed_spike = (
+        frame.step_speed_mps.ge(20.0)
+        & frame.step_speed_mps.ge(1.60 * local_speed_baseline)
+        & (
+            (frame.step_speed_mps - previous_speed).abs().ge(7.0)
+            | (frame.step_speed_mps - next_speed).abs().ge(7.0)
+        )
+    ).fillna(False)
+    frame["gps_outlier"] = (
+        isolated_out_and_back | repeated_time_move | local_speed_spike
+    )
+    outlier_reason = pd.Series(pd.NA, index=frame.index, dtype="object")
+    outlier_reason.loc[isolated_out_and_back] = "isolated_out_and_back"
+    outlier_reason.loc[repeated_time_move] = "repeated_time_position_change"
+    outlier_reason.loc[local_speed_spike] = "local_speed_acceleration_spike"
+    frame["gps_outlier_reason"] = outlier_reason
+    outlier_boundary = frame.gps_outlier | frame.gps_outlier.shift(
+        fill_value=False
+    )
     split_before = (
-        frame.time_gap_anomaly | frame.nonpositive_time_anomaly | frame.spatial_jump_anomaly
+        frame.time_gap_anomaly
+        | frame.nonpositive_time_anomaly
+        | frame.spatial_jump_anomaly
+        | outlier_boundary
     )
     if len(split_before):
         split_before.iloc[0] = False
@@ -113,6 +167,7 @@ def preprocess_order(
     break_reason.loc[frame.time_gap_anomaly] = "preprocess_time_gap"
     break_reason.loc[frame.spatial_jump_anomaly] = "preprocess_spatial_jump"
     break_reason.loc[frame.nonpositive_time_anomaly] = "preprocess_nonpositive_time"
+    break_reason.loc[outlier_boundary] = "preprocess_gps_outlier"
     frame["preprocess_break_before"] = split_before
     frame["preprocess_break_reason"] = break_reason
     frame["subtrace_number"] = split_before.astype("int64").cumsum()
@@ -156,6 +211,7 @@ def preprocess_order(
         "time_gap_anomaly_count": int(frame.time_gap_anomaly.sum()),
         "nonpositive_time_anomaly_count": int(frame.nonpositive_time_anomaly.sum()),
         "spatial_jump_anomaly_count": int(frame.spatial_jump_anomaly.sum()),
+        "gps_outlier_count": int(frame.gps_outlier.sum()),
         "subtrace_count": int(frame.subtrace_id.nunique()) if len(frame) else 0,
         "usable_subtrace_count": len(subtraces),
         "preprocess_break_count": int(len(preprocess_breaks)),

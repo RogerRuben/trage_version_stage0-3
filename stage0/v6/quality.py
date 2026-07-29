@@ -20,6 +20,13 @@ def _sum(frame: pd.DataFrame, column: str) -> float:
     return float(pd.to_numeric(frame[column], errors="coerce").fillna(0).sum())
 
 
+def _checks_json(checks: dict[str, Any]) -> str:
+    return json.dumps(
+        {str(name): bool(passed) for name, passed in checks.items()},
+        sort_keys=True,
+    )
+
+
 def evaluate_route_quality(
     source_points: pd.DataFrame,
     matched_points: pd.DataFrame,
@@ -236,7 +243,7 @@ def evaluate_route_quality(
         "formal_analysis_eligible": quality in {"strict_core", "analysis_set"},
         "strict_evaluation_eligible": quality == "strict_core",
         "quality_reasons": "|".join(failed),
-        "quality_checks_json": json.dumps(strict_checks, sort_keys=True),
+        "quality_checks_json": _checks_json(strict_checks),
         "processing_exception": processing_exception,
     }
 
@@ -330,7 +337,7 @@ def evaluate_dynamic_measurement_quality(
         "time_conservation_valid": conservation_valid,
         "inferred_edge_observed_time_violation_count": inferred_violations,
         "unresolved_duplicate_allocation_count": duplicate_allocations,
-        "dynamic_quality_checks_json": json.dumps(strict_checks, sort_keys=True),
+        "dynamic_quality_checks_json": _checks_json(strict_checks),
     }
 
 
