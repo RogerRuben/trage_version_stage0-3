@@ -46,13 +46,13 @@ def _physical_uid(uid: str) -> str:
     return uid[:-2] if uid.endswith((":F", ":R")) else uid
 
 
-def build_directed_edge_catalog(
-    route_batches: Iterable[pd.DataFrame],
-) -> pd.DataFrame:
-    """Create real graph edges for every observed direction, including synthetic R."""
+class DirectedCatalogBuilder:
+    """Streaming conflict-checking catalog builder."""
 
-    records: dict[str, dict[str, Any]] = {}
-    for route in route_batches:
+    def __init__(self) -> None:
+        self._records: dict[str, dict[str, Any]] = {}
+
+    def update(self, route: pd.DataFrame) -> None:
         mapped = route.loc[
             route["canonical_mapping_available"].eq(True),
             [
@@ -87,9 +87,9 @@ def build_directed_edge_catalog(
                     row.osm_direction_disagreement
                 ),
             }
-            previous = records.get(uid)
+            previous = self._records.get(uid)
             if previous is None:
-                records[uid] = candidate
+                self._records[uid] = candidate
                 continue
             stable = (
                 "physical_edge_uid",
@@ -122,35 +122,71 @@ def build_directed_edge_catalog(
                 or candidate["osm_direction_disagreement"]
             )
 
-    parent: dict[int, int] = {}
+    def finalize(self) -> pd.DataFrame:
+        records = {key: dict(value) for key, value in self._records.items()}
+        parent: dict[int, int] = {}
 
-    def find(node: int) -> int:
-        parent.setdefault(node, node)
-        while parent[node] != node:
-            parent[node] = parent[parent[node]]
-            node = parent[node]
-        return node
+        def find(node: int) -> int:
+            parent.setdefault(node, node)
+            while parent[node] != node:
+                parent[node] = parent[parent[node]]
+                node = parent[node]
+            return node
 
-    def union(left: int, right: int) -> None:
-        left_root, right_root = find(left), find(right)
-        if left_root != right_root:
-            parent[max(left_root, right_root)] = min(left_root, right_root)
+        def union(left: int, right: int) -> None:
+            left_root, right_root = find(left), find(right)
+            if left_root != right_root:
+                parent[max(left_root, right_root)] = min(left_root, right_root)
 
-    for record in records.values():
-        union(record["observed_from_node"], record["observed_to_node"])
-    for record in records.values():
-        record["upper_region_id"] = str(find(record["observed_from_node"]))
+        for record in records.values():
+            union(record["observed_from_node"], record["observed_to_node"])
+        for record in records.values():
+            record["upper_region_id"] = str(
+                find(record["observed_from_node"])
+            )
 
-    catalog = pd.DataFrame(records.values(), columns=CATALOG_COLUMNS)
-    if len(catalog):
-        catalog = catalog.sort_values(
-            "observed_directed_edge_uid", kind="stable"
-        ).reset_index(drop=True)
-        catalog["observed_from_node"] = catalog["observed_from_node"].astype(
-            "Int64"
-        )
-        catalog["observed_to_node"] = catalog["observed_to_node"].astype("Int64")
-    return catalog
+        catalog = pd.DataFrame(records.values(), columns=CATALOG_COLUMNS)
+        if len(catalog):
+            catalog = catalog.sort_values(
+                "observed_directed_edge_uid", kind="stable"
+            ).reset_index(drop=True)
+            catalog["observed_from_node"] = catalog[
+                "observed_from_node"
+            ].astype("Int64")
+            catalog["observed_to_node"] = catalog["observed_to_node"].astype(
+                "Int64"
+            )
+        return catalog
+
+
+def build_directed_edge_catalog(
+    route_batches: Iterable[pd.DataFrame],
+) -> pd.DataFrame:
+    """Create real graph edges for every observed direction, including synthetic R."""
+
+    builder = DirectedCatalogBuilder()
+    for route in route_batches:
+        builder.update(route)
+    return builder.finalize()
+
+
+def catalog_region_statistics(catalog: pd.DataFrame) -> dict[str, Any]:
+    if catalog.empty:
+        return {
+            "region_count": 0,
+            "maximum_region_edge_share": 0.0,
+            "region_size_p50": 0.0,
+            "region_size_p90": 0.0,
+            "region_size_max": 0,
+        }
+    sizes = catalog.groupby("upper_region_id", sort=False).size().to_numpy()
+    return {
+        "region_count": int(len(sizes)),
+        "maximum_region_edge_share": float(sizes.max() / len(catalog)),
+        "region_size_p50": float(np.quantile(sizes, 0.50)),
+        "region_size_p90": float(np.quantile(sizes, 0.90)),
+        "region_size_max": int(sizes.max()),
+    }
 
 
 def fit_directed_support(
@@ -167,7 +203,6 @@ def fit_directed_support(
             "edge_hour",
             "road_class_hour",
             "node_hour",
-            "upper_region_hour",
             "global_hour",
         )
     }
@@ -199,9 +234,6 @@ def fit_directed_support(
                 int(edge.observed_to_node),
             }:
                 counters["node_hour"][(str(node), hour)] += count
-            counters["upper_region_hour"][
-                (str(edge.upper_region_id), hour)
-            ] += count
             counters["global_hour"][("global", hour)] += count
 
     rows = [
@@ -234,7 +266,6 @@ def fit_directed_support_from_observations(
         "observed_from_node",
         "observed_to_node",
         "road_class",
-        "upper_region_id",
     ]
     catalog = edge_catalog[catalog_columns]
     counters: dict[str, Counter[tuple[str, int]]] = {
@@ -244,7 +275,6 @@ def fit_directed_support_from_observations(
             "edge_hour",
             "road_class_hour",
             "node_hour",
-            "upper_region_hour",
             "global_hour",
         )
     }
@@ -264,25 +294,19 @@ def fit_directed_support_from_observations(
     for observations in observation_batches:
         if observations.empty:
             continue
-        samples = (
-            observations.groupby(
-                ["order_id", "traversal_id"],
-                sort=False,
-                dropna=False,
-            )
-            .agg(
-                observed_directed_edge_uid=(
-                    "observed_directed_edge_uid",
-                    "first",
-                ),
-                observation_window_start_time=("interval_start_time", "min"),
-                observation_count=("gps_interval_id", "size"),
-            )
-            .reset_index()
-        )
+        samples = observations[
+            [
+                "order_id",
+                "traversal_id",
+                "gps_interval_id",
+                "observed_directed_edge_uid",
+                "interval_start_time",
+            ]
+        ].copy()
+        samples["observation_count"] = 1
         samples["hour"] = (
             pd.to_datetime(
-                samples["observation_window_start_time"],
+                samples["interval_start_time"],
                 unit="s",
                 utc=True,
             )
@@ -310,7 +334,6 @@ def fit_directed_support_from_observations(
         for scope, key in (
             ("edge_hour", "observed_directed_edge_uid"),
             ("road_class_hour", "road_class"),
-            ("upper_region_hour", "upper_region_id"),
         ):
             grouped = (
                 samples.groupby([key, "hour"], sort=False)[
@@ -327,6 +350,7 @@ def fit_directed_support_from_observations(
                     [
                         "order_id",
                         "traversal_id",
+                        "gps_interval_id",
                         "hour",
                         "observation_count",
                         node_column,
@@ -335,7 +359,9 @@ def fit_directed_support_from_observations(
                 for node_column in ("observed_from_node", "observed_to_node")
             ],
             ignore_index=True,
-        ).drop_duplicates(["order_id", "traversal_id", "node"])
+        ).drop_duplicates(
+            ["order_id", "gps_interval_id", "node"]
+        )
         node_grouped = (
             node_samples.groupby(["node", "hour"], sort=False)[
                 "observation_count"
@@ -383,6 +409,7 @@ def apply_directed_support(
         result["edge_hour_observation_count"] = pd.Series(dtype="int64")
         result["edge_support_level"] = pd.Series(dtype="object")
         result["edge_hour_support_level"] = pd.Series(dtype="object")
+        result["directed_edge_model_scope"] = pd.Series(dtype="object")
         return result
     support = config.section("support")
     edge_minimum = int(support["minimum_edge_observations"])
@@ -403,11 +430,20 @@ def apply_directed_support(
     edge_hour_counts: list[int] = []
     edge_levels: list[str] = []
     hour_levels: list[str] = []
+    model_scopes: list[str] = []
     for row in result.itertuples(index=False):
         uid = str(row.observed_directed_edge_uid)
-        if uid not in catalog.index:
-            raise ContractError(f"label edge absent from directed graph: {uid}")
-        edge = catalog.loc[uid]
+        train_seen = uid in catalog.index
+        if train_seen:
+            edge = catalog.loc[uid]
+            road_class = str(edge.road_class)
+            from_node = int(edge.observed_from_node)
+            to_node = int(edge.observed_to_node)
+        else:
+            road_class = str(row.canonical_highway)
+            from_node = int(row.observed_from_node)
+            to_node = int(row.observed_to_node)
+        model_scopes.append("train_seen" if train_seen else "evaluation_unseen")
         hour = int(
             pd.to_datetime(
                 float(row.observation_window_start_time), unit="s", utc=True
@@ -426,25 +462,19 @@ def apply_directed_support(
             ("edge_hour", edge_hour_count),
             (
                 "road_class_hour",
-                lookup.get(("road_class_hour", str(edge.road_class), hour), 0),
+                lookup.get(("road_class_hour", road_class, hour), 0),
             ),
             (
                 "spatial_neighbor",
                 max(
                     lookup.get(
-                        ("node_hour", str(int(edge.observed_from_node)), hour),
+                        ("node_hour", str(from_node), hour),
                         0,
                     ),
                     lookup.get(
-                        ("node_hour", str(int(edge.observed_to_node)), hour),
+                        ("node_hour", str(to_node), hour),
                         0,
                     ),
-                ),
-            ),
-            (
-                "upper_spatial_region",
-                lookup.get(
-                    ("upper_region_hour", str(edge.upper_region_id), hour), 0
                 ),
             ),
             ("global_hour", lookup.get(("global_hour", "global", hour), 0)),
@@ -461,4 +491,5 @@ def apply_directed_support(
     result["edge_hour_observation_count"] = edge_hour_counts
     result["edge_support_level"] = edge_levels
     result["edge_hour_support_level"] = hour_levels
+    result["directed_edge_model_scope"] = model_scopes
     return result

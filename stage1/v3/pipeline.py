@@ -12,8 +12,11 @@ from .aggregation import aggregate_order_labels
 from .input_adapter import (
     BucketRef,
     Stage0Bucket,
+    derive_movement_direction_context,
     iter_stage0_buckets,
     load_stage0_bucket,
+    load_stage0_fit_bucket,
+    load_stage0_fit_route_parts,
 )
 from .freeze import load_stage0_freeze_manifest
 from .io import (
@@ -35,6 +38,7 @@ from .models import (
     write_model_bundle,
 )
 from .primitives import build_interval_labels, build_traversal_primitives
+from .preflight import validate_preflight_for_fit
 from .references import (
     apply_percentile_labels,
     apply_reference_labels,
@@ -203,9 +207,14 @@ def _primitive_batches(
     reference_models: Stage1V3Models | None = None,
     reference_fit_manifest_id: str | None = None,
     leave_one_out_reference: bool = False,
+    trusted_fit: bool = False,
 ) -> Iterator[pd.DataFrame]:
     for ref in refs:
-        bucket = load_stage0_bucket(ref, config)
+        bucket = (
+            load_stage0_fit_bucket(ref, config)
+            if trusted_fit
+            else load_stage0_bucket(ref, config)
+        )
         primitives = build_traversal_primitives(
             bucket.link_interval_observations,
             bucket.link_traversals,
@@ -232,6 +241,7 @@ def fit_stage1_v3(
     input_root: str | Path,
     model_root: str | Path,
     stage0_freeze_manifest: str | Path,
+    validated_preflight: str | Path,
     config: "Stage1V3Config",
     *,
     stage1_code_sha: str | None = None,
@@ -253,6 +263,17 @@ def fit_stage1_v3(
         },
     )
     _require_global_order_uniqueness(all_refs)
+    preflight_records = validate_preflight_for_fit(
+        validated_preflight,
+        input_root,
+        all_refs,
+        config,
+    )
+    validated_input_manifest_id = sha256_bytes(
+        canonical_json_bytes(
+            [preflight_records[_bucket_key(ref)] for ref in all_refs]
+        )
+    )
     upstream_identity = _single_upstream_identity(all_refs)
     freeze.validate_bucket_identity(upstream_identity)
     identities = _input_identities(all_refs)
@@ -269,6 +290,8 @@ def fit_stage1_v3(
         if (
             manifest.get("source_manifest_id") != source_id
             or manifest.get("stage1_code_sha") != code_sha
+            or manifest.get("validated_input_manifest_id")
+            != validated_input_manifest_id
             or manifest.get("upstream_identity") != upstream_identity
             or manifest.get("stage0_freeze_identity", {}).get("manifest_sha")
             != freeze.manifest_sha
@@ -279,19 +302,21 @@ def fit_stage1_v3(
         return manifest
 
     edge_catalog = build_directed_edge_catalog(
-        load_stage0_bucket(ref, config).route_parts
-        for ref in all_refs
+        load_stage0_fit_route_parts(ref)
+        for ref in refs
     )
     support = fit_directed_support_from_observations(
         (
-            load_stage0_bucket(ref, config).link_interval_observations
+            load_stage0_fit_bucket(
+                ref, config
+            ).link_interval_observations
             for ref in refs
         ),
         edge_catalog,
         config,
     )
     reference = fit_reference_histograms(
-        _primitive_batches(refs, config),
+        _primitive_batches(refs, config, trusted_fit=True),
         config,
     )
 
@@ -309,6 +334,7 @@ def fit_stage1_v3(
             reference_models=reference_shell,
             reference_fit_manifest_id=source_id,
             leave_one_out_reference=True,
+            trusted_fit=True,
         ),
         config,
     )
@@ -332,6 +358,7 @@ def fit_stage1_v3(
             "fixed600_summary_sha": freeze.manifest["fixed600_summary_sha"],
         },
         stage1_code_sha=code_sha,
+        validated_input_manifest_id=validated_input_manifest_id,
     )
     return manifest
 
@@ -370,8 +397,12 @@ def _movement_context(bucket: Stage0Bucket, ref: BucketRef) -> pd.DataFrame:
                 "order_id",
                 "movement_sequence",
                 "from_edge_uid",
+                "observed_from_directed_edge_uid",
                 "via_node",
                 "to_edge_uid",
+                "observed_to_directed_edge_uid",
+                "movement_direction_mapping_available",
+                "movement_lineage_only",
                 "movement_source",
                 "movement_quality",
                 "iis_available",
@@ -391,6 +422,10 @@ def _movement_context(bucket: Stage0Bucket, ref: BucketRef) -> pd.DataFrame:
     if missing:
         raise ContractError(f"turn_movements missing context columns: {missing}")
     result = movements[keep].copy()
+    result = derive_movement_direction_context(
+        result,
+        bucket.route_parts,
+    )
     result["iis_available"] = False
     result["iis_unavailable_reason"] = (
         "STAGE0_V6_MOVEMENT_DYNAMIC_EVIDENCE_NOT_AVAILABLE"
@@ -401,6 +436,7 @@ def _movement_context(bucket: Stage0Bucket, ref: BucketRef) -> pd.DataFrame:
 def _route_sequence_context(
     bucket: Stage0Bucket,
     ref: BucketRef,
+    models: Stage1V3Models,
 ) -> pd.DataFrame:
     columns = [
         "order_id",
@@ -427,6 +463,21 @@ def _route_sequence_context(
     result = bucket.route_parts[columns].rename(
         columns={"length_m": "route_part_length_m"}
     )
+    train_edges = set(
+        models.support.edge_catalog["observed_directed_edge_uid"].astype(str)
+    )
+    mapped = result["observed_directed_edge_uid"].notna()
+    result["directed_edge_model_scope"] = "unmapped"
+    result.loc[
+        mapped
+        & result["observed_directed_edge_uid"].astype(str).isin(train_edges),
+        "directed_edge_model_scope",
+    ] = "train_seen"
+    result.loc[
+        mapped
+        & ~result["observed_directed_edge_uid"].astype(str).isin(train_edges),
+        "directed_edge_model_scope",
+    ] = "evaluation_unseen"
     return _with_partition(result, ref)
 
 
@@ -593,7 +644,9 @@ def _transform_bucket(
     return {
         "interval_labels": interval_labels,
         "traversal_labels": traversal_labels,
-        "route_sequence_context": _route_sequence_context(bucket, ref),
+        "route_sequence_context": _route_sequence_context(
+            bucket, ref, models
+        ),
         "movement_context": _movement_context(bucket, ref),
         "order_labels": order_labels,
         "order_label_quality": order_quality,

@@ -3,14 +3,21 @@
 from __future__ import annotations
 
 from collections import Counter
+import json
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import pandas as pd
 
-from .input_adapter import iter_stage0_buckets, load_stage0_bucket
+from .input_adapter import (
+    derive_movement_direction_context,
+    iter_stage0_buckets,
+    load_stage0_bucket,
+)
+from .io import canonical_json_bytes, sha256_bytes, sha256_file
 from .schema import ALL_INPUT_PRODUCTS, ContractError
+from .support import DirectedCatalogBuilder, catalog_region_statistics
 
 if TYPE_CHECKING:
     from .config import Stage1V3Config
@@ -32,6 +39,17 @@ def run_global_preflight(
     unresolved_start_node_count = 0
     unresolved_end_node_count = 0
     tolerance = float(config.section("direct")["duration_tolerance_s"])
+    maximum_direct_speed = float(
+        config.section("rts")["maximum_direct_speed_mps"]
+    )
+    catalog_builders = {
+        "global": DirectedCatalogBuilder(),
+        "train": DirectedCatalogBuilder(),
+        "validation": DirectedCatalogBuilder(),
+        "test": DirectedCatalogBuilder(),
+    }
+    movement_counts: Counter[str] = Counter()
+    validated_buckets: list[dict[str, Any]] = []
 
     for ref in refs:
         try:
@@ -39,6 +57,11 @@ def run_global_preflight(
         except ContractError as exc:
             raise ContractError(f"{ref.path}: {exc}") from exc
         accepted = int(ref.manifest["accepted_core_count"])
+        try:
+            catalog_builders["global"].update(bucket.route_parts)
+            catalog_builders[ref.split].update(bucket.route_parts)
+        except ContractError as exc:
+            raise ContractError(f"{ref.path}: catalog conflict: {exc}") from exc
         split_counts[ref.split] += accepted
         for product in ALL_INPUT_PRODUCTS:
             product_rows[product] += int(
@@ -70,6 +93,19 @@ def run_global_preflight(
         )
 
         observations = bucket.link_interval_observations
+        direction_movements = derive_movement_direction_context(
+            bucket.turn_movements,
+            bucket.route_parts,
+        )
+        movement_counts["movement_count"] += len(direction_movements)
+        movement_counts["direction_mapped_count"] += int(
+            direction_movements[
+                "movement_direction_mapping_available"
+            ].sum()
+        )
+        movement_counts["lineage_only_count"] += int(
+            direction_movements["movement_lineage_only"].sum()
+        )
         direction = observations["observed_direction"].astype("string")
         direction_counts["direct_observation_count"] += len(observations)
         direction_counts["actual_F_count"] += int(direction.eq("F").sum())
@@ -91,6 +127,49 @@ def run_global_preflight(
         )
         direction_counts["directed_identity_null_count"] += int(
             observations["observed_directed_edge_uid"].isna().sum()
+        )
+        direction_counts["maximum_speed_exceeded_count"] += int(
+            pd.to_numeric(
+                observations["observed_speed_mps"], errors="coerce"
+            ).gt(maximum_direct_speed).sum()
+        )
+        validated_buckets.append(
+            {
+                "split": ref.split,
+                "date": ref.date,
+                "bucket": ref.bucket,
+                "manifest_sha": sha256_file(ref.path / "manifest.json"),
+                "trusted_product_size_bytes": {
+                    product: int(
+                        (ref.path / f"{product}.parquet").stat().st_size
+                    )
+                    for product in (
+                        "route_parts",
+                        "link_traversals",
+                        "link_interval_observations",
+                    )
+                },
+                "trusted_product_row_counts": {
+                    product: int(
+                        ref.manifest["product_row_counts"][product]
+                    )
+                    for product in (
+                        "route_parts",
+                        "link_traversals",
+                        "link_interval_observations",
+                    )
+                },
+                "trusted_product_sha256": {
+                    product: sha256_file(
+                        ref.path / f"{product}.parquet"
+                    )
+                    for product in (
+                        "route_parts",
+                        "link_traversals",
+                        "link_interval_observations",
+                    )
+                },
+            }
         )
 
         bounds = bucket.order_base[
@@ -117,6 +196,19 @@ def run_global_preflight(
             )
 
     actual_order_count = len(seen_orders)
+    catalogs = {
+        name: builder.finalize()
+        for name, builder in catalog_builders.items()
+    }
+    edge_sets = {
+        name: set(catalog["observed_directed_edge_uid"].astype(str))
+        for name, catalog in catalogs.items()
+    }
+    validation_unseen = edge_sets["validation"] - edge_sets["train"]
+    test_unseen = edge_sets["test"] - edge_sets["train"]
+    validated_input_manifest_id = sha256_bytes(
+        canonical_json_bytes(validated_buckets)
+    )
     failures: list[str] = []
     if actual_order_count != int(expected["expected_order_count"]):
         failures.append(
@@ -169,6 +261,7 @@ def run_global_preflight(
     return {
         "schema_version": "stage1_v3_global_preflight.1",
         "engineering_status": "PASS",
+        "input_root": str(Path(input_root).resolve()),
         "config_sha": config.digest,
         "stage0_release": config.section("stage0_release"),
         "accepted_order_count": actual_order_count,
@@ -195,14 +288,135 @@ def run_global_preflight(
         ),
         "actual_direction_null_count": 0,
         "directed_identity_null_count": 0,
+        "maximum_direct_speed_mps": maximum_direct_speed,
+        "maximum_direct_speed_exceeded_count": int(
+            direction_counts["maximum_speed_exceeded_count"]
+        ),
         "observation_traversal_route_part_fk_failure_count": 0,
         "invalid_direct_time_distance_speed_count": 0,
         "direct_observation_outside_order_time_count": 0,
         "unmapped_traversal_count": unmapped_traversal_count,
         "direct_observation_on_unmapped_traversal_count": 0,
+        "directed_catalog": {
+            "catalog_conflict_count": 0,
+            "directed_edge_count": int(len(catalogs["global"])),
+            "synthetic_reverse_unique_edge_count": int(
+                catalogs["global"]["synthetic_reverse_edge"].sum()
+            ),
+            "train_seen_directed_edge_count": int(len(catalogs["train"])),
+            "validation_directed_edge_count": int(
+                len(catalogs["validation"])
+            ),
+            "test_directed_edge_count": int(len(catalogs["test"])),
+            "validation_unseen_directed_edge_count": int(
+                len(validation_unseen)
+            ),
+            "test_unseen_directed_edge_count": int(len(test_unseen)),
+            "model_catalog_fit_scope": "train_only",
+            "upper_region_usage": "audit_only_not_a_model_fallback",
+            "train_upper_region_statistics": catalog_region_statistics(
+                catalogs["train"]
+            ),
+            "global_upper_region_statistics": catalog_region_statistics(
+                catalogs["global"]
+            ),
+        },
+        "movement_direction": {
+            "movement_count": int(movement_counts["movement_count"]),
+            "direction_mapped_count": int(
+                movement_counts["direction_mapped_count"]
+            ),
+            "lineage_only_count": int(
+                movement_counts["lineage_only_count"]
+            ),
+        },
+        "validated_input_manifest_id": validated_input_manifest_id,
+        "validated_buckets": validated_buckets,
         "nullable_od": {
             "unresolved_start_node_count": unresolved_start_node_count,
             "unresolved_end_node_count": unresolved_end_node_count,
         },
         "product_row_counts": dict(sorted(product_rows.items())),
     }
+
+
+def validate_preflight_for_fit(
+    report_path: str | Path,
+    input_root: str | Path,
+    refs: list[Any],
+    config: "Stage1V3Config",
+) -> dict[str, dict[str, Any]]:
+    """Bind fit to the exact products validated by a PASS preflight."""
+
+    path = Path(report_path)
+    try:
+        report = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ContractError(f"cannot read Stage1 preflight report {path}: {exc}") from exc
+    if not isinstance(report, dict):
+        raise ContractError("Stage1 preflight report must be a JSON object")
+    if report.get("engineering_status") != "PASS":
+        raise ContractError("Stage1 fit requires a PASS global preflight")
+    if report.get("config_sha") != config.digest:
+        raise ContractError("Stage1 preflight config SHA differs from fit config")
+    if report.get("stage0_release") != config.section("stage0_release"):
+        raise ContractError("Stage1 preflight Stage0 release differs from fit")
+    if Path(str(report.get("input_root", ""))).resolve() != Path(
+        input_root
+    ).resolve():
+        raise ContractError("Stage1 preflight input root differs from fit input")
+
+    records = report.get("validated_buckets")
+    if not isinstance(records, list):
+        raise ContractError("Stage1 preflight has no validated bucket manifest")
+    indexed: dict[str, dict[str, Any]] = {}
+    for record in records:
+        if not isinstance(record, dict):
+            raise ContractError("invalid Stage1 preflight bucket record")
+        key = (
+            f"{record.get('split')}/{record.get('date')}/"
+            f"{int(record.get('bucket')):05d}"
+        )
+        if key in indexed:
+            raise ContractError(f"duplicate preflight bucket record: {key}")
+        indexed[key] = record
+    expected_keys = {
+        f"{ref.split}/{ref.date}/{ref.bucket:05d}" for ref in refs
+    }
+    if set(indexed) != expected_keys:
+        raise ContractError(
+            "Stage1 preflight bucket set differs from fit input"
+        )
+    identity = sha256_bytes(canonical_json_bytes(records))
+    if report.get("validated_input_manifest_id") != identity:
+        raise ContractError("Stage1 preflight validated manifest ID is corrupt")
+
+    trusted_products = (
+        "route_parts",
+        "link_traversals",
+        "link_interval_observations",
+    )
+    for ref in refs:
+        key = f"{ref.split}/{ref.date}/{ref.bucket:05d}"
+        record = indexed[key]
+        if record.get("manifest_sha") != sha256_file(
+            ref.path / "manifest.json"
+        ):
+            raise ContractError(f"bucket manifest changed after preflight: {ref.path}")
+        for product in trusted_products:
+            product_path = ref.path / f"{product}.parquet"
+            sizes = record.get("trusted_product_size_bytes", {})
+            counts = record.get("trusted_product_row_counts", {})
+            hashes = record.get("trusted_product_sha256", {})
+            if (
+                not product_path.is_file()
+                or int(product_path.stat().st_size)
+                != int(sizes.get(product, -1))
+                or int(ref.manifest["product_row_counts"][product])
+                != int(counts.get(product, -1))
+                or sha256_file(product_path) != hashes.get(product)
+            ):
+                raise ContractError(
+                    f"trusted fit product changed after preflight: {product_path}"
+                )
+    return indexed

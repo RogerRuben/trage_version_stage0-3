@@ -871,6 +871,10 @@ def verify_stage1_v3(
                 & ~traversals["discontinuous_direct_window"].eq(
                     True
                 ).to_numpy(dtype=bool)
+                & traversals["rts_direct_speed_valid"]
+                .fillna(False)
+                .astype(bool)
+                .to_numpy(dtype=bool)
             )
             expected_pace[pace_eligible] = (
                 direct_time[pace_eligible] / direct_distance[pace_eligible]

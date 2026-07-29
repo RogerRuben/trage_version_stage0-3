@@ -19,6 +19,7 @@ from stage1.v3.input_adapter import (
     _enrich_direction_lineage,
     _fill_nullable_order_endpoints,
     _normalize_nullable_dtypes,
+    derive_movement_direction_context,
 )
 from stage1.v3.io import canonical_json_bytes, sha256_bytes
 from stage1.v3.models import load_model_bundle, write_model_bundle
@@ -100,12 +101,14 @@ def _config_payload() -> dict:
         "rts": {
             "minimum_direct_observed_time_s": 3.0,
             "minimum_direct_observed_distance_m": 10.0,
+            "maximum_direct_speed_mps": 75.0,
             "minimum_reference_sample_size": 1,
             "sec_per_m_clip": [0.01, 10.0],
             "tail_event_percentile_threshold": 0.90,
         },
         "reference": {
             "minimum_observed_distance_m": 10.0,
+            "maximum_direct_speed_mps": 75.0,
             "histogram_min_sec_per_m": 0.01,
             "histogram_max_sec_per_m": 10.0,
             "histogram_bins": 64,
@@ -128,14 +131,31 @@ def _config_payload() -> dict:
             "validation_test_reference_application": "full_train_frozen",
             "raw_cdf_application": "full_train_empirical_self_rank_for_train",
             "fallback": [
-                {"name": name}
-                for name in (
-                    "edge_time_weekday",
-                    "edge_peak",
-                    "edge",
-                    "highway_time_weekday",
-                    "highway",
-                    "global",
+                {"name": name, "key": list(key)}
+                for name, key in (
+                    (
+                        "edge_time_weekday",
+                        (
+                            "observed_directed_edge_uid",
+                            "time_bin_30m",
+                            "weekday_type",
+                        ),
+                    ),
+                    (
+                        "edge_peak",
+                        ("observed_directed_edge_uid", "peak_offpeak"),
+                    ),
+                    ("edge", ("observed_directed_edge_uid",)),
+                    (
+                        "highway_time_weekday",
+                        (
+                            "canonical_highway",
+                            "time_bin_30m",
+                            "weekday_type",
+                        ),
+                    ),
+                    ("highway", ("canonical_highway",)),
+                    ("global", ("global",)),
                 )
             ],
             "fallback_policy": (
@@ -158,9 +178,9 @@ def _config_payload() -> dict:
             "fallback_order": [
                 "road_class_hour",
                 "spatial_neighbor",
-                "upper_spatial_region",
                 "global_hour",
             ],
+            "upper_region_usage": "audit_only_not_a_model_fallback",
             "validation_test_policy": "apply_frozen_train_support_only",
         },
         "preflight": {
@@ -469,6 +489,30 @@ def test_lcs_continuous_window_uses_frozen_component_weights(tmp_path):
     )
     assert bool(row["lcs_available"])
     assert row["lcs_raw"] == pytest.approx(expected)
+
+
+def test_rts_and_reference_reject_impossible_direct_speed(tmp_path):
+    config = _load_config(tmp_path)
+    observations = _observations().iloc[[0, 0, 0]].copy()
+    observations["gps_interval_id"] = [1, 2, 3]
+    observations["traversal_id"] = 10
+    observations["measurement_source"] = "direct_observed"
+    observations["label_valid"] = True
+    observations["interval_start_time"] = [0.0, 1.0, 2.0]
+    observations["interval_end_time"] = [1.0, 2.0, 3.0]
+    observations["observed_travel_time_s"] = 1.0
+    observations["observed_distance_m"] = 100.0
+    observations["observed_speed_mps"] = 100.0
+
+    result = build_traversal_primitives(
+        observations,
+        _traversals().iloc[[0]].copy(),
+        _route_parts().iloc[[0]].copy(),
+        config,
+    )
+
+    assert not bool(result.iloc[0]["rts_direct_speed_valid"])
+    assert np.isnan(result.iloc[0]["observed_sec_per_m"])
 
 
 def test_empty_primitives_keep_declared_logical_columns(tmp_path):
@@ -895,6 +939,32 @@ def test_actual_direction_identity_and_unmapped_lineage_are_independent():
     assert len(products["link_interval_observations"]) == 2
 
 
+def test_movement_context_uses_actual_directed_route_identities():
+    products = _direction_products()
+    _normalize_nullable_dtypes(products)
+    _enrich_direction_lineage(products)
+    movements = pd.DataFrame(
+        {
+            "order_id": ["o1", "o1"],
+            "movement_sequence": [0, 1],
+            "from_edge_uid": ["physical1:F", "physical2:R"],
+            "to_edge_uid": ["physical2:R", pd.NA],
+        }
+    )
+
+    result = derive_movement_direction_context(
+        movements,
+        products["route_parts"],
+    )
+
+    assert result.iloc[0]["observed_from_directed_edge_uid"] == "physical1:R"
+    assert result.iloc[0]["observed_to_directed_edge_uid"] == "physical2:R"
+    assert bool(result.iloc[0]["movement_direction_mapping_available"])
+    assert not bool(result.iloc[0]["movement_lineage_only"])
+    assert not bool(result.iloc[1]["movement_direction_mapping_available"])
+    assert bool(result.iloc[1]["movement_lineage_only"])
+
+
 def test_synthetic_reverse_is_a_real_graph_edge_with_inherited_static_data(
     tmp_path,
 ):
@@ -943,6 +1013,74 @@ def test_synthetic_reverse_is_a_real_graph_edge_with_inherited_static_data(
     assert int(labelled.iloc[0]["edge_observation_count"]) == 3
     assert labelled.iloc[0]["edge_support_level"] == "edge"
     assert labelled.iloc[0]["edge_hour_support_level"] == "edge_hour"
+
+
+def test_edge_hour_support_counts_each_interval_in_its_own_hour(tmp_path):
+    products = _direction_products()
+    _normalize_nullable_dtypes(products)
+    _enrich_direction_lineage(products)
+    catalog = build_directed_edge_catalog([products["route_parts"]])
+    config = _load_config(tmp_path)
+    boundary = pd.Timestamp(
+        "2016-10-09 10:00:00", tz="Asia/Shanghai"
+    ).timestamp()
+    model = fit_directed_support_from_observations(
+        [
+            pd.DataFrame(
+                {
+                    "order_id": ["o1", "o1"],
+                    "traversal_id": [1, 1],
+                    "gps_interval_id": [1, 2],
+                    "observed_directed_edge_uid": ["physical1:R"] * 2,
+                    "interval_start_time": [boundary - 1.0, boundary + 1.0],
+                }
+            )
+        ],
+        catalog,
+        config,
+    )
+    edge_hour = model.counts[
+        model.counts["scope"].eq("edge_hour")
+    ].sort_values("hour")
+    assert edge_hour["hour"].tolist() == [9, 10]
+    assert edge_hour["observation_count"].tolist() == [1, 1]
+
+
+def test_evaluation_unseen_edge_uses_zero_train_support_and_fallback(tmp_path):
+    products = _direction_products()
+    _normalize_nullable_dtypes(products)
+    _enrich_direction_lineage(products)
+    catalog = build_directed_edge_catalog([products["route_parts"]])
+    config = _load_config(tmp_path)
+    training = pd.DataFrame(
+        {
+            "observed_directed_edge_uid": ["physical1:R"],
+            "direct_interval_count": [3],
+            "observation_window_start_time": [1475967600.0],
+        }
+    )
+    model = fit_directed_support([training], catalog)
+    evaluation = pd.DataFrame(
+        {
+            "observed_directed_edge_uid": ["heldout:R"],
+            "canonical_highway": ["primary"],
+            "observed_from_node": [20],
+            "observed_to_node": [99],
+            "observation_window_start_time": [1475967600.0],
+        }
+    )
+
+    result = apply_directed_support(evaluation, model, config)
+
+    assert result.iloc[0]["directed_edge_model_scope"] == "evaluation_unseen"
+    assert int(result.iloc[0]["edge_observation_count"]) == 0
+    assert int(result.iloc[0]["edge_hour_observation_count"]) == 0
+    assert result.iloc[0]["edge_support_level"] == "fallback_required"
+    assert result.iloc[0]["edge_hour_support_level"] in {
+        "road_class_hour",
+        "spatial_neighbor",
+        "global_hour",
+    }
 
 
 def test_route_segment_component_distance_is_forbidden_for_features():
@@ -1008,10 +1146,13 @@ def test_model_bundle_round_trip_includes_directed_graph_and_train_support(
         },
         stage0_freeze_identity=freeze_identity,
         stage1_code_sha="stage1",
+        validated_input_manifest_id="preflight",
     )
     loaded = load_model_bundle(target, config)
     assert "physical1:R" in set(
         loaded.support.edge_catalog["observed_directed_edge_uid"]
     )
     assert loaded.manifest["support_fit_scope"] == "train_only"
+    assert loaded.manifest["directed_edge_catalog_fit_scope"] == "train_only"
+    assert loaded.manifest["validated_input_manifest_id"] == "preflight"
     assert loaded.manifest["stage0_release"]["stage0_tag"] == "stage0-v6-final"

@@ -62,6 +62,15 @@ class Stage0Bucket:
     canonical_quality: pd.DataFrame
 
 
+@dataclass(frozen=True)
+class Stage0FitBucket:
+    """The three preflight-validated products needed while fitting models."""
+
+    route_parts: pd.DataFrame
+    link_traversals: pd.DataFrame
+    link_interval_observations: pd.DataFrame
+
+
 def _split_dates(config: Stage1V3Config) -> dict[str, tuple[str, ...]]:
     return {
         "train": config.train_dates,
@@ -275,6 +284,38 @@ def _read_product(ref: BucketRef, product: str) -> pd.DataFrame:
     return frame
 
 
+def _read_product_subset(
+    ref: BucketRef,
+    product: str,
+    columns: Sequence[str],
+) -> pd.DataFrame:
+    requested = tuple(sorted(set(columns)))
+    undeclared = sorted(set(requested) - REQUIRED_COLUMNS[product])
+    if undeclared:
+        raise Stage1V3InputError(
+            f"{product}: requested undeclared columns {undeclared}"
+        )
+    path = ref.path / f"{product}.parquet"
+    if not path.is_file():
+        raise Stage1V3InputError(f"required Stage0 product is missing: {path}")
+    expected = int(ref.manifest["product_row_counts"][product])
+    if expected == 0:
+        return pd.DataFrame(
+            {column: pd.Series(dtype="object") for column in requested}
+        )
+    try:
+        frame = pd.read_parquet(path, columns=list(requested))
+    except Exception as exc:
+        raise Stage1V3InputError(
+            f"cannot read trusted columns from {path}: {exc}"
+        ) from exc
+    if len(frame) != expected:
+        raise Stage1V3InputError(
+            f"{path}: expected {expected} rows from manifest, found {len(frame)}"
+        )
+    return frame
+
+
 def _require_non_null(frame: pd.DataFrame, columns: Sequence[str], name: str) -> None:
     for column in columns:
         count = int(frame[column].isna().sum())
@@ -465,10 +506,9 @@ def _directed_uid(uid: Any, direction: Any) -> Any:
     )
 
 
-def _enrich_direction_lineage(products: dict[str, pd.DataFrame]) -> None:
-    """Attach actual traversal identity while retaining physical Stage 0 lineage."""
+def _enrich_route_direction_lineage(route: pd.DataFrame) -> None:
+    """Attach actual directed identity to route rows in place."""
 
-    route = products["route_parts"]
     direction = route["canonical_traversal_direction"].astype("string").str.upper()
     mapped = (
         route["canonical_edge_uid"].notna()
@@ -519,6 +559,12 @@ def _enrich_direction_lineage(products: dict[str, pd.DataFrame]) -> None:
     )
     route["sequence_feature_mask"] = mapped.astype(bool)
 
+
+def _enrich_direction_lineage(products: dict[str, pd.DataFrame]) -> None:
+    """Attach actual traversal identity while retaining physical Stage 0 lineage."""
+
+    route = products["route_parts"]
+    _enrich_route_direction_lineage(route)
     traversal = products["link_traversals"]
     context_columns = [
         "order_id",
@@ -2002,3 +2048,137 @@ def load_stage0_bucket(
         config,
     )
     return bucket
+
+
+def load_stage0_fit_bucket(
+    ref: BucketRef,
+    config: Stage1V3Config,
+) -> Stage0FitBucket:
+    """Load only fit products after a bound global preflight has passed.
+
+    The caller must validate the preflight report and its product hashes once
+    before iterating. This loader still checks the bucket manifest, required
+    columns, row counts, direction joins, and direct-label arithmetic.
+    """
+
+    validate_split_config(config)
+    _validate_manifest(ref)
+    disk_manifest = _read_manifest(ref.path / "manifest.json")
+    if disk_manifest != ref.manifest:
+        raise Stage1V3InputError(
+            f"{ref.path}: BucketRef manifest differs from the on-disk manifest"
+        )
+    products = {
+        product: _read_product(ref, product)
+        for product in (
+            "route_parts",
+            "link_traversals",
+            "link_interval_observations",
+        )
+    }
+    for column in _NULLABLE_NODE_COLUMNS["route_parts"]:
+        products["route_parts"][column] = _nullable_int64(
+            products["route_parts"][column],
+            name=f"route_parts.{column}",
+        )
+    _enrich_direction_lineage(products)
+    _validate_measurement_sources(products["route_parts"], "route_parts")
+    _validate_measurement_sources(
+        products["link_traversals"], "link_traversals"
+    )
+    _validate_direct_intervals(
+        products["link_interval_observations"],
+        config,
+    )
+    return Stage0FitBucket(
+        route_parts=products["route_parts"],
+        link_traversals=products["link_traversals"],
+        link_interval_observations=products[
+            "link_interval_observations"
+        ],
+    )
+
+
+def load_stage0_fit_route_parts(ref: BucketRef) -> pd.DataFrame:
+    """Read only the route columns required for a directed fit catalog."""
+
+    _validate_manifest(ref)
+    columns = (
+        "order_id",
+        "route_sequence",
+        "canonical_edge_uid",
+        "canonical_from_node",
+        "canonical_to_node",
+        "canonical_traversal_direction",
+        "mapping_status",
+        "traversed_against_osm_oneway",
+        "osm_oneway",
+        "canonical_highway",
+        "canonical_length_m",
+        "road_class",
+        "bridge",
+        "tunnel",
+    )
+    route = _read_product_subset(ref, "route_parts", columns)
+    for column in ("canonical_from_node", "canonical_to_node"):
+        route[column] = _nullable_int64(
+            route[column],
+            name=f"route_parts.{column}",
+        )
+    _enrich_route_direction_lineage(route)
+    return route
+
+
+def derive_movement_direction_context(
+    movements: pd.DataFrame,
+    route_parts: pd.DataFrame,
+) -> pd.DataFrame:
+    """Map movement sequence boundaries to actual directed route identities."""
+
+    result = movements.copy()
+    route = route_parts[
+        [
+            "order_id",
+            "route_sequence",
+            "observed_directed_edge_uid",
+        ]
+    ]
+    from_context = route.rename(
+        columns={
+            "route_sequence": "movement_sequence",
+            "observed_directed_edge_uid": (
+                "observed_from_directed_edge_uid"
+            ),
+        }
+    )
+    to_context = route.assign(
+        movement_sequence=pd.to_numeric(
+            route["route_sequence"], errors="raise"
+        ).astype(int)
+        - 1
+    )[
+        ["order_id", "movement_sequence", "observed_directed_edge_uid"]
+    ].rename(
+        columns={
+            "observed_directed_edge_uid": "observed_to_directed_edge_uid"
+        }
+    )
+    result = result.merge(
+        from_context,
+        on=["order_id", "movement_sequence"],
+        how="left",
+        validate="one_to_one",
+    ).merge(
+        to_context,
+        on=["order_id", "movement_sequence"],
+        how="left",
+        validate="one_to_one",
+    )
+    result["movement_direction_mapping_available"] = (
+        result["observed_from_directed_edge_uid"].notna()
+        & result["observed_to_directed_edge_uid"].notna()
+    )
+    result["movement_lineage_only"] = (
+        ~result["movement_direction_mapping_available"]
+    )
+    return result

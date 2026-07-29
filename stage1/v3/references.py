@@ -498,6 +498,12 @@ def apply_reference_labels(
 
     reason = np.full(len(result), "", dtype=object)
     reason[~valid_observation] = "INVALID_OR_INSUFFICIENT_DIRECT_PACE"
+    speed_valid = result.get(
+        "rts_direct_speed_valid",
+        pd.Series(True, index=result.index, dtype=bool),
+    ).fillna(False).astype(bool)
+    invalid_speed = ~speed_valid
+    reason[invalid_speed.to_numpy(dtype=bool)] = "IMPOSSIBLE_DIRECT_SPEED"
     reason[valid_observation & ~valid_reference] = "REFERENCE_SUPPORT_UNAVAILABLE"
     result["reference_sec_per_m"] = reference
     result["reference_level_used"] = level

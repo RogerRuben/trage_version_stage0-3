@@ -112,6 +112,7 @@ TRAVERSAL_PRIMITIVE_COLUMNS = (
     "lcs_raw",
     "lcs_available",
     "lcs_unavailable_reason",
+    "rts_direct_speed_valid",
     "observed_sec_per_m",
     "time_bin_30m",
     "weekday_type",
@@ -782,11 +783,32 @@ def build_traversal_primitives(
             acceleration_rms_bounded = float("nan")
             lcs_raw = float("nan")
 
+        maximum_rts_speed = float(
+            _section_value(rts_cfg, "maximum_direct_speed_mps")
+        )
+        maximum_reference_speed = float(
+            _section_value(
+                config.section("reference"),
+                "maximum_direct_speed_mps",
+            )
+        )
+        if abs(maximum_rts_speed - maximum_reference_speed) > 1e-12:
+            raise ContractError(
+                "RTS and reference maximum direct speeds differ"
+            )
+        maximum_group_speed = (
+            float(np.max(speed)) if speed.size else float("nan")
+        )
+        rts_direct_speed_valid = bool(
+            np.isfinite(maximum_group_speed)
+            and maximum_group_speed <= maximum_rts_speed
+        )
         observed_sec_per_m = (
             observed_time_s / observed_distance_m
             if observed_distance_m >= minimum_rts_distance
             and observed_time_s >= minimum_rts_time
             and not discontinuous_direct_window
+            and rts_direct_speed_valid
             else float("nan")
         )
         first = group.sort_values(
@@ -869,6 +891,7 @@ def build_traversal_primitives(
                 "lcs_raw": lcs_raw,
                 "lcs_available": lcs_available,
                 "lcs_unavailable_reason": reason,
+                "rts_direct_speed_valid": rts_direct_speed_valid,
                 "observed_sec_per_m": observed_sec_per_m,
                 "time_bin_30m": minute // time_bin_minutes,
                 "weekday_type": (

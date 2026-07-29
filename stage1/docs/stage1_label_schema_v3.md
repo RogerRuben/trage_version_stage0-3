@@ -119,6 +119,12 @@ reject their bucket or order. OD nodes are nullable `Int64` and use the fallback
 order: order endpoint, first/last route canonical endpoint, first/last OSM
 endpoint, then null.
 
+`movement_context` keeps the original `from_edge_uid`/`to_edge_uid` as
+lineage and separately maps both sides to
+`observed_from_directed_edge_uid`/`observed_to_directed_edge_uid`. A movement
+touching an unmapped route part is explicitly `movement_lineage_only` and is
+not valid actual-direction topology.
+
 ## LCS review candidate
 
 LCS summarizes stop-go and longitudinal-control variation inside one continuous
@@ -175,9 +181,14 @@ normalization is the ordinary full-train empirical self-rank, while validation
 and test only apply that frozen train CDF. This distinction is recorded in the
 model manifest.
 
-Edge and edge-hour observation support is fitted from Train only. Low support
-uses road class x hour, spatial neighbor, upper spatial region, then
-global/hour. Validation and test never contribute to support counts.
+RTS and its reference fit reject a direct window containing a speed above
+75 m/s, matching the LCS physical-speed guard.
+
+Edge and edge-hour observation support is fitted from Train only, with each GPS
+interval counted in its own start hour. Low support uses road class x hour,
+spatial neighbor, then global/hour. Connected-component `upper_region_id` is
+reported only as a graph-degeneracy audit and is never a model fallback.
+Validation and test never contribute to support counts.
 
 Supported values at exactly 0 or 1 receive their occupied-bin empirical
 midrank, rather than being forced to artificial CDF tails.
@@ -234,9 +245,19 @@ tag `stage0-v6-final`, commit
 `a5e482f4a0d2b607`. The bucket code identity must contain that content hash.
 
 All eleven input Parquet files, their physical schemas, each bucket manifest,
-and row counts are hashed. The fitted model binds the complete train,
-validation, and test input identities, even though only train contributes to
-statistics. Transform and audit reject any byte-level input change.
+and row counts are hashed. A PASS global preflight additionally validates the
+complete directed catalog and records hashes for the three products used by
+fit. Fit requires that report, verifies it once, then uses a product-pruned
+loader for route parts, traversals, and direct observations. The fitted model
+binds the preflight manifest and the complete train, validation, and test input
+identities, even though its graph catalog, support, references, and
+normalization use Train only. Transform and audit reject any byte-level input
+change.
+
+Validation/Test directed edges absent from Train are deterministically derived
+at transform time, receive zero Train edge support, and enter the frozen
+road-class, adjacent-node, or global-hour fallback. They never mutate the
+training graph catalog or its audit-only connected-component regions.
 
 Stage 1 hashes its executable v3 source files directly; a caller-provided
 `--stage1-code-sha` is only an optional expected-value assertion and cannot
@@ -263,7 +284,8 @@ The CLI is:
 python -m stage1.v3.cli --config <config> fit \
   --input <stage1/input_v1> \
   --model-root <model_dir> \
-  --stage0-freeze-manifest <freeze.json>
+  --stage0-freeze-manifest <freeze.json> \
+  --validated-preflight <stage1_v3_preflight.json>
 
 python -m stage1.v3.cli --config <config> transform \
   --input <stage1/input_v1> \

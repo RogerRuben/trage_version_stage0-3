@@ -18,6 +18,19 @@ and 956 unmapped traversals with zero direct labels. All OD endpoints were
 resolved by the nullable fallback chain. The machine-readable evidence is
 `stage1_v3_preflight.json`.
 
+The strengthened catalog audit found 25,382 directed identities globally and
+24,423 seen in Train, with zero cross-bucket static conflicts. Validation has
+629 directed identities unseen in Train and Test has 409; these remain
+evaluation-only identities with zero Train edge support. There are 6,502
+unique synthetic reverse graph edges. Movement direction mapping succeeds for
+15,299,731 of 15,300,365 rows; the remaining 634 touch an unmapped lineage gap
+and are explicitly masked. No direct interval exceeds the shared 75 m/s guard.
+
+The Train connected-component audit confirms that `upper_region_id` is not a
+useful spatial fallback: its largest component contains 99.76% of Train
+directed edges. It is therefore retained only as audit evidence and removed
+from model fallback selection.
+
 ## Effective product interpretation
 
 The Stage 0 input contains two related but different dynamic products:
@@ -59,11 +72,13 @@ time in Stage 1.
 
 ### Leakage and reproducibility
 
-Reference pace and normalization distributions are fitted from train dates
-only. Train RTS reference application is leave-one-out; validation and test use
-the complete frozen train reference. The fitted model binds the exact content,
-schema, and row-count identities of all input buckets. Transform rejects any
-input drift.
+The directed graph catalog, support, reference pace, and normalization
+distributions are fitted from train dates only. Train RTS reference application
+is leave-one-out; validation and test use the complete frozen train reference.
+Held-out directed identities absent from Train get zero edge support and frozen
+fallbacks without mutating the model catalog or region audit. The fitted model
+binds the exact content, schema, and row-count identities of all input buckets
+and the exact PASS preflight manifest. Transform rejects any input drift.
 
 The executable v3 source tree is content-hashed. A caller-supplied code identity
 is only an expected-value assertion. Resume checks exact input, model, config,
@@ -83,17 +98,24 @@ observation-to-traversal-to-route-part joins. F-to-R observations become actual
 against-oneway flag is true. Synthetic reverse identities are materialized as
 graph edges with actual endpoints and inherited static attributes.
 
+Movement identities retain their Stage 0 physical lineage fields and add
+actual directed identities for both sides of the turn. Movements touching an
+unmapped route part are explicitly lineage-only and cannot be interpreted as
+actual directed topology.
+
 OD and canonical node columns are normalized to nullable `Int64`, independent
 of physical Parquet dtype. Unmapped route parts and traversals remain as masked
 lineage gaps and cannot generate direct link labels.
 
 ### Support and segment-distance safety
 
-Edge and edge-hour support counts are fitted from Train only. Low-support
-samples route to road-class/hour, spatial-neighbor, upper-region, then
-global/hour support. `route_segments.segment_route_distance_m` is declared
-lineage-only and deprecated for features; local distance must be reconstructed
-from route sequence.
+Edge and edge-hour support counts are fitted from Train only; edge-hour counts
+use each direct interval's own start hour. Low-support samples route to
+road-class/hour, spatial-neighbor, then global/hour support. Network connected
+components are reported as a degeneracy audit but are not a spatial fallback.
+`route_segments.segment_route_distance_m` is declared lineage-only and
+deprecated for features; local distance must be reconstructed from route
+sequence.
 
 ### LCS continuity defect
 
@@ -106,6 +128,9 @@ continuous-window case.
 Internal direct-observation gaps longer than the configured limit make both LCS
 and RTS pace unavailable. Disconnected observations are not blended into one
 continuous traversal label.
+
+RTS and reference fitting also reject direct windows with any observed speed
+above the shared 75 m/s physical limit.
 
 ### Output schema and audit strength
 

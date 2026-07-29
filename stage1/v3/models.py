@@ -20,7 +20,7 @@ from .io import (
 )
 from .references import COHORT_LEVELS, SparseCohortHistograms
 from .schema import ContractError
-from .support import DirectedSupportModel
+from .support import DirectedSupportModel, catalog_region_statistics
 
 if TYPE_CHECKING:
     from .config import Stage1V3Config
@@ -82,6 +82,7 @@ def write_model_bundle(
     upstream_identity: dict[str, str],
     stage0_freeze_identity: dict[str, Any],
     stage1_code_sha: str,
+    validated_input_manifest_id: str,
 ) -> dict[str, Any]:
     """Atomically publish a content-addressed, train-only model bundle."""
 
@@ -107,7 +108,7 @@ def write_model_bundle(
             for name, filename in MODEL_FILES.items()
         }
         manifest_core = {
-            "schema_version": "stage1_v3_models.2",
+            "schema_version": "stage1_v3_models.3",
             "label_schema_version": config.schema_version,
             "engineering_status": "PASS",
             "scientific_status": "NOT_VALIDATED",
@@ -115,6 +116,9 @@ def write_model_bundle(
             "config_sha": config.digest,
             "stage1_code_sha": str(stage1_code_sha),
             "source_manifest_id": str(source_manifest_id),
+            "validated_input_manifest_id": str(
+                validated_input_manifest_id
+            ),
             "source_schema_sha": sha256_bytes(
                 canonical_json_bytes(
                     {
@@ -130,11 +134,16 @@ def write_model_bundle(
             "stage0_freeze_identity": stage0_freeze_identity,
             "stage0_release": config.section("stage0_release"),
             "directed_edge_identity": "observed_directed_edge_uid",
+            "directed_edge_catalog_fit_scope": "train_only",
             "support_fit_scope": "train_only",
             "support_definition": config.section("support"),
             "directed_edge_count": int(len(support.edge_catalog)),
             "synthetic_reverse_graph_edge_count": int(
                 support.edge_catalog["synthetic_reverse_edge"].sum()
+            ),
+            "upper_region_usage": "audit_only_not_a_model_fallback",
+            "upper_region_statistics": catalog_region_statistics(
+                support.edge_catalog
             ),
             "cohort_fallback": [
                 "edge_time_weekday",
@@ -189,7 +198,7 @@ def load_model_bundle(
 ) -> Stage1V3Models:
     source = Path(root)
     manifest = _read_json(source / "model_manifest.json")
-    if manifest.get("schema_version") != "stage1_v3_models.2":
+    if manifest.get("schema_version") != "stage1_v3_models.3":
         raise ContractError("unsupported Stage1 v3 model schema")
     if manifest.get("label_schema_version") != config.schema_version:
         raise ContractError("model label schema differs from the requested schema")
@@ -201,7 +210,12 @@ def load_model_bundle(
         raise ContractError("model config SHA differs from the requested config")
     if tuple(manifest.get("fit_dates", [])) != config.reference_fit_dates:
         raise ContractError("model fit dates differ from frozen train dates")
-    for name in ("model_id", "stage1_code_sha", "source_manifest_id"):
+    for name in (
+        "model_id",
+        "stage1_code_sha",
+        "source_manifest_id",
+        "validated_input_manifest_id",
+    ):
         if not isinstance(manifest.get(name), str) or not manifest[name].strip():
             raise ContractError(f"model manifest has invalid {name}")
     if manifest.get("cohort_fallback") != list(COHORT_LEVELS):
@@ -226,6 +240,13 @@ def load_model_bundle(
         raise ContractError("model Stage0 release identity differs from config")
     if manifest.get("support_fit_scope") != "train_only":
         raise ContractError("support counts must be fitted from Train only")
+    if manifest.get("directed_edge_catalog_fit_scope") != "train_only":
+        raise ContractError("directed edge catalog must be fitted from Train only")
+    if (
+        manifest.get("upper_region_usage")
+        != "audit_only_not_a_model_fallback"
+    ):
+        raise ContractError("upper connected components cannot be model fallbacks")
     if manifest.get("support_definition") != config.section("support"):
         raise ContractError("model support definition differs from config")
     input_identities = manifest.get("input_bucket_identities")

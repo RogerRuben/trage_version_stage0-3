@@ -302,6 +302,7 @@
       "source_scope": "direct_observed_intervals_with_train_fitted_reference",
       "minimum_direct_observed_time_s": 3.0,
       "minimum_direct_observed_distance_m": 10.0,
+      "maximum_direct_speed_mps": 75.0,
       "minimum_reference_sample_size": 100,
       "sec_per_m_clip": [
         0.01,
@@ -323,6 +324,7 @@
       "threshold_status": "review_candidate",
       "fit_dates_source": "split.reference_fit_dates",
       "minimum_observed_distance_m": 10.0,
+      "maximum_direct_speed_mps": 75.0,
       "histogram_min_sec_per_m": 0.01,
       "histogram_max_sec_per_m": 10.0,
       "histogram_bins": 4096,
@@ -415,7 +417,7 @@
         "level": 1,
         "name": "edge_time_weekday",
         "key": [
-          "canonical_edge_uid",
+          "observed_directed_edge_uid",
           "time_bin_30m",
           "weekday_type"
         ]
@@ -424,7 +426,7 @@
         "level": 2,
         "name": "edge_peak",
         "key": [
-          "canonical_edge_uid",
+          "observed_directed_edge_uid",
           "peak_offpeak"
         ]
       },
@@ -432,7 +434,7 @@
         "level": 3,
         "name": "edge",
         "key": [
-          "canonical_edge_uid"
+          "observed_directed_edge_uid"
         ]
       },
       {
@@ -481,6 +483,7 @@
       "time_bin_30m",
       "canonical_highway",
       "canonical_edge_uid",
+      "observed_directed_edge_uid",
       "reference_level_used",
       "availability_reason"
     ],
@@ -505,9 +508,9 @@
     "fallback_order": [
       "road_class_hour",
       "spatial_neighbor",
-      "upper_spatial_region",
       "global_hour"
     ],
+    "upper_region_usage": "audit_only_not_a_model_fallback",
     "validation_test_policy": "apply_frozen_train_support_only"
   },
   "preflight": {
@@ -699,6 +702,8 @@
         "edge_hour_observation_count",
         "edge_support_level",
         "edge_hour_support_level",
+        "directed_edge_model_scope",
+        "rts_direct_speed_valid",
         "observed_sec_per_m",
         "time_bin_30m",
         "weekday_type",
@@ -739,6 +744,7 @@
         "canonical_mapping_available",
         "route_lineage_status",
         "sequence_feature_mask",
+        "directed_edge_model_scope",
         "synthetic_reverse_edge",
         "osm_direction_disagreement",
         "mapping_status",
@@ -785,8 +791,12 @@
         "order_id",
         "movement_sequence",
         "from_edge_uid",
+        "observed_from_directed_edge_uid",
         "via_node",
         "to_edge_uid",
+        "observed_to_directed_edge_uid",
+        "movement_direction_mapping_available",
+        "movement_lineage_only",
         "movement_source",
         "movement_quality",
         "iis_available",

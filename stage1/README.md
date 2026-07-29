@@ -46,6 +46,12 @@ References and normalization objects are fitted on train dates only.
 Train RTS references use leave-one-out application; validation and test only
 apply the full frozen train objects.
 
+The fitted directed graph catalog is also Train-only. Validation/Test edges
+unseen in Train are assigned deterministic actual-direction identities at
+transform time, have zero Train edge support, and use frozen fallback
+statistics without changing the model graph. Movement context carries actual
+directed identities on both sides; gaps remain explicitly lineage-only.
+
 Input acceptance reconciles both `interval_measurements` and
 `turn_movements`, and requires content plus schema hashes for every required
 Stage 0 v6 product. Resume is permitted only for a PASS bucket whose declared
@@ -62,7 +68,9 @@ python -m stage1.v3.cli --config stage1/config/stage1_label_schema_v3.json verif
 python -m stage1.v3.cli --config stage1/config/stage1_label_schema_v3.json preflight ...
 ```
 
-Fit and transform require the Stage 0 freeze manifest. The executable v3 source
+Fit requires a PASS global preflight report in addition to the Stage 0 freeze
+manifest; transform requires the freeze manifest and the fitted model. The
+executable v3 source
 tree is content-hashed automatically; `--stage1-code-sha` is only an optional
 expected-value assertion. The checked-in config is `review_candidate`, so fit
 and transform refuse to run without the explicit engineering-only

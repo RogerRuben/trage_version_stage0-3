@@ -349,6 +349,11 @@ def validate_config(config: Stage1V3Config) -> None:
         "rts.minimum_direct_observed_distance_m",
         minimum=1e-12,
     )
+    rts_maximum_speed = _number(
+        rts,
+        "rts.maximum_direct_speed_mps",
+        minimum=1e-12,
+    )
     _number(
         rts,
         "rts.tail_event_percentile_threshold",
@@ -367,9 +372,24 @@ def validate_config(config: Stage1V3Config) -> None:
         "reference.minimum_observed_distance_m",
         minimum=1e-12,
     )
+    reference_maximum_speed = _number(
+        reference,
+        "reference.maximum_direct_speed_mps",
+        minimum=1e-12,
+    )
     if abs(reference_distance - rts_distance) > 1e-12:
         raise Stage1V3ConfigError(
             "reference and RTS minimum observed distances must be identical"
+        )
+    lcs_maximum_speed = float(
+        config.section("lcs")["maximum_physical_speed_mps"]
+    )
+    if (
+        abs(reference_maximum_speed - rts_maximum_speed) > 1e-12
+        or abs(rts_maximum_speed - lcs_maximum_speed) > 1e-12
+    ):
+        raise Stage1V3ConfigError(
+            "LCS, RTS, and reference maximum direct speeds must be identical"
         )
     lower = _number(
         reference,
@@ -469,6 +489,21 @@ def validate_config(config: Stage1V3Config) -> None:
         != expected_fallback
     ):
         raise Stage1V3ConfigError("cohort_reference fallback order is frozen")
+    expected_fallback_keys = (
+        ("observed_directed_edge_uid", "time_bin_30m", "weekday_type"),
+        ("observed_directed_edge_uid", "peak_offpeak"),
+        ("observed_directed_edge_uid",),
+        ("canonical_highway", "time_bin_30m", "weekday_type"),
+        ("canonical_highway",),
+        ("global",),
+    )
+    if tuple(
+        tuple(item.get("key", ())) if isinstance(item, dict) else ()
+        for item in fallback
+    ) != expected_fallback_keys:
+        raise Stage1V3ConfigError(
+            "cohort_reference edge keys must use actual directed identity"
+        )
     if (
         cohort.get("fallback_policy")
         != "first_level_meeting_minimum_sample_size_else_global_if_nonempty_else_na"
@@ -519,10 +554,16 @@ def validate_config(config: Stage1V3Config) -> None:
     if support.get("fallback_order") != [
         "road_class_hour",
         "spatial_neighbor",
-        "upper_spatial_region",
         "global_hour",
     ]:
         raise Stage1V3ConfigError("support fallback order is frozen")
+    if (
+        support.get("upper_region_usage")
+        != "audit_only_not_a_model_fallback"
+    ):
+        raise Stage1V3ConfigError(
+            "connected-component upper regions are audit-only"
+        )
     if (
         support.get("validation_test_policy")
         != "apply_frozen_train_support_only"
