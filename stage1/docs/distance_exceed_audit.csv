@@ -1,0 +1,4 @@
+split,affected_traversal_count,affected_order_count,direct_traversal_count,affected_traversal_share
+train,0,0,4217873,0.0
+validation,0,0,780240,0.0
+test,0,0,777417,0.0

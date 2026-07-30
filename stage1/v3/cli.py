@@ -12,6 +12,7 @@ from .config import load_config, validate_config
 from .io import atomic_write_json
 from .pipeline import fit_stage1_v3, transform_stage1_v3
 from .preflight import run_global_preflight
+from .scientific_review import run_scientific_review
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -76,6 +77,13 @@ def _parser() -> argparse.ArgumentParser:
     )
     preflight.add_argument("--input", type=Path, required=True)
     preflight.add_argument("--report", type=Path)
+    scientific = subparsers.add_parser(
+        "scientific-review",
+        help="stream descriptive scientific diagnostics over all output buckets",
+    )
+    scientific.add_argument("--input", type=Path, required=True)
+    scientific.add_argument("--output", type=Path, required=True)
+    scientific.add_argument("--report-dir", type=Path, required=True)
     return parser
 
 
@@ -116,10 +124,14 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
         if args.report:
             atomic_write_json(args.report, result)
-    else:
+    elif args.command == "preflight":
         result = run_global_preflight(args.input, config)
         if args.report:
             atomic_write_json(args.report, result)
+    else:
+        result = run_scientific_review(
+            args.input, args.output, args.report_dir, config
+        )
     print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
     return 0 if result.get("engineering_status") == "PASS" else 2
 

@@ -488,7 +488,33 @@ def apply_reference_labels(
     pace = pd.to_numeric(result["observed_sec_per_m"], errors="coerce").to_numpy(
         dtype=np.float64
     )
+    measurement_flags = result["rts_measurement_available"]
+    if not measurement_flags.map(
+        lambda value: isinstance(value, (bool, np.bool_))
+    ).all():
+        raise ContractError(
+            "rts_measurement_available must contain strict booleans"
+        )
+    measurement_available = measurement_flags.eq(True).to_numpy(dtype=bool)
+    measurement_reason = (
+        result["rts_measurement_unavailable_reason"]
+        .fillna("")
+        .astype(str)
+        .to_numpy(dtype=object)
+    )
     valid_observation = np.isfinite(pace) & (pace > 0)
+    if np.any(valid_observation != measurement_available):
+        raise ContractError(
+            "RTS pace and measurement availability are inconsistent"
+        )
+    if np.any(
+        measurement_available & (measurement_reason != "")
+    ) or np.any(
+        ~measurement_available & (measurement_reason == "")
+    ):
+        raise ContractError(
+            "RTS measurement availability reason is inconsistent"
+        )
     valid_reference = np.isfinite(reference) & (reference > 0)
     available = valid_observation & valid_reference
     excess = np.full(len(result), np.nan, dtype=np.float64)
@@ -496,15 +522,11 @@ def apply_reference_labels(
     rts = np.full(len(result), np.nan, dtype=np.float64)
     rts[available] = excess[available] / (1.0 + excess[available])
 
-    reason = np.full(len(result), "", dtype=object)
-    reason[~valid_observation] = "INVALID_OR_INSUFFICIENT_DIRECT_PACE"
-    speed_valid = result.get(
-        "rts_direct_speed_valid",
-        pd.Series(True, index=result.index, dtype=bool),
-    ).fillna(False).astype(bool)
-    invalid_speed = ~speed_valid
-    reason[invalid_speed.to_numpy(dtype=bool)] = "IMPOSSIBLE_DIRECT_SPEED"
-    reason[valid_observation & ~valid_reference] = "REFERENCE_SUPPORT_UNAVAILABLE"
+    reason = measurement_reason.copy()
+    reason[measurement_available & ~valid_reference] = (
+        "REFERENCE_SUPPORT_UNAVAILABLE"
+    )
+    reason[available] = ""
     result["reference_sec_per_m"] = reference
     result["reference_level_used"] = level
     result["reference_sample_size"] = support
@@ -572,15 +594,17 @@ def apply_percentile_labels(
         result[f"{dimension}_cdf_sample_size"] = support
         result.loc[~available, f"{dimension}_cdf_level_used"] = "unresolved"
         result.loc[~available, f"{dimension}_cdf_sample_size"] = 0
-    rts_tail_threshold = float(
-        config.section("rts")["tail_event_percentile_threshold"]
+    tail_threshold = float(
+        config.section("aggregation")["tail_percentile_threshold"]
     )
-    result["rts_tail_event"] = (
-        result["rts_available"].fillna(False)
-        & pd.to_numeric(result["rts_pct"], errors="coerce").ge(
-            rts_tail_threshold
-        )
-    )
+    for dimension in ("lcs", "rts"):
+        available = result[f"{dimension}_available"].eq(True)
+        event = pd.Series(pd.NA, index=result.index, dtype="boolean")
+        event.loc[available] = pd.to_numeric(
+            result.loc[available, f"{dimension}_pct"],
+            errors="coerce",
+        ).ge(tail_threshold).astype(bool)
+        result[f"{dimension}_tail_event"] = event
     for unavailable in ("gns", "iis", "pmis"):
         for suffix in ("raw", "pct"):
             column = f"{unavailable}_{suffix}"

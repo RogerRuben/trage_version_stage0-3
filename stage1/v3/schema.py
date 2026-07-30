@@ -7,6 +7,8 @@ from types import MappingProxyType
 
 INPUT_ROOT_NAME = "input_v1"
 INPUT_BUCKET_SCHEMA_VERSION = "stage1_input_bucket.1"
+OUTPUT_BUCKET_SCHEMA_VERSION = "stage1_v3_output_bucket.2"
+OUTPUT_SUMMARY_SCHEMA_VERSION = "stage1_v3_output_summary.2"
 
 ALL_INPUT_PRODUCTS = (
     "order_base",
@@ -239,8 +241,9 @@ OUTPUT_REQUIRED_COLUMNS = MappingProxyType(
                 "adjacent_gap_s",
                 "speed_delta_mps",
                 "acceleration_mps2",
-                "is_low_speed",
                 "is_stop",
+                "is_crawl",
+                "is_low_speed_total",
                 "kinematic_sequence_valid",
                 "lcs_component_available",
                 "lcs_component_unavailable_reason",
@@ -276,11 +279,12 @@ OUTPUT_REQUIRED_COLUMNS = MappingProxyType(
                 "time_weighted_speed_mean_mps",
                 "maximum_internal_gap_s",
                 "discontinuous_direct_window",
-                "low_speed_time_share",
+                "crawl_time_share",
                 "stop_time_share",
                 "time_weighted_speed_cv",
                 "speed_cv_bounded",
                 "acceleration_pair_count",
+                "acceleration_weight_s",
                 "acceleration_rms_mps2",
                 "acceleration_rms_bounded",
                 "maximum_absolute_acceleration_mps2",
@@ -288,10 +292,13 @@ OUTPUT_REQUIRED_COLUMNS = MappingProxyType(
                 "lcs_unavailable_reason",
                 "lcs_raw",
                 "lcs_pct",
+                "lcs_tail_event",
                 "lcs_cdf_level_used",
                 "lcs_cdf_sample_size",
                 "rts_available",
                 "rts_unavailable_reason",
+                "rts_measurement_available",
+                "rts_measurement_unavailable_reason",
                 "rts_raw",
                 "rts_pct",
                 "rts_tail_event",
@@ -306,6 +313,7 @@ OUTPUT_REQUIRED_COLUMNS = MappingProxyType(
                 "reference_fit_manifest_id",
                 "edge_observation_count",
                 "edge_hour_observation_count",
+                "edge_time_bin_30m_observation_count",
                 "edge_support_level",
                 "edge_hour_support_level",
                 "directed_edge_model_scope",
@@ -385,6 +393,8 @@ OUTPUT_REQUIRED_COLUMNS = MappingProxyType(
                 "core_composition_signature",
                 "composition_signature",
                 "core_composite_status",
+                "lcs_tail_event_present",
+                "rts_tail_event_present",
                 *{
                     f"{dimension}_{suffix}"
                     for dimension in ("lcs", "rts", "gns", "iis", "pmis")

@@ -314,7 +314,7 @@ def validate_config(config: Stage1V3Config) -> None:
             "LCS low_speed_mps cannot exceed maximum_physical_speed_mps"
         )
     component_names = (
-        "low_speed_time_share",
+        "crawl_time_share",
         "stop_time_share",
         "speed_cv_bounded",
         "acceleration_rms_bounded",
@@ -552,9 +552,11 @@ def validate_config(config: Stage1V3Config) -> None:
     if support.get("fit_scope") != "train_only":
         raise Stage1V3ConfigError("support.fit_scope must be train_only")
     if support.get("fallback_order") != [
-        "road_class_hour",
+        "edge_hour",
+        "highway_hour",
         "spatial_neighbor",
         "global_hour",
+        "unavailable",
     ]:
         raise Stage1V3ConfigError("support fallback order is frozen")
     if (

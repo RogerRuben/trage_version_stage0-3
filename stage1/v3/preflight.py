@@ -15,7 +15,12 @@ from .input_adapter import (
     iter_stage0_buckets,
     load_stage0_bucket,
 )
-from .io import canonical_json_bytes, sha256_bytes, sha256_file
+from .io import (
+    canonical_json_bytes,
+    sha256_bytes,
+    sha256_file,
+    stage1_v3_code_identity,
+)
 from .schema import ALL_INPUT_PRODUCTS, ContractError
 from .support import DirectedCatalogBuilder, catalog_region_statistics
 
@@ -36,9 +41,16 @@ def run_global_preflight(
     seen_orders: dict[str, tuple[str, str, int]] = {}
     direction_counts: Counter[str] = Counter()
     unmapped_traversal_count = 0
+    direct_distance_exceed_counts: Counter[str] = Counter()
+    direct_distance_exceed_orders: set[str] = set()
+    support_key_counts: Counter[str] = Counter()
+    canonical_highway_missing_counts: Counter[str] = Counter()
     unresolved_start_node_count = 0
     unresolved_end_node_count = 0
     tolerance = float(config.section("direct")["duration_tolerance_s"])
+    distance_tolerance = float(
+        config.section("direct")["distance_identity_tolerance_m"]
+    )
     maximum_direct_speed = float(
         config.section("rts")["maximum_direct_speed_mps"]
     )
@@ -93,6 +105,106 @@ def run_global_preflight(
         )
 
         observations = bucket.link_interval_observations
+        observation_support = observations.merge(
+            bucket.link_traversals[
+                [
+                    "order_id",
+                    "traversal_id",
+                    "canonical_highway",
+                ]
+            ],
+            on=["order_id", "traversal_id"],
+            how="left",
+            validate="many_to_one",
+            indicator=True,
+        )
+        if observation_support["_merge"].ne("both").any():
+            raise ContractError(
+                "support preflight found an orphan direct traversal"
+            )
+        highway_missing = (
+            observation_support["canonical_highway"].isna()
+            | observation_support["canonical_highway"]
+            .astype("string")
+            .str.strip()
+            .isin(["", "nan", "<NA>"])
+        )
+        canonical_highway_missing_counts[
+            "direct_observation_count"
+        ] += int(highway_missing.sum())
+        traversal_highway_missing = (
+            bucket.link_traversals["canonical_highway"].isna()
+            | bucket.link_traversals["canonical_highway"]
+            .astype("string")
+            .str.strip()
+            .isin(["", "nan", "<NA>"])
+        )
+        canonical_highway_missing_counts[
+            "traversal_count"
+        ] += int(traversal_highway_missing.sum())
+        finite_start = np.isfinite(
+            pd.to_numeric(
+                observations["interval_start_time"], errors="coerce"
+            )
+        )
+        support_key_available = (
+            observation_support["observed_directed_edge_uid"].notna()
+            & ~highway_missing
+            & observation_support["observed_from_node"].notna()
+            & observation_support["observed_to_node"].notna()
+            & finite_start
+        )
+        support_key_counts["constructable_count"] += int(
+            support_key_available.sum()
+        )
+        support_key_counts["failure_count"] += int(
+            (~support_key_available).sum()
+        )
+
+        direct_by_traversal = (
+            observations.assign(
+                _distance=pd.to_numeric(
+                    observations["observed_distance_m"], errors="coerce"
+                )
+            )
+            .groupby(
+                ["order_id", "traversal_id"], sort=False, dropna=False
+            )
+            .agg(
+                direct_distance_m=("_distance", "sum"),
+                direct_interval_count=("gps_interval_id", "size"),
+            )
+            .reset_index()
+        )
+        traversal_allocated = bucket.link_traversals[
+            ["order_id", "traversal_id", "allocated_distance_m"]
+        ].copy()
+        traversal_allocated["allocated_distance_m"] = pd.to_numeric(
+            traversal_allocated["allocated_distance_m"], errors="coerce"
+        )
+        distance_audit = direct_by_traversal.merge(
+            traversal_allocated,
+            on=["order_id", "traversal_id"],
+            how="left",
+            validate="one_to_one",
+            indicator=True,
+        )
+        if distance_audit["_merge"].ne("both").any():
+            raise ContractError(
+                "distance preflight found an orphan direct traversal"
+            )
+        exceeds = distance_audit["direct_distance_m"].gt(
+            distance_audit["allocated_distance_m"] + distance_tolerance
+        )
+        direct_distance_exceed_counts["traversal_count"] += int(
+            exceeds.sum()
+        )
+        direct_distance_exceed_counts["interval_count"] += int(
+            distance_audit.loc[exceeds, "direct_interval_count"].sum()
+        )
+        direct_distance_exceed_orders.update(
+            distance_audit.loc[exceeds, "order_id"].astype(str)
+        )
         direction_movements = derive_movement_direction_context(
             bucket.turn_movements,
             bucket.route_parts,
@@ -259,10 +371,11 @@ def run_global_preflight(
         raise ContractError("Stage1 global preflight failed: " + "; ".join(failures))
 
     return {
-        "schema_version": "stage1_v3_global_preflight.1",
+        "schema_version": "stage1_v3_global_preflight.2",
         "engineering_status": "PASS",
         "input_root": str(Path(input_root).resolve()),
         "config_sha": config.digest,
+        "stage1_code_sha": stage1_v3_code_identity(),
         "stage0_release": config.section("stage0_release"),
         "accepted_order_count": actual_order_count,
         "split_order_counts": dict(sorted(split_counts.items())),
@@ -292,6 +405,40 @@ def run_global_preflight(
         "maximum_direct_speed_exceeded_count": int(
             direction_counts["maximum_speed_exceeded_count"]
         ),
+        "direct_distance_exceeds_allocated": {
+            "interval_count": int(
+                direct_distance_exceed_counts["interval_count"]
+            ),
+            "traversal_count": int(
+                direct_distance_exceed_counts["traversal_count"]
+            ),
+            "order_count": len(direct_distance_exceed_orders),
+            "distance_identity_tolerance_m": distance_tolerance,
+            "input_direct_labels_deleted_count": 0,
+        },
+        "canonical_highway_missing": {
+            "direct_observation_count": int(
+                canonical_highway_missing_counts[
+                    "direct_observation_count"
+                ]
+            ),
+            "traversal_count": int(
+                canonical_highway_missing_counts["traversal_count"]
+            ),
+        },
+        "support_key_constructability": {
+            "constructable_count": int(
+                support_key_counts["constructable_count"]
+            ),
+            "failure_count": int(support_key_counts["failure_count"]),
+            "key_fields": [
+                "observed_directed_edge_uid",
+                "canonical_highway",
+                "observed_from_node",
+                "observed_to_node",
+                "interval_start_time",
+            ],
+        },
         "observation_traversal_route_part_fk_failure_count": 0,
         "invalid_direct_time_distance_speed_count": 0,
         "direct_observation_outside_order_time_count": 0,
@@ -359,6 +506,8 @@ def validate_preflight_for_fit(
         raise ContractError("Stage1 fit requires a PASS global preflight")
     if report.get("config_sha") != config.digest:
         raise ContractError("Stage1 preflight config SHA differs from fit config")
+    if report.get("stage1_code_sha") != stage1_v3_code_identity():
+        raise ContractError("Stage1 preflight code SHA differs from fit code")
     if report.get("stage0_release") != config.section("stage0_release"):
         raise ContractError("Stage1 preflight Stage0 release differs from fit")
     if Path(str(report.get("input_root", ""))).resolve() != Path(

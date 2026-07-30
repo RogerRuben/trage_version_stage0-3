@@ -261,7 +261,7 @@
       "maximum_physical_speed_mps": 75.0,
       "maximum_absolute_acceleration_mps2": 8.0,
       "components": {
-        "low_speed_time_share": {
+        "crawl_time_share": {
           "weight": 0.25,
           "range": [
             0.0,
@@ -506,9 +506,11 @@
     "minimum_edge_hour_observations": 5,
     "minimum_fallback_observations": 20,
     "fallback_order": [
-      "road_class_hour",
+      "edge_hour",
+      "highway_hour",
       "spatial_neighbor",
-      "global_hour"
+      "global_hour",
+      "unavailable"
     ],
     "upper_region_usage": "audit_only_not_a_model_fallback",
     "validation_test_policy": "apply_frozen_train_support_only"
@@ -628,8 +630,9 @@
         "adjacent_gap_s",
         "speed_delta_mps",
         "acceleration_mps2",
-        "is_low_speed",
         "is_stop",
+        "is_crawl",
+        "is_low_speed_total",
         "kinematic_sequence_valid",
         "lcs_component_available",
         "lcs_component_unavailable_reason",
@@ -671,11 +674,12 @@
         "time_weighted_speed_mean_mps",
         "maximum_internal_gap_s",
         "discontinuous_direct_window",
-        "low_speed_time_share",
+        "crawl_time_share",
         "stop_time_share",
         "time_weighted_speed_cv",
         "speed_cv_bounded",
         "acceleration_pair_count",
+        "acceleration_weight_s",
         "acceleration_rms_mps2",
         "acceleration_rms_bounded",
         "maximum_absolute_acceleration_mps2",
@@ -683,10 +687,13 @@
         "lcs_unavailable_reason",
         "lcs_raw",
         "lcs_pct",
+        "lcs_tail_event",
         "lcs_cdf_level_used",
         "lcs_cdf_sample_size",
         "rts_available",
         "rts_unavailable_reason",
+        "rts_measurement_available",
+        "rts_measurement_unavailable_reason",
         "rts_raw",
         "rts_pct",
         "rts_tail_event",
@@ -700,6 +707,7 @@
         "reference_fit_manifest_id",
         "edge_observation_count",
         "edge_hour_observation_count",
+        "edge_time_bin_30m_observation_count",
         "edge_support_level",
         "edge_hour_support_level",
         "directed_edge_model_scope",
@@ -852,7 +860,9 @@
         "valid_core_dimension_count",
         "core_composition_signature",
         "composition_signature",
-        "core_composite_status"
+        "core_composite_status",
+        "lcs_tail_event_present",
+        "rts_tail_event_present"
       ],
       "composite_output_policy": "status_only_numeric_composite_fields_forbidden"
     },

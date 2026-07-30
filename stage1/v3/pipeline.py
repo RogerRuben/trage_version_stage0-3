@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import time
 from typing import TYPE_CHECKING, Any, Iterable, Iterator, Sequence
 
 import pandas as pd
@@ -47,8 +48,10 @@ from .references import (
 )
 from .schema import (
     ContractError,
+    OUTPUT_BUCKET_SCHEMA_VERSION,
     OUTPUT_PRIMARY_KEYS,
     OUTPUT_REQUIRED_COLUMNS,
+    OUTPUT_SUMMARY_SCHEMA_VERSION,
 )
 from .support import (
     apply_directed_support,
@@ -68,6 +71,15 @@ OUTPUT_PRODUCTS = (
     "order_labels",
     "order_label_quality",
 )
+
+
+def _current_rss_mb() -> float:
+    try:
+        import psutil
+
+        return float(psutil.Process().memory_info().rss / (1024 * 1024))
+    except (ImportError, OSError):
+        return float("nan")
 
 
 def _execution_guard(
@@ -250,6 +262,8 @@ def fit_stage1_v3(
 ) -> dict[str, Any]:
     """Fit train-only pace references and label CDFs without full-data concat."""
 
+    started = time.perf_counter()
+    initial_rss_mb = _current_rss_mb()
     _execution_guard(config, allow_review_candidate=allow_review_candidate)
     code_sha = _verified_code_identity(stage1_code_sha)
     freeze = load_stage0_freeze_manifest(stage0_freeze_manifest, config)
@@ -299,6 +313,9 @@ def fit_stage1_v3(
             raise ContractError(
                 "existing Stage1 v3 models do not match input/config/code identity"
             )
+        execution_path = destination / "fit_execution.json"
+        if execution_path.is_file():
+            return {**manifest, "execution": _read_json(execution_path)}
         return manifest
 
     edge_catalog = build_directed_edge_catalog(
@@ -360,7 +377,15 @@ def fit_stage1_v3(
         stage1_code_sha=code_sha,
         validated_input_manifest_id=validated_input_manifest_id,
     )
-    return manifest
+    execution = {
+        "schema_version": "stage1_v3_fit_execution.1",
+        "runtime_s": time.perf_counter() - started,
+        "initial_rss_mb": initial_rss_mb,
+        "peak_rss_mb_observed": max(initial_rss_mb, _current_rss_mb()),
+        "resumed": False,
+    }
+    atomic_write_json(destination / "fit_execution.json", execution)
+    return {**manifest, "execution": execution}
 
 
 def _read_json(path: Path) -> dict[str, Any]:
@@ -538,7 +563,7 @@ def _resume_matches(
         raise ContractError(f"incomplete Stage1 v3 bucket exists: {target}")
     manifest = _read_json(manifest_path)
     expected = {
-        "schema_version": "stage1_v3_output_bucket.1",
+        "schema_version": OUTPUT_BUCKET_SCHEMA_VERSION,
         "label_schema_version": "stage1_label_schema_v3",
         "scientific_status": "NOT_VALIDATED",
         "split": ref.split,
@@ -666,6 +691,8 @@ def transform_stage1_v3(
 ) -> dict[str, Any]:
     """Apply immutable train models to every bucket with exact resume identity."""
 
+    started = time.perf_counter()
+    peak_rss_mb = _current_rss_mb()
     _execution_guard(config, allow_review_candidate=allow_review_candidate)
     code_sha = _verified_code_identity(stage1_code_sha)
     freeze = load_stage0_freeze_manifest(stage0_freeze_manifest, config)
@@ -729,6 +756,7 @@ def transform_stage1_v3(
                 prior = _read_json(target / "manifest.json")
                 for product, count in prior["product_row_counts"].items():
                     row_counts[product] += int(count)
+                peak_rss_mb = max(peak_rss_mb, _current_rss_mb())
                 continue
 
         bucket = load_stage0_bucket(ref, config)
@@ -747,7 +775,7 @@ def transform_stage1_v3(
                 counts[product] = int(len(frame))
                 row_counts[product] += int(len(frame))
             manifest = {
-                "schema_version": "stage1_v3_output_bucket.1",
+                "schema_version": OUTPUT_BUCKET_SCHEMA_VERSION,
                 "label_schema_version": config.schema_version,
                 "engineering_status": "PASS",
                 "scientific_status": "NOT_VALIDATED",
@@ -770,9 +798,10 @@ def transform_stage1_v3(
             }
             atomic_write_json(temporary / "manifest.json", manifest)
         transformed += 1
+        peak_rss_mb = max(peak_rss_mb, _current_rss_mb())
 
     summary = {
-        "schema_version": "stage1_v3_output_summary.1",
+        "schema_version": OUTPUT_SUMMARY_SCHEMA_VERSION,
         "engineering_status": "PASS",
         "scientific_status": "NOT_VALIDATED",
         "model_id": models.model_id,
@@ -787,6 +816,8 @@ def transform_stage1_v3(
         "transformed_bucket_count": transformed,
         "resumed_bucket_count": skipped,
         "product_row_counts": row_counts,
+        "runtime_s": time.perf_counter() - started,
+        "peak_rss_mb": peak_rss_mb,
         "dates": {
             "train": list(config.train_dates),
             "validation": list(config.validation_dates),

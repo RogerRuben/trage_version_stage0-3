@@ -201,7 +201,8 @@ def fit_directed_support(
         for scope in (
             "edge",
             "edge_hour",
-            "road_class_hour",
+            "edge_time_bin_30m",
+            "highway_hour",
             "node_hour",
             "global_hour",
         )
@@ -216,19 +217,20 @@ def fit_directed_support(
             count = int(row.direct_interval_count)
             if count <= 0:
                 raise ContractError("direct_interval_count must be positive")
-            hour = int(
-                pd.to_datetime(
-                    float(row.observation_window_start_time),
-                    unit="s",
-                    utc=True,
-                )
-                .tz_convert("Asia/Shanghai")
-                .hour
-            )
+            local_time = pd.to_datetime(
+                float(row.observation_window_start_time),
+                unit="s",
+                utc=True,
+            ).tz_convert("Asia/Shanghai")
+            hour = int(local_time.hour)
+            time_bin_30m = hour * 2 + int(local_time.minute >= 30)
             edge = catalog.loc[uid]
             counters["edge"][(uid, -1)] += count
             counters["edge_hour"][(uid, hour)] += count
-            counters["road_class_hour"][(str(edge.road_class), hour)] += count
+            counters["edge_time_bin_30m"][(uid, time_bin_30m)] += count
+            counters["highway_hour"][
+                (str(edge.canonical_highway), hour)
+            ] += count
             for node in {
                 int(edge.observed_from_node),
                 int(edge.observed_to_node),
@@ -265,7 +267,7 @@ def fit_directed_support_from_observations(
         "observed_directed_edge_uid",
         "observed_from_node",
         "observed_to_node",
-        "road_class",
+        "canonical_highway",
     ]
     catalog = edge_catalog[catalog_columns]
     counters: dict[str, Counter[tuple[str, int]]] = {
@@ -273,7 +275,8 @@ def fit_directed_support_from_observations(
         for scope in (
             "edge",
             "edge_hour",
-            "road_class_hour",
+            "edge_time_bin_30m",
+            "highway_hour",
             "node_hour",
             "global_hour",
         )
@@ -304,14 +307,14 @@ def fit_directed_support_from_observations(
             ]
         ].copy()
         samples["observation_count"] = 1
-        samples["hour"] = (
-            pd.to_datetime(
-                samples["interval_start_time"],
-                unit="s",
-                utc=True,
-            )
-            .dt.tz_convert(timezone)
-            .dt.hour.astype(int)
+        local_time = pd.to_datetime(
+            samples["interval_start_time"],
+            unit="s",
+            utc=True,
+        ).dt.tz_convert(timezone)
+        samples["hour"] = local_time.dt.hour.astype(int)
+        samples["time_bin_30m"] = (
+            samples["hour"] * 2 + (local_time.dt.minute >= 30).astype(int)
         )
         samples = samples.merge(
             catalog,
@@ -333,7 +336,7 @@ def fit_directed_support_from_observations(
         update("edge", edge_total, "observed_directed_edge_uid", "hour")
         for scope, key in (
             ("edge_hour", "observed_directed_edge_uid"),
-            ("road_class_hour", "road_class"),
+            ("highway_hour", "canonical_highway"),
         ):
             grouped = (
                 samples.groupby([key, "hour"], sort=False)[
@@ -343,6 +346,19 @@ def fit_directed_support_from_observations(
                 .reset_index()
             )
             update(scope, grouped, key, "hour")
+        edge_time_bin = (
+            samples.groupby(
+                ["observed_directed_edge_uid", "time_bin_30m"], sort=False
+            )["observation_count"]
+            .sum()
+            .reset_index()
+        )
+        update(
+            "edge_time_bin_30m",
+            edge_time_bin,
+            "observed_directed_edge_uid",
+            "time_bin_30m",
+        )
 
         node_samples = pd.concat(
             [
@@ -407,6 +423,9 @@ def apply_directed_support(
         result = frame.copy()
         result["edge_observation_count"] = pd.Series(dtype="int64")
         result["edge_hour_observation_count"] = pd.Series(dtype="int64")
+        result["edge_time_bin_30m_observation_count"] = pd.Series(
+            dtype="int64"
+        )
         result["edge_support_level"] = pd.Series(dtype="object")
         result["edge_hour_support_level"] = pd.Series(dtype="object")
         result["directed_edge_model_scope"] = pd.Series(dtype="object")
@@ -428,6 +447,7 @@ def apply_directed_support(
     result = frame.copy()
     edge_counts: list[int] = []
     edge_hour_counts: list[int] = []
+    edge_time_bin_counts: list[int] = []
     edge_levels: list[str] = []
     hour_levels: list[str] = []
     model_scopes: list[str] = []
@@ -436,33 +456,37 @@ def apply_directed_support(
         train_seen = uid in catalog.index
         if train_seen:
             edge = catalog.loc[uid]
-            road_class = str(edge.road_class)
+            canonical_highway = str(edge.canonical_highway)
             from_node = int(edge.observed_from_node)
             to_node = int(edge.observed_to_node)
         else:
-            road_class = str(row.canonical_highway)
+            canonical_highway = str(row.canonical_highway)
             from_node = int(row.observed_from_node)
             to_node = int(row.observed_to_node)
         model_scopes.append("train_seen" if train_seen else "evaluation_unseen")
-        hour = int(
-            pd.to_datetime(
-                float(row.observation_window_start_time), unit="s", utc=True
-            )
-            .tz_convert(str(config.section("time")["timezone"]))
-            .hour
-        )
+        local_time = pd.to_datetime(
+            float(row.observation_window_start_time), unit="s", utc=True
+        ).tz_convert(str(config.section("time")["timezone"]))
+        hour = int(local_time.hour)
+        time_bin_30m = hour * 2 + int(local_time.minute >= 30)
         edge_count = lookup.get(("edge", uid, -1), 0)
         edge_hour_count = lookup.get(("edge_hour", uid, hour), 0)
+        edge_time_bin_count = lookup.get(
+            ("edge_time_bin_30m", uid, time_bin_30m), 0
+        )
         edge_counts.append(edge_count)
         edge_hour_counts.append(edge_hour_count)
+        edge_time_bin_counts.append(edge_time_bin_count)
         edge_levels.append(
             "edge" if edge_count >= edge_minimum else "fallback_required"
         )
         candidates = (
             ("edge_hour", edge_hour_count),
             (
-                "road_class_hour",
-                lookup.get(("road_class_hour", road_class, hour), 0),
+                "highway_hour",
+                lookup.get(
+                    ("highway_hour", canonical_highway, hour), 0
+                ),
             ),
             (
                 "spatial_neighbor",
@@ -489,6 +513,7 @@ def apply_directed_support(
 
     result["edge_observation_count"] = edge_counts
     result["edge_hour_observation_count"] = edge_hour_counts
+    result["edge_time_bin_30m_observation_count"] = edge_time_bin_counts
     result["edge_support_level"] = edge_levels
     result["edge_hour_support_level"] = hour_levels
     result["directed_edge_model_scope"] = model_scopes

@@ -108,7 +108,7 @@ def write_model_bundle(
             for name, filename in MODEL_FILES.items()
         }
         manifest_core = {
-            "schema_version": "stage1_v3_models.3",
+            "schema_version": "stage1_v3_models.4",
             "label_schema_version": config.schema_version,
             "engineering_status": "PASS",
             "scientific_status": "NOT_VALIDATED",
@@ -198,7 +198,7 @@ def load_model_bundle(
 ) -> Stage1V3Models:
     source = Path(root)
     manifest = _read_json(source / "model_manifest.json")
-    if manifest.get("schema_version") != "stage1_v3_models.3":
+    if manifest.get("schema_version") != "stage1_v3_models.4":
         raise ContractError("unsupported Stage1 v3 model schema")
     if manifest.get("label_schema_version") != config.schema_version:
         raise ContractError("model label schema differs from the requested schema")

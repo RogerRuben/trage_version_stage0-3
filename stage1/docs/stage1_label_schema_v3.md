@@ -24,6 +24,11 @@ V3 makes five deliberately narrow decisions:
 The machine-readable contract is
 [`stage1/config/stage1_label_schema_v3.json`](../config/stage1_label_schema_v3.json).
 
+The final mathematical definitions, including mutually exclusive crawl/stop
+states, midpoint-delta-weighted acceleration RMS, the traversal distance gate,
+`canonical_highway` support, and nullable tail semantics, are specified in
+[`stage1_v3_methodology.md`](stage1_v3_methodology.md).
+
 ## Frozen input and temporal split
 
 Stage 1 reads `stage1/input_v1` without modifying it. Eleven Stage 0 products

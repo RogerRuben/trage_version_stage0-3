@@ -34,6 +34,8 @@ ORDER_LABEL_COLUMNS = (
         for dimension in DIMENSIONS
         for statistic in DIMENSION_STATISTICS
     ),
+    "lcs_tail_event_present",
+    "rts_tail_event_present",
     "all_dimension_mask",
     "valid_core_dimension_count",
     "core_composition_signature",
@@ -526,6 +528,21 @@ def aggregate_order_labels(
             )
             mask[dimension] = available
             dimension_coverage[dimension] = coverage_share
+            if dimension in CORE_IDENTITY_DIMENSIONS:
+                tail_column = f"{dimension}_tail_event"
+                if not available:
+                    label_row[f"{dimension}_tail_event_present"] = pd.NA
+                else:
+                    tail_values = group.loc[valid, tail_column].astype(
+                        "boolean"
+                    )
+                    if tail_values.isna().any():
+                        raise ContractError(
+                            f"{tail_column} must be known for available rows"
+                        )
+                    label_row[f"{dimension}_tail_event_present"] = bool(
+                        tail_values.any()
+                    )
 
         core_available = [
             dimension for dimension in CORE_IDENTITY_DIMENSIONS if mask[dimension]
@@ -573,7 +590,10 @@ def aggregate_order_labels(
                 },
             }
         )
+    labels = pd.DataFrame(labels_rows).reindex(columns=ORDER_LABEL_COLUMNS)
+    for column in ("lcs_tail_event_present", "rts_tail_event_present"):
+        labels[column] = labels[column].astype("boolean")
     return (
-        pd.DataFrame(labels_rows).reindex(columns=ORDER_LABEL_COLUMNS),
+        labels,
         pd.DataFrame(quality_rows).reindex(columns=ORDER_QUALITY_COLUMNS),
     )

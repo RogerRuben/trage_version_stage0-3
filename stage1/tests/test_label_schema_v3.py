@@ -9,6 +9,10 @@ import pandas as pd
 import pytest
 
 from stage1.v3.aggregation import aggregate_order_labels
+from stage1.v3.audit import (
+    _frame_value_mismatches,
+    _nullable_identity_mismatch,
+)
 from stage1.v3.config import load_config, validate_config, validate_split_config
 from stage1.v3.histograms import (
     FixedBinHistogram,
@@ -32,6 +36,8 @@ from stage1.v3.primitives import (
 from stage1.v3.references import (
     SparseCohortHistograms,
     apply_reference_labels,
+    fit_label_histograms,
+    fit_reference_histograms,
 )
 from stage1.v3.schema import (
     ContractError,
@@ -92,7 +98,7 @@ def _config_payload() -> dict:
             "maximum_physical_speed_mps": 75.0,
             "maximum_absolute_acceleration_mps2": 8.0,
             "components": {
-                "low_speed_time_share": {"weight": 0.25},
+                "crawl_time_share": {"weight": 0.25},
                 "stop_time_share": {"weight": 0.25},
                 "speed_cv_bounded": {"weight": 0.25},
                 "acceleration_rms_bounded": {"weight": 0.25},
@@ -176,9 +182,11 @@ def _config_payload() -> dict:
             "minimum_edge_hour_observations": 1,
             "minimum_fallback_observations": 1,
             "fallback_order": [
-                "road_class_hour",
+                "edge_hour",
+                "highway_hour",
                 "spatial_neighbor",
                 "global_hour",
+                "unavailable",
             ],
             "upper_region_usage": "audit_only_not_a_model_fallback",
             "validation_test_policy": "apply_frozen_train_support_only",
@@ -330,6 +338,7 @@ def _traversal_labels(
             "lcs_unavailable_reason": ["", ""],
             "lcs_raw": [0.2, 0.4],
             "lcs_pct": [0.3, 0.5],
+            "lcs_tail_event": pd.Series([False, False], dtype="boolean"),
             "gns_available": [False, False],
             "gns_unavailable_reason": [
                 "EDGE_STATIC_FEATURE_EXTENSION_NOT_FITTED",
@@ -343,6 +352,10 @@ def _traversal_labels(
             ),
             "rts_raw": rts_raw,
             "rts_pct": rts_pct,
+            "rts_tail_event": pd.Series(
+                [pd.NA, pd.NA] if rts_missing else [False, False],
+                dtype="boolean",
+            ),
             "iis_available": [False, False],
             "iis_unavailable_reason": [
                 "STAGE0_V6_MOVEMENT_DYNAMIC_EVIDENCE_NOT_AVAILABLE",
@@ -481,7 +494,7 @@ def test_lcs_continuous_window_uses_frozen_component_weights(tmp_path):
     row = result.iloc[0]
     expected = np.mean(
         [
-            row["low_speed_time_share"],
+            row["crawl_time_share"],
             row["stop_time_share"],
             row["speed_cv_bounded"],
             row["acceleration_rms_bounded"],
@@ -682,6 +695,8 @@ def _reference_frame(observed_sec_per_m: float) -> pd.DataFrame:
             "weekday_type": ["weekday"],
             "peak_offpeak": ["offpeak"],
             "observed_sec_per_m": [observed_sec_per_m],
+            "rts_measurement_available": [True],
+            "rts_measurement_unavailable_reason": [""],
         }
     )
 
@@ -1077,10 +1092,226 @@ def test_evaluation_unseen_edge_uses_zero_train_support_and_fallback(tmp_path):
     assert int(result.iloc[0]["edge_hour_observation_count"]) == 0
     assert result.iloc[0]["edge_support_level"] == "fallback_required"
     assert result.iloc[0]["edge_hour_support_level"] in {
-        "road_class_hour",
+        "highway_hour",
         "spatial_neighbor",
         "global_hour",
     }
+
+
+def test_crawl_and_stop_are_mutually_exclusive(tmp_path):
+    config = _load_config(tmp_path)
+    observations = _observations().iloc[[0, 0, 0]].copy()
+    observations["gps_interval_id"] = [1, 2, 3]
+    observations["interval_start_time"] = [0.0, 2.0, 4.0]
+    observations["interval_end_time"] = [2.0, 4.0, 6.0]
+    observations["observed_travel_time_s"] = 2.0
+    observations["observed_speed_mps"] = [0.5, 2.0, 6.0]
+    observations["observed_distance_m"] = [1.0, 4.0, 12.0]
+    labels = build_interval_labels(
+        observations,
+        _traversals().iloc[[0]].copy(),
+        _route_parts().iloc[[0]].copy(),
+        config,
+    )
+
+    assert labels["is_stop"].tolist() == [True, False, False]
+    assert labels["is_crawl"].tolist() == [False, True, False]
+    assert labels["is_low_speed_total"].tolist() == [True, True, False]
+    assert not (labels["is_stop"] & labels["is_crawl"]).any()
+
+
+def test_acceleration_rms_is_weighted_by_midpoint_delta(tmp_path):
+    config = _load_config(tmp_path)
+    observations = _observations().iloc[[0, 0, 0]].copy()
+    observations["gps_interval_id"] = [1, 2, 3]
+    observations["interval_start_time"] = [0.0, 1.0, 3.0]
+    observations["interval_end_time"] = [1.0, 3.0, 7.0]
+    observations["observed_travel_time_s"] = [1.0, 2.0, 4.0]
+    observations["observed_speed_mps"] = [1.0, 3.0, 9.0]
+    observations["observed_distance_m"] = [1.0, 6.0, 36.0]
+    traversal = _traversals().iloc[[0]].copy()
+    traversal["allocated_distance_m"] = 100.0
+    route = _route_parts().iloc[[0]].copy()
+    route["length_m"] = 100.0
+    result = build_traversal_primitives(
+        observations, traversal, route, config
+    ).iloc[0]
+
+    weights = np.array([1.5, 3.0])
+    accelerations = np.array([2.0 / 1.5, 6.0 / 3.0])
+    expected = np.sqrt(
+        np.sum(weights * np.square(accelerations)) / weights.sum()
+    )
+    ordinary = np.sqrt(np.mean(np.square(accelerations)))
+    assert result["acceleration_pair_count"] == 2
+    assert result["acceleration_weight_s"] == pytest.approx(weights.sum())
+    assert result["acceleration_rms_mps2"] == pytest.approx(expected)
+    assert result["acceleration_rms_mps2"] != pytest.approx(ordinary)
+    assert result["maximum_absolute_acceleration_mps2"] == pytest.approx(
+        max(abs(accelerations))
+    )
+
+
+def test_distance_exceed_invalidates_both_labels_and_fit_inputs(tmp_path):
+    config = _load_config(tmp_path)
+    observations = _observations().iloc[[0, 0, 0]].copy()
+    observations["gps_interval_id"] = [1, 2, 3]
+    observations["interval_start_time"] = [0.0, 2.0, 4.0]
+    observations["interval_end_time"] = [2.0, 4.0, 6.0]
+    observations["observed_travel_time_s"] = 2.0
+    observations["observed_speed_mps"] = [10.0, 10.0, 10.0]
+    observations["observed_distance_m"] = [20.0, 20.0, 20.0]
+    primitive = build_traversal_primitives(
+        observations,
+        _traversals().iloc[[0]].copy(),
+        _route_parts().iloc[[0]].copy(),
+        config,
+    )
+    row = primitive.iloc[0]
+
+    assert bool(row["direct_distance_exceeds_allocated"])
+    assert not bool(row["lcs_available"])
+    assert not bool(row["rts_measurement_available"])
+    assert row["lcs_unavailable_reason"] == (
+        "DIRECT_DISTANCE_EXCEEDS_TRAVERSAL"
+    )
+    assert row["rts_measurement_unavailable_reason"] == (
+        "DIRECT_DISTANCE_EXCEEDS_TRAVERSAL"
+    )
+    assert np.isnan(row["observed_sec_per_m"])
+    reference = fit_reference_histograms([primitive], config)
+    labels = primitive.assign(
+        rts_raw=np.nan,
+        rts_available=False,
+        rts_unavailable_reason="DIRECT_DISTANCE_EXCEEDS_TRAVERSAL",
+    )
+    normalization = fit_label_histograms([labels], config)
+    assert reference.invalid_count == 1
+    assert sum(reference.counts["global"].get("global", {}).values()) == 0
+    assert normalization["lcs"].invalid_count == 1
+    assert normalization["rts"].invalid_count == 1
+
+
+def test_support_uses_canonical_highway_and_interval_time_bins(tmp_path):
+    products = _direction_products()
+    _normalize_nullable_dtypes(products)
+    _enrich_direction_lineage(products)
+    catalog = build_directed_edge_catalog([products["route_parts"]])
+    config = _load_config(tmp_path)
+    times = [
+        pd.Timestamp("2016-10-09 09:29", tz="Asia/Shanghai").timestamp(),
+        pd.Timestamp("2016-10-09 09:31", tz="Asia/Shanghai").timestamp(),
+        pd.Timestamp("2016-10-09 10:01", tz="Asia/Shanghai").timestamp(),
+    ]
+    observations = pd.DataFrame(
+        {
+            "order_id": ["a", "b", "c"],
+            "traversal_id": [1, 2, 3],
+            "gps_interval_id": [1, 2, 3],
+            "observed_directed_edge_uid": ["physical1:R"] * 3,
+            "interval_start_time": times,
+        }
+    )
+    model = fit_directed_support_from_observations(
+        [observations], catalog, config
+    )
+    assert "road_class_hour" not in set(model.counts["scope"])
+    lookup = {
+        (row.scope, row.key, int(row.hour)): int(row.observation_count)
+        for row in model.counts.itertuples(index=False)
+    }
+    assert lookup[("highway_hour", "primary", 9)] == 2
+    assert lookup[("edge_hour", "physical1:R", 9)] == 2
+    assert lookup[("edge_hour", "physical1:R", 10)] == 1
+    assert lookup[("edge_time_bin_30m", "physical1:R", 18)] == 1
+    assert lookup[("edge_time_bin_30m", "physical1:R", 19)] == 1
+    assert lookup[("edge_time_bin_30m", "physical1:R", 20)] == 1
+    applied = apply_directed_support(
+        pd.DataFrame(
+            {
+                "observed_directed_edge_uid": ["physical1:R"],
+                "canonical_highway": ["wrong_test_value"],
+                "observed_from_node": [20],
+                "observed_to_node": [10],
+                "observation_window_start_time": [times[1]],
+            }
+        ),
+        model,
+        config,
+    ).iloc[0]
+    assert applied["edge_hour_observation_count"] == 2
+    assert applied["edge_time_bin_30m_observation_count"] == 1
+    assert applied["edge_hour_support_level"] == "edge_hour"
+
+
+@pytest.mark.parametrize(
+    ("available", "percentile", "expected"),
+    [
+        (False, np.nan, pd.NA),
+        (True, 0.5, False),
+        (True, 0.95, True),
+    ],
+)
+def test_order_tail_event_present_has_three_states(
+    tmp_path, available, percentile, expected
+):
+    config = _load_config(tmp_path)
+    traversals = _traversal_labels()
+    traversals["rts_available"] = available
+    traversals["rts_pct"] = percentile
+    traversals["rts_raw"] = 0.2 if available else np.nan
+    traversals["rts_unavailable_reason"] = (
+        "" if available else "REFERENCE_SUPPORT_UNAVAILABLE"
+    )
+    traversals["rts_tail_event"] = pd.Series(
+        [percentile >= 0.9] * 2 if available else [pd.NA, pd.NA],
+        dtype="boolean",
+    )
+    labels, _ = aggregate_order_labels(
+        traversals,
+        _route_parts(),
+        _aggregation_traversals(),
+        _order_base(),
+        config,
+    )
+    actual = labels.iloc[0]["rts_tail_event_present"]
+    if expected is pd.NA:
+        assert pd.isna(actual)
+    else:
+        assert bool(actual) is expected
+
+
+def test_audit_regeneration_treats_nullable_boolean_missing_as_equal():
+    expected = pd.DataFrame(
+        {
+            "split": ["train", "train", "train"],
+            "date": ["20161009"] * 3,
+            "order_id": ["a", "b", "c"],
+            "tail_event_present": pd.Series(
+                [pd.NA, False, True], dtype="boolean"
+            ),
+        }
+    )
+    actual = expected.copy()
+    assert (
+        _frame_value_mismatches(
+            actual,
+            expected,
+            keys=["split", "date", "order_id"],
+        )
+        == {}
+    )
+
+
+def test_audit_nullable_integer_identity_is_dtype_independent():
+    output_values = pd.Series([12438758330, pd.NA], dtype="Int64")
+    input_values = pd.Series([12438758330.0, np.nan], dtype="float64")
+    mismatch = _nullable_identity_mismatch(
+        output_values,
+        input_values,
+        numeric=True,
+    )
+    assert mismatch.tolist() == [False, False]
 
 
 def test_route_segment_component_distance_is_forbidden_for_features():

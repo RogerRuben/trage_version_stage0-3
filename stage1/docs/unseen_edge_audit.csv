@@ -1,0 +1,10 @@
+split,metric,count
+test,nonzero_edge_hour_support_count,0
+test,nonzero_edge_support_count,0
+test,traversal_count,113
+train,nonzero_edge_hour_support_count,0
+train,nonzero_edge_support_count,0
+train,traversal_count,0
+validation,nonzero_edge_hour_support_count,0
+validation,nonzero_edge_support_count,0
+validation,traversal_count,134

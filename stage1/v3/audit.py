@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 from collections import Counter, defaultdict
 from pathlib import Path
+import time
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -29,9 +30,12 @@ from .pipeline import OUTPUT_PRODUCTS, _input_identities
 from .primitives import build_interval_labels, build_traversal_primitives
 from .schema import (
     ContractError,
+    OUTPUT_BUCKET_SCHEMA_VERSION,
     OUTPUT_PRIMARY_KEYS,
     OUTPUT_REQUIRED_COLUMNS,
+    OUTPUT_SUMMARY_SCHEMA_VERSION,
 )
+from .support import apply_directed_support
 
 if TYPE_CHECKING:
     from .config import Stage1V3Config
@@ -40,8 +44,9 @@ if TYPE_CHECKING:
 STRICT_BOOLEAN_OUTPUTS = {
     "interval_labels": (
         "label_valid",
-        "is_low_speed",
         "is_stop",
+        "is_crawl",
+        "is_low_speed_total",
         "kinematic_sequence_valid",
         "lcs_component_available",
     ),
@@ -50,7 +55,7 @@ STRICT_BOOLEAN_OUTPUTS = {
         "discontinuous_direct_window",
         "lcs_available",
         "rts_available",
-        "rts_tail_event",
+        "rts_measurement_available",
         "gns_available",
         "iis_available",
         "pmis_available",
@@ -134,6 +139,31 @@ def _strict_boolean(series: pd.Series, name: str) -> pd.Series:
     return series.eq(True)
 
 
+def _nullable_identity_mismatch(
+    left: pd.Series,
+    right: pd.Series,
+    *,
+    numeric: bool = False,
+) -> pd.Series:
+    """Compare identity columns without turning nullable values into strings."""
+
+    both_missing = left.isna() & right.isna()
+    if numeric:
+        same_value = (
+            pd.to_numeric(left, errors="coerce")
+            .astype("Int64")
+            .eq(pd.to_numeric(right, errors="coerce").astype("Int64"))
+            .fillna(False)
+        )
+    else:
+        same_value = (
+            left.astype("string")
+            .eq(right.astype("string"))
+            .fillna(False)
+        )
+    return ~(both_missing | same_value)
+
+
 def _frame_value_mismatches(
     actual: pd.DataFrame,
     expected: pd.DataFrame,
@@ -163,10 +193,17 @@ def _frame_value_mismatches(
         expected_values = joined[f"{column}_expected"]
         actual_values = joined[f"{column}_actual"]
         if pd.api.types.is_bool_dtype(expected[column].dtype):
+            both_missing = expected_values.isna() & actual_values.isna()
             strict_actual = actual_values.map(
-                lambda value: isinstance(value, (bool, np.bool_))
+                lambda value: pd.isna(value)
+                or isinstance(value, (bool, np.bool_))
             )
-            mismatch = ~strict_actual | actual_values.ne(expected_values)
+            same_boolean = (
+                actual_values.astype("boolean")
+                .eq(expected_values.astype("boolean"))
+                .fillna(False)
+            )
+            mismatch = ~(both_missing | (strict_actual & same_boolean))
         elif pd.api.types.is_numeric_dtype(expected[column].dtype):
             left = pd.to_numeric(expected_values, errors="coerce")
             right = pd.to_numeric(actual_values, errors="coerce")
@@ -206,6 +243,15 @@ def verify_stage1_v3(
     from .config import validate_config
 
     validate_config(config)
+    started = time.perf_counter()
+    try:
+        import psutil
+
+        process = psutil.Process()
+        peak_rss_mb = process.memory_info().rss / (1024 * 1024)
+    except (ImportError, OSError):
+        process = None
+        peak_rss_mb = float("nan")
     code_sha = stage1_v3_code_identity()
     if (
         stage1_code_sha is not None
@@ -216,6 +262,8 @@ def verify_stage1_v3(
         )
     freeze = load_stage0_freeze_manifest(stage0_freeze_manifest, config)
     models = load_model_bundle(model_root, config)
+    if models.support.counts["scope"].eq("road_class_hour").any():
+        raise ContractError("legacy road_class_hour support scope is forbidden")
     if models.manifest.get("stage1_code_sha") != code_sha:
         raise ContractError("audit code SHA differs from the fitted model")
     if models.manifest.get("stage0_freeze_identity", {}).get(
@@ -245,6 +293,11 @@ def verify_stage1_v3(
             f"missing={missing[:5]}, extra={extra[:5]}"
         )
     for ref in refs:
+        if process is not None:
+            peak_rss_mb = max(
+                peak_rss_mb,
+                process.memory_info().rss / (1024 * 1024),
+            )
         dates[ref.split].add(ref.date)
         bucket = load_stage0_bucket(ref, config)
         target = (
@@ -264,7 +317,7 @@ def verify_stage1_v3(
             f"{ref.split}/{ref.date}/{ref.bucket:05d}"
         ]
         for name, expected in {
-            "schema_version": "stage1_v3_output_bucket.1",
+            "schema_version": OUTPUT_BUCKET_SCHEMA_VERSION,
             "label_schema_version": config.schema_version,
             "scientific_status": "NOT_VALIDATED",
             "model_id": models.model_id,
@@ -447,6 +500,15 @@ def verify_stage1_v3(
                 )
 
         if len(intervals):
+            stop = intervals["is_stop"].eq(True)
+            crawl = intervals["is_crawl"].eq(True)
+            low_total = intervals["is_low_speed_total"].eq(True)
+            invalid_low_speed = (stop & crawl) | low_total.ne(stop | crawl)
+            if invalid_low_speed.any():
+                failures.append(
+                    f"{target}: crawl/stop partition failures="
+                    f"{int(invalid_low_speed.sum())}"
+                )
             try:
                 valid_flags = _strict_boolean(
                     intervals["label_valid"],
@@ -565,6 +627,101 @@ def verify_stage1_v3(
                     )
 
         if len(traversals):
+            expected_support = apply_directed_support(
+                traversals,
+                models.support,
+                config,
+            )
+            for column in (
+                "edge_observation_count",
+                "edge_hour_observation_count",
+                "edge_time_bin_30m_observation_count",
+                "edge_support_level",
+                "edge_hour_support_level",
+                "directed_edge_model_scope",
+            ):
+                mismatch = (
+                    traversals[column]
+                    .astype("string")
+                    .fillna("<NULL>")
+                    .ne(
+                        expected_support[column]
+                        .astype("string")
+                        .fillna("<NULL>")
+                    )
+                )
+                if mismatch.any():
+                    failures.append(
+                        f"{target}: support identity failures for {column}="
+                        f"{int(mismatch.sum())}"
+                    )
+            unseen = traversals["directed_edge_model_scope"].eq(
+                "evaluation_unseen"
+            )
+            unseen_nonzero = unseen & (
+                pd.to_numeric(
+                    traversals["edge_observation_count"], errors="coerce"
+                ).ne(0)
+                | pd.to_numeric(
+                    traversals["edge_hour_observation_count"],
+                    errors="coerce",
+                ).ne(0)
+                | pd.to_numeric(
+                    traversals[
+                        "edge_time_bin_30m_observation_count"
+                    ],
+                    errors="coerce",
+                ).ne(0)
+            )
+            if unseen_nonzero.any():
+                failures.append(
+                    f"{target}: evaluation unseen support leakage="
+                    f"{int(unseen_nonzero.sum())}"
+                )
+            distance_exceeds = traversals[
+                "direct_distance_exceeds_allocated"
+            ].eq(True)
+            invalid_distance_labels = distance_exceeds & (
+                traversals["lcs_available"].eq(True)
+                | traversals["rts_available"].eq(True)
+                | traversals["rts_measurement_available"].eq(True)
+                | pd.to_numeric(
+                    traversals["observed_sec_per_m"], errors="coerce"
+                ).notna()
+            )
+            if invalid_distance_labels.any():
+                failures.append(
+                    f"{target}: labels retained after distance exceed="
+                    f"{int(invalid_distance_labels.sum())}"
+                )
+            acceleration_pairs = pd.to_numeric(
+                traversals["acceleration_pair_count"], errors="coerce"
+            )
+            acceleration_weight = pd.to_numeric(
+                traversals["acceleration_weight_s"], errors="coerce"
+            )
+            weighted_rms = pd.to_numeric(
+                traversals["acceleration_rms_mps2"], errors="coerce"
+            )
+            invalid_acceleration_weight = (
+                acceleration_pairs.ge(
+                    int(
+                        config.section("lcs")[
+                            "minimum_acceleration_pairs"
+                        ]
+                    )
+                )
+                & (
+                    ~np.isfinite(acceleration_weight)
+                    | acceleration_weight.le(0)
+                    | ~np.isfinite(weighted_rms)
+                )
+            )
+            if invalid_acceleration_weight.any():
+                failures.append(
+                    f"{target}: acceleration weighting failures="
+                    f"{int(invalid_acceleration_weight.sum())}"
+                )
             invalid_traversal_provenance = int(
                 (
                     ~traversals["measurement_source"].eq("direct_observed")
@@ -690,8 +847,12 @@ def verify_stage1_v3(
                 "movement_source",
                 "movement_quality",
             ):
-                mismatch = ~movement_identity[f"{column}_output"].astype(str).eq(
-                    movement_identity[f"{column}_input"].astype(str)
+                output_values = movement_identity[f"{column}_output"]
+                input_values = movement_identity[f"{column}_input"]
+                mismatch = _nullable_identity_mismatch(
+                    output_values,
+                    input_values,
+                    numeric=column == "via_node",
                 )
                 if mismatch.any():
                     failures.append(
@@ -801,7 +962,7 @@ def verify_stage1_v3(
         if len(traversals):
             lcs_available = traversals["lcs_available"].eq(True)
             lcs_components = [
-                "low_speed_time_share",
+                "crawl_time_share",
                 "stop_time_share",
                 "speed_cv_bounded",
                 "acceleration_rms_bounded",
@@ -868,6 +1029,9 @@ def verify_stage1_v3(
                         "minimum_direct_observed_distance_m"
                     ]
                 ))
+                & ~traversals["direct_distance_exceeds_allocated"]
+                .eq(True)
+                .to_numpy(dtype=bool)
                 & ~traversals["discontinuous_direct_window"].eq(
                     True
                 ).to_numpy(dtype=bool)
@@ -876,6 +1040,25 @@ def verify_stage1_v3(
                 .astype(bool)
                 .to_numpy(dtype=bool)
             )
+            measurement_available = traversals[
+                "rts_measurement_available"
+            ].eq(True).to_numpy(dtype=bool)
+            if np.any(measurement_available != pace_eligible):
+                failures.append(
+                    f"{target}: RTS measurement availability failures="
+                    f"{int(np.sum(measurement_available != pace_eligible))}"
+                )
+            measurement_reasons = traversals[
+                "rts_measurement_unavailable_reason"
+            ].fillna("").astype(str)
+            invalid_measurement_reason = (
+                measurement_available & measurement_reasons.ne("")
+            ) | (~measurement_available & measurement_reasons.eq(""))
+            if invalid_measurement_reason.any():
+                failures.append(
+                    f"{target}: RTS measurement reason failures="
+                    f"{int(invalid_measurement_reason.sum())}"
+                )
             expected_pace[pace_eligible] = (
                 direct_time[pace_eligible] / direct_distance[pace_eligible]
             )
@@ -1001,24 +1184,32 @@ def verify_stage1_v3(
                     f"{target}: RTS reference identity failures="
                     f"{int(reference_identity_failure.sum())}"
                 )
-            try:
-                tail_event = _strict_boolean(
-                    traversals["rts_tail_event"],
-                    "traversal_labels.rts_tail_event",
+            for dimension, dimension_available in (
+                ("lcs", lcs_available),
+                ("rts", rts_available),
+            ):
+                tail_event = traversals[f"{dimension}_tail_event"].astype(
+                    "boolean"
                 )
-                expected_tail = rts_available & pd.to_numeric(
-                    traversals["rts_pct"], errors="coerce"
+                expected_tail = pd.Series(
+                    pd.NA, index=traversals.index, dtype="boolean"
+                )
+                expected_tail.loc[dimension_available] = pd.to_numeric(
+                    traversals.loc[
+                        dimension_available, f"{dimension}_pct"
+                    ],
+                    errors="coerce",
                 ).ge(
                     float(
-                        config.section("rts")[
-                            "tail_event_percentile_threshold"
+                        config.section("aggregation")[
+                            "tail_percentile_threshold"
                         ]
                     )
-                )
-                if not tail_event.eq(expected_tail).all():
-                    failures.append(f"{target}: RTS tail-event mismatch")
-            except ContractError as exc:
-                failures.append(f"{target}: {exc}")
+                ).astype(bool)
+                if not tail_event.equals(expected_tail):
+                    failures.append(
+                        f"{target}: {dimension.upper()} tail-event mismatch"
+                    )
 
         for unavailable in ("gns", "iis", "pmis"):
             try:
@@ -1119,6 +1310,17 @@ def verify_stage1_v3(
                     f"{target}: {dimension} order missingness failures="
                     f"{int(unavailable_leak.sum() + available_missing.sum())}"
                 )
+            tail_present = orders[
+                f"{dimension}_tail_event_present"
+            ].astype("boolean")
+            invalid_tail_state = (
+                order_available & tail_present.isna()
+            ) | (~order_available & tail_present.notna())
+            if invalid_tail_state.any():
+                failures.append(
+                    f"{target}: {dimension} order tail-state failures="
+                    f"{int(invalid_tail_state.sum())}"
+                )
 
         for unavailable in ("gns", "iis", "pmis"):
             try:
@@ -1208,7 +1410,7 @@ def verify_stage1_v3(
     else:
         summary = _read_json(summary_path)
         for name, expected in {
-            "schema_version": "stage1_v3_output_summary.1",
+            "schema_version": OUTPUT_SUMMARY_SCHEMA_VERSION,
             "engineering_status": "PASS",
             "scientific_status": "NOT_VALIDATED",
             "model_id": models.model_id,
@@ -1263,6 +1465,8 @@ def verify_stage1_v3(
         "config_sha": config.digest,
         "stage1_code_sha": code_sha,
         "bucket_count": len(refs),
+        "runtime_s": time.perf_counter() - started,
+        "peak_rss_mb": peak_rss_mb,
         "unique_order_count": len(seen_orders),
         "counters": dict(sorted(counters.items())),
         "schema_hashes": {
