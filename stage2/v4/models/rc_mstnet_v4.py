@@ -1,0 +1,148 @@
+"""RC-MSTNet v4 with explicit masks and continuous route chunks."""
+
+from __future__ import annotations
+
+import math
+
+import torch
+from torch import nn
+
+
+def sinusoidal_position_encoding(
+    positions: torch.Tensor,
+    dimension: int,
+) -> torch.Tensor:
+    half = dimension // 2
+    frequency = torch.exp(
+        torch.arange(half, device=positions.device, dtype=torch.float32)
+        * (-math.log(10000.0) / max(half - 1, 1))
+    )
+    angles = positions.to(torch.float32).unsqueeze(-1) * frequency
+    encoding = torch.cat((torch.sin(angles), torch.cos(angles)), dim=-1)
+    if encoding.shape[-1] < dimension:
+        encoding = torch.nn.functional.pad(encoding, (0, dimension - encoding.shape[-1]))
+    return encoding
+
+
+class RCMSTNetV4(nn.Module):
+    def __init__(
+        self,
+        *,
+        numeric_feature_count: int,
+        categorical_sizes: tuple[int, ...],
+        hidden_dim: int = 128,
+        categorical_embedding_dim: int = 24,
+        transformer_layers: int = 3,
+        attention_heads: int = 4,
+        dropout: float = 0.1,
+    ):
+        super().__init__()
+        self.numeric_encoder = nn.Sequential(
+            nn.Linear(numeric_feature_count * 2, hidden_dim),
+            nn.GELU(),
+            nn.LayerNorm(hidden_dim),
+        )
+        self.embeddings = nn.ModuleList(
+            [
+                nn.Embedding(size, categorical_embedding_dim, padding_idx=0)
+                for size in categorical_sizes
+            ]
+        )
+        self.categorical_encoder = nn.Sequential(
+            nn.Linear(
+                categorical_embedding_dim * len(categorical_sizes),
+                hidden_dim,
+            ),
+            nn.GELU(),
+            nn.LayerNorm(hidden_dim),
+        )
+        self.input_fusion = nn.Sequential(
+            nn.Linear(hidden_dim * 2, hidden_dim),
+            nn.GELU(),
+            nn.LayerNorm(hidden_dim),
+        )
+        self.local_route = nn.Conv1d(
+            hidden_dim,
+            hidden_dim,
+            kernel_size=3,
+            padding=1,
+        )
+        layer = nn.TransformerEncoderLayer(
+            d_model=hidden_dim,
+            nhead=attention_heads,
+            dim_feedforward=hidden_dim * 4,
+            dropout=dropout,
+            activation="gelu",
+            batch_first=True,
+            norm_first=True,
+        )
+        self.route_transformer = nn.TransformerEncoder(
+            layer,
+            num_layers=transformer_layers,
+            enable_nested_tensor=False,
+        )
+        self.final_norm = nn.LayerNorm(hidden_dim)
+        self.crawl_head = nn.Linear(hidden_dim, 1)
+        self.stop_presence_head = nn.Linear(hidden_dim, 1)
+        self.stop_positive_head = nn.Linear(hidden_dim, 1)
+        self.speed_cv_head = nn.Linear(hidden_dim, 1)
+        self.acceleration_head = nn.Linear(hidden_dim, 1)
+        self.rts_head = nn.Linear(hidden_dim, 1)
+        self.lcs_tail_head = nn.Linear(hidden_dim, 1)
+        self.rts_tail_head = nn.Linear(hidden_dim, 1)
+        self.uncertainty_head = nn.Linear(hidden_dim, 2)
+
+    def forward(
+        self,
+        numeric: torch.Tensor,
+        numeric_missing: torch.Tensor,
+        categorical: torch.Tensor,
+        route_sequence: torch.Tensor,
+        pad_mask: torch.Tensor,
+    ) -> dict[str, torch.Tensor]:
+        numeric_input = torch.cat(
+            (numeric, numeric_missing.to(numeric.dtype)),
+            dim=-1,
+        )
+        numeric_state = self.numeric_encoder(numeric_input)
+        categorical_state = self.categorical_encoder(
+            torch.cat(
+                [
+                    embedding(categorical[..., index])
+                    for index, embedding in enumerate(self.embeddings)
+                ],
+                dim=-1,
+            )
+        )
+        h = self.input_fusion(torch.cat((numeric_state, categorical_state), dim=-1))
+        h = h + sinusoidal_position_encoding(route_sequence, h.shape[-1]).to(h.dtype)
+        valid = (~pad_mask).unsqueeze(-1).to(h.dtype)
+        h = h * valid
+        h = h + self.local_route(h.transpose(1, 2)).transpose(1, 2)
+        h = h * valid
+        h = self.route_transformer(h, src_key_padding_mask=pad_mask)
+        h = self.final_norm(h) * valid
+
+        crawl = torch.sigmoid(self.crawl_head(h).squeeze(-1))
+        stop_presence_logit = self.stop_presence_head(h).squeeze(-1)
+        stop_positive = torch.sigmoid(self.stop_positive_head(h).squeeze(-1))
+        stop_share = torch.sigmoid(stop_presence_logit) * stop_positive
+        speed_cv = torch.sigmoid(self.speed_cv_head(h).squeeze(-1))
+        acceleration = torch.sigmoid(self.acceleration_head(h).squeeze(-1))
+        rts = torch.sigmoid(self.rts_head(h).squeeze(-1))
+        lcs = (crawl + stop_share + speed_cv + acceleration) / 4.0
+        uncertainty = self.uncertainty_head(h)
+        return {
+            "crawl_share": crawl,
+            "stop_presence_logit": stop_presence_logit,
+            "stop_positive_share": stop_positive,
+            "stop_share": stop_share,
+            "speed_cv": speed_cv,
+            "acceleration_rms": acceleration,
+            "rts_raw": rts,
+            "lcs_reconstructed_raw": lcs,
+            "lcs_tail_logit": self.lcs_tail_head(h).squeeze(-1),
+            "rts_tail_logit": self.rts_tail_head(h).squeeze(-1),
+            "lcs_log_scale": uncertainty[..., 0],
+            "rts_log_scale": uncertainty[..., 1],
+        }
