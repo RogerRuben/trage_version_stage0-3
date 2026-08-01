@@ -51,7 +51,7 @@ def _validate(payload: dict[str, Any]) -> None:
         "validation_model_dates": ("20161022", "20161023"),
         "calibration_dates": ("20161024",),
         "evaluation_dates": ("20161025", "20161026", "20161027"),
-        "legacy_test_dates": ("20161031",),
+        "legacy_test_dates": (),
     }
     protocol_name = split.get("protocol_name")
     expected_folds = (

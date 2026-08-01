@@ -14,7 +14,8 @@ def test_frozen_config_and_service_time_masks() -> None:
     assert split["validation_model_dates"] == ["20161022", "20161023"]
     assert split["calibration_dates"] == ["20161024"]
     assert split["evaluation_dates"] == ["20161025", "20161026", "20161027"]
-    assert split["legacy_test_dates"] == ["20161031"]
+    assert split["legacy_test_dates"] == []
+    assert config.payload["legacy_benchmark_fit"]["benchmark_dates"] == ["20161031"]
     assert len(config.payload["rolling_folds"]) == 3
     arrays = service_time_target_arrays(
         np.array(["direct_observed", "engine_interpolated", "direct_observed"]),
