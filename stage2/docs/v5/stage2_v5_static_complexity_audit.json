@@ -1,5 +1,5 @@
 {
-  "allowlisted_finding_count": 10,
+  "allowlisted_finding_count": 11,
   "blocking_finding_count": 0,
   "findings": [
     {
@@ -13,14 +13,14 @@
       "blocking": false,
       "file": "stage2/v5/data.py",
       "justification": "bounded one-day Stage 1 partition scan",
-      "line": 55,
+      "line": 64,
       "pattern": "partition_streaming_read"
     },
     {
       "blocking": false,
       "file": "stage2/v5/data.py",
       "justification": "bounded one-day Stage 1 partition scan",
-      "line": 58,
+      "line": 67,
       "pattern": "partition_streaming_read"
     },
     {
@@ -28,6 +28,13 @@
       "file": "stage2/v5/evaluate.py",
       "justification": "bounded one-day prediction scan; the day frame is released each iteration",
       "line": 61,
+      "pattern": "partition_streaming_read"
+    },
+    {
+      "blocking": false,
+      "file": "stage2/v5/final_evaluation.py",
+      "justification": "bounded three-day one-shot final evaluation scan",
+      "line": 77,
       "pattern": "partition_streaming_read"
     },
     {
@@ -81,8 +88,8 @@
     "concat_inside_loop",
     "repeated_parquet_read_inside_loop"
   ],
-  "scanned_file_count": 27,
+  "scanned_file_count": 31,
   "schema_version": "stage2_v5_static_complexity_audit.1",
-  "source_sha256": "cefcc9fedfec3532a070a571ff1db8cc1fd0f7b0c3ae90bc7bdd80262ea8fa00",
+  "source_sha256": "748a960c51ce9ae5a2b19be31fbe650fe5210b7ff6ac8b43f78f3d331bb447a9",
   "status": "PASS"
 }

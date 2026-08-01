@@ -1,0 +1,168 @@
+schema_version: stage0_v6_valhalla.1
+
+paths:
+  raw_root: D:/pycodes/didi_xian_raw
+  archive: D:/pycodes/didi_xian_raw/22-4-8.rar
+  seven_zip: C:/Program Files/7-Zip/7z.exe
+  pbf: D:/pycodes/didi_xian_raw/map_data/xian_roadmap_update.osm.pbf
+  valhalla_data: D:/pycodes/didi_xian_raw/valhalla_data
+  valhalla_config: D:/pycodes/didi_xian_raw/valhalla_data/valhalla.json
+  valhalla_tiles: D:/pycodes/didi_xian_raw/valhalla_data/tiles
+  output: stage2/output_v5/final_upstream/stage0_report
+  work: stage2/output_v5/final_upstream/stage0_work
+  stage1_input: stage2/output_v5/final_upstream/stage1/input_v1
+  fixed_sample_points: D:/pycodes/didi_xian_raw/.worktrees/stage0-v5/stage0/work_v5/sampled_points/orders=200__dates=31ff44387df7
+  fixed_sample_manifest: D:/pycodes/didi_xian_raw/.worktrees/stage0-v5/stage0/output_v5/manifests/sampling_runs/orders=200__dates=31ff44387df7/sampling_manifest.parquet
+  canonical_edges: D:/pycodes/didi_xian_raw/.worktrees/stage0-v5/stage0/output_v5/network/canonical_edges.parquet
+  v5_output: D:/pycodes/didi_xian_raw/.worktrees/stage0-v5/stage0/output_v5
+
+sample:
+  dates: ["20161010", "20161014", "20161016"]
+  orders_per_day: 200
+  seed: 20261009
+  expected_sha256: 160241c6f54f6c8083144a7c9ff052072e222f10ab4373fb9aca1b951c69746b
+
+preprocess:
+  coordinate_system: gcj02
+  maximum_time_gap_s: 300
+  maximum_speed_mps: 75
+  minimum_subtrace_points: 3
+
+modeling_eligibility:
+  minimum_valid_points: 10
+  minimum_unique_locations: 5
+  minimum_raw_gps_distance_m: 100
+  unobserved_gap_minimum_time_s: 20
+  unobserved_gap_minimum_distance_m: 300
+  maximum_unobserved_movement_share: 0.20
+
+valhalla:
+  backend: python
+  service_url: http://127.0.0.1:8002
+  costing: auto
+  ignore_oneways: true
+  oneway_candidate_selection: compare_on_risk
+  oneway_compare_snap_p90_m: 12
+  oneway_compare_snap_max_m: 40
+  oneway_selection_minimum_snap_improvement_m: 2
+  shape_match: map_snap
+  search_radius_m: 80
+  retry_search_radius_m: 160
+  gps_accuracy_m: 20
+  breakage_distance_m: 1000
+  interpolation_distance_m: 10
+  request_timeout_s: 120
+  controlled_retry: true
+
+quality:
+  strict:
+    minimum_matched_interval_share: 0.90
+    maximum_snap_distance_p90_m: 40
+    minimum_canonical_mapping_share: 0.99
+    maximum_inferred_distance_share: 0.25
+    maximum_od_endpoint_error_m: 100
+    minimum_route_gps_ratio: 0.50
+    maximum_route_gps_ratio: 2.50
+    maximum_preprocess_break_time_share: 0.10
+  analysis:
+    minimum_matched_interval_share: 0.50
+    minimum_canonical_mapping_share: 0.50
+    maximum_od_endpoint_error_m: 300
+    minimum_route_gps_ratio: 0.25
+    maximum_route_gps_ratio: 4.00
+    maximum_preprocess_break_time_share: 0.50
+  dynamic_strict:
+    minimum_direct_observed_interval_time_share: 0.70
+    maximum_unresolved_time_share: 0.20
+  dynamic_partial:
+    minimum_direct_observed_interval_time_share: 0.0
+
+products:
+  position_backtrack_tolerance: 0.01
+  enable_engine_allocation: false
+
+final_quality:
+  minimum_meaningful_segment_distance_m: 50
+  minimum_meaningful_segment_time_s: 30
+  segment_pass_minimum_buffer40_share: 0.85
+  segment_pass_maximum_uncovered_distance_share: 0.15
+  segment_fail_minimum_buffer40_share: 0.35
+  segment_fail_maximum_uncovered_distance_share: 0.55
+  order_fail_maximum_uncovered_distance_share: 0.30
+  order_fail_maximum_isolated_component_share: 0.25
+  order_pass_minimum_buffer20_share: 0.97
+  order_partial_raw_gps_p99_m: 30
+  route_fail_catastrophic_outlier_gap_distance_m: 250
+  route_fail_unsupported_interval_distance_m: 250
+  gps_unresolved_gap_distance_m: 300
+  inferred_corridor_minimum_points: 20
+  inferred_corridor_minimum_interpolated_point_share: 0.50
+  inferred_corridor_minimum_route_distance_share: 0.20
+  parallel_minimum_offset_m: 20
+  parallel_minimum_point_count: 5
+  parallel_window_minimum_time_s: 15
+  parallel_window_minimum_distance_m: 50
+  parallel_reliable_order_minimum_points: 20
+  parallel_maximum_offset_std_m: 18
+  parallel_minimum_same_sign_share: 0.80
+  parallel_maximum_heading_difference_deg: 25
+  parallel_relaxed_maximum_heading_difference_deg: 60
+  parallel_relaxed_minimum_same_sign_share: 0.60
+  parallel_minimum_time_s: 45
+  parallel_minimum_distance_m: 250
+  parallel_fail_offset_m: 40
+  parallel_fail_distance_m: 400
+  parallel_uncertain_distance_m: 250
+
+stage1_core:
+  maximum_local_outlier_time_share: 0.05
+  maximum_local_outlier_distance_share: 0.05
+  minimum_valid_direct_interval_count: 8
+  minimum_unique_timed_edge_count: 5
+
+production:
+  selection_seed: 20261009
+  candidate_bucket_size: 2000
+  raw_chunk_size: 500000
+  train_dates: []
+  validation_dates: ["20161028", "20161029"]
+  test_date: "20161030"
+  train_daily_target: 10000
+  validation_daily_target: 10000
+  test_target: 10000
+  prefilter:
+    minimum_valid_points: 10
+    minimum_duration_s: 30
+    maximum_invalid_coordinate_share: 0.10
+    maximum_reverse_timestamp_share: 0.05
+    maximum_duplicate_point_share: 0.90
+    minimum_od_distance_m: 50
+    maximum_impossible_speed_interval_share: 0.50
+    impossible_speed_mps: 75
+
+fixed600_regression:
+  route_fail: [29, 32]
+  no_route_review: [13, 17, 18, 19, 20, 24, 25, 27, 28]
+  discontinuity_not_fail: [33, 34, 35, 36, 37]
+  gps_local_outlier: [4, 14, 16, 34]
+  parallel_fail_or_improved: [1, 2, 3, 7]
+  route_partial: [6]
+  route_uncertain_if_not_improved: [23]
+
+audit:
+  route_buffer_m: 40
+  speed_violation_mps: 50
+  review_speed_mps: 45
+  hard_speed_mps: 70
+  hard_speed_violation_count: 4
+  hard_topology_violations: 5
+  hard_valhalla_discontinuities: 3
+  manual_image_limit: 600
+  auto_fail_image_limit: 600
+  total_image_limit: 600
+
+runtime:
+  orders_per_bucket: 200
+  diagnostic_response_sample_count: 0
+  manual_audit_sample_count: 100
+  parquet_compression: zstd

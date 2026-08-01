@@ -65,10 +65,10 @@
       },
       {
         "detail": {
-          "collected": 32,
+          "collected": 34,
           "failed": 0,
-          "passed": 32,
-          "runtime_s": 95.65,
+          "passed": 34,
+          "runtime_s": 169.71,
           "status": "PASS"
         },
         "name": "regression_tests",
@@ -93,7 +93,7 @@
         "status": "PASS"
       },
       {
-        "detail": 451.8828125,
+        "detail": 436.76953125,
         "name": "peak_rss",
         "status": "PASS"
       }

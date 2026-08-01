@@ -122,6 +122,8 @@ def verify(*, repo_root: str | Path = ".") -> dict[str, Any]:
 
     final_path = docs / "stage2_v5_final_test_results.json"
     final_result = _json(final_path) if final_path.is_file() else None
+    development_path = docs / "stage2_v5_development_freeze.json"
+    development = _json(development_path) if development_path.is_file() else None
     final_checks: list[dict[str, Any]] = []
     if final_result is not None:
         final_checks = [
@@ -131,8 +133,24 @@ def verify(*, repo_root: str | Path = ".") -> dict[str, Any]:
             _check("final_aggregate_mae", final_result.get("aggregate_mae_better_than_strong_baseline") is True, final_result.get("aggregate_relative_mae_change")),
             _check("final_daily_mae_wins", int(final_result.get("daily_mae_wins", 0)) >= int(admission["minimum_final_daily_mae_wins_vs_strong_baseline"]), final_result.get("daily_mae_wins")),
             _check("final_paired_bootstrap", final_result.get("paired_bootstrap_ci_below_zero") is True, final_result.get("paired_bootstrap_ci95")),
+            _check(
+                "final_pace_quantile_calibration",
+                float(final_result.get("maximum_pace_quantile_coverage_error", np.inf))
+                <= float(admission["maximum_pace_quantile_coverage_error"]),
+                final_result.get("maximum_pace_quantile_coverage_error"),
+            ),
             _check("final_route_scenario_coverage", final_result.get("route_scenario_coverage_acceptable") is True, final_result.get("route_scenario_coverage")),
             _check("no_final_tuning", final_result.get("post_test_tuning_count") == 0, final_result.get("post_test_tuning_count")),
+            _check(
+                "development_frozen_before_final",
+                development is not None and development.get("freeze_status") == "FROZEN_BEFORE_FINAL_TEST",
+                development.get("implementation_commit") if development else None,
+            ),
+            _check(
+                "selection_model_unchanged",
+                development is not None and final_result.get("selection_model_id") == development.get("selection_model_id"),
+                final_result.get("selection_model_id"),
+            ),
         ]
     final_test_status = (
         "PASS" if final_checks and all(item["status"] == "PASS" for item in final_checks)

@@ -41,8 +41,17 @@ def _input_split(split: str) -> str:
     return "validation" if split in {"validation_model", "calibration"} else split
 
 
-def _traversal_targets(repo_root: Path, split: str, date: str) -> pd.DataFrame:
-    day = repo_root / "stage1/input_v1" / f"split={_input_split(split)}" / f"date={date}"
+def _traversal_targets(
+    repo_root: Path,
+    split: str,
+    date: str,
+    *,
+    stage1_input_root: Path | None = None,
+    stage1_output_root: Path | None = None,
+) -> pd.DataFrame:
+    input_root = stage1_input_root or (repo_root / "stage1/input_v1")
+    output_root = stage1_output_root or (repo_root / "stage1/output_v3")
+    day = input_root / f"split={_input_split(split)}" / f"date={date}"
     paths = sorted(day.glob("bucket=*/link_traversals.parquet"))
     if not paths:
         raise Stage2V5ContractError(f"missing Stage 1 traversal partitions for {date}")
@@ -53,8 +62,8 @@ def _traversal_targets(repo_root: Path, split: str, date: str) -> pd.DataFrame:
     ]
     for path in paths:  # Bounded daily partition streaming; one concat after scan.
         frame = pd.read_parquet(path, columns=columns)
-        relative = path.relative_to(repo_root / "stage1/input_v1")
-        label_path = repo_root / "stage1/output_v3" / relative.parent / "traversal_labels.parquet"
+        relative = path.relative_to(input_root)
+        label_path = output_root / relative.parent / "traversal_labels.parquet"
         labels = pd.read_parquet(
             label_path,
             columns=["order_id", "traversal_id", "observed_sec_per_m", "rts_measurement_available"],
@@ -91,9 +100,17 @@ def load_v5_day(
     split: str,
     repo_root: str | Path = ".",
     extra_columns: Iterable[str] = (),
+    stage1_input_root: str | Path | None = None,
+    stage1_output_root: str | Path | None = None,
+    route_feature_root: str | Path | None = None,
 ) -> pd.DataFrame:
     root = Path(repo_root).resolve()
-    route_path = root / "stage2/output_v4/route_conditioned_dataset/revealed_route_proxy" / f"day={date}.parquet"
+    feature_root = (
+        Path(route_feature_root).resolve()
+        if route_feature_root is not None
+        else root / "stage2/output_v4/route_conditioned_dataset/revealed_route_proxy"
+    )
+    route_path = feature_root / f"day={date}.parquet"
     if not route_path.is_file():
         raise Stage2V5ContractError(f"missing frozen v4 route features for {date}")
     schema = set(pq.read_schema(route_path).names)
@@ -111,7 +128,13 @@ def load_v5_day(
     )
     columns = [column for column in requested if column in schema]
     route = pd.read_parquet(route_path, columns=columns)
-    targets = _traversal_targets(root, split, date)
+    targets = _traversal_targets(
+        root,
+        split,
+        date,
+        stage1_input_root=(Path(stage1_input_root).resolve() if stage1_input_root is not None else None),
+        stage1_output_root=(Path(stage1_output_root).resolve() if stage1_output_root is not None else None),
+    )
     result = route.merge(
         targets,
         on=["order_id", "traversal_id"],

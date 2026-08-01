@@ -34,50 +34,50 @@
       "row_count": 701601
     }
   },
-  "expected_full_runtime_s_linear_times_1_5": 6.427333708005284,
-  "maximum_peak_rss_mb": 451.8828125,
+  "expected_full_runtime_s_linear_times_1_5": 5.504394893504175,
+  "maximum_peak_rss_mb": 436.76953125,
   "new_final_test_note": "20161028-30 raw archives exist, but frozen Stage 0/1 products have not yet been materialized; this is a scientific execution dependency, not a performance-gate override.",
   "new_final_test_upstream_products_ready": false,
   "performance_gate_status": "PASS",
   "profile_report_sha256": "f123fefa4f0518c97ccd5b79a8fdf98f1d14bc3df4c4340f5c45a2fc0a701bd9",
   "runs": [
     {
-      "peak_rss_mb": 112.0859375,
+      "peak_rss_mb": 108.953125,
       "read_bytes": 6224931,
       "row_count": 87789,
-      "rows_per_s": 405558.6045550027,
-      "runtime_s": 0.21646440000040457,
+      "rows_per_s": 1028188.5450778246,
+      "runtime_s": 0.08538220000627916,
       "stage": "one_bucket_train",
       "write_bytes": 0
     },
     {
-      "peak_rss_mb": 135.44921875,
+      "peak_rss_mb": 127.94140625,
       "read_bytes": 17928091,
       "row_count": 714536,
-      "rows_per_s": 2361192.3470304604,
-      "runtime_s": 0.30261659999814583,
+      "rows_per_s": 2374743.1783650434,
+      "runtime_s": 0.30088980000437004,
       "stage": "one_train_day",
       "write_bytes": 0
     },
     {
-      "peak_rss_mb": 136.8671875,
+      "peak_rss_mb": 136.984375,
       "read_bytes": 17827475,
       "row_count": 701601,
-      "rows_per_s": 2460916.865578662,
-      "runtime_s": 0.28509740000299644,
+      "rows_per_s": 2525171.5987456227,
+      "runtime_s": 0.2778429000027245,
       "stage": "one_validation_day",
       "write_bytes": 0
     },
     {
-      "peak_rss_mb": 451.8828125,
+      "peak_rss_mb": 436.76953125,
       "read_bytes": 718089833,
       "row_count": 2116712,
-      "rows_per_s": 11309149.368647272,
-      "runtime_s": 0.1871681000047829,
+      "rows_per_s": 11449218.215299185,
+      "runtime_s": 0.18487830000231043,
       "stage": "legacy_full_day_read_only_inference",
       "write_bytes": 0
     }
   ],
   "schema_version": "stage2_v5_preflight.1",
-  "static_audit_sha256": "f199ad5cc7f5f4578535e4e02680a1c6605b44dfe96e2b929ae3aac70d8e4ac4"
+  "static_audit_sha256": "dfd2e4d5b0caa0b35d39c18f7d0e0a052473df3b12b8dcc65d97cec92353a6a8"
 }

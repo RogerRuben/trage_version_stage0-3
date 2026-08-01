@@ -6,10 +6,10 @@
     "git diff --check"
   ],
   "pytest": {
-    "collected": 32,
-    "passed": 32,
+    "collected": 34,
+    "passed": 34,
     "failed": 0,
-    "runtime_s": 95.65,
+    "runtime_s": 169.71,
     "status": "PASS"
   },
   "compileall_status": "PASS",

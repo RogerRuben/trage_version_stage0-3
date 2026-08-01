@@ -16,6 +16,7 @@ ALLOWED_PARTITION_READS = {
     "ablations.py": "bounded four-model by three-day development-only evaluation scan",
     "data.py": "bounded one-day Stage 1 partition scan",
     "evaluate.py": "bounded one-day prediction scan; the day frame is released each iteration",
+    "final_evaluation.py": "bounded three-day one-shot final evaluation scan",
     "preflight.py": "bounded one-partition-at-a-time dry run",
     "scenario_pipeline.py": "bounded one-day/order-base partition scan and one scenario day at a time",
     "service_time_audit.py": "bounded one-partition-at-a-time audit scan",
