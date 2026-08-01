@@ -1,0 +1,16 @@
+{
+  "continuous_target_count": 6,
+  "evaluation_rule": "v4 and v5 use identical physical traversal rows and masks",
+  "new_final_test_consumed": false,
+  "schema_version": "stage2_v5_state_target_evaluation.1",
+  "status": "PASS",
+  "tail_target_count": 2,
+  "validation_winner_by_continuous_target": {
+    "acceleration_rms_bounded": "rc_mstnet_v5",
+    "crawl_time_share": "rc_mstnet_v5",
+    "lcs_raw": "rc_mstnet_v4",
+    "rts_raw": "rc_mstnet_v5",
+    "speed_cv_bounded": "rc_mstnet_v5",
+    "stop_time_share": "rc_mstnet_v5"
+  }
+}

@@ -1,5 +1,12 @@
-stage,row_count,runtime_s,peak_rss_mb,read_bytes,write_bytes,rows_per_s
-one_bucket_train,87789,0.06048870000086026,104.28125,6224931,0,1451328.9258779157
-one_train_day,714536,0.21990269999878365,119.2734375,17928091,0,3249327.99826447
-one_validation_day,701601,0.21488260000114678,121.2734375,17827475,0,3265043.330619863
-legacy_full_day_read_only_inference,2116712,0.11234949999925448,459.46875,718089833,0,18840422.075879697
+stage,row_count,runtime_s,peak_rss_mb,read_bytes,write_bytes,rows_per_s,scope
+one_bucket_train,87789,0.21646440000040457,112.0859375,6224931.0,0.0,405558.6045550027,preflight_read_transform
+one_train_day,714536,0.30261659999814583,135.44921875,17928091.0,0.0,2361192.3470304604,preflight_read_transform
+one_validation_day,701601,0.28509740000299644,136.8671875,17827475.0,0.0,2460916.865578662,preflight_read_transform
+legacy_full_day_read_only_inference,2116712,0.1871681000047829,451.8828125,718089833.0,0.0,11309149.368647272,preflight_read_transform
+service_time_target_audit,15649455,52.05622690000018,,,,300625.99485096266,full_frozen_stage1_audit
+tensor_shard_build,15649455,291.8467888999985,,,,53622.159280848886,full_20_day_vectorized_transform
+strong_baseline_fit,500000,54.8994117000002,,,,9107.565719142272,train_only_tree_fit_and_evaluation
+rc_mstnet_v5_horizon_gate_fit,15649455,1818.8566979000002,,,,,13_epochs_gpu_amp
+ablation_ordinary_concatenation_fit,15649455,1566.4568958,,,,,13_epochs_gpu_amp
+ablation_without_recent_fit,15649455,1560.0543556,,,,,13_epochs_gpu_amp
+ablation_without_profile_fit,15649455,1759.2684146,,,,,13_epochs_gpu_amp

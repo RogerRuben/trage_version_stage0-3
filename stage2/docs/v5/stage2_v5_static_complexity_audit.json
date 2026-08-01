@@ -1,26 +1,54 @@
 {
-  "allowlisted_finding_count": 4,
+  "allowlisted_finding_count": 10,
   "blocking_finding_count": 0,
   "findings": [
     {
       "blocking": false,
+      "file": "stage2/v5/ablations.py",
+      "justification": "bounded four-model by three-day development-only evaluation scan",
+      "line": 50,
+      "pattern": "partition_streaming_read"
+    },
+    {
+      "blocking": false,
       "file": "stage2/v5/data.py",
-      "justification": "bounded one-partition-at-a-time audit scan",
+      "justification": "bounded one-day Stage 1 partition scan",
       "line": 55,
       "pattern": "partition_streaming_read"
     },
     {
       "blocking": false,
-      "file": "stage2/v5/preflight.py",
-      "justification": "bounded one-partition-at-a-time audit scan",
-      "line": 67,
+      "file": "stage2/v5/data.py",
+      "justification": "bounded one-day Stage 1 partition scan",
+      "line": 58,
       "pattern": "partition_streaming_read"
     },
     {
       "blocking": false,
-      "file": "stage2/v5/service_time_audit.py",
-      "justification": "bounded one-partition-at-a-time audit scan",
-      "line": 202,
+      "file": "stage2/v5/evaluate.py",
+      "justification": "bounded one-day prediction scan; the day frame is released each iteration",
+      "line": 61,
+      "pattern": "partition_streaming_read"
+    },
+    {
+      "blocking": false,
+      "file": "stage2/v5/preflight.py",
+      "justification": "bounded one-partition-at-a-time dry run",
+      "line": 68,
+      "pattern": "partition_streaming_read"
+    },
+    {
+      "blocking": false,
+      "file": "stage2/v5/scenario_pipeline.py",
+      "justification": "bounded one-day/order-base partition scan and one scenario day at a time",
+      "line": 69,
+      "pattern": "partition_streaming_read"
+    },
+    {
+      "blocking": false,
+      "file": "stage2/v5/scenario_pipeline.py",
+      "justification": "bounded one-day/order-base partition scan and one scenario day at a time",
+      "line": 153,
       "pattern": "partition_streaming_read"
     },
     {
@@ -28,6 +56,20 @@
       "file": "stage2/v5/service_time_audit.py",
       "justification": "bounded one-partition-at-a-time audit scan",
       "line": 203,
+      "pattern": "partition_streaming_read"
+    },
+    {
+      "blocking": false,
+      "file": "stage2/v5/service_time_audit.py",
+      "justification": "bounded one-partition-at-a-time audit scan",
+      "line": 204,
+      "pattern": "partition_streaming_read"
+    },
+    {
+      "blocking": false,
+      "file": "stage2/v5/state_evaluation.py",
+      "justification": "bounded three-day v4/v5 same-row evaluation scan",
+      "line": 54,
       "pattern": "partition_streaming_read"
     }
   ],
@@ -39,8 +81,8 @@
     "concat_inside_loop",
     "repeated_parquet_read_inside_loop"
   ],
-  "scanned_file_count": 19,
+  "scanned_file_count": 27,
   "schema_version": "stage2_v5_static_complexity_audit.1",
-  "source_sha256": "c2b2b7ff047499e934ee6240f801ae57a0548f04d25bcb20237e9983f6ef7e5a",
+  "source_sha256": "cefcc9fedfec3532a070a571ff1db8cc1fd0f7b0c3ae90bc7bdd80262ea8fa00",
   "status": "PASS"
 }

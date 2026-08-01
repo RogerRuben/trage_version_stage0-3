@@ -2,7 +2,7 @@
 
 ## 结论
 
-当前最强开发集 baseline 是冻结 v4 参数规格的 `HistGradientBoostingRegressor`。它在 20161025–26 的同一 direct-pace 样本上，按样本数加权 MAE 为 **0.030140 s/m**，稳定优于 strict historical profile 与 v4 static entry-time pace。该结论只确立强 baseline，不代表 v5 深度模型已经胜出。
+当前最强开发集 service-pace baseline 是冻结 v4 参数规格的 `HistGradientBoostingRegressor`。它在 20161025–26 的同一 direct-pace 样本上，按样本数加权 MAE 为 **0.030140 s/m**，稳定优于 strict historical profile 与 v4 static entry-time pace。RC-MSTNet v5 在相同行上达到 **0.028951 s/m**，两天配对 bootstrap CI 均低于 0，因此代码计算的开发期科学状态为 `PREDICTIVE_BASELINE_VALIDATED`。
 
 10 月 28–30 日新 final test 未被读取。20161031 结果只作为已公开的 legacy benchmark。
 
@@ -36,5 +36,4 @@
 
 ## 当前科学状态
 
-`BASELINE_COMPETITIVE`：强 baseline 已建立，但 RC-MSTNet v5 尚未在同集上完成训练、消融、校准和比较，因此不能声明 `PREDICTIVE_BASELINE_VALIDATED`。
-
+`PREDICTIVE_BASELINE_VALIDATED`：强 baseline、v4、v5 已在同集上完成比较；该状态只适用于开发协议。20161028–30 的一次性 final test 尚未执行，因此不能据此创建最终 release/tag。

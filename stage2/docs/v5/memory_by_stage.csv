@@ -1,5 +1,5 @@
 stage,peak_rss_mb
-one_bucket_train,104.28125
-one_train_day,119.2734375
-one_validation_day,121.2734375
-legacy_full_day_read_only_inference,459.46875
+one_bucket_train,112.0859375
+one_train_day,135.44921875
+one_validation_day,136.8671875
+legacy_full_day_read_only_inference,451.8828125

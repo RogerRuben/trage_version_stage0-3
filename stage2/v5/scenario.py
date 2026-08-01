@@ -66,8 +66,8 @@ def generate_route_scenarios(
         raise Stage2V5ContractError("scenario input lengths differ")
     if scenario_count <= 0 or np.any(~np.isfinite(mu)) or np.any(~np.isfinite(sigma)) or np.any(sigma <= 0):
         raise Stage2V5ContractError("invalid scenario distribution inputs")
-    if np.any(~np.isfinite(distance)) or np.any(distance <= 0):
-        raise Stage2V5ContractError("scenario distances must be finite and positive")
+    if np.any(~np.isfinite(distance)) or np.any(distance < 0):
+        raise Stage2V5ContractError("scenario distances must be finite and non-negative")
     unique_routes, inverse = np.unique(route, return_inverse=True)
     route_count = len(unique_routes)
     rng = np.random.default_rng(int(seed))

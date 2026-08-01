@@ -1,0 +1,351 @@
+"""GPU worker for overlap-weighted RC-MSTNet v5 training and prediction."""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import os
+import random
+import tempfile
+import time
+from pathlib import Path
+from typing import Any
+
+import numpy as np
+import torch
+
+from .models.losses import rc_mstnet_v5_loss
+from .models.rc_mstnet_v5 import RCMSTNetV5
+
+
+def _json(path: Path) -> dict[str, Any]:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _canonical(value: Any) -> bytes:
+    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def _atomic_json(path: Path, payload: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f".{path.name}.tmp")
+    temporary.write_bytes(_canonical(payload))
+    os.replace(temporary, path)
+
+
+def _atomic_checkpoint(path: Path, payload: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, name = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".pt", dir=path.parent)
+    os.close(descriptor)
+    temporary = Path(name)
+    try:
+        torch.save(payload, temporary)
+        os.replace(temporary, path)
+    except Exception:
+        temporary.unlink(missing_ok=True)
+        raise
+
+
+def _atomic_npz(path: Path, payload: dict[str, np.ndarray]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, name = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".npz", dir=path.parent)
+    os.close(descriptor)
+    temporary = Path(name)
+    try:
+        np.savez_compressed(temporary, **payload)
+        os.replace(temporary, path)
+    except Exception:
+        temporary.unlink(missing_ok=True)
+        raise
+
+
+def _shards(root: Path, split: str, dates: list[str]) -> list[Path]:
+    paths: list[Path] = []
+    for date in dates:
+        manifest = _json(root / f"split={split}" / f"date={date}" / "manifest.json")
+        paths.extend(root / item["path"] for item in manifest["files"])
+    return paths
+
+
+def _batches(length: int, size: int, shuffle: bool):
+    index = np.arange(length)
+    if shuffle:
+        np.random.shuffle(index)
+    for start in range(0, length, size):
+        yield index[start : start + size]
+
+
+def _load_shard(path: Path) -> dict[str, np.ndarray]:
+    """Decompress every NPZ member once, never once per mini-batch."""
+    with np.load(path, allow_pickle=False) as archive:
+        return {name: archive[name] for name in archive.files}
+
+
+def _tensor(values: np.ndarray, indices: np.ndarray, device: torch.device, dtype: torch.dtype) -> torch.Tensor:
+    return torch.as_tensor(values[indices], dtype=dtype, device=device)
+
+
+def _forward_loss(model: RCMSTNetV5, data: Any, indices: np.ndarray, device: torch.device) -> tuple[torch.Tensor, dict[str, torch.Tensor], dict[str, torch.Tensor]]:
+    pad = _tensor(data["pad_mask"], indices, device, torch.bool)
+    outputs = model(
+        _tensor(data["numeric"], indices, device, torch.float32),
+        _tensor(data["numeric_missing"], indices, device, torch.bool),
+        _tensor(data["categorical"], indices, device, torch.long),
+        _tensor(data["route_sequence"], indices, device, torch.long).clamp_min(0),
+        pad,
+        recent_history=_tensor(data["recent_history"], indices, device, torch.float32),
+        profile_history=_tensor(data["profile_history"], indices, device, torch.float32),
+        forecast_horizon_s=_tensor(data["forecast_horizon_s"], indices, device, torch.float32),
+        history_age_s=_tensor(data["history_age_s"], indices, device, torch.float32),
+        history_support=_tensor(data["history_support"], indices, device, torch.float32),
+    )
+    target = _tensor(data["targets"], indices, device, torch.float32)
+    target_mask = _tensor(data["target_masks"], indices, device, torch.bool)
+    tail = _tensor(data["tail_targets"], indices, device, torch.float32)
+    tail_mask = _tensor(data["tail_masks"], indices, device, torch.bool)
+    availability = _tensor(data["availability_targets"], indices, device, torch.float32)
+    valid = ~pad
+    targets = {
+        "crawl_time_share": target[..., 0], "stop_time_share": target[..., 1],
+        "speed_cv_bounded": target[..., 2], "acceleration_rms_bounded": target[..., 3],
+        "rts_raw": target[..., 4], "lcs_raw": target[..., 5],
+        "pace_sec_per_m": target[..., 6], "lcs_tail_event": tail[..., 0],
+        "rts_tail_event": tail[..., 1], "availability": availability,
+    }
+    masks = {
+        "crawl_target_valid": target_mask[..., 0] & valid,
+        "stop_target_valid": target_mask[..., 1] & valid,
+        "speed_cv_target_valid": target_mask[..., 2] & valid,
+        "acceleration_rms_target_valid": target_mask[..., 3] & valid,
+        "rts_target_valid": target_mask[..., 4] & tail_mask[..., 1] & valid,
+        "lcs_target_valid": target_mask[..., 5] & tail_mask[..., 0] & valid,
+        "pace_target_valid": target_mask[..., 6] & valid,
+        "availability_valid": valid.unsqueeze(-1).expand_as(availability),
+    }
+    supervision = _tensor(data["supervision_weight"], indices, device, torch.float32)
+    loss, components = rc_mstnet_v5_loss(
+        outputs,
+        targets,
+        masks,
+        supervision,
+        component_weights={
+            "pace_distribution": 1.0,
+            "crawl": 0.5,
+            "stop_occurrence": 0.25,
+            "stop_positive": 0.5,
+            "speed_cv": 0.5,
+            "acceleration": 0.5,
+            "rts": 0.5,
+            "lcs_consistency": 0.5,
+            "lcs_tail": 0.25,
+            "rts_tail": 0.25,
+            "availability": 0.2,
+        },
+    )
+    return loss, outputs, components
+
+
+def _evaluate(model: RCMSTNetV5, shards: list[Path], batch_size: int, device: torch.device, mixed: bool) -> float:
+    model.eval()
+    total = 0.0
+    chunks = 0
+    with torch.no_grad():
+        for path in shards:
+            data = _load_shard(path)
+            for indices in _batches(len(data["numeric"]), batch_size, False):
+                with torch.autocast(device_type=device.type, dtype=torch.float16, enabled=mixed):
+                    loss, _, _ = _forward_loss(model, data, indices, device)
+                if not torch.isfinite(loss):
+                    raise RuntimeError(f"non-finite validation loss in {path.name}")
+                total += float(loss.item()) * len(indices)
+                chunks += len(indices)
+    return total / max(chunks, 1)
+
+
+def _predict(model: RCMSTNetV5, shards: list[Path], tensor_root: Path, output_root: Path, batch_size: int, device: torch.device, mixed: bool, name: str) -> dict[str, Any]:
+    model.eval()
+    files: list[dict[str, Any]] = []
+    with torch.no_grad():
+        for path in shards:
+            relative = path.relative_to(tensor_root)
+            output_path = output_root / relative
+            data = _load_shard(path)
+            storage = {key: [] for key in (
+                "pred_crawl_time_share", "pred_stop_time_share", "pred_speed_cv_bounded",
+                "pred_acceleration_rms_bounded", "pred_rts_raw", "pred_lcs_raw",
+                "lcs_tail_score", "rts_tail_score", "pace_log_mu", "pace_log_scale",
+                "pace_pred_mean", "pace_pred_p50", "pace_pred_p90", "pace_pred_p95",
+                "availability_probability", "history_recent_gate",
+                "stop_occurrence_probability", "stop_positive_share",
+            )}
+            for indices in _batches(len(data["numeric"]), batch_size, False):
+                with torch.autocast(device_type=device.type, dtype=torch.float16, enabled=mixed):
+                    _, output, _ = _forward_loss(model, data, indices, device)
+                mapped = {
+                        "pred_crawl_time_share": output["crawl_share"],
+                        "pred_stop_time_share": output["stop_share"],
+                        "pred_speed_cv_bounded": output["speed_cv"],
+                        "pred_acceleration_rms_bounded": output["acceleration_rms"],
+                        "pred_rts_raw": output["rts_raw"],
+                        "pred_lcs_raw": output["lcs_reconstructed_raw"],
+                        "lcs_tail_score": torch.sigmoid(output["lcs_tail_logit"]),
+                        "rts_tail_score": torch.sigmoid(output["rts_tail_logit"]),
+                        "pace_log_mu": output["pace_log_mu"], "pace_log_scale": output["pace_log_scale"],
+                        "pace_pred_mean": output["pace_pred_mean"], "pace_pred_p50": output["pace_pred_p50"],
+                        "pace_pred_p90": output["pace_pred_p90"], "pace_pred_p95": output["pace_pred_p95"],
+                        "availability_probability": torch.sigmoid(output["availability_logits"]),
+                        "history_recent_gate": output["history_recent_gate"],
+                        "stop_occurrence_probability": torch.sigmoid(output["stop_presence_logit"]),
+                        "stop_positive_share": output["stop_positive_share"],
+                }
+                for key, value in mapped.items():
+                    storage[key].append(value.float().cpu().numpy())
+            payload = {key: np.concatenate(values).astype(np.float32) for key, values in storage.items()}
+            for key in (
+                "order_id", "traversal_id", "route_sequence", "pad_mask", "targets",
+                "target_masks", "tail_targets", "tail_masks", "allocated_distance_m",
+                "overlap_supervision_count", "supervision_weight",
+            ):
+                payload[key] = data[key]
+            _atomic_npz(output_path, payload)
+            files.append({"path": relative.as_posix(), "chunk_count": len(payload["order_id"]), "sha256": _sha256(output_path)})
+    manifest = {"schema_version": "stage2_v5_chunk_predictions.1", "status": "PASS", "chunk_count": int(sum(item["chunk_count"] for item in files)), "files": files}
+    _atomic_json(output_root / name, manifest)
+    return manifest
+
+
+def train(args: argparse.Namespace) -> dict[str, Any]:
+    started = time.perf_counter()
+    config = _json(args.config)
+    deep = config["deep"]
+    seed = int(deep["random_seed"])
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    tensor_root = args.tensor_root
+    artifacts = _json(tensor_root / "feature_artifacts.json")
+    split = config["split"]
+    train_shards = _shards(tensor_root, "train", split["train_dates"])
+    validation_shards = _shards(tensor_root, "validation_model", split["validation_model_dates"])
+    calibration_shards = _shards(tensor_root, "calibration", split["calibration_dates"])
+    categorical_sizes = tuple(len(artifacts["vocabularies"][name]["token_to_index"]) for name in ("edge", "highway", "time_bin", "position_bucket", "route_length_bucket"))
+    model_config = {
+        "numeric_feature_count": len(artifacts["numeric_features"]),
+        "categorical_sizes": categorical_sizes,
+        "hidden_dim": int(deep["hidden_dim"]), "categorical_embedding_dim": int(deep["categorical_embedding_dim"]),
+        "transformer_layers": int(deep["transformer_layers"]), "attention_heads": int(deep["attention_heads"]),
+        "dropout": float(deep["dropout"]),
+        "minimum_log_scale": float(config["distribution"]["minimum_log_scale"]),
+        "maximum_log_scale": float(config["distribution"]["maximum_log_scale"]),
+        "history_mode": args.history_mode,
+    }
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    mixed = bool(deep.get("mixed_precision", False)) and device.type == "cuda"
+    model = RCMSTNetV5(**model_config).to(device)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=float(deep["learning_rate"]), weight_decay=float(deep["weight_decay"]))
+    scaler = torch.cuda.amp.GradScaler(enabled=mixed)
+    checkpoint = args.output / "best_model.pt"
+    manifest_path = args.output / "model_manifest.json"
+    if args.predict_only:
+        if not checkpoint.is_file() or not manifest_path.is_file():
+            raise RuntimeError("predict-only requires a completed checkpoint and manifest")
+        saved = torch.load(checkpoint, map_location=device)
+        model.load_state_dict(saved["model_state_dict"], strict=False)
+        _predict(model, validation_shards, tensor_root, args.prediction_root, int(deep["batch_size"]), device, mixed, "validation_prediction_manifest.json")
+        _predict(model, calibration_shards, tensor_root, args.prediction_root, int(deep["batch_size"]), device, mixed, "calibration_prediction_manifest.json")
+        return _json(manifest_path)
+    if args.resume and checkpoint.is_file() and manifest_path.is_file():
+        manifest = _json(manifest_path)
+        if manifest.get("status") == "PASS":
+            return manifest
+    if (checkpoint.exists() or manifest_path.exists()) and not args.force:
+        raise RuntimeError("model output exists; use --resume or --force")
+    best = float("inf")
+    best_epoch = -1
+    patience = 0
+    history: list[dict[str, Any]] = []
+    batch_size = int(deep["batch_size"])
+    for epoch in range(int(deep["maximum_epochs"])):
+        epoch_started = time.perf_counter()
+        model.train()
+        random.shuffle(train_shards)
+        total = 0.0
+        chunks = 0
+        for path in train_shards:
+            data = _load_shard(path)
+            for indices in _batches(len(data["numeric"]), batch_size, True):
+                optimizer.zero_grad(set_to_none=True)
+                with torch.autocast(device_type=device.type, dtype=torch.float16, enabled=mixed):
+                    loss, _, _ = _forward_loss(model, data, indices, device)
+                if not torch.isfinite(loss):
+                    raise RuntimeError(f"non-finite training loss in {path.name}")
+                scaler.scale(loss).backward()
+                scaler.unscale_(optimizer)
+                torch.nn.utils.clip_grad_norm_(model.parameters(), float(deep["gradient_clip_norm"]))
+                scaler.step(optimizer)
+                scaler.update()
+                total += float(loss.item()) * len(indices)
+                chunks += len(indices)
+        validation = _evaluate(model, validation_shards, batch_size, device, mixed)
+        record = {"epoch": epoch, "train_loss": total / max(chunks, 1), "validation_loss": validation, "runtime_s": time.perf_counter() - epoch_started}
+        history.append(record)
+        print(json.dumps(record), flush=True)
+        if validation < best - 1e-6:
+            best = validation
+            best_epoch = epoch
+            patience = 0
+            _atomic_checkpoint(checkpoint, {"model_state_dict": model.state_dict(), "model_config": model_config, "best_epoch": best_epoch, "best_validation_loss": best})
+        else:
+            patience += 1
+            if patience >= int(deep["early_stopping_patience"]):
+                break
+    saved = torch.load(checkpoint, map_location=device)
+    model.load_state_dict(saved["model_state_dict"])
+    _predict(model, validation_shards, tensor_root, args.prediction_root, batch_size, device, mixed, "validation_prediction_manifest.json")
+    _predict(model, calibration_shards, tensor_root, args.prediction_root, batch_size, device, mixed, "calibration_prediction_manifest.json")
+    checkpoint_sha = _sha256(checkpoint)
+    model_id = hashlib.sha256(_canonical({"checkpoint_sha256": checkpoint_sha, "config_sha256": hashlib.sha256(_canonical(config)).hexdigest(), "artifact_sha256": _sha256(tensor_root / "feature_artifacts.json")})).hexdigest()
+    manifest = {
+        "schema_version": "stage2_v5_rc_mstnet.1", "status": "PASS", "model_id": model_id,
+        "checkpoint_sha256": checkpoint_sha, "fit_dates": split["train_dates"],
+        "validation_dates": split["validation_model_dates"], "calibration_prediction_dates": split["calibration_dates"],
+        "new_final_test_rows_read": 0, "device": str(device), "mixed_precision": mixed,
+        "history_mode": args.history_mode,
+        "best_epoch": best_epoch, "best_validation_loss": best, "training_history": history,
+        "runtime_s": time.perf_counter() - started,
+    }
+    _atomic_json(manifest_path, manifest)
+    return manifest
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--config", type=Path, default=Path("stage2/config/stage2_v5.json"))
+    parser.add_argument("--tensor-root", type=Path, default=Path("stage2/output_v5/tensor_shards"))
+    parser.add_argument("--output", type=Path, default=Path("stage2/output_v5/deep_model"))
+    parser.add_argument("--prediction-root", type=Path, default=Path("stage2/output_v5/deep_predictions"))
+    parser.add_argument("--resume", action="store_true")
+    parser.add_argument("--force", action="store_true")
+    parser.add_argument("--predict-only", action="store_true")
+    parser.add_argument(
+        "--history-mode",
+        choices=("gate", "ordinary_concatenation", "without_recent", "without_profile"),
+        default="gate",
+    )
+    manifest = train(parser.parse_args())
+    print(json.dumps(manifest, sort_keys=True))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

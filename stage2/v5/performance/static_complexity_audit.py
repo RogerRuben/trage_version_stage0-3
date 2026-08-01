@@ -12,7 +12,15 @@ from typing import Any
 
 SCHEMA_VERSION = "stage2_v5_static_complexity_audit.1"
 EXCLUDED = {"reference.py", "static_complexity_audit.py", "benchmark_hotspots.py"}
-ALLOWED_PARTITION_READS = {"data.py", "service_time_audit.py", "preflight.py"}
+ALLOWED_PARTITION_READS = {
+    "ablations.py": "bounded four-model by three-day development-only evaluation scan",
+    "data.py": "bounded one-day Stage 1 partition scan",
+    "evaluate.py": "bounded one-day prediction scan; the day frame is released each iteration",
+    "preflight.py": "bounded one-partition-at-a-time dry run",
+    "scenario_pipeline.py": "bounded one-day/order-base partition scan and one scenario day at a time",
+    "service_time_audit.py": "bounded one-partition-at-a-time audit scan",
+    "state_evaluation.py": "bounded three-day v4/v5 same-row evaluation scan",
+}
 
 
 class Scanner(ast.NodeVisitor):
@@ -57,7 +65,7 @@ class Scanner(ast.NodeVisitor):
                 node,
                 "partition_streaming_read" if allowed else "repeated_parquet_read_inside_loop",
                 blocking=not allowed,
-                reason="bounded one-partition-at-a-time audit scan" if allowed else "",
+                reason=ALLOWED_PARTITION_READS.get(self.path.name, ""),
             )
         self.generic_visit(node)
 

@@ -1,0 +1,19 @@
+{
+  "schema_version": "stage2_v5_test_results.1",
+  "commands": [
+    "D:/anaconda/envs/stage0-valhalla/python.exe -m pytest stage2/tests_v4 stage2/tests_v5 -q",
+    "D:/anaconda/envs/stage0-valhalla/python.exe -m compileall -q stage2/v5 stage2/tests_v5",
+    "git diff --check"
+  ],
+  "pytest": {
+    "collected": 32,
+    "passed": 32,
+    "failed": 0,
+    "runtime_s": 95.65,
+    "status": "PASS"
+  },
+  "compileall_status": "PASS",
+  "diff_check_status": "PASS",
+  "new_final_test_consumed": false,
+  "status": "PASS"
+}

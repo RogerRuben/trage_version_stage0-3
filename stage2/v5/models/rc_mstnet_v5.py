@@ -76,8 +76,12 @@ class RCMSTNetV5(nn.Module):
         dropout: float = 0.1,
         minimum_log_scale: float = -5.0,
         maximum_log_scale: float = 2.0,
+        history_mode: str = "gate",
     ):
         super().__init__()
+        if history_mode not in {"gate", "ordinary_concatenation", "without_recent", "without_profile"}:
+            raise ValueError(f"unknown history mode: {history_mode}")
+        self.history_mode = history_mode
         self.minimum_log_scale = float(minimum_log_scale)
         self.maximum_log_scale = float(maximum_log_scale)
         self.numeric_encoder = nn.Sequential(
@@ -95,6 +99,9 @@ class RCMSTNetV5(nn.Module):
         self.recent_encoder = nn.Sequential(nn.Linear(4, hidden_dim), nn.GELU(), nn.LayerNorm(hidden_dim))
         self.profile_encoder = nn.Sequential(nn.Linear(3, hidden_dim), nn.GELU(), nn.LayerNorm(hidden_dim))
         self.horizon_gate = HorizonGate(hidden_dim)
+        self.ordinary_history_fusion = nn.Sequential(
+            nn.Linear(hidden_dim * 2, hidden_dim), nn.GELU(), nn.LayerNorm(hidden_dim)
+        )
         self.history_fusion = nn.Sequential(nn.Linear(hidden_dim * 2, hidden_dim), nn.GELU(), nn.LayerNorm(hidden_dim))
         self.local_route = nn.Conv1d(hidden_dim, hidden_dim, kernel_size=3, padding=1)
         layer = nn.TransformerEncoderLayer(
@@ -146,18 +153,35 @@ class RCMSTNetV5(nn.Module):
         dtype = h.dtype
         recent_history = torch.zeros((*batch_shape, 4), device=device, dtype=dtype) if recent_history is None else recent_history
         profile_history = torch.zeros((*batch_shape, 3), device=device, dtype=dtype) if profile_history is None else profile_history
+        # Frozen profile support can reach millions and is not representable in
+        # fp16.  Counts are scale features, so encode them as log1p before the
+        # profile linear layer (the same transform is used at fit and predict).
+        profile_history = torch.cat(
+            (
+                profile_history[..., :2],
+                torch.log1p(profile_history[..., 2:].clamp_min(0.0)),
+            ),
+            dim=-1,
+        )
         forecast_horizon_s = torch.zeros(batch_shape, device=device, dtype=dtype) if forecast_horizon_s is None else forecast_horizon_s
         history_age_s = torch.zeros(batch_shape, device=device, dtype=dtype) if history_age_s is None else history_age_s
         history_support = torch.zeros(batch_shape, device=device, dtype=dtype) if history_support is None else history_support
+        recent_state = self.recent_encoder(recent_history)
+        profile_state = self.profile_encoder(profile_history)
         history, gate = self.horizon_gate(
-            self.recent_encoder(recent_history),
-            self.profile_encoder(profile_history),
+            recent_state,
+            profile_state,
             forecast_horizon_s,
             history_age_s,
             history_support,
-            use_recent=use_recent,
-            use_profile=use_profile,
+            use_recent=use_recent and self.history_mode != "without_recent",
+            use_profile=use_profile and self.history_mode != "without_profile",
         )
+        if self.history_mode == "ordinary_concatenation":
+            history = self.ordinary_history_fusion(
+                torch.cat((recent_state, profile_state), dim=-1)
+            )
+            gate = torch.full_like(gate, 0.5)
         h = self.history_fusion(torch.cat((h, history), dim=-1))
         h = h + sinusoidal_position_encoding(route_sequence, h.shape[-1]).to(dtype)
         valid = (~pad_mask).unsqueeze(-1).to(dtype)
@@ -166,15 +190,17 @@ class RCMSTNetV5(nn.Module):
         h = self.route_transformer(h, src_key_padding_mask=pad_mask)
         h = self.final_norm(h) * valid
 
-        stop_presence_logit = self.stop_presence_head(h).squeeze(-1)
-        stop_positive = torch.sigmoid(self.stop_positive_head(h).squeeze(-1))
+        stop_presence_logit = self.stop_presence_head(h).squeeze(-1).float()
+        stop_positive = torch.sigmoid(self.stop_positive_head(h).squeeze(-1).float())
         stop_share = torch.sigmoid(stop_presence_logit) * stop_positive
-        crawl = (1.0 - stop_share) * torch.sigmoid(self.crawl_head(h).squeeze(-1))
+        crawl = (1.0 - stop_share) * torch.sigmoid(self.crawl_head(h).squeeze(-1).float())
         speed_cv = torch.sigmoid(self.speed_cv_head(h).squeeze(-1))
         acceleration = torch.sigmoid(self.acceleration_head(h).squeeze(-1))
         rts = torch.sigmoid(self.rts_head(h).squeeze(-1))
         lcs = (crawl + stop_share + speed_cv + acceleration) / 4.0
-        distribution = self.pace_distribution_head(h)
+        # Distribution arithmetic stays float32 under AMP so positive-time
+        # exponentials cannot overflow merely because the encoder uses fp16.
+        distribution = self.pace_distribution_head(h).float()
         pace_log_mu = distribution[..., 0]
         pace_log_scale = torch.clamp(distribution[..., 1], self.minimum_log_scale, self.maximum_log_scale)
         sigma = torch.exp(pace_log_scale)

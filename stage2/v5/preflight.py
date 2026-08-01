@@ -13,6 +13,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 import psutil
+import joblib
 
 from .availability import service_time_target_arrays
 
@@ -90,6 +91,72 @@ def _legacy_inference(root: Path) -> dict[str, Any]:
     }
 
 
+def _completed_runtime_records(root: Path) -> list[dict[str, Any]]:
+    """Append already-completed full development stages when available."""
+
+    records: list[dict[str, Any]] = []
+    audit_path = root / "stage2/docs/v5/stage2_v5_service_time_target_audit.json"
+    if audit_path.is_file():
+        audit = json.loads(audit_path.read_text(encoding="utf-8"))
+        records.append({
+            "stage": "service_time_target_audit",
+            "row_count": int(audit["counters"]["traversal_row_count"]),
+            "runtime_s": float(audit["runtime_s"]),
+            "peak_rss_mb": np.nan,
+            "read_bytes": np.nan,
+            "write_bytes": np.nan,
+            "rows_per_s": int(audit["counters"]["traversal_row_count"]) / float(audit["runtime_s"]),
+            "scope": "full_frozen_stage1_audit",
+        })
+    shard_path = root / "stage2/output_v5/tensor_shards/tensor_manifest.json"
+    if shard_path.is_file():
+        shards = json.loads(shard_path.read_text(encoding="utf-8"))
+        runtime_s = float(sum(float(day["runtime_s"]) for day in shards["days"]))
+        records.append({
+            "stage": "tensor_shard_build",
+            "row_count": int(shards["source_row_count"]),
+            "runtime_s": runtime_s,
+            "peak_rss_mb": np.nan,
+            "read_bytes": np.nan,
+            "write_bytes": np.nan,
+            "rows_per_s": int(shards["source_row_count"]) / runtime_s,
+            "scope": "full_20_day_vectorized_transform",
+        })
+    baseline_path = root / "stage2/output_v5/baselines/service_time_baselines.joblib"
+    if baseline_path.is_file():
+        baseline = joblib.load(baseline_path)
+        records.append({
+            "stage": "strong_baseline_fit",
+            "row_count": int(baseline["tree_fit_row_count"]),
+            "runtime_s": float(baseline["runtime_s"]),
+            "peak_rss_mb": np.nan,
+            "read_bytes": np.nan,
+            "write_bytes": np.nan,
+            "rows_per_s": int(baseline["tree_fit_row_count"]) / float(baseline["runtime_s"]),
+            "scope": "train_only_tree_fit_and_evaluation",
+        })
+    manifests = [("rc_mstnet_v5_horizon_gate_fit", root / "stage2/output_v5/deep_model/model_manifest.json")]
+    manifests += [
+        (f"ablation_{mode}_fit", root / f"stage2/output_v5/ablations/{mode}/model/model_manifest.json")
+        for mode in ("ordinary_concatenation", "without_recent", "without_profile")
+    ]
+    for stage, path in manifests:
+        if not path.is_file():
+            continue
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        records.append({
+            "stage": stage,
+            "row_count": 15_649_455,
+            "runtime_s": float(manifest["runtime_s"]),
+            "peak_rss_mb": np.nan,
+            "read_bytes": np.nan,
+            "write_bytes": np.nan,
+            "rows_per_s": np.nan,
+            "scope": f"{len(manifest['training_history'])}_epochs_gpu_amp",
+        })
+    return records
+
+
 def run_preflight(repo_root: str | Path = ".") -> dict[str, Any]:
     root = Path(repo_root).resolve()
     static_path = root / "stage2/docs/v5/stage2_v5_static_complexity_audit.json"
@@ -108,7 +175,7 @@ def run_preflight(repo_root: str | Path = ".") -> dict[str, Any]:
         record, detail = _measure(name, function)
         records.append(record)
         details[name] = detail
-    runtime = pd.DataFrame(records)
+    runtime = pd.DataFrame([{**record, "scope": "preflight_read_transform"} for record in records])
     measured_rows = runtime["row_count"].sum()
     measured_runtime = runtime["runtime_s"].sum()
     projected_rows = 15_649_455
@@ -137,8 +204,11 @@ def run_preflight(repo_root: str | Path = ".") -> dict[str, Any]:
         "new_final_test_note": "20161028-30 raw archives exist, but frozen Stage 0/1 products have not yet been materialized; this is a scientific execution dependency, not a performance-gate override.",
     }
     output = root / "stage2/docs/v5"
+    completed = _completed_runtime_records(root)
+    if completed:
+        runtime = pd.concat([runtime, pd.DataFrame(completed)], ignore_index=True)
     runtime.to_csv(output / "runtime_by_stage.csv", index=False)
-    runtime.loc[:, ["stage", "peak_rss_mb"]].to_csv(output / "memory_by_stage.csv", index=False)
+    runtime.loc[runtime["peak_rss_mb"].notna(), ["stage", "peak_rss_mb"]].to_csv(output / "memory_by_stage.csv", index=False)
     (output / "stage2_v5_preflight.json").write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return report
 

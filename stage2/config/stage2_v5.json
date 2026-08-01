@@ -55,6 +55,22 @@
     "dropout": 0.1,
     "availability_groups": ["service_time", "lcs", "rts", "dynamics"]
   },
+  "deep": {
+    "python_executable": "D:/anaconda/envs/pytorch/python.exe",
+    "random_seed": 20261009,
+    "hidden_dim": 128,
+    "categorical_embedding_dim": 24,
+    "transformer_layers": 3,
+    "attention_heads": 4,
+    "dropout": 0.1,
+    "batch_size": 64,
+    "maximum_epochs": 20,
+    "early_stopping_patience": 3,
+    "learning_rate": 0.0003,
+    "weight_decay": 0.0001,
+    "gradient_clip_norm": 1.0,
+    "mixed_precision": true
+  },
   "baseline": {
     "tree_max_train_rows": 500000,
     "tree_max_iter": 80,
@@ -67,6 +83,8 @@
     "count": 1000,
     "models": ["independent", "shared_route_latent", "residual_block"],
     "shared_route_rho": 0.35,
+    "residual_block_size": 5,
+    "evaluation_timeout_thresholds_s": [600, 900, 1200],
     "generator_id": "stage2_v5_route_scenarios.1"
   },
   "performance": {
@@ -74,6 +92,17 @@
     "maximum_five_x_scaling_ratio": 8.0,
     "full_runtime_safety_factor": 1.5,
     "maximum_peak_rss_mb": 8192
+  },
+  "admission": {
+    "minimum_final_test_day_count": 3,
+    "maximum_pace_quantile_coverage_error": 0.03,
+    "route_p90_coverage_minimum": 0.85,
+    "route_p90_coverage_maximum": 0.95,
+    "route_p95_coverage_minimum": 0.90,
+    "route_p95_coverage_maximum": 0.99,
+    "minimum_final_daily_mae_wins_vs_strong_baseline": 2,
+    "require_aggregate_mae_better_than_strong_baseline": true,
+    "require_paired_bootstrap_ci_below_zero": true
   },
   "runtime": {
     "random_seed": 20261009,

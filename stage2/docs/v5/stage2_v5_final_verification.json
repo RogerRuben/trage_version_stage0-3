@@ -1,0 +1,182 @@
+{
+  "checks": {
+    "development_scientific": [
+      {
+        "detail": "hist_gradient_boosting",
+        "name": "same_set_baseline_complete",
+        "status": "PASS"
+      },
+      {
+        "detail": "PREDICTIVE_BASELINE_VALIDATED",
+        "name": "strong_baseline_beaten",
+        "status": "PASS"
+      },
+      {
+        "detail": true,
+        "name": "paired_bootstrap",
+        "status": "PASS"
+      }
+    ],
+    "engineering": [
+      {
+        "detail": "PASS",
+        "name": "service_time_target_audit",
+        "status": "PASS"
+      },
+      {
+        "detail": "PASS",
+        "name": "prediction_merge",
+        "status": "PASS"
+      },
+      {
+        "detail": "PASS",
+        "name": "model_fit",
+        "status": "PASS"
+      },
+      {
+        "detail": "PASS",
+        "name": "horizon_ablation_complete",
+        "status": "PASS"
+      },
+      {
+        "detail": "horizon_gate",
+        "name": "horizon_gate_selected",
+        "status": "PASS"
+      },
+      {
+        "detail": "13d6d349b3963d02da4260e289ac190e7708b5aa2d598c77cad17bf953398c16",
+        "name": "trained_distribution_scale",
+        "status": "PASS"
+      },
+      {
+        "detail": 0.0075090800172593,
+        "name": "pace_quantile_calibration_development",
+        "status": "PASS"
+      },
+      {
+        "detail": "shared_route_latent",
+        "name": "scenario_selected",
+        "status": "PASS"
+      },
+      {
+        "detail": "PASS",
+        "name": "v4_v5_state_same_row_evaluation",
+        "status": "PASS"
+      },
+      {
+        "detail": {
+          "collected": 32,
+          "failed": 0,
+          "passed": 32,
+          "runtime_s": 95.65,
+          "status": "PASS"
+        },
+        "name": "regression_tests",
+        "status": "PASS"
+      }
+    ],
+    "final_test": [],
+    "performance": [
+      {
+        "detail": 0,
+        "name": "static_complexity",
+        "status": "PASS"
+      },
+      {
+        "detail": "PASS",
+        "name": "micro_benchmarks",
+        "status": "PASS"
+      },
+      {
+        "detail": "PASS",
+        "name": "layered_preflight",
+        "status": "PASS"
+      },
+      {
+        "detail": 451.8828125,
+        "name": "peak_rss",
+        "status": "PASS"
+      }
+    ],
+    "temporal": [
+      {
+        "detail": "FROZEN_BEFORE_MODEL_FIT",
+        "name": "split_frozen_before_fit",
+        "status": "PASS"
+      },
+      {
+        "detail": [
+          "20161009",
+          "20161010",
+          "20161011",
+          "20161012",
+          "20161013",
+          "20161014",
+          "20161015",
+          "20161016",
+          "20161017",
+          "20161018",
+          "20161019",
+          "20161020",
+          "20161021",
+          "20161022",
+          "20161023",
+          "20161024"
+        ],
+        "name": "train_dates_match",
+        "status": "PASS"
+      },
+      {
+        "detail": [
+          "20161025",
+          "20161026"
+        ],
+        "name": "validation_dates_match",
+        "status": "PASS"
+      },
+      {
+        "detail": [
+          "20161027"
+        ],
+        "name": "calibration_dates_match",
+        "status": "PASS"
+      },
+      {
+        "detail": [
+          "20161028",
+          "20161029",
+          "20161030"
+        ],
+        "name": "final_dates_match",
+        "status": "PASS"
+      },
+      {
+        "detail": "frozen_legacy_benchmark_only",
+        "name": "legacy_not_untouched",
+        "status": "PASS"
+      },
+      {
+        "detail": 0,
+        "name": "main_fit_read_no_final_rows",
+        "status": "PASS"
+      }
+    ]
+  },
+  "development_scientific_status": "PREDICTIVE_BASELINE_VALIDATED",
+  "engineering_status": "PASS",
+  "final_test_status": "PENDING_UPSTREAM_PRODUCTS",
+  "identities": {
+    "config_sha256": "3c9b29baf052d0de385f472dedf1308d83307cfddd47b2110c44e7b924f8ecb7",
+    "distribution_model_id": "dcc449d4f6d154fd15a3479730eda11168ec3f5c54018dff4b736ad2d44fb32b",
+    "performance_benchmark_sha256": "00ea652a330227dec991b2fb9caa17039ccad31619ba89dcad642e6b62072b79",
+    "profile_sha256": "f123fefa4f0518c97ccd5b79a8fdf98f1d14bc3df4c4340f5c45a2fc0a701bd9",
+    "scenario_generator_id": "stage2_v5_route_scenarios.1",
+    "scenario_seed": 20261009,
+    "selection_model_id": "dcc449d4f6d154fd15a3479730eda11168ec3f5c54018dff4b736ad2d44fb32b",
+    "split_freeze_sha256": "77a6d87c0633b32ea65907f20e150d99586751c61cc7ddb39501c53079a0ca35"
+  },
+  "performance_gate_status": "PASS",
+  "schema_version": "stage2_v5_final_verification.1",
+  "stage3_admission_status": "READY_FOR_ROUTE_SCENARIO_PROTOTYPE",
+  "temporal_contract_status": "PASS"
+}
