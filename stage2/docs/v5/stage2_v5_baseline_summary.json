@@ -1,0 +1,8 @@
+{
+  "best_validation_mae": 0.030139872380692687,
+  "best_validation_model": "hist_gradient_boosting",
+  "evaluation_rule": "all models use identical direct-pace rows per date",
+  "legacy_is_untouched_test": false,
+  "new_final_test_consumed": false,
+  "schema_version": "stage2_v5_baseline_evaluation.1"
+}

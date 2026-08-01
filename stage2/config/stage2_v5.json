@@ -1,0 +1,82 @@
+{
+  "schema_version": "stage2_v5.1",
+  "stage2_v4_release": {
+    "tag": "stage2-v4-final",
+    "commit": "70cb70265cbb95e5fc9981024a554de28ee2be85"
+  },
+  "split": {
+    "train_dates": [
+      "20161009", "20161010", "20161011", "20161012",
+      "20161013", "20161014", "20161015", "20161016",
+      "20161017", "20161018", "20161019", "20161020",
+      "20161021", "20161022", "20161023", "20161024"
+    ],
+    "validation_model_dates": ["20161025", "20161026"],
+    "calibration_dates": ["20161027"],
+    "final_test_dates": ["20161028", "20161029", "20161030"],
+    "legacy_test_dates": ["20161031"]
+  },
+  "service_time_target": {
+    "primary": "direct_observed_sec_per_m",
+    "physical_window_quality_gate": "frozen_stage1_rts_measurement_available",
+    "physical_window_quality_semantics": "direct_time_ge_3s_distance_ge_10m_continuous_and_speed_le_75mps",
+    "derived_full_traversal_time": "predicted_pace_times_allocated_distance_m",
+    "direct_time_role": "auxiliary_high_coverage_sensitivity",
+    "direct_distance_coverage_threshold": 0.9,
+    "interpolated_time_supervision": false,
+    "missing_policy": "nan_plus_mask"
+  },
+  "distribution": {
+    "family": "lognormal",
+    "quantiles": [0.5, 0.9, 0.95],
+    "minimum_log_scale": -5.0,
+    "maximum_log_scale": 2.0
+  },
+  "selection": {
+    "methods": ["complete_case", "component_mask", "stabilized_ipw"],
+    "epsilon": 0.05,
+    "maximum_weight": 10.0
+  },
+  "history": {
+    "windows_minutes": [5, 15, 30, 60],
+    "minimum_observations": 5,
+    "fallback_order": ["edge_time", "edge", "highway_time", "highway", "global_time", "global"]
+  },
+  "shards": {
+    "max_seq_len": 128,
+    "overlap": 32,
+    "chunks_per_file": 1024
+  },
+  "model": {
+    "hidden_dim": 128,
+    "categorical_embedding_dim": 24,
+    "transformer_layers": 3,
+    "attention_heads": 4,
+    "dropout": 0.1,
+    "availability_groups": ["service_time", "lcs", "rts", "dynamics"]
+  },
+  "baseline": {
+    "tree_max_train_rows": 500000,
+    "tree_max_iter": 80,
+    "tree_learning_rate": 0.08,
+    "tree_max_leaf_nodes": 31,
+    "tree_min_samples_leaf": 50
+  },
+  "scenario": {
+    "seed": 20261009,
+    "count": 1000,
+    "models": ["independent", "shared_route_latent", "residual_block"],
+    "shared_route_rho": 0.35,
+    "generator_id": "stage2_v5_route_scenarios.1"
+  },
+  "performance": {
+    "benchmark_rows": [10000, 50000, 100000, 500000],
+    "maximum_five_x_scaling_ratio": 8.0,
+    "full_runtime_safety_factor": 1.5,
+    "maximum_peak_rss_mb": 8192
+  },
+  "runtime": {
+    "random_seed": 20261009,
+    "parquet_compression": "zstd"
+  }
+}

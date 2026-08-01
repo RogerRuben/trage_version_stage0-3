@@ -1,0 +1,83 @@
+{
+  "benchmark_report_sha256": "00ea652a330227dec991b2fb9caa17039ccad31619ba89dcad642e6b62072b79",
+  "conditions": {
+    "layered_dry_run_pass": true,
+    "micro_benchmark_pass": true,
+    "peak_rss_acceptable": true,
+    "reference_equivalence_tests_required": true,
+    "runtime_projection_finite": true,
+    "static_complexity_audit_pass": true
+  },
+  "details": {
+    "legacy_full_day_read_only_inference": {
+      "order_count": 30000,
+      "read_bytes": 718089833,
+      "row_count": 2116712,
+      "zero_distance_token_count": 137
+    },
+    "one_bucket_train": {
+      "label_row_count": 32313,
+      "pace_target_count": 32225,
+      "read_bytes": 6224931,
+      "row_count": 87789
+    },
+    "one_train_day": {
+      "pace_target_count": 262940,
+      "partition_count": 9,
+      "read_bytes": 17928091,
+      "row_count": 714536
+    },
+    "one_validation_day": {
+      "pace_target_count": 259808,
+      "partition_count": 9,
+      "read_bytes": 17827475,
+      "row_count": 701601
+    }
+  },
+  "expected_full_runtime_s_linear_times_1_5": 3.939489374604645,
+  "maximum_peak_rss_mb": 459.46875,
+  "new_final_test_note": "20161028-30 raw archives exist, but frozen Stage 0/1 products have not yet been materialized; this is a scientific execution dependency, not a performance-gate override.",
+  "new_final_test_upstream_products_ready": false,
+  "performance_gate_status": "PASS",
+  "profile_report_sha256": "f123fefa4f0518c97ccd5b79a8fdf98f1d14bc3df4c4340f5c45a2fc0a701bd9",
+  "runs": [
+    {
+      "peak_rss_mb": 104.28125,
+      "read_bytes": 6224931,
+      "row_count": 87789,
+      "rows_per_s": 1451328.9258779157,
+      "runtime_s": 0.06048870000086026,
+      "stage": "one_bucket_train",
+      "write_bytes": 0
+    },
+    {
+      "peak_rss_mb": 119.2734375,
+      "read_bytes": 17928091,
+      "row_count": 714536,
+      "rows_per_s": 3249327.99826447,
+      "runtime_s": 0.21990269999878365,
+      "stage": "one_train_day",
+      "write_bytes": 0
+    },
+    {
+      "peak_rss_mb": 121.2734375,
+      "read_bytes": 17827475,
+      "row_count": 701601,
+      "rows_per_s": 3265043.330619863,
+      "runtime_s": 0.21488260000114678,
+      "stage": "one_validation_day",
+      "write_bytes": 0
+    },
+    {
+      "peak_rss_mb": 459.46875,
+      "read_bytes": 718089833,
+      "row_count": 2116712,
+      "rows_per_s": 18840422.075879697,
+      "runtime_s": 0.11234949999925448,
+      "stage": "legacy_full_day_read_only_inference",
+      "write_bytes": 0
+    }
+  ],
+  "schema_version": "stage2_v5_preflight.1",
+  "static_audit_sha256": "e887a2aa80a491fa6aee0f6b43db9d7471e42d9ffddd23916fe10c88879a59dd"
+}

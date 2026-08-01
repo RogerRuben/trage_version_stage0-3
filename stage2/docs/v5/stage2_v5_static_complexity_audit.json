@@ -1,0 +1,46 @@
+{
+  "allowlisted_finding_count": 4,
+  "blocking_finding_count": 0,
+  "findings": [
+    {
+      "blocking": false,
+      "file": "stage2/v5/data.py",
+      "justification": "bounded one-partition-at-a-time audit scan",
+      "line": 55,
+      "pattern": "partition_streaming_read"
+    },
+    {
+      "blocking": false,
+      "file": "stage2/v5/preflight.py",
+      "justification": "bounded one-partition-at-a-time audit scan",
+      "line": 67,
+      "pattern": "partition_streaming_read"
+    },
+    {
+      "blocking": false,
+      "file": "stage2/v5/service_time_audit.py",
+      "justification": "bounded one-partition-at-a-time audit scan",
+      "line": 202,
+      "pattern": "partition_streaming_read"
+    },
+    {
+      "blocking": false,
+      "file": "stage2/v5/service_time_audit.py",
+      "justification": "bounded one-partition-at-a-time audit scan",
+      "line": 203,
+      "pattern": "partition_streaming_read"
+    }
+  ],
+  "prohibited_patterns": [
+    "groupby.apply",
+    "DataFrame.apply(axis=1)",
+    "iterrows",
+    "itertuples",
+    "concat_inside_loop",
+    "repeated_parquet_read_inside_loop"
+  ],
+  "scanned_file_count": 19,
+  "schema_version": "stage2_v5_static_complexity_audit.1",
+  "source_sha256": "c2b2b7ff047499e934ee6240f801ae57a0548f04d25bcb20237e9983f6ef7e5a",
+  "status": "PASS"
+}
