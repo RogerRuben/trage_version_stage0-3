@@ -46,6 +46,14 @@
     "calibration_dates": ["20161027"],
     "benchmark_dates": ["20161031"]
   },
+  "selected_history_mode": "ordinary_concatenation",
+  "selection_evidence": {
+    "protocol": "development_temporal_evaluation",
+    "selection_dates": ["20161022", "20161023"],
+    "selection_metric": "same-row direct-observed pace_sec_per_m MAE",
+    "selected_validation_mae": 0.02858136294300031,
+    "horizon_gate_validation_mae": 0.028694231437763815
+  },
   "service_time_target": {
     "primary": "direct_observed_sec_per_m",
     "physical_window_quality_gate": "frozen_stage1_rts_measurement_available",

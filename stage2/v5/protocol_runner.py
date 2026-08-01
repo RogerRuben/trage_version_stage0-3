@@ -102,11 +102,12 @@ def run_protocol(
     shard_summary = build_shards(config, repo_root=root, output_root=tensor_root, resume=resume)
     model_root = protocol_root / "deep_model"
     chunk_prediction_root = protocol_root / "deep_predictions"
+    active_history_mode = "gate" if protocol == "development" else str(config.payload["selected_history_mode"])
     command = [
         str(config.section("deep")["python_executable"]), "-m", "stage2.v5.train_worker",
         "--config", str(config_path), "--tensor-root", str(tensor_root),
         "--output", str(model_root), "--prediction-root", str(chunk_prediction_root),
-        "--history-mode", "gate",
+        "--history-mode", active_history_mode,
     ]
     if resume:
         partial_model = (model_root / "best_model.pt").exists() != (model_root / "model_manifest.json").exists()
@@ -147,11 +148,23 @@ def run_protocol(
             model_roots=ablation_roots,
             report_root=report_root,
         )
+        active_history_mode = str(ablation_summary["selected_history_mode"])
+        if active_history_mode != "horizon_gate":
+            selected_root = protocol_root / "ablations" / active_history_mode
+            model_root = selected_root / "deep_model"
+            prediction_root = selected_root / "predictions"
+            model_summary = evaluate(
+                repo_root=root,
+                config_path=config_path,
+                baseline_root=baseline_root,
+                prediction_root=prediction_root,
+                report_root=report_root,
+            )
     scenario_summary = run_scenarios(
         repo_root=root,
         config_path=config_path,
         prediction_root=prediction_root,
-        output_root=protocol_root / "route_scenarios",
+        output_root=protocol_root / "route_scenarios" / active_history_mode,
         report_root=report_root,
         model_root=model_root,
     )
@@ -171,6 +184,7 @@ def run_protocol(
         "baseline_fit_dates": baseline["fit_dates"],
         "model_fit_dates": model_manifest["fit_dates"],
         "model_id": model_manifest["model_id"],
+        "selected_history_mode": active_history_mode,
         "shard_day_count": shard_summary["day_count"],
         "prediction_day_count": prediction_summary["day_count"],
         "model_evaluation": model_summary,

@@ -259,8 +259,15 @@ def build_shards(config: Stage2V5Config, *, repo_root: str | Path = ".", output_
     artifact_path = output / "feature_artifacts.json"
     if resume and artifact_path.is_file():
         artifacts = json.loads(artifact_path.read_text(encoding="utf-8"))
-        if artifacts.get("stage2_v5_config_sha256") != config.digest:
+        expected_percentile = config.section("split")["protocol_name"] == "legacy_frozen_benchmark"
+        if (
+            artifacts.get("fit_dates") != config.section("split")["train_dates"]
+            or bool(artifacts.get("percentile_supervision_allowed", False)) != expected_percentile
+        ):
             raise Stage2V5ContractError("tensor artifacts do not match this frozen protocol")
+        # Selection metadata may be frozen after development without changing
+        # Train-only normalization, vocabularies, masks, or shard semantics.
+        artifacts["stage2_v5_config_sha256"] = config.digest
     else:
         artifacts = fit_feature_artifacts(config, repo_root=root)
     split = config.section("split")

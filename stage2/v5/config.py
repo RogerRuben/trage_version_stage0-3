@@ -78,6 +78,8 @@ def _validate(payload: dict[str, Any]) -> None:
     legacy = payload.get("legacy_benchmark_fit", {})
     if tuple(legacy.get("benchmark_dates", ())) != ("20161031",):
         raise Stage2V5ContractError("legacy benchmark identity mismatch")
+    if payload.get("selected_history_mode") != "ordinary_concatenation":
+        raise Stage2V5ContractError("history mode differs from frozen development selection")
     if protocol_name == "development_temporal_evaluation":
         expected_active = expected_development
     elif protocol_name in {fold["fold_id"] for fold in folds}:
