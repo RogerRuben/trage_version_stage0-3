@@ -52,3 +52,8 @@ def test_vectorized_chunks_preserve_routes_and_unit_supervision() -> None:
     assert len(unique) == sum(lengths)
     assert np.allclose(totals, 1.0)
     assert np.all(payload["overlap_supervision_count"][valid] >= 1)
+    assert not payload["tail_masks"].any()
+
+    artifacts["percentile_supervision_allowed"] = True
+    legacy_payload = vectorized_chunk_payload(frame, artifacts, max_seq_len=5, overlap=2)
+    assert legacy_payload["tail_masks"][~legacy_payload["pad_mask"]].all()

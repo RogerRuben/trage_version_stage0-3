@@ -3,9 +3,10 @@
 - Engineering: `PASS`
 - Temporal contract: `PASS`
 - Performance gate: `PASS`
-- Development scientific status: `PREDICTIVE_BASELINE_VALIDATED`
-- Preregistered 20161028–30 final test: `PENDING_UPSTREAM_PRODUCTS`
-- Stage 3 admission: `READY_FOR_ROUTE_SCENARIO_PROTOTYPE`
+- Development temporal evaluation: `PENDING`
+- Rolling-origin evaluation: `PENDING`
+- 20161031 legacy frozen benchmark: `PENDING`
+- Stage 3 admission: `NOT_READY`
 
-20161028–30 的原始归档存在，但冻结的 Stage 0/1 上游产品尚未物化，因此尚未读取 final-test 标签。
-当前状态只允许路线情景原型验证，不构成 Stage 2 v5 最终冻结或正式 Stage 3 准入。
+20161028–30 未生产、未读取。主要科学稳定性由三个预注册 rolling-origin folds 判定；20161031 仅用于与冻结 v4 的版本可比性。
+RTS/LCS percentile 在 development 与 rolling 训练中禁用，不参与模型结构选择；主结论使用 direct pace、物理时间、raw 组件与路线服务时间。

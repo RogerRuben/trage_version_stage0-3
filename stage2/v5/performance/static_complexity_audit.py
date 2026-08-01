@@ -20,6 +20,7 @@ ALLOWED_PARTITION_READS = {
     "preflight.py": "bounded one-partition-at-a-time dry run",
     "scenario_pipeline.py": "bounded one-day/order-base partition scan and one scenario day at a time",
     "service_time_audit.py": "bounded one-partition-at-a-time audit scan",
+    "shards.py": "bounded one-day-at-a-time Train-only artifact fit and shard construction",
     "state_evaluation.py": "bounded three-day v4/v5 same-row evaluation scan",
 }
 

@@ -13,6 +13,7 @@ import numpy as np
 import pandas as pd
 
 from .config import load_config
+from .data import _input_split
 from .scenario import generate_route_scenarios
 
 
@@ -63,7 +64,7 @@ def _route_product(
 
 
 def _order_truth(root: Path, date: str) -> pd.Series:
-    day = root / "stage1/input_v1/split=validation" / f"date={date}"
+    day = root / "stage1/input_v1" / f"split={_input_split(date)}" / f"date={date}"
     parts: list[pd.DataFrame] = []
     for path in sorted(day.glob("bucket=*/order_base.parquet")):
         parts.append(pd.read_parquet(path, columns=["order_id", "departure_time", "arrival_time"]))
@@ -138,19 +139,36 @@ def _metrics(route_id: np.ndarray, scenarios: np.ndarray, truth: pd.Series, *, m
     }
 
 
-def run(*, repo_root: str | Path = ".") -> dict[str, Any]:
+def run(
+    *,
+    repo_root: str | Path = ".",
+    config_path: str | Path = "stage2/config/stage2_v5.json",
+    prediction_root: str | Path = "stage2/output_v5/predictions",
+    output_root: str | Path = "stage2/output_v5/route_scenarios",
+    report_root: str | Path = "stage2/docs/v5",
+    model_root: str | Path = "stage2/output_v5/deep_model",
+) -> dict[str, Any]:
     root = Path(repo_root).resolve()
-    config = load_config(root / "stage2/config/stage2_v5.json")
+    def resolved(value: str | Path) -> Path:
+        path = Path(value)
+        return path if path.is_absolute() else root / path
+
+    config = load_config(resolved(config_path))
     scenario_config = config.section("scenario")
     models = tuple(scenario_config["models"])
     scenario_count = int(scenario_config["count"])
-    output = root / "stage2/output_v5/route_scenarios"
+    output = resolved(output_root)
+    predictions = resolved(prediction_root)
+    reports = resolved(report_root)
+    reports.mkdir(parents=True, exist_ok=True)
     report_rows: list[dict[str, Any]] = []
     generated: dict[tuple[str, str], tuple[np.ndarray, np.ndarray]] = {}
     dates = [("validation_model", date) for date in config.section("split")["validation_model_dates"]]
     dates += [("calibration", date) for date in config.section("split")["calibration_dates"]]
+    dates += [("evaluation", date) for date in config.section("split")["evaluation_dates"]]
+    dates += [("legacy", date) for date in config.section("split")["legacy_test_dates"]]
     for split, date in dates:
-        prediction = pd.read_parquet(root / "stage2/output_v5/predictions" / f"split={split}" / f"date={date}" / "traversal_predictions.parquet")
+        prediction = pd.read_parquet(predictions / f"split={split}" / f"date={date}" / "traversal_predictions.parquet")
         truth = _order_truth(root, date)
         for model_index, model in enumerate(models):
             path = output / f"split={split}" / f"date={date}" / f"model={model}" / "route_scenarios.npz"
@@ -208,9 +226,24 @@ def run(*, repo_root: str | Path = ".") -> dict[str, Any]:
     offset_s = float(offsets[chosen_index])
     calibrated = _metrics(calibration_routes, calibration_scenarios, _order_truth(root, calibration_date), model=selected, split="calibration", date=calibration_date, scale=route_scale, dispersion=dispersion_multiplier, offset_s=offset_s)
     calibrated["scenario_model"] = f"{selected}_calibrated"
-    metrics = pd.concat((metrics, pd.DataFrame([calibrated])), ignore_index=True)
-    report_root = root / "stage2/docs/v5"
-    metrics.to_csv(report_root / "scenario_coverage.csv", index=False)
+    calibrated_rows = [calibrated]
+    for split_name in ("evaluation", "legacy"):
+        for date in config.section("split")["evaluation_dates" if split_name == "evaluation" else "legacy_test_dates"]:
+            route_id, values = generated[(date, selected)]
+            row = _metrics(
+                route_id,
+                values,
+                _order_truth(root, date),
+                model=f"{selected}_frozen_calibrated",
+                split=split_name,
+                date=date,
+                scale=route_scale,
+                dispersion=dispersion_multiplier,
+                offset_s=offset_s,
+            )
+            calibrated_rows.append(row)
+    metrics = pd.concat((metrics, pd.DataFrame(calibrated_rows)), ignore_index=True)
+    metrics.to_csv(reports / "scenario_coverage.csv", index=False)
     selection = {
         "schema_version": "stage2_v5_scenario_selection.1",
         "selected_model": selected,
@@ -223,10 +256,11 @@ def run(*, repo_root: str | Path = ".") -> dict[str, Any]:
         "scenario_count": scenario_count,
         "scenario_seed": int(scenario_config["seed"]),
         "generator_id": scenario_config["generator_id"],
-        "new_final_test_consumed": False,
+        "evaluation_dates": config.section("split")["evaluation_dates"],
+        "legacy_benchmark_dates": config.section("split")["legacy_test_dates"],
         "scores": {name: float(value) for name, value in score.items()},
     }
-    (report_root / "stage2_v5_scenario_selection.json").write_text(json.dumps(selection, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    (reports / "stage2_v5_scenario_selection.json").write_text(json.dumps(selection, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     raw_path = output / "split=calibration" / f"date={calibration_date}" / f"model={selected}" / "route_scenarios.npz"
     calibrated_values = _calibrate_values(
         calibration_scenarios,
@@ -240,7 +274,7 @@ def run(*, repo_root: str | Path = ".") -> dict[str, Any]:
     temporary_scenario = scenario_path.with_name(f".{scenario_path.name}.tmp.npz")
     np.savez_compressed(temporary_scenario, route_id=calibration_routes, route_time_s=calibrated_values)
     os.replace(temporary_scenario, scenario_path)
-    model_manifest = json.loads((root / "stage2/output_v5/deep_model/model_manifest.json").read_text(encoding="utf-8"))
+    model_manifest = json.loads((resolved(model_root) / "model_manifest.json").read_text(encoding="utf-8"))
     product = _route_product(
         calibration_routes,
         calibrated_values,
@@ -260,8 +294,20 @@ def run(*, repo_root: str | Path = ".") -> dict[str, Any]:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo-root", default=".")
+    parser.add_argument("--config", default="stage2/config/stage2_v5.json")
+    parser.add_argument("--prediction-root", default="stage2/output_v5/predictions")
+    parser.add_argument("--output-root", default="stage2/output_v5/route_scenarios")
+    parser.add_argument("--report-root", default="stage2/docs/v5")
+    parser.add_argument("--model-root", default="stage2/output_v5/deep_model")
     args = parser.parse_args()
-    report = run(repo_root=args.repo_root)
+    report = run(
+        repo_root=args.repo_root,
+        config_path=args.config,
+        prediction_root=args.prediction_root,
+        output_root=args.output_root,
+        report_root=args.report_root,
+        model_root=args.model_root,
+    )
     print(json.dumps(report, sort_keys=True))
     return 0
 

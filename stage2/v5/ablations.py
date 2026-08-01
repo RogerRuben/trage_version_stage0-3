@@ -35,12 +35,21 @@ def _identity(frame: pd.DataFrame) -> np.ndarray:
     return frame[["order_id", "traversal_id"]].astype(str).to_numpy()
 
 
-def evaluate_ablations(*, repo_root: str | Path = ".") -> dict[str, Any]:
+def evaluate_ablations(
+    *,
+    repo_root: str | Path = ".",
+    config_path: str | Path = "stage2/config/stage2_v5.json",
+    model_roots: dict[str, str | Path] | None = None,
+    report_root: str | Path = "stage2/docs/v5",
+) -> dict[str, Any]:
     root = Path(repo_root).resolve()
-    config = load_config(root / "stage2/config/stage2_v5.json")
+    config_file = Path(config_path)
+    config = load_config(config_file if config_file.is_absolute() else root / config_file)
+    roots = model_roots or MODEL_ROOTS
     split_config = config.section("split")
     dates = [("validation_model", value) for value in split_config["validation_model_dates"]]
     dates += [("calibration", value) for value in split_config["calibration_dates"]]
+    dates += [("evaluation", value) for value in split_config["evaluation_dates"]]
     seed = int(config.section("runtime")["random_seed"])
     metric_rows: list[dict[str, Any]] = []
     bootstrap_rows: list[dict[str, Any]] = []
@@ -48,7 +57,7 @@ def evaluate_ablations(*, repo_root: str | Path = ".") -> dict[str, Any]:
     for split, date in dates:
         frames = {
             model: pd.read_parquet(_prediction_path(root, relative, split, date))
-            for model, relative in MODEL_ROOTS.items()
+            for model, relative in roots.items()
         }
         reference = frames["horizon_gate"]
         reference_identity = _identity(reference)
@@ -108,14 +117,16 @@ def evaluate_ablations(*, repo_root: str | Path = ".") -> dict[str, Any]:
         "horizon_gate_validation_mae": gate_mae,
         "horizon_gate_selected": selected == "horizon_gate",
         "validation_mae_by_model": {name: float(value) for name, value in aggregate_mae.items()},
-        "new_final_test_consumed": False,
+        "development_evaluation_dates": list(split_config["evaluation_dates"]),
         "status": "PASS",
     }
-    report_root = root / "stage2/docs/v5"
-    report_root.mkdir(parents=True, exist_ok=True)
-    metrics.to_csv(report_root / "horizon_gate_ablation.csv", index=False)
-    bootstraps.to_csv(report_root / "horizon_gate_ablation_bootstrap.csv", index=False)
-    (report_root / "stage2_v5_horizon_ablation.json").write_text(
+    report = Path(report_root)
+    if not report.is_absolute():
+        report = root / report
+    report.mkdir(parents=True, exist_ok=True)
+    metrics.to_csv(report / "horizon_gate_ablation.csv", index=False)
+    bootstraps.to_csv(report / "horizon_gate_ablation_bootstrap.csv", index=False)
+    (report / "stage2_v5_horizon_ablation.json").write_text(
         json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     return summary

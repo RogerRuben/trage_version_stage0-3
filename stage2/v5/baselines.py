@@ -158,13 +158,13 @@ def evaluate_service_baselines(bundle: dict[str, Any], config: Stage2V5Config, *
     split = config.section("split")
     dates = [("validation_model", date) for date in split["validation_model_dates"]]
     dates += [("calibration", date) for date in split["calibration_dates"]]
+    dates += [("evaluation", date) for date in split["evaluation_dates"]]
     dates += [("legacy", date) for date in split["legacy_test_dates"]]
     metric_rows: list[dict[str, Any]] = []
     bootstrap_rows: list[dict[str, Any]] = []
     seed = int(config.section("runtime")["random_seed"])
     for split_name, date in dates:
-        input_split = "test" if split_name == "legacy" else split_name
-        frame = load_v5_day(date, split=input_split, repo_root=repo_root)
+        frame = load_v5_day(date, split=split_name, repo_root=repo_root)
         predictions = _predict(frame, bundle)
         truth = pd.to_numeric(frame["pace_sec_per_m"], errors="coerce").to_numpy(float)
         valid = frame["pace_target_valid"].to_numpy(bool)
@@ -190,8 +190,8 @@ def evaluate_service_baselines(bundle: dict[str, Any], config: Stage2V5Config, *
         "evaluation_rule": "all models use identical direct-pace rows per date",
         "best_validation_model": best_model,
         "best_validation_mae": float(by_model.min()),
+        "development_evaluation_dates": list(split["evaluation_dates"]),
         "legacy_is_untouched_test": False,
-        "new_final_test_consumed": False,
     }
     return metrics_frame, bootstrap_frame, summary
 

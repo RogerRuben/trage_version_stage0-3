@@ -37,8 +37,22 @@ PROFILE_PACE_COLUMNS = (
 )
 
 
-def _input_split(split: str) -> str:
-    return "validation" if split in {"validation_model", "calibration"} else split
+def _input_split(date: str) -> str:
+    """Map a physical date to its frozen Stage 1 partition.
+
+    Stage 2 roles change across rolling folds, whereas the Stage 1 storage
+    partition is immutable.  Inferring the path from the Stage 2 role would
+    therefore either miss rows or silently read the wrong upstream product.
+    """
+
+    day = int(date[-2:])
+    if 9 <= day <= 24:
+        return "train"
+    if 25 <= day <= 27:
+        return "validation"
+    if day == 31:
+        return "test"
+    raise Stage2V5ContractError(f"date is outside frozen Stage 1 products: {date}")
 
 
 def _traversal_targets(
@@ -51,7 +65,7 @@ def _traversal_targets(
 ) -> pd.DataFrame:
     input_root = stage1_input_root or (repo_root / "stage1/input_v1")
     output_root = stage1_output_root or (repo_root / "stage1/output_v3")
-    day = input_root / f"split={_input_split(split)}" / f"date={date}"
+    day = input_root / f"split={_input_split(date)}" / f"date={date}"
     paths = sorted(day.glob("bucket=*/link_traversals.parquet"))
     if not paths:
         raise Stage2V5ContractError(f"missing Stage 1 traversal partitions for {date}")

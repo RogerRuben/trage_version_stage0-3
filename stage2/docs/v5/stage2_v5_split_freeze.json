@@ -1,81 +1,60 @@
 {
-  "schema_version": "stage2_v5_split_freeze.1",
-  "freeze_status": "FROZEN_BEFORE_MODEL_FIT",
+  "schema_version": "stage2_v5_split_freeze.2",
+  "freeze_status": "FROZEN_BEFORE_PROTOCOL_RETRAIN",
   "frozen_at": "2026-08-01",
-  "taskbook_sha256": "3f2277165afee8f663edeaa271958a0c5a180c91b9830f013a7538252c9624fb",
+  "protocol": "development_plus_preregistered_rolling_origin",
+  "supersedes": "new_unseen_future_dates",
+  "upstream_rebuild_required": false,
   "base_stage2": {
     "tag": "stage2-v4-final",
-    "freeze_commit": "70cb70265cbb95e5fc9981024a554de28ee2be85",
-    "implementation_commit": "0c047845c6a13702a2aebc510520350a7593edbd"
+    "freeze_commit": "70cb70265cbb95e5fc9981024a554de28ee2be85"
   },
-  "upstream_stage1": {
-    "tag": "stage1-v3-final",
-    "commit": "8bfdec5a043e3ecbdd6473ce49c735db7732e493"
+  "development": {
+    "train_dates": ["20161009", "20161010", "20161011", "20161012", "20161013", "20161014", "20161015", "20161016", "20161017", "20161018", "20161019", "20161020", "20161021"],
+    "validation_model_dates": ["20161022", "20161023"],
+    "calibration_dates": ["20161024"],
+    "evaluation_dates": ["20161025", "20161026", "20161027"],
+    "evaluation_role": "development_temporal_evaluation"
   },
-  "protocol": "new_unseen_future_dates",
-  "split": {
-    "train_dates": [
-      "20161009",
-      "20161010",
-      "20161011",
-      "20161012",
-      "20161013",
-      "20161014",
-      "20161015",
-      "20161016",
-      "20161017",
-      "20161018",
-      "20161019",
-      "20161020",
-      "20161021",
-      "20161022",
-      "20161023",
-      "20161024"
-    ],
+  "rolling_folds": [
+    {
+      "fold_id": "fold_1",
+      "train_dates": ["20161009", "20161010", "20161011", "20161012", "20161013", "20161014", "20161015", "20161016", "20161017", "20161018"],
+      "validation_model_dates": ["20161019", "20161020"],
+      "calibration_dates": ["20161021"],
+      "evaluation_dates": ["20161022", "20161023"]
+    },
+    {
+      "fold_id": "fold_2",
+      "train_dates": ["20161009", "20161010", "20161011", "20161012", "20161013", "20161014", "20161015", "20161016", "20161017", "20161018", "20161019", "20161020"],
+      "validation_model_dates": ["20161021", "20161022"],
+      "calibration_dates": ["20161023"],
+      "evaluation_dates": ["20161024", "20161025"]
+    },
+    {
+      "fold_id": "fold_3",
+      "train_dates": ["20161009", "20161010", "20161011", "20161012", "20161013", "20161014", "20161015", "20161016", "20161017", "20161018", "20161019", "20161020", "20161021", "20161022"],
+      "validation_model_dates": ["20161023", "20161024"],
+      "calibration_dates": ["20161025"],
+      "evaluation_dates": ["20161026", "20161027"]
+    }
+  ],
+  "legacy_benchmark": {
+    "train_dates": ["20161009", "20161010", "20161011", "20161012", "20161013", "20161014", "20161015", "20161016", "20161017", "20161018", "20161019", "20161020", "20161021", "20161022", "20161023", "20161024"],
     "validation_model_dates": ["20161025", "20161026"],
     "calibration_dates": ["20161027"],
-    "final_test_dates": ["20161028", "20161029", "20161030"],
-    "legacy_benchmark_dates": ["20161031"]
+    "benchmark_dates": ["20161031"],
+    "role": "legacy_frozen_benchmark",
+    "untouched_test": false
   },
-  "rolling_fold_definition": null,
-  "raw_source_evidence": {
-    "archive": "D:/pycodes/didi_xian_raw/22-4-8.rar",
-    "archive_size_bytes": 5653081126,
-    "members": [
-      {
-        "date": "20161028",
-        "member": "22-4-8/10-28/028c56cc2980435c83b2f33339b593cc.tar.gz",
-        "size_bytes": 221422103
-      },
-      {
-        "date": "20161029",
-        "member": "22-4-8/10-29/22cf96e849fa4d40a0b10cce18167eb5.tar.gz",
-        "size_bytes": 207766621
-      },
-      {
-        "date": "20161030",
-        "member": "22-4-8/10-30/6f8b0186a2b4478bb745efcbc30ba3c0.tar.gz",
-        "size_bytes": 185278913
-      }
-    ]
-  },
-  "usage_audit": {
-    "frozen_stage1_dates": "20161009-20161027 plus 20161031",
-    "frozen_stage2_v4_dates": "20161009-20161027 plus 20161031",
-    "stage0_v6_final_test_date": "20161031",
-    "repository_report_reference_count_for_20161028_20161030": 0,
-    "non_report_references": [
-      "stage0/config/stage0_v5.yaml reserved the dates as a held-out test split",
-      "stage0/config/split_stage0_v5.json reserved the dates as a held-out test split"
-    ],
-    "conclusion": "Raw dates 20161028-20161030 exist and have no frozen Stage 1/2 products or reported model-selection results; they are preregistered as the Stage 2 v5 final test."
-  },
-  "rules": {
-    "final_test_may_be_read_before_model_and_calibration_freeze": false,
-    "final_test_may_select_features_hyperparameters_or_baselines": false,
-    "final_test_run_count": 1,
-    "legacy_20161031_is_untouched_test": false,
-    "legacy_20161031_role": "frozen_legacy_benchmark_only",
-    "split_change_allowed": false
+  "leakage_rules": {
+    "feature_artifacts_fit_per_fold_train_only": true,
+    "baseline_fit_per_fold_train_only": true,
+    "deep_model_fit_per_fold_train_only": true,
+    "availability_and_ipw_fit_per_fold": true,
+    "scenario_calibration_fit_on_fold_calibration_only": true,
+    "rts_lcs_percentile_supervision_in_development_or_rolling": false,
+    "rolling_primary_targets": ["pace_sec_per_m", "travel_time", "rts_raw", "lcs_raw", "route_service_time"],
+    "stage1_rts_lcs_percentiles_role": "legacy_and_descriptive_reporting_only"
   }
 }

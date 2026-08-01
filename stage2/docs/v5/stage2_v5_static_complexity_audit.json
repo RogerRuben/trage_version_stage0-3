@@ -6,35 +6,28 @@
       "blocking": false,
       "file": "stage2/v5/ablations.py",
       "justification": "bounded four-model by three-day development-only evaluation scan",
-      "line": 50,
+      "line": 59,
       "pattern": "partition_streaming_read"
     },
     {
       "blocking": false,
       "file": "stage2/v5/data.py",
       "justification": "bounded one-day Stage 1 partition scan",
-      "line": 64,
+      "line": 78,
       "pattern": "partition_streaming_read"
     },
     {
       "blocking": false,
       "file": "stage2/v5/data.py",
       "justification": "bounded one-day Stage 1 partition scan",
-      "line": 67,
+      "line": 81,
       "pattern": "partition_streaming_read"
     },
     {
       "blocking": false,
       "file": "stage2/v5/evaluate.py",
       "justification": "bounded one-day prediction scan; the day frame is released each iteration",
-      "line": 61,
-      "pattern": "partition_streaming_read"
-    },
-    {
-      "blocking": false,
-      "file": "stage2/v5/final_evaluation.py",
-      "justification": "bounded three-day one-shot final evaluation scan",
-      "line": 77,
+      "line": 83,
       "pattern": "partition_streaming_read"
     },
     {
@@ -48,14 +41,14 @@
       "blocking": false,
       "file": "stage2/v5/scenario_pipeline.py",
       "justification": "bounded one-day/order-base partition scan and one scenario day at a time",
-      "line": 69,
+      "line": 70,
       "pattern": "partition_streaming_read"
     },
     {
       "blocking": false,
       "file": "stage2/v5/scenario_pipeline.py",
       "justification": "bounded one-day/order-base partition scan and one scenario day at a time",
-      "line": 153,
+      "line": 171,
       "pattern": "partition_streaming_read"
     },
     {
@@ -74,6 +67,13 @@
     },
     {
       "blocking": false,
+      "file": "stage2/v5/shards.py",
+      "justification": "bounded one-day-at-a-time Train-only artifact fit and shard construction",
+      "line": 120,
+      "pattern": "partition_streaming_read"
+    },
+    {
+      "blocking": false,
       "file": "stage2/v5/state_evaluation.py",
       "justification": "bounded three-day v4/v5 same-row evaluation scan",
       "line": 54,
@@ -88,8 +88,8 @@
     "concat_inside_loop",
     "repeated_parquet_read_inside_loop"
   ],
-  "scanned_file_count": 31,
+  "scanned_file_count": 30,
   "schema_version": "stage2_v5_static_complexity_audit.1",
-  "source_sha256": "748a960c51ce9ae5a2b19be31fbe650fe5210b7ff6ac8b43f78f3d331bb447a9",
+  "source_sha256": "cce961301a9d774167eed1e42ed312428b7ec43bbb43c8e3a178be48b61acf92",
   "status": "PASS"
 }

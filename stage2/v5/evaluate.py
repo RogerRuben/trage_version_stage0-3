@@ -43,12 +43,34 @@ def _quantiles(truth: np.ndarray, prediction: pd.DataFrame, valid: np.ndarray, s
     return rows
 
 
-def evaluate(*, repo_root: str | Path = ".") -> dict[str, Any]:
+def evaluate(
+    *,
+    repo_root: str | Path = ".",
+    config_path: str | Path = "stage2/config/stage2_v5.json",
+    baseline_root: str | Path = "stage2/output_v5/baselines",
+    prediction_root: str | Path = "stage2/output_v5/predictions",
+    report_root: str | Path = "stage2/docs/v5",
+) -> dict[str, Any]:
     root = Path(repo_root).resolve()
-    config = load_config(root / "stage2/config/stage2_v5.json")
-    baseline_bundle = joblib.load(root / "stage2/output_v5/baselines/service_time_baselines.joblib")
+    config_file = Path(config_path)
+    if not config_file.is_absolute():
+        config_file = root / config_file
+    config = load_config(config_file)
+    baseline_path = Path(baseline_root)
+    if not baseline_path.is_absolute():
+        baseline_path = root / baseline_path
+    predictions_path = Path(prediction_root)
+    if not predictions_path.is_absolute():
+        predictions_path = root / predictions_path
+    report_path = Path(report_root)
+    if not report_path.is_absolute():
+        report_path = root / report_path
+    report_path.mkdir(parents=True, exist_ok=True)
+    baseline_bundle = joblib.load(baseline_path / "service_time_baselines.joblib")
     dates = [("validation_model", date) for date in config.section("split")["validation_model_dates"]]
     dates += [("calibration", date) for date in config.section("split")["calibration_dates"]]
+    dates += [("evaluation", date) for date in config.section("split")["evaluation_dates"]]
+    dates += [("legacy", date) for date in config.section("split")["legacy_test_dates"]]
     metric_rows: list[dict[str, Any]] = []
     quantile_rows: list[dict[str, Any]] = []
     availability_rows: list[dict[str, Any]] = []
@@ -57,7 +79,7 @@ def evaluate(*, repo_root: str | Path = ".") -> dict[str, Any]:
     subgroup_parts: list[pd.DataFrame] = []
     seed = int(config.section("runtime")["random_seed"])
     for split, date in dates:
-        prediction_path = root / "stage2/output_v5/predictions" / f"split={split}" / f"date={date}" / "traversal_predictions.parquet"
+        prediction_path = predictions_path / f"split={split}" / f"date={date}" / "traversal_predictions.parquet"
         prediction = pd.read_parquet(prediction_path)
         source = load_v5_day(date, split=split, repo_root=root)
         source = source.sort_values(["order_id", "route_sequence"], kind="stable", ignore_index=True)
@@ -121,21 +143,21 @@ def evaluate(*, repo_root: str | Path = ".") -> dict[str, Any]:
     bootstraps = pd.DataFrame(bootstrap_rows)
     stops = pd.DataFrame(stop_rows)
     subgroups = pd.concat(subgroup_parts, ignore_index=True)
-    report_root = root / "stage2/docs/v5"
-    metrics.to_csv(report_root / "service_time_metrics.csv", index=False)
-    quantiles.to_csv(report_root / "quantile_calibration.csv", index=False)
-    availability.to_csv(report_root / "availability_audit.csv", index=False)
-    bootstraps.to_csv(report_root / "deep_paired_error_bootstrap.csv", index=False)
-    stops.to_json(report_root / "stop_two_part_metrics.json", orient="records", indent=2)
-    subgroups.to_csv(report_root / "subgroup_metrics.csv", index=False)
-    validation = metrics[metrics["split"].eq("validation_model")].copy()
-    validation["weighted_error"] = validation["mae"] * validation["count"]
-    totals = validation.groupby("model", sort=False, observed=True)[["weighted_error", "count"]].sum()
+    metrics.to_csv(report_path / "service_time_metrics.csv", index=False)
+    quantiles.to_csv(report_path / "quantile_calibration.csv", index=False)
+    availability.to_csv(report_path / "availability_audit.csv", index=False)
+    bootstraps.to_csv(report_path / "deep_paired_error_bootstrap.csv", index=False)
+    stops.to_json(report_path / "stop_two_part_metrics.json", orient="records", indent=2)
+    subgroups.to_csv(report_path / "subgroup_metrics.csv", index=False)
+    scientific_role = "evaluation" if config.section("split")["evaluation_dates"] else "validation_model"
+    scientific = metrics[metrics["split"].eq(scientific_role)].copy()
+    scientific["weighted_error"] = scientific["mae"] * scientific["count"]
+    totals = scientific.groupby("model", sort=False, observed=True)[["weighted_error", "count"]].sum()
     aggregate_mae = totals["weighted_error"] / totals["count"]
     deep_mae = float(aggregate_mae["rc_mstnet_v5_mean"])
     baseline_mae = float(aggregate_mae["hist_gradient_boosting"])
-    validation_bootstrap = bootstraps[bootstraps["split"].eq("validation_model")]
-    all_ci_below_zero = all((value if isinstance(value, list) else json.loads(value))[1] < 0 for value in validation_bootstrap["ci95"])
+    scientific_bootstrap = bootstraps[bootstraps["split"].eq(scientific_role)]
+    all_ci_below_zero = all((value if isinstance(value, list) else json.loads(value))[1] < 0 for value in scientific_bootstrap["ci95"])
     if deep_mae < baseline_mae and all_ci_below_zero:
         status = "PREDICTIVE_BASELINE_VALIDATED"
     elif deep_mae <= baseline_mae * 1.02:
@@ -145,22 +167,33 @@ def evaluate(*, repo_root: str | Path = ".") -> dict[str, Any]:
     summary = {
         "schema_version": "stage2_v5_model_evaluation.1",
         "status": status,
-        "validation_deep_mae": deep_mae,
-        "validation_strong_baseline_mae": baseline_mae,
+        "scientific_evaluation_role": scientific_role,
+        "scientific_evaluation_dates": list(config.section("split")["evaluation_dates"]),
+        "evaluation_deep_mae": deep_mae,
+        "evaluation_strong_baseline_mae": baseline_mae,
         "relative_mae_change": deep_mae / baseline_mae - 1.0,
-        "validation_paired_ci_all_below_zero": all_ci_below_zero,
-        "new_final_test_consumed": False,
-        "legacy_evaluated_in_this_step": False,
+        "evaluation_paired_ci_all_below_zero": all_ci_below_zero,
+        "legacy_evaluated_in_this_step": bool(config.section("split")["legacy_test_dates"]),
     }
-    (report_root / "stage2_v5_model_summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    (report_path / "stage2_v5_model_summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return summary
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo-root", default=".")
+    parser.add_argument("--config", default="stage2/config/stage2_v5.json")
+    parser.add_argument("--baseline-root", default="stage2/output_v5/baselines")
+    parser.add_argument("--prediction-root", default="stage2/output_v5/predictions")
+    parser.add_argument("--report-root", default="stage2/docs/v5")
     args = parser.parse_args()
-    summary = evaluate(repo_root=args.repo_root)
+    summary = evaluate(
+        repo_root=args.repo_root,
+        config_path=args.config,
+        baseline_root=args.baseline_root,
+        prediction_root=args.prediction_root,
+        report_root=args.report_root,
+    )
     print(json.dumps(summary, sort_keys=True))
     return 0
 

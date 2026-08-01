@@ -200,8 +200,8 @@ def run_preflight(repo_root: str | Path = ".") -> dict[str, Any]:
         "static_audit_sha256": _sha256(static_path),
         "benchmark_report_sha256": _sha256(benchmark_path),
         "profile_report_sha256": _sha256(root / "stage2/docs/v5/performance_profile_hotspots.txt"),
-        "new_final_test_upstream_products_ready": False,
-        "new_final_test_note": "20161028-30 raw archives exist, but frozen Stage 0/1 products have not yet been materialized; this is a scientific execution dependency, not a performance-gate override.",
+        "upstream_rebuild_required": False,
+        "upstream_reuse_note": "Rolling-origin evaluation reuses frozen Stage 0/1 and v4 causal route products for 20161009-27 and the 20161031 legacy benchmark.",
     }
     output = root / "stage2/docs/v5"
     completed = _completed_runtime_records(root)

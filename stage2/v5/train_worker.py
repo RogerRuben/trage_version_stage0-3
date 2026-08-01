@@ -238,6 +238,8 @@ def train(args: argparse.Namespace) -> dict[str, Any]:
     train_shards = _shards(tensor_root, "train", split["train_dates"])
     validation_shards = _shards(tensor_root, "validation_model", split["validation_model_dates"])
     calibration_shards = _shards(tensor_root, "calibration", split["calibration_dates"])
+    evaluation_shards = _shards(tensor_root, "evaluation", split.get("evaluation_dates", []))
+    legacy_shards = _shards(tensor_root, "legacy", split.get("legacy_test_dates", []))
     categorical_sizes = tuple(len(artifacts["vocabularies"][name]["token_to_index"]) for name in ("edge", "highway", "time_bin", "position_bucket", "route_length_bucket"))
     model_config = {
         "numeric_feature_count": len(artifacts["numeric_features"]),
@@ -263,6 +265,10 @@ def train(args: argparse.Namespace) -> dict[str, Any]:
         model.load_state_dict(saved["model_state_dict"], strict=False)
         _predict(model, validation_shards, tensor_root, args.prediction_root, int(deep["batch_size"]), device, mixed, "validation_prediction_manifest.json")
         _predict(model, calibration_shards, tensor_root, args.prediction_root, int(deep["batch_size"]), device, mixed, "calibration_prediction_manifest.json")
+        if evaluation_shards:
+            _predict(model, evaluation_shards, tensor_root, args.prediction_root, int(deep["batch_size"]), device, mixed, "evaluation_prediction_manifest.json")
+        if legacy_shards:
+            _predict(model, legacy_shards, tensor_root, args.prediction_root, int(deep["batch_size"]), device, mixed, "legacy_prediction_manifest.json")
         return _json(manifest_path)
     if args.resume and checkpoint.is_file() and manifest_path.is_file():
         manifest = _json(manifest_path)
@@ -313,13 +319,19 @@ def train(args: argparse.Namespace) -> dict[str, Any]:
     model.load_state_dict(saved["model_state_dict"])
     _predict(model, validation_shards, tensor_root, args.prediction_root, batch_size, device, mixed, "validation_prediction_manifest.json")
     _predict(model, calibration_shards, tensor_root, args.prediction_root, batch_size, device, mixed, "calibration_prediction_manifest.json")
+    if evaluation_shards:
+        _predict(model, evaluation_shards, tensor_root, args.prediction_root, batch_size, device, mixed, "evaluation_prediction_manifest.json")
+    if legacy_shards:
+        _predict(model, legacy_shards, tensor_root, args.prediction_root, batch_size, device, mixed, "legacy_prediction_manifest.json")
     checkpoint_sha = _sha256(checkpoint)
     model_id = hashlib.sha256(_canonical({"checkpoint_sha256": checkpoint_sha, "config_sha256": hashlib.sha256(_canonical(config)).hexdigest(), "artifact_sha256": _sha256(tensor_root / "feature_artifacts.json")})).hexdigest()
     manifest = {
         "schema_version": "stage2_v5_rc_mstnet.1", "status": "PASS", "model_id": model_id,
         "checkpoint_sha256": checkpoint_sha, "fit_dates": split["train_dates"],
         "validation_dates": split["validation_model_dates"], "calibration_prediction_dates": split["calibration_dates"],
-        "new_final_test_rows_read": 0, "device": str(device), "mixed_precision": mixed,
+        "evaluation_prediction_dates": split.get("evaluation_dates", []),
+        "legacy_prediction_dates": split.get("legacy_test_dates", []),
+        "device": str(device), "mixed_precision": mixed,
         "history_mode": args.history_mode,
         "best_epoch": best_epoch, "best_validation_loss": best, "training_history": history,
         "runtime_s": time.perf_counter() - started,
