@@ -109,7 +109,8 @@ def run_protocol(
         "--history-mode", "gate",
     ]
     if resume:
-        command.append("--resume")
+        partial_model = (model_root / "best_model.pt").exists() != (model_root / "model_manifest.json").exists()
+        command.append("--force" if partial_model else "--resume")
     subprocess.run(command, cwd=root, check=True)
     prediction_root = protocol_root / "predictions"
     prediction_summary = merge_all(chunk_prediction_root, prediction_root)
@@ -134,7 +135,8 @@ def run_protocol(
                 "--history-mode", history_mode,
             ]
             if resume:
-                local_command.append("--resume")
+                partial_model = (local_model / "best_model.pt").exists() != (local_model / "model_manifest.json").exists()
+                local_command.append("--force" if partial_model else "--resume")
             subprocess.run(local_command, cwd=root, check=True)
             merged_root = local_root / "predictions"
             merge_all(local_chunks, merged_root)
