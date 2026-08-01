@@ -33,11 +33,20 @@ def verify(*, repo_root: str | Path = ".") -> dict[str, Any]:
     development = _json(docs / "protocols/development/protocol_summary.json")
     rolling = _json(docs / "stage2_v5_rolling_origin_summary.json")
     legacy = _json(docs / "protocols/legacy/protocol_summary.json")
+    legacy_report = _json(docs / "stage2_v5_legacy_benchmark_summary.json")
     admission = config.section("admission")
 
     engineering_checks = [
         _check("service_time_target_audit", service.get("engineering_status") == "PASS", service.get("engineering_status")),
         _check("regression_tests", tests.get("status") == "PASS" and tests.get("pytest", {}).get("failed") == 0, tests.get("pytest")),
+        _check(
+            "legacy_predictions_finite",
+            legacy_report.get("prediction_numeric_stability", {}).get(
+                "nonfinite_availability_probability_count"
+            )
+            == 0,
+            legacy_report.get("prediction_numeric_stability"),
+        ),
     ]
     performance_checks = [
         _check("static_complexity", static.get("status") == "PASS" and static.get("blocking_finding_count") == 0, static.get("blocking_finding_count")),
@@ -71,7 +80,14 @@ def verify(*, repo_root: str | Path = ".") -> dict[str, Any]:
     performance_status = "PASS" if all(item["status"] == "PASS" for item in performance_checks) else "FAIL"
     rolling_status = "PASS" if scientific_checks and all(item["status"] == "PASS" for item in scientific_checks) else ("PENDING" if not scientific_checks else "FAIL")
     development_status = development.get("model_evaluation", {}).get("status", "PENDING")
-    legacy_status = "PASS" if legacy.get("status") == "PASS" else "PENDING"
+    legacy_status = (
+        "PASS"
+        if legacy.get("status") == "PASS"
+        and legacy_report.get("status") == "COMPLETED"
+        and legacy_report.get("date") == "20161031"
+        and legacy_report.get("used_for_model_or_hyperparameter_selection") is False
+        else "PENDING"
+    )
     foundation = engineering_status == temporal_status == performance_status == "PASS"
     if foundation and rolling_status == "PASS" and legacy_status == "PASS":
         admission_status = "READY_FOR_STAGE3"

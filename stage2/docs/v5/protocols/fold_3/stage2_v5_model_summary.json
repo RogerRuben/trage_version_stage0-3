@@ -1,0 +1,14 @@
+{
+  "evaluation_deep_mae": 0.04448261510612112,
+  "evaluation_paired_ci_all_below_zero": false,
+  "evaluation_strong_baseline_mae": 0.02973469742776506,
+  "legacy_evaluated_in_this_step": false,
+  "relative_mae_change": 0.49598344540694916,
+  "schema_version": "stage2_v5_model_evaluation.1",
+  "scientific_evaluation_dates": [
+    "20161026",
+    "20161027"
+  ],
+  "scientific_evaluation_role": "evaluation",
+  "status": "BASELINE_NOT_BEATEN"
+}

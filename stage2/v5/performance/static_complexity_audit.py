@@ -22,6 +22,7 @@ ALLOWED_PARTITION_READS = {
     "service_time_audit.py": "bounded one-partition-at-a-time audit scan",
     "shards.py": "bounded one-day-at-a-time Train-only artifact fit and shard construction",
     "state_evaluation.py": "bounded three-day v4/v5 same-row evaluation scan",
+    "tail_diagnostic.py": "bounded two-day read-only post-evaluation diagnostic",
 }
 
 

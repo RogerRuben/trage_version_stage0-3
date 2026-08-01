@@ -1,31 +1,25 @@
-# Stage 2 v5 路线场景报告
+# Stage 2 v5 路线情景报告
 
-## 选择结果
-
-在 20161025–26 比较 independent、shared route latent 与 residual block 后，选择 `shared_route_latent`。所有方案使用相同 traversal log-normal 边缘分布、1,000 个固定 seed 场景，路线场景严格等于 traversal 场景求和。
-
-未校准场景暴露出明确的位置偏差：路线总时长平均低估约 25%，shared latent 的 P90/P95 coverage 只有约 0.34/0.41。原因是 direct pace 监督只覆盖可靠 GPS interval，并不能自动恢复订单级停车、未直接计时区段和其他路线总时长开销。
-
-## 校准
-
-只使用 20161027 calibration 拟合：
+开发协议在 20161022—23 比较 independent、shared route latent 和 residual block，选择 `shared_route_latent`。随后只使用 20161024 calibration 拟合路线时间 scale、dispersion 与 offset：
 
 ```text
-route time scale = 1.3401549203
-route dispersion multiplier = 2.8
-route offset = 16.4230 s
+route time scale = 1.3496731736
+route dispersion multiplier = 2.9
+route offset = 16.8771 s
+scenario seed = 20261009
+scenario count = 1000
 ```
 
-校准日拟合内覆盖为 P50=0.5000、P90=0.9028、P95=0.9402；mean MAE 为 196.1 s，RMSE 为 312.0 s。该覆盖是 calibration-fit 诊断，不是无偏泛化结果，最终是否可接受只能由一次性 20161028–30 final test 判断。
+冻结校准在 development temporal evaluation 20161025—27 的覆盖为：
 
-## 正式场景 provenance
+| Date | P50 | P90 | P95 |
+|---|---:|---:|---:|
+| 20161025 | 0.4903 | 0.8959 | 0.9384 |
+| 20161026 | 0.5093 | 0.8982 | 0.9337 |
+| 20161027 | 0.4957 | 0.9047 | 0.9413 |
 
-- generator：`stage2_v5_route_scenarios.1`
-- model：`shared_route_latent`
-- seed：20261009
-- scenario count：1,000
-- shared route rho：0.35
-- 输出：mean/std/P50/P90/P95/CVaR90/CVaR95，以及针对外部阈值的 timeout probability
+三个 rolling folds 的合并覆盖为 P50 0.4851、P90 0.8802、P95 0.9234；覆盖门通过。20161031 legacy 最终拟合的冻结校准覆盖为 P50 0.6099、P90 0.9461、P95 0.9685，路线 mean MAE 为 166.68 秒。
 
-任何 timeout threshold 必须由 Stage 3 或外部服务约束提供，不能使用真实订单时长作为决策输入。
+路线情景严格等于 traversal 情景逐路线求和，输出 mean/std/P50/P90/P95/CVaR90/CVaR95。任何 timeout threshold 必须来自 Stage 3 或外部服务约束，不能使用订单结束后才可得的真实时长作为决策输入。
 
+由于 rolling pace 聚合未战胜 tree，情景产品当前只允许用于 `READY_FOR_ROUTE_SCENARIO_PROTOTYPE`，不能作为已通过 Stage 3 科学准入的正式输入。

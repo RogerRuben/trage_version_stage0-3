@@ -174,6 +174,7 @@ def _evaluate(model: RCMSTNetV5, shards: list[Path], batch_size: int, device: to
 def _predict(model: RCMSTNetV5, shards: list[Path], tensor_root: Path, output_root: Path, batch_size: int, device: torch.device, mixed: bool, name: str) -> dict[str, Any]:
     model.eval()
     files: list[dict[str, Any]] = []
+    mixed_precision_fallback_batch_count = 0
     with torch.no_grad():
         for path in shards:
             relative = path.relative_to(tensor_root)
@@ -190,6 +191,23 @@ def _predict(model: RCMSTNetV5, shards: list[Path], tensor_root: Path, output_ro
             for indices in _batches(len(data["numeric"]), batch_size, False):
                 with torch.autocast(device_type=device.type, dtype=torch.float16, enabled=mixed):
                     _, output, _ = _forward_loss(model, data, indices, device)
+                # Long out-of-period feature ages can exceed the finite fp16
+                # range after Train-only normalization.  Preserve AMP for the
+                # normal path, but rerun only a non-finite batch in fp32.  A
+                # silent NaN or clipping the frozen benchmark would both be
+                # scientifically invalid.
+                if any(
+                    isinstance(value, torch.Tensor) and not torch.isfinite(value).all()
+                    for value in output.values()
+                ):
+                    with torch.autocast(device_type=device.type, enabled=False):
+                        _, output, _ = _forward_loss(model, data, indices, device)
+                    mixed_precision_fallback_batch_count += 1
+                    if any(
+                        isinstance(value, torch.Tensor) and not torch.isfinite(value).all()
+                        for value in output.values()
+                    ):
+                        raise RuntimeError(f"non-finite prediction after fp32 fallback in {path.name}")
                 mapped = {
                         "pred_crawl_time_share": output["crawl_share"],
                         "pred_stop_time_share": output["stop_share"],
@@ -218,7 +236,13 @@ def _predict(model: RCMSTNetV5, shards: list[Path], tensor_root: Path, output_ro
                 payload[key] = data[key]
             _atomic_npz(output_path, payload)
             files.append({"path": relative.as_posix(), "chunk_count": len(payload["order_id"]), "sha256": _sha256(output_path)})
-    manifest = {"schema_version": "stage2_v5_chunk_predictions.1", "status": "PASS", "chunk_count": int(sum(item["chunk_count"] for item in files)), "files": files}
+    manifest = {
+        "schema_version": "stage2_v5_chunk_predictions.1",
+        "status": "PASS",
+        "chunk_count": int(sum(item["chunk_count"] for item in files)),
+        "mixed_precision_fallback_batch_count": mixed_precision_fallback_batch_count,
+        "files": files,
+    }
     _atomic_json(output_root / name, manifest)
     return manifest
 

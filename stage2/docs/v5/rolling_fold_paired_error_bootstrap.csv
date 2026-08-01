@@ -1,0 +1,7 @@
+fold,split,date,left_model,right_model,left_minus_right_absolute_error,ci95,replicates,order_count
+fold_1,evaluation,20161022,rc_mstnet_v5_mean,hist_gradient_boosting,-0.001049090732076,"[-0.001108152543664741, -0.0009934510566358273]",500,10000
+fold_1,evaluation,20161023,rc_mstnet_v5_mean,hist_gradient_boosting,-0.001177166188531,"[-0.001238138834891407, -0.0011185065742192156]",500,10000
+fold_2,evaluation,20161024,rc_mstnet_v5_mean,hist_gradient_boosting,-0.000100110841602,"[-0.00015632631887201607, -5.0470212948498065e-05]",500,10000
+fold_2,evaluation,20161025,rc_mstnet_v5_mean,hist_gradient_boosting,-0.0002109205912611,"[-0.000269952034435447, -0.00015414392379219075]",500,10000
+fold_3,evaluation,20161026,rc_mstnet_v5_mean,hist_gradient_boosting,0.0306038600134704,"[-0.0012472038741521935, 0.09484414188176297]",500,10000
+fold_3,evaluation,20161027,rc_mstnet_v5_mean,hist_gradient_boosting,-0.0012092985089214,"[-0.0012718107224722304, -0.0011470727628132762]",500,10000

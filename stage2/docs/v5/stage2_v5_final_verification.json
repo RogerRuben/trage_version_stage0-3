@@ -11,10 +11,18 @@
           "collected": 35,
           "failed": 0,
           "passed": 35,
-          "runtime_s": 174.2,
+          "runtime_s": 45.8,
           "status": "PASS"
         },
         "name": "regression_tests",
+        "status": "PASS"
+      },
+      {
+        "detail": {
+          "mixed_precision_fallback_batch_count": 1,
+          "nonfinite_availability_probability_count": 0
+        },
+        "name": "legacy_predictions_finite",
         "status": "PASS"
       }
     ],
@@ -30,7 +38,42 @@
         "status": "PASS"
       }
     ],
-    "rolling_scientific": [],
+    "rolling_scientific": [
+      {
+        "detail": 3,
+        "name": "three_rolling_folds",
+        "status": "PASS"
+      },
+      {
+        "detail": 0.14968466113805468,
+        "name": "rolling_aggregate_beats_tree",
+        "status": "FAIL"
+      },
+      {
+        "detail": {
+          "fold_1": "WIN",
+          "fold_2": "WIN",
+          "fold_3": "LOSS_OR_MIXED"
+        },
+        "name": "rolling_fold_stability",
+        "status": "PASS"
+      },
+      {
+        "detail": 0.8802333333333333,
+        "name": "rolling_p90_coverage",
+        "status": "PASS"
+      },
+      {
+        "detail": 0.9234333333333333,
+        "name": "rolling_p95_coverage",
+        "status": "PASS"
+      },
+      {
+        "detail": false,
+        "name": "no_percentile_selection",
+        "status": "PASS"
+      }
+    ],
     "temporal": [
       {
         "detail": "FROZEN_BEFORE_PROTOCOL_RETRAIN",
@@ -104,12 +147,12 @@
       }
     ]
   },
-  "development_scientific_status": "PENDING",
+  "development_scientific_status": "PREDICTIVE_BASELINE_VALIDATED",
   "engineering_status": "PASS",
-  "legacy_benchmark_status": "PENDING",
+  "legacy_benchmark_status": "PASS",
   "performance_gate_status": "PASS",
-  "rolling_origin_status": "PENDING",
+  "rolling_origin_status": "FAIL",
   "schema_version": "stage2_v5_final_verification.2",
-  "stage3_admission_status": "NOT_READY",
+  "stage3_admission_status": "READY_FOR_ROUTE_SCENARIO_PROTOTYPE",
   "temporal_contract_status": "PASS"
 }

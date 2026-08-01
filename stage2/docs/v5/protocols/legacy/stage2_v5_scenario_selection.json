@@ -1,0 +1,27 @@
+{
+  "calibration_dates": [
+    "20161027"
+  ],
+  "calibration_status": "FIT_ON_CALIBRATION_DATE_NOT_AN_UNBIASED_EVALUATION",
+  "evaluation_dates": [],
+  "generator_id": "stage2_v5_route_scenarios.1",
+  "legacy_benchmark_dates": [
+    "20161031"
+  ],
+  "route_dispersion_multiplier": 2.6999999999999993,
+  "route_offset_s": 16.19543178148419,
+  "route_time_scale": 1.3366554061487828,
+  "scenario_count": 1000,
+  "scenario_seed": 20261009,
+  "schema_version": "stage2_v5_scenario_selection.1",
+  "scores": {
+    "independent": 2.415961750299603,
+    "residual_block": 2.366923565838564,
+    "shared_route_latent": 2.0867472013448563
+  },
+  "selected_model": "shared_route_latent",
+  "selection_dates": [
+    "20161025",
+    "20161026"
+  ]
+}

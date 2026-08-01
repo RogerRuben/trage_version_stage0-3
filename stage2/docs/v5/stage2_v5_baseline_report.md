@@ -1,39 +1,22 @@
-# Stage 2 v5 同集 service-pace baseline 报告
+# Stage 2 v5 service-pace baseline 报告
 
-## 结论
+所有 baseline 都在各协议的 Train 日期上重新拟合，并与 v5 使用完全相同的 direct-observed pace 行。每个 rolling fold 分别重拟合 Train-only normalization、vocabulary、tree 与历史统计，没有使用未来 fold 数据。
 
-当前最强开发集 service-pace baseline 是冻结 v4 参数规格的 `HistGradientBoostingRegressor`。它在 20161025–26 的同一 direct-pace 样本上，按样本数加权 MAE 为 **0.030140 s/m**，稳定优于 strict historical profile 与 v4 static entry-time pace。RC-MSTNet v5 在相同行上达到 **0.028951 s/m**，两天配对 bootstrap CI 均低于 0，因此代码计算的开发期科学状态为 `PREDICTIVE_BASELINE_VALIDATED`。
+## 主要比较
 
-10 月 28–30 日新 final test 未被读取。20161031 结果只作为已公开的 legacy benchmark。
+| 协议 | v5 MAE (s/m) | Tree MAE (s/m) | 相对变化 |
+|---|---:|---:|---:|
+| Development evaluation 25—27 | 0.028746 | 0.029871 | -3.77% |
+| Rolling Fold 1 | 0.028697 | 0.029810 | -3.73% |
+| Rolling Fold 2 | 0.029767 | 0.029922 | -0.52% |
+| Rolling Fold 3 | 0.044483 | 0.029735 | +49.60% |
+| Rolling pooled | 0.034286 | 0.029822 | +14.97% |
+| Legacy 20161031 | 0.028135 | 0.028493 | -1.26% |
 
-## 同集结果
+Rolling pooled 是主要科学稳定性结论，因此 baseline 未被总体战胜。Fold 3 的异常来自冻结概率均值的极端尾部；正式比较保留原始结果。
 
-| Date | Model | N | MAE (s/m) | RMSE (s/m) | Pearson | Spearman |
-|---|---|---:|---:|---:|---:|---:|
-| 20161025 | HistGradientBoosting | 237,553 | 0.03036 | 0.05783 | 0.5643 | 0.7111 |
-| 20161025 | strict history | 237,553 | 0.03143 | 0.05668 | 0.5908 | 0.6695 |
-| 20161025 | v4 static entry pace | 237,553 | 0.03147 | 0.05950 | 0.5313 | 0.6695 |
-| 20161026 | HistGradientBoosting | 238,711 | 0.02992 | 0.06273 | 0.5320 | 0.7090 |
-| 20161026 | v4 static entry pace | 238,711 | 0.03095 | 0.06388 | 0.5082 | 0.6737 |
-| 20161026 | strict history | 238,711 | 0.03095 | 0.06106 | 0.5723 | 0.6737 |
-| 20161027 calibration | HistGradientBoosting | 237,196 | 0.02952 | 0.05242 | 0.5980 | 0.7157 |
-| 20161031 legacy | HistGradientBoosting | 717,805 | 0.02849 | 0.04839 | 0.6168 | 0.7126 |
+## Legacy 同排产品
 
-完整 CSV 同时包含 global mean、highway × time-bin mean 与 edge rolling mean。
+20161031 上，strict historical profile MAE 为 0.030015，v4 static entry-time proxy 为 0.030014，tree 为 0.028493，v5 mean 为 0.028135，v5 P50 为 0.027335。实际冻结 RC-MSTNet v4/v5 的辅助状态目标另存于 `protocols/legacy/legacy_v4_v5_state_metrics.csv`，避免把 v4 static proxy 误称为 v4 深度模型。
 
-## Paired order-cluster bootstrap
-
-负值表示 tree 的绝对误差更低：
-
-| Date | 对照 | Tree − control MAE | 95% CI |
-|---|---|---:|---:|
-| 20161025 | strict history | -0.001075 | [-0.001184, -0.000962] |
-| 20161026 | v4 static entry pace | -0.001025 | [-0.001111, -0.000938] |
-| 20161027 | strict history | -0.000905 | [-0.000984, -0.000837] |
-| 20161031 legacy | v4 static entry pace | -0.001521 | [-0.001561, -0.001480] |
-
-每个日期使用 500 次 order-cluster bootstrap，所有模型在完全相同的有效 pace 行上比较。baseline 没有使用评估集重新拟合或调参；tree 最多使用 500,000 个稳定哈希选择的 Train 标签。
-
-## 当前科学状态
-
-`PREDICTIVE_BASELINE_VALIDATED`：强 baseline、v4、v5 已在同集上完成比较；该状态只适用于开发协议。20161028–30 的一次性 final test 尚未执行，因此不能据此创建最终 release/tag。
+20161031 是 legacy frozen benchmark，仅用于版本可比性；20161028—30 未生产、未读取。

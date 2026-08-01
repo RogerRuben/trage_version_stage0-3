@@ -34,50 +34,50 @@
       "row_count": 701601
     }
   },
-  "expected_full_runtime_s_linear_times_1_5": 5.239708531324236,
-  "maximum_peak_rss_mb": 445.21484375,
+  "expected_full_runtime_s_linear_times_1_5": 3.8517256658124657,
+  "maximum_peak_rss_mb": 469.328125,
   "performance_gate_status": "PASS",
   "profile_report_sha256": "f123fefa4f0518c97ccd5b79a8fdf98f1d14bc3df4c4340f5c45a2fc0a701bd9",
   "runs": [
     {
-      "peak_rss_mb": 109.18359375,
+      "peak_rss_mb": 108.49609375,
       "read_bytes": 6224931,
       "row_count": 87789,
-      "rows_per_s": 1087050.4674585713,
-      "runtime_s": 0.0807589000032749,
+      "rows_per_s": 1542834.8484181804,
+      "runtime_s": 0.05690110000432469,
       "stage": "one_bucket_train",
       "write_bytes": 0
     },
     {
-      "peak_rss_mb": 130.703125,
+      "peak_rss_mb": 135.328125,
       "read_bytes": 17928091,
       "row_count": 714536,
-      "rows_per_s": 2571226.9550402137,
-      "runtime_s": 0.27789689999917755,
+      "rows_per_s": 3340678.247486592,
+      "runtime_s": 0.2138894999952754,
       "stage": "one_train_day",
       "write_bytes": 0
     },
     {
-      "peak_rss_mb": 138.90625,
+      "peak_rss_mb": 139.6875,
       "read_bytes": 17827475,
       "row_count": 701601,
-      "rows_per_s": 2633121.4379388806,
-      "runtime_s": 0.2664521999977296,
+      "rows_per_s": 3325414.7877764087,
+      "runtime_s": 0.21098149998579174,
       "stage": "one_validation_day",
       "write_bytes": 0
     },
     {
-      "peak_rss_mb": 445.21484375,
+      "peak_rss_mb": 469.328125,
       "read_bytes": 718089833,
       "row_count": 2116712,
-      "rows_per_s": 11562928.479437642,
-      "runtime_s": 0.1830601999972714,
+      "rows_per_s": 18846242.88090309,
+      "runtime_s": 0.11231480000424199,
       "stage": "legacy_full_day_read_only_inference",
       "write_bytes": 0
     }
   ],
   "schema_version": "stage2_v5_preflight.1",
-  "static_audit_sha256": "cd1ebf52b2a2b150abed87d7751dbc4b93f2b8e25d9bd7471d861906a7a229a0",
+  "static_audit_sha256": "c43590a950afba7ca04ae3dd6a6232b0db42c4c6e06d98d3866b7e6be9436336",
   "upstream_rebuild_required": false,
   "upstream_reuse_note": "Rolling-origin evaluation reuses frozen Stage 0/1 and v4 causal route products for 20161009-27 and the 20161031 legacy benchmark."
 }

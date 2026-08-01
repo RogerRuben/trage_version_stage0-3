@@ -1,0 +1,32 @@
+{
+  "actual_v4_v5_auxiliary_comparison_path": "protocols/legacy/legacy_v4_v5_state_metrics.csv",
+  "date": "20161031",
+  "new_unseen_test_claimed": false,
+  "percentiles_are_descriptive_only": true,
+  "prediction_numeric_stability": {
+    "mixed_precision_fallback_batch_count": 1,
+    "nonfinite_availability_probability_count": 0
+  },
+  "route_scenarios": {
+    "mean_mae_s": 166.6801241270836,
+    "mean_rmse_s": 243.8080331696692,
+    "p50_coverage": 0.6099333333333333,
+    "p90_coverage": 0.9461333333333334,
+    "p95_coverage": 0.9684666666666668,
+    "route_count": 30000
+  },
+  "schema_version": "stage2_v5_legacy_frozen_benchmark.1",
+  "scientific_role": "legacy_frozen_benchmark_for_version_comparability",
+  "service_time": {
+    "direct_pace_row_count": 717805,
+    "strict_historical_profile_mae": 0.0300145441412859,
+    "tree_mae": 0.0284928642936422,
+    "v4_static_entry_time_proxy_mae": 0.030013534481211,
+    "v5_mean_mae": 0.0281352040400291,
+    "v5_mean_relative_to_tree": -0.012552625454819943,
+    "v5_p50_mae": 0.0273347687403384
+  },
+  "status": "COMPLETED",
+  "used_for_model_or_hyperparameter_selection": false,
+  "v5_model_id": "0a6dca484d142a815d9474313cc091988f4cffbca3cd1e1b55b1ccd5bb7a1af6"
+}

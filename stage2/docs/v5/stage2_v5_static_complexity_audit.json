@@ -1,5 +1,5 @@
 {
-  "allowlisted_finding_count": 11,
+  "allowlisted_finding_count": 12,
   "blocking_finding_count": 0,
   "findings": [
     {
@@ -78,6 +78,13 @@
       "justification": "bounded three-day v4/v5 same-row evaluation scan",
       "line": 54,
       "pattern": "partition_streaming_read"
+    },
+    {
+      "blocking": false,
+      "file": "stage2/v5/tail_diagnostic.py",
+      "justification": "bounded two-day read-only post-evaluation diagnostic",
+      "line": 29,
+      "pattern": "partition_streaming_read"
     }
   ],
   "prohibited_patterns": [
@@ -88,8 +95,8 @@
     "concat_inside_loop",
     "repeated_parquet_read_inside_loop"
   ],
-  "scanned_file_count": 30,
+  "scanned_file_count": 32,
   "schema_version": "stage2_v5_static_complexity_audit.1",
-  "source_sha256": "d69995917b343317af228c6e70627a5578a0a451ed26f086a4ffdb4a5af0ee33",
+  "source_sha256": "60d3cc68d2d8a8dbef38b7b267c85d91364d70f3defe583067fd22b8e739cadc",
   "status": "PASS"
 }

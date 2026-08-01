@@ -56,14 +56,27 @@ def summarize(*, repo_root: str | Path = ".") -> dict[str, Any]:
         name: float(np.average(scenarios[name], weights=scenario_weights))
         for name in ("p50_coverage", "p90_coverage", "p95_coverage")
     }
+    aggregate_relative_change = float(
+        aggregate_mae["rc_mstnet_v5_mean"] / aggregate_mae["hist_gradient_boosting"] - 1.0
+    )
+    aggregate_baseline_result = "WIN" if aggregate_relative_change < 0.0 else "LOSS_OR_TIE"
     result = {
         "schema_version": "stage2_v5_rolling_origin_summary.1",
-        "status": "PASS",
+        # Completion and scientific acceptance are deliberately separate: a
+        # successfully executed preregistered protocol can still reject the
+        # candidate model.
+        "execution_status": "COMPLETED",
+        "scientific_status": (
+            "BASELINE_VALIDATED"
+            if aggregate_baseline_result == "WIN"
+            else "BASELINE_NOT_BEATEN"
+        ),
+        "aggregate_baseline_result": aggregate_baseline_result,
         "fold_count": 3,
         "evaluation_dates": sorted(metrics["date"].astype(str).unique().tolist()),
         "v5_aggregate_mae": float(aggregate_mae["rc_mstnet_v5_mean"]),
         "tree_aggregate_mae": float(aggregate_mae["hist_gradient_boosting"]),
-        "aggregate_relative_mae_change": float(aggregate_mae["rc_mstnet_v5_mean"] / aggregate_mae["hist_gradient_boosting"] - 1.0),
+        "aggregate_relative_mae_change": aggregate_relative_change,
         "daily_win_count": int(fold_daily["v5_win"].sum()),
         "daily_comparison_count": int(len(fold_daily)),
         "fold_win_count": int(fold_wins.sum()),
