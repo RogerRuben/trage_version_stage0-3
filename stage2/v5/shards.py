@@ -267,7 +267,8 @@ def build_shards(config: Stage2V5Config, *, repo_root: str | Path = ".", output_
             raise Stage2V5ContractError("tensor artifacts do not match this frozen protocol")
         # Selection metadata may be frozen after development without changing
         # Train-only normalization, vocabularies, masks, or shard semantics.
-        artifacts["stage2_v5_config_sha256"] = config.digest
+        # Preserve the fitted artifact bytes so checkpoint provenance remains
+        # stable; only fit dates and mask policy govern safe reuse here.
     else:
         artifacts = fit_feature_artifacts(config, repo_root=root)
     split = config.section("split")
