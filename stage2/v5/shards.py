@@ -216,7 +216,7 @@ def vectorized_chunk_payload(
     target_masks = working.loc[:, TARGET_MASKS].fillna(False).to_numpy(bool)
     targets = np.where(target_masks, targets, 0.0)
     tail_targets = np.column_stack([working[column].astype("boolean").fillna(False).to_numpy(np.float32) for column in TAIL_TARGETS])
-    tail_masks = working.loc[:, TAIL_MASKS].fillna(False).to_numpy(bool)
+    tail_masks = working.loc[:, TAIL_MASKS].fillna(False).to_numpy(bool, copy=True)
     if not bool(artifacts.get("percentile_supervision_allowed", False)):
         tail_masks[:] = False
     dynamics = target_masks[:, :4].all(axis=1)
