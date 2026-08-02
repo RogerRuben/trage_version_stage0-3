@@ -1,0 +1,11 @@
+{
+  "base_config": "stage2/config/stage2_v5_1_training.json",
+  "split": {
+    "protocol_name": "v5_1_rolling_fold_2_diagnostic",
+    "train_dates": ["20161009", "20161010", "20161011", "20161012", "20161013", "20161014", "20161015", "20161016", "20161017", "20161018", "20161019", "20161020"],
+    "validation_model_dates": ["20161021", "20161022"],
+    "calibration_dates": ["20161023"],
+    "evaluation_dates": ["20161024", "20161025"],
+    "legacy_test_dates": []
+  }
+}

@@ -20,6 +20,8 @@ import psutil
 from stage2.v5.aggregation import RouteDimension, aggregate_route_dimensions
 from stage2.v5.cdf import EmpiricalCDFIndex, map_empirical_cdf
 from stage2.v5.history import causal_window_mean
+from stage2.v5.scenario import _bounded_quantile_inverse, _normal_cdf_approximation
+from stage2.v5.scenario_v5_1 import _sample_crps
 
 
 def _measure(name: str, rows: int, function: Callable[[], object]) -> tuple[dict[str, float | int | str], object]:
@@ -81,7 +83,7 @@ def _merge_case(rows: int) -> Callable[[], object]:
     shard_count = 10
     per_shard = int(np.ceil(rows / shard_count))
     shards = [pd.DataFrame({"row_id": np.arange(index * per_shard, min((index + 1) * per_shard, rows)), "prediction": float(index)}) for index in range(shard_count)]
-    return lambda: pd.concat(shards, ignore_index=True, copy=False).sort_values("row_id", kind="stable", ignore_index=True)
+    return lambda: pd.concat(shards, ignore_index=True).sort_values("row_id", kind="stable", ignore_index=True)
 
 
 def _history_case(rows: int) -> Callable[[], object]:
@@ -107,6 +109,38 @@ def _scenario_aggregation_case(rows: int) -> Callable[[], object]:
     return aggregate
 
 
+def _cross_order_scenario_case(rows: int) -> Callable[[], object]:
+    scenario_count = 16
+    rng = np.random.default_rng(20261009)
+    network = rng.standard_normal((48, scenario_count))
+    network_inverse = np.arange(rows, dtype=np.int64) % 48
+    route = rng.standard_normal((max(1, rows // 20), scenario_count))
+    route_inverse = np.arange(rows, dtype=np.int64) // 20
+    residual = rng.standard_normal((rows, scenario_count))
+    p50 = np.full(rows, 0.2)
+    p90 = np.full(rows, 0.3)
+    p95 = np.full(rows, 0.35)
+
+    def generate() -> np.ndarray:
+        latent = (
+            np.sqrt(0.2) * network[network_inverse]
+            + np.sqrt(0.2) * route[route_inverse]
+            + np.sqrt(0.6) * residual
+        )
+        return _bounded_quantile_inverse(
+            _normal_cdf_approximation(latent), p50, p90, p95
+        )
+
+    return generate
+
+
+def _proper_scoring_case(rows: int) -> Callable[[], object]:
+    scenario_count = 16
+    values = np.linspace(10.0, 100.0, rows * scenario_count, dtype=np.float64).reshape(rows, scenario_count)
+    truth = np.linspace(20.0, 80.0, rows, dtype=np.float64)
+    return lambda: _sample_crps(values, truth)
+
+
 def run_benchmarks(sizes: tuple[int, ...]) -> tuple[pd.DataFrame, dict[str, object]]:
     factories = {
         "cdf_mapping": lambda rows: _cdf_case(rows, min(10000, max(100, rows // 50))),
@@ -114,6 +148,8 @@ def run_benchmarks(sizes: tuple[int, ...]) -> tuple[pd.DataFrame, dict[str, obje
         "prediction_shard_merge": _merge_case,
         "history_lookup": _history_case,
         "scenario_aggregation": _scenario_aggregation_case,
+        "cross_order_scenario_generation": _cross_order_scenario_case,
+        "sample_crps": _proper_scoring_case,
     }
     records: list[dict[str, float | int | str]] = []
     for name, factory in factories.items():
@@ -149,6 +185,8 @@ def _write_profile(output: Path) -> None:
     _cdf_case(100000, 1000)()
     _history_case(100000)()
     _scenario_aggregation_case(100000)()
+    _cross_order_scenario_case(100000)()
+    _proper_scoring_case(100000)()
     profiler.disable()
     stream = io.StringIO()
     pstats.Stats(profiler, stream=stream).strip_dirs().sort_stats("cumulative").print_stats(30)

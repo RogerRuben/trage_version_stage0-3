@@ -76,14 +76,24 @@ class RCMSTNetV5(nn.Module):
         dropout: float = 0.1,
         minimum_log_scale: float = -5.0,
         maximum_log_scale: float = 2.0,
+        distribution_family: str = "lognormal",
+        maximum_log_p50: float = math.log(5.0),
+        maximum_log_p90_p50_ratio: float = math.log(10.0),
+        maximum_log_p95_p90_ratio: float = math.log(3.0),
         history_mode: str = "gate",
     ):
         super().__init__()
         if history_mode not in {"gate", "ordinary_concatenation", "without_recent", "without_profile"}:
             raise ValueError(f"unknown history mode: {history_mode}")
         self.history_mode = history_mode
+        if distribution_family not in {"lognormal", "monotonic_quantiles"}:
+            raise ValueError(f"unknown distribution family: {distribution_family}")
+        self.distribution_family = distribution_family
         self.minimum_log_scale = float(minimum_log_scale)
         self.maximum_log_scale = float(maximum_log_scale)
+        self.maximum_log_p50 = float(maximum_log_p50)
+        self.maximum_log_p90_p50_ratio = float(maximum_log_p90_p50_ratio)
+        self.maximum_log_p95_p90_ratio = float(maximum_log_p95_p90_ratio)
         self.numeric_encoder = nn.Sequential(
             nn.Linear(numeric_feature_count * 2, hidden_dim), nn.GELU(), nn.LayerNorm(hidden_dim)
         )
@@ -123,7 +133,9 @@ class RCMSTNetV5(nn.Module):
         self.rts_head = nn.Linear(hidden_dim, 1)
         self.lcs_tail_head = nn.Linear(hidden_dim, 1)
         self.rts_tail_head = nn.Linear(hidden_dim, 1)
-        self.pace_distribution_head = nn.Linear(hidden_dim, 2)
+        self.pace_distribution_head = nn.Linear(
+            hidden_dim, 2 if distribution_family == "lognormal" else 3
+        )
         self.availability_head = nn.Linear(hidden_dim, 4)
 
     def forward(
@@ -201,13 +213,47 @@ class RCMSTNetV5(nn.Module):
         # Distribution arithmetic stays float32 under AMP so positive-time
         # exponentials cannot overflow merely because the encoder uses fp16.
         distribution = self.pace_distribution_head(h).float()
-        pace_log_mu = distribution[..., 0]
-        pace_log_scale = torch.clamp(distribution[..., 1], self.minimum_log_scale, self.maximum_log_scale)
-        sigma = torch.exp(pace_log_scale)
-        pace_mean = torch.exp(pace_log_mu + 0.5 * sigma.square())
         z90 = 1.2815515655446004
         z95 = 1.6448536269514722
-        return {
+        if self.distribution_family == "lognormal":
+            pace_log_mu = distribution[..., 0]
+            pace_log_scale = torch.clamp(
+                distribution[..., 1], self.minimum_log_scale, self.maximum_log_scale
+            )
+            sigma = torch.exp(pace_log_scale)
+            pace_p50 = torch.exp(pace_log_mu)
+            pace_p90 = torch.exp(pace_log_mu + z90 * sigma)
+            pace_p95 = torch.exp(pace_log_mu + z95 * sigma)
+            pace_mean = torch.exp(pace_log_mu + 0.5 * sigma.square())
+        else:
+            # v5.1 predicts the admitted quantiles directly. Softplus increments
+            # enforce ordering by construction and the frozen log bounds prevent
+            # an otherwise finite checkpoint from creating an explosive tail.
+            minimum_log_pace = math.log(1.0e-3)
+            log_p50 = torch.clamp(
+                distribution[..., 0], minimum_log_pace, self.maximum_log_p50
+            )
+            log_p90_p50_ratio = torch.clamp(
+                torch.nn.functional.softplus(distribution[..., 1]) * 0.1,
+                min=1.0e-5,
+                max=self.maximum_log_p90_p50_ratio,
+            )
+            log_p95_p90_ratio = torch.clamp(
+                torch.nn.functional.softplus(distribution[..., 2]) * 0.05,
+                min=1.0e-5,
+                max=self.maximum_log_p95_p90_ratio,
+            )
+            pace_log_mu = log_p50
+            pace_p50 = torch.exp(log_p50)
+            pace_p90 = pace_p50 * torch.exp(log_p90_p50_ratio)
+            pace_p95 = pace_p90 * torch.exp(log_p95_p90_ratio)
+            # Preserve the v5 prediction schema for merging and diagnostics.
+            # This is an effective scale inferred from P90, not a formal
+            # log-normal parameter. The formal v5.1 contract blocks mean/std.
+            effective_sigma = log_p90_p50_ratio / z90
+            pace_log_scale = torch.log(effective_sigma.clamp_min(math.exp(self.minimum_log_scale)))
+            pace_mean = pace_p50
+        result = {
             "crawl_share": crawl,
             "stop_presence_logit": stop_presence_logit,
             "stop_positive_share": stop_positive,
@@ -221,9 +267,14 @@ class RCMSTNetV5(nn.Module):
             "pace_log_mu": pace_log_mu,
             "pace_log_scale": pace_log_scale,
             "pace_pred_mean": pace_mean,
-            "pace_pred_p50": torch.exp(pace_log_mu),
-            "pace_pred_p90": torch.exp(pace_log_mu + z90 * sigma),
-            "pace_pred_p95": torch.exp(pace_log_mu + z95 * sigma),
+            "pace_pred_p50": pace_p50,
+            "pace_pred_p90": pace_p90,
+            "pace_pred_p95": pace_p95,
             "availability_logits": self.availability_head(h),
             "history_recent_gate": gate,
         }
+        if self.distribution_family == "monotonic_quantiles":
+            # A zero-dimensional tensor is intentionally used as a family
+            # marker so device moves and finite-output checks remain uniform.
+            result["pace_quantile_family"] = torch.ones((), device=device)
+        return result

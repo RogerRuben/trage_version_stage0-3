@@ -15,12 +15,17 @@ from typing import Any
 import numpy as np
 import torch
 
+from .config import load_inherited_payload
 from .models.losses import rc_mstnet_v5_loss
 from .models.rc_mstnet_v5 import RCMSTNetV5
 
 
 def _json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _training_config(path: Path) -> dict[str, Any]:
+    return load_inherited_payload(path)
 
 
 def _canonical(value: Any) -> bytes:
@@ -155,20 +160,241 @@ def _forward_loss(model: RCMSTNetV5, data: Any, indices: np.ndarray, device: tor
 
 
 def _evaluate(model: RCMSTNetV5, shards: list[Path], batch_size: int, device: torch.device, mixed: bool) -> float:
+    return _evaluate_metrics(model, shards, batch_size, device, mixed)[0]
+
+
+def _evaluate_metrics(
+    model: RCMSTNetV5,
+    shards: list[Path],
+    batch_size: int,
+    device: torch.device,
+    mixed: bool,
+) -> tuple[float, float]:
     model.eval()
     total = 0.0
+    distribution_total = 0.0
     chunks = 0
     with torch.no_grad():
         for path in shards:
             data = _load_shard(path)
             for indices in _batches(len(data["numeric"]), batch_size, False):
                 with torch.autocast(device_type=device.type, dtype=torch.float16, enabled=mixed):
-                    loss, _, _ = _forward_loss(model, data, indices, device)
+                    loss, _, components = _forward_loss(model, data, indices, device)
                 if not torch.isfinite(loss):
                     raise RuntimeError(f"non-finite validation loss in {path.name}")
                 total += float(loss.item()) * len(indices)
+                distribution_total += float(components["pace_distribution"].item()) * len(indices)
                 chunks += len(indices)
-    return total / max(chunks, 1)
+    return total / max(chunks, 1), distribution_total / max(chunks, 1)
+
+
+def _weighted_unique(values: np.ndarray, inverse: np.ndarray, weights: np.ndarray, count: int) -> np.ndarray:
+    usable = np.isfinite(values)
+    numerator = np.bincount(
+        inverse, weights=np.where(usable, values * weights, 0.0), minlength=count
+    )
+    denominator = np.bincount(
+        inverse, weights=np.where(usable, weights, 0.0), minlength=count
+    )
+    return np.divide(
+        numerator, denominator, out=np.full(count, np.nan), where=denominator > 0
+    )
+
+
+def _checkpoint_arrays(chunks: Path) -> dict[str, np.ndarray]:
+    names = (
+        "pace_log_mu",
+        "pace_log_scale",
+        "pace_pred_mean",
+        "pace_pred_p50",
+        "pace_pred_p90",
+        "pace_pred_p95",
+        "allocated_distance_m",
+    )
+    storage: dict[str, list[np.ndarray]] = {
+        name: [] for name in (*names, "order_id", "traversal_id", "weight", "truth", "target_valid")
+    }
+    for path in sorted(chunks.glob("split=*/date=*/shard-*.npz")):
+        with np.load(path, allow_pickle=False) as data:
+            valid = ~data["pad_mask"]
+            storage["order_id"].append(
+                np.broadcast_to(data["order_id"][:, None], valid.shape)[valid].astype(str)
+            )
+            storage["traversal_id"].append(data["traversal_id"][valid].astype(np.int64))
+            storage["weight"].append(data["supervision_weight"][valid].astype(np.float64))
+            storage["truth"].append(data["targets"][..., 6][valid].astype(np.float64))
+            storage["target_valid"].append(data["target_masks"][..., 6][valid].astype(bool))
+            for field in names:
+                storage[field].append(data[field][valid].astype(np.float64))
+    if not storage["order_id"]:
+        raise RuntimeError("checkpoint candidate produced no validation rows")
+    combined = {name: np.concatenate(parts) for name, parts in storage.items()}
+    identity = np.rec.fromarrays(
+        [combined["order_id"], combined["traversal_id"]],
+        names=("order_id", "traversal_id"),
+    )
+    unique, inverse = np.unique(identity, return_inverse=True)
+    count = len(unique)
+    weights = combined["weight"]
+    total_weight = np.bincount(inverse, weights=weights, minlength=count)
+    if not np.allclose(total_weight, 1.0, atol=1.0e-5, rtol=0):
+        raise RuntimeError("checkpoint overlap weights do not sum to one")
+    merged = {
+        "order_id": unique["order_id"].astype(str),
+        "traversal_id": unique["traversal_id"].astype(np.int64),
+    }
+    for field in names:
+        merged[field] = _weighted_unique(combined[field], inverse, weights, count)
+    valid_weight = weights * combined["target_valid"].astype(float)
+    merged["truth"] = _weighted_unique(combined["truth"], inverse, valid_weight, count)
+    merged["target_valid"] = (
+        np.bincount(inverse, weights=combined["target_valid"].astype(float), minlength=count) > 0
+    )
+    return merged
+
+
+def _route_scenario_smoke(arrays: dict[str, np.ndarray], maximum_route_quantile_s: float) -> bool:
+    _, inverse = np.unique(arrays["order_id"], return_inverse=True)
+    count = int(inverse.max()) + 1 if len(inverse) else 0
+    routes = np.column_stack(
+        [
+            np.bincount(
+                inverse,
+                weights=arrays[field] * arrays["allocated_distance_m"],
+                minlength=count,
+            )
+            for field in ("pace_pred_p50", "pace_pred_p90", "pace_pred_p95")
+        ]
+    )
+    return bool(
+        len(routes)
+        and np.isfinite(routes).all()
+        and np.all(routes[:, 0] <= routes[:, 1])
+        and np.all(routes[:, 1] <= routes[:, 2])
+        and float(routes[:, 2].max()) <= maximum_route_quantile_s
+    )
+
+
+def _select_checkpoint(candidates: list[dict[str, Any]]) -> dict[str, Any]:
+    eligible = [row for row in candidates if row["hard_gate_status"] == "PASS"]
+    if not eligible:
+        return {
+            "status": "NO_STABLE_CHECKPOINT",
+            "selected_checkpoint_id": None,
+            "candidate_count": len(candidates),
+            "stable_candidate_count": 0,
+        }
+    selected = min(
+        eligible,
+        key=lambda row: (
+            row["validation_p50_mae"],
+            row.get("validation_distribution_loss", row["validation_distribution_nll"]),
+            row["validation_mean_mae"],
+            row["validation_quantile_coverage_error"],
+            row["checkpoint_id"],
+        ),
+    )
+    return {
+        "status": "STABLE_CHECKPOINT_SELECTED",
+        "selected_checkpoint_id": selected["checkpoint_id"],
+        "candidate_count": len(candidates),
+        "stable_candidate_count": len(eligible),
+        "selected_metrics": selected,
+    }
+
+
+def _evaluate_checkpoint_candidate(
+    model: RCMSTNetV5,
+    *,
+    checkpoint_id: str,
+    distribution_loss: float,
+    validation_shards: list[Path],
+    tensor_root: Path,
+    batch_size: int,
+    device: torch.device,
+    mixed: bool,
+    thresholds: dict[str, float],
+    temporary_parent: Path,
+) -> dict[str, Any]:
+    with tempfile.TemporaryDirectory(prefix="checkpoint-selection-", dir=temporary_parent) as name:
+        candidate_root = Path(name)
+        chunks = candidate_root / "chunks"
+        _predict(
+            model,
+            validation_shards,
+            tensor_root,
+            chunks,
+            batch_size,
+            device,
+            mixed,
+            "validation_prediction_manifest.json",
+        )
+        arrays = _checkpoint_arrays(chunks)
+        valid = (
+            arrays["target_valid"]
+            & np.isfinite(arrays["truth"])
+            & (arrays["truth"] > 0)
+        )
+        if not valid.any():
+            raise RuntimeError("checkpoint validation has no valid pace targets")
+        finite_fields = (
+            "pace_log_mu", "pace_log_scale", "pace_pred_mean",
+            "pace_pred_p50", "pace_pred_p90", "pace_pred_p95",
+        )
+        finite = all(np.isfinite(arrays[field]).all() for field in finite_fields)
+        p50 = arrays["pace_pred_p50"]
+        p90 = arrays["pace_pred_p90"]
+        p95 = arrays["pace_pred_p95"]
+        mean = arrays["pace_pred_mean"]
+        truth = arrays["truth"]
+        ratio = np.divide(mean, p50, out=np.full_like(mean, np.inf), where=p50 > 0)
+        absolute_error = np.abs(mean[valid] - truth[valid])
+        squared_error = np.square(mean[valid] - truth[valid])
+        mae_total = float(absolute_error.sum())
+        rmse_total = float(squared_error.sum())
+        coverage_error = max(
+            abs(float((truth[valid] <= p90[valid]).mean()) - 0.9),
+            abs(float((truth[valid] <= p95[valid]).mean()) - 0.95),
+        )
+        smoke = _route_scenario_smoke(
+            arrays, float(thresholds["maximum_route_cvar95_s"])
+        )
+        hard_checks = {
+            "all_outputs_finite": finite,
+            "quantiles_monotonic": bool(
+                np.all(p50 > 0) and np.all(p50 <= p90) and np.all(p90 <= p95)
+            ),
+            "pace_mean_stable": bool(
+                float(mean.max()) <= thresholds["maximum_pace_mean_s_per_m"]
+                and float(np.quantile(mean, 0.999))
+                <= thresholds["maximum_p99_9_pace_mean_s_per_m"]
+            ),
+            "mean_to_p50_stable": bool(
+                float(ratio.max()) <= thresholds["maximum_mean_to_p50_ratio"]
+            ),
+            "route_scenario_smoke_stable": smoke,
+        }
+        return {
+            "checkpoint_id": checkpoint_id,
+            "hard_gate_status": "PASS" if all(hard_checks.values()) else "FAIL",
+            "hard_checks": hard_checks,
+            "diagnostics": {
+                "maximum_row_mae_contribution_share": float(absolute_error.max()) / max(mae_total, np.finfo(float).tiny),
+                "maximum_row_rmse_contribution_share": float(squared_error.max()) / max(rmse_total, np.finfo(float).tiny),
+                "single_row_contribution_threshold_pass": bool(
+                    float(absolute_error.max()) / max(mae_total, np.finfo(float).tiny)
+                    <= thresholds["maximum_single_row_mae_contribution_share"]
+                    and float(squared_error.max()) / max(rmse_total, np.finfo(float).tiny)
+                    <= thresholds["maximum_single_row_rmse_contribution_share"]
+                ),
+            },
+            "validation_p50_mae": float(np.mean(np.abs(p50[valid] - truth[valid]))),
+            "validation_distribution_nll": float(distribution_loss),
+            "validation_distribution_loss": float(distribution_loss),
+            "validation_mean_mae": float(np.mean(absolute_error)),
+            "validation_quantile_coverage_error": float(coverage_error),
+            "unique_traversal_count": int(len(p50)),
+        }
 
 
 def _predict(model: RCMSTNetV5, shards: list[Path], tensor_root: Path, output_root: Path, batch_size: int, device: torch.device, mixed: bool, name: str) -> dict[str, Any]:
@@ -232,6 +458,7 @@ def _predict(model: RCMSTNetV5, shards: list[Path], tensor_root: Path, output_ro
                 "order_id", "traversal_id", "route_sequence", "pad_mask", "targets",
                 "target_masks", "tail_targets", "tail_masks", "allocated_distance_m",
                 "overlap_supervision_count", "supervision_weight",
+                "categorical",
             ):
                 payload[key] = data[key]
             _atomic_npz(output_path, payload)
@@ -249,7 +476,7 @@ def _predict(model: RCMSTNetV5, shards: list[Path], tensor_root: Path, output_ro
 
 def train(args: argparse.Namespace) -> dict[str, Any]:
     started = time.perf_counter()
-    config = _json(args.config)
+    config = _training_config(args.config)
     deep = config["deep"]
     seed = int(deep["random_seed"])
     random.seed(seed)
@@ -273,6 +500,14 @@ def train(args: argparse.Namespace) -> dict[str, Any]:
         "dropout": float(deep["dropout"]),
         "minimum_log_scale": float(config["distribution"]["minimum_log_scale"]),
         "maximum_log_scale": float(config["distribution"]["maximum_log_scale"]),
+        "distribution_family": config["distribution"].get("family", "lognormal"),
+        "maximum_log_p50": float(config["distribution"].get("maximum_log_p50", np.log(5.0))),
+        "maximum_log_p90_p50_ratio": float(
+            config["distribution"].get("maximum_log_p90_p50_ratio", np.log(10.0))
+        ),
+        "maximum_log_p95_p90_ratio": float(
+            config["distribution"].get("maximum_log_p95_p90_ratio", np.log(3.0))
+        ),
         "history_mode": args.history_mode,
     }
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -282,6 +517,7 @@ def train(args: argparse.Namespace) -> dict[str, Any]:
     scaler = torch.cuda.amp.GradScaler(enabled=mixed)
     checkpoint = args.output / "best_model.pt"
     manifest_path = args.output / "model_manifest.json"
+    args.output.mkdir(parents=True, exist_ok=True)
     if args.predict_only:
         if not checkpoint.is_file() or not manifest_path.is_file():
             raise RuntimeError("predict-only requires a completed checkpoint and manifest")
@@ -304,6 +540,9 @@ def train(args: argparse.Namespace) -> dict[str, Any]:
     best_epoch = -1
     patience = 0
     history: list[dict[str, Any]] = []
+    checkpoint_candidates: list[dict[str, Any]] = []
+    stable_selection = config.get("checkpoint_selection", {}).get("mode") == "stable_unique_traversal"
+    stability_thresholds = config.get("stability_thresholds", {})
     batch_size = int(deep["batch_size"])
     for epoch in range(int(deep["maximum_epochs"])):
         epoch_started = time.perf_counter()
@@ -326,19 +565,56 @@ def train(args: argparse.Namespace) -> dict[str, Any]:
                 scaler.update()
                 total += float(loss.item()) * len(indices)
                 chunks += len(indices)
-        validation = _evaluate(model, validation_shards, batch_size, device, mixed)
+        validation, distribution_loss = _evaluate_metrics(
+            model, validation_shards, batch_size, device, mixed
+        )
         record = {"epoch": epoch, "train_loss": total / max(chunks, 1), "validation_loss": validation, "runtime_s": time.perf_counter() - epoch_started}
+        selected_changed = False
+        if stable_selection:
+            candidate = _evaluate_checkpoint_candidate(
+                model,
+                checkpoint_id=f"epoch_{epoch:03d}",
+                distribution_loss=distribution_loss,
+                validation_shards=validation_shards,
+                tensor_root=tensor_root,
+                batch_size=batch_size,
+                device=device,
+                mixed=mixed,
+                thresholds=stability_thresholds,
+                temporary_parent=args.output,
+            )
+            checkpoint_candidates.append(candidate)
+            selection = _select_checkpoint(checkpoint_candidates)
+            record["checkpoint_candidate"] = candidate
+            record["checkpoint_selection"] = selection
+            selected_changed = selection["selected_checkpoint_id"] == candidate["checkpoint_id"]
         history.append(record)
         print(json.dumps(record), flush=True)
-        if validation < best - 1e-6:
-            best = validation
+        improved = selected_changed if stable_selection else validation < best - 1e-6
+        if improved:
+            best = (
+                float(record["checkpoint_candidate"]["validation_p50_mae"])
+                if stable_selection
+                else validation
+            )
             best_epoch = epoch
             patience = 0
-            _atomic_checkpoint(checkpoint, {"model_state_dict": model.state_dict(), "model_config": model_config, "best_epoch": best_epoch, "best_validation_loss": best})
+            _atomic_checkpoint(
+                checkpoint,
+                {
+                    "model_state_dict": model.state_dict(),
+                    "model_config": model_config,
+                    "best_epoch": best_epoch,
+                    "best_validation_loss": validation,
+                    "checkpoint_selection": record.get("checkpoint_selection"),
+                },
+            )
         else:
             patience += 1
             if patience >= int(deep["early_stopping_patience"]):
                 break
+    if not checkpoint.is_file():
+        raise RuntimeError("training completed without a stable checkpoint")
     saved = torch.load(checkpoint, map_location=device)
     model.load_state_dict(saved["model_state_dict"])
     _predict(model, validation_shards, tensor_root, args.prediction_root, batch_size, device, mixed, "validation_prediction_manifest.json")
@@ -349,6 +625,7 @@ def train(args: argparse.Namespace) -> dict[str, Any]:
         _predict(model, legacy_shards, tensor_root, args.prediction_root, batch_size, device, mixed, "legacy_prediction_manifest.json")
     checkpoint_sha = _sha256(checkpoint)
     model_id = hashlib.sha256(_canonical({"checkpoint_sha256": checkpoint_sha, "config_sha256": hashlib.sha256(_canonical(config)).hexdigest(), "artifact_sha256": _sha256(tensor_root / "feature_artifacts.json")})).hexdigest()
+    selected_record = history[best_epoch]
     manifest = {
         "schema_version": "stage2_v5_rc_mstnet.1", "status": "PASS", "model_id": model_id,
         "checkpoint_sha256": checkpoint_sha, "fit_dates": split["train_dates"],
@@ -357,7 +634,17 @@ def train(args: argparse.Namespace) -> dict[str, Any]:
         "legacy_prediction_dates": split.get("legacy_test_dates", []),
         "device": str(device), "mixed_precision": mixed,
         "history_mode": args.history_mode,
-        "best_epoch": best_epoch, "best_validation_loss": best, "training_history": history,
+        "distribution_family": model.distribution_family,
+        "best_epoch": best_epoch,
+        "best_validation_loss": float(selected_record["validation_loss"]),
+        "best_validation_p50_mae": (
+            float(selected_record["checkpoint_candidate"]["validation_p50_mae"])
+            if stable_selection
+            else None
+        ),
+        "training_history": history,
+        "checkpoint_selection_mode": "stable_unique_traversal" if stable_selection else "legacy_validation_loss",
+        "checkpoint_candidates": checkpoint_candidates,
         "runtime_s": time.perf_counter() - started,
     }
     _atomic_json(manifest_path, manifest)

@@ -53,6 +53,9 @@ def merge_prediction_day(paths: list[Path], *, split: str, date: str) -> pd.Data
                 "supervision_weight": data["supervision_weight"][valid].astype(np.float64),
                 "allocated_distance_m": data["allocated_distance_m"][valid].astype(np.float64),
             }
+            if "categorical" in data:
+                arrays["canonical_highway_index"] = data["categorical"][..., 1][valid].astype(np.float64)
+                arrays["estimated_time_bin_index"] = data["categorical"][..., 2][valid].astype(np.float64)
             for name in PREDICTION_COLUMNS:
                 arrays[name] = data[name][valid].astype(np.float64)
             arrays["availability_probability"] = data["availability_probability"][valid].astype(np.float64)
@@ -74,6 +77,9 @@ def merge_prediction_day(paths: list[Path], *, split: str, date: str) -> pd.Data
     result = pd.DataFrame({"split": split, "date": date, "order_id": unique["order_id"].astype(str), "traversal_id": unique["traversal_id"].astype(np.int64)})
     result["route_sequence"] = np.rint(_weighted(combined["route_sequence"].astype(float), inverse, weights, count)).astype(np.int64)
     result["allocated_distance_m"] = _weighted(combined["allocated_distance_m"], inverse, weights, count)
+    for name in ("canonical_highway_index", "estimated_time_bin_index"):
+        if name in combined:
+            result[name] = np.rint(_weighted(combined[name], inverse, weights, count)).astype(np.int64)
     for name in PREDICTION_COLUMNS:
         result[name] = _weighted(combined[name], inverse, weights, count)
     availability = combined["availability_probability"]

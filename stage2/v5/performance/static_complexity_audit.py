@@ -23,6 +23,11 @@ ALLOWED_PARTITION_READS = {
     "shards.py": "bounded one-day-at-a-time Train-only artifact fit and shard construction",
     "state_evaluation.py": "bounded three-day v4/v5 same-row evaluation scan",
     "tail_diagnostic.py": "bounded two-day read-only post-evaluation diagnostic",
+    "distribution_stability.py": "bounded protocol-day streaming stability audit",
+    "formal_products.py": "bounded protocol-day formal product export and scoring",
+    "scenario_v5_1.py": "bounded protocol-day and route-batch v5.1 scenario generation",
+    "retraining_reports.py": "bounded protocol-day retraining comparison and paired diagnostics",
+    "tree_scenarios_v5_1.py": "bounded protocol-day tree residual-bootstrap scenario baseline",
 }
 
 

@@ -1,0 +1,106 @@
+{
+  "maximum_peak_rss_delta_mb": 507.3577575683594,
+  "maximum_process_rss_mb": 385.75,
+  "scaling_checks": [
+    {
+      "high_rows": 50000,
+      "hotspot": "cdf_mapping",
+      "low_rows": 10000,
+      "runtime_ratio": 4.706457001372058,
+      "status": "PASS"
+    },
+    {
+      "high_rows": 500000,
+      "hotspot": "cdf_mapping",
+      "low_rows": 100000,
+      "runtime_ratio": 5.39083398911472,
+      "status": "PASS"
+    },
+    {
+      "high_rows": 50000,
+      "hotspot": "route_aggregation",
+      "low_rows": 10000,
+      "runtime_ratio": 3.6087326481784494,
+      "status": "PASS"
+    },
+    {
+      "high_rows": 500000,
+      "hotspot": "route_aggregation",
+      "low_rows": 100000,
+      "runtime_ratio": 5.12659758632475,
+      "status": "PASS"
+    },
+    {
+      "high_rows": 50000,
+      "hotspot": "prediction_shard_merge",
+      "low_rows": 10000,
+      "runtime_ratio": 1.197067066432273,
+      "status": "PASS"
+    },
+    {
+      "high_rows": 500000,
+      "hotspot": "prediction_shard_merge",
+      "low_rows": 100000,
+      "runtime_ratio": 4.16223517710006,
+      "status": "PASS"
+    },
+    {
+      "high_rows": 50000,
+      "hotspot": "history_lookup",
+      "low_rows": 10000,
+      "runtime_ratio": 3.5722390933057704,
+      "status": "PASS"
+    },
+    {
+      "high_rows": 500000,
+      "hotspot": "history_lookup",
+      "low_rows": 100000,
+      "runtime_ratio": 5.344897496746248,
+      "status": "PASS"
+    },
+    {
+      "high_rows": 50000,
+      "hotspot": "scenario_aggregation",
+      "low_rows": 10000,
+      "runtime_ratio": 5.091093286984516,
+      "status": "PASS"
+    },
+    {
+      "high_rows": 500000,
+      "hotspot": "scenario_aggregation",
+      "low_rows": 100000,
+      "runtime_ratio": 5.291764937268373,
+      "status": "PASS"
+    },
+    {
+      "high_rows": 50000,
+      "hotspot": "cross_order_scenario_generation",
+      "low_rows": 10000,
+      "runtime_ratio": 4.33869806457692,
+      "status": "PASS"
+    },
+    {
+      "high_rows": 500000,
+      "hotspot": "cross_order_scenario_generation",
+      "low_rows": 100000,
+      "runtime_ratio": 4.770560324190104,
+      "status": "PASS"
+    },
+    {
+      "high_rows": 50000,
+      "hotspot": "sample_crps",
+      "low_rows": 10000,
+      "runtime_ratio": 0.9285651879859482,
+      "status": "PASS"
+    },
+    {
+      "high_rows": 500000,
+      "hotspot": "sample_crps",
+      "low_rows": 100000,
+      "runtime_ratio": 4.756655139227627,
+      "status": "PASS"
+    }
+  ],
+  "schema_version": "stage2_v5_performance_benchmarks.1",
+  "status": "PASS"
+}

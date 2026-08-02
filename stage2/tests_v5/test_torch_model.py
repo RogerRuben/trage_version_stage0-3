@@ -48,3 +48,55 @@ assert torch.isfinite(out['pace_log_scale'].grad).all()
 '''
     result = subprocess.run([str(PYTORCH_PYTHON), "-c", script], cwd=REPO, capture_output=True, text=True, timeout=60)
     assert result.returncode == 0, result.stderr
+
+
+def test_monotonic_quantile_family_is_bounded_and_trainable() -> None:
+    script = r'''
+import torch
+from stage2.v5.models.losses import rc_mstnet_v5_loss
+from stage2.v5.models.rc_mstnet_v5 import RCMSTNetV5
+
+torch.manual_seed(11)
+model = RCMSTNetV5(
+    numeric_feature_count=3,
+    categorical_sizes=(8, 5),
+    hidden_dim=16,
+    categorical_embedding_dim=4,
+    transformer_layers=1,
+    attention_heads=4,
+    dropout=0.0,
+    distribution_family='monotonic_quantiles',
+)
+numeric = torch.randn(2, 5, 3)
+missing = torch.zeros_like(numeric, dtype=torch.bool)
+categorical = torch.ones(2, 5, 2, dtype=torch.long)
+sequence = torch.arange(5).repeat(2, 1)
+pad = torch.zeros(2, 5, dtype=torch.bool)
+out = model(numeric, missing, categorical, sequence, pad)
+assert torch.all(out['pace_pred_p50'] > 0)
+assert torch.all(out['pace_pred_p50'] <= out['pace_pred_p90'])
+assert torch.all(out['pace_pred_p90'] <= out['pace_pred_p95'])
+assert float(out['pace_pred_p50'].max()) <= 5.0 + 1e-6
+assert float((out['pace_pred_p90'] / out['pace_pred_p50']).max()) <= 10.0 + 1e-6
+assert float((out['pace_pred_p95'] / out['pace_pred_p90']).max()) <= 3.0 + 1e-6
+shape = out['pace_pred_p50'].shape
+targets = {
+    'pace_sec_per_m': torch.full(shape, 0.25), 'crawl_time_share': torch.zeros(shape),
+    'stop_time_share': torch.zeros(shape), 'speed_cv_bounded': torch.zeros(shape),
+    'acceleration_rms_bounded': torch.zeros(shape), 'rts_raw': torch.zeros(shape),
+    'lcs_raw': torch.zeros(shape), 'lcs_tail_event': torch.zeros(shape),
+    'rts_tail_event': torch.zeros(shape), 'availability': torch.zeros((*shape, 4)),
+}
+masks = {name: torch.ones(shape, dtype=torch.bool) for name in (
+    'pace_target_valid', 'crawl_target_valid', 'stop_target_valid',
+    'speed_cv_target_valid', 'acceleration_rms_target_valid', 'rts_target_valid',
+    'lcs_target_valid')}
+masks['availability_valid'] = torch.ones((*shape, 4), dtype=torch.bool)
+loss, components = rc_mstnet_v5_loss(out, targets, masks, torch.ones(shape))
+assert torch.isfinite(loss) and torch.isfinite(components['pace_distribution'])
+loss.backward()
+assert model.pace_distribution_head.weight.grad is not None
+assert torch.isfinite(model.pace_distribution_head.weight.grad).all()
+'''
+    result = subprocess.run([str(PYTORCH_PYTHON), "-c", script], cwd=REPO, capture_output=True, text=True, timeout=60)
+    assert result.returncode == 0, result.stderr

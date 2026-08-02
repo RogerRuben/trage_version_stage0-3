@@ -11,6 +11,28 @@ from typing import Any
 from .contracts import Stage2V5ContractError
 
 
+def _deep_merge(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
+    result = dict(base)
+    for key, value in override.items():
+        if isinstance(value, dict) and isinstance(result.get(key), dict):
+            result[key] = _deep_merge(result[key], value)
+        else:
+            result[key] = value
+    return result
+
+
+def load_inherited_payload(path: str | Path) -> dict[str, Any]:
+    config_path = Path(path)
+    payload = json.loads(config_path.read_text(encoding="utf-8"))
+    base_path = payload.pop("base_config", None)
+    if base_path is None:
+        return payload
+    resolved = Path(base_path)
+    if not resolved.is_absolute():
+        resolved = config_path.resolve().parents[2] / resolved
+    return _deep_merge(load_inherited_payload(resolved), payload)
+
+
 @dataclass(frozen=True)
 class Stage2V5Config:
     payload: dict[str, Any]

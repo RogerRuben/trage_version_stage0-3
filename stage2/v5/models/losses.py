@@ -28,6 +28,19 @@ def weighted_lognormal_nll(log_mu: torch.Tensor, log_scale: torch.Tensor, target
     return weighted_masked_mean(loss, mask & (target > 0), weight)
 
 
+def weighted_pinball(
+    prediction: torch.Tensor,
+    target: torch.Tensor,
+    mask: torch.Tensor,
+    weight: torch.Tensor,
+    *,
+    quantile: float,
+) -> torch.Tensor:
+    error = target - prediction
+    loss = torch.maximum(quantile * error, (quantile - 1.0) * error)
+    return weighted_masked_mean(loss, mask & torch.isfinite(target), weight)
+
+
 def stop_two_part_loss(presence_logits: torch.Tensor, positive_share: torch.Tensor, target_share: torch.Tensor, mask: torch.Tensor, weight: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
     occurrence = (target_share > 0).to(target_share.dtype)
     presence = weighted_masked_bce(presence_logits, occurrence, mask, weight)
@@ -51,8 +64,27 @@ def rc_mstnet_v5_loss(
     stop_presence, stop_positive = stop_two_part_loss(
         outputs["stop_presence_logit"], outputs["stop_positive_share"], targets["stop_time_share"], masks["stop_target_valid"], weight
     )
+    if "pace_quantile_family" in outputs:
+        pace_distribution = sum(
+            weighted_pinball(
+                outputs[f"pace_pred_p{int(quantile * 100):02d}"],
+                targets["pace_sec_per_m"],
+                masks["pace_target_valid"],
+                pace_weight,
+                quantile=quantile,
+            )
+            for quantile in (0.5, 0.9, 0.95)
+        ) / 3.0
+    else:
+        pace_distribution = weighted_lognormal_nll(
+            outputs["pace_log_mu"],
+            outputs["pace_log_scale"],
+            targets["pace_sec_per_m"],
+            masks["pace_target_valid"],
+            pace_weight,
+        )
     components = {
-        "pace_distribution": weighted_lognormal_nll(outputs["pace_log_mu"], outputs["pace_log_scale"], targets["pace_sec_per_m"], masks["pace_target_valid"], pace_weight),
+        "pace_distribution": pace_distribution,
         "crawl": weighted_masked_huber(outputs["crawl_share"], targets["crawl_time_share"], masks["crawl_target_valid"], weight),
         "stop_occurrence": stop_presence,
         "stop_positive": stop_positive,
