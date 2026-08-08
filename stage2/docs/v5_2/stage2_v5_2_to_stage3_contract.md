@@ -19,7 +19,6 @@ one preselected fallback, or unavailable.
 - Stop weighted mean/P90/high exposure/maximum consecutive high exposure.
 - Speed-CV weighted mean/P90/high exposure.
 - Acceleration-RMS weighted mean/P90/high exposure.
-- RTS time-weighted mean/P90/high exposure and distance-weighted sensitivity.
 - Static route-complexity fields, preserving NA where upstream fields do not exist.
 - Micro-condition coverage, Train-only support, low-support share, and unseen-edge share.
 - Prediction source, model ID/hash, transfer-model version, and feature cutoff time.
@@ -32,6 +31,12 @@ The machine-readable allow mask is `STAGE3_ALLOWED_FIELDS` in
 `stage2_v5_2_micro_condition_tokens.2`,
 `stage2_v5_2_original_route_micro_conditions.2`, and
 `stage2_v5_2_static_route_complexity.2`.
+
+The four core and Stage 3 deployable micro-condition families are crawl, stop,
+speed-CV, and acceleration-RMS. RTS is retained only as a legacy/descriptive
+diagnostic for comparison with frozen earlier releases. RTS fields, percentiles,
+tails, and sensitivity summaries are excluded from Stage 3 assignment inputs and
+must not influence AV route-suitability decisions.
 
 ## Evaluation-only fields
 
@@ -50,7 +55,8 @@ It must not infer missing static or dynamic fields as zero.
 
 This interface is structurally defined but not yet admitted. Admission requires
 zero temporal leakage, completed micro products and manifests, performance-gate
-PASS, completed rolling evaluation for all five micro targets, a documented
+PASS, completed rolling evaluation for the four core/deployable micro targets,
+a separately reported RTS diagnostic, a documented
 positive or negative transfer conclusion, stable pace P50, and final status
 `READY_FOR_AV_ROUTE_SUITABILITY_STAGE`.
 

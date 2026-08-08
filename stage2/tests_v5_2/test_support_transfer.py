@@ -8,6 +8,7 @@ from stage2.v5_2.support_transfer import (
     SupportAwareEdgeRepresentation,
     fit_train_support,
     lookup_train_support,
+    _payload_hash,
     select_tau_once,
     support_gate,
 )
@@ -38,10 +39,7 @@ def test_tau_selection_is_limited_to_train_quantile_candidates() -> None:
     ).to_payload()
     candidates = artifact["tau_candidates"]
     targets = ("crawl", "stop", "speed_cv", "acceleration_rms")
-    scores = {
-        float(value): {target: float(index + 1) for target in targets}
-        for index, value in enumerate(candidates)
-    }
+    scores = {label: {target: float(index + 1) for target in targets} for index, label in enumerate(("p25", "p50", "p75"))}
     metrics = {
         "schema_version": "stage2_v5_2_tau_evaluation.2", "status": "PASS",
         "protocol_id": "transfer_tuning", "protocol_hash": "p" * 64,
@@ -52,8 +50,12 @@ def test_tau_selection_is_limited_to_train_quantile_candidates() -> None:
         "m1_source_checkpoint_sha256": "a" * 64, "m1_checkpoint_sha256": "b" * 64,
         "m1_evaluation_manifest_sha256": "c" * 64, "evaluation_code_sha256": "d" * 64,
         "evaluation_schema": "fixture", "m1_core_mae": {target: 1.0 for target in targets},
-        "m4_candidates": {str(tau): {"core_mae": score} for tau, score in scores.items()},
+        "m4_candidates": {
+            label: {"support_tau_candidate": label, "support_tau_value": artifact["positive_quantiles"][label], "core_mae": score}
+            for label, score in scores.items()
+        },
     }
+    metrics["artifact_sha256"] = _payload_hash(metrics)
     selection = select_tau_once(metrics, artifact)
     assert selection["selected_tau"] in candidates
     assert selection["rolling_reselection_allowed"] is False

@@ -19,6 +19,7 @@ from .micro_metrics import (
     relative_error_improvement,
 )
 from .protocols import get_protocol, protocol_role_dates
+from .support_transfer import TAU_CANDIDATE_LABELS, _payload_hash
 from .training import (
     CORE_METRIC_DEFINITION,
     PACE_METRIC_DEFINITION,
@@ -84,6 +85,7 @@ def predict_checkpoint(
         raise Stage2V52ContractError("evaluation checkpoint hash differs from training selection")
     source = training.get("source", {})
     constructor = training.get("constructor", {})
+    tau_provenance = constructor.get("support_tau_provenance", {})
     model, source_binding = initialized_transfer_model(
         protocol_id=protocol_id,
         feature_artifact_path=source["feature_artifact_path"],
@@ -113,7 +115,7 @@ def predict_checkpoint(
     expected_dates = protocol_role_dates(protocol_id)[role]
     if tuple(sorted(predictions["date"].astype(str).unique())) != tuple(sorted(expected_dates)):
         raise Stage2V52ContractError("prediction dates differ from frozen protocol role")
-    return predictions, {
+    result = {
         **diagnostics,
         "protocol_id": protocol_id, "protocol_hash": protocol.digest,
         "model_id": model_id, "role": role, "evaluation_dates": list(expected_dates),
@@ -126,7 +128,17 @@ def predict_checkpoint(
         "static_artifact_sha256": training["static_artifact_sha256"],
         "support_artifact_sha256": training["support_artifact_sha256"],
         "support_tau": float(constructor["support_tau"]),
+        "support_tau_candidate": tau_provenance.get("support_tau_candidate"),
+        "support_tau_value": tau_provenance.get("support_tau_value", constructor["support_tau"]),
+        "support_tau_source_support_sha256": tau_provenance.get("support_tau_source_support_sha256"),
     }
+    m4_initialization = training.get("m4_initialization")
+    if model_id == "M5":
+        if not isinstance(m4_initialization, Mapping):
+            raise Stage2V52ContractError("M5 evaluation lacks its adopted M4 parent provenance")
+        result["parent_m4_checkpoint_sha256"] = m4_initialization.get("m4_checkpoint_sha256")
+        result["parent_m4_adoption_sha256"] = m4_initialization.get("m4_adoption_manifest_sha256")
+    return predictions, result
 
 
 def evaluate_checkpoint(
@@ -223,31 +235,57 @@ def build_tau_metrics_manifest(
     validate_evaluation_payload(m1, protocol_id="transfer_tuning")
     if m1.get("model_id") != "M1" or m1.get("role") != "validation":
         raise Stage2V52ContractError("tau M1 provenance must be transfer-tuning validation")
-    candidates: dict[str, Any] = {}
+    evaluations: dict[str, tuple[Mapping[str, Any], str | Path]] = {}
     for path in m4_evaluation_paths:
         payload = _json(path)
         validate_evaluation_payload(payload, protocol_id="transfer_tuning")
         if payload.get("model_id") != "M4" or payload.get("role") != "validation":
             raise Stage2V52ContractError("tau candidates must be formal M4 validation evaluations")
-        tau = payload.get("support_tau")
-        if tau is None:
-            raise Stage2V52ContractError("M4 evaluation manifest does not bind support_tau")
-        key = str(float(tau))
-        if key in candidates:
-            raise Stage2V52ContractError("duplicate tau evaluation candidate")
-        candidates[key] = {
+        label = str(payload.get("support_tau_candidate", ""))
+        if label not in TAU_CANDIDATE_LABELS:
+            raise Stage2V52ContractError("M4 evaluation manifest does not bind a labelled tau candidate")
+        prior = evaluations.get(label)
+        if prior is not None and sha256_path(prior[1]) != sha256_path(path):
+            raise Stage2V52ContractError("one tau label maps to multiple evaluations")
+        evaluations[label] = (payload, path)
+    support = _json(support_artifact_path)
+    quantiles = support.get("positive_quantiles", {})
+    expected = {label: float(quantiles[label]) for label in TAU_CANDIDATE_LABELS}
+    # Discrete support counts may make multiple labels numerically identical.  In
+    # that case one trained/evaluated checkpoint is a valid alias for every label
+    # with the same value; formal candidate identity remains the quantile label.
+    candidates: dict[str, Any] = {}
+    for label in TAU_CANDIDATE_LABELS:
+        selected = evaluations.get(label)
+        if selected is None:
+            matching = [
+                pair for observed_label, pair in evaluations.items()
+                if np.isclose(float(pair[0].get("support_tau_value", np.nan)), expected[label])
+            ]
+            if not matching:
+                raise Stage2V52ContractError(f"tau evaluation is missing labelled candidate {label}")
+            selected = matching[0]
+        payload, path = selected
+        observed_value = float(payload.get("support_tau_value", payload.get("support_tau", np.nan)))
+        if not np.isclose(observed_value, expected[label]):
+            raise Stage2V52ContractError("tau evaluation value differs from labelled Train quantile")
+        candidates[label] = {
+            "support_tau_candidate": label,
+            "support_tau_value": expected[label],
+            "support_tau_source_support_sha256": payload.get("support_tau_source_support_sha256"),
             "checkpoint_sha256": payload["checkpoint_sha256"],
             "unique_traversal_count": payload["unique_traversal_count"],
             "core_mae": payload["core_mae"],
             "evaluation_manifest_sha256": sha256_path(path),
+            "aliased_from_candidate": str(payload.get("support_tau_candidate")),
         }
-    support = _json(support_artifact_path)
-    expected = {float(value) for value in support.get("tau_candidates", ())}
-    observed = {float(value) for value in candidates}
-    if observed != expected or len(expected) != 3:
-        raise Stage2V52ContractError("tau evaluations must cover exactly support P25/P50/P75")
     support_sha = sha256_path(support_artifact_path)
     feature_sha = sha256_path(feature_artifact_path)
+    if any(
+        payload.get("support_tau_source_support_sha256") != support_sha
+        for payload, _ in evaluations.values()
+    ):
+        raise Stage2V52ContractError("tau candidate label provenance is not bound to this support file")
     for path in m4_evaluation_paths:
         payload = _json(path)
         if payload.get("feature_artifact_sha256") != feature_sha:
@@ -258,7 +296,7 @@ def build_tau_metrics_manifest(
         raise Stage2V52ContractError("tau M1 feature artifact differs from frozen source")
     if m1.get("support_artifact_sha256") != support_sha:
         raise Stage2V52ContractError("tau M1 support artifact differs from frozen source")
-    return {
+    result = {
         "schema_version": TAU_METRICS_SCHEMA_VERSION,
         "status": "PASS", "protocol_id": "transfer_tuning", "protocol_hash": protocol.digest,
         "train_dates": list(protocol.train_dates), "validation_dates": list(protocol.validation_dates),
@@ -275,6 +313,8 @@ def build_tau_metrics_manifest(
         "evaluation_code_sha256": _code_sha256(),
         "evaluation_schema": "unique_traversal_overlap_mean_then_stratified_mae.1",
     }
+    result["artifact_sha256"] = _payload_hash(result)
+    return result
 
 
 def evaluate_spatial_adoption(
@@ -412,10 +452,18 @@ def _canonical_manifest_hash(payload: Mapping[str, Any]) -> str:
 
 def evaluate_temporal_adoption(
     *, m4_evaluations: Sequence[Mapping[str, Any]], m5_evaluations: Sequence[Mapping[str, Any]],
+    m4_adoption_manifest: Mapping[str, Any], m4_adoption_manifest_sha256: str,
 ) -> dict[str, Any]:
     """Decide M5 only from paired formal rolling-origin evaluation manifests."""
     if len(m4_evaluations) != 3 or len(m5_evaluations) != 3:
         raise Stage2V52ContractError("temporal adoption requires M4/M5 results for exactly three rolling folds")
+    if (
+        m4_adoption_manifest.get("schema_version") != ROLLING_SPATIAL_ADOPTION_SCHEMA_VERSION
+        or m4_adoption_manifest.get("status") != "PASS"
+        or m4_adoption_manifest.get("adopt") is not True
+        or not isinstance(m4_adoption_manifest_sha256, str) or len(m4_adoption_manifest_sha256) != 64
+    ):
+        raise Stage2V52ContractError("temporal adoption requires the adopted rolling M4 artifact")
     daily: dict[str, list[float]] = {}
     target_values: dict[str, list[float]] = {target: [] for target in CORE_TRANSFER_TARGETS}
     provenance: dict[str, dict[str, str]] = {}
@@ -429,6 +477,19 @@ def evaluate_temporal_adoption(
             raise Stage2V52ContractError("temporal adoption requires formal M4/M5 evaluation roles")
         if set(m4.get("metrics_by_date", {})) != set(m5.get("metrics_by_date", {})):
             raise Stage2V52ContractError("M4/M5 daily evaluation support differs")
+        paired_fields = (
+            "tensor_manifest_sha256", "feature_artifact_sha256", "support_artifact_sha256",
+            "static_artifact_sha256", "source_checkpoint_sha256",
+        )
+        mismatches = [field for field in paired_fields if m4.get(field) != m5.get(field)]
+        if mismatches:
+            raise Stage2V52ContractError(f"M4/M5 temporal comparison is not paired: {mismatches}")
+        if m5.get("parent_m4_checkpoint_sha256") != m4.get("checkpoint_sha256"):
+            raise Stage2V52ContractError("M5 checkpoint was not initialized from the paired M4 checkpoint")
+        if m5.get("parent_m4_adoption_sha256") != m4_adoption_manifest_sha256:
+            raise Stage2V52ContractError("M5 adoption parent does not match the paired M4 evaluation")
+        if m4_adoption_manifest.get("selected_m4_checkpoint_sha256_by_protocol", {}).get(protocol_id) != m4.get("checkpoint_sha256"):
+            raise Stage2V52ContractError("rolling M4 adoption does not select the paired M4 evaluation checkpoint")
         provenance[protocol_id] = {"M4": _canonical_manifest_hash(m4), "M5": _canonical_manifest_hash(m5)}
         for date in sorted(m4["metrics_by_date"]):
             improvements: list[float] = []
@@ -448,10 +509,18 @@ def evaluate_temporal_adoption(
     return {
         "schema_version": ADOPTION_SCHEMA_VERSION, "status": "PASS", "verification_status": "PASS",
         "protocol_id": "rolling_origin_fold_1_2_3", "source_evaluation_hashes": provenance,
+        "parent_m4_adoption_sha256": m4_adoption_manifest_sha256,
         "evaluation_dates": sorted(daily), "daily_mean_improvements": daily_mean,
         "target_mean_improvements": target_mean, **result,
     }
 
 
 def evaluate_pace_guard(payload: Mapping[str, Any]) -> dict[str, Any]:
-    return pace_stability(float(payload["candidate_pace_p50_mae"]), float(payload["v5_1_pace_p50_mae"]))
+    result = pace_stability(float(payload["candidate_pace_p50_mae"]), float(payload["v5_1_pace_p50_mae"]))
+    return {
+        "schema_version": "stage2_v5_2_pace_guard.1",
+        "protocol_id": str(payload.get("protocol_id", "rolling_origin_fold_1_2_3")),
+        "model_id": None,
+        "evaluation_dates": list(payload.get("evaluation_dates", ())),
+        **result,
+    }

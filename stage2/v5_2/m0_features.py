@@ -18,6 +18,7 @@ from stage2.v5.data import load_v5_day
 
 from .contracts import FORBIDDEN_MODEL_INPUTS, Stage2V52ContractError, validate_model_inputs
 from .feature_binding import sha256_path
+from .micro_metrics import stop_two_part_metrics
 from .protocols import get_protocol
 from .support_transfer import lookup_train_support
 from .training import M0_MATRIX_SCHEMA_VERSION, M0_TRAINING_SCHEMA_VERSION
@@ -134,31 +135,42 @@ def build_m0_feature_matrix(
     protocol = get_protocol(protocol_id)
     root = Path(repo_root).resolve()
     feature_root = Path(route_feature_root).resolve()
-    feature_values: dict[str, list[np.ndarray]] | None = None
     feature_names: tuple[str, ...] = ()
-    for date in protocol.train_dates:
-        frame = load_v5_day(
-            date, split="train", repo_root=root, route_feature_root=feature_root,
-            extra_columns=("observed_directed_edge_uid",),
-        ).assign(split="train", date=date)
-        if frame.empty:
-            raise Stage2V52ContractError("M0 matrix requires non-empty data for every protocol Train date")
+    median: dict[str, float] = {}
+    # Exact Train medians are fitted one feature at a time from disk-backed
+    # float64 streams.  This preserves the previous algorithm while avoiding an
+    # all-dates x all-features in-memory copy.
+    with tempfile.TemporaryDirectory(prefix="stage2-v5-2-m0-median-") as temporary:
+        temp_root = Path(temporary)
+        feature_paths: dict[str, Path] = {}
+        feature_counts: dict[str, int] = {}
+        for date in protocol.train_dates:
+            frame = load_v5_day(
+                date, split="train", repo_root=root, route_feature_root=feature_root,
+                extra_columns=("observed_directed_edge_uid",),
+            ).assign(split="train", date=date)
+            if frame.empty:
+                raise Stage2V52ContractError("M0 matrix requires non-empty data for every protocol Train date")
+            if not feature_names:
+                feature_names = tuple(column for column in _feature_candidates() if column in frame.columns)
+                feature_paths = {name: temp_root / f"feature-{index:04d}.f64" for index, name in enumerate(feature_names)}
+                feature_counts = {name: 0 for name in feature_names}
+            if not set(feature_names) <= set(frame.columns):
+                raise Stage2V52ContractError("M0 Train feature columns drift across dates")
+            for name in feature_names:
+                values = pd.to_numeric(frame[name], errors="coerce").to_numpy(np.float64)
+                with feature_paths[name].open("ab") as handle:
+                    values.tofile(handle)
+                feature_counts[name] += int(len(values))
         if not feature_names:
-            feature_names = tuple(column for column in _feature_candidates() if column in frame.columns)
-            feature_values = {name: [] for name in feature_names}
-        if not set(feature_names) <= set(frame.columns):
-            raise Stage2V52ContractError("M0 Train feature columns drift across dates")
+            raise Stage2V52ContractError("M0 matrix has no canonical decision-time features")
         for name in feature_names:
-            feature_values[name].append(pd.to_numeric(frame[name], errors="coerce").to_numpy(float))
-    if not feature_names:
-        raise Stage2V52ContractError("M0 matrix has no canonical decision-time features")
+            values = np.memmap(feature_paths[name], mode="r", dtype=np.float64, shape=(feature_counts[name],))
+            median[name] = float(np.nanmedian(values))
+            del values
     validate_model_inputs(feature_names)
     forbidden = sorted(set(feature_names) & FORBIDDEN_MODEL_INPUTS)
-    median = {
-        name: float(np.nanmedian(np.concatenate((feature_values or {})[name]))) for name in feature_names
-    }
     median = {name: value if np.isfinite(value) else 0.0 for name, value in median.items()}
-    del feature_values
 
     def train_frames() -> Iterable[pd.DataFrame]:
         for date in protocol.train_dates:
@@ -192,7 +204,7 @@ def build_m0_feature_matrix(
         "feature_schema": feature_schema,
         "feature_schema_hash": _canonical_hash(feature_schema),
         "source_product_hashes": source_hashes,
-        "construction_policy": "daily_dataframe_scan_then_numpy_concatenation_no_cross_day_dataframe_concat",
+        "construction_policy": "daily_dataframe_scan_disk_backed_per_feature_exact_median_then_numpy_materialization",
         "valid_target_counts": valid_counts,
         "forbidden_input_audit": {"status": "PASS" if not forbidden else "FAIL", "fields": forbidden},
         "matrix_path": matrix_path.as_posix(),
@@ -310,6 +322,14 @@ def evaluate_m0_baseline(
                     "count": count,
                     "mae": float(np.mean(np.abs(candidate[valid] - truth[valid]))) if count else None,
                 }
+            stop_valid = selector & archive["stop_valid"].astype(bool)
+            stop_truth = archive["stop"].astype(float)
+            stop_valid &= np.isfinite(stop_truth)
+            metrics[group]["stop_two_part"] = stop_two_part_metrics(
+                stop_truth[stop_valid],
+                predictions["stop_occurrence_probability"].astype(float)[stop_valid],
+                predictions["stop_positive_share"].astype(float)[stop_valid],
+            )
         unique_count = int(len(archive["features"]))
     report = {
         "schema_version": "stage2_v5_2_m0_evaluation.1", "status": "PASS",
@@ -319,13 +339,19 @@ def evaluate_m0_baseline(
         "core_mae": {target: metrics["overall"][target]["mae"] for target in ("crawl", "stop", "speed_cv", "acceleration_rms")},
         "low_support_core_mae": {target: metrics["low"][target]["mae"] for target in ("crawl", "stop", "speed_cv", "acceleration_rms")},
         "unseen_core_mae": {target: metrics["unseen"][target]["mae"] for target in ("crawl", "stop", "speed_cv", "acceleration_rms")},
+        "stop_two_part_metrics_by_support": {
+            group: values["stop_two_part"] for group, values in metrics.items()
+        },
         "unique_traversal_count": unique_count, "duplicate_prediction_count": 0,
         "matrix_manifest_sha256": sha256_path(matrix_manifest_path),
         "training_manifest_sha256": sha256_path(training_manifest_path),
         "model_sha256": sha256_path(model_path),
         "source_product_hashes": manifest["source_product_hashes"],
     }
-    if any(value is None for group in metrics.values() for value in (row["mae"] for row in group.values())):
+    if any(
+        metrics[group][target]["mae"] is None
+        for group in metrics for target in ("crawl", "stop", "speed_cv", "acceleration_rms")
+    ):
         report["status"] = "FAIL_INSUFFICIENT_SUPPORT"
     _atomic_json(Path(output_path), report)
     return report

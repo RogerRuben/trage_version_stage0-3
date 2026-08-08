@@ -6,9 +6,19 @@
     "documentation_head": "4137ded50abe7c4d4b1351e8fc3d095342ef4a74",
     "frozen_v5_1": true
   },
-  "phase": "A_2_1_BLOCKER_FIX_CODE_READY",
+  "phase": "A_2_2_REVIEW_FIX_CODE_READY",
   "execution_authorization": "NONE_PHASE_A_2",
   "phase_b_allowed": false,
+  "phase_b0_gate": {
+    "report_path": null,
+    "report_sha256": null
+  },
+  "tau_freeze": {
+    "artifact_name": "stage2_v5_2_tau_freeze.json",
+    "expected_file_sha256": null,
+    "write_once_in_phase": "PHASE_B1",
+    "required_for_phases": ["PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"]
+  },
   "research_scope": {
     "route": "frozen_historical_original_service_route",
     "formal_micro_targets": ["crawl", "stop", "speed_cv", "acceleration_rms", "rts"],
@@ -144,7 +154,7 @@
     "tau_candidates": ["train_support_p25", "train_support_p50", "train_support_p75"],
     "tau_selection_protocol": "transfer_tuning_09_18_to_19_20",
     "tau_selection_metric": "macro_normalized_MAE_over_4_core_micro_targets",
-    "tau_tie_break": "smaller_tau",
+    "tau_tie_break": "candidate_label_order_p25_p50_p75",
     "pace_or_rts_used_for_tau": false,
     "rolling_tau_reselection": false
   },
@@ -213,5 +223,5 @@
     ]
   },
   "final_status_requires_experiments": "READY_FOR_AV_ROUTE_SUITABILITY_STAGE",
-  "current_status": "PHASE_A2_1_CODE_READY_FOR_VERIFICATION"
+  "current_status": "PHASE_A2_2_CODE_READY_FOR_VERIFICATION"
 }

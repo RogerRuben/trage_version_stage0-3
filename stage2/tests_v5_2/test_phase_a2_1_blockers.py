@@ -183,7 +183,23 @@ def test_adopted_m4_can_initialize_m5_only_from_rolling_decision() -> None:
 def test_temporal_adoption_accepts_real_three_fold_six_date_mapping() -> None:
     m4 = [_evaluation(f"fold_{index}", "M4", 1.0) for index in range(1, 4)]
     m5 = [_evaluation(f"fold_{index}", "M5", 0.8) for index in range(1, 4)]
-    decision = evaluate_temporal_adoption(m4_evaluations=m4, m5_evaluations=m5)
+    selected = {f"fold_{index}": m4[index - 1]["checkpoint_sha256"] for index in range(1, 4)}
+    adoption_sha = _hash("d")
+    adoption = {
+        "schema_version": "stage2_v5_2_rolling_spatial_adoption.1", "status": "PASS",
+        "verification_status": "PASS", "protocol_id": "rolling_origin_fold_1_2_3",
+        "decision_scope": "rolling_origin_three_fold_six_dates", "adopt": True,
+        "selected_m4_checkpoint_sha256_by_protocol": selected,
+    }
+    for baseline, candidate in zip(m4, m5):
+        candidate.update({
+            "parent_m4_checkpoint_sha256": baseline["checkpoint_sha256"],
+            "parent_m4_adoption_sha256": adoption_sha,
+        })
+    decision = evaluate_temporal_adoption(
+        m4_evaluations=m4, m5_evaluations=m5,
+        m4_adoption_manifest=adoption, m4_adoption_manifest_sha256=adoption_sha,
+    )
     assert isinstance(decision["daily_mean_improvements"], dict)
     assert len(decision["daily_mean_improvements"]) == 6
 
@@ -242,7 +258,7 @@ def test_final_verifier_rejects_naked_pass_strings() -> None:
     assert result["status"] == "FAIL"
 
 
-def test_final_verifier_accepts_frozen_negative_transfer_stop_rule(tmp_path: Path) -> None:
+def test_final_verifier_requires_release_bound_hard_specs(tmp_path: Path) -> None:
     gates = {}
     for name in FINAL_REQUIRED_GATES:
         report = {
@@ -264,7 +280,8 @@ def test_final_verifier_accepts_frozen_negative_transfer_stop_rule(tmp_path: Pat
         **spatial, "status": "NOT_APPLICABLE_BY_FROZEN_STOP_RULE",
     }
     result = verify_final_gate_bundle({"required_gates": gates})
-    assert result["status"] == "PASS"
+    assert result["status"] == "FAIL"
+    assert result["reason"] == "release_manifest_or_context_unbound"
 
 
 def test_none_phase_a2_blocks_workloads(tmp_path: Path) -> None:

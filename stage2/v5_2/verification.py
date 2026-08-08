@@ -17,7 +17,7 @@ from .contracts import (
     CONFIG_SCHEMA_VERSION, Stage2V52ContractError, TOKEN_REQUIRED_COLUMNS, require_columns,
 )
 from .feature_binding import bind_v51_source_model
-from .protocols import get_protocol, validate_protocols
+from .protocols import get_protocol, protocol_role_dates, validate_protocols
 
 
 FINAL_REQUIRED_GATES = (
@@ -38,6 +38,24 @@ FINAL_REQUIRED_GATES = (
     "performance",
     "reproducibility",
 )
+FINAL_GATE_SPECS: dict[str, dict[str, Any]] = {
+    "phase_b0_metadata_schema_audit": {"schemas": ("stage2_v5_2_phase_b0_metadata_audit.1",), "protocol": "release", "models": (None,), "dates": "protocol_scope"},
+    "source_model_binding": {"schemas": ("stage2_v5_2_preflight.2",), "protocol": "release", "models": (None,), "dates": "none"},
+    "transfer_shard_integrity": {"schemas": ("stage2_v5_2_transfer_manifest.2",), "protocol": "release", "models": (None,), "dates": "none"},
+    "temporal_leakage_zero": {"schemas": ("stage2_v5_2_transfer_temporal_audit.1",), "protocol": "release", "models": (None,), "dates": "none"},
+    "unique_traversal_evaluation": {"schemas": ("stage2_v5_2_evaluation.2",), "protocol": "release", "models": ("M1", "M4", "M5"), "dates": "canonical_role"},
+    "m0_baseline_complete": {"schemas": ("stage2_v5_2_m0_evaluation.1",), "protocol": "release", "models": ("M0",), "dates": "canonical_role"},
+    "m1_baseline_complete": {"schemas": ("stage2_v5_2_evaluation.2",), "protocol": "release", "models": ("M1",), "dates": "canonical_role"},
+    "spatial_adoption": {"schemas": ("stage2_v5_2_rolling_spatial_adoption.1",), "protocol": "rolling", "models": (None,), "dates": "rolling_evaluation"},
+    "temporal_adoption": {"schemas": ("stage2_v5_2_adoption.2",), "protocol": "rolling", "models": (None,), "dates": "rolling_evaluation"},
+    "pace_guard": {"schemas": ("stage2_v5_2_pace_guard.1",), "protocol": "rolling", "models": (None,), "dates": "rolling_evaluation"},
+    "rolling_origin_complete": {"schemas": ("stage2_v5_2_rolling_complete.1",), "protocol": "rolling", "models": (None,), "dates": "rolling_evaluation"},
+    "legacy_benchmark_complete": {"schemas": ("stage2_v5_2_evaluation.2",), "protocol": "legacy", "models": ("M1", "M4", "M5"), "dates": "legacy"},
+    "product_schema": {"schemas": ("stage2_v5_2_product_schema_verification.1",), "protocol": "release", "models": (None,), "dates": "protocol_scope"},
+    "stage3_contract": {"schemas": ("stage2_v5_2_stage3_contract_verification.1",), "protocol": "global", "models": (None,), "dates": "none"},
+    "performance": {"schemas": ("stage2_v5_2_performance.2",), "protocol": "global", "models": (None,), "dates": "none"},
+    "reproducibility": {"schemas": ("stage2_v5_2_reproducibility.1",), "protocol": "release", "models": (None,), "dates": "protocol_scope"},
+}
 REQUIRED_RELEASE_OUTPUTS = frozenset({
     "micro_condition_tokens_manifest", "original_route_micro_conditions_manifest",
     "static_route_complexity_manifest", "rolling_results", "performance_report",
@@ -90,10 +108,15 @@ def verify_artifact_payload(payload: Mapping[str, Any], *, artifact_type: str) -
             raise Stage2V52ContractError("support artifact schema is invalid")
         quantiles = payload.get("positive_quantiles", {})
         candidates = payload.get("tau_candidates", ())
+        candidate_table = payload.get("tau_candidate_table", {})
         if (
             not isinstance(quantiles, Mapping)
             or any(name not in quantiles for name in ("p25", "p50", "p75"))
             or [float(value) for value in candidates]
+            != [float(quantiles[name]) for name in ("p25", "p50", "p75")]
+            or not isinstance(candidate_table, Mapping)
+            or list(candidate_table) != ["p25", "p50", "p75"]
+            or [float(candidate_table[name]) for name in ("p25", "p50", "p75")]
             != [float(quantiles[name]) for name in ("p25", "p50", "p75")]
         ):
             raise Stage2V52ContractError("support artifact tau candidates are not P25/P50/P75")
@@ -145,17 +168,25 @@ def build_release_manifest(
     source_checkpoint_path: str | Path, feature_artifact_path: str | Path,
     source_model_manifest_path: str | Path, source_config_path: str | Path,
     support_artifact_path: str | Path, static_artifact_path: str | Path,
-    tau_artifact_path: str | Path, micro_cdf_path: str | Path,
+    tau_freeze_artifact_path: str | Path, micro_cdf_path: str | Path,
     transfer_manifest_path: str | Path, training_manifest_path: str | Path,
     selected_checkpoint_path: str | Path, evaluation_manifest_path: str | Path,
-    stage1_release: Mapping[str, Any], output_paths: Mapping[str, str | Path],
+    stage1_release_manifest_path: str | Path, output_paths: Mapping[str, str | Path],
 ) -> dict[str, Any]:
     root = Path(repo_root).resolve()
+    stage1_release_path = Path(stage1_release_manifest_path)
+    if not stage1_release_path.is_file():
+        raise Stage2V52ContractError("Stage 1 release manifest path does not exist")
+    stage1_release = json.loads(stage1_release_path.read_text(encoding="utf-8"))
+    if not isinstance(stage1_release, dict):
+        raise Stage2V52ContractError("Stage 1 release manifest must be a JSON object")
+    stage1_release_sha = sha256_file(stage1_release_path)
     stage0_release = stage1_release.get("stage0_release", {})
     stage0_commit = stage0_release.get("git_commit", stage0_release.get("commit"))
     if (
         stage1_release.get("schema_version") != "stage1_v3_release_manifest.1"
         or not stage1_release.get("release_tag")
+        or ("engineering_status" in stage1_release and stage1_release.get("engineering_status") != "PASS")
         or not stage0_release.get("tag") or not stage0_commit
     ):
         raise Stage2V52ContractError(
@@ -166,10 +197,11 @@ def build_release_manifest(
         "v5_1_feature_artifact": feature_artifact_path,
         "v5_1_source_model_manifest": source_model_manifest_path,
         "v5_1_source_config": source_config_path, "support_artifact": support_artifact_path,
-        "static_structure_artifact": static_artifact_path, "tau_selection": tau_artifact_path,
+        "static_structure_artifact": static_artifact_path, "tau_freeze": tau_freeze_artifact_path,
         "micro_cdf_artifact": micro_cdf_path, "transfer_manifest": transfer_manifest_path,
         "training_manifest": training_manifest_path, "selected_checkpoint": selected_checkpoint_path,
         "evaluation_manifest": evaluation_manifest_path,
+        "stage1_release_manifest": stage1_release_path,
     }
     missing = [str(path) for path in artifacts.values() if not Path(path).is_file()]
     if missing:
@@ -184,25 +216,28 @@ def build_release_manifest(
     transfer = json.loads(Path(transfer_manifest_path).read_text(encoding="utf-8"))
     training = json.loads(Path(training_manifest_path).read_text(encoding="utf-8"))
     evaluation = json.loads(Path(evaluation_manifest_path).read_text(encoding="utf-8"))
-    tau = json.loads(Path(tau_artifact_path).read_text(encoding="utf-8"))
+    tau = json.loads(Path(tau_freeze_artifact_path).read_text(encoding="utf-8"))
     protocol = get_protocol(protocol_id)
     selected_sha = sha256_file(selected_checkpoint_path)
     training_sha = sha256_file(training_manifest_path)
     transfer_sha = sha256_file(transfer_manifest_path)
     source_checkpoint_sha = sha256_file(source_checkpoint_path)
+    tau_freeze_sha = sha256_file(tau_freeze_artifact_path)
     relation_checks = {
         "source_manifest_schema_status": source_manifest.get("schema_version") == "stage2_v5_rc_mstnet.1" and source_manifest.get("status") == "PASS",
         "source_checkpoint_bound": source_manifest.get("checkpoint_sha256") == source_checkpoint_sha,
         "transfer_protocol_bound": transfer.get("protocol_id") == protocol_id and transfer.get("protocol_hash") == protocol.digest,
+        "transfer_stage1_release_bound": transfer.get("stage1_release_manifest_sha256") == stage1_release_sha,
         "training_protocol_bound": training.get("schema_version") == "stage2_v5_2_training.2" and training.get("status") == "PASS" and training.get("protocol_id") == protocol_id and training.get("protocol_hash") == protocol.digest,
         "training_selected_checkpoint_bound": training.get("selected_checkpoint_sha256") == selected_sha,
         "training_transfer_bound": training.get("tensor_manifest_sha256") == transfer_sha,
         "training_source_bound": training.get("source", {}).get("source_checkpoint_sha256") == source_checkpoint_sha and training.get("source", {}).get("feature_artifact_sha256") == sha256_file(feature_artifact_path),
+        "training_tau_freeze_bound": training.get("constructor", {}).get("support_tau_provenance", {}).get("tau_freeze_artifact_sha256") == tau_freeze_sha,
         "evaluation_protocol_bound": evaluation.get("schema_version") == "stage2_v5_2_evaluation.2" and evaluation.get("status") == "PASS" and evaluation.get("protocol_id") == protocol_id,
         "evaluation_checkpoint_bound": evaluation.get("checkpoint_sha256") == selected_sha,
         "evaluation_training_bound": evaluation.get("training_manifest_sha256") == training_sha,
         "evaluation_transfer_bound": evaluation.get("tensor_manifest_sha256") == transfer_sha,
-        "tau_frozen_transfer_tuning": tau.get("schema_version") == "stage2_v5_2_tau_selection.1" and tau.get("selection_protocol") == "transfer_tuning" and tau.get("rolling_reselection_allowed") is False,
+        "tau_frozen_transfer_tuning": tau.get("schema_version") == "stage2_v5_2_tau_freeze.1" and tau.get("status") == "PASS" and tau.get("selection_protocol") == "transfer_tuning" and tau.get("rolling_reselection_allowed") is False,
     }
     if not all(relation_checks.values()):
         failed = sorted(name for name, passed in relation_checks.items() if not passed)
@@ -212,22 +247,92 @@ def build_release_manifest(
         "protocol_id": protocol_id, "protocol_sha256": protocol.digest,
         "artifact_hashes": {name: sha256_file(path) for name, path in artifacts.items()},
         "artifact_paths": {name: Path(path).as_posix() for name, path in artifacts.items()},
+        "stage1_release_manifest_sha256": stage1_release_sha,
         "stage1_release": dict(stage1_release), "stage0_release": dict(stage0_release),
         "output_hashes": {name: sha256_file(path) for name, path in output_paths.items()},
         "relationship_verification": {"status": "PASS", "checks": relation_checks},
     }
 
 
+def _report_dates(report: Mapping[str, Any]) -> list[str]:
+    return [str(value) for value in report.get("evaluation_dates", report.get("dates", [])) or []]
+
+
+def _gate_policy_matches(
+    name: str, report: Mapping[str, Any], release: Mapping[str, Any], release_context: Mapping[str, Any],
+) -> tuple[bool, list[str]]:
+    spec = FINAL_GATE_SPECS[name]
+    failures: list[str] = []
+    if report.get("schema_version") not in spec["schemas"]:
+        failures.append("schema_version")
+    protocol_policy = spec["protocol"]
+    protocol_id = report.get("protocol_id")
+    release_protocol = str(release["protocol_id"])
+    if protocol_policy == "release" and protocol_id != release_protocol:
+        failures.append("protocol_id")
+    elif protocol_policy == "rolling" and protocol_id != "rolling_origin_fold_1_2_3":
+        failures.append("protocol_id")
+    elif protocol_policy == "legacy" and protocol_id != "legacy_31":
+        failures.append("protocol_id")
+    elif protocol_policy == "global" and protocol_id not in (None, "global"):
+        failures.append("protocol_id")
+    if report.get("model_id") not in spec["models"]:
+        failures.append("model_id")
+    dates = _report_dates(report)
+    if spec["dates"] == "protocol_scope":
+        expected = sorted({date for values in protocol_role_dates(release_protocol).values() for date in values})
+        if sorted(dates) != expected:
+            failures.append("evaluation_dates")
+    elif spec["dates"] == "canonical_role":
+        role = str(report.get("role", ""))
+        expected = protocol_role_dates(str(protocol_id)).get(role)
+        if expected is None or dates != list(expected):
+            failures.append("evaluation_dates")
+    elif spec["dates"] == "rolling_evaluation":
+        expected = sorted({date for index in range(1, 4) for date in get_protocol(f"fold_{index}").evaluation_dates})
+        if sorted(dates) != expected:
+            failures.append("evaluation_dates")
+    elif spec["dates"] == "legacy" and dates != ["20161031"]:
+        failures.append("evaluation_dates")
+    elif spec["dates"] == "none" and dates:
+        failures.append("evaluation_dates")
+    context_fields = {
+        "protocol_hash": release_context.get("protocol_sha256"),
+        "stage1_release_manifest_sha256": release_context.get("stage1_release_manifest_sha256"),
+        "git_commit": release_context.get("git_commit"),
+    }
+    for field, expected in context_fields.items():
+        if field in report and report.get(field) != expected:
+            failures.append(field)
+    return not failures, sorted(set(failures))
+
+
 def verify_final_gate_bundle(payload: Mapping[str, Any]) -> dict[str, Any]:
+    release_path = Path(str(payload.get("release_manifest_path", "")))
+    release_sha = payload.get("release_manifest_sha256")
+    release_context = payload.get("release_context")
+    if not release_path.is_file() or sha256_file(release_path) != release_sha or not isinstance(release_context, Mapping):
+        return {"status": "FAIL", "stage2_status": "NOT_READY", "reason": "release_manifest_or_context_unbound"}
+    release = json.loads(release_path.read_text(encoding="utf-8"))
+    if release.get("schema_version") != "stage2_v5_2_release_manifest.3":
+        return {"status": "FAIL", "stage2_status": "NOT_READY", "reason": "release_manifest_schema_invalid"}
+    expected_context = {
+        "git_commit": release.get("git_commit"),
+        "protocol_id": release.get("protocol_id"),
+        "protocol_sha256": release.get("protocol_sha256"),
+        "stage1_release_manifest_sha256": release.get("stage1_release_manifest_sha256"),
+        "tau_freeze_sha256": release.get("artifact_hashes", {}).get("tau_freeze"),
+        "transfer_manifest_sha256": release.get("artifact_hashes", {}).get("transfer_manifest"),
+        "selected_checkpoint_sha256": release.get("artifact_hashes", {}).get("selected_checkpoint"),
+    }
+    if dict(release_context) != expected_context:
+        return {"status": "FAIL", "stage2_status": "NOT_READY", "reason": "release_context_mismatch"}
     gates = payload.get("required_gates")
     if not isinstance(gates, Mapping) or set(gates) != set(FINAL_REQUIRED_GATES):
         missing = sorted(set(FINAL_REQUIRED_GATES) - set(gates or {}))
         extra = sorted(set(gates or {}) - set(FINAL_REQUIRED_GATES))
         return {"status": "FAIL", "stage2_status": "NOT_READY", "missing_gates": missing, "extra_gates": extra}
-    required_reference_fields = {
-        "report_path", "report_sha256", "schema_version", "protocol_id", "model_id",
-        "evaluation_dates",
-    }
+    required_reference_fields = {"report_path", "report_sha256"}
     results: dict[str, Any] = {}
     reports: dict[str, dict[str, Any]] = {}
     for name in FINAL_REQUIRED_GATES:
@@ -248,18 +353,13 @@ def verify_final_gate_bundle(payload: Mapping[str, Any]) -> dict[str, Any]:
             results[name] = {"status": "FAIL", "reason": "report_not_object"}
             continue
         reports[name] = report
-        observed_dates = report.get("evaluation_dates", report.get("fit_dates_observed", report.get("dates", [])))
-        metadata_matches = (
-            report.get("schema_version") == reference.get("schema_version")
-            and report.get("protocol_id") == reference.get("protocol_id")
-            and report.get("model_id") == reference.get("model_id")
-            and list(observed_dates or []) == list(reference.get("evaluation_dates") or [])
-        )
+        metadata_matches, policy_failures = _gate_policy_matches(name, report, release, release_context)
         report_status = report.get("verification_status", report.get("status"))
         passed = metadata_matches and report_status == "PASS"
         results[name] = {
             "status": "PASS" if passed else "FAIL",
             "metadata_matches": metadata_matches,
+            "policy_failures": policy_failures,
             "derived_report_status": report_status,
         }
     spatial = reports.get("spatial_adoption")
@@ -290,6 +390,8 @@ def verify_final_gate_bundle(payload: Mapping[str, Any]) -> dict[str, Any]:
         "required_gate_names": list(FINAL_REQUIRED_GATES),
         "gate_results": results,
         "negative_transfer_stop_rule_supported": True,
+        "release_manifest_sha256": release_sha,
+        "release_context": dict(release_context),
     }
 
 

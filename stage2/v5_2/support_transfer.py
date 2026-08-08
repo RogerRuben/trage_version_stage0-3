@@ -23,6 +23,22 @@ except ImportError:  # pragma: no cover - exercised only in lightweight readers.
 
 
 SUPPORT_GROUPS = ("unseen", "low", "medium", "high")
+TAU_CANDIDATE_LABELS = ("p25", "p50", "p75")
+
+
+def _payload_hash(payload: Mapping[str, Any], *, self_field: str = "artifact_sha256") -> str:
+    canonical = dict(payload)
+    canonical.pop(self_field, None)
+    raw = json.dumps(canonical, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(raw).hexdigest()
+
+
+def validate_embedded_hash(payload: Mapping[str, Any], *, name: str) -> str:
+    observed = str(payload.get("artifact_sha256", ""))
+    expected = _payload_hash(payload)
+    if len(observed) != 64 or observed != expected:
+        raise Stage2V52ContractError(f"{name} embedded artifact hash is invalid")
+    return observed
 
 
 def support_gate(support: np.ndarray | Iterable[float], tau: float) -> np.ndarray:
@@ -57,6 +73,9 @@ class TrainSupportArtifact:
             "counts": self.counts,
             "positive_quantiles": self.positive_quantiles,
             "tau_candidates": list(self.tau_candidates),
+            "tau_candidate_table": {
+                label: float(self.positive_quantiles[label]) for label in TAU_CANDIDATE_LABELS
+            },
             "group_boundaries": list(self.group_boundaries),
             "fit_dates": list(self.fit_dates),
             "fit_dates_observed": list(self.fit_dates),
@@ -69,8 +88,7 @@ class TrainSupportArtifact:
             "source": self.source,
             "evaluation_support_used": False,
         }
-        canonical = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
-        payload["artifact_sha256"] = hashlib.sha256(canonical).hexdigest()
+        payload["artifact_sha256"] = _payload_hash(payload)
         return payload
 
 
@@ -160,6 +178,9 @@ def lookup_train_support(edge_ids: Iterable[object], artifact: Mapping[str, Any]
 def select_tau_once(
     metrics_manifest: Mapping[str, Any],
     artifact: Mapping[str, Any],
+    *,
+    metrics_manifest_sha256: str | None = None,
+    support_artifact_sha256: str | None = None,
 ) -> dict[str, Any]:
     """Select tau only from the formal, hash-bound transfer-tuning evaluator output."""
     if metrics_manifest.get("schema_version") != "stage2_v5_2_tau_evaluation.2":
@@ -172,22 +193,30 @@ def select_tau_once(
         raise Stage2V52ContractError("tau metrics validation dates are not frozen 19-20")
     if metrics_manifest.get("support_artifact_embedded_sha256") != artifact.get("artifact_sha256"):
         raise Stage2V52ContractError("tau metrics are not bound to this support artifact")
+    validate_embedded_hash(metrics_manifest, name="tau metrics")
+    validate_embedded_hash(artifact, name="Train support")
     candidates_payload = metrics_manifest.get("m4_candidates", {})
     if not isinstance(candidates_payload, Mapping):
         raise Stage2V52ContractError("tau metrics have no M4 candidate mapping")
-    candidate_mae_by_target = {
-        float(tau): dict(payload.get("core_mae", {}))
-        for tau, payload in candidates_payload.items()
-    }
+    if tuple(candidates_payload) != TAU_CANDIDATE_LABELS:
+        raise Stage2V52ContractError("tau scores must be keyed by p25/p50/p75 labels")
     v5_1_mae_by_target = metrics_manifest.get("m1_core_mae", {})
-    allowed = tuple(float(value) for value in artifact.get("tau_candidates", ()))
-    if not allowed or set(map(float, candidate_mae_by_target)) != set(allowed):
-        raise Stage2V52ContractError("tau scores must cover exactly Train P25/P50/P75 candidates")
+    quantiles = artifact.get("positive_quantiles", {})
+    if not isinstance(quantiles, Mapping):
+        raise Stage2V52ContractError("Train support has no quantile mapping")
+    candidate_values = {label: float(quantiles[label]) for label in TAU_CANDIDATE_LABELS}
+    if [float(value) for value in artifact.get("tau_candidates", ())] != list(candidate_values.values()):
+        raise Stage2V52ContractError("support candidates do not preserve labelled P25/P50/P75 order")
+    for label, payload in candidates_payload.items():
+        if str(payload.get("support_tau_candidate")) != label:
+            raise Stage2V52ContractError("tau candidate payload label mismatch")
+        if not np.isclose(float(payload.get("support_tau_value", np.nan)), candidate_values[label]):
+            raise Stage2V52ContractError("tau candidate numeric value differs from Train quantile")
     if set(v5_1_mae_by_target) != set(CORE_TRANSFER_TARGETS):
         raise Stage2V52ContractError("tau baseline must contain exactly four core micro targets")
-    scores: dict[float, float] = {}
-    for tau in allowed:
-        target_mae = candidate_mae_by_target[tau]
+    scores: dict[str, float] = {}
+    for label in TAU_CANDIDATE_LABELS:
+        target_mae = dict(candidates_payload[label].get("core_mae", {}))
         if set(target_mae) != set(CORE_TRANSFER_TARGETS):
             raise Stage2V52ContractError("tau candidate includes a non-core target or misses a core target")
         normalized = []
@@ -197,10 +226,11 @@ def select_tau_once(
             if not np.isfinite(baseline) or baseline <= 0 or not np.isfinite(candidate):
                 raise Stage2V52ContractError("tau selection MAE values must be finite with positive M1 baseline")
             normalized.append(candidate / baseline)
-        scores[tau] = float(np.mean(normalized))
-    selected = min(allowed, key=lambda value: (scores[value], value))
-    return {
-        "schema_version": "stage2_v5_2_tau_selection.1",
+        scores[label] = float(np.mean(normalized))
+    selected = min(TAU_CANDIDATE_LABELS, key=lambda label: (scores[label], TAU_CANDIDATE_LABELS.index(label)))
+    result = {
+        "schema_version": "stage2_v5_2_tau_selection.2",
+        "status": "PASS",
         "selection_protocol": "transfer_tuning",
         "train_dates": [f"201610{day:02d}" for day in range(9, 19)],
         "validation_dates": ["20161019", "20161020"],
@@ -209,10 +239,19 @@ def select_tau_once(
         "core_targets": list(CORE_TRANSFER_TARGETS),
         "rts_used": False,
         "pace_used": False,
-        "candidates": list(allowed),
-        "scores": {str(value): scores[value] for value in allowed},
-        "selected_tau": float(selected),
-        "tie_break": "smaller_tau",
+        "candidate_labels": list(TAU_CANDIDATE_LABELS),
+        "candidate_table": {
+            label: {"support_tau_value": candidate_values[label], "score": scores[label]}
+            for label in TAU_CANDIDATE_LABELS
+        },
+        "scores": scores,
+        "selected_candidate": selected,
+        "selected_tau": candidate_values[selected],
+        "tie_break": "candidate_label_order_p25_p50_p75",
+        "metrics_manifest_sha256": metrics_manifest_sha256 or metrics_manifest["artifact_sha256"],
+        "metrics_manifest_embedded_sha256": metrics_manifest["artifact_sha256"],
+        "transfer_tuning_support_sha256": support_artifact_sha256 or metrics_manifest["support_artifact_sha256"],
+        "transfer_tuning_support_embedded_sha256": artifact["artifact_sha256"],
         "metrics_manifest_schema_version": metrics_manifest["schema_version"],
         "metrics_manifest_provenance": {
             key: metrics_manifest[key] for key in (
@@ -222,6 +261,56 @@ def select_tau_once(
             )
         },
     }
+    result["artifact_sha256"] = _payload_hash(result)
+    return result
+
+
+def freeze_tau_selection(
+    selection: Mapping[str, Any],
+    metrics_manifest: Mapping[str, Any],
+    support_artifact: Mapping[str, Any],
+    *,
+    selection_artifact_sha256: str,
+    metrics_manifest_sha256: str,
+    support_artifact_sha256: str,
+) -> dict[str, Any]:
+    """Create the one-time B1 tau freeze consumed verbatim by Phase C/D."""
+    if selection.get("schema_version") != "stage2_v5_2_tau_selection.2" or selection.get("status") != "PASS":
+        raise Stage2V52ContractError("tau freeze requires a successful formal selection")
+    validate_embedded_hash(selection, name="tau selection")
+    validate_embedded_hash(metrics_manifest, name="tau metrics")
+    validate_embedded_hash(support_artifact, name="Train support")
+    if selection.get("metrics_manifest_sha256") != metrics_manifest_sha256:
+        raise Stage2V52ContractError("tau selection metrics file hash mismatch")
+    if selection.get("transfer_tuning_support_sha256") != support_artifact_sha256:
+        raise Stage2V52ContractError("tau selection support file hash mismatch")
+    if selection_artifact_sha256 != hashlib.sha256(
+        json.dumps(dict(selection), indent=2, sort_keys=True).encode("utf-8") + b"\n"
+    ).hexdigest():
+        raise Stage2V52ContractError("tau selection file hash does not match canonical CLI output")
+    label = str(selection.get("selected_candidate", ""))
+    table = selection.get("candidate_table", {})
+    if label not in TAU_CANDIDATE_LABELS or not isinstance(table, Mapping) or label not in table:
+        raise Stage2V52ContractError("tau selection has no valid selected candidate")
+    selected_tau = float(selection.get("selected_tau", np.nan))
+    if not np.isfinite(selected_tau) or selected_tau <= 0 or not np.isclose(
+        selected_tau, float(table[label].get("support_tau_value", np.nan))
+    ):
+        raise Stage2V52ContractError("selected tau does not match the labelled candidate table")
+    result = {
+        "schema_version": "stage2_v5_2_tau_freeze.1", "status": "PASS",
+        "selection_protocol": "transfer_tuning", "rolling_reselection_allowed": False,
+        "selected_candidate": label, "selected_tau": selected_tau,
+        "candidate_table": dict(table),
+        "tau_selection_artifact_sha256": selection_artifact_sha256,
+        "tau_selection_embedded_sha256": selection["artifact_sha256"],
+        "metrics_manifest_sha256": metrics_manifest_sha256,
+        "metrics_manifest_embedded_sha256": metrics_manifest["artifact_sha256"],
+        "transfer_tuning_support_sha256": support_artifact_sha256,
+        "transfer_tuning_support_embedded_sha256": support_artifact["artifact_sha256"],
+    }
+    result["artifact_sha256"] = _payload_hash(result)
+    return result
 
 
 if nn is not None:

@@ -669,6 +669,7 @@ def train_transfer_from_shards(
     component_weights: Mapping[str, float], m4_checkpoint_path: str | Path | None = None,
     m4_training_manifest: Mapping[str, Any] | None = None,
     m4_adoption_manifest: Mapping[str, Any] | None = None,
+    m4_adoption_manifest_sha256: str | None = None,
     support_artifact_path: str | Path | None = None,
     support_tau_provenance: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
@@ -706,15 +707,19 @@ def train_transfer_from_shards(
     if model_id == "M4" and protocol_id == "transfer_tuning":
         if (
             tau_provenance.get("kind") != "train_support_quantile_candidate"
-            or tau_provenance.get("candidate") not in {"p25", "p50", "p75"}
-            or tau_provenance.get("support_artifact_sha256")
+            or tau_provenance.get("support_tau_candidate") not in {"p25", "p50", "p75"}
+            or float(tau_provenance.get("support_tau_value", float("nan"))) != float(support_tau)
+            or tau_provenance.get("support_tau_source_support_sha256")
             != tensor_manifest.get("support_artifact_sha256")
         ):
             raise Stage2V52ContractError("transfer-tuning M4 tau lacks verified P25/P50/P75 provenance")
     elif model_id in {"M4", "M5"}:
         if (
             tau_provenance.get("kind") != "frozen_transfer_tuning_selection"
+            or not isinstance(tau_provenance.get("tau_freeze_artifact_sha256"), str)
             or not isinstance(tau_provenance.get("tau_selection_artifact_sha256"), str)
+            or tau_provenance.get("support_tau_candidate") not in {"p25", "p50", "p75"}
+            or float(tau_provenance.get("support_tau_value", float("nan"))) != float(support_tau)
             or tau_provenance.get("current_protocol_support_artifact_sha256")
             != tensor_manifest.get("support_artifact_sha256")
         ):
@@ -733,7 +738,10 @@ def train_transfer_from_shards(
     )
     m4_initialization: dict[str, Any] | None = None
     if model_id == "M5":
-        if m4_checkpoint_path is None or m4_training_manifest is None or m4_adoption_manifest is None:
+        if (
+            m4_checkpoint_path is None or m4_training_manifest is None or m4_adoption_manifest is None
+            or not isinstance(m4_adoption_manifest_sha256, str) or len(m4_adoption_manifest_sha256) != 64
+        ):
             raise Stage2V52ContractError("M5 requires selected M4 checkpoint, training, and adoption manifests")
         if (
             m4_training_manifest.get("schema_version") != TRAINING_SCHEMA_VERSION
@@ -748,7 +756,7 @@ def train_transfer_from_shards(
             m4_checkpoint_sha256=sha256_path(m4_checkpoint_path),
         )
         m4_initialization = model.initialize_spatial_from_m4(m4_checkpoint_path)
-        m4_initialization["m4_adoption_manifest_sha256"] = _canonical_hash(m4_adoption_manifest)
+        m4_initialization["m4_adoption_manifest_sha256"] = m4_adoption_manifest_sha256
         model.set_temporal_adapter_only_trainable()
     if model_id != "M1":
         if v5_1_metric_manifest is None:
