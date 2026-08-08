@@ -2,6 +2,10 @@
 
 Status: `NOT_READY_IMPLEMENTATION_ONLY`.
 
+- Branch: `codex/stage2-v5-micro-transfer`
+- Base commit: `ed10efc5269c128db65248424d6378e22722622f`
+- Fix commit: `fdf6b9eeb91bff1d5dc0af33aac68826c477f4ac`
+
 This change implements the Phase A.1 repair specification without running any
 test, compile, model, data, development, rolling, legacy, or benchmark workload.
 The code-level checklist is implemented but not experimentally validated, and

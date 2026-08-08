@@ -1,16 +1,26 @@
 {
-  "schema_version": "stage2_v5_2_release_manifest.1",
+  "schema_version": "stage2_v5_2_release_manifest.2",
   "release_status": "IMPLEMENTATION_ONLY_NOT_RUN",
-  "base_branch": "codex/stage2-v5-robust-scenarios",
-  "base_head": "1fb5168a51f5701ff16a2a19f77a8560fa0c2f38",
-  "new_branch": "codex/stage2-v5-micro-transfer",
-  "implementation_commit": "RECORDED_BY_REMOTE_GIT_COMMIT",
-  "frozen_upstream": {"stage0_rerun": false, "stage1_rerun": false, "v5_v5_1_modified": false},
+  "branch": "codex/stage2-v5-micro-transfer",
+  "base_commit": "ed10efc5269c128db65248424d6378e22722622f",
+  "implementation_commit": "fdf6b9eeb91bff1d5dc0af33aac68826c477f4ac",
+  "frozen_upstream": {
+    "stage0_rerun": false,
+    "stage1_rerun": false,
+    "v5_v5_1_modified": false
+  },
   "new_dates_produced": [],
+  "tests_run": false,
+  "compileall_run": false,
   "experiments_run": false,
-  "phase_b_required": true,
-  "final_ready_status_requires_completed_gates": "READY_FOR_AV_ROUTE_SUITABILITY_STAGE",
+  "performance_benchmark_run": false,
+  "phase_b_allowed": false,
+  "phase_b_required_before_execution": true,
   "current_stage2_status": "NOT_READY_IMPLEMENTATION_ONLY",
   "config": "stage2/config/stage2_v5_2.json",
-  "contract": "stage2/docs/v5_2/stage2_v5_2_to_stage3_contract.md"
+  "methodology": "stage2/docs/v5_2/stage2_v5_2_methodology.md",
+  "pre_experiment_audit": "stage2/docs/v5_2/stage2_v5_2_pre_experiment_audit_report.md",
+  "static_schema_audit": "stage2/docs/v5_2/stage2_v5_2_static_schema_audit.json",
+  "stage3_contract": "stage2/docs/v5_2/stage2_v5_2_to_stage3_contract.md",
+  "runtime_manifest_policy": "build-release-manifest binds actual git/config/checkpoint/upstream/artifact/protocol/output hashes after authorized execution"
 }
