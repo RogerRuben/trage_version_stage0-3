@@ -1,0 +1,16 @@
+{
+  "schema_version": "stage2_v5_2_release_manifest.1",
+  "release_status": "IMPLEMENTATION_ONLY_NOT_RUN",
+  "base_branch": "codex/stage2-v5-robust-scenarios",
+  "base_head": "1fb5168a51f5701ff16a2a19f77a8560fa0c2f38",
+  "new_branch": "codex/stage2-v5-micro-transfer",
+  "implementation_commit": "RECORDED_BY_REMOTE_GIT_COMMIT",
+  "frozen_upstream": {"stage0_rerun": false, "stage1_rerun": false, "v5_v5_1_modified": false},
+  "new_dates_produced": [],
+  "experiments_run": false,
+  "phase_b_required": true,
+  "final_ready_status_requires_completed_gates": "READY_FOR_AV_ROUTE_SUITABILITY_STAGE",
+  "current_stage2_status": "NOT_READY_IMPLEMENTATION_ONLY",
+  "config": "stage2/config/stage2_v5_2.json",
+  "contract": "stage2/docs/v5_2/stage2_v5_2_to_stage3_contract.md"
+}

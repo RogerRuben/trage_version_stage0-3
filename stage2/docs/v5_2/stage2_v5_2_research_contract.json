@@ -1,0 +1,26 @@
+{
+  "schema_version": "stage2_v5_2.1",
+  "status": "FROZEN_PHASE_A",
+  "formal_micro_targets": ["crawl", "stop", "speed_cv", "acceleration_rms", "rts"],
+  "common_operational_targets": ["pace_p50", "travel_time_p50"],
+  "travel_time_is_only_formal_target": false,
+  "route_identity": "historical_original_service_route",
+  "hv_route_policy": "original_route_only",
+  "av_route_policy": "evaluate_original_route_first; fallback is deferred to Stage 3",
+  "transfer_scope": "high-support/historical knowledge to low-support, unseen edges and later dates",
+  "stage2_excludes": [
+    "AV safety or failure probability",
+    "path planning",
+    "fallback route search",
+    "HV/AV assignment",
+    "Stage 4 optimization"
+  ],
+  "deprecated_to_appendix": [
+    "strict route P90/P95 coverage",
+    "route mean/std/CVaR",
+    "joint random service-time distribution",
+    "complex copula",
+    "cross-order deep scenario calibration",
+    "log-normal mean"
+  ]
+}
