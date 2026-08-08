@@ -8,7 +8,7 @@ import pytest
 def test_s0_is_numerically_identical_to_v51_for_same_checkpoint(tmp_path) -> None:
     torch = pytest.importorskip("torch")
     from stage2.v5.models.rc_mstnet_v5 import RCMSTNetV5
-    from stage2.v5_2.feature_binding import bind_v51_feature_schema
+    from stage2.v5_2.feature_binding import V51SourceModelBinding, bind_v51_feature_schema, sha256_path
     from stage2.v5_2.models.rc_mstnet_transfer import RCMSTNetTransfer
 
     names = ("edge", "highway", "time_bin", "position_bucket", "route_length_bucket")
@@ -33,10 +33,20 @@ def test_s0_is_numerically_identical_to_v51_for_same_checkpoint(tmp_path) -> Non
         support_tau=2.0, spatial_mode="identity", temporal_mode="none",
         backbone_kwargs=options,
     ).eval()
-    transfer.initialize_from_v51(
-        checkpoint_path, source_model_id="fixture-v5.1",
-        source_feature_artifact_path=artifact_path,
+    source_binding = V51SourceModelBinding(
+        protocol_id="fixture", source_protocol_id="fixture", fit_dates=(), validation_dates=(),
+        feature_artifact_path=artifact_path.as_posix(),
+        feature_artifact_sha256=sha256_path(artifact_path),
+        source_checkpoint_path=checkpoint_path.as_posix(),
+        source_checkpoint_sha256=sha256_path(checkpoint_path),
+        source_model_manifest_path="fixture.json", source_model_manifest_sha256="m" * 64,
+        source_model_id="fixture-v5.1", source_config_path="fixture-config.json",
+        source_config_sha256="c" * 64, resolved_source_config_sha256="r" * 64,
+        distribution_family="lognormal", history_mode="gate", numeric_features=("a", "b", "c"),
+        categorical_vocabulary_sha256=binding.categorical_vocabulary_sha256,
+        model_config={},
     )
+    transfer.initialize_from_v51(checkpoint_path, source_binding=source_binding)
     torch.manual_seed(17)
     numeric = torch.randn(2, 4, 3)
     missing = torch.zeros_like(numeric, dtype=torch.bool)

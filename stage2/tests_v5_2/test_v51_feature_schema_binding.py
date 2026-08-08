@@ -23,11 +23,14 @@ def _state(torch, count):
     return {f"embeddings.{index}.weight": torch.zeros(4, 3) for index in range(count)}
 
 
-def test_wrong_edge_categorical_slot_fails(tmp_path) -> None:
+def test_json_key_order_does_not_change_frozen_categorical_order(tmp_path) -> None:
     torch = pytest.importorskip("torch")
     names = ("highway", "edge", "time_bin", "position_bucket", "route_length_bucket")
-    with pytest.raises(Stage2V52ContractError, match="categorical order"):
-        bind_v51_feature_schema(_artifact(tmp_path, names), checkpoint_state=_state(torch, 5))
+    binding = bind_v51_feature_schema(_artifact(tmp_path, names), checkpoint_state=_state(torch, 5))
+    assert binding.categorical_names == (
+        "edge", "highway", "time_bin", "position_bucket", "route_length_bucket"
+    )
+    assert binding.edge_column_index == 0
 
 
 def test_wrong_unseen_index_fails(tmp_path) -> None:

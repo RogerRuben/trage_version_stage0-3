@@ -1,12 +1,12 @@
 {
-  "schema_version": "stage2_v5_2.2",
+  "schema_version": "stage2_v5_2_config.3",
   "base": {
     "branch": "codex/stage2-v5-micro-transfer",
     "head": "ed10efc5269c128db65248424d6378e22722622f",
     "frozen_v5_1": true
   },
-  "phase": "A_1_PRE_EXPERIMENT_FIX",
-  "execution_authorization": "NONE_PHASE_A_1",
+  "phase": "A_2_STATIC_REVIEW_FIX",
+  "execution_authorization": "NONE_PHASE_A_2",
   "research_scope": {
     "route": "frozen_historical_original_service_route",
     "formal_micro_targets": ["crawl", "stop", "speed_cv", "acceleration_rms", "rts"],
@@ -43,8 +43,25 @@
     "transformer_layers": 3,
     "attention_heads": 4,
     "dropout": 0.1,
+    "minimum_log_scale": -5.0,
+    "maximum_log_scale": 2.0,
     "distribution_family": "monotonic_quantiles",
+    "maximum_log_p50": 1.6094379124341003,
+    "maximum_log_p90_p50_ratio": 2.302585092994046,
+    "maximum_log_p95_p90_ratio": 1.0986122886681098,
     "history_mode": "ordinary_concatenation"
+  },
+  "shards": {
+    "max_seq_len": 128,
+    "overlap": 32,
+    "chunks_per_file": 1024,
+    "canonical_layout": "protocol=<id>/split=<role>/date=<YYYYMMDD>/shard-*.npz"
+  },
+  "reproducibility": {
+    "base_seed": 20261009,
+    "numpy_generator_required": true,
+    "torch_seed_required": true,
+    "cuda_seed_required_when_available": true
   },
   "training": {
     "initialization_policy": "shared_backbone_and_edge_ID_from_frozen_v5_1; new_structure_and_adapter_fresh",
@@ -54,6 +71,18 @@
     "new_branch_lr": 0.0003,
     "backbone_lr_ratio": 0.1,
     "default_nonselected_tau": 1.0,
+    "loss_weights": {
+      "pace": 1.0,
+      "crawl": 1.0,
+      "stop": 1.0,
+      "speed_cv": 1.0,
+      "acceleration": 1.0,
+      "rts": 0.0,
+      "lcs_consistency": 0.25,
+      "lcs_tail": 0.0,
+      "rts_tail": 0.0,
+      "availability": 0.1
+    },
     "freeze_schedule_may_change_after_rolling": false
   },
   "checkpoint_selection": {
@@ -73,6 +102,7 @@
     "original_route_micro_conditions": "original_route_micro_conditions",
     "static_route_complexity": "static_route_complexity",
     "minimum_prediction_coverage": 0.8,
+    "service_time_complete_threshold": 0.999,
     "missing_policy": "NA_not_zero",
     "dynamic_weight": "estimated_travel_time_p50_s",
     "rts_sensitivity_weight": "allocated_distance_m",
@@ -161,6 +191,10 @@
   "performance": {
     "sizes": [10000, 50000, 100000, 500000],
     "maximum_five_x_runtime_ratio": 8.0,
+    "warmup_runs": 2,
+    "repeat_runs": 3,
+    "timing_summary": "median",
+    "inference_mode": true,
     "real_kernels_required": [
       "build_static_structure_features",
       "SupportAwareEdgeRepresentation.forward",

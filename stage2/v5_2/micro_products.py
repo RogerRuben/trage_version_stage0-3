@@ -284,8 +284,11 @@ def aggregate_original_route_micro_conditions(
     train_cdf: Mapping[str, Any],
     *,
     minimum_coverage: float = 0.80,
+    service_time_complete_threshold: float = 0.999,
 ) -> pd.DataFrame:
     """Aggregate traversal predictions over each historical original route."""
+    if not 0 < minimum_coverage <= service_time_complete_threshold <= 1:
+        raise Stage2V52ContractError("coverage thresholds must satisfy 0 < minimum <= complete <= 1")
     required = (
         *ORDER_KEYS, "route_sequence", "estimated_travel_time_p50_s", "allocated_distance_m",
         "edge_train_support", "support_group", "protocol_id", "model_id", "prediction_source",
@@ -328,6 +331,11 @@ def aggregate_original_route_micro_conditions(
     result["partial_travel_time_p50_s"] = partial_time
     result["pace_prediction_coverage_distance"] = pace_coverage
     result["travel_time_p50_s"] = np.where(pace_coverage >= minimum_coverage, partial_time, np.nan)
+    result["service_time_complete_flag"] = pace_coverage >= service_time_complete_threshold
+    result["service_time_status"] = np.where(
+        result["service_time_complete_flag"], "complete",
+        np.where(pace_coverage >= minimum_coverage, "partial_coverage_estimate", "unavailable"),
+    )
     physical_time = pace_valid
     total_time = partial_time
     common_valid = pace_valid.copy()
@@ -517,6 +525,11 @@ def write_partition_products(
         "split": split,
         "date": date,
         "route_semantics": "historical_original_service_route",
+        "product_schema_versions": {
+            "micro_condition_tokens": "stage2_v5_2_micro_condition_tokens.2",
+            "original_route_micro_conditions": "stage2_v5_2_original_route_micro_conditions.2",
+            "static_route_complexity": "stage2_v5_2_static_route_complexity.2",
+        },
         "route_source_hash": _canonical_hash(
             token_frame[["route_track", "route_source", "route_product_version"]]
             .drop_duplicates()

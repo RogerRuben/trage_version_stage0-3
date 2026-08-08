@@ -23,6 +23,22 @@ one preselected fallback, or unavailable.
 - Static route-complexity fields, preserving NA where upstream fields do not exist.
 - Micro-condition coverage, Train-only support, low-support share, and unseen-edge share.
 - Prediction source, model ID/hash, transfer-model version, and feature cutoff time.
+- `service_time_complete_flag` only when route pace-distance coverage reaches the
+  frozen near-one threshold (`0.999`). Lower but admissible coverage is explicitly
+  `partial_coverage_estimate`; it is never presented as complete service time.
+
+The machine-readable allow mask is `STAGE3_ALLOWED_FIELDS` in
+`stage2.v5_2.contracts`. Product schemas are independently namespaced as
+`stage2_v5_2_micro_condition_tokens.2`,
+`stage2_v5_2_original_route_micro_conditions.2`, and
+`stage2_v5_2_static_route_complexity.2`.
+
+## Evaluation-only fields
+
+Target-availability flags, observed target values, truth, error, and absolute
+error fields may exist in evaluation artifacts. They are listed by
+`STAGE3_EVALUATION_ONLY_FIELDS` and must be removed before a Stage 3 serving or
+assignment product is written.
 
 ## Forbidden inputs
 

@@ -13,7 +13,7 @@ from torch import nn
 from stage2.v5.models.rc_mstnet_v5 import RCMSTNetV5, sinusoidal_position_encoding
 
 from ..contracts import Stage2V52ContractError
-from ..feature_binding import V51FeatureSchemaBinding, validate_binding_against_model
+from ..feature_binding import V51FeatureSchemaBinding, V51SourceModelBinding, validate_binding_against_model
 from ..support_transfer import SupportAwareEdgeRepresentation
 from ..temporal_adapter import TemporalAdapter, stack_temporal_features
 
@@ -85,10 +85,13 @@ class RCMSTNetTransfer(nn.Module):
         self,
         checkpoint_path: str | Path,
         *,
-        source_model_id: str,
-        source_feature_artifact_path: str | Path,
+        source_binding: V51SourceModelBinding,
     ) -> dict[str, Any]:
         checkpoint_file = Path(checkpoint_path)
+        if _sha256(checkpoint_file) != source_binding.source_checkpoint_sha256:
+            raise Stage2V52ContractError("v5.1 checkpoint differs from protocol source binding")
+        if self.binding.feature_artifact_sha256 != source_binding.feature_artifact_sha256:
+            raise Stage2V52ContractError("feature binding differs from protocol source binding")
         saved = torch.load(checkpoint_file, map_location="cpu")
         state = saved.get("model_state_dict", saved)
         self.backbone.load_state_dict(state, strict=True)
@@ -99,15 +102,37 @@ class RCMSTNetTransfer(nn.Module):
         with torch.no_grad():
             self.edge_representation.id_embedding.weight.copy_(legacy_edge.weight)
         self.source_provenance = {
-            "source_checkpoint_path": checkpoint_file.as_posix(),
-            "source_checkpoint_sha256": _sha256(checkpoint_file),
-            "source_model_id": str(source_model_id),
-            "feature_artifact_path": Path(source_feature_artifact_path).as_posix(),
+            **source_binding.to_payload(),
             "feature_schema_hash": self.binding.feature_artifact_sha256,
             "edge_vocab_hash": self.binding.edge_vocabulary_sha256,
             "initialization_policy": "shared_backbone_and_edge_id_from_frozen_v5_1; structure_and_adapter_fresh",
         }
         return dict(self.source_provenance)
+
+    def initialize_spatial_from_m4(self, checkpoint_path: str | Path) -> dict[str, Any]:
+        """Load M4 spatial/shared weights while keeping this M5 adapter fresh."""
+        checkpoint_file = Path(checkpoint_path)
+        saved = torch.load(checkpoint_file, map_location="cpu")
+        state = saved.get("model_state_dict", saved)
+        spatial_state = {
+            name: value for name, value in state.items()
+            if not name.startswith("temporal_adapter.")
+        }
+        result = self.load_state_dict(spatial_state, strict=False)
+        missing = set(result.missing_keys)
+        expected_missing = {
+            name for name in self.state_dict() if name.startswith("temporal_adapter.")
+        }
+        if missing != expected_missing or result.unexpected_keys:
+            raise Stage2V52ContractError(
+                "selected M4 checkpoint is incompatible with the M5 spatial/shared model"
+            )
+        return {
+            "m4_checkpoint_path": checkpoint_file.as_posix(),
+            "m4_checkpoint_sha256": _sha256(checkpoint_file),
+            "m4_loaded_components": "shared_backbone_support_branch_id_branch",
+            "temporal_adapter_initialization": "fresh_after_m4_load",
+        }
 
     def set_shared_backbone_frozen(self, frozen: bool) -> None:
         for parameter in self.backbone.parameters():

@@ -10,6 +10,9 @@ from typing import Any
 from .contracts import Stage2V52ContractError
 
 
+CANONICAL_SHARD_ROLES = ("train", "validation", "calibration", "evaluation", "legacy")
+
+
 def _dates(first: int, last: int) -> tuple[str, ...]:
     return tuple(f"201610{day:02d}" for day in range(first, last + 1))
 
@@ -60,6 +63,22 @@ def get_protocol(protocol_id: str) -> ProtocolSpec:
         return PROTOCOLS[protocol_id]
     except KeyError as exc:
         raise Stage2V52ContractError(f"unknown frozen protocol: {protocol_id}") from exc
+
+
+def protocol_role_dates(protocol_id: str) -> dict[str, tuple[str, ...]]:
+    spec = get_protocol(protocol_id)
+    return {
+        "train": spec.train_dates,
+        "validation": spec.validation_dates,
+        "calibration": spec.calibration_dates,
+        "evaluation": spec.evaluation_dates,
+        "legacy": spec.legacy_benchmark_dates,
+    }
+
+
+def canonical_transfer_root(root: str, protocol_id: str) -> str:
+    normalized = root.rstrip("/\\")
+    return f"{normalized}/protocol={protocol_id}"
 
 
 def validate_protocols() -> None:

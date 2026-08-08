@@ -5,7 +5,11 @@ from __future__ import annotations
 from collections.abc import Iterable, Mapping
 
 
-SCHEMA_VERSION = "stage2_v5_2.1"
+SCHEMA_VERSION = "stage2_v5_2_research_contract.2"
+CONFIG_SCHEMA_VERSION = "stage2_v5_2_config.3"
+TOKEN_SCHEMA_VERSION = "stage2_v5_2_micro_condition_tokens.2"
+ROUTE_SCHEMA_VERSION = "stage2_v5_2_original_route_micro_conditions.2"
+STATIC_SCHEMA_VERSION = "stage2_v5_2_static_route_complexity.2"
 FINAL_READY_STATUS = "READY_FOR_AV_ROUTE_SUITABILITY_STAGE"
 IMPLEMENTATION_ONLY_STATUS = "NOT_READY_IMPLEMENTATION_ONLY"
 
@@ -79,6 +83,7 @@ ROUTE_DYNAMIC_COLUMNS = (
     "acceleration_prediction_coverage", "rts_prediction_coverage",
     "micro_condition_coverage", "low_support_route_share",
     "unseen_edge_route_share", "support_weighted_mean", "unknown_flag",
+    "service_time_complete_flag", "service_time_status",
 )
 
 STATIC_COMPLEXITY_COLUMNS = (
@@ -109,6 +114,17 @@ FORBIDDEN_STAGE3_FIELDS = frozenset(
 FORBIDDEN_STAGE3_CONCEPTS = frozenset(
     {"route_decision_variable", "path_planning", "fallback_route_search", "hv_av_assignment"}
 )
+
+STAGE3_ALLOWED_FIELDS = frozenset({
+    *TOKEN_IDENTITY_COLUMNS, *TOKEN_PREDICTION_COLUMNS, *TOKEN_SUPPORT_COLUMNS,
+    *TOKEN_PROVENANCE_COLUMNS, *ROUTE_DYNAMIC_COLUMNS, *STATIC_COMPLEXITY_COLUMNS,
+    "split", "date", "route_identity", "static_field_status",
+})
+STAGE3_EVALUATION_ONLY_FIELDS = frozenset({
+    *TOKEN_AVAILABILITY_COLUMNS, "crawl_time_share", "stop_time_share",
+    "speed_cv_bounded", "acceleration_rms_bounded", "rts_raw", "pace_sec_per_m",
+    "target", "truth", "error", "absolute_error",
+})
 
 RESEARCH_CONTRACT = {
     "schema_version": SCHEMA_VERSION,
@@ -154,3 +170,13 @@ def validate_research_contract(payload: Mapping[str, object]) -> None:
         raise Stage2V52ContractError("travel time cannot be the only formal Stage 2 target")
     if payload.get("hv_route_policy") != "original_route_only":
         raise Stage2V52ContractError("HV must always retain the original route")
+
+
+def validate_stage3_fields(columns: Iterable[str]) -> dict[str, list[str]]:
+    observed = set(columns)
+    forbidden = sorted(observed & FORBIDDEN_STAGE3_FIELDS)
+    evaluation_only = sorted(observed & STAGE3_EVALUATION_ONLY_FIELDS)
+    unknown = sorted(observed - STAGE3_ALLOWED_FIELDS - STAGE3_EVALUATION_ONLY_FIELDS)
+    if forbidden:
+        raise Stage2V52ContractError(f"Stage 3 product contains forbidden fields: {forbidden}")
+    return {"evaluation_only": evaluation_only, "unknown": unknown}

@@ -27,7 +27,9 @@ def _frame() -> pd.DataFrame:
 
 def test_internal_route_sort_scattered_back_to_explicit_row_id_order() -> None:
     frame = _frame()
-    artifact = fit_static_structure_artifact([frame], fit_dates=("20161009",))
+    artifact = fit_static_structure_artifact(
+        [frame], protocol_id="fixture", protocol_train_dates=("20161009",)
+    )
     features, names, row_id = build_static_structure_features(frame, artifact)
     major = names.index("road_class=major")
     minor = names.index("road_class=minor")

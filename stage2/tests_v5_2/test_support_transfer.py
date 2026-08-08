@@ -42,7 +42,19 @@ def test_tau_selection_is_limited_to_train_quantile_candidates() -> None:
         float(value): {target: float(index + 1) for target in targets}
         for index, value in enumerate(candidates)
     }
-    selection = select_tau_once(scores, {target: 1.0 for target in targets}, artifact)
+    metrics = {
+        "schema_version": "stage2_v5_2_tau_evaluation.2", "status": "PASS",
+        "protocol_id": "transfer_tuning", "protocol_hash": "p" * 64,
+        "train_dates": [f"201610{day:02d}" for day in range(9, 19)],
+        "validation_dates": ["20161019", "20161020"],
+        "support_artifact_embedded_sha256": artifact["artifact_sha256"],
+        "support_artifact_sha256": "s" * 64, "feature_artifact_sha256": "f" * 64,
+        "m1_source_checkpoint_sha256": "a" * 64, "m1_checkpoint_sha256": "b" * 64,
+        "m1_evaluation_manifest_sha256": "c" * 64, "evaluation_code_sha256": "d" * 64,
+        "evaluation_schema": "fixture", "m1_core_mae": {target: 1.0 for target in targets},
+        "m4_candidates": {str(tau): {"core_mae": score} for tau, score in scores.items()},
+    }
+    selection = select_tau_once(metrics, artifact)
     assert selection["selected_tau"] in candidates
     assert selection["rolling_reselection_allowed"] is False
 
@@ -73,7 +85,9 @@ def test_static_structure_encoder_uses_train_vocabulary_for_unseen_category() ->
     })
     evaluation = train.copy()
     evaluation["canonical_highway"] = "unseen_class"
-    artifact = fit_static_structure_artifact([train], fit_dates=["20161009"])
+    artifact = fit_static_structure_artifact(
+        [train], protocol_id="fixture", protocol_train_dates=["20161009"]
+    )
     features, names, row_id = build_static_structure_features(evaluation, artifact)
     unseen_index = names.index("canonical_highway=__UNSEEN_OR_MISSING__")
     assert features[0, unseen_index] == 1.0

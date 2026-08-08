@@ -1,6 +1,6 @@
 {
-  "schema_version": "stage2_v5_2.1",
-  "status": "FROZEN_PHASE_A",
+  "schema_version": "stage2_v5_2_research_contract.2",
+  "status": "FROZEN_PHASE_A_2_STATIC_REVIEW",
   "formal_micro_targets": ["crawl", "stop", "speed_cv", "acceleration_rms", "rts"],
   "common_operational_targets": ["pace_p50", "travel_time_p50"],
   "travel_time_is_only_formal_target": false,

@@ -2,7 +2,7 @@
 
 ## Status and scope
 
-This commit completes Phase A.1 implementation only. No tests, bucket PoC,
+This commit completes Phase A.2 static-review implementation only. No tests, bucket PoC,
 model training, development evaluation, rolling backtest, legacy benchmark, or
 performance benchmark has been run. Stage 2 therefore remains
 `NOT_READY_IMPLEMENTATION_ONLY`.
@@ -28,6 +28,13 @@ untouched confirmatory test.
 
 ## Products and provenance
 
+Every formal v5.2 run first binds the exact v5.1 feature artifact, resolved
+source config, model manifest, and checkpoint to frozen protocol dates and the
+model constructor. Transfer tensors are an atomic product under
+`protocol=<id>/split=<role>/date=<day>`; their manifests bind Stage 1, route,
+feature, support, static, temporal-audit, and shard hashes. No manual leakage
+count is accepted.
+
 `micro_condition_tokens` contains one row per physical traversal with five micro
 predictions, P50 pace/time, target-availability masks, Train-only support,
 model/time provenance, and frozen original-route provenance. Planned, fallback,
@@ -40,6 +47,8 @@ frozen Train CDF. Consecutive exposure respects `route_sequence`. Coverage
 denominators use full physical route distance. Below minimum pace distance
 coverage, `travel_time_p50_s` is NA while `partial_travel_time_p50_s` remains
 diagnostic. Every micro dimension has its own distance coverage field.
+`service_time_complete_flag` requires at least 0.999 pace-distance coverage;
+admissible lower coverage is labeled `partial_coverage_estimate`.
 
 RTS is reported with time and distance weighting; time weighting is the formal
 downstream default. No composite grade is created.
@@ -74,6 +83,9 @@ candidates are Train support P25/P50/P75. Tau is selected once using Train
 20161009–20161018 and Validation 20161019–20161020 by macro normalized MAE over
 crawl, expected stop share, speed CV, and acceleration RMS; ties prefer smaller
 tau. Later dates, pace, and RTS cannot select tau.
+Tau metrics come only from the formal checkpoint evaluator and bind M1 plus all
+three M4 checkpoint/evaluation hashes, unique-traversal counts, feature/support
+artifacts, metric definitions, and evaluator code.
 
 ## Temporal transfer
 
@@ -91,6 +103,11 @@ prohibited.
 
 ## Adoption and checkpointing
 
+Overlapping sequence windows are merged on `(date,order_id,traversal_id)` before
+any metric. Copies must agree on support, validity, and truth. Empty overall,
+low-support, unseen, or pace groups are `INSUFFICIENT_SUPPORT`, never zero or a
+passing metric.
+
 S3 is adopted only if at least three of four core low-support targets improve,
 their mean relative improvement exceeds 2%, no overall core target degrades over
 2%, and unseen performance is no worse than structure-only. Otherwise v5.1 is
@@ -105,10 +122,18 @@ Checkpoint selection first requires finite outputs, zero temporal leakage, and
 the 2% pace guard. It then minimizes validation macro normalized MAE over the
 four core targets, using low-support core MAE and pace P50 only as secondary keys.
 RTS and route P90/P95/CVaR do not select early rolling checkpoints.
+M5 starts from the selected M4 spatial/shared state only after a formal M4
+adoption PASS; its temporal adapter remains freshly initialized.
+
+M0 is built from a canonical Train-only matrix artifact recording feature
+names/order, Train-median missing policy, source/matrix hashes, forbidden-input
+audit, and exact target masks. Raw and [0,1] comparison-clipped predictions are
+both preserved.
 
 ## Phase gates
 
-Phase B0 is one fixed Train bucket and one fixed Validation bucket. Phase B1 is
+Phase B0 begins with a Parquet-metadata-only schema audit, then one fixed Train
+bucket and one fixed Validation bucket. Phase B1 is
 the frozen transfer-tuning protocol. Phase C is one development day. Full rolling
 is allowed only after product, leakage, scientific, and real-kernel performance
 gates pass. This implementation-only commit authorizes none of those runs.

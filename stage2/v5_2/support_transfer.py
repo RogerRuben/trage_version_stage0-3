@@ -157,11 +157,28 @@ def lookup_train_support(edge_ids: Iterable[object], artifact: Mapping[str, Any]
 
 
 def select_tau_once(
-    candidate_mae_by_target: Mapping[float, Mapping[str, float]],
-    v5_1_mae_by_target: Mapping[str, float],
+    metrics_manifest: Mapping[str, Any],
     artifact: Mapping[str, Any],
 ) -> dict[str, Any]:
-    """Select tau by frozen four-target macro normalized validation MAE."""
+    """Select tau only from the formal, hash-bound transfer-tuning evaluator output."""
+    if metrics_manifest.get("schema_version") != "stage2_v5_2_tau_evaluation.2":
+        raise Stage2V52ContractError("tau selection requires the formal evaluator metrics manifest")
+    if metrics_manifest.get("status") != "PASS" or metrics_manifest.get("protocol_id") != "transfer_tuning":
+        raise Stage2V52ContractError("tau metrics are not a successful transfer-tuning evaluation")
+    if tuple(metrics_manifest.get("train_dates", ())) != tuple(f"201610{day:02d}" for day in range(9, 19)):
+        raise Stage2V52ContractError("tau metrics Train dates are not frozen 09-18")
+    if tuple(metrics_manifest.get("validation_dates", ())) != ("20161019", "20161020"):
+        raise Stage2V52ContractError("tau metrics validation dates are not frozen 19-20")
+    if metrics_manifest.get("support_artifact_embedded_sha256") != artifact.get("artifact_sha256"):
+        raise Stage2V52ContractError("tau metrics are not bound to this support artifact")
+    candidates_payload = metrics_manifest.get("m4_candidates", {})
+    if not isinstance(candidates_payload, Mapping):
+        raise Stage2V52ContractError("tau metrics have no M4 candidate mapping")
+    candidate_mae_by_target = {
+        float(tau): dict(payload.get("core_mae", {}))
+        for tau, payload in candidates_payload.items()
+    }
+    v5_1_mae_by_target = metrics_manifest.get("m1_core_mae", {})
     allowed = tuple(float(value) for value in artifact.get("tau_candidates", ()))
     if not allowed or set(map(float, candidate_mae_by_target)) != set(allowed):
         raise Stage2V52ContractError("tau scores must cover exactly Train P25/P50/P75 candidates")
@@ -195,6 +212,14 @@ def select_tau_once(
         "scores": {str(value): scores[value] for value in allowed},
         "selected_tau": float(selected),
         "tie_break": "smaller_tau",
+        "metrics_manifest_schema_version": metrics_manifest["schema_version"],
+        "metrics_manifest_provenance": {
+            key: metrics_manifest[key] for key in (
+                "protocol_hash", "m1_source_checkpoint_sha256", "m1_checkpoint_sha256",
+                "m1_evaluation_manifest_sha256", "support_artifact_sha256",
+                "feature_artifact_sha256", "evaluation_code_sha256", "evaluation_schema",
+            )
+        },
     }
 
 

@@ -1,7 +1,7 @@
 {
   "schema_version": "stage2_v5_2_final_verification.1",
   "status": "NOT_RUN",
-  "phase": "A_IMPLEMENTATION_ONLY",
+  "phase": "A_2_STATIC_REVIEW_IMPLEMENTATION_ONLY",
   "upstream_identity": "PENDING_RUNTIME_VERIFICATION",
   "temporal_leakage_count": null,
   "performance_gate": "NOT_RUN",

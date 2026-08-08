@@ -24,37 +24,67 @@ STRUCTURE_REQUIRED_FIELDS = (
 class StaticStructureArtifact:
     vocabularies: dict[str, tuple[str, ...]]
     fit_dates: tuple[str, ...]
+    protocol_id: str
 
     def to_payload(self) -> dict[str, Any]:
-        return {
+        payload = {
             "schema_version": "stage2_v5_2_static_structure.1",
             "fit_scope": "train_only",
             "fit_dates": list(self.fit_dates),
+            "fit_dates_observed": list(self.fit_dates),
+            "protocol_id": self.protocol_id,
             "vocabularies": {name: list(values) for name, values in self.vocabularies.items()},
             "label_fields_used": [],
             "evaluation_rows_used": 0,
         }
+        payload["feature_names"] = list(static_structure_feature_names(payload))
+        payload["feature_count"] = len(payload["feature_names"])
+        return payload
 
 
 def fit_static_structure_artifact(
     train_frames: Iterable[pd.DataFrame],
     *,
-    fit_dates: Sequence[str],
+    protocol_id: str,
+    protocol_train_dates: Sequence[str],
 ) -> StaticStructureArtifact:
     values = {name: set() for name in CATEGORICAL_STATIC_FIELDS}
     row_count = 0
+    observed_dates: set[str] = set()
     for frame in train_frames:  # Bounded Train-partition streaming; no frame accumulation.
         require_columns(frame.columns, STRUCTURE_REQUIRED_FIELDS, product="Train static structure")
+        if not frame["split"].astype(str).eq("train").all():
+            raise Stage2V52ContractError("static structure artifact contains non-Train rows")
+        observed_dates.update(frame["date"].astype(str).unique())
         validate_model_inputs(column for column in frame.columns if column in CATEGORICAL_STATIC_FIELDS + BOOLEAN_STATIC_FIELDS)
         row_count += len(frame)
         for name in CATEGORICAL_STATIC_FIELDS:  # Fixed three-field loop.
             values[name].update(frame[name].astype("string").dropna().astype(str).unique())
     if row_count == 0:
         raise Stage2V52ContractError("cannot fit static structure on empty Train data")
+    expected_dates = tuple(str(value) for value in protocol_train_dates)
+    if tuple(sorted(observed_dates)) != tuple(sorted(expected_dates)):
+        raise Stage2V52ContractError("static structure dates differ from protocol Train dates")
     return StaticStructureArtifact(
         vocabularies={name: tuple(sorted(entries)) for name, entries in values.items()},
-        fit_dates=tuple(str(value) for value in fit_dates),
+        fit_dates=expected_dates,
+        protocol_id=str(protocol_id),
     )
+
+
+def static_structure_feature_names(artifact: StaticStructureArtifact | Mapping[str, Any]) -> tuple[str, ...]:
+    payload = artifact.to_payload() if isinstance(artifact, StaticStructureArtifact) else artifact
+    vocabularies = payload.get("vocabularies", {})
+    names: list[str] = []
+    for field in CATEGORICAL_STATIC_FIELDS:
+        vocabulary = tuple(str(value) for value in vocabularies.get(field, ()))
+        names.extend(f"{field}={value}" for value in ("__UNSEEN_OR_MISSING__", *vocabulary))
+    road_vocabulary = tuple(str(value) for value in vocabularies.get("road_class", ()))
+    for field in ("upstream_road_class", "downstream_road_class"):
+        names.extend(f"{field}={value}" for value in ("__UNSEEN_OR_MISSING__", *road_vocabulary))
+    for field in BOOLEAN_STATIC_FIELDS:
+        names.extend((field, f"{field}_available"))
+    return tuple(names)
 
 
 def _one_hot(values: pd.Series, vocabulary: Sequence[str]) -> np.ndarray:
@@ -86,9 +116,10 @@ def build_static_structure_features(
         arrays.append(encoded)
         names.extend(f"{field}={value}" for value in ("__UNSEEN_OR_MISSING__", *vocabulary))
     road_vocabulary = tuple(str(value) for value in vocabularies.get("road_class", ()))
-    order = working["order_id"].astype(str)
-    upstream = working["road_class"].shift(1).where(order.eq(order.shift(1)))
-    downstream = working["road_class"].shift(-1).where(order.eq(order.shift(-1)))
+    route_key = ["split", "date", "order_id"]
+    route_group = working.groupby(route_key, sort=False, observed=True, dropna=False)["road_class"]
+    upstream = route_group.shift(1)
+    downstream = route_group.shift(-1)
     for field, values in (("upstream_road_class", upstream), ("downstream_road_class", downstream)):
         arrays.append(_one_hot(values, road_vocabulary))
         names.extend(f"{field}={value}" for value in ("__UNSEEN_OR_MISSING__", *road_vocabulary))
@@ -98,6 +129,12 @@ def build_static_structure_features(
         arrays.append(values.notna().to_numpy(np.float32)[:, None])
         names.extend((field, f"{field}_available"))
     sorted_features = np.column_stack(arrays).astype(np.float32, copy=False)
+    expected_names = static_structure_feature_names(payload)
+    stored_names = tuple(str(value) for value in payload.get("feature_names", expected_names))
+    if stored_names != expected_names or int(payload.get("feature_count", len(expected_names))) != len(expected_names):
+        raise Stage2V52ContractError("static structure artifact feature schema is inconsistent")
+    if tuple(names) != expected_names:
+        raise Stage2V52ContractError("static structure feature schema drifted from artifact")
     original_row_id = frame["row_id"].to_numpy(copy=True)
     original_index = pd.Index(original_row_id)
     destination = original_index.get_indexer(working["row_id"])

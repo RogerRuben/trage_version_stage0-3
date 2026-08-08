@@ -1,47 +1,77 @@
-# Stage 2 v5.2 pre-experiment audit repair report
+# Stage 2 v5.2 Phase A.2 static-review repair report
 
 Status: `NOT_READY_IMPLEMENTATION_ONLY`.
 
-- Branch: `codex/stage2-v5-micro-transfer`
-- Base commit: `ed10efc5269c128db65248424d6378e22722622f`
-- Fix commit: `fdf6b9eeb91bff1d5dc0af33aac68826c477f4ac`
+This change implements the Phase A.2 static-review taskbook. No test,
+`compileall`, training, inference, development, rolling, legacy, benchmark, or
+data-production workload was run. Phase B remains unauthorized until the user
+explicitly authorizes it.
 
-This change implements the Phase A.1 repair specification without running any
-test, compile, model, data, development, rolling, legacy, or benchmark workload.
-The code-level checklist is implemented but not experimentally validated, and
-Phase B remains unauthorized.
+## P0 code review
 
-## P0 implementation checklist
+1. PASS (code): categorical order comes from frozen v5 `CATEGORY_NAMES`; JSON
+   object order is ignored and all checkpoint embedding sizes are checked.
+2. PASS (code): `V51SourceModelBinding` binds each protocol to exact Train and
+   validation dates, resolved source config, feature vocabulary/order, model
+   manifest, checkpoint, model parameters, distribution, and history mode.
+3. PASS (code): `build-transfer-shards` writes the canonical
+   `protocol/split/date` layout with atomic NPZ/JSON files and content hashes.
+4. PASS (code): tensor alignment uses `(split,date,order_id,traversal_id)` and
+   every builder call accepts exactly one split/date partition.
+5. PASS (code): evaluator merges overlap copies by unique physical traversal,
+   validates target/support consistency, records raw/unique/duplicate counts,
+   and only then computes metrics.
+6. PASS (code): empty overall, low-support, unseen, or pace groups produce
+   `INSUFFICIENT_SUPPORT`; selection and adoption fail closed.
+7. PASS (code): temporal leakage is calculated from hash-bound transfer shards;
+   no CLI leakage-count override remains.
+8. PASS (code): tau selection accepts only formal evaluator manifests bound to
+   protocol dates, M1/M4 checkpoint/evaluation hashes, artifacts, counts,
+   definitions, and evaluation code.
+9. PASS (code): non-M1 models require a formal same-protocol/source M1 metric
+   manifest.
+10. PASS (code): M5 requires a passing formal M4 adoption manifest and loads
+    selected M4 shared/spatial weights while leaving the temporal adapter fresh.
+11. PASS (code): `evaluate-model` performs checkpoint inference, unique-
+    traversal evaluation, prediction Parquet output, and provenance manifest
+    output.
+12. PASS (code): `verify-final` accepts exactly the hard-coded final gate set;
+    missing and extra gates fail.
+13. PASS (code): release generation reads the real Stage 1 `release_tag` schema
+    and binds source config/manifest, tensors, training, checkpoint, evaluation,
+    artifacts, and products by SHA-256.
 
-1. PASS (code): edge transfer replaces the bound categorical edge representation.
-2. PASS (code): M1 is frozen v5.1; M2–M5 load the v5.1 backbone and edge-ID table.
-3. PASS (code): category order and reserved indices bind to frozen v5 preprocessing.
-4. PASS (code): support validates actual Train split/dates and unique traversals.
-5. PASS (code): CDF validates Train split, protocol, dates, model, and source.
-6. PASS (code): `feature_cutoff_time < decision_time` is fail-closed and audited.
-7. PASS (code): only frozen original/revealed route provenance is accepted.
-8. PASS (code): pace and five dimension coverages use full route distance.
-9. PASS (code): static features scatter back by explicit unique integer `row_id`.
-10. PASS (code): temporal adapter uses the frozen shared-hidden insertion point.
-11. PASS (code): online updates require completed, label-available prior orders.
-12. PASS (code): RTS is a secondary frozen-reference diagnostic.
-13. PASS (code): tau tuning is Train 09–18 / Validation 19–20.
-14. PASS (code): tau uses four-core macro normalized MAE and smaller-tau tie-break.
-15. PASS (code): checkpoint selection is micro-first with finite/leakage/pace gates.
-16. PASS (code): protocol-bound preflight/artifact/train/evaluate/product/verify CLI exists.
+## P1 code review
 
-## P1 implementation checklist
-
-- M0 is a multi-head micro tree baseline, including two-part stop prediction.
-- A bounded schema audit records available fields and explicit NA fields.
-- Runtime manifests bind source, config, upstream, artifact, protocol, and output hashes.
-- Performance code calls production kernels and samples peak process RSS.
-- All ten requested regression/integration test modules are present but were not run.
+- PASS (code): support, static, CDF, and M0 artifacts have type-specific
+  Train-only/evaluation-row rules.
+- PASS (code): static upstream/downstream neighbors use the full
+  `(split,date,order_id)` route key and the fitted artifact validates its own
+  feature schema.
+- PASS (code): the canonical M0 builder freezes feature names/order, Train-only
+  median fill, source hashes, forbidden-input audit, targets/masks, and matrix
+  hash; M0 preserves raw and clipped predictions.
+- PASS (code): thresholds, seeds, loss weights, shard dimensions, benchmark
+  sizes, warmups, repetitions, and coverage rules come from frozen config rather
+  than CLI overrides.
+- PASS (code): benchmark code uses inference mode, two warmups, three repeats,
+  median timing, CPU and available GPU, full transfer forward, and baseline /
+  peak / delta RSS.
+- PASS (code): Phase B0 has a metadata-only upstream schema audit command; it was
+  implemented but not run.
+- PASS (code): Stage 3 allowed and evaluation-only field masks are separate and
+  documented.
+- PASS (code): complete service time requires frozen `0.999` route coverage;
+  partial estimates remain explicitly marked.
+- PASS (code): NumPy Generator, Torch, and CUDA seeds plus policies are recorded.
+- PASS (code): raw RTS/LCS masks are independent of tail supervision, while
+  early-phase RTS and tail loss weights are frozen to zero.
+- PASS (code): config, research contract, token, route, static, training,
+  evaluation, release, and transfer products use distinct schema namespaces.
 
 ## Execution decision
 
 Phase B allowed now: **NO**.
 
-The user prohibited experiments and test execution for this change. A later
-authorized verification turn must run tests and Phase B0/B1 checks before any
-development or rolling experiment. Full rolling remains forbidden.
+The next action, only after explicit authorization, is static/unit verification
+and the Phase B0 metadata/schema audit. No 20161028-30 production is required.
