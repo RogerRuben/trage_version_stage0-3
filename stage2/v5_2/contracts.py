@@ -125,6 +125,13 @@ STAGE3_EVALUATION_ONLY_FIELDS = frozenset({
     "speed_cv_bounded", "acceleration_rms_bounded", "rts_raw", "pace_sec_per_m",
     "target", "truth", "error", "absolute_error",
 })
+STAGE3_DIAGNOSTIC_ONLY_FIELDS = frozenset({
+    "pred_rts_raw", "rts_raw", "rts_target_available",
+    "rts_weighted_mean", "rts_weighted_p90", "rts_high_exposure_share",
+    "rts_distance_weighted_mean", "rts_distance_weighted_p90",
+    "rts_prediction_coverage",
+})
+STAGE3_ALLOWED_FIELDS = STAGE3_ALLOWED_FIELDS - STAGE3_DIAGNOSTIC_ONLY_FIELDS
 
 RESEARCH_CONTRACT = {
     "schema_version": SCHEMA_VERSION,
@@ -176,7 +183,21 @@ def validate_stage3_fields(columns: Iterable[str]) -> dict[str, list[str]]:
     observed = set(columns)
     forbidden = sorted(observed & FORBIDDEN_STAGE3_FIELDS)
     evaluation_only = sorted(observed & STAGE3_EVALUATION_ONLY_FIELDS)
-    unknown = sorted(observed - STAGE3_ALLOWED_FIELDS - STAGE3_EVALUATION_ONLY_FIELDS)
+    diagnostic_only = sorted(observed & STAGE3_DIAGNOSTIC_ONLY_FIELDS)
+    unknown = sorted(
+        observed - STAGE3_ALLOWED_FIELDS - STAGE3_EVALUATION_ONLY_FIELDS
+        - STAGE3_DIAGNOSTIC_ONLY_FIELDS
+    )
     if forbidden:
         raise Stage2V52ContractError(f"Stage 3 product contains forbidden fields: {forbidden}")
-    return {"evaluation_only": evaluation_only, "unknown": unknown}
+    if evaluation_only:
+        raise Stage2V52ContractError(
+            f"Stage 3 serving product contains evaluation-only fields: {evaluation_only}"
+        )
+    if diagnostic_only:
+        raise Stage2V52ContractError(
+            f"Stage 3 serving product contains diagnostic-only RTS fields: {diagnostic_only}"
+        )
+    if unknown:
+        raise Stage2V52ContractError(f"Stage 3 serving product contains unknown fields: {unknown}")
+    return {"evaluation_only": [], "diagnostic_only": [], "unknown": []}

@@ -13,7 +13,8 @@ def test_rts_cannot_enter_early_rolling_adoption_targets() -> None:
         "protocol_id": "fold_1", "protocol_hash": get_protocol("fold_1").digest,
         "role": "evaluation", "model_id": "M4",
         "evaluation_dates": ["20161022", "20161023"],
-        "rts_role": "secondary_frozen_reference_target",
+        "rts_role": "legacy_descriptive_diagnostic_not_stage3_deployable",
+        "rts_stage3_deployable": False,
         "adoption_targets": ["crawl", "stop", "speed_cv", "acceleration_rms", "rts"],
     }
     for key in (

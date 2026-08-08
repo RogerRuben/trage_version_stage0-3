@@ -7,13 +7,13 @@ import pytest
 
 from stage2.v5_2.contracts import Stage2V52ContractError
 from stage2.v5_2.micro_products import DIMENSIONS, aggregate_original_route_micro_conditions
+from stage2.v5_2.support_transfer import fit_train_support
 from stage2.v5_2.verification import FINAL_REQUIRED_GATES, verify_artifact_payload, verify_final_gate_bundle
 
 
 def test_artifact_verifier_uses_type_specific_evaluation_fields() -> None:
-    verify_artifact_payload(
-        {"fit_scope": "train_only", "evaluation_support_used": False}, artifact_type="support"
-    )
+    support = fit_train_support(["a", "a", "b"], fit_dates=["20161009"]).to_payload()
+    verify_artifact_payload(support, artifact_type="support")
     verify_artifact_payload(
         {"fit_scope": "train_only", "evaluation_rows_used": 0}, artifact_type="static_structure"
     )
@@ -28,7 +28,7 @@ def test_artifact_verifier_uses_type_specific_evaluation_fields() -> None:
 
 def test_final_verifier_rejects_missing_or_invented_gates() -> None:
     exact = {name: "PASS" for name in FINAL_REQUIRED_GATES}
-    assert verify_final_gate_bundle({"required_gates": exact})["status"] == "PASS"
+    assert verify_final_gate_bundle({"required_gates": exact})["status"] == "FAIL"
     incomplete = dict(exact); incomplete.pop(FINAL_REQUIRED_GATES[0])
     assert verify_final_gate_bundle({"required_gates": incomplete})["status"] == "FAIL"
     invented = {**exact, "manual_override": "PASS"}

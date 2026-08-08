@@ -140,6 +140,13 @@ class RCMSTNetTransfer(nn.Module):
         for parameter in self.edge_representation.id_embedding.parameters():
             parameter.requires_grad = not frozen
 
+    def set_temporal_adapter_only_trainable(self) -> None:
+        """Freeze the complete selected M4 model for a clean M5 marginal ablation."""
+        for parameter in self.parameters():
+            parameter.requires_grad = False
+        for parameter in self.temporal_adapter.parameters():
+            parameter.requires_grad = True
+
     def optimizer_parameter_groups(
         self,
         *,

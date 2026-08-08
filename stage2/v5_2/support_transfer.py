@@ -53,6 +53,7 @@ class TrainSupportArtifact:
     def to_payload(self) -> dict[str, Any]:
         payload = {
             "schema_version": "stage2_v5_2_train_support.1",
+            "fit_scope": "train_only",
             "counts": self.counts,
             "positive_quantiles": self.positive_quantiles,
             "tau_candidates": list(self.tau_candidates),
@@ -138,7 +139,7 @@ def fit_train_support_frame(
 
 
 def lookup_train_support(edge_ids: Iterable[object], artifact: Mapping[str, Any]) -> tuple[np.ndarray, np.ndarray]:
-    if artifact.get("evaluation_support_used") is not False:
+    if artifact.get("fit_scope") != "train_only" or artifact.get("evaluation_support_used") is not False:
         raise Stage2V52ContractError("support artifact does not prove Train-only fitting")
     counts = artifact.get("counts")
     if not isinstance(counts, Mapping):

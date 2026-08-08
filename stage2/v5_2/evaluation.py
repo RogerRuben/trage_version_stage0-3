@@ -14,7 +14,10 @@ import pandas as pd
 
 from .contracts import CORE_TRANSFER_TARGETS, Stage2V52ContractError
 from .feature_binding import sha256_path
-from .micro_metrics import decide_spatial_transfer, decide_temporal_adapter, pace_stability
+from .micro_metrics import (
+    decide_spatial_transfer, decide_temporal_adapter, pace_stability,
+    relative_error_improvement,
+)
 from .protocols import get_protocol, protocol_role_dates
 from .training import (
     CORE_METRIC_DEFINITION,
@@ -31,6 +34,7 @@ from .training import (
 EVALUATION_SCHEMA_VERSION = "stage2_v5_2_evaluation.2"
 TAU_METRICS_SCHEMA_VERSION = "stage2_v5_2_tau_evaluation.2"
 ADOPTION_SCHEMA_VERSION = "stage2_v5_2_adoption.2"
+ROLLING_SPATIAL_ADOPTION_SCHEMA_VERSION = "stage2_v5_2_rolling_spatial_adoption.1"
 
 
 def _json(path: str | Path) -> dict[str, Any]:
@@ -162,7 +166,8 @@ def evaluate_checkpoint(
         "metrics_by_support": metrics["groups"],
         "metrics_by_date": by_date,
         "pace_guard_input": metrics["pace_p50"],
-        "rts_role": "secondary_frozen_reference_target",
+        "rts_role": "legacy_descriptive_diagnostic_not_stage3_deployable",
+        "rts_stage3_deployable": False,
         "adoption_targets": list(CORE_TRANSFER_TARGETS),
         "prediction_path": prediction_path.as_posix(),
         "prediction_sha256": sha256_path(prediction_path),
@@ -193,8 +198,11 @@ def validate_evaluation_payload(payload: Mapping[str, Any], *, protocol_id: str)
     expected_dates = protocol_role_dates(protocol_id)[role]
     if tuple(payload.get("evaluation_dates", ())) != expected_dates:
         raise Stage2V52ContractError("evaluation dates differ from frozen protocol role")
-    if payload.get("rts_role") != "secondary_frozen_reference_target":
-        raise Stage2V52ContractError("RTS must remain secondary under frozen Stage 1 reference")
+    if (
+        payload.get("rts_role") != "legacy_descriptive_diagnostic_not_stage3_deployable"
+        or payload.get("rts_stage3_deployable") is not False
+    ):
+        raise Stage2V52ContractError("RTS must remain a non-deployable frozen-reference diagnostic")
     if set(payload.get("adoption_targets", ())) != set(CORE_TRANSFER_TARGETS):
         raise Stage2V52ContractError("adoption target set must exclude RTS and pace")
     for key in (
@@ -276,20 +284,33 @@ def evaluate_spatial_adoption(
         validate_evaluation_payload(payload, protocol_id=str(m4["protocol_id"]))
     if (m1.get("model_id"), m2.get("model_id"), m4.get("model_id")) != ("M1", "M2", "M4"):
         raise Stage2V52ContractError("spatial adoption requires formal M1/M2/M4 evaluations")
+    paired_fields = (
+        "protocol_id", "protocol_hash", "role", "evaluation_dates",
+        "tensor_manifest_sha256", "feature_artifact_sha256", "support_artifact_sha256",
+        "static_artifact_sha256", "source_checkpoint_sha256",
+    )
+    mismatches = [field for field in paired_fields if m1.get(field) != m2.get(field) or m1.get(field) != m4.get(field)]
+    if mismatches:
+        raise Stage2V52ContractError(f"spatial adoption is not a paired comparison: {mismatches}")
     for payload in (m1, m2, m4):
         for field in ("core_mae", "low_support_core_mae", "unseen_core_mae"):
             if any(payload.get(field, {}).get(target) is None for target in CORE_TRANSFER_TARGETS):
                 raise Stage2V52ContractError("spatial adoption has an insufficient-support metric group")
     low = {
-        target: (float(m1["low_support_core_mae"][target]) - float(m4["low_support_core_mae"][target]))
-        / float(m1["low_support_core_mae"][target])
+        target: relative_error_improvement(
+            float(m1["low_support_core_mae"][target]), float(m4["low_support_core_mae"][target])
+        )
         for target in CORE_TRANSFER_TARGETS
     }
     overall = {
-        target: (float(m1["core_mae"][target]) - float(m4["core_mae"][target]))
-        / float(m1["core_mae"][target])
+        target: relative_error_improvement(
+            float(m1["core_mae"][target]), float(m4["core_mae"][target])
+        )
         for target in CORE_TRANSFER_TARGETS
     }
+    for payload in (m2, m4):
+        if any(not np.isfinite(float(payload["unseen_core_mae"][target])) for target in CORE_TRANSFER_TARGETS):
+            raise Stage2V52ContractError("spatial adoption unseen MAE must be finite")
     result = decide_spatial_transfer(
         low_support_improvement_by_target=low, overall_improvement_by_target=overall,
         unseen_candidate_error=m4["unseen_core_mae"],
@@ -297,11 +318,89 @@ def evaluate_spatial_adoption(
     )
     return {
         "schema_version": ADOPTION_SCHEMA_VERSION,
-        "status": "PASS", "protocol_id": m4["protocol_id"],
+        "status": "PASS", "verification_status": "PASS", "protocol_id": m4["protocol_id"],
+        "role": m4["role"], "evaluation_dates": list(m4["evaluation_dates"]),
         "source_evaluation_hashes": {
             "M1": _canonical_manifest_hash(m1), "M2": _canonical_manifest_hash(m2),
             "M4": _canonical_manifest_hash(m4),
         },
+        **result,
+    }
+
+
+def evaluate_rolling_spatial_adoption(
+    *,
+    m1_evaluations: Sequence[Mapping[str, Any]],
+    m2_evaluations: Sequence[Mapping[str, Any]],
+    m4_evaluations: Sequence[Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Apply the formal M4 adoption gate only after three paired rolling folds."""
+    if not (len(m1_evaluations) == len(m2_evaluations) == len(m4_evaluations) == 3):
+        raise Stage2V52ContractError("rolling spatial adoption requires three M1/M2/M4 folds")
+    by_model = {
+        model: {str(payload.get("protocol_id", "")): payload for payload in values}
+        for model, values in (("M1", m1_evaluations), ("M2", m2_evaluations), ("M4", m4_evaluations))
+    }
+    expected_folds = {"fold_1", "fold_2", "fold_3"}
+    if any(set(values) != expected_folds for values in by_model.values()):
+        raise Stage2V52ContractError("rolling spatial adoption requires exactly fold_1/fold_2/fold_3")
+    values: dict[str, dict[str, list[float]]] = {
+        model: {group: [] for group in ("overall", "low", "unseen")}
+        for model in ("M1", "M2", "M4")
+    }
+    provenance: dict[str, dict[str, str]] = {}
+    evaluation_dates: list[str] = []
+    selected_m4: dict[str, str] = {}
+    for fold in sorted(expected_folds):
+        m1, m2, m4 = (by_model[model][fold] for model in ("M1", "M2", "M4"))
+        single = evaluate_spatial_adoption(m1=m1, m2=m2, m4=m4)
+        if m4.get("role") != "evaluation":
+            raise Stage2V52ContractError("formal rolling spatial adoption requires evaluation role")
+        provenance[fold] = dict(single["source_evaluation_hashes"])
+        selected_m4[fold] = str(m4["checkpoint_sha256"])
+        for date in m4["evaluation_dates"]:
+            if date in evaluation_dates:
+                raise Stage2V52ContractError("rolling spatial evaluation dates overlap")
+            evaluation_dates.append(str(date))
+            for model, payload in (("M1", m1), ("M2", m2), ("M4", m4)):
+                day = payload.get("metrics_by_date", {}).get(date, {}).get("groups", {})
+                for group in ("overall", "low", "unseen"):
+                    for target in CORE_TRANSFER_TARGETS:
+                        mae = day.get(group, {}).get(target, {}).get("mae")
+                        if mae is None or not np.isfinite(float(mae)):
+                            raise Stage2V52ContractError("rolling spatial daily MAE is insufficient")
+                        values[model][group].append((target, float(mae)))
+    if len(evaluation_dates) != 6:
+        raise Stage2V52ContractError("rolling spatial adoption requires six distinct evaluation dates")
+
+    def means(model: str, group: str) -> dict[str, float]:
+        return {
+            target: float(np.mean([value for name, value in values[model][group] if name == target]))
+            for target in CORE_TRANSFER_TARGETS
+        }
+
+    m1_low, m1_overall = means("M1", "low"), means("M1", "overall")
+    m4_low, m4_overall = means("M4", "low"), means("M4", "overall")
+    result = decide_spatial_transfer(
+        low_support_improvement_by_target={
+            target: relative_error_improvement(m1_low[target], m4_low[target])
+            for target in CORE_TRANSFER_TARGETS
+        },
+        overall_improvement_by_target={
+            target: relative_error_improvement(m1_overall[target], m4_overall[target])
+            for target in CORE_TRANSFER_TARGETS
+        },
+        unseen_candidate_error=means("M4", "unseen"),
+        unseen_structure_only_error=means("M2", "unseen"),
+    )
+    return {
+        "schema_version": ROLLING_SPATIAL_ADOPTION_SCHEMA_VERSION,
+        "status": "PASS", "verification_status": "PASS",
+        "protocol_id": "rolling_origin_fold_1_2_3",
+        "decision_scope": "rolling_origin_three_fold_six_dates",
+        "role": "evaluation", "evaluation_dates": sorted(evaluation_dates),
+        "source_evaluation_hashes": provenance,
+        "selected_m4_checkpoint_sha256_by_protocol": selected_m4,
         **result,
     }
 
@@ -343,11 +442,11 @@ def evaluate_temporal_adoption(
             daily[date] = improvements
     if len(daily) != 6:
         raise Stage2V52ContractError("temporal adoption requires exactly six distinct rolling evaluation dates")
-    daily_mean = [float(np.mean(daily[date])) for date in sorted(daily)]
+    daily_mean = {date: float(np.mean(daily[date])) for date in sorted(daily)}
     target_mean = {target: float(np.mean(values)) for target, values in target_values.items()}
     result = decide_temporal_adapter(daily_mean, target_mean)
     return {
-        "schema_version": ADOPTION_SCHEMA_VERSION, "status": "PASS",
+        "schema_version": ADOPTION_SCHEMA_VERSION, "status": "PASS", "verification_status": "PASS",
         "protocol_id": "rolling_origin_fold_1_2_3", "source_evaluation_hashes": provenance,
         "evaluation_dates": sorted(daily), "daily_mean_improvements": daily_mean,
         "target_mean_improvements": target_mean, **result,

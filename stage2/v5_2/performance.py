@@ -34,6 +34,12 @@ PROHIBITED_PATTERNS = (
 )
 
 
+def benchmark_kernel_devices(*, torch_kernel: bool, cuda_available: bool) -> tuple[str, ...]:
+    if not torch_kernel:
+        return ("cpu",)
+    return ("cpu", "cuda") if cuda_available else ("cpu",)
+
+
 class ComplexityScanner(ast.NodeVisitor):
     def __init__(self, path: Path):
         self.path = path
@@ -90,7 +96,7 @@ def static_complexity_audit(root: str | Path) -> dict[str, Any]:
 
 def _measure(
     name: str, rows: int, function: Callable[[], object], *, device: str,
-    warmup_runs: int, repeat_runs: int,
+    warmup_runs: int, repeat_runs: int, fixture_setup_rss: int,
 ) -> dict[str, float | int | str]:
     process = psutil.Process(os.getpid())
     baseline_rss = process.memory_info().rss
@@ -134,6 +140,8 @@ def _measure(
         "repeat_runs": repeat_runs,
         "wall_time_s": float(np.median(timings)),
         "rows_per_s": rows / max(float(np.median(timings)), 1.0e-12),
+        "fixture_setup_rss_mb": fixture_setup_rss / (1024 * 1024),
+        "execution_baseline_rss_mb": baseline_rss / (1024 * 1024),
         "rss_baseline_mb": baseline_rss / (1024 * 1024),
         "rss_peak_mb": max(traced_peak, peak_rss, baseline_rss) / (1024 * 1024),
         "rss_delta_mb": max(0, max(traced_peak, peak_rss) - baseline_rss) / (1024 * 1024),
@@ -267,26 +275,29 @@ def run_benchmarks(
     warmup_runs: int = 2, repeat_runs: int = 3,
 ) -> tuple[pd.DataFrame, dict[str, Any]]:
     factories = {
-        "support_aware_edge_representation": _support_representation_case,
-        "static_structure_preprocessing": _static_structure_case,
-        "micro_route_aggregation": _route_case,
-        "weighted_quantile": _quantile_case,
-        "max_consecutive_high_exposure": _consecutive_case,
-        "temporal_adapter": _temporal_adapter_case,
-        "full_transfer_model_forward": _full_transfer_forward_case,
+        "support_aware_edge_representation": (_support_representation_case, True),
+        "static_structure_preprocessing": (_static_structure_case, False),
+        "micro_route_aggregation": (_route_case, False),
+        "weighted_quantile": (_quantile_case, False),
+        "max_consecutive_high_exposure": (_consecutive_case, False),
+        "temporal_adapter": (_temporal_adapter_case, True),
+        "full_transfer_model_forward": (_full_transfer_forward_case, True),
     }
     import torch
     devices = ("cpu", "cuda") if torch.cuda.is_available() else ("cpu",)
     records = []
-    for device in devices:
-        for name, factory in factories.items():
+    for name, (factory, torch_kernel) in factories.items():
+        kernel_devices = benchmark_kernel_devices(
+            torch_kernel=torch_kernel, cuda_available=torch.cuda.is_available()
+        )
+        for device in kernel_devices:
             for rows in sizes:
-                function = factory(int(rows), device) if name in {
-                    "support_aware_edge_representation", "temporal_adapter", "full_transfer_model_forward"
-                } else factory(int(rows))
+                fixture_setup_rss = psutil.Process(os.getpid()).memory_info().rss
+                function = factory(int(rows), device) if torch_kernel else factory(int(rows))
                 records.append(_measure(
                     name, int(rows), function, device=device,
                     warmup_runs=warmup_runs, repeat_runs=repeat_runs,
+                    fixture_setup_rss=fixture_setup_rss,
                 ))
     frame = pd.DataFrame(records)
     checks: list[dict[str, Any]] = []
@@ -303,6 +314,7 @@ def run_benchmarks(
         "schema_version": "stage2_v5_2_performance.2",
         "status": "PASS" if checks and all(row["status"] == "PASS" for row in checks) else "FAIL",
         "timing_policy": {"inference_mode": True, "warmup_runs": warmup_runs, "repeat_runs": repeat_runs, "summary": "median"},
-        "devices": list(devices),
+        "devices": sorted(frame["device"].unique().tolist()),
+        "cpu_only_kernels": sorted(name for name, (_, torch_kernel) in factories.items() if not torch_kernel),
         "scaling_checks": checks,
     }

@@ -34,7 +34,8 @@ def test_s0_is_numerically_identical_to_v51_for_same_checkpoint(tmp_path) -> Non
         backbone_kwargs=options,
     ).eval()
     source_binding = V51SourceModelBinding(
-        protocol_id="fixture", source_protocol_id="fixture", fit_dates=(), validation_dates=(),
+        protocol_id="fixture", source_protocol_id="fixture", source_protocol_name="fixture",
+        fit_dates=(), validation_dates=(),
         feature_artifact_path=artifact_path.as_posix(),
         feature_artifact_sha256=sha256_path(artifact_path),
         source_checkpoint_path=checkpoint_path.as_posix(),

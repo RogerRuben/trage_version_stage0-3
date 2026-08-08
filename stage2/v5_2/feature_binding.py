@@ -28,6 +28,18 @@ SOURCE_BACKBONE_KEYS = (
     "maximum_log_p95_p90_ratio",
     "history_mode",
 )
+V51_SOURCE_PROTOCOL_IDS = {
+    "transfer_tuning": "fold_1", "development": "development",
+    "fold_1": "fold_1", "fold_2": "fold_2", "fold_3": "fold_3", "legacy_31": "legacy",
+}
+V51_SOURCE_PROTOCOL_NAMES = {
+    "transfer_tuning": "v5_1_rolling_fold_1_diagnostic",
+    "development": "development_temporal_evaluation",
+    "fold_1": "v5_1_rolling_fold_1_diagnostic",
+    "fold_2": "v5_1_rolling_fold_2_diagnostic",
+    "fold_3": "v5_1_rolling_fold_3_diagnostic",
+    "legacy_31": "v5_1_legacy_frozen_benchmark",
+}
 
 
 def _canonical_hash(value: Any) -> str:
@@ -99,6 +111,7 @@ class V51FeatureSchemaBinding:
 class V51SourceModelBinding:
     protocol_id: str
     source_protocol_id: str
+    source_protocol_name: str
     fit_dates: tuple[str, ...]
     validation_dates: tuple[str, ...]
     feature_artifact_path: str
@@ -197,17 +210,15 @@ def bind_v51_source_model(
 
     protocol = get_protocol(protocol_id)
     expected_fit_dates = tuple(protocol.train_dates)
-    source_protocol_id = {
-        "transfer_tuning": "fold_1", "development": "development",
-        "fold_1": "fold_1", "fold_2": "fold_2", "fold_3": "fold_3",
-        "legacy_31": "legacy",
-    }[protocol_id]
+    source_protocol_id = V51_SOURCE_PROTOCOL_IDS[protocol_id]
     feature_path = Path(feature_artifact_path)
     checkpoint_path = Path(source_checkpoint_path)
     manifest_path = Path(source_model_manifest_path)
     config_path = Path(source_config_path)
     feature = _load_json(feature_path)
     manifest = _load_json(manifest_path)
+    if manifest.get("schema_version") != "stage2_v5_rc_mstnet.1" or manifest.get("status") != "PASS":
+        raise Stage2V52ContractError("v5.1 source model manifest schema/status is not frozen PASS")
     resolved_config = load_resolved_source_config(config_path)
     artifact_fit_dates = tuple(str(value) for value in feature.get("fit_dates", ()))
     model_fit_dates = tuple(str(value) for value in manifest.get("fit_dates", ()))
@@ -245,13 +256,11 @@ def bind_v51_source_model(
     split = resolved_config.get("split", {})
     if tuple(str(value) for value in split.get("train_dates", ())) != expected_fit_dates:
         raise Stage2V52ContractError("resolved source config Train dates differ from protocol")
-    expected_config_protocol = {
-        "transfer_tuning": "fold_1", "development": "development_temporal_evaluation",
-        "fold_1": "fold_1", "fold_2": "fold_2", "fold_3": "fold_3",
-        "legacy_31": "legacy_frozen_benchmark",
-    }[protocol_id]
+    expected_config_protocol = V51_SOURCE_PROTOCOL_NAMES[protocol_id]
     if str(split.get("protocol_name", "")) != expected_config_protocol:
         raise Stage2V52ContractError("resolved source config protocol identity mismatch")
+    if tuple(str(value) for value in split.get("validation_model_dates", ())) != expected_validation:
+        raise Stage2V52ContractError("resolved source config Validation dates differ from protocol")
     distribution = resolved_config.get("distribution", {})
     deep = resolved_config.get("deep", {})
     source_history_mode = str(manifest.get("history_mode", checkpoint_config["history_mode"]))
@@ -267,14 +276,10 @@ def bind_v51_source_model(
     model_id = str(manifest.get("model_id", ""))
     if not model_id:
         raise Stage2V52ContractError("v5.1 source model manifest has no model_id")
-    manifest_protocol = str(
-        manifest.get("protocol_id", manifest.get("fold_id", manifest.get("source_protocol_id", "")))
-    )
-    if manifest_protocol != source_protocol_id:
-        raise Stage2V52ContractError("v5.1 source model manifest protocol identity mismatch")
     return V51SourceModelBinding(
         protocol_id=protocol_id,
         source_protocol_id=source_protocol_id,
+        source_protocol_name=expected_config_protocol,
         fit_dates=expected_fit_dates,
         validation_dates=expected_validation,
         feature_artifact_path=feature_path.as_posix(),

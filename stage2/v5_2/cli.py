@@ -13,9 +13,11 @@ import pandas as pd
 from .contracts import CONFIG_SCHEMA_VERSION, RESEARCH_CONTRACT, Stage2V52ContractError, validate_research_contract
 from .evaluation import (
     build_tau_metrics_manifest, evaluate_checkpoint, evaluate_spatial_adoption,
-    evaluate_temporal_adoption, validate_evaluation_payload,
+    evaluate_rolling_spatial_adoption, evaluate_temporal_adoption, validate_evaluation_payload,
 )
-from .m0_features import build_m0_feature_matrix
+from .m0_features import (
+    build_m0_feature_matrix, evaluate_m0_baseline, transform_m0_feature_matrix,
+)
 from .metadata_schema_audit import audit_input_metadata, write_metadata_audit
 from .micro_products import (
     aggregate_original_route_micro_conditions, aggregate_static_route_complexity,
@@ -29,8 +31,37 @@ from .support_transfer import fit_train_support_frame, select_tau_once
 from .training import train_micro_tree_baseline_from_npz, train_transfer_from_shards
 from .transfer_data import build_transfer_shards
 from .verification import (
-    build_release_manifest, preflight, sha256_file, verify_final_gate_bundle, verify_phase_b,
+    build_release_manifest, preflight, sha256_file, verify_artifact_payload,
+    verify_final_gate_bundle, verify_one_train_one_validation_bucket, verify_phase_b,
 )
+
+
+COMMAND_AUTHORIZATIONS = {
+    "preflight": {"PHASE_B0", "PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
+    "audit-static-schema": {"PHASE_B0", "PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
+    "audit-input-metadata": {"PHASE_B0", "PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
+    "benchmark": {"PHASE_B0", "PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
+    "verify-phase-b": {"PHASE_B0", "PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
+    "verify-one-bucket-correctness": {"PHASE_B0", "PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
+    "fit-support": {"PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
+    "fit-static-artifact": {"PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
+    "fit-train-cdf": {"PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
+    "build-transfer-shards": {"PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
+    "build-m0-feature-matrix": {"PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
+    "transform-m0-feature-matrix": {"PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
+    "evaluate-m0": {"PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
+    "build-tau-metrics": {"PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
+    "tune-tau": {"PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
+    "train-tree-baseline": {"PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
+    "train-model": {"PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
+    "evaluate-model": {"PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
+    "decide-spatial-adoption": {"PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
+    "decide-rolling-spatial-adoption": {"PHASE_D", "PHASE_D_COMPLETE"},
+    "decide-temporal-adoption": {"PHASE_D", "PHASE_D_COMPLETE"},
+    "build-products": {"PHASE_D", "PHASE_D_COMPLETE"},
+    "build-release-manifest": {"PHASE_D_COMPLETE"},
+    "verify-final": {"PHASE_D_COMPLETE"},
+}
 
 
 def _json(path: str | Path) -> dict[str, Any]:
@@ -58,6 +89,59 @@ def _require_execution(config: dict[str, Any], allowed: set[str]) -> None:
     authorization = str(config.get("execution_authorization", "NONE"))
     if authorization not in allowed:
         raise Stage2V52ContractError(f"execution authorization is {authorization}; allowed={sorted(allowed)}")
+
+
+def _resolve_training_tau(args: argparse.Namespace, config: dict[str, Any]) -> tuple[float, dict[str, Any]]:
+    model, protocol_id = str(args.model), str(args.protocol)
+    tau_candidate = getattr(args, "tau_candidate", None)
+    tau_artifact_path = getattr(args, "tau_artifact", None)
+    support_path = getattr(args, "support_artifact", None)
+    if model == "M4" and protocol_id == "transfer_tuning":
+        if tau_candidate is None or support_path is None or tau_artifact_path is not None:
+            raise Stage2V52ContractError(
+                "transfer_tuning M4 requires --tau-candidate and --support-artifact, and forbids --tau-artifact"
+            )
+        support = _json(support_path)
+        verify_artifact_payload(support, artifact_type="support")
+        if support.get("protocol_id") != "transfer_tuning":
+            raise Stage2V52ContractError("tau candidate must come from transfer_tuning Train support")
+        key = str(tau_candidate)
+        quantiles = support.get("positive_quantiles", {})
+        if key not in {"p25", "p50", "p75"} or key not in quantiles:
+            raise Stage2V52ContractError("tau candidate is absent from verified support quantiles")
+        tau = float(quantiles[key])
+        expected = [float(quantiles[name]) for name in ("p25", "p50", "p75")]
+        if [float(value) for value in support.get("tau_candidates", ())] != expected:
+            raise Stage2V52ContractError("support tau candidates do not equal Train P25/P50/P75")
+        return tau, {
+            "kind": "train_support_quantile_candidate", "candidate": key,
+            "support_artifact_sha256": sha256_file(support_path),
+        }
+    if model in {"M4", "M5"}:
+        if tau_candidate is not None or tau_artifact_path is None or support_path is None:
+            raise Stage2V52ContractError(
+                "non-tuning M4/M5 requires frozen --tau-artifact and --support-artifact"
+            )
+        support = _json(support_path)
+        verify_artifact_payload(support, artifact_type="support")
+        selection = _json(tau_artifact_path)
+        if (
+            selection.get("schema_version") != "stage2_v5_2_tau_selection.1"
+            or selection.get("selection_protocol") != "transfer_tuning"
+            or selection.get("rolling_reselection_allowed") is not False
+        ):
+            raise Stage2V52ContractError("M4/M5 tau artifact is not the frozen transfer-tuning selection")
+        tau = float(selection.get("selected_tau", float("nan")))
+        if not tau > 0:
+            raise Stage2V52ContractError("selected tau is not finite and positive")
+        return tau, {
+            "kind": "frozen_transfer_tuning_selection",
+            "tau_selection_artifact_sha256": sha256_file(tau_artifact_path),
+            "current_protocol_support_artifact_sha256": sha256_file(support_path),
+        }
+    if tau_candidate is not None or tau_artifact_path is not None:
+        raise Stage2V52ContractError("tau arguments are only legal for M4/M5")
+    return 1.0, {"kind": "neutral_not_used_by_model", "value": 1.0}
 
 
 def _preflight(args: argparse.Namespace) -> dict[str, Any]:
@@ -121,6 +205,24 @@ def _build_m0(args: argparse.Namespace) -> dict[str, Any]:
     )
 
 
+def _transform_m0(args: argparse.Namespace) -> dict[str, Any]:
+    return transform_m0_feature_matrix(
+        protocol_id=args.protocol, role=args.role, repo_root=args.repo_root,
+        route_feature_root=args.route_feature_root,
+        train_matrix_manifest_path=args.train_matrix_manifest,
+        support_artifact_path=args.support_artifact,
+        output_matrix_path=args.output_matrix, output_manifest_path=args.output_manifest,
+    )
+
+
+def _evaluate_m0(args: argparse.Namespace) -> dict[str, Any]:
+    return evaluate_m0_baseline(
+        protocol_id=args.protocol, role=args.role, matrix_path=args.matrix,
+        matrix_manifest_path=args.matrix_manifest, model_path=args.model,
+        training_manifest_path=args.training_manifest, output_path=args.output,
+    )
+
+
 def _build_tau_metrics(args: argparse.Namespace) -> dict[str, Any]:
     report = build_tau_metrics_manifest(
         m1_evaluation_path=args.m1_evaluation, m4_evaluation_paths=args.m4_evaluations,
@@ -146,7 +248,7 @@ def _train_tree(args: argparse.Namespace) -> dict[str, Any]:
 def _train_model(args: argparse.Namespace) -> dict[str, Any]:
     config = _config(args); _require_execution(config, {"PHASE_B0", "PHASE_B1", "PHASE_C", "PHASE_D"})
     training = config["training"]
-    tau = float(_json(args.tau_artifact)["selected_tau"]) if args.tau_artifact else float(training["default_nonselected_tau"])
+    tau, tau_provenance = _resolve_training_tau(args, config)
     return train_transfer_from_shards(
         protocol_id=args.protocol, model_id=args.model, tensor_root=args.tensor_root,
         feature_artifact_path=args.feature_artifact, source_checkpoint_path=args.source_checkpoint,
@@ -163,6 +265,8 @@ def _train_model(args: argparse.Namespace) -> dict[str, Any]:
         m4_checkpoint_path=args.m4_checkpoint,
         m4_training_manifest=_json(args.m4_training_manifest) if args.m4_training_manifest else None,
         m4_adoption_manifest=_json(args.m4_adoption) if args.m4_adoption else None,
+        support_artifact_path=args.support_artifact,
+        support_tau_provenance=tau_provenance,
     )
 
 
@@ -187,6 +291,16 @@ def _decide_temporal(args: argparse.Namespace) -> dict[str, Any]:
         m5_evaluations=[_json(path) for path in args.m5_evaluations],
     )
     _write_json(args.output, result); return result
+
+
+def _decide_rolling_spatial(args: argparse.Namespace) -> dict[str, Any]:
+    result = evaluate_rolling_spatial_adoption(
+        m1_evaluations=[_json(path) for path in args.m1_evaluations],
+        m2_evaluations=[_json(path) for path in args.m2_evaluations],
+        m4_evaluations=[_json(path) for path in args.m4_evaluations],
+    )
+    _write_json(args.output, result)
+    return result
 
 
 def _build_products(args: argparse.Namespace) -> dict[str, Any]:
@@ -227,6 +341,16 @@ def _verify_phase_a(args: argparse.Namespace) -> dict[str, Any]:
 
 def _verify_b(args: argparse.Namespace) -> dict[str, Any]:
     report = verify_phase_b(pd.read_parquet(args.tokens)); _write_json(args.output, report); return report
+
+
+def _verify_one_bucket(args: argparse.Namespace) -> dict[str, Any]:
+    report = verify_one_train_one_validation_bucket(
+        train_traversal_path=args.train_traversal, train_label_path=args.train_label,
+        validation_traversal_path=args.validation_traversal,
+        validation_label_path=args.validation_label,
+    )
+    _write_json(args.output, report)
+    return report
 
 
 def _audit_static(args: argparse.Namespace) -> dict[str, Any]:
@@ -275,17 +399,21 @@ def parser() -> argparse.ArgumentParser:
     for flag in ("feature-artifact", "support-artifact", "static-artifact", "stage1-release", "route-feature-root"): command.add_argument(f"--{flag}", required=True)
     command.add_argument("--repo-root", default="."); command.add_argument("--output-root", required=True); command.set_defaults(function=_build_transfer)
     command = add_protocol("build-m0-feature-matrix"); command.add_argument("--repo-root", default="."); command.add_argument("--route-feature-root", required=True); command.add_argument("--output-matrix", required=True); command.add_argument("--output-manifest", required=True); command.set_defaults(function=_build_m0)
+    command = add_protocol("transform-m0-feature-matrix"); command.add_argument("--role", choices=("validation", "evaluation", "calibration", "legacy"), required=True); command.add_argument("--repo-root", default="."); command.add_argument("--route-feature-root", required=True); command.add_argument("--train-matrix-manifest", required=True); command.add_argument("--support-artifact", required=True); command.add_argument("--output-matrix", required=True); command.add_argument("--output-manifest", required=True); command.set_defaults(function=_transform_m0)
+    command = add_protocol("evaluate-m0"); command.add_argument("--role", choices=("validation", "evaluation", "calibration", "legacy"), required=True); command.add_argument("--matrix", required=True); command.add_argument("--matrix-manifest", required=True); command.add_argument("--model", required=True); command.add_argument("--training-manifest", required=True); command.add_argument("--output", required=True); command.set_defaults(function=_evaluate_m0)
     command = commands.add_parser("build-tau-metrics"); command.add_argument("--m1-evaluation", required=True); command.add_argument("--m4-evaluations", nargs=3, required=True); command.add_argument("--support-artifact", required=True); command.add_argument("--feature-artifact", required=True); command.add_argument("--output", required=True); command.set_defaults(function=_build_tau_metrics)
     command = commands.add_parser("tune-tau"); command.add_argument("--metrics", required=True); command.add_argument("--support-artifact", required=True); command.add_argument("--output", required=True); command.set_defaults(function=_tune_tau)
     command = add_protocol("train-tree-baseline"); command.add_argument("--input", required=True); command.add_argument("--matrix-manifest", required=True); command.add_argument("--output", required=True); command.set_defaults(function=_train_tree)
     command = add_protocol("train-model"); command.add_argument("--model", choices=("M1", "M2", "M3", "M4", "M5"), required=True)
     for flag in ("tensor-root", "feature-artifact", "source-checkpoint", "source-model-manifest", "source-config", "static-artifact", "output"): command.add_argument(f"--{flag}", required=True)
-    for flag in ("m1-metrics", "tau-artifact", "m4-checkpoint", "m4-training-manifest", "m4-adoption"): command.add_argument(f"--{flag}")
+    for flag in ("m1-metrics", "tau-artifact", "support-artifact", "m4-checkpoint", "m4-training-manifest", "m4-adoption"): command.add_argument(f"--{flag}")
+    command.add_argument("--tau-candidate", choices=("p25", "p50", "p75"))
     command.set_defaults(function=_train_model)
     command = add_protocol("evaluate-model"); command.add_argument("--model", choices=("M1", "M2", "M3", "M4", "M5"), required=True); command.add_argument("--role", choices=("train", "validation", "calibration", "evaluation", "legacy"), required=True)
     for flag in ("tensor-root", "checkpoint", "training-manifest", "output"): command.add_argument(f"--{flag}", required=True)
     command.set_defaults(function=_evaluate)
     command = commands.add_parser("decide-spatial-adoption"); command.add_argument("--m1", required=True); command.add_argument("--m2", required=True); command.add_argument("--m4", required=True); command.add_argument("--output", required=True); command.set_defaults(function=_decide_spatial)
+    command = commands.add_parser("decide-rolling-spatial-adoption"); command.add_argument("--m1-evaluations", nargs=3, required=True); command.add_argument("--m2-evaluations", nargs=3, required=True); command.add_argument("--m4-evaluations", nargs=3, required=True); command.add_argument("--output", required=True); command.set_defaults(function=_decide_rolling_spatial)
     command = commands.add_parser("decide-temporal-adoption"); command.add_argument("--m4-evaluations", nargs=3, required=True); command.add_argument("--m5-evaluations", nargs=3, required=True); command.add_argument("--output", required=True); command.set_defaults(function=_decide_temporal)
     command = add_protocol("build-products")
     for flag in ("evaluation-manifest", "route-context", "support-artifact", "train-cdf", "output-root"): command.add_argument(f"--{flag}", required=True)
@@ -295,6 +423,7 @@ def parser() -> argparse.ArgumentParser:
     command = commands.add_parser("benchmark"); command.add_argument("--output-csv", required=True); command.add_argument("--output-json", required=True); command.set_defaults(function=_benchmark)
     command = commands.add_parser("verify-phase-a"); command.add_argument("--source-root", default="stage2/v5_2"); command.set_defaults(function=_verify_phase_a)
     command = commands.add_parser("verify-phase-b"); command.add_argument("--tokens", required=True); command.add_argument("--output", required=True); command.set_defaults(function=_verify_b)
+    command = commands.add_parser("verify-one-bucket-correctness"); command.add_argument("--train-traversal", required=True); command.add_argument("--train-label", required=True); command.add_argument("--validation-traversal", required=True); command.add_argument("--validation-label", required=True); command.add_argument("--output", required=True); command.set_defaults(function=_verify_one_bucket)
     command = add_protocol("build-release-manifest"); command.add_argument("--repo-root", default=".")
     for flag in ("source-checkpoint", "feature-artifact", "source-model-manifest", "source-config", "support-artifact", "static-artifact", "tau-artifact", "micro-cdf", "transfer-manifest", "training-manifest", "selected-checkpoint", "evaluation-manifest", "stage1-release", "outputs-manifest", "output"): command.add_argument(f"--{flag}", required=True)
     command.set_defaults(function=_release)
@@ -304,6 +433,11 @@ def parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = parser().parse_args(argv)
+    if args.command != "verify-phase-a":
+        allowed = COMMAND_AUTHORIZATIONS.get(args.command)
+        if allowed is None:
+            raise Stage2V52ContractError(f"command has no fail-closed authorization policy: {args.command}")
+        _require_execution(_config(args), allowed)
     result = args.function(args)
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0 if result.get("status", "PASS") in {"PASS", "MICRO_FIRST_CHECKPOINT_SELECTED"} else 2

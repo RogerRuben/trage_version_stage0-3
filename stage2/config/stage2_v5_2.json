@@ -2,16 +2,20 @@
   "schema_version": "stage2_v5_2_config.3",
   "base": {
     "branch": "codex/stage2-v5-micro-transfer",
-    "head": "ed10efc5269c128db65248424d6378e22722622f",
+    "implementation_commit": "c4b29b72b226d46521630f2637aabcec5f8174ae",
+    "documentation_head": "4137ded50abe7c4d4b1351e8fc3d095342ef4a74",
     "frozen_v5_1": true
   },
-  "phase": "A_2_STATIC_REVIEW_FIX",
+  "phase": "A_2_1_BLOCKER_FIX_CODE_READY",
   "execution_authorization": "NONE_PHASE_A_2",
+  "phase_b_allowed": false,
   "research_scope": {
     "route": "frozen_historical_original_service_route",
     "formal_micro_targets": ["crawl", "stop", "speed_cv", "acceleration_rms", "rts"],
     "core_transfer_targets": ["crawl", "stop", "speed_cv", "acceleration_rms"],
     "secondary_frozen_reference_targets": ["rts"],
+    "stage3_deployable_micro_targets": ["crawl", "stop", "speed_cv", "acceleration_rms"],
+    "diagnostic_only_not_stage3_deployable": ["rts"],
     "common_operational_targets": ["pace_p50", "travel_time_p50"],
     "path_planning": false,
     "stage4_optimization": false,
@@ -70,19 +74,20 @@
     "batch_size": 64,
     "new_branch_lr": 0.0003,
     "backbone_lr_ratio": 0.1,
-    "default_nonselected_tau": 1.0,
     "loss_weights": {
-      "pace": 1.0,
+      "pace_distribution": 1.0,
       "crawl": 1.0,
-      "stop": 1.0,
+      "stop_occurrence": 0.5,
+      "stop_positive": 0.5,
       "speed_cv": 1.0,
       "acceleration": 1.0,
       "rts": 0.0,
-      "lcs_consistency": 0.25,
+      "lcs_consistency": 0.0,
       "lcs_tail": 0.0,
       "rts_tail": 0.0,
       "availability": 0.1
     },
+    "availability_auxiliary_role": "missingness_prediction_regularizer_only_not_main_innovation_or_adoption_target",
     "freeze_schedule_may_change_after_rolling": false
   },
   "checkpoint_selection": {
@@ -93,7 +98,7 @@
     ],
     "primary": "validation_macro_normalized_mae_over_4_core_micro_targets",
     "secondary": ["low_support_macro_core_micro_mae", "pace_p50_mae"],
-    "rts_role": "secondary_frozen_reference_target",
+    "rts_role": "legacy_descriptive_diagnostic_not_stage3_deployable",
     "route_p90_p95_cvar_used": false
   },
   "products": {
@@ -208,5 +213,5 @@
     ]
   },
   "final_status_requires_experiments": "READY_FOR_AV_ROUTE_SUITABILITY_STAGE",
-  "current_status": "NOT_READY_IMPLEMENTATION_ONLY"
+  "current_status": "PHASE_A2_1_CODE_READY_FOR_VERIFICATION"
 }

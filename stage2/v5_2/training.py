@@ -27,6 +27,41 @@ M0_MATRIX_SCHEMA_VERSION = "stage2_v5_2_m0_matrix.2"
 M0_TRAINING_SCHEMA_VERSION = "stage2_v5_2_m0_training.2"
 CORE_METRIC_DEFINITION = "unique_traversal_mean_absolute_error"
 PACE_METRIC_DEFINITION = "unique_traversal_pace_p50_mean_absolute_error"
+LOSS_COMPONENT_KEYS = frozenset({
+    "pace_distribution", "crawl", "stop_occurrence", "stop_positive", "speed_cv",
+    "acceleration", "rts", "lcs_consistency", "lcs_tail", "rts_tail", "availability",
+})
+
+
+def validate_loss_weight_schema(component_weights: Mapping[str, float]) -> dict[str, float]:
+    """Require an explicit frozen weight for every real v5 loss component."""
+    observed = set(component_weights)
+    missing = sorted(LOSS_COMPONENT_KEYS - observed)
+    unknown = sorted(observed - LOSS_COMPONENT_KEYS)
+    if missing or unknown:
+        raise Stage2V52ContractError(
+            f"loss-weight schema mismatch: missing={missing}, unknown={unknown}"
+        )
+    weights = {name: float(component_weights[name]) for name in LOSS_COMPONENT_KEYS}
+    if any(not np.isfinite(value) or value < 0 for value in weights.values()):
+        raise Stage2V52ContractError("loss weights must be finite and non-negative")
+    return weights
+
+
+def validate_m5_m4_adoption(
+    payload: Mapping[str, Any], *, protocol_id: str, m4_checkpoint_sha256: str,
+) -> None:
+    if (
+        payload.get("schema_version") != "stage2_v5_2_rolling_spatial_adoption.1"
+        or payload.get("status") != "PASS"
+        or payload.get("verification_status") != "PASS"
+        or payload.get("protocol_id") != "rolling_origin_fold_1_2_3"
+        or payload.get("decision_scope") != "rolling_origin_three_fold_six_dates"
+        or payload.get("adopt") is not True
+        or payload.get("selected_m4_checkpoint_sha256_by_protocol", {}).get(protocol_id)
+        != m4_checkpoint_sha256
+    ):
+        raise Stage2V52ContractError("M5 is blocked until formal rolling M4 adoption passes")
 
 
 def _json(path: str | Path) -> dict[str, Any]:
@@ -396,6 +431,8 @@ def _forward_loss(
     import torch
     from stage2.v5.models.losses import rc_mstnet_v5_loss
 
+    component_weights = validate_loss_weight_schema(component_weights)
+
     def tensor(name: str, dtype: Any) -> Any:
         return torch.as_tensor(data[name][index], dtype=dtype, device=device)
 
@@ -632,6 +669,8 @@ def train_transfer_from_shards(
     component_weights: Mapping[str, float], m4_checkpoint_path: str | Path | None = None,
     m4_training_manifest: Mapping[str, Any] | None = None,
     m4_adoption_manifest: Mapping[str, Any] | None = None,
+    support_artifact_path: str | Path | None = None,
+    support_tau_provenance: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Execute M1–M5 on canonical protocol-bound augmented shards."""
     import torch
@@ -643,6 +682,7 @@ def train_transfer_from_shards(
     }
     if model_id not in modes:
         raise Stage2V52ContractError("deep training model must be M1-M5")
+    component_weights = validate_loss_weight_schema(component_weights)
     protocol = get_protocol(protocol_id)
     static_artifact = _json(static_artifact_path)
     if static_artifact.get("protocol_id") != protocol_id:
@@ -658,6 +698,27 @@ def train_transfer_from_shards(
         or tensor_manifest.get("static_artifact_sha256") != sha256_path(static_artifact_path)
     ):
         raise Stage2V52ContractError("transfer tensors are not bound to the training artifacts")
+    if support_artifact_path is not None and (
+        tensor_manifest.get("support_artifact_sha256") != sha256_path(support_artifact_path)
+    ):
+        raise Stage2V52ContractError("selected tau support artifact differs from transfer tensors")
+    tau_provenance = dict(support_tau_provenance or {})
+    if model_id == "M4" and protocol_id == "transfer_tuning":
+        if (
+            tau_provenance.get("kind") != "train_support_quantile_candidate"
+            or tau_provenance.get("candidate") not in {"p25", "p50", "p75"}
+            or tau_provenance.get("support_artifact_sha256")
+            != tensor_manifest.get("support_artifact_sha256")
+        ):
+            raise Stage2V52ContractError("transfer-tuning M4 tau lacks verified P25/P50/P75 provenance")
+    elif model_id in {"M4", "M5"}:
+        if (
+            tau_provenance.get("kind") != "frozen_transfer_tuning_selection"
+            or not isinstance(tau_provenance.get("tau_selection_artifact_sha256"), str)
+            or tau_provenance.get("current_protocol_support_artifact_sha256")
+            != tensor_manifest.get("support_artifact_sha256")
+        ):
+            raise Stage2V52ContractError("M4/M5 tau lacks frozen transfer-tuning selection provenance")
     np_rng = np.random.default_rng(int(base_seed))
     torch.manual_seed(int(base_seed))
     if torch.cuda.is_available():
@@ -682,15 +743,13 @@ def train_transfer_from_shards(
             or m4_training_manifest.get("selected_checkpoint_sha256") != sha256_path(m4_checkpoint_path)
         ):
             raise Stage2V52ContractError("M4 training manifest does not bind the selected checkpoint")
-        if (
-            m4_adoption_manifest.get("schema_version") != "stage2_v5_2_adoption.2"
-            or m4_adoption_manifest.get("status") != "PASS"
-            or m4_adoption_manifest.get("protocol_id") not in {protocol_id, "transfer_tuning"}
-            or m4_adoption_manifest.get("adopt") is not True
-        ):
-            raise Stage2V52ContractError("M5 is blocked until formal M4 adoption passes")
+        validate_m5_m4_adoption(
+            m4_adoption_manifest, protocol_id=protocol_id,
+            m4_checkpoint_sha256=sha256_path(m4_checkpoint_path),
+        )
         m4_initialization = model.initialize_spatial_from_m4(m4_checkpoint_path)
         m4_initialization["m4_adoption_manifest_sha256"] = _canonical_hash(m4_adoption_manifest)
+        model.set_temporal_adapter_only_trainable()
     if model_id != "M1":
         if v5_1_metric_manifest is None:
             raise Stage2V52ContractError(f"{model_id} requires a formal M1 metric manifest")
@@ -721,7 +780,10 @@ def train_transfer_from_shards(
         ) if maximum_epochs else None
     )
     for epoch in range(maximum_epochs):
-        model.set_shared_backbone_frozen(epoch < shared_freeze_epochs)
+        if model_id == "M5":
+            model.set_temporal_adapter_only_trainable()
+        else:
+            model.set_shared_backbone_frozen(epoch < shared_freeze_epochs)
         model.train()
         for path in train_paths:
             data = _load_npz(path)
@@ -783,6 +845,7 @@ def train_transfer_from_shards(
         ),
         "constructor": {
             "static_feature_count": static_feature_count, "support_tau": support_tau,
+            "support_tau_provenance": tau_provenance,
             "spatial_mode": spatial_mode, "temporal_mode": temporal_mode,
             "backbone_kwargs": dict(backbone_kwargs),
         },
@@ -794,6 +857,7 @@ def train_transfer_from_shards(
         "temporal_leakage_count": int(temporal_audit["temporal_leakage_count"]),
         "backbone_lr": new_branch_lr * backbone_lr_ratio, "new_branch_lr": new_branch_lr,
         "shared_freeze_epochs": shared_freeze_epochs,
+        "m5_trainable_scope": "fresh_temporal_adapter_only" if model_id == "M5" else None,
         "random_seed": {
             "base_seed": int(base_seed), "numpy_rng": "numpy.random.default_rng(PCG64)",
             "torch_manual_seed": int(base_seed),
@@ -802,7 +866,8 @@ def train_transfer_from_shards(
         },
         "loss_policy": {
             "component_weights": dict(component_weights),
-            "rts_role": "secondary_frozen_reference_target",
+            "rts_role": "legacy_descriptive_diagnostic_not_stage3_deployable",
+            "rts_stage3_deployable": False,
             "rts_raw_mask": "rts_target_valid_independent_of_tail_mask",
             "lcs_raw_mask": "lcs_target_valid_independent_of_tail_mask",
         },

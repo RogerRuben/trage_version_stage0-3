@@ -25,7 +25,7 @@ class ProtocolSpec:
     calibration_dates: tuple[str, ...] = ()
     evaluation_dates: tuple[str, ...] = ()
     legacy_benchmark_dates: tuple[str, ...] = ()
-    rts_role: str = "secondary_frozen_reference_target"
+    rts_role: str = "legacy_descriptive_diagnostic_not_stage3_deployable"
 
     def to_payload(self) -> dict[str, Any]:
         return asdict(self)

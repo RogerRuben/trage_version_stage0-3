@@ -169,10 +169,10 @@ def decide_spatial_transfer(
     adopted = wins >= 3 and mean_improvement > 0.02 and overall_stable and unseen_not_worse
     return {
         "adopt": adopted,
-        "status": "ADOPT_SUPPORT_AWARE" if adopted else "RETAIN_V5_1_NEGATIVE_OR_INSUFFICIENT_TRANSFER",
+        "decision_status": "ADOPT_SUPPORT_AWARE" if adopted else "RETAIN_V5_1_NEGATIVE_OR_INSUFFICIENT_TRANSFER",
         "low_support_target_wins": wins,
         "adoption_target_count": 4,
-        "rts_role": "secondary_frozen_reference_target",
+        "rts_role": "legacy_descriptive_diagnostic_not_stage3_deployable",
         "low_support_mean_relative_improvement": mean_improvement,
         "overall_no_target_degrades_over_2pct": overall_stable,
         "unseen_not_worse_than_structure_only": unseen_not_worse,
@@ -190,11 +190,11 @@ def decide_temporal_adapter(
     adopted = len(daily_mean_improvements) == 6 and improved_days >= 4 and target_mean > 0.01
     return {
         "adopt": adopted,
-        "status": "ADOPT_TEMPORAL_ADAPTER" if adopted else "RETAIN_NO_OR_ZERO_SHOT_ADAPTER",
+        "decision_status": "ADOPT_TEMPORAL_ADAPTER" if adopted else "RETAIN_NO_OR_ZERO_SHOT_ADAPTER",
         "improved_rolling_dates": improved_days,
         "rolling_date_count": len(daily_mean_improvements),
         "four_core_target_mean_relative_improvement": target_mean,
-        "rts_role": "secondary_frozen_reference_target",
+        "rts_role": "legacy_descriptive_diagnostic_not_stage3_deployable",
     }
 
 
