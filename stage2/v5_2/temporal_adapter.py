@@ -9,6 +9,14 @@ import pandas as pd
 
 from .contracts import Stage2V52ContractError, require_columns
 
+
+TEMPORAL_FEATURE_NAMES = (
+    "decision_hour_sin",
+    "decision_hour_cos",
+    "decision_weekday_index",
+    "forecast_horizon_log1p",
+)
+
 try:
     import torch
     from torch import nn
@@ -20,25 +28,47 @@ except ImportError:  # pragma: no cover
 def causal_update_mask(
     events: pd.DataFrame,
     *,
-    decision_time: float,
+    adaptation_cutoff_time: float,
     current_order_id: str,
 ) -> np.ndarray:
-    """Select only completed prior observations, excluding the current order."""
-    require_columns(events.columns, ("order_id", "observation_end_time"), product="adapter events")
+    """Select completed orders whose labels were available before adaptation."""
+    require_columns(
+        events.columns,
+        ("order_id", "observation_end_time", "order_completion_time", "label_available_time"),
+        product="adapter events",
+    )
     end = pd.to_numeric(events["observation_end_time"], errors="coerce").to_numpy(np.float64)
+    completion = pd.to_numeric(events["order_completion_time"], errors="coerce").to_numpy(np.float64)
+    label_time = pd.to_numeric(events["label_available_time"], errors="coerce").to_numpy(np.float64)
     order = events["order_id"].astype(str).to_numpy()
-    return np.isfinite(end) & (end < float(decision_time)) & (order != str(current_order_id))
+    cutoff = float(adaptation_cutoff_time)
+    return (
+        np.isfinite(end) & np.isfinite(completion) & np.isfinite(label_time)
+        & (end < cutoff) & (completion < cutoff) & (label_time < cutoff)
+        & (order != str(current_order_id))
+    )
 
 
 def causal_update_events(
     events: pd.DataFrame,
     *,
-    decision_time: float,
+    adaptation_cutoff_time: float,
     current_order_id: str,
 ) -> pd.DataFrame:
     return events.loc[causal_update_mask(
-        events, decision_time=decision_time, current_order_id=current_order_id
+        events, adaptation_cutoff_time=adaptation_cutoff_time, current_order_id=current_order_id
     )].copy()
+
+
+def stack_temporal_features(features: Mapping[str, "torch.Tensor"]) -> "torch.Tensor":
+    if tuple(features.keys()) != TEMPORAL_FEATURE_NAMES:
+        raise Stage2V52ContractError(
+            f"temporal feature schema must be exactly {TEMPORAL_FEATURE_NAMES}"
+        )
+    shapes = {tuple(value.shape) for value in features.values()}
+    if len(shapes) != 1:
+        raise Stage2V52ContractError("temporal feature tensors have different shapes")
+    return torch.stack(tuple(features[name] for name in TEMPORAL_FEATURE_NAMES), dim=-1)
 
 
 def adapter_parameter_ratio(adapter_parameters: int, shared_parameters: int) -> float:

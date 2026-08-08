@@ -1,95 +1,173 @@
 {
-  "schema_version": "stage2_v5_2.1",
+  "schema_version": "stage2_v5_2.2",
   "base": {
-    "branch": "codex/stage2-v5-robust-scenarios",
-    "head": "1fb5168a51f5701ff16a2a19f77a8560fa0c2f38",
+    "branch": "codex/stage2-v5-micro-transfer",
+    "head": "ed10efc5269c128db65248424d6378e22722622f",
     "frozen_v5_1": true
   },
-  "phase": "A_IMPLEMENTATION_ONLY",
+  "phase": "A_1_PRE_EXPERIMENT_FIX",
+  "execution_authorization": "NONE_PHASE_A_1",
   "research_scope": {
-    "route": "historical_original_service_route",
+    "route": "frozen_historical_original_service_route",
     "formal_micro_targets": ["crawl", "stop", "speed_cv", "acceleration_rms", "rts"],
+    "core_transfer_targets": ["crawl", "stop", "speed_cv", "acceleration_rms"],
+    "secondary_frozen_reference_targets": ["rts"],
     "common_operational_targets": ["pace_p50", "travel_time_p50"],
     "path_planning": false,
     "stage4_optimization": false,
     "av_safety_probability": false
   },
-  "dates": {
-    "allowed_development_and_rolling": [
-      "20161009", "20161010", "20161011", "20161012", "20161013", "20161014", "20161015",
-      "20161016", "20161017", "20161018", "20161019", "20161020", "20161021", "20161022",
-      "20161023", "20161024", "20161025", "20161026", "20161027"
+  "protocols": {
+    "transfer_tuning": {
+      "train_dates": [
+        "20161009", "20161010", "20161011", "20161012", "20161013",
+        "20161014", "20161015", "20161016", "20161017", "20161018"
+      ],
+      "validation_dates": ["20161019", "20161020"],
+      "tau_selection_dates_after_20161020_allowed": false
+    },
+    "definitions_source": "stage2.v5_2.protocols.PROTOCOLS",
+    "forbidden_new_production": ["20161028", "20161029", "20161030"],
+    "cli_date_override_allowed": false
+  },
+  "v5_1_binding": {
+    "categorical_order_source": "frozen_v5_preprocessing_CATEGORY_NAMES_checked_against_serialized_vocabulary_order",
+    "edge_source_field": "observed_directed_edge_uid",
+    "pad_unseen_source": "frozen_edge_vocabulary",
+    "embedding_sizes_checked_against_checkpoint": true,
+    "source_checkpoint_required": true
+  },
+  "backbone": {
+    "hidden_dim": 128,
+    "categorical_embedding_dim": 24,
+    "transformer_layers": 3,
+    "attention_heads": 4,
+    "dropout": 0.1,
+    "distribution_family": "monotonic_quantiles",
+    "history_mode": "ordinary_concatenation"
+  },
+  "training": {
+    "initialization_policy": "shared_backbone_and_edge_ID_from_frozen_v5_1; new_structure_and_adapter_fresh",
+    "shared_freeze_epochs": 1,
+    "maximum_epochs": 4,
+    "batch_size": 64,
+    "new_branch_lr": 0.0003,
+    "backbone_lr_ratio": 0.1,
+    "default_nonselected_tau": 1.0,
+    "freeze_schedule_may_change_after_rolling": false
+  },
+  "checkpoint_selection": {
+    "hard_gates": [
+      "all_outputs_finite",
+      "temporal_leakage_count_zero",
+      "pace_p50_relative_degradation_at_most_2pct"
     ],
-    "legacy_benchmark": ["20161031"],
-    "forbidden_new_production": ["20161028", "20161029", "20161030"]
+    "primary": "validation_macro_normalized_mae_over_4_core_micro_targets",
+    "secondary": ["low_support_macro_core_micro_mae", "pace_p50_mae"],
+    "rts_role": "secondary_frozen_reference_target",
+    "route_p90_p95_cvar_used": false
   },
   "products": {
     "root": "stage2/output_v5_2",
     "micro_condition_tokens": "micro_condition_tokens",
     "original_route_micro_conditions": "original_route_micro_conditions",
     "static_route_complexity": "static_route_complexity",
-    "minimum_micro_condition_coverage": 0.8,
+    "minimum_prediction_coverage": 0.8,
     "missing_policy": "NA_not_zero",
     "dynamic_weight": "estimated_travel_time_p50_s",
     "rts_sensitivity_weight": "allocated_distance_m",
-    "high_exposure_train_cdf_quantile": 0.9
+    "high_exposure_train_cdf_quantile": 0.9,
+    "micro_cdf_scope": "separate_Train_only_artifact_per_protocol_and_model"
+  },
+  "route_provenance": {
+    "allowed": [
+      ["revealed_route_proxy", "frozen_stage2_v4_revealed_route_proxy", "stage2_v4_route_conditioned_dataset.1"],
+      ["historical_original_service_route", "frozen_stage1_route_parts", "stage1_v3_route_sequence_context.1"]
+    ],
+    "planned_fallback_or_oracle_allowed": false
   },
   "static_complexity": {
+    "schema_audit": "stage2/docs/v5_2/stage2_v5_2_static_schema_audit.json",
     "available": [
       "canonical_highway", "road_class", "bridge", "tunnel", "observed_direction",
       "synthetic_reverse_edge", "osm_direction_disagreement"
     ],
-    "upstream_unavailable_emit_na": ["intersection", "signal", "merge", "turn", "ramp", "speed_limit", "lane_information"]
+    "schema_audited_na": [
+      "intersection", "signal", "merge", "turning_type", "ramp", "speed_limit", "lane_information"
+    ],
+    "na_policy": "NA_not_zero_no_reconstruction"
   },
   "spatial_transfer": {
     "models": {
-      "S0": "current_v5_1_edge_identity",
-      "S1": "structure_only",
-      "S2": "id_structure_concat",
-      "S3": "support_aware"
+      "S0": "exact_frozen_v5_1_forward",
+      "S1": "structure_only_edge_categorical_replacement",
+      "S2": "id_structure_concat_projection",
+      "S3": "support_aware_edge_categorical_replacement"
     },
-    "support_source": "train_only",
+    "support_source": "verified_unique_physical_Train_traversals_only",
     "lambda": "n/(n+tau)",
     "tau_candidates": ["train_support_p25", "train_support_p50", "train_support_p75"],
-    "tau_selection": "development_validation_once_then_frozen",
+    "tau_selection_protocol": "transfer_tuning_09_18_to_19_20",
+    "tau_selection_metric": "macro_normalized_MAE_over_4_core_micro_targets",
+    "tau_tie_break": "smaller_tau",
+    "pace_or_rts_used_for_tau": false,
     "rolling_tau_reselection": false
   },
   "temporal_transfer": {
     "models": {"T0": "none", "T1": "zero_shot_small_adapter", "T2": "causal_online_adapter"},
-    "adapter": "two_layer_bottleneck_mlp",
+    "adapter": "two_layer_bottleneck_hidden_token_MLP",
+    "insertion_point": "after_input_history_fusion_before_local_route_transformer",
     "maximum_adapter_to_shared_parameter_ratio": 0.1,
+    "temporal_feature_names": [
+      "decision_hour_sin", "decision_hour_cos", "decision_weekday_index", "forecast_horizon_log1p"
+    ],
+    "normalization_source": "frozen_analytic_transform",
+    "availability_time": "decision_time",
     "online_update_interval_minutes": 60,
-    "eligibility": "observation_end_time < decision_time and order_id != current_order_id",
+    "online_eligibility": [
+      "observation_end_time < adaptation_cutoff_time",
+      "order_completion_time < adaptation_cutoff_time",
+      "label_available_time < adaptation_cutoff_time",
+      "order_id != current_order_id"
+    ],
     "main_result": "zero_shot"
   },
   "experiment_matrix": {
-    "M0": "tree_baseline",
-    "M1": "current_rc_mstnet_v5_1",
+    "M0": "strong_micro_tree_baseline",
+    "M1": "frozen_rc_mstnet_v5_1",
     "M2": "structure_only",
     "M3": "id_structure_concat",
     "M4": "support_aware_spatial_transfer",
     "M5": "M4_plus_temporal_adapter",
-    "M6": "M5_plus_optional_task_pretraining",
-    "stop_if_M4_not_adopted": ["M5", "M6"]
+    "M6": "optional_task_pretraining_future_only",
+    "M5_requires_M4_adoption": true
   },
   "adoption": {
+    "targets": ["crawl", "stop", "speed_cv", "acceleration_rms"],
+    "rts_used": false,
     "spatial": {
       "minimum_low_support_target_wins": 3,
-      "minimum_five_target_mean_relative_improvement": 0.02,
+      "minimum_four_target_mean_relative_improvement": 0.02,
       "maximum_any_overall_target_degradation": 0.02,
       "unseen_must_not_be_worse_than_structure_only": true
     },
     "temporal": {
       "minimum_improved_rolling_dates": 4,
       "required_rolling_dates": 6,
-      "minimum_five_target_mean_relative_improvement": 0.01
+      "minimum_four_target_mean_relative_improvement": 0.01
     },
-    "task_pretraining": "adopt_only_if_low_support_and_overall_both_stably_improve",
     "maximum_pace_p50_mae_degradation": 0.02
   },
   "performance": {
     "sizes": [10000, 50000, 100000, 500000],
     "maximum_five_x_runtime_ratio": 8.0,
+    "real_kernels_required": [
+      "build_static_structure_features",
+      "SupportAwareEdgeRepresentation.forward",
+      "TemporalAdapter.forward",
+      "aggregate_original_route_micro_conditions"
+    ],
+    "peak_memory": "process_peak_RSS_sampler",
     "prohibited": [
       "per_order_python_loop", "per_edge_full_column_scan", "groupby.apply",
       "DataFrame.apply(axis=1)", "concat_inside_loop", "repeated_unique_edge_filter"

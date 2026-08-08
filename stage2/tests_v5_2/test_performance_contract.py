@@ -24,10 +24,19 @@ def test_optimized_aggregation_matches_small_reference() -> None:
         "route_sequence": np.arange(4), "estimated_travel_time_p50_s": [1.0, 2.0, 3.0, 4.0],
         "allocated_distance_m": 10.0, "edge_train_support": [0, 1, 2, 3],
         "support_group": ["unseen", "low", "medium", "high"],
+        "protocol_id": "development",
+        "model_id": "M4", "prediction_source": "fixture",
+        "route_track": "historical_original_service_route",
+        "route_source": "frozen_stage1_route_parts",
+        "route_product_version": "stage1_v3_route_sequence_context.1",
     })
     for column in DIMENSIONS.values():
         frame[column] = [0.1, 0.2, 0.8, 0.9]
-    cdf = {"fit_split": "train", "evaluation_rows_used": 0, "thresholds": {name: 0.8 for name in DIMENSIONS}}
+    cdf = {
+        "fit_split": "train", "evaluation_rows_used": 0, "protocol_id": "development",
+        "model_id": "M4", "prediction_source": "fixture",
+        "thresholds": {name: 0.8 for name in DIMENSIONS},
+    }
     actual = aggregate_original_route_micro_conditions(frame, cdf).iloc[0]
     expected = _reference(frame, 0.8)
     assert np.allclose(

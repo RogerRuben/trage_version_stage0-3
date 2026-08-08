@@ -12,6 +12,7 @@ import numpy as np
 import pandas as pd
 
 from .contracts import Stage2V52ContractError
+from .contracts import CORE_TRANSFER_TARGETS
 
 try:  # The data-contract helpers remain importable without torch.
     import torch
@@ -41,6 +42,12 @@ class TrainSupportArtifact:
     tau_candidates: tuple[float, ...]
     group_boundaries: tuple[float, float]
     fit_dates: tuple[str, ...]
+    protocol_id: str = "unspecified"
+    source_row_count: int = 0
+    unique_traversal_count: int = 0
+    duplicate_removed_count: int = 0
+    missing_edge_count: int = 0
+    input_sha256: str = ""
     source: str = "train_only_observed_directed_edge_uid"
 
     def to_payload(self) -> dict[str, Any]:
@@ -51,11 +58,18 @@ class TrainSupportArtifact:
             "tau_candidates": list(self.tau_candidates),
             "group_boundaries": list(self.group_boundaries),
             "fit_dates": list(self.fit_dates),
+            "fit_dates_observed": list(self.fit_dates),
+            "protocol_id": self.protocol_id,
+            "source_row_count": self.source_row_count,
+            "unique_traversal_count": self.unique_traversal_count,
+            "duplicate_removed_count": self.duplicate_removed_count,
+            "missing_edge_count": self.missing_edge_count,
+            "input_sha256": self.input_sha256,
             "source": self.source,
             "evaluation_support_used": False,
         }
         canonical = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
-        payload["artifact_hash"] = hashlib.sha256(canonical).hexdigest()
+        payload["artifact_sha256"] = hashlib.sha256(canonical).hexdigest()
         return payload
 
 
@@ -73,6 +87,53 @@ def fit_train_support(edge_ids: Iterable[object], *, fit_dates: Iterable[str]) -
         tau_candidates=(quantiles["p25"], quantiles["p50"], quantiles["p75"]),
         group_boundaries=(quantiles["p25"], quantiles["p75"]),
         fit_dates=tuple(str(value) for value in fit_dates),
+    )
+
+
+def fit_train_support_frame(
+    frame: pd.DataFrame,
+    *,
+    protocol_id: str,
+    protocol_train_dates: Iterable[str],
+    input_sha256: str,
+    allowed_date_subset: Iterable[str] | None = None,
+) -> TrainSupportArtifact:
+    """Fit support from unique physical Train traversals with verified dates."""
+    required = ("split", "date", "order_id", "traversal_id", "observed_directed_edge_uid")
+    missing = sorted(set(required) - set(frame.columns))
+    if missing:
+        raise Stage2V52ContractError(f"support input is missing: {missing}")
+    split = frame["split"].astype(str)
+    if not split.eq("train").all():
+        raise Stage2V52ContractError("support input contains non-Train rows")
+    observed_dates = tuple(sorted(frame["date"].astype(str).unique()))
+    expected = tuple(str(value) for value in protocol_train_dates)
+    allowed = tuple(str(value) for value in allowed_date_subset) if allowed_date_subset is not None else expected
+    if not set(allowed) <= set(expected) or observed_dates != tuple(sorted(allowed)):
+        raise Stage2V52ContractError(
+            f"support dates {observed_dates} do not match the allowed protocol Train dates {tuple(sorted(allowed))}"
+        )
+    identity = ["date", "order_id", "traversal_id"]
+    edge = frame["observed_directed_edge_uid"].astype("string")
+    valid = edge.notna() & edge.str.len().fillna(0).gt(0)
+    working = frame.loc[valid, [*identity, "observed_directed_edge_uid"]].copy()
+    inconsistent = working.groupby(identity, sort=False, observed=True)["observed_directed_edge_uid"].nunique(dropna=True)
+    if (inconsistent > 1).any():
+        raise Stage2V52ContractError("one physical traversal maps to multiple directed edges in support input")
+    unique = working.drop_duplicates(identity, keep="first")
+    base = fit_train_support(unique["observed_directed_edge_uid"], fit_dates=observed_dates)
+    return TrainSupportArtifact(
+        counts=base.counts,
+        positive_quantiles=base.positive_quantiles,
+        tau_candidates=base.tau_candidates,
+        group_boundaries=base.group_boundaries,
+        fit_dates=observed_dates,
+        protocol_id=str(protocol_id),
+        source_row_count=int(len(frame)),
+        unique_traversal_count=int(len(unique)),
+        duplicate_removed_count=int(len(working) - len(unique)),
+        missing_edge_count=int((~valid).sum()),
+        input_sha256=str(input_sha256),
     )
 
 
@@ -96,28 +157,44 @@ def lookup_train_support(edge_ids: Iterable[object], artifact: Mapping[str, Any]
 
 
 def select_tau_once(
-    candidate_scores: Mapping[float, float],
+    candidate_mae_by_target: Mapping[float, Mapping[str, float]],
+    v5_1_mae_by_target: Mapping[str, float],
     artifact: Mapping[str, Any],
-    *,
-    lower_is_better: bool = True,
 ) -> dict[str, Any]:
-    """Select tau only from Train P25/P50/P75 candidates on development validation."""
+    """Select tau by frozen four-target macro normalized validation MAE."""
     allowed = tuple(float(value) for value in artifact.get("tau_candidates", ()))
-    if not allowed or set(map(float, candidate_scores)) != set(allowed):
+    if not allowed or set(map(float, candidate_mae_by_target)) != set(allowed):
         raise Stage2V52ContractError("tau scores must cover exactly Train P25/P50/P75 candidates")
-    if any(not np.isfinite(value) for value in candidate_scores.values()):
-        raise Stage2V52ContractError("tau candidate scores must be finite")
-    selected = (min if lower_is_better else max)(
-        allowed, key=lambda value: (float(candidate_scores[value]), value)
-    )
+    if set(v5_1_mae_by_target) != set(CORE_TRANSFER_TARGETS):
+        raise Stage2V52ContractError("tau baseline must contain exactly four core micro targets")
+    scores: dict[float, float] = {}
+    for tau in allowed:
+        target_mae = candidate_mae_by_target[tau]
+        if set(target_mae) != set(CORE_TRANSFER_TARGETS):
+            raise Stage2V52ContractError("tau candidate includes a non-core target or misses a core target")
+        normalized = []
+        for target in CORE_TRANSFER_TARGETS:
+            baseline = float(v5_1_mae_by_target[target])
+            candidate = float(target_mae[target])
+            if not np.isfinite(baseline) or baseline <= 0 or not np.isfinite(candidate):
+                raise Stage2V52ContractError("tau selection MAE values must be finite with positive M1 baseline")
+            normalized.append(candidate / baseline)
+        scores[tau] = float(np.mean(normalized))
+    selected = min(allowed, key=lambda value: (scores[value], value))
     return {
         "schema_version": "stage2_v5_2_tau_selection.1",
-        "selection_split": "development_validation",
+        "selection_protocol": "transfer_tuning",
+        "train_dates": [f"201610{day:02d}" for day in range(9, 19)],
+        "validation_dates": ["20161019", "20161020"],
         "rolling_reselection_allowed": False,
+        "selection_metric": "macro_normalized_mae_over_4_core_micro_targets",
+        "core_targets": list(CORE_TRANSFER_TARGETS),
+        "rts_used": False,
+        "pace_used": False,
         "candidates": list(allowed),
-        "scores": {str(value): float(candidate_scores[value]) for value in allowed},
+        "scores": {str(value): scores[value] for value in allowed},
         "selected_tau": float(selected),
-        "lower_is_better": bool(lower_is_better),
+        "tie_break": "smaller_tau",
     }
 
 

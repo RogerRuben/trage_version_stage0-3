@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import average_precision_score, brier_score_loss, roc_auc_score
 
-from .contracts import MICRO_TARGETS, Stage2V52ContractError
+from .contracts import CORE_TRANSFER_TARGETS, Stage2V52ContractError
 
 
 REGRESSION_TARGET_COLUMNS = {
@@ -155,20 +155,24 @@ def decide_spatial_transfer(
     unseen_candidate_error: Mapping[str, float],
     unseen_structure_only_error: Mapping[str, float],
 ) -> dict[str, Any]:
-    if set(low_support_improvement_by_target) != set(MICRO_TARGETS):
-        raise Stage2V52ContractError("spatial adoption requires exactly five micro targets")
+    if set(low_support_improvement_by_target) != set(CORE_TRANSFER_TARGETS):
+        raise Stage2V52ContractError("spatial adoption requires exactly four core micro targets")
+    if set(overall_improvement_by_target) != set(CORE_TRANSFER_TARGETS):
+        raise Stage2V52ContractError("overall spatial adoption inputs differ from four core targets")
     wins = sum(float(value) > 0 for value in low_support_improvement_by_target.values())
     mean_improvement = float(np.mean(list(low_support_improvement_by_target.values())))
     overall_stable = all(float(value) >= -0.02 for value in overall_improvement_by_target.values())
     unseen_not_worse = all(
         float(unseen_candidate_error[target]) <= float(unseen_structure_only_error[target])
-        for target in MICRO_TARGETS
+        for target in CORE_TRANSFER_TARGETS
     )
     adopted = wins >= 3 and mean_improvement > 0.02 and overall_stable and unseen_not_worse
     return {
         "adopt": adopted,
         "status": "ADOPT_SUPPORT_AWARE" if adopted else "RETAIN_V5_1_NEGATIVE_OR_INSUFFICIENT_TRANSFER",
         "low_support_target_wins": wins,
+        "adoption_target_count": 4,
+        "rts_role": "secondary_frozen_reference_target",
         "low_support_mean_relative_improvement": mean_improvement,
         "overall_no_target_degrades_over_2pct": overall_stable,
         "unseen_not_worse_than_structure_only": unseen_not_worse,
@@ -180,6 +184,8 @@ def decide_temporal_adapter(
     target_mean_improvements: Mapping[str, float],
 ) -> dict[str, Any]:
     improved_days = sum(float(value) > 0 for value in daily_mean_improvements.values())
+    if set(target_mean_improvements) != set(CORE_TRANSFER_TARGETS):
+        raise Stage2V52ContractError("temporal adoption requires exactly four core micro targets")
     target_mean = float(np.mean(list(target_mean_improvements.values())))
     adopted = len(daily_mean_improvements) == 6 and improved_days >= 4 and target_mean > 0.01
     return {
@@ -187,7 +193,8 @@ def decide_temporal_adapter(
         "status": "ADOPT_TEMPORAL_ADAPTER" if adopted else "RETAIN_NO_OR_ZERO_SHOT_ADAPTER",
         "improved_rolling_dates": improved_days,
         "rolling_date_count": len(daily_mean_improvements),
-        "five_target_mean_relative_improvement": target_mean,
+        "four_core_target_mean_relative_improvement": target_mean,
+        "rts_role": "secondary_frozen_reference_target",
     }
 
 

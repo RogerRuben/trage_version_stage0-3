@@ -44,6 +44,23 @@ DIMENSIONS = {
     "acceleration": "pred_acceleration_rms_bounded",
     "rts": "pred_rts_raw",
 }
+ALLOWED_ROUTE_PROVENANCE = frozenset({
+    (
+        "revealed_route_proxy",
+        "frozen_stage2_v4_revealed_route_proxy",
+        "stage2_v4_route_conditioned_dataset.1",
+    ),
+    (
+        "historical_original_service_route",
+        "frozen_stage1_route_parts",
+        "stage1_v3_route_sequence_context.1",
+    ),
+})
+
+
+def _canonical_hash(value: Any) -> str:
+    raw = json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(raw).hexdigest()
 
 
 def _sha256_file(path: Path) -> str:
@@ -73,6 +90,7 @@ def build_micro_condition_tokens(
     route_context: pd.DataFrame,
     *,
     support_artifact: Mapping[str, Any],
+    protocol_id: str,
     prediction_source: str,
     model_id: str,
     model_hash: str,
@@ -81,26 +99,30 @@ def build_micro_condition_tokens(
     join = [*ORDER_KEYS, "traversal_id"]
     require_columns(predictions.columns, (*join, "allocated_distance_m"), product="traversal predictions")
     require_columns(route_context.columns, join, product="route context")
-    cutoff_inputs = {"feature_cutoff_time", "decision_time", "feature_age_s"} & set(route_context.columns)
-    if "feature_cutoff_time" not in cutoff_inputs and not {"decision_time", "feature_age_s"} <= cutoff_inputs:
-        raise Stage2V52ContractError(
-            "route context requires feature_cutoff_time or decision_time plus feature_age_s"
-        )
     context_required = (
         *join, "route_sequence", "observed_directed_edge_uid", "canonical_edge_uid",
+        "decision_time", "feature_cutoff_time", "route_track", "route_source", "route_product_version",
     )
     require_columns(route_context.columns, context_required, product="route context")
     if predictions.duplicated(join).any() or route_context.duplicated(join).any():
         raise Stage2V52ContractError("token identity is not one-to-one")
     keep = list(dict.fromkeys([
         *context_required, "history_support", "observed_sec_per_m_profile_count",
-        "feature_cutoff_time", "decision_time", "feature_age_s",
+        "feature_cutoff_time", "decision_time",
         "route_part_length_m", "canonical_highway", "road_class", "bridge", "tunnel",
     ]))
     keep = [column for column in keep if column in route_context.columns]
     merged = predictions.merge(route_context.loc[:, keep], on=join, how="left", validate="one_to_one")
     if merged["observed_directed_edge_uid"].isna().any():
         raise Stage2V52ContractError("prediction row is missing its original-route edge identity")
+    provenance = merged[["route_track", "route_source", "route_product_version"]].astype(str)
+    observed_provenance = {
+        tuple(row) for row in provenance.drop_duplicates().to_numpy()
+    }
+    if len(observed_provenance) != 1 or not observed_provenance <= ALLOWED_ROUTE_PROVENANCE:
+        raise Stage2V52ContractError(
+            f"route context is not a frozen original-route product: {sorted(observed_provenance)}"
+        )
     result = merged.loc[:, [column for column in ORDER_KEYS if column in merged.columns]].copy()
     for column in ("order_id", "route_sequence", "traversal_id", "observed_directed_edge_uid", "canonical_edge_uid"):
         result[column] = merged[column]
@@ -113,26 +135,31 @@ def build_micro_condition_tokens(
     result["estimated_travel_time_p50_s"] = result["pred_pace_p50"] * distance
     for target, source in AVAILABILITY_ALIASES.items():
         result[target] = merged[source].fillna(False).astype(bool) if source in merged else False
-    history_source = "history_support" if "history_support" in merged else "observed_sec_per_m_profile_count"
+    if "history_support" in merged:
+        history_source = "history_support"
+    elif "observed_sec_per_m_profile_count" in merged:
+        history_source = "observed_sec_per_m_profile_count"
+    else:
+        raise Stage2V52ContractError("route context has no frozen history support field")
     result["history_support"] = pd.to_numeric(merged[history_source], errors="coerce").fillna(0).astype("int64")
     support, group = lookup_train_support(result["observed_directed_edge_uid"], support_artifact)
     result["edge_train_support"] = support
     result["edge_seen_in_train"] = support > 0
     result["support_group"] = group
+    result["protocol_id"] = str(protocol_id)
     result["prediction_source"] = str(prediction_source)
     result["model_id"] = str(model_id)
     result["model_hash"] = str(model_hash)
-    if "feature_cutoff_time" in merged:
-        cutoff = pd.to_numeric(merged["feature_cutoff_time"], errors="coerce")
-    else:
-        decision = pd.to_numeric(merged["decision_time"], errors="coerce")
-        age = pd.to_numeric(merged["feature_age_s"], errors="coerce")
-        cutoff = decision - age
-        if ((age <= 0) | age.isna()).any():
-            raise Stage2V52ContractError("derived feature cutoff requires strictly positive feature_age_s")
+    decision = pd.to_numeric(merged["decision_time"], errors="coerce")
+    cutoff = pd.to_numeric(merged["feature_cutoff_time"], errors="coerce")
+    age = decision - cutoff
+    if decision.isna().any() or cutoff.isna().any() or (age <= 0).any():
+        raise Stage2V52ContractError("every feature_cutoff_time must be strictly earlier than decision_time")
+    result["decision_time"] = decision
     result["feature_cutoff_time"] = cutoff
-    if result["feature_cutoff_time"].isna().any():
-        raise Stage2V52ContractError("feature_cutoff_time cannot be missing")
+    result["feature_age_s"] = age
+    for column in ("route_track", "route_source", "route_product_version"):
+        result[column] = merged[column].astype(str)
     for optional in ("route_part_length_m", "canonical_highway", "road_class", "bridge", "tunnel"):
         if optional in merged:
             result[optional] = merged[optional]
@@ -143,11 +170,30 @@ def build_micro_condition_tokens(
 def fit_train_cdf_thresholds(
     train_tokens: pd.DataFrame,
     *,
+    protocol_id: str,
+    protocol_train_dates: Sequence[str],
+    input_sha256: str,
     quantile: float = 0.90,
 ) -> dict[str, Any]:
     """Freeze the empirical Train CDF cut corresponding to F_train(z)>=q."""
     if not 0 < quantile < 1:
         raise Stage2V52ContractError("CDF quantile must be between zero and one")
+    metadata = ("split", "date", "protocol_id", "model_id", "prediction_source")
+    require_columns(train_tokens.columns, metadata, product="Train micro CDF input")
+    if not train_tokens["split"].astype(str).eq("train").all():
+        raise Stage2V52ContractError("micro CDF input contains non-Train rows")
+    observed_dates = tuple(sorted(train_tokens["date"].astype(str).unique()))
+    expected_dates = tuple(sorted(str(value) for value in protocol_train_dates))
+    if observed_dates != expected_dates:
+        raise Stage2V52ContractError(
+            f"micro CDF dates {observed_dates} differ from protocol Train dates {expected_dates}"
+        )
+    if set(train_tokens["protocol_id"].astype(str).unique()) != {str(protocol_id)}:
+        raise Stage2V52ContractError("micro CDF protocol_id is mixed or incorrect")
+    model_ids = tuple(sorted(train_tokens["model_id"].astype(str).unique()))
+    sources = tuple(sorted(train_tokens["prediction_source"].astype(str).unique()))
+    if len(model_ids) != 1 or len(sources) != 1:
+        raise Stage2V52ContractError("micro CDF requires one model_id and prediction_source")
     thresholds: dict[str, float] = {}
     counts: dict[str, int] = {}
     for name, column in DIMENSIONS.items():
@@ -158,14 +204,21 @@ def fit_train_cdf_thresholds(
             raise Stage2V52ContractError(f"Train CDF has no valid {name} values")
         thresholds[name] = float(np.quantile(values, quantile, method="inverted_cdf"))
         counts[name] = int(len(values))
-    return {
+    payload = {
         "schema_version": "stage2_v5_2_train_micro_cdf.1",
         "fit_split": "train",
         "evaluation_rows_used": 0,
+        "protocol_id": str(protocol_id),
+        "fit_dates_observed": list(observed_dates),
+        "model_id": model_ids[0],
+        "prediction_source": sources[0],
+        "input_sha256": str(input_sha256),
         "quantile": float(quantile),
         "thresholds": thresholds,
         "valid_counts": counts,
     }
+    payload["artifact_sha256"] = _canonical_hash(payload)
+    return payload
 
 
 def weighted_quantile_by_group(
@@ -235,40 +288,75 @@ def aggregate_original_route_micro_conditions(
     """Aggregate traversal predictions over each historical original route."""
     required = (
         *ORDER_KEYS, "route_sequence", "estimated_travel_time_p50_s", "allocated_distance_m",
-        "edge_train_support", "support_group", *DIMENSIONS.values(),
+        "edge_train_support", "support_group", "protocol_id", "model_id", "prediction_source",
+        "route_track", "route_source", "route_product_version", *DIMENSIONS.values(),
     )
     require_columns(tokens.columns, required, product="micro tokens for route aggregation")
     if train_cdf.get("fit_split") != "train" or train_cdf.get("evaluation_rows_used") != 0:
         raise Stage2V52ContractError("high exposure requires a frozen Train-only CDF")
+    token_protocols = set(tokens["protocol_id"].astype(str).unique())
+    if token_protocols != {str(train_cdf.get("protocol_id"))}:
+        raise Stage2V52ContractError("route aggregation CDF protocol differs from token protocol")
+    if set(tokens["model_id"].astype(str).unique()) != {str(train_cdf.get("model_id"))}:
+        raise Stage2V52ContractError("route aggregation CDF model differs from token model")
+    if set(tokens["prediction_source"].astype(str).unique()) != {
+        str(train_cdf.get("prediction_source"))
+    }:
+        raise Stage2V52ContractError("route aggregation CDF source differs from token source")
     thresholds = train_cdf.get("thresholds", {})
     working = tokens.sort_values([*ORDER_KEYS, "route_sequence"], kind="stable").reset_index(drop=True)
     grouped = working.groupby(list(ORDER_KEYS), sort=False, observed=True, dropna=False)
     codes = grouped.ngroup().to_numpy(np.int64)
     group_count = int(codes.max() + 1) if len(codes) else 0
     result = working.loc[:, ORDER_KEYS].groupby(codes, sort=False, observed=True).first().reset_index(drop=True)
-    result["route_identity"] = "historical_original_service_route"
+    for column in ("route_track", "route_source", "route_product_version"):
+        result[column] = working[column].groupby(codes, sort=False, observed=True).first().to_numpy()
+    result["route_identity"] = result["route_track"]
     time_weight = pd.to_numeric(working["estimated_travel_time_p50_s"], errors="coerce").to_numpy(np.float64)
     distance_weight = pd.to_numeric(working["allocated_distance_m"], errors="coerce").to_numpy(np.float64)
-    physical_time = np.isfinite(time_weight) & (time_weight > 0)
-    total_time = np.bincount(codes, weights=np.where(physical_time, time_weight, 0.0), minlength=group_count)
-    result["travel_time_p50_s"] = total_time
-    common_valid = physical_time.copy()
+    physical_distance = np.isfinite(distance_weight) & (distance_weight > 0)
+    total_distance = np.bincount(
+        codes, weights=np.where(physical_distance, distance_weight, 0.0), minlength=group_count
+    )
+    result["route_total_distance_m"] = total_distance
+    pace_valid = physical_distance & np.isfinite(time_weight) & (time_weight > 0)
+    partial_time = np.bincount(codes, weights=np.where(pace_valid, time_weight, 0.0), minlength=group_count)
+    pace_distance = np.bincount(
+        codes, weights=np.where(pace_valid, distance_weight, 0.0), minlength=group_count
+    )
+    pace_coverage = _divide(pace_distance, total_distance)
+    result["partial_travel_time_p50_s"] = partial_time
+    result["pace_prediction_coverage_distance"] = pace_coverage
+    result["travel_time_p50_s"] = np.where(pace_coverage >= minimum_coverage, partial_time, np.nan)
+    physical_time = pace_valid
+    total_time = partial_time
+    common_valid = pace_valid.copy()
     for column in DIMENSIONS.values():
         common_valid &= np.isfinite(pd.to_numeric(working[column], errors="coerce").to_numpy(np.float64))
-    covered = np.bincount(codes, weights=np.where(common_valid, time_weight, 0.0), minlength=group_count)
-    result["micro_condition_coverage"] = _divide(covered, total_time)
+    covered_distance = np.bincount(
+        codes, weights=np.where(common_valid, distance_weight, 0.0), minlength=group_count
+    )
+    result["micro_prediction_coverage_distance"] = _divide(covered_distance, total_distance)
+    result["micro_condition_coverage"] = result["micro_prediction_coverage_distance"]
     support = pd.to_numeric(working["edge_train_support"], errors="coerce").to_numpy(np.float64)
-    support_valid = physical_time & np.isfinite(support)
-    support_num = np.bincount(codes, weights=np.where(support_valid, support * time_weight, 0.0), minlength=group_count)
-    support_den = np.bincount(codes, weights=np.where(support_valid, time_weight, 0.0), minlength=group_count)
+    support_valid = physical_distance & np.isfinite(support)
+    support_num = np.bincount(codes, weights=np.where(support_valid, support * distance_weight, 0.0), minlength=group_count)
+    support_den = np.bincount(codes, weights=np.where(support_valid, distance_weight, 0.0), minlength=group_count)
     result["support_weighted_mean"] = _divide(support_num, support_den)
     groups = working["support_group"].astype(str).to_numpy()
     for name, mask in (("low_support_route_share", groups == "low"), ("unseen_edge_route_share", groups == "unseen")):
-        numerator = np.bincount(codes, weights=np.where(physical_time & mask, time_weight, 0.0), minlength=group_count)
-        result[name] = _divide(numerator, total_time)
+        numerator = np.bincount(codes, weights=np.where(physical_distance & mask, distance_weight, 0.0), minlength=group_count)
+        result[name] = _divide(numerator, total_distance)
     for name, column in DIMENSIONS.items():  # Fixed five-dimension loop, never per route.
         value = pd.to_numeric(working[column], errors="coerce").to_numpy(np.float64)
         valid = physical_time & np.isfinite(value)
+        dimension_distance = np.bincount(
+            codes,
+            weights=np.where(physical_distance & np.isfinite(value), distance_weight, 0.0),
+            minlength=group_count,
+        )
+        coverage_column = f"{name}_prediction_coverage"
+        result[coverage_column] = _divide(dimension_distance, total_distance)
         valid_weight = np.where(valid, time_weight, 0.0)
         denominator = np.bincount(codes, weights=valid_weight, minlength=group_count)
         numerator = np.bincount(codes, weights=np.where(valid, value * time_weight, 0.0), minlength=group_count)
@@ -294,8 +382,17 @@ def aggregate_original_route_micro_conditions(
             result["rts_distance_weighted_p90"] = weighted_quantile_by_group(
                 codes, value, distance, group_count, quantile=0.90
             )
+        insufficient = result[coverage_column].to_numpy(float) < minimum_coverage
+        for output in (f"{name}_weighted_mean", f"{name}_weighted_p90", f"{name}_high_exposure_share"):
+            result.loc[insufficient, output] = np.nan
+        if name in {"crawl", "stop"}:
+            result.loc[insufficient, f"{name}_max_consecutive_high_share"] = np.nan
+        if name == "rts":
+            result.loc[insufficient, ["rts_distance_weighted_mean", "rts_distance_weighted_p90"]] = np.nan
     result["unknown_flag"] = (
-        ~np.isfinite(result["micro_condition_coverage"].to_numpy(float))
+        ~np.isfinite(result["pace_prediction_coverage_distance"].to_numpy(float))
+        | (result["pace_prediction_coverage_distance"].to_numpy(float) < minimum_coverage)
+        | ~np.isfinite(result["micro_condition_coverage"].to_numpy(float))
         | (result["micro_condition_coverage"].to_numpy(float) < minimum_coverage)
     )
     return result
@@ -305,7 +402,10 @@ def aggregate_static_route_complexity(tokens: pd.DataFrame) -> pd.DataFrame:
     """Build a separate product; unavailable dimensions remain NA, never zero."""
     require_columns(
         tokens.columns,
-        (*ORDER_KEYS, "route_sequence", "allocated_distance_m", "road_class", "bridge", "tunnel"),
+        (
+            *ORDER_KEYS, "route_sequence", "allocated_distance_m", "canonical_highway",
+            "road_class", "bridge", "tunnel",
+        ),
         product="static complexity input",
     )
     working = tokens.sort_values([*ORDER_KEYS, "route_sequence"], kind="stable").reset_index(drop=True)
@@ -332,13 +432,58 @@ def aggregate_static_route_complexity(tokens: pd.DataFrame) -> pd.DataFrame:
     eligible_count = np.bincount(codes, weights=transition_eligible.astype(float), minlength=group_count)
     changed_count = np.bincount(codes, weights=changed.astype(float), minlength=group_count)
     result["road_class_transition_rate"] = _divide(changed_count, eligible_count)
+    highway = working["canonical_highway"].astype("string")
+    highway_known = highway.notna().to_numpy()
+    prior_highway_known = np.r_[False, highway_known[:-1]]
+    highway_transition_eligible = same_group & highway_known & prior_highway_known
+    highway_text = highway.astype(str).to_numpy()
+    highway_changed = highway_transition_eligible & (highway_text != np.r_["", highway_text[:-1]])
+    highway_eligible_count = np.bincount(
+        codes, weights=highway_transition_eligible.astype(float), minlength=group_count
+    )
+    highway_changed_count = np.bincount(
+        codes, weights=highway_changed.astype(float), minlength=group_count
+    )
+    result["canonical_highway_transition_rate"] = _divide(
+        highway_changed_count, highway_eligible_count
+    )
+    category_frame = pd.DataFrame({
+        "group": codes[physical & highway_known],
+        "highway": highway_text[physical & highway_known],
+        "weight": distance[physical & highway_known],
+    })
+    entropy = np.full(group_count, np.nan, dtype=np.float64)
+    if not category_frame.empty:
+        category_weight = category_frame.groupby(
+            ["group", "highway"], sort=False, observed=True
+        )["weight"].sum().reset_index()
+        category_total = category_weight.groupby("group", sort=False, observed=True)["weight"].transform("sum")
+        probability = category_weight["weight"].to_numpy(float) / category_total.to_numpy(float)
+        category_weight["entropy_term"] = -probability * np.log(probability)
+        entropy_by_group = category_weight.groupby("group", sort=False, observed=True)["entropy_term"].sum()
+        entropy[entropy_by_group.index.to_numpy(np.int64)] = entropy_by_group.to_numpy(float)
+    result["canonical_highway_entropy"] = entropy
+    normalized_highway = np.char.lower(highway_text.astype(str))
+    for output, categories in (
+        ("motorway_trunk_exposure_share", ("motorway", "motorway_link", "trunk", "trunk_link")),
+        ("primary_secondary_exposure_share", ("primary", "primary_link", "secondary", "secondary_link")),
+    ):
+        exposed = physical & highway_known & np.isin(normalized_highway, categories)
+        known_weight = np.bincount(
+            codes, weights=np.where(physical & highway_known, distance, 0.0), minlength=group_count
+        )
+        exposed_weight = np.bincount(
+            codes, weights=np.where(exposed, distance, 0.0), minlength=group_count
+        )
+        result[output] = _divide(exposed_weight, known_weight)
     for column in (
         "intersection_exposure_share", "signal_exposure_share", "merge_exposure_share",
         "turn_exposure_share", "ramp_exposure_share",
     ):
         result[column] = pd.Series(pd.array([pd.NA] * group_count, dtype="Float64"))
     result["static_field_status"] = (
-        "bridge,tunnel,road_class=AVAILABLE; intersection,signal,merge,turn,ramp=NA_UPSTREAM_UNAVAILABLE"
+        "canonical_highway,bridge,tunnel,road_class=AVAILABLE; "
+        "intersection,signal,merge,turn,ramp=NA_SCHEMA_AUDITED_NO_STABLE_JOINABLE_FIELD"
     )
     require_columns(result.columns, STATIC_COMPLEXITY_COLUMNS, product="static route complexity")
     return result
@@ -368,9 +513,16 @@ def write_partition_products(
         _atomic_parquet(path, frame)
     manifest = {
         "schema_version": "stage2_v5_2_micro_partition.1",
+        "status": "PASS",
         "split": split,
         "date": date,
         "route_semantics": "historical_original_service_route",
+        "route_source_hash": _canonical_hash(
+            token_frame[["route_track", "route_source", "route_product_version"]]
+            .drop_duplicates()
+            .sort_values(["route_track", "route_source", "route_product_version"], kind="stable")
+            .to_dict(orient="records")
+        ),
         "row_counts": {
             "micro_condition_tokens": int(len(token_frame)),
             "original_route_micro_conditions": int(len(route_frame)),

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import ast
 import os
+import threading
 import time
 import tracemalloc
 from collections.abc import Callable, Iterable
@@ -20,7 +21,9 @@ from .micro_products import (
     aggregate_original_route_micro_conditions,
     weighted_quantile_by_group,
 )
-from .support_transfer import support_gate
+from .support_transfer import SupportAwareEdgeRepresentation
+from .structure_features import build_static_structure_features, fit_static_structure_artifact
+from .temporal_adapter import TemporalAdapter
 
 
 PROHIBITED_PATTERNS = (
@@ -85,20 +88,33 @@ def static_complexity_audit(root: str | Path) -> dict[str, Any]:
 
 def _measure(name: str, rows: int, function: Callable[[], object]) -> dict[str, float | int | str]:
     process = psutil.Process(os.getpid())
-    before = process.memory_info().rss
+    peak_rss = process.memory_info().rss
+    stop = threading.Event()
+
+    def sample_rss() -> None:
+        nonlocal peak_rss
+        while not stop.wait(0.005):
+            peak_rss = max(peak_rss, process.memory_info().rss)
+
+    sampler = threading.Thread(target=sample_rss, daemon=True)
     tracemalloc.start()
+    sampler.start()
     started = time.perf_counter()
-    function()
-    wall = time.perf_counter() - started
-    _, traced_peak = tracemalloc.get_traced_memory()
-    tracemalloc.stop()
-    after = process.memory_info().rss
+    try:
+        function()
+    finally:
+        wall = time.perf_counter() - started
+        stop.set()
+        sampler.join()
+        _, traced_peak = tracemalloc.get_traced_memory()
+        tracemalloc.stop()
+        peak_rss = max(peak_rss, process.memory_info().rss)
     return {
         "hotspot": name,
         "rows": rows,
         "wall_time_s": wall,
         "rows_per_s": rows / max(wall, 1.0e-12),
-        "peak_rss_mb": max(traced_peak, after - before, 0) / (1024 * 1024),
+        "peak_rss_mb": max(traced_peak, peak_rss, 0) / (1024 * 1024),
     }
 
 
@@ -111,34 +127,59 @@ def _route_case(rows: int) -> Callable[[], object]:
         "route_sequence": sequence, "estimated_travel_time_p50_s": 1.0 + sequence,
         "allocated_distance_m": 10.0, "edge_train_support": sequence,
         "support_group": np.where(sequence == 0, "unseen", np.where(sequence < 7, "low", "high")),
+        "protocol_id": "development",
+        "model_id": "M4",
+        "prediction_source": "benchmark_fixture",
+        "route_track": "historical_original_service_route",
+        "route_source": "frozen_stage1_route_parts",
+        "route_product_version": "stage1_v3_route_sequence_context.1",
     })
     for column in DIMENSIONS.values():
         frame[column] = (sequence % 11) / 10.0
     cdf = {
-        "fit_split": "train", "evaluation_rows_used": 0,
+        "fit_split": "train", "evaluation_rows_used": 0, "protocol_id": "development",
+        "model_id": "M4", "prediction_source": "benchmark_fixture",
         "thresholds": {name: 0.8 for name in DIMENSIONS},
     }
     return lambda: aggregate_original_route_micro_conditions(frame, cdf)
 
 
 def _support_representation_case(rows: int) -> Callable[[], object]:
-    support = (np.arange(rows) % 1000).astype(np.float32)
-    identity = np.tile(np.linspace(-1.0, 1.0, 16, dtype=np.float32), (rows, 1))
-    structure = np.flip(identity, axis=1).copy()
+    import torch
 
-    def represent() -> np.ndarray:
-        gate = support_gate(support, 25.0).astype(np.float32)
-        return gate[:, None] * identity + (1.0 - gate[:, None]) * structure
-
-    return represent
+    module = SupportAwareEdgeRepresentation(
+        edge_vocabulary_size=1001,
+        static_feature_count=8,
+        embedding_dim=16,
+        tau=25.0,
+        mode="support_aware",
+    ).eval()
+    edge = torch.as_tensor(np.arange(rows) % 1001, dtype=torch.long)
+    static = torch.ones((rows, 8), dtype=torch.float32)
+    support = torch.as_tensor(np.arange(rows) % 1000, dtype=torch.float32)
+    return lambda: module(edge, static, support)
 
 
 def _temporal_adapter_case(rows: int) -> Callable[[], object]:
-    state = np.tile(np.linspace(-1.0, 1.0, 16, dtype=np.float32), (rows, 1))
-    time_features = np.tile(np.array([0.0, 1.0, 0.5, 0.25], dtype=np.float32), (rows, 1))
-    down = np.ones((20, 4), dtype=np.float32) / 20.0
-    up = np.ones((4, 16), dtype=np.float32) / 4.0
-    return lambda: state + np.maximum(np.column_stack((state, time_features)) @ down, 0.0) @ up
+    import torch
+
+    module = TemporalAdapter(hidden_dim=16, time_feature_dim=4, bottleneck_dim=4).eval()
+    state = torch.ones((rows, 16), dtype=torch.float32)
+    time_features = torch.ones((rows, 4), dtype=torch.float32)
+    return lambda: module(state, time_features)
+
+
+def _static_structure_case(rows: int) -> Callable[[], object]:
+    frame = pd.DataFrame({
+        "split": "train", "date": "20161009", "order_id": (np.arange(rows) // 20).astype(str),
+        "route_sequence": np.arange(rows) % 20, "row_id": np.arange(rows),
+        "canonical_highway": np.where(np.arange(rows) % 2, "primary", "secondary"),
+        "road_class": np.where(np.arange(rows) % 3, "major", "minor"),
+        "observed_direction": "forward", "bridge": False, "tunnel": False,
+        "synthetic_reverse_edge": False, "osm_direction_disagreement": False,
+    })
+    artifact = fit_static_structure_artifact([frame], fit_dates=("20161009",))
+    return lambda: build_static_structure_features(frame, artifact)
 
 
 def _quantile_case(rows: int) -> Callable[[], object]:
@@ -159,9 +200,7 @@ def _consecutive_case(rows: int) -> Callable[[], object]:
 def run_benchmarks(sizes: Iterable[int] = (10_000, 50_000, 100_000, 500_000)) -> tuple[pd.DataFrame, dict[str, Any]]:
     factories = {
         "support_aware_edge_representation": _support_representation_case,
-        "static_structure_preprocessing": lambda rows: lambda: np.column_stack((
-            np.arange(rows) % 12, np.arange(rows) % 2, np.arange(rows) % 3
-        )).astype(np.float32),
+        "static_structure_preprocessing": _static_structure_case,
         "micro_route_aggregation": _route_case,
         "weighted_quantile": _quantile_case,
         "max_consecutive_high_exposure": _consecutive_case,

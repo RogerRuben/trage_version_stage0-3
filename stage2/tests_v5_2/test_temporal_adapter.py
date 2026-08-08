@@ -10,8 +10,12 @@ def test_causal_online_update_excludes_future_and_current_order() -> None:
     events = pd.DataFrame({
         "order_id": ["old", "current", "future", "equal"],
         "observation_end_time": [90.0, 80.0, 110.0, 100.0],
+        "order_completion_time": [91.0, 81.0, 111.0, 99.0],
+        "label_available_time": [92.0, 82.0, 112.0, 100.0],
     })
-    selected = causal_update_events(events, decision_time=100.0, current_order_id="current")
+    selected = causal_update_events(
+        events, adaptation_cutoff_time=100.0, current_order_id="current"
+    )
     assert selected["order_id"].tolist() == ["old"]
 
 

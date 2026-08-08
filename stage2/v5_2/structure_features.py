@@ -15,7 +15,8 @@ from .contracts import Stage2V52ContractError, require_columns, validate_model_i
 CATEGORICAL_STATIC_FIELDS = ("canonical_highway", "road_class", "observed_direction")
 BOOLEAN_STATIC_FIELDS = ("bridge", "tunnel", "synthetic_reverse_edge", "osm_direction_disagreement")
 STRUCTURE_REQUIRED_FIELDS = (
-    "order_id", "route_sequence", *CATEGORICAL_STATIC_FIELDS, *BOOLEAN_STATIC_FIELDS,
+    "split", "date", "order_id", "route_sequence", "row_id",
+    *CATEGORICAL_STATIC_FIELDS, *BOOLEAN_STATIC_FIELDS,
 )
 
 
@@ -65,14 +66,18 @@ def _one_hot(values: pd.Series, vocabulary: Sequence[str]) -> np.ndarray:
 def build_static_structure_features(
     frame: pd.DataFrame,
     artifact: StaticStructureArtifact | Mapping[str, Any],
-) -> tuple[np.ndarray, tuple[str, ...]]:
-    """Encode road semantics plus upstream/downstream road class without labels."""
+) -> tuple[np.ndarray, tuple[str, ...], np.ndarray]:
+    """Encode structure, then scatter features back to the caller's row order."""
     require_columns(frame.columns, STRUCTURE_REQUIRED_FIELDS, product="static structure input")
     payload = artifact.to_payload() if isinstance(artifact, StaticStructureArtifact) else artifact
     if payload.get("fit_scope") != "train_only" or payload.get("evaluation_rows_used") != 0:
         raise Stage2V52ContractError("static structure artifact must be Train-only")
     vocabularies = payload.get("vocabularies", {})
-    working = frame.sort_values(["order_id", "route_sequence"], kind="stable").reset_index(drop=True)
+    if frame["row_id"].isna().any() or frame["row_id"].duplicated().any():
+        raise Stage2V52ContractError("static structure row_id must be complete and unique")
+    working = frame.sort_values(
+        ["split", "date", "order_id", "route_sequence", "row_id"], kind="stable"
+    ).reset_index(drop=True)
     arrays: list[np.ndarray] = []
     names: list[str] = []
     for field in CATEGORICAL_STATIC_FIELDS:  # Fixed schema loop, never an edge loop.
@@ -92,4 +97,17 @@ def build_static_structure_features(
         arrays.append(values.fillna(False).to_numpy(np.float32)[:, None])
         arrays.append(values.notna().to_numpy(np.float32)[:, None])
         names.extend((field, f"{field}_available"))
-    return np.column_stack(arrays).astype(np.float32, copy=False), tuple(names)
+    sorted_features = np.column_stack(arrays).astype(np.float32, copy=False)
+    original_row_id = frame["row_id"].to_numpy(copy=True)
+    original_index = pd.Index(original_row_id)
+    destination = original_index.get_indexer(working["row_id"])
+    if np.any(destination < 0):
+        raise Stage2V52ContractError("cannot scatter static features back to input row_id")
+    features = np.empty_like(sorted_features)
+    features[destination] = sorted_features
+    return features, tuple(names), original_row_id
+
+
+def validate_feature_alignment(expected_row_id: np.ndarray, feature_row_id: np.ndarray) -> None:
+    if not np.array_equal(np.asarray(expected_row_id), np.asarray(feature_row_id)):
+        raise Stage2V52ContractError("static structure features are not aligned to the model batch row_id")

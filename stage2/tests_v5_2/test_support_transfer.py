@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import numpy as np
+import pandas as pd
 import pytest
 
 from stage2.v5_2.support_transfer import (
@@ -36,8 +37,12 @@ def test_tau_selection_is_limited_to_train_quantile_candidates() -> None:
         fit_dates=["20161009"],
     ).to_payload()
     candidates = artifact["tau_candidates"]
-    scores = {float(value): float(index + 1) for index, value in enumerate(candidates)}
-    selection = select_tau_once(scores, artifact)
+    targets = ("crawl", "stop", "speed_cv", "acceleration_rms")
+    scores = {
+        float(value): {target: float(index + 1) for target in targets}
+        for index, value in enumerate(candidates)
+    }
+    selection = select_tau_once(scores, {target: 1.0 for target in targets}, artifact)
     assert selection["selected_tau"] in candidates
     assert selection["rolling_reselection_allowed"] is False
 
@@ -60,9 +65,8 @@ def test_structure_branch_computes_unseen_edge_representation() -> None:
 
 
 def test_static_structure_encoder_uses_train_vocabulary_for_unseen_category() -> None:
-    import pandas as pd
-
     train = pd.DataFrame({
+        "split": ["train"], "date": ["20161009"], "row_id": [10],
         "order_id": ["a"], "route_sequence": [0], "canonical_highway": ["primary"],
         "road_class": ["major"], "observed_direction": ["forward"], "bridge": [False],
         "tunnel": [False], "synthetic_reverse_edge": [False], "osm_direction_disagreement": [False],
@@ -70,7 +74,8 @@ def test_static_structure_encoder_uses_train_vocabulary_for_unseen_category() ->
     evaluation = train.copy()
     evaluation["canonical_highway"] = "unseen_class"
     artifact = fit_static_structure_artifact([train], fit_dates=["20161009"])
-    features, names = build_static_structure_features(evaluation, artifact)
+    features, names, row_id = build_static_structure_features(evaluation, artifact)
     unseen_index = names.index("canonical_highway=__UNSEEN_OR_MISSING__")
     assert features[0, unseen_index] == 1.0
+    assert row_id.tolist() == [10]
     assert artifact.to_payload()["evaluation_rows_used"] == 0

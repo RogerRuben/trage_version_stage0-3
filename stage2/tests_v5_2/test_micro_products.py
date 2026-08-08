@@ -21,6 +21,13 @@ def _tokens() -> pd.DataFrame:
         "allocated_distance_m": [10.0, 10.0, 10.0],
         "edge_train_support": [0, 2, 100],
         "support_group": ["unseen", "low", "high"],
+        "protocol_id": "development",
+        "model_id": "M4",
+        "prediction_source": "fixture",
+        "route_track": "historical_original_service_route",
+        "route_source": "frozen_stage1_route_parts",
+        "route_product_version": "stage1_v3_route_sequence_context.1",
+        "canonical_highway": ["primary", "primary", "secondary"],
         "road_class": ["primary", "primary", "secondary"],
         "bridge": [False, True, False],
         "tunnel": [False, False, False],
@@ -42,6 +49,9 @@ def test_route_aggregation_uses_time_weights_train_cdf_and_route_order() -> None
     cdf = {
         "fit_split": "train",
         "evaluation_rows_used": 0,
+        "protocol_id": "development",
+        "model_id": "M4",
+        "prediction_source": "fixture",
         "thresholds": {name: 0.8 for name in DIMENSIONS},
     }
     result = aggregate_original_route_micro_conditions(_tokens(), cdf).iloc[0]
@@ -57,7 +67,8 @@ def test_missing_micro_value_remains_missing_and_reduces_coverage() -> None:
     frame = _tokens()
     frame.loc[:, "pred_rts_raw"] = np.nan
     cdf = {
-        "fit_split": "train", "evaluation_rows_used": 0,
+        "fit_split": "train", "evaluation_rows_used": 0, "protocol_id": "development",
+        "model_id": "M4", "prediction_source": "fixture",
         "thresholds": {name: 0.8 for name in DIMENSIONS},
     }
     result = aggregate_original_route_micro_conditions(frame, cdf).iloc[0]

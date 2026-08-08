@@ -16,6 +16,8 @@ MICRO_TARGETS = (
     "acceleration_rms",
     "rts",
 )
+CORE_TRANSFER_TARGETS = ("crawl", "stop", "speed_cv", "acceleration_rms")
+SECONDARY_TRANSFER_TARGETS = ("rts",)
 COMMON_OPERATIONAL_TARGETS = ("pace_p50", "travel_time_p50")
 TOKEN_IDENTITY_COLUMNS = (
     "order_id",
@@ -43,10 +45,16 @@ TOKEN_SUPPORT_COLUMNS = (
     "support_group",
 )
 TOKEN_PROVENANCE_COLUMNS = (
+    "protocol_id",
     "prediction_source",
     "model_id",
     "model_hash",
+    "decision_time",
     "feature_cutoff_time",
+    "feature_age_s",
+    "route_track",
+    "route_source",
+    "route_product_version",
 )
 TOKEN_REQUIRED_COLUMNS = (
     *TOKEN_IDENTITY_COLUMNS,
@@ -65,7 +73,11 @@ ROUTE_DYNAMIC_COLUMNS = (
     "acceleration_weighted_mean", "acceleration_weighted_p90", "acceleration_high_exposure_share",
     "rts_weighted_mean", "rts_weighted_p90", "rts_high_exposure_share",
     "rts_distance_weighted_mean", "rts_distance_weighted_p90",
-    "travel_time_p50_s", "micro_condition_coverage", "low_support_route_share",
+    "route_total_distance_m", "partial_travel_time_p50_s", "travel_time_p50_s",
+    "pace_prediction_coverage_distance", "micro_prediction_coverage_distance",
+    "crawl_prediction_coverage", "stop_prediction_coverage", "speed_cv_prediction_coverage",
+    "acceleration_prediction_coverage", "rts_prediction_coverage",
+    "micro_condition_coverage", "low_support_route_share",
     "unseen_edge_route_share", "support_weighted_mean", "unknown_flag",
 )
 
@@ -73,6 +85,8 @@ STATIC_COMPLEXITY_COLUMNS = (
     "intersection_exposure_share", "signal_exposure_share", "merge_exposure_share",
     "turn_exposure_share", "ramp_exposure_share", "bridge_exposure_share",
     "tunnel_exposure_share", "road_class_transition_rate",
+    "canonical_highway_transition_rate", "canonical_highway_entropy",
+    "motorway_trunk_exposure_share", "primary_secondary_exposure_share",
 )
 STABLE_STATIC_INPUTS = ("canonical_highway", "road_class", "bridge", "tunnel")
 UNAVAILABLE_STATIC_INPUTS = (
