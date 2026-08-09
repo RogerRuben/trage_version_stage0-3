@@ -15,6 +15,7 @@ from stage2.v5_2.cli import (
     _verify_phase_c_authorization,
 )
 from stage2.v5_2.contracts import Stage2V52ContractError
+from stage2.v5_2.feature_binding import sha256_path
 
 
 REPO = Path(__file__).resolve().parents[2]
@@ -24,17 +25,59 @@ def _config() -> dict[str, object]:
     return json.loads((REPO / "stage2/config/stage2_v5_2.json").read_text(encoding="utf-8"))
 
 
-def test_phase_c_is_bound_to_frozen_b1_and_only_allows_phase_c_commands() -> None:
+def test_phase_c_freeze_retains_reviewed_authorization_provenance_but_blocks_execution() -> None:
     config = _config()
-    assert config["execution_authorization"] == "PHASE_C"
-    assert _verify_phase_c_authorization(config, repo_root=REPO)["status"] == "PASS"
-    _require_execution(config, COMMAND_AUTHORIZATIONS["train-model"])
+    assert config["execution_authorization"] == "NONE_POST_C"
+    assert config["phase"] == "PHASE_C_COMPLETE_FROZEN"
+    assert config["phase_c_complete"] is True
+    assert config["phase_c_direction"] == "FAIL"
+    assert config["phase_d_authorized"] is False
+    historical = dict(config)
+    historical.update({
+        "phase": "PHASE_C", "execution_authorization": "PHASE_C",
+        "phase_c_authorized": True, "current_status": "PHASE_C_AUTHORIZED",
+    })
+    assert _verify_phase_c_authorization(historical, repo_root=REPO)["status"] == "PASS"
+    with pytest.raises(Stage2V52ContractError):
+        _require_execution(config, COMMAND_AUTHORIZATIONS["train-model"])
     blocked = {
         "build-tau-metrics", "tune-tau", "freeze-tau", "build-release-manifest",
     }
     for command in blocked:
         with pytest.raises(Stage2V52ContractError):
             _require_execution(config, COMMAND_AUTHORIZATIONS[command])
+    _require_execution(config, COMMAND_AUTHORIZATIONS["verify-b1-evidence"])
+    _require_execution(config, COMMAND_AUTHORIZATIONS["verify-existing-tau-freeze"])
+
+
+def test_post_phase_c_freeze_blocks_all_development_execution_commands() -> None:
+    config = _config()
+    for command in (
+        "fit-support", "fit-static-artifact", "fit-train-cdf", "build-transfer-shards",
+        "build-m0-feature-matrix", "transform-m0-feature-matrix", "evaluate-m0",
+        "train-tree-baseline", "train-model", "evaluate-model", "decide-spatial-adoption",
+    ):
+        with pytest.raises(Stage2V52ContractError, match="NONE_POST_C"):
+            _require_execution(config, COMMAND_AUTHORIZATIONS[command])
+
+
+def test_post_phase_c_status_and_execution_config_provenance_are_synchronized() -> None:
+    status_path = REPO / "stage2/docs/v5_2/stage2_v5_2_status_manifest.json"
+    evidence_path = REPO / "stage2/docs/v5_2/stage2_v5_2_phase_c_evidence_bundle.json"
+    config_path = REPO / "stage2/config/stage2_v5_2.json"
+    status = json.loads(status_path.read_text(encoding="utf-8"))
+    evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
+    assert status["status"] == status["current_status"] == "PHASE_C_FAIL_FROZEN"
+    assert status["phase"] == "PHASE_C_COMPLETE_FROZEN"
+    assert status["phase_c_authorized"] is False
+    assert status["phase_d_authorized"] is False
+    assert status["config"]["sha256"] == sha256_path(config_path)
+    assert evidence["execution_base_commit"] == evidence["phase_c_authorization_commit"]
+    execution_config = evidence["frozen_bindings"]["phase_c_execution_config_git"]
+    assert execution_config["git_file_sha256"] == sha256_git_file(
+        REPO, execution_config["commit"], execution_config["path"],
+    )
+    assert evidence["frozen_bindings"]["post_c_frozen_config"]["sha256"] == sha256_path(config_path)
 
 
 def test_phase_c_binds_b1_execution_config_hash() -> None:

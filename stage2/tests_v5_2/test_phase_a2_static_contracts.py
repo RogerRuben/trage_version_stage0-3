@@ -68,7 +68,9 @@ def test_config_schema_and_phase_execution_is_gate_bound() -> None:
     config = json.loads(open("stage2/config/stage2_v5_2.json", encoding="utf-8").read())
     assert config["schema_version"] == "stage2_v5_2_config.3"
     authorization = config["execution_authorization"]
-    assert authorization in {"NONE_PHASE_A_2", "PHASE_B0", "PHASE_B1", "NONE_POST_B1", "PHASE_C"}
+    assert authorization in {
+        "NONE_PHASE_A_2", "PHASE_B0", "PHASE_B1", "NONE_POST_B1", "PHASE_C", "NONE_POST_C",
+    }
     if authorization == "PHASE_B1":
         gate = config["phase_b0_gate"]
         report_path = Path(gate["report_path"])
@@ -87,6 +89,15 @@ def test_config_schema_and_phase_execution_is_gate_bound() -> None:
         assert config["phase_c_authorized"] is True
         assert config["phase_d_authorized"] is False
         assert config["phase_c_authorization"]["tau_reselection_allowed"] is False
+    if authorization == "NONE_POST_C":
+        assert config["phase"] == "PHASE_C_COMPLETE_FROZEN"
+        assert config["phase_b1_complete"] is True
+        assert config["phase_c_authorized"] is False
+        assert config["phase_c_complete"] is True
+        assert config["phase_c_direction"] == "FAIL"
+        assert config["current_status"] == "PHASE_C_FAIL_FROZEN"
+        assert config["phase_d_authorized"] is False
+        assert config["m5_authorized"] is False
     assert config["performance"]["warmup_runs"] == 2
     assert config["performance"]["repeat_runs"] == 3
     assert config["training"]["loss_weights"]["rts"] == 0.0

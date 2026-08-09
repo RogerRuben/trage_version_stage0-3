@@ -73,8 +73,8 @@ COMMAND_AUTHORIZATIONS = {
     "verify-final": {"PHASE_D_COMPLETE"},
     "build-b1-summary": {"NONE_POST_B1"},
     "build-b1-evidence": {"NONE_POST_B1"},
-    "verify-b1-evidence": {"NONE_POST_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
-    "verify-existing-tau-freeze": {"NONE_POST_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
+    "verify-b1-evidence": {"NONE_POST_B1", "PHASE_C", "NONE_POST_C", "PHASE_D", "PHASE_D_COMPLETE"},
+    "verify-existing-tau-freeze": {"NONE_POST_B1", "PHASE_C", "NONE_POST_C", "PHASE_D", "PHASE_D_COMPLETE"},
 }
 
 B1_MUTATING_PROTOCOL_COMMANDS = {

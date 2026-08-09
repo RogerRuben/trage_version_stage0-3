@@ -1,6 +1,6 @@
 # Stage 2 v5.2 Phase C development report
 
-- Direction: `WEAK`
+- Direction: `FAIL`
 - Formal spatial adopt: `FALSE`
 - Phase D authorized: `NO`
 - M5 authorized: `NO`
@@ -13,6 +13,13 @@
 - Calibration: `20161024`
 - Evaluation: `20161025-20161027`
 - Frozen tau: `p25 / 3.0`
+
+## M4 frozen tau consumption
+
+- Relationship audit: `PASS`
+- Tau freeze file SHA: `5900d6184d151d8093528f1fa04a1afd73a75d07fd0187da7da22abdb44296ec`
+- Transfer-tuning support SHA: `12303d329143440041f5271413796dfb69ee12e7dcb1023a235345f908bcfdae`
+- Development support SHA: `4bc907af5990c93f23730978ab4f2c049a5ed2ff7fb87ca9c5157bd6b33c2d98`
 
 ## Aggregate 20161025-20161027
 
@@ -119,7 +126,7 @@ Positive percentages favor M4.
 - Pace guard: `PASS`
 - Temporal leakage: `0`
 
-The pre-registered continuation gate does not pass. The result is classified as `C-WEAK`: structured transfer remains modestly useful, while support-aware gating evidence is weak/preliminary and does not justify adoption or retuning.
+The pre-registered continuation gate does not pass. The result is classified as `C-FAIL`. Structured representation retains modest value, but the support-aware spatial transfer path has direct counter-evidence from the overall-stability, unseen-versus-M2, and M3-to-M4 comparisons. Spatial transfer expansion must stop; no retuning or rerun is authorized.
 
 ## Runtime and memory
 
@@ -128,8 +135,8 @@ The pre-registered continuation gate does not pass. The result is classified as 
 
 ## Verification
 
-- Base combined suite: `123 passed`
-- GPU v5.2 suite: `76 passed`
+- Base combined suite: `128 passed`
+- GPU v5.2 suite: `81 passed`
 - compileall: `PASS`
 
 Phase D remains unauthorized. No M5/M6, rolling folds, tau reselection, or 20161028-30 data were run.

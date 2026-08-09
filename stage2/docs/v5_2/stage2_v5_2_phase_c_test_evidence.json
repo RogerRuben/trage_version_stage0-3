@@ -8,16 +8,16 @@
   "base": {
     "environment": "base",
     "scope": "stage2/tests stage2/tests_v4 stage2/tests_v5 stage2/tests_v5_2",
-    "passed": 123,
+    "passed": 128,
     "failed": 0,
     "warnings": 10
   },
   "gpu_v5_2": {
     "environment": "pytorch_cuda",
     "scope": "stage2/tests_v5_2",
-    "passed": 76,
+    "passed": 81,
     "failed": 0
   },
-  "phase_c_direction": "WEAK",
+  "phase_c_direction": "FAIL",
   "phase_d_authorized": false
 }

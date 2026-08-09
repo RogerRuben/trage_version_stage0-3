@@ -6,12 +6,16 @@
     "documentation_head": "4137ded50abe7c4d4b1351e8fc3d095342ef4a74",
     "frozen_v5_1": true
   },
-  "phase": "PHASE_C",
-  "execution_authorization": "PHASE_C",
+  "phase": "PHASE_C_COMPLETE_FROZEN",
+  "execution_authorization": "NONE_POST_C",
   "phase_b_allowed": false,
   "phase_b1_complete": true,
-  "phase_c_authorized": true,
+  "phase_c_authorized": false,
+  "phase_c_was_authorized": true,
+  "phase_c_complete": true,
+  "phase_c_direction": "FAIL",
   "phase_d_authorized": false,
+  "m5_authorized": false,
   "phase_c_authorization": {
     "authorization_base_commit": "f64d7fd6ab58f9d82a7bb54e97624b0d4c23b84a",
     "b1_frozen_commit": "f64d7fd6ab58f9d82a7bb54e97624b0d4c23b84a",
@@ -255,5 +259,5 @@
     ]
   },
   "final_status_requires_experiments": "READY_FOR_AV_ROUTE_SUITABILITY_STAGE",
-  "current_status": "PHASE_C_AUTHORIZED"
+  "current_status": "PHASE_C_FAIL_FROZEN"
 }

@@ -1,24 +1,67 @@
 {
-  "schema_version": "stage2_v5_2_status_manifest.1",
-  "status": "PHASE_B1_FROZEN_COMPLETE",
+  "artifact_sha256": "a0c455776d840cdf356cc88bf1f839fdb4dcfc68e9c8e89f1f7c74f2b86f9fd2",
+  "b1_evidence_bundle": {
+    "path": "stage2/docs/v5_2/stage2_v5_2_phase_b1_evidence_bundle.json",
+    "sha256": "e44629ed30ac86d951012e438d8448eed7fe226edaa915ea6d5305322765d934",
+    "size_bytes": 12325
+  },
   "branch": "codex/stage2-v5-micro-transfer",
-  "b1_execution_commit": "876f41ea0f879d57ef4e7d8e2e09113bcb855a54",
-  "config_path": "stage2/config/stage2_v5_2.json",
-  "config_sha256": "5e496cd79c569fe1847811fdac13434a5c83afbb90bf744e25dfb829133cf29c",
-  "b1_verification_path": "stage2/docs/v5_2/stage2_v5_2_phase_b1_verification.json",
-  "b1_verification_sha256": "6639697798327f502da558fb195033ad49570ca813c5e9ce71ff6c1729b3b666",
-  "b1_evidence_bundle_path": "stage2/docs/v5_2/stage2_v5_2_phase_b1_evidence_bundle.json",
-  "b1_evidence_bundle_sha256": "e44629ed30ac86d951012e438d8448eed7fe226edaa915ea6d5305322765d934",
-  "tau_freeze_path": "stage2/output_v5_2/transfer_tuning/stage2_v5_2_tau_freeze.json",
-  "tau_freeze_file_sha256": "5900d6184d151d8093528f1fa04a1afd73a75d07fd0187da7da22abdb44296ec",
+  "config": {
+    "path": "stage2/config/stage2_v5_2.json",
+    "sha256": "5a43e4958c629ad651338321e699c466e420e86eabcbebb9eb82a346df873e53",
+    "size_bytes": 10795
+  },
+  "current_status": "PHASE_C_FAIL_FROZEN",
+  "execution_authorization": "NONE_POST_C",
+  "formal_release_available": false,
+  "formal_release_requires": "PHASE_D_COMPLETE",
+  "formal_spatial_adopt": false,
+  "freeze_correction_base_commit": "13196fb7d42ee0054d2dc3550c597c7c2f881790",
+  "m4_tau_consumption": {
+    "development_support_sha256": "4bc907af5990c93f23730978ab4f2c049a5ed2ff7fb87ca9c5157bd6b33c2d98",
+    "selected_candidate": "p25",
+    "selected_tau": 3.0,
+    "status": "PASS",
+    "tau_freeze_file_sha256": "5900d6184d151d8093528f1fa04a1afd73a75d07fd0187da7da22abdb44296ec",
+    "training_spatial_mode": "support_aware",
+    "transfer_tuning_support_sha256": "12303d329143440041f5271413796dfb69ee12e7dcb1023a235345f908bcfdae"
+  },
+  "m5_authorized": false,
+  "phase": "PHASE_C_COMPLETE_FROZEN",
+  "phase_b1_complete": true,
+  "phase_c_authorized": false,
+  "phase_c_complete": true,
+  "phase_c_direction": "FAIL",
+  "phase_c_evidence_bundle": {
+    "path": "stage2/docs/v5_2/stage2_v5_2_phase_c_evidence_bundle.json",
+    "sha256": "ebbe3ce9d6d0d11351564e0d99664b6ca91a121b470ab8a90e5b330cff6f6644",
+    "size_bytes": 9603
+  },
+  "phase_c_execution_commit": "13196fb7d42ee0054d2dc3550c597c7c2f881790",
+  "phase_c_report": {
+    "path": "stage2/docs/v5_2/stage2_v5_2_phase_c_report.json",
+    "sha256": "e7c4c105f2d6ccb0d32675a8821ec69bf1be3cb1805b3f357ccd665438aab9d3",
+    "size_bytes": 24534
+  },
+  "phase_c_test_evidence": {
+    "path": "stage2/docs/v5_2/stage2_v5_2_phase_c_test_evidence.json",
+    "sha256": "ea97eda4bce99b93b978a4dd0d1354d99286aa3ead394464d79d6b23e9b05a64",
+    "size_bytes": 513
+  },
+  "phase_c_was_authorized": true,
+  "phase_d_authorized": false,
+  "rerun_inference_required": false,
+  "rerun_training_required": false,
+  "schema_version": "stage2_v5_2_status_manifest.2",
+  "scientific_conclusion": "Structured representation has modest value, but fixed n/(n+tau) support-aware spatial gating has no reliable incremental benefit; stop spatial transfer expansion.",
   "selected_candidate": "p25",
   "selected_tau": 3.0,
-  "phase_b1_complete": true,
-  "part_a_base_tests_passed": 118,
-  "part_a_gpu_v5_2_tests_passed": 71,
-  "part_a_completion_status": "PASS",
-  "phase_c_authorized": false,
   "stage2_final_ready": false,
-  "formal_release_available": false,
-  "formal_release_requires": "PHASE_D_COMPLETE"
+  "status": "PHASE_C_FAIL_FROZEN",
+  "tau_freeze": {
+    "path": "stage2/output_v5_2/transfer_tuning/stage2_v5_2_tau_freeze.json",
+    "sha256": "5900d6184d151d8093528f1fa04a1afd73a75d07fd0187da7da22abdb44296ec",
+    "size_bytes": 1211
+  },
+  "tau_reselection_allowed": false
 }

@@ -1,5 +1,5 @@
 {
-  "artifact_sha256": "0ce45c57d1eb12aa6439010761de36079bb568d21b4bdfbe9c6dc3ce194e9004",
+  "artifact_sha256": "e3112dacb4c04dcb26a98c9f6545ead34c4d96299e9ff1c947e08d8bd7202276",
   "code": {
     "evaluation": {
       "path": "stage2/v5_2/evaluation.py",
@@ -13,8 +13,8 @@
     },
     "phase_c_report": {
       "path": "stage2/v5_2/phase_c_report.py",
-      "sha256": "3abb2258acde9d6df1182799d083a596425a34599bbf1c446e68f539e176c150",
-      "size_bytes": 27883
+      "sha256": "5354c3d14146591edbf295022c4d97667dfe997f2763b9e187cc3dca473f5383",
+      "size_bytes": 38217
     },
     "training": {
       "path": "stage2/v5_2/training.py",
@@ -39,10 +39,16 @@
       "sha256": "5a3789a29135d02c32783d2d1b7a0d0d1ae77979b5d1fcb5483fcc81b3ca2b9e",
       "size_bytes": 1742
     },
-    "phase_c_config": {
+    "phase_c_execution_config_git": {
+      "commit": "7a95a685042d41ded7143c4cac015fc04761af90",
+      "git_file_sha256": "b6f3a68dafdaa6f043d6e26fbea58c3fb5a830e9a0f79a1f1343ebccc2d14e73",
+      "git_file_size_bytes": 10654,
+      "path": "stage2/config/stage2_v5_2.json"
+    },
+    "post_c_frozen_config": {
       "path": "stage2/config/stage2_v5_2.json",
-      "sha256": "b6f3a68dafdaa6f043d6e26fbea58c3fb5a830e9a0f79a1f1343ebccc2d14e73",
-      "size_bytes": 10654
+      "sha256": "5a43e4958c629ad651338321e699c466e420e86eabcbebb9eb82a346df873e53",
+      "size_bytes": 10795
     },
     "source_config": {
       "path": "stage2/config/stage2_v5_1_development.json",
@@ -54,6 +60,15 @@
       "sha256": "5900d6184d151d8093528f1fa04a1afd73a75d07fd0187da7da22abdb44296ec",
       "size_bytes": 1211
     }
+  },
+  "m4_tau_consumption": {
+    "development_support_sha256": "4bc907af5990c93f23730978ab4f2c049a5ed2ff7fb87ca9c5157bd6b33c2d98",
+    "selected_candidate": "p25",
+    "selected_tau": 3.0,
+    "status": "PASS",
+    "tau_freeze_file_sha256": "5900d6184d151d8093528f1fa04a1afd73a75d07fd0187da7da22abdb44296ec",
+    "training_spatial_mode": "support_aware",
+    "transfer_tuning_support_sha256": "12303d329143440041f5271413796dfb69ee12e7dcb1023a235345f908bcfdae"
   },
   "models": {
     "M0": {
@@ -168,25 +183,26 @@
     }
   },
   "phase_c_authorization_commit": "7a95a685042d41ded7143c4cac015fc04761af90",
-  "phase_c_direction": "WEAK",
+  "phase_c_direction": "FAIL",
+  "phase_c_execution_commit": "13196fb7d42ee0054d2dc3550c597c7c2f881790",
   "phase_d_authorized": false,
   "reports": {
     "json": {
       "path": "stage2/docs/v5_2/stage2_v5_2_phase_c_report.json",
-      "sha256": "40025063586f1e98f9a024a322fe5f4ece1686a23e52fbacf4f48d32f567f76f",
-      "size_bytes": 24645
+      "sha256": "e7c4c105f2d6ccb0d32675a8821ec69bf1be3cb1805b3f357ccd665438aab9d3",
+      "size_bytes": 24534
     },
     "markdown": {
       "path": "stage2/docs/v5_2/stage2_v5_2_phase_c_report.md",
-      "sha256": "b7ed7ed0c229db0b896b154527249eeea5278849722bbe0efb8b4e738f31e774",
-      "size_bytes": 5427
+      "sha256": "22d2ecfa61df11428a848312f4e4b88bdaa45cd6b6bc84d9086ad6891d5df8ba",
+      "size_bytes": 5756
     }
   },
-  "schema_version": "stage2_v5_2_phase_c_evidence_bundle.1",
+  "schema_version": "stage2_v5_2_phase_c_evidence_bundle.2",
   "status": "PASS",
   "test_evidence": {
     "path": "stage2/docs/v5_2/stage2_v5_2_phase_c_test_evidence.json",
-    "sha256": "5b716206fa5e6d571cfc87ae5908639004ba7f2b3854f87515b3c10f1082b7d2",
+    "sha256": "ea97eda4bce99b93b978a4dd0d1354d99286aa3ead394464d79d6b23e9b05a64",
     "size_bytes": 513
   },
   "train_only_artifacts": {

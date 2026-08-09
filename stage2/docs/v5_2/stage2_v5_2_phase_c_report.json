@@ -1,5 +1,5 @@
 {
-  "artifact_sha256": "c34554b48ba3eb1492f89a572167bdafbe2b39ad87a16bf1ccdf9bcc7bfc4345",
+  "artifact_sha256": "abbc65c4628db33a126e473951b2357a104cb047b0c389383e54ffdc3fad6c72",
   "comparisons": {
     "M4_vs_M1": {
       "low": {
@@ -99,8 +99,17 @@
     "unseen_not_worse_than_structure_only": false,
     "verification_status": "PASS"
   },
-  "execution_base_commit": "7a95a685042d41ded7143c4cac015fc04761af90",
-  "interpretation": "Support-aware transfer is weak/preliminary on the development window: M4 wins three low-support targets versus M1 but misses the 2% mean-improvement gate, and the frozen overall-stability and unseen-versus-M2 gates do not pass.",
+  "execution_base_commit": "13196fb7d42ee0054d2dc3550c597c7c2f881790",
+  "interpretation": "Phase C fails the pre-registered support-aware spatial continuation rule. Structured representation shows modest value, but M4 misses the low-support strength gate, fails overall stability, is systematically worse than M2 on unseen targets, and adds no stable increment over M3. Stop support-aware spatial transfer expansion; this does not invalidate the Stage 2 source model or the completed experiment.",
+  "m4_tau_consumption": {
+    "development_support_sha256": "4bc907af5990c93f23730978ab4f2c049a5ed2ff7fb87ca9c5157bd6b33c2d98",
+    "selected_candidate": "p25",
+    "selected_tau": 3.0,
+    "status": "PASS",
+    "tau_freeze_file_sha256": "5900d6184d151d8093528f1fa04a1afd73a75d07fd0187da7da22abdb44296ec",
+    "training_spatial_mode": "support_aware",
+    "transfer_tuning_support_sha256": "12303d329143440041f5271413796dfb69ee12e7dcb1023a235345f908bcfdae"
+  },
   "m5_authorized": false,
   "metrics": {
     "M0": {
@@ -639,7 +648,7 @@
     "relative_degradation": -0.01157719400270687,
     "status": "PASS"
   },
-  "phase_c_direction": "WEAK",
+  "phase_c_direction": "FAIL",
   "phase_c_formal_spatial_adopt": false,
   "phase_d_authorized": false,
   "protocol": {
@@ -695,7 +704,7 @@
       "transfer_shards": 670.0
     }
   },
-  "schema_version": "stage2_v5_2_phase_c_report.1",
+  "schema_version": "stage2_v5_2_phase_c_report.2",
   "selected_candidate": "p25",
   "selected_checkpoints": {
     "M0": {
@@ -740,11 +749,11 @@
   "test_evidence": {
     "artifact": {
       "path": "stage2/docs/v5_2/stage2_v5_2_phase_c_test_evidence.json",
-      "sha256": "5b716206fa5e6d571cfc87ae5908639004ba7f2b3854f87515b3c10f1082b7d2",
+      "sha256": "ea97eda4bce99b93b978a4dd0d1354d99286aa3ead394464d79d6b23e9b05a64",
       "size_bytes": 513
     },
-    "base_passed": 123,
+    "base_passed": 128,
     "compileall_status": "PASS",
-    "gpu_v5_2_passed": 76
+    "gpu_v5_2_passed": 81
   }
 }
