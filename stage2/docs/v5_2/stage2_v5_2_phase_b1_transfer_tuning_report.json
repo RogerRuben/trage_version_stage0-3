@@ -1,35 +1,296 @@
 {
-  "schema_version": "stage2_v5_2_phase_b1_transfer_tuning_report.1",
-  "status": "PASS",
-  "phase": "PHASE_B1_TRANSFER_TUNING_COMPLETE",
+  "artifact_sha256": "721eac974e47d1935e4f032f2c4d4e192ddc60d9ea7d4563553fd9d7c06ddb58",
+  "low_support_relative_improvement_vs_m1": {
+    "M2": {
+      "acceleration_rms": 0.005310963204171221,
+      "crawl": -0.006240192067480052,
+      "speed_cv": 0.012304191603117227,
+      "stop": 0.030820658419840555
+    },
+    "M3": {
+      "acceleration_rms": 0.020759457067669393,
+      "crawl": 0.004921620556258941,
+      "speed_cv": 0.00876492446892565,
+      "stop": 0.005813177495729284
+    },
+    "M4_p25": {
+      "acceleration_rms": 0.02198943668853138,
+      "crawl": 0.009741736582634419,
+      "speed_cv": 0.0038608368482960166,
+      "stop": -0.0203240627052982
+    },
+    "M4_p50": {
+      "acceleration_rms": 0.016293320969629828,
+      "crawl": 0.006983754654918035,
+      "speed_cv": 0.015863463190477715,
+      "stop": 2.2001635812096838e-05
+    },
+    "M4_p75": {
+      "acceleration_rms": 0.006225364704452509,
+      "crawl": 0.0009967309130827324,
+      "speed_cv": 0.013838325152102048,
+      "stop": 0.02412517995021654
+    }
+  },
+  "m3_to_m4_p25_relative_improvement": {
+    "low": {
+      "acceleration_rms": 0.0012560546330923135,
+      "crawl": 0.004843956140490131,
+      "speed_cv": -0.004947451660749767,
+      "stop": -0.026290069038724568
+    },
+    "overall": {
+      "acceleration_rms": 4.7225634964152623e-05,
+      "crawl": -0.0007124176591523722,
+      "speed_cv": 9.138664797591245e-05,
+      "stop": 0.0024658338337630054
+    },
+    "unseen": {
+      "acceleration_rms": 0.022015813757051066,
+      "crawl": 0.032278741097258146,
+      "speed_cv": -0.00034829514468019955,
+      "stop": -0.13153069334545717
+    }
+  },
+  "metrics": {
+    "M0": {
+      "low": {
+        "acceleration_rms": 0.13492388644117453,
+        "crawl": 0.3643696714280959,
+        "speed_cv": 0.09395095900061433,
+        "stop": 0.103310146073571
+      },
+      "overall": {
+        "acceleration_rms": 0.1209611189850295,
+        "crawl": 0.18308267851576498,
+        "speed_cv": 0.06399706428213396,
+        "stop": 0.005524656615813333
+      },
+      "unseen": {
+        "acceleration_rms": 0.13164651006178837,
+        "crawl": 0.36310750589607127,
+        "speed_cv": 0.088721329879837,
+        "stop": 0.10193102282273402
+      }
+    },
+    "M1": {
+      "low": {
+        "acceleration_rms": 0.13420582704271214,
+        "crawl": 0.3602332788149448,
+        "speed_cv": 0.09698915688467485,
+        "stop": 0.10017541464024035
+      },
+      "overall": {
+        "acceleration_rms": 0.12034904364839392,
+        "crawl": 0.15289358494566238,
+        "speed_cv": 0.06345873214337787,
+        "stop": 0.004881246601614377
+      },
+      "unseen": {
+        "acceleration_rms": 0.1346444365169321,
+        "crawl": 0.39018072194835923,
+        "speed_cv": 0.0856877979988187,
+        "stop": 0.10358761098967156
+      }
+    },
+    "M2": {
+      "low": {
+        "acceleration_rms": 0.13349306483350293,
+        "crawl": 0.3624812036638482,
+        "speed_cv": 0.09579578371494102,
+        "stop": 0.09708794240354761
+      },
+      "overall": {
+        "acceleration_rms": 0.1200718249849676,
+        "crawl": 0.15286547162517425,
+        "speed_cv": 0.06331990847007664,
+        "stop": 0.0046932373428534135
+      },
+      "unseen": {
+        "acceleration_rms": 0.13157207501076518,
+        "crawl": 0.39469995612364445,
+        "speed_cv": 0.0875604271330101,
+        "stop": 0.1133854083011669
+      }
+    },
+    "M3": {
+      "low": {
+        "acceleration_rms": 0.1314197869379879,
+        "crawl": 0.35846034730488063,
+        "speed_cv": 0.0961390542502759,
+        "stop": 0.09959307717422836
+      },
+      "overall": {
+        "acceleration_rms": 0.12005598340475443,
+        "crawl": 0.15271704948720594,
+        "speed_cv": 0.06328360591475293,
+        "stop": 0.004662174639803104
+      },
+      "unseen": {
+        "acceleration_rms": 0.13353957572863215,
+        "crawl": 0.3852046084134503,
+        "speed_cv": 0.08686404257807429,
+        "stop": 0.10307735746332357
+      }
+    },
+    "M4_p25": {
+      "low": {
+        "acceleration_rms": 0.13125471650572443,
+        "crawl": 0.35672398110443093,
+        "speed_cv": 0.09661469757388934,
+        "stop": 0.10221138604891784
+      },
+      "overall": {
+        "acceleration_rms": 0.1200503136847069,
+        "crawl": 0.15282584781011427,
+        "speed_cv": 0.06327782263813655,
+        "stop": 0.004650678491837366
+      },
+      "unseen": {
+        "acceleration_rms": 0.13059959330019497,
+        "crawl": 0.3727706885890018,
+        "speed_cv": 0.08689429690235152,
+        "stop": 0.11663519375869205
+      }
+    },
+    "M4_p50": {
+      "low": {
+        "acceleration_rms": 0.1320191684267106,
+        "crawl": 0.35771749797716457,
+        "speed_cv": 0.09545057296455935,
+        "stop": 0.10017321061725011
+      },
+      "overall": {
+        "acceleration_rms": 0.12005128367402498,
+        "crawl": 0.15281229589952286,
+        "speed_cv": 0.06327656005063349,
+        "stop": 0.004659990654155169
+      },
+      "unseen": {
+        "acceleration_rms": 0.13132849140536218,
+        "crawl": 0.3811546258945414,
+        "speed_cv": 0.08665758140179808,
+        "stop": 0.11446087816292552
+      }
+    },
+    "M4_p75": {
+      "low": {
+        "acceleration_rms": 0.13337034682390858,
+        "crawl": 0.3598742231700288,
+        "speed_cv": 0.09564698939547649,
+        "stop": 0.097758664735457
+      },
+      "overall": {
+        "acceleration_rms": 0.12004714425156462,
+        "crawl": 0.15278401055746704,
+        "speed_cv": 0.0632799849077534,
+        "stop": 0.0046577158397975785
+      },
+      "unseen": {
+        "acceleration_rms": 0.13146076369143667,
+        "crawl": 0.3919301748123839,
+        "speed_cv": 0.08688405411319561,
+        "stop": 0.1143574280185866
+      }
+    }
+  },
+  "no_history_temporal_fallback": {
+    "audited_token_count": 9954428,
+    "fallback_share": 3.857579762493636e-05,
+    "interpretation": "explicit no-history sentinel represented by a positive audit age; it carries no target-day future observation",
+    "minimum_no_history_fallback_feature_age_s": 1.0,
+    "minimum_strict_observed_feature_age_s": 1.0,
+    "no_history_temporal_fallback_token_count": 384,
+    "not_a_real_observation": true,
+    "shard_count": 132,
+    "strict_observed_history_token_count": 9954044,
+    "temporal_leakage_count": 0,
+    "unique_physical_no_history_row_count": 278
+  },
+  "overall_unique_traversal_count": 1439737,
+  "pace_p50_mae": {
+    "M0": null,
+    "M1": 0.027546248866766786,
+    "M2": 0.027325424655855374,
+    "M3": 0.02731000605982166,
+    "M4_p25": 0.027312256466854715,
+    "M4_p50": 0.027306709498070573,
+    "M4_p75": 0.02730538956108114
+  },
+  "phase_c_authorized": false,
+  "protocol_hash": "32cc07da657296d2ac37ea8f68df1f01cfc1a2e296d5412e006e6516e15d35ce",
   "protocol_id": "transfer_tuning",
-  "train_dates": ["20161009", "20161010", "20161011", "20161012", "20161013", "20161014", "20161015", "20161016", "20161017", "20161018"],
-  "validation_dates": ["20161019", "20161020"],
-  "transfer_source_row_count": 8594152,
-  "audited_temporal_token_count": 9954428,
-  "temporal_leakage_count": 0,
-  "unique_validation_traversal_count": 1439737,
-  "models_completed": ["M0", "M1", "M2", "M3", "M4_p25", "M4_p50", "M4_p75"],
-  "all_formal_evaluations_passed": true,
-  "tau_selection": {
-    "metric": "macro_normalized_mae_over_4_core_micro_targets",
-    "pace_used": false,
-    "rts_used": false,
-    "scores": {"p25": 0.9867471126649979, "p50": 0.9871989301708131, "p75": 0.9870410659374413},
-    "selected_candidate": "p25",
-    "selected_tau": 3.0,
-    "rolling_reselection_allowed": false
+  "schema_version": "stage2_v5_2_phase_b1_transfer_tuning_report.2",
+  "scientific_conclusion": {
+    "classification": "CASE_C",
+    "rationale": [
+      "M4-p25 has only small mixed low-support changes relative to M1",
+      "M4-p25 does not stably improve over M3 across low-support and unseen targets",
+      "unseen differences between M4 and M2 may include shared-backbone fine-tuning and cannot be attributed to the edge gate alone"
+    ],
+    "statement": "B1 shows no convincing support-aware transfer evidence; keep the protocol frozen and test temporal robustness before any adoption claim"
+  },
+  "scope": "PHASE_B1_ONLY",
+  "selected_m4_p25_comparisons": {
+    "low_vs_m1": {
+      "acceleration_rms": 0.02198943668853138,
+      "crawl": 0.009741736582634419,
+      "speed_cv": 0.0038608368482960166,
+      "stop": -0.0203240627052982
+    },
+    "low_vs_m3": {
+      "acceleration_rms": 0.0012560546330923135,
+      "crawl": 0.004843956140490131,
+      "speed_cv": -0.004947451660749767,
+      "stop": -0.026290069038724568
+    },
+    "unseen_vs_m2": {
+      "acceleration_rms": 0.007391247044562024,
+      "crawl": 0.05555933613474493,
+      "speed_cv": 0.007607663101582184,
+      "stop": -0.028661408079012074
+    }
+  },
+  "status": "PASS",
+  "target_eligible_unique_traversal_counts": {
+    "low": {
+      "acceleration_rms": 148,
+      "crawl": 424,
+      "speed_cv": 231,
+      "stop": 424
+    },
+    "overall": {
+      "acceleration_rms": 243789,
+      "crawl": 530556,
+      "speed_cv": 357834,
+      "stop": 530556
+    },
+    "unseen": {
+      "acceleration_rms": 42,
+      "crawl": 141,
+      "speed_cv": 72,
+      "stop": 141
+    }
   },
   "tau_freeze": {
-    "path": "stage2/output_v5_2/transfer_tuning/stage2_v5_2_tau_freeze.json",
-    "file_sha256": "5900d6184d151d8093528f1fa04a1afd73a75d07fd0187da7da22abdb44296ec",
-    "embedded_artifact_sha256": "83d42c642fb9327de6dd3bf5924df5767e62f3e518670568beee9344c5355af0"
+    "interpretation": "selected by the preregistered metric; p25/p50/p75 overall differences are small and do not establish statistical superiority",
+    "selected_candidate": "p25",
+    "selected_tau": 3.0
   },
-  "phase_b0_smoke_status": "PASS",
-  "metadata_audit_status": "PASS",
-  "one_bucket_correctness_status": "PASS",
-  "performance_benchmark_status": "PASS",
-  "performance_scaling_checks_passed": 14,
-  "next_phase_authorized": false,
-  "notes": "B1 completion freezes tau but does not constitute rolling spatial adoption or authorize M5/Phase C/Phase D."
+  "train_dates": [
+    "20161009",
+    "20161010",
+    "20161011",
+    "20161012",
+    "20161013",
+    "20161014",
+    "20161015",
+    "20161016",
+    "20161017",
+    "20161018"
+  ],
+  "validation_dates": [
+    "20161019",
+    "20161020"
+  ]
 }

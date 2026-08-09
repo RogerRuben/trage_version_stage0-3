@@ -12,6 +12,10 @@ from typing import Any
 import pandas as pd
 
 from .contracts import CONFIG_SCHEMA_VERSION, RESEARCH_CONTRACT, Stage2V52ContractError, validate_research_contract
+from .b1_freeze import (
+    build_b1_evidence_bundle, build_b1_results_summary,
+    verify_b1_evidence_bundle, verify_existing_tau_freeze,
+)
 from .evaluation import (
     build_tau_metrics_manifest, evaluate_checkpoint, evaluate_spatial_adoption,
     evaluate_rolling_spatial_adoption, evaluate_temporal_adoption, validate_evaluation_payload,
@@ -55,8 +59,8 @@ COMMAND_AUTHORIZATIONS = {
     "build-m0-feature-matrix": {"PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
     "transform-m0-feature-matrix": {"PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
     "evaluate-m0": {"PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
-    "build-tau-metrics": {"PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
-    "tune-tau": {"PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
+    "build-tau-metrics": {"PHASE_B1"},
+    "tune-tau": {"PHASE_B1"},
     "freeze-tau": {"PHASE_B1"},
     "train-tree-baseline": {"PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
     "train-model": {"PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
@@ -67,6 +71,16 @@ COMMAND_AUTHORIZATIONS = {
     "build-products": {"PHASE_D", "PHASE_D_COMPLETE"},
     "build-release-manifest": {"PHASE_D_COMPLETE"},
     "verify-final": {"PHASE_D_COMPLETE"},
+    "build-b1-summary": {"NONE_POST_B1"},
+    "build-b1-evidence": {"NONE_POST_B1"},
+    "verify-b1-evidence": {"NONE_POST_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
+    "verify-existing-tau-freeze": {"NONE_POST_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
+}
+
+B1_MUTATING_PROTOCOL_COMMANDS = {
+    "fit-support", "fit-static-artifact", "fit-train-cdf", "build-transfer-shards",
+    "build-m0-feature-matrix", "transform-m0-feature-matrix", "evaluate-m0",
+    "train-tree-baseline", "train-model", "evaluate-model",
 }
 
 
@@ -107,6 +121,15 @@ def _require_execution(config: dict[str, Any], allowed: set[str]) -> None:
             or report.get("status") != "PASS" or report.get("authorizes_phase_b1") is not True
         ):
             raise Stage2V52ContractError("Phase B0 smoke report does not authorize PHASE_B1")
+
+
+def _require_protocol_execution(config: dict[str, Any], args: argparse.Namespace) -> None:
+    if (
+        getattr(args, "protocol", None) == "transfer_tuning"
+        and getattr(args, "command", None) in B1_MUTATING_PROTOCOL_COMMANDS
+        and config.get("execution_authorization") != "PHASE_B1"
+    ):
+        raise Stage2V52ContractError("the completed transfer_tuning protocol cannot be reopened after Phase B1")
 
 
 def _resolve_training_tau(args: argparse.Namespace, config: dict[str, Any]) -> tuple[float, dict[str, Any]]:
@@ -278,6 +301,10 @@ def _tune_tau(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def _freeze_tau(args: argparse.Namespace) -> dict[str, Any]:
+    if Path(args.output).exists():
+        raise Stage2V52ContractError(
+            "tau freeze is write-once; use verify-existing-tau-freeze for an existing artifact"
+        )
     artifact = freeze_tau_selection(
         _json(args.selection), _json(args.metrics), _json(args.support_artifact),
         selection_artifact_sha256=sha256_file(args.selection),
@@ -286,6 +313,35 @@ def _freeze_tau(args: argparse.Namespace) -> dict[str, Any]:
     )
     _write_json(args.output, artifact)
     return {"status": "PASS", "selected_candidate": artifact["selected_candidate"], "selected_tau": artifact["selected_tau"]}
+
+
+def _verify_tau_freeze(args: argparse.Namespace) -> dict[str, Any]:
+    config = _config(args)
+    return verify_existing_tau_freeze(
+        args.freeze, repo_root=args.repo_root,
+        expected_file_sha256=str(config["tau_freeze"]["expected_file_sha256"]),
+    )
+
+
+def _build_b1_summary(args: argparse.Namespace) -> dict[str, Any]:
+    report = build_b1_results_summary(repo_root=args.repo_root)
+    _write_json(args.output, report)
+    return report
+
+
+def _build_b1_evidence(args: argparse.Namespace) -> dict[str, Any]:
+    if Path(args.output).exists():
+        raise Stage2V52ContractError("the Phase B1 evidence bundle is write-once")
+    bundle = build_b1_evidence_bundle(
+        repo_root=args.repo_root, test_evidence_path=args.test_evidence,
+        b1_execution_commit=args.b1_execution_commit,
+    )
+    _write_json(args.output, bundle)
+    return bundle
+
+
+def _verify_b1_evidence(args: argparse.Namespace) -> dict[str, Any]:
+    return verify_b1_evidence_bundle(_json(args.input), repo_root=args.repo_root)
 
 
 def _train_tree(args: argparse.Namespace) -> dict[str, Any]:
@@ -505,6 +561,10 @@ def parser() -> argparse.ArgumentParser:
     for flag in ("source-checkpoint", "feature-artifact", "source-model-manifest", "source-config", "support-artifact", "static-artifact", "tau-freeze-artifact", "micro-cdf", "transfer-manifest", "training-manifest", "selected-checkpoint", "evaluation-manifest", "stage1-release", "outputs-manifest", "output"): command.add_argument(f"--{flag}", required=True)
     command.set_defaults(function=_release)
     command = commands.add_parser("verify-final"); command.add_argument("--input", required=True); command.add_argument("--output", required=True); command.set_defaults(function=_verify_final)
+    command = commands.add_parser("build-b1-summary"); command.add_argument("--repo-root", default="."); command.add_argument("--output", required=True); command.set_defaults(function=_build_b1_summary)
+    command = commands.add_parser("build-b1-evidence"); command.add_argument("--repo-root", default="."); command.add_argument("--test-evidence", required=True); command.add_argument("--b1-execution-commit", default="876f41ea0f879d57ef4e7d8e2e09113bcb855a54"); command.add_argument("--output", required=True); command.set_defaults(function=_build_b1_evidence)
+    command = commands.add_parser("verify-b1-evidence"); command.add_argument("--repo-root", default="."); command.add_argument("--input", required=True); command.set_defaults(function=_verify_b1_evidence)
+    command = commands.add_parser("verify-existing-tau-freeze"); command.add_argument("--repo-root", default="."); command.add_argument("--freeze", required=True); command.set_defaults(function=_verify_tau_freeze)
     return root
 
 
@@ -514,7 +574,9 @@ def main(argv: list[str] | None = None) -> int:
         allowed = COMMAND_AUTHORIZATIONS.get(args.command)
         if allowed is None:
             raise Stage2V52ContractError(f"command has no fail-closed authorization policy: {args.command}")
-        _require_execution(_config(args), allowed)
+        config = _config(args)
+        _require_execution(config, allowed)
+        _require_protocol_execution(config, args)
     result = args.function(args)
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0 if result.get("status", "PASS") in {"PASS", "MICRO_FIRST_CHECKPOINT_SELECTED"} else 2

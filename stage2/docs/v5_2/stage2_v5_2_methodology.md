@@ -2,11 +2,11 @@
 
 ## Status and scope
 
-Phase A.2 execution verification and Phase B0 have passed. Phase B1 transfer
-tuning has run only on the frozen `20161009-20161018 -> 20161019-20161020`
-protocol: M0/M1/M2/M3 and the three M4 tau candidates were evaluated, and tau
-was selected once and frozen at `3.0` (`Train-support p25`). Rolling folds,
-Phase C/D, the legacy 20161031 benchmark, and Stage 3 remain unopened.
+Phase A.2 execution verification, Phase B0, and Phase B1 have passed. Phase B1
+is now post-run frozen: its mutating commands are disabled, its evidence bundle
+is hash-bound, and tau is write-once at `3.0` (`Train-support p25`). It used
+only `20161009-20161018 -> 20161019-20161020`. Phase C/D, rolling folds, the
+legacy 20161031 benchmark, and Stage 3 remain unopened and unauthorized.
 
 The frozen research question is dispatch-time prediction, using only then-known
 history, of multidimensional micro operating conditions along the historical
@@ -141,6 +141,8 @@ Train-only support and static artifacts before running one fixed Train bucket
 and one fixed Validation bucket. These two preparation commands cannot read
 Validation labels for fitting and do not train a model. Phase B1 is the frozen
 transfer-tuning protocol and is now complete with a hash-bound tau freeze.
-Phase C is one development day. Full rolling remains allowed only after its
-product, leakage, scientific, and real-kernel gates pass; completing B1 does not
-implicitly authorize Phase C or D.
+Its low-support and unseen evidence is mixed, so the frozen conclusion is Case
+C: no convincing support-aware transfer evidence in B1. A later Phase C
+development window requires a separate explicit authorization. Full rolling
+remains allowed only after its product, leakage, scientific, and real-kernel
+gates pass; completing B1 does not implicitly authorize Phase C or D.

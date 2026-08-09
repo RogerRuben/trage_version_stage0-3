@@ -6,16 +6,20 @@
     "documentation_head": "4137ded50abe7c4d4b1351e8fc3d095342ef4a74",
     "frozen_v5_1": true
   },
-  "phase": "B1_TRANSFER_TUNING",
-  "execution_authorization": "PHASE_B1",
-  "phase_b_allowed": true,
+  "phase": "B1_COMPLETE_FROZEN",
+  "execution_authorization": "NONE_POST_B1",
+  "phase_b_allowed": false,
+  "phase_b1_complete": true,
+  "phase_c_authorized": false,
   "phase_b0_gate": {
     "report_path": "stage2/docs/v5_2/stage2_v5_2_phase_b0_smoke.json",
     "report_sha256": "3fcdf953f07d5dd7c32d5efd4952e67bd3ced80d8275644b4d1dc3289ffccdc7"
   },
   "tau_freeze": {
     "artifact_name": "stage2_v5_2_tau_freeze.json",
+    "artifact_path": "stage2/output_v5_2/transfer_tuning/stage2_v5_2_tau_freeze.json",
     "expected_file_sha256": "5900d6184d151d8093528f1fa04a1afd73a75d07fd0187da7da22abdb44296ec",
+    "write_once": true,
     "write_once_in_phase": "PHASE_B1",
     "required_for_phases": ["PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"]
   },
@@ -222,5 +226,5 @@
     ]
   },
   "final_status_requires_experiments": "READY_FOR_AV_ROUTE_SUITABILITY_STAGE",
-  "current_status": "PHASE_B1_TRANSFER_TUNING_COMPLETE"
+  "current_status": "PHASE_B1_FROZEN_COMPLETE"
 }
