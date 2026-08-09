@@ -68,7 +68,7 @@ def test_config_schema_and_phase_execution_is_gate_bound() -> None:
     config = json.loads(open("stage2/config/stage2_v5_2.json", encoding="utf-8").read())
     assert config["schema_version"] == "stage2_v5_2_config.3"
     authorization = config["execution_authorization"]
-    assert authorization in {"NONE_PHASE_A_2", "PHASE_B0", "PHASE_B1", "NONE_POST_B1"}
+    assert authorization in {"NONE_PHASE_A_2", "PHASE_B0", "PHASE_B1", "NONE_POST_B1", "PHASE_C"}
     if authorization == "PHASE_B1":
         gate = config["phase_b0_gate"]
         report_path = Path(gate["report_path"])
@@ -81,6 +81,12 @@ def test_config_schema_and_phase_execution_is_gate_bound() -> None:
         assert config["phase"] == "B1_COMPLETE_FROZEN"
         assert config["phase_b1_complete"] is True
         assert config["phase_c_authorized"] is False
+    if authorization == "PHASE_C":
+        assert config["phase"] == "PHASE_C"
+        assert config["phase_b1_complete"] is True
+        assert config["phase_c_authorized"] is True
+        assert config["phase_d_authorized"] is False
+        assert config["phase_c_authorization"]["tau_reselection_allowed"] is False
     assert config["performance"]["warmup_runs"] == 2
     assert config["performance"]["repeat_runs"] == 3
     assert config["training"]["loss_weights"]["rts"] == 0.0

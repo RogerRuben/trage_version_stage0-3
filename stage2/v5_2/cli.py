@@ -14,7 +14,7 @@ import pandas as pd
 from .contracts import CONFIG_SCHEMA_VERSION, RESEARCH_CONTRACT, Stage2V52ContractError, validate_research_contract
 from .b1_freeze import (
     build_b1_evidence_bundle, build_b1_results_summary,
-    verify_b1_evidence_bundle, verify_existing_tau_freeze,
+    sha256_git_file, verify_b1_evidence_bundle, verify_existing_tau_freeze,
 )
 from .evaluation import (
     build_tau_metrics_manifest, evaluate_checkpoint, evaluate_spatial_adoption,
@@ -121,6 +121,78 @@ def _require_execution(config: dict[str, Any], allowed: set[str]) -> None:
             or report.get("status") != "PASS" or report.get("authorizes_phase_b1") is not True
         ):
             raise Stage2V52ContractError("Phase B0 smoke report does not authorize PHASE_B1")
+    if authorization == "PHASE_C":
+        _verify_phase_c_authorization(config)
+
+
+def _verify_phase_c_authorization(
+    config: dict[str, Any], *, repo_root: str | Path = ".",
+) -> dict[str, Any]:
+    """Fail closed unless Phase C is bound to the reviewed B1 freeze."""
+    root = Path(repo_root).resolve()
+    binding = config.get("phase_c_authorization", {})
+    if (
+        config.get("phase") != "PHASE_C"
+        or config.get("execution_authorization") != "PHASE_C"
+        or config.get("phase_b1_complete") is not True
+        or config.get("phase_c_authorized") is not True
+        or config.get("phase_d_authorized") is not False
+        or config.get("current_status") != "PHASE_C_AUTHORIZED"
+    ):
+        raise Stage2V52ContractError("Phase C status flags are incomplete or inconsistent")
+
+    evidence_path = root / str(binding.get("b1_evidence_bundle_path", ""))
+    tau_path = root / str(binding.get("tau_freeze_path", ""))
+    if (
+        not evidence_path.is_file()
+        or sha256_file(evidence_path) != binding.get("b1_evidence_bundle_sha256")
+    ):
+        raise Stage2V52ContractError("Phase C B1 evidence-bundle binding does not resolve")
+    evidence = _json(evidence_path)
+    if (
+        evidence.get("schema_version") != "stage2_v5_2_phase_b1_evidence_bundle.1"
+        or evidence.get("status") != "PASS"
+        or evidence.get("phase_c_authorized") is not False
+        or evidence.get("b1_execution_commit") != binding.get("b1_execution_commit")
+        or evidence.get("config", {}).get("sha256") != binding.get("b1_frozen_config_sha256")
+        or evidence.get("tau", {}).get("freeze", {}).get("sha256") != binding.get("tau_freeze_sha256")
+    ):
+        raise Stage2V52ContractError("Phase C bindings differ from the frozen B1 evidence identity")
+
+    frozen_config_path = str(binding.get("b1_frozen_config_path", ""))
+    execution_config_path = str(binding.get("b1_execution_config_path", ""))
+    if (
+        sha256_git_file(root, str(binding.get("b1_frozen_commit", "")), frozen_config_path)
+        != binding.get("b1_frozen_config_sha256")
+        or sha256_git_file(root, str(binding.get("b1_execution_commit", "")), execution_config_path)
+        != binding.get("b1_execution_config_sha256")
+    ):
+        raise Stage2V52ContractError("Phase C Git config provenance does not resolve")
+
+    tau = verify_existing_tau_freeze(
+        tau_path, repo_root=root, expected_file_sha256=str(binding.get("tau_freeze_sha256", ""))
+    )
+    protocol = get_protocol("development")
+    if (
+        config.get("tau_freeze", {}).get("expected_file_sha256") != binding.get("tau_freeze_sha256")
+        or float(binding.get("selected_tau", float("nan"))) != 3.0
+        or binding.get("selected_candidate") != "p25"
+        or binding.get("protocol_id") != "development"
+        or binding.get("protocol_sha256") != protocol.digest
+        or binding.get("train_dates") != list(protocol.train_dates)
+        or binding.get("validation_dates") != list(protocol.validation_dates)
+        or binding.get("calibration_dates") != list(protocol.calibration_dates)
+        or binding.get("evaluation_dates") != list(protocol.evaluation_dates)
+    ):
+        raise Stage2V52ContractError("Phase C protocol or frozen tau binding is inconsistent")
+    return {
+        "status": "PASS",
+        "b1_evidence_bundle_sha256": binding["b1_evidence_bundle_sha256"],
+        "b1_execution_config_sha256": binding["b1_execution_config_sha256"],
+        "tau_freeze_sha256": tau["sha256"],
+        "protocol_sha256": protocol.digest,
+        "phase_d_authorized": False,
+    }
 
 
 def _require_protocol_execution(config: dict[str, Any], args: argparse.Namespace) -> None:
@@ -130,6 +202,14 @@ def _require_protocol_execution(config: dict[str, Any], args: argparse.Namespace
         and config.get("execution_authorization") != "PHASE_B1"
     ):
         raise Stage2V52ContractError("the completed transfer_tuning protocol cannot be reopened after Phase B1")
+    if (
+        config.get("execution_authorization") == "PHASE_C"
+        and getattr(args, "command", None) in B1_MUTATING_PROTOCOL_COMMANDS
+    ):
+        if getattr(args, "protocol", None) != "development":
+            raise Stage2V52ContractError("Phase C may execute only the frozen development protocol")
+        if getattr(args, "model", None) == "M5":
+            raise Stage2V52ContractError("Phase C forbids M5; only M0/M1/M2/M3/M4 are authorized")
 
 
 def _resolve_training_tau(args: argparse.Namespace, config: dict[str, Any]) -> tuple[float, dict[str, Any]]:

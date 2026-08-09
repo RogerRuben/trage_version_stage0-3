@@ -6,11 +6,40 @@
     "documentation_head": "4137ded50abe7c4d4b1351e8fc3d095342ef4a74",
     "frozen_v5_1": true
   },
-  "phase": "B1_COMPLETE_FROZEN",
-  "execution_authorization": "NONE_POST_B1",
+  "phase": "PHASE_C",
+  "execution_authorization": "PHASE_C",
   "phase_b_allowed": false,
   "phase_b1_complete": true,
-  "phase_c_authorized": false,
+  "phase_c_authorized": true,
+  "phase_d_authorized": false,
+  "phase_c_authorization": {
+    "authorization_base_commit": "f64d7fd6ab58f9d82a7bb54e97624b0d4c23b84a",
+    "b1_frozen_commit": "f64d7fd6ab58f9d82a7bb54e97624b0d4c23b84a",
+    "b1_frozen_config_path": "stage2/config/stage2_v5_2.json",
+    "b1_frozen_config_sha256": "5e496cd79c569fe1847811fdac13434a5c83afbb90bf744e25dfb829133cf29c",
+    "b1_execution_commit": "876f41ea0f879d57ef4e7d8e2e09113bcb855a54",
+    "b1_execution_config_path": "stage2/config/stage2_v5_2.json",
+    "b1_execution_config_sha256": "9fa69c652a6680014fca3d3cdaee19f06934a42b63de217fab0380118e14d67d",
+    "b1_evidence_bundle_path": "stage2/docs/v5_2/stage2_v5_2_phase_b1_evidence_bundle.json",
+    "b1_evidence_bundle_sha256": "e44629ed30ac86d951012e438d8448eed7fe226edaa915ea6d5305322765d934",
+    "tau_freeze_path": "stage2/output_v5_2/transfer_tuning/stage2_v5_2_tau_freeze.json",
+    "tau_freeze_sha256": "5900d6184d151d8093528f1fa04a1afd73a75d07fd0187da7da22abdb44296ec",
+    "selected_candidate": "p25",
+    "selected_tau": 3.0,
+    "protocol_id": "development",
+    "protocol_sha256": "725a71e76c4685f3a8ba0b0b584a9e10b29df426723a11313cf3a89b2bac6790",
+    "train_dates": [
+      "20161009", "20161010", "20161011", "20161012", "20161013",
+      "20161014", "20161015", "20161016", "20161017", "20161018",
+      "20161019", "20161020", "20161021"
+    ],
+    "validation_dates": ["20161022", "20161023"],
+    "calibration_dates": ["20161024"],
+    "evaluation_dates": ["20161025", "20161026", "20161027"],
+    "tau_reselection_allowed": false,
+    "m4_models": ["M4"],
+    "forbidden_models": ["M4-p50", "M4-p75", "M5", "M6"]
+  },
   "phase_b0_gate": {
     "report_path": "stage2/docs/v5_2/stage2_v5_2_phase_b0_smoke.json",
     "report_sha256": "3fcdf953f07d5dd7c32d5efd4952e67bd3ced80d8275644b4d1dc3289ffccdc7"
@@ -226,5 +255,5 @@
     ]
   },
   "final_status_requires_experiments": "READY_FOR_AV_ROUTE_SUITABILITY_STAGE",
-  "current_status": "PHASE_B1_FROZEN_COMPLETE"
+  "current_status": "PHASE_C_AUTHORIZED"
 }

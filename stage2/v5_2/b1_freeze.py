@@ -20,6 +20,7 @@ from .verification import sha256_file
 B1_EVIDENCE_SCHEMA_VERSION = "stage2_v5_2_phase_b1_evidence_bundle.1"
 B1_SUMMARY_SCHEMA_VERSION = "stage2_v5_2_phase_b1_transfer_tuning_report.2"
 B1_EXECUTION_COMMIT = "876f41ea0f879d57ef4e7d8e2e09113bcb855a54"
+B1_SCIENTIFIC_MEAN_THRESHOLD = 0.02
 
 MODEL_PATHS = {
     "M0": {
@@ -153,6 +154,119 @@ def _relative_improvement(baseline: Mapping[str, float], candidate: Mapping[str,
     return {
         target: (float(baseline[target]) - float(candidate[target])) / float(baseline[target])
         for target in CORE_TRANSFER_TARGETS
+    }
+
+
+def sha256_git_file(repo_root: str | Path, commit: str, path: str) -> str:
+    """Hash the exact bytes of a file stored in a Git commit."""
+    if len(commit) != 40:
+        raise Stage2V52ContractError("Git evidence commit must be a full SHA")
+    completed = subprocess.run(
+        ["git", "show", f"{commit}:{path}"], cwd=Path(repo_root).resolve(),
+        check=False, capture_output=True,
+    )
+    if completed.returncode != 0:
+        raise Stage2V52ContractError(f"Git evidence file does not resolve: {commit}:{path}")
+    return hashlib.sha256(completed.stdout).hexdigest()
+
+
+def classify_b1_scientific_conclusion(
+    metrics: Mapping[str, Mapping[str, Mapping[str, float]]],
+) -> dict[str, Any]:
+    """Classify frozen B1 metrics using explicit, deterministic evidence rules."""
+    required_models = {"M1", "M2", "M3", "M4_p25"}
+    if not required_models.issubset(metrics):
+        raise Stage2V52ContractError("B1 scientific classification is missing required models")
+
+    comparisons: dict[str, dict[str, float]] = {}
+    for candidate in ("M2", "M3", "M4_p25"):
+        for group in ("low", "unseen"):
+            comparisons[f"{candidate}_{group}_vs_M1"] = _relative_improvement(
+                metrics["M1"][group], metrics[candidate][group]
+            )
+    for group in ("low", "unseen"):
+        comparisons[f"M4_p25_{group}_vs_M3"] = _relative_improvement(
+            metrics["M3"][group], metrics["M4_p25"][group]
+        )
+    comparisons["M4_p25_unseen_vs_M2"] = _relative_improvement(
+        metrics["M2"]["unseen"], metrics["M4_p25"]["unseen"]
+    )
+
+    diagnostics = {
+        name: {
+            "mean_relative_improvement": sum(values.values()) / len(values),
+            "target_win_count": sum(value > 0.0 for value in values.values()),
+        }
+        for name, values in comparisons.items()
+    }
+
+    def stable_positive(name: str) -> bool:
+        item = diagnostics[name]
+        return (
+            int(item["target_win_count"]) >= 3
+            and float(item["mean_relative_improvement"]) >= B1_SCIENTIFIC_MEAN_THRESHOLD
+        )
+
+    unseen_vs_m2 = diagnostics["M4_p25_unseen_vs_M2"]
+    unseen_not_systematically_worse = not (
+        int(unseen_vs_m2["target_win_count"]) <= 1
+        and float(unseen_vs_m2["mean_relative_improvement"]) < -B1_SCIENTIFIC_MEAN_THRESHOLD
+    )
+    case_a = (
+        stable_positive("M4_p25_low_vs_M1")
+        and stable_positive("M4_p25_unseen_vs_M1")
+        and stable_positive("M4_p25_low_vs_M3")
+        and stable_positive("M4_p25_unseen_vs_M3")
+        and unseen_not_systematically_worse
+    )
+    structured_positive = all(
+        stable_positive(f"{model}_{group}_vs_M1")
+        for model in ("M2", "M3", "M4_p25")
+        for group in ("low", "unseen")
+    )
+    m3_m4_close = all(
+        abs(float(diagnostics[f"M4_p25_{group}_vs_M3"]["mean_relative_improvement"]))
+        < B1_SCIENTIFIC_MEAN_THRESHOLD
+        for group in ("low", "unseen")
+    )
+
+    if case_a:
+        classification = "CASE_A"
+        statement = "support-aware transfer obtains preliminary positive evidence"
+        rationale = [
+            "M4-p25 has stable material gains over M1 and M3 in low-support and unseen groups",
+            "M4-p25 is not systematically worse than M2 on unseen edges",
+        ]
+    elif structured_positive and m3_m4_close and unseen_not_systematically_worse:
+        classification = "CASE_B"
+        statement = (
+            "structured representation transfer is positive; support-aware gating adds limited incremental value"
+        )
+        rationale = [
+            "M2, M3, and M4-p25 have stable material gains over M1 in low-support and unseen groups",
+            "M3 and M4-p25 remain within the preregistered materiality threshold",
+        ]
+    else:
+        classification = "CASE_C"
+        statement = (
+            "B1 shows no convincing support-aware transfer evidence; keep the protocol frozen "
+            "and test temporal robustness before any adoption claim"
+        )
+        rationale = [
+            "the frozen low-support/unseen comparisons do not satisfy the stable material-gain rule",
+            "M4-p25 does not stably improve over M3 across low-support and unseen targets",
+            "unseen differences between M4 and M2 may include shared-backbone fine-tuning and cannot be attributed to the edge gate alone",
+        ]
+    return {
+        "classification": classification,
+        "statement": statement,
+        "rationale": rationale,
+        "rule": {
+            "mean_relative_improvement_threshold": B1_SCIENTIFIC_MEAN_THRESHOLD,
+            "minimum_target_wins": 3,
+            "unseen_not_systematically_worse": unseen_not_systematically_worse,
+        },
+        "diagnostics": diagnostics,
     }
 
 
@@ -295,18 +409,7 @@ def build_b1_results_summary(*, repo_root: str | Path) -> dict[str, Any]:
             ),
         },
         "no_history_temporal_fallback": temporal,
-        "scientific_conclusion": {
-            "classification": "CASE_C",
-            "statement": (
-                "B1 shows no convincing support-aware transfer evidence; keep the protocol frozen "
-                "and test temporal robustness before any adoption claim"
-            ),
-            "rationale": [
-                "M4-p25 has only small mixed low-support changes relative to M1",
-                "M4-p25 does not stably improve over M3 across low-support and unseen targets",
-                "unseen differences between M4 and M2 may include shared-backbone fine-tuning and cannot be attributed to the edge gate alone",
-            ],
-        },
+        "scientific_conclusion": classify_b1_scientific_conclusion(metrics),
         "phase_c_authorized": False,
     }
     result["artifact_sha256"] = _payload_hash(result)
@@ -486,18 +589,39 @@ def verify_b1_evidence_bundle(payload: Mapping[str, Any], *, repo_root: str | Pa
     collect(payload)
     if len(records) < 35:
         raise Stage2V52ContractError("Phase B1 evidence bundle has too few bound artifacts")
+    frozen_config_bytes: bytes | None = None
+    config_record = payload["config"]
+    current_config_path = _resolve(root, str(config_record["path"]))
+    if not current_config_path.is_file() or sha256_file(current_config_path) != config_record.get("sha256"):
+        current_config = _json(root / "stage2/config/stage2_v5_2.json")
+        binding = current_config.get("phase_c_authorization", {})
+        frozen_commit = str(binding.get("b1_frozen_commit", ""))
+        if (
+            binding.get("b1_frozen_config_path") != config_record.get("path")
+            or binding.get("b1_frozen_config_sha256") != config_record.get("sha256")
+            or sha256_git_file(root, frozen_commit, str(config_record["path"])) != config_record.get("sha256")
+        ):
+            raise Stage2V52ContractError("Phase B1 frozen config binding does not resolve")
+        completed = subprocess.run(
+            ["git", "show", f"{frozen_commit}:{config_record['path']}"], cwd=root,
+            check=True, capture_output=True,
+        )
+        frozen_config_bytes = completed.stdout
     for record in records:
         if record.get("status") != "PASS":
             raise Stage2V52ContractError(f"non-passing B1 evidence record: {record.get('path')}")
         path = _resolve(root, str(record["path"]))
-        if not path.is_file() or sha256_file(path) != record.get("sha256"):
+        is_frozen_config = record is config_record and frozen_config_bytes is not None
+        if not is_frozen_config and (not path.is_file() or sha256_file(path) != record.get("sha256")):
             raise Stage2V52ContractError(f"B1 evidence hash does not resolve: {record.get('path')}")
     test_path = _resolve(root, str(payload["test_evidence"]["path"]))
     tests = _json(test_path)
     if int(tests.get("base", {}).get("passed", 0)) < 111 or int(tests.get("gpu_v5_2", {}).get("passed", 0)) < 64:
         raise Stage2V52ContractError("B1 test evidence is below the frozen minimum")
-    config_path = _resolve(root, str(payload["config"]["path"]))
-    config = _json(config_path)
+    config = (
+        json.loads(frozen_config_bytes.decode("utf-8"))
+        if frozen_config_bytes is not None else _json(current_config_path)
+    )
     freeze_sha = payload["tau"]["freeze"]["sha256"]
     if config.get("tau_freeze", {}).get("expected_file_sha256") != freeze_sha:
         raise Stage2V52ContractError("B1 evidence tau hash differs from frozen config")

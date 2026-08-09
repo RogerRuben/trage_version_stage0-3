@@ -6,9 +6,13 @@ from pathlib import Path
 
 import pytest
 
-from stage2.v5_2.b1_freeze import verify_b1_evidence_bundle, verify_existing_tau_freeze
+from stage2.v5_2.b1_freeze import (
+    classify_b1_scientific_conclusion, sha256_git_file,
+    verify_b1_evidence_bundle, verify_existing_tau_freeze,
+)
 from stage2.v5_2.cli import (
     COMMAND_AUTHORIZATIONS, _freeze_tau, _require_execution, _require_protocol_execution,
+    _verify_phase_c_authorization,
 )
 from stage2.v5_2.contracts import Stage2V52ContractError
 
@@ -20,22 +24,43 @@ def _config() -> dict[str, object]:
     return json.loads((REPO / "stage2/config/stage2_v5_2.json").read_text(encoding="utf-8"))
 
 
-def test_b1_complete_blocks_training() -> None:
+def test_phase_c_is_bound_to_frozen_b1_and_only_allows_phase_c_commands() -> None:
     config = _config()
-    assert config["execution_authorization"] == "NONE_POST_B1"
+    assert config["execution_authorization"] == "PHASE_C"
+    assert _verify_phase_c_authorization(config, repo_root=REPO)["status"] == "PASS"
+    _require_execution(config, COMMAND_AUTHORIZATIONS["train-model"])
     blocked = {
-        "train-model", "train-tree-baseline", "evaluate-model", "build-tau-metrics",
-        "tune-tau", "freeze-tau", "build-transfer-shards", "build-m0-feature-matrix",
+        "build-tau-metrics", "tune-tau", "freeze-tau", "build-release-manifest",
     }
     for command in blocked:
         with pytest.raises(Stage2V52ContractError):
             _require_execution(config, COMMAND_AUTHORIZATIONS[command])
 
 
+def test_phase_c_binds_b1_execution_config_hash() -> None:
+    binding = _config()["phase_c_authorization"]
+    assert sha256_git_file(
+        REPO, binding["b1_execution_commit"], binding["b1_execution_config_path"]
+    ) == binding["b1_execution_config_sha256"]
+
+
 def test_transfer_tuning_cannot_reopen_under_a_later_authorization() -> None:
     args = argparse.Namespace(command="train-model", protocol="transfer_tuning")
     with pytest.raises(Stage2V52ContractError, match="cannot be reopened"):
         _require_protocol_execution({"execution_authorization": "PHASE_C"}, args)
+
+
+def test_phase_c_blocks_rolling_and_m5() -> None:
+    with pytest.raises(Stage2V52ContractError, match="only the frozen development"):
+        _require_protocol_execution(
+            {"execution_authorization": "PHASE_C"},
+            argparse.Namespace(command="train-model", protocol="fold_1", model="M4"),
+        )
+    with pytest.raises(Stage2V52ContractError, match="forbids M5"):
+        _require_protocol_execution(
+            {"execution_authorization": "PHASE_C"},
+            argparse.Namespace(command="train-model", protocol="development", model="M5"),
+        )
 
 
 def test_existing_tau_freeze_is_write_once(tmp_path: Path) -> None:
@@ -94,3 +119,6 @@ def test_b1_low_unseen_and_no_history_report_is_frozen() -> None:
     assert temporal["no_history_temporal_fallback_token_count"] == 384
     assert temporal["unique_physical_no_history_row_count"] == 278
     assert temporal["not_a_real_observation"] is True
+    automatic = classify_b1_scientific_conclusion(payload["metrics"])
+    assert automatic["classification"] == "CASE_C"
+    assert automatic["rule"]["mean_relative_improvement_threshold"] == 0.02
