@@ -1,0 +1,6 @@
+support_dimension,train_cell_count,p25,p50,p75,p90
+temporal,48,11405,42919,48801,50095
+origin_grid,87,11063,15789,22403,33125
+od_grid_pair,7139,35,100,232,493
+origin_grid_x_time_bin,4103,82,307,546,839
+od_grid_pair_x_time_bin,213369,1,3,8,16
