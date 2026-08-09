@@ -212,9 +212,9 @@ def test_real_support_payload_passes_verifier() -> None:
 def test_m0_validation_transform_uses_train_schema(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     from stage2.v5_2 import m0_features
 
-    def fake_day(date: str, **_: object) -> pd.DataFrame:
-        return pd.DataFrame({
-            "order_id": [f"o-{date}"], "traversal_id": [1],
+    def fake_batches(_root: Path, date: str, **_: object):
+        yield pd.DataFrame({
+            "date": [date], "order_id": [f"o-{date}"], "traversal_id": [1],
             "observed_directed_edge_uid": ["edge-a"], "feature_a": [np.nan],
             "crawl_time_share": [0.1], "crawl_target_valid": [True],
             "stop_time_share": [0.2], "stop_target_valid": [True],
@@ -223,8 +223,9 @@ def test_m0_validation_transform_uses_train_schema(tmp_path: Path, monkeypatch: 
             "rts_raw": [0.5], "rts_target_valid": [True],
         })
 
-    monkeypatch.setattr(m0_features, "load_v5_day", fake_day)
+    monkeypatch.setattr(m0_features, "_iter_m0_day_batches", fake_batches)
     monkeypatch.setattr(m0_features, "_source_hashes", lambda *args: {"fixture": True})
+    monkeypatch.setattr(m0_features, "_projected_route_rows", lambda _root, dates: len(tuple(dates)))
     schema = {
         "feature_names": ["feature_a"], "median": {"feature_a": 7.0},
         "missing_policy": "Train_partition_median_fitted_on_exact_protocol_dates", "dtype": "float32",

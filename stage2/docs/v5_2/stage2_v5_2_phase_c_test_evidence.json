@@ -1,0 +1,23 @@
+{
+  "schema_version": "stage2_v5_2_phase_c_test_evidence.1",
+  "status": "PASS",
+  "compileall": {
+    "scope": "stage2",
+    "status": "PASS"
+  },
+  "base": {
+    "environment": "base",
+    "scope": "stage2/tests stage2/tests_v4 stage2/tests_v5 stage2/tests_v5_2",
+    "passed": 123,
+    "failed": 0,
+    "warnings": 10
+  },
+  "gpu_v5_2": {
+    "environment": "pytorch_cuda",
+    "scope": "stage2/tests_v5_2",
+    "passed": 76,
+    "failed": 0
+  },
+  "phase_c_direction": "WEAK",
+  "phase_d_authorized": false
+}

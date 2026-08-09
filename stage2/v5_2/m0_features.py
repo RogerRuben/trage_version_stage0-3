@@ -7,14 +7,15 @@ import json
 import os
 import tempfile
 from collections.abc import Iterable, Mapping
+from contextlib import ExitStack
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 import pandas as pd
+import pyarrow.parquet as pq
 
 from stage2.v4.models.baselines import _feature_candidates
-from stage2.v5.data import load_v5_day
 
 from .contracts import FORBIDDEN_MODEL_INPUTS, Stage2V52ContractError, validate_model_inputs
 from .feature_binding import sha256_path
@@ -89,6 +90,71 @@ def _source_hashes(root: Path, feature_root: Path, date: str) -> dict[str, Any]:
     }
 
 
+def _projected_route_rows(feature_root: Path, dates: Iterable[str]) -> int:
+    return sum(
+        int(pq.ParquetFile(feature_root / f"day={date}.parquet").metadata.num_rows)
+        for date in dates
+    )
+
+
+def _route_feature_names(feature_root: Path, date: str) -> tuple[str, ...]:
+    route_path = feature_root / f"day={date}.parquet"
+    if not route_path.is_file():
+        raise Stage2V52ContractError(f"missing frozen v4 route features for {date}")
+    schema = set(pq.ParquetFile(route_path).schema_arrow.names)
+    required = {
+        "date", "order_id", "traversal_id", "observed_directed_edge_uid",
+        *(column for pair in TARGET_COLUMNS.values() for column in pair),
+    }
+    missing = sorted(required - schema)
+    if missing:
+        raise Stage2V52ContractError(
+            f"M0 route product is missing projected columns for {date}: {missing}"
+        )
+    return tuple(column for column in _feature_candidates() if column in schema)
+
+
+def _iter_m0_day_batches(
+    feature_root: Path, date: str, *, split: str,
+    feature_names: tuple[str, ...] | None = None, batch_size: int = 65_536,
+) -> Iterable[pd.DataFrame]:
+    """Read only M0-owned columns in bounded Parquet record batches.
+
+    The frozen route-conditioned product already contains the four component
+    labels and RTS diagnostic used by M0.  Reading it directly avoids the v5
+    adapter's full-day Stage 1 merge, which is unnecessary for this baseline
+    and can exceed host memory on the development split.
+    """
+    route_path = feature_root / f"day={date}.parquet"
+    available_features = _route_feature_names(feature_root, date)
+    selected_features = available_features if feature_names is None else feature_names
+    missing_features = sorted(set(selected_features) - set(available_features))
+    if missing_features:
+        raise Stage2V52ContractError(
+            f"M0 route feature columns drift for {date}: {missing_features}"
+        )
+    columns = tuple(dict.fromkeys([
+        "date", "order_id", "traversal_id", "observed_directed_edge_uid",
+        *selected_features,
+        *(column for pair in TARGET_COLUMNS.values() for column in pair),
+    ]))
+    parquet = pq.ParquetFile(route_path)
+    observed_rows = 0
+    for batch in parquet.iter_batches(columns=columns, batch_size=batch_size):
+        frame = batch.to_pandas(split_blocks=True)
+        if frame.empty:
+            continue
+        frame["split"] = split
+        frame["date"] = str(date)
+        observed_rows += int(len(frame))
+        yield frame
+    if observed_rows != int(parquet.metadata.num_rows):
+        raise Stage2V52ContractError(
+            f"M0 projected batch scan changed row count for {date}: "
+            f"{parquet.metadata.num_rows} != {observed_rows}"
+        )
+
+
 def _matrix_arrays(
     frames: Iterable[pd.DataFrame], *, feature_names: tuple[str, ...], median: Mapping[str, float],
     split: str, support_artifact: Mapping[str, Any] | None,
@@ -127,6 +193,93 @@ def _matrix_arrays(
     return payload, valid_counts
 
 
+def _write_matrix_disk_backed(
+    frames: Iterable[pd.DataFrame], *, feature_names: tuple[str, ...], median: Mapping[str, float],
+    split: str, support_artifact: Mapping[str, Any] | None, expected_rows: int,
+    output_matrix_path: str | Path,
+) -> tuple[dict[str, int], int]:
+    """Materialize daily arrays into memmaps before one deterministic NPZ write."""
+    if expected_rows <= 0:
+        raise Stage2V52ContractError("M0 disk-backed writer requires a positive row count")
+    matrix_path = Path(output_matrix_path)
+    matrix_path.parent.mkdir(parents=True, exist_ok=True)
+    shapes_and_dtypes: dict[str, tuple[tuple[int, ...], Any]] = {
+        "features": ((expected_rows, len(feature_names)), np.float32),
+        "split": ((expected_rows,), "U16"),
+        "date": ((expected_rows,), "U8"),
+        "order_id": ((expected_rows,), "U64"),
+        "traversal_id": ((expected_rows,), np.int64),
+        "support_group_code": ((expected_rows,), np.int8),
+    }
+    for target in TARGET_COLUMNS:
+        shapes_and_dtypes[target] = ((expected_rows,), np.float32)
+        shapes_and_dtypes[f"{target}_valid"] = ((expected_rows,), np.bool_)
+    valid_counts = {target: 0 for target in TARGET_COLUMNS}
+    with tempfile.TemporaryDirectory(prefix="stage2-v5-2-m0-matrix-", dir=matrix_path.parent) as temporary:
+        temp_root = Path(temporary)
+        stores = {
+            name: np.lib.format.open_memmap(
+                temp_root / f"{name}.npy", mode="w+", dtype=dtype, shape=shape,
+            )
+            for name, (shape, dtype) in shapes_and_dtypes.items()
+        }
+        offset = 0
+        try:
+            group_codes = {"unseen": 0, "low": 1, "medium": 2, "high": 3}
+            for frame in frames:
+                count = int(len(frame))
+                end = offset + count
+                if end > expected_rows:
+                    raise Stage2V52ContractError("M0 source rows exceed the projected matrix size")
+                for column_index, name in enumerate(feature_names):
+                    values = pd.to_numeric(frame[name], errors="coerce").to_numpy(np.float32)
+                    values[~np.isfinite(values)] = float(median[name])
+                    stores["features"][offset:end, column_index] = values
+                stores["split"][offset:end] = split
+                stores["date"][offset:end] = frame["date"].astype(str).to_numpy(dtype="U8")
+                stores["order_id"][offset:end] = frame["order_id"].astype(str).to_numpy(dtype="U64")
+                stores["traversal_id"][offset:end] = pd.to_numeric(
+                    frame["traversal_id"], errors="raise"
+                ).to_numpy(np.int64)
+                if support_artifact is None:
+                    stores["support_group_code"][offset:end] = group_codes["medium"]
+                else:
+                    _, groups = lookup_train_support(frame["observed_directed_edge_uid"], support_artifact)
+                    stores["support_group_code"][offset:end] = np.fromiter(
+                        (group_codes[str(value)] for value in groups), dtype=np.int8, count=count,
+                    )
+                for target, (column, mask_column) in TARGET_COLUMNS.items():
+                    values = pd.to_numeric(frame[column], errors="coerce").to_numpy(np.float32)
+                    mask = frame[mask_column].fillna(False).to_numpy(bool) & np.isfinite(values)
+                    stores[target][offset:end] = np.where(mask, values, 0.0).astype(np.float32)
+                    stores[f"{target}_valid"][offset:end] = mask
+                    valid_counts[target] += int(mask.sum())
+                offset = end
+                del frame, values, mask
+            if offset != expected_rows:
+                raise Stage2V52ContractError(
+                    f"M0 source row projection differs from materialized rows: {expected_rows} != {offset}"
+                )
+        finally:
+            for store in stores.values():
+                store.flush()
+                store._mmap.close()
+            del store
+            del stores
+        payload = {
+            name: np.load(temp_root / f"{name}.npy", mmap_mode="r", allow_pickle=False)
+            for name in shapes_and_dtypes
+        }
+        try:
+            _atomic_npz(matrix_path, payload)
+        finally:
+            for array in payload.values():
+                array._mmap.close()
+            del array
+        del payload
+    return valid_counts, expected_rows
+
+
 def build_m0_feature_matrix(
     *, protocol_id: str, repo_root: str | Path, route_feature_root: str | Path,
     output_matrix_path: str | Path, output_manifest_path: str | Path,
@@ -142,26 +295,31 @@ def build_m0_feature_matrix(
     # all-dates x all-features in-memory copy.
     with tempfile.TemporaryDirectory(prefix="stage2-v5-2-m0-median-") as temporary:
         temp_root = Path(temporary)
-        feature_paths: dict[str, Path] = {}
-        feature_counts: dict[str, int] = {}
-        for date in protocol.train_dates:
-            frame = load_v5_day(
-                date, split="train", repo_root=root, route_feature_root=feature_root,
-                extra_columns=("observed_directed_edge_uid",),
-            ).assign(split="train", date=date)
-            if frame.empty:
-                raise Stage2V52ContractError("M0 matrix requires non-empty data for every protocol Train date")
-            if not feature_names:
-                feature_names = tuple(column for column in _feature_candidates() if column in frame.columns)
-                feature_paths = {name: temp_root / f"feature-{index:04d}.f64" for index, name in enumerate(feature_names)}
-                feature_counts = {name: 0 for name in feature_names}
-            if not set(feature_names) <= set(frame.columns):
-                raise Stage2V52ContractError("M0 Train feature columns drift across dates")
-            for name in feature_names:
-                values = pd.to_numeric(frame[name], errors="coerce").to_numpy(np.float64)
-                with feature_paths[name].open("ab") as handle:
-                    values.tofile(handle)
-                feature_counts[name] += int(len(values))
+        feature_names = _route_feature_names(feature_root, protocol.train_dates[0])
+        feature_paths = {
+            name: temp_root / f"feature-{index:04d}.f64"
+            for index, name in enumerate(feature_names)
+        }
+        feature_counts = {name: 0 for name in feature_names}
+        with ExitStack() as stack:
+            feature_handles = {
+                name: stack.enter_context(path.open("ab"))
+                for name, path in feature_paths.items()
+            }
+            for date in protocol.train_dates:
+                date_rows = 0
+                for frame in _iter_m0_day_batches(
+                    feature_root, date, split="train", feature_names=feature_names,
+                ):
+                    date_rows += int(len(frame))
+                    for name in feature_names:
+                        values = pd.to_numeric(frame[name], errors="coerce").to_numpy(np.float64)
+                        values.tofile(feature_handles[name])
+                        feature_counts[name] += int(len(values))
+                if date_rows <= 0:
+                    raise Stage2V52ContractError(
+                        "M0 matrix requires non-empty data for every protocol Train date"
+                    )
         if not feature_names:
             raise Stage2V52ContractError("M0 matrix has no canonical decision-time features")
         for name in feature_names:
@@ -174,16 +332,16 @@ def build_m0_feature_matrix(
 
     def train_frames() -> Iterable[pd.DataFrame]:
         for date in protocol.train_dates:
-            yield load_v5_day(
-                date, split="train", repo_root=root, route_feature_root=feature_root,
-                extra_columns=("observed_directed_edge_uid",),
-            ).assign(split="train", date=date)
+            yield from _iter_m0_day_batches(
+                feature_root, date, split="train", feature_names=feature_names,
+            )
 
-    payload, valid_counts = _matrix_arrays(
-        train_frames(), feature_names=feature_names, median=median, split="train", support_artifact=None,
+    expected_rows = _projected_route_rows(feature_root, protocol.train_dates)
+    valid_counts, row_count = _write_matrix_disk_backed(
+        train_frames(), feature_names=feature_names, median=median, split="train",
+        support_artifact=None, expected_rows=expected_rows, output_matrix_path=output_matrix_path,
     )
     matrix_path = Path(output_matrix_path)
-    _atomic_npz(matrix_path, payload)
     source_hashes = {date: _source_hashes(root, feature_root, date) for date in protocol.train_dates}
     feature_schema = {
         "feature_names": list(feature_names),
@@ -199,12 +357,12 @@ def build_m0_feature_matrix(
         "fit_scope": "train_only",
         "fit_dates_observed": list(protocol.train_dates),
         "evaluation_rows_used": 0,
-        "row_count": int(len(payload["features"])),
+        "row_count": row_count,
         "feature_count": len(feature_names),
         "feature_schema": feature_schema,
         "feature_schema_hash": _canonical_hash(feature_schema),
         "source_product_hashes": source_hashes,
-        "construction_policy": "daily_dataframe_scan_disk_backed_per_feature_exact_median_then_numpy_materialization",
+        "construction_policy": "projected_parquet_batch_scan_disk_backed_exact_median_and_memmap_matrix_materialization",
         "valid_target_counts": valid_counts,
         "forbidden_input_audit": {"status": "PASS" if not forbidden else "FAIL", "fields": forbidden},
         "matrix_path": matrix_path.as_posix(),
@@ -247,26 +405,24 @@ def transform_m0_feature_matrix(
 
     def role_frames() -> Iterable[pd.DataFrame]:
         for date in role_dates[role]:
-            frame = load_v5_day(
-                date, split=role, repo_root=root, route_feature_root=feature_root,
-                extra_columns=("observed_directed_edge_uid",),
-            ).assign(split=role, date=date)
-            if not set(feature_names) <= set(frame.columns):
-                raise Stage2V52ContractError("M0 transform columns differ from Train schema")
-            yield frame
+            yield from _iter_m0_day_batches(
+                feature_root, date, split=role, feature_names=feature_names,
+            )
 
-    payload, valid_counts = _matrix_arrays(
+    expected_rows = _projected_route_rows(feature_root, role_dates[role])
+    valid_counts, row_count = _write_matrix_disk_backed(
         role_frames(), feature_names=feature_names, median=schema["median"], split=role,
-        support_artifact=support,
+        support_artifact=support, expected_rows=expected_rows, output_matrix_path=output_matrix_path,
     )
-    identity = pd.DataFrame({
-        "date": payload["date"].astype(str), "order_id": payload["order_id"].astype(str),
-        "traversal_id": payload["traversal_id"],
-    })
-    if identity.duplicated(["date", "order_id", "traversal_id"]).any():
-        raise Stage2V52ContractError("M0 transformed role is not unique by physical traversal")
     matrix_path = Path(output_matrix_path)
-    _atomic_npz(matrix_path, payload)
+    with np.load(matrix_path, allow_pickle=False) as payload:
+        identity = pd.DataFrame({
+            "date": payload["date"].astype(str), "order_id": payload["order_id"].astype(str),
+            "traversal_id": payload["traversal_id"],
+        })
+        if identity.duplicated(["date", "order_id", "traversal_id"]).any():
+            raise Stage2V52ContractError("M0 transformed role is not unique by physical traversal")
+        unique_count = int(len(identity))
     manifest = {
         "schema_version": M0_MATRIX_SCHEMA_VERSION, "status": "PASS",
         "protocol_id": protocol_id, "protocol_hash": protocol.digest, "role": role,
@@ -277,7 +433,7 @@ def transform_m0_feature_matrix(
         "source_product_hashes": {
             date: _source_hashes(root, feature_root, date) for date in role_dates[role]
         },
-        "row_count": int(len(payload["features"])), "unique_traversal_count": int(len(identity)),
+        "row_count": row_count, "unique_traversal_count": unique_count,
         "valid_target_counts": valid_counts, "matrix_path": matrix_path.as_posix(),
         "matrix_sha256": sha256_path(matrix_path),
     }
@@ -307,35 +463,48 @@ def evaluate_m0_baseline(
         model = joblib.load(model_path)
         predictions = model.predict(archive["features"])
         groups = archive["support_group_code"].astype(np.int8)
-        metrics: dict[str, Any] = {}
-        for group, selector in {
-            "overall": np.ones(len(groups), dtype=bool), "low": groups == 1, "unseen": groups == 0,
-        }.items():
-            metrics[group] = {}
-            for target in ("crawl", "stop", "speed_cv", "acceleration_rms"):
-                valid = selector & archive[f"{target}_valid"].astype(bool)
-                truth = archive[target].astype(float)
-                candidate = predictions[f"pred_{target}"].astype(float)
-                valid &= np.isfinite(truth) & np.isfinite(candidate)
-                count = int(valid.sum())
-                metrics[group][target] = {
-                    "count": count,
-                    "mae": float(np.mean(np.abs(candidate[valid] - truth[valid]))) if count else None,
-                }
-            stop_valid = selector & archive["stop_valid"].astype(bool)
-            stop_truth = archive["stop"].astype(float)
-            stop_valid &= np.isfinite(stop_truth)
-            metrics[group]["stop_two_part"] = stop_two_part_metrics(
-                stop_truth[stop_valid],
-                predictions["stop_occurrence_probability"].astype(float)[stop_valid],
-                predictions["stop_positive_share"].astype(float)[stop_valid],
-            )
+        dates = archive["date"].astype(str)
+
+        def grouped_metrics(base_selector: np.ndarray) -> dict[str, Any]:
+            result: dict[str, Any] = {}
+            for group, selector in {
+                "overall": base_selector,
+                "low": base_selector & (groups == 1),
+                "unseen": base_selector & (groups == 0),
+            }.items():
+                result[group] = {}
+                for target in ("crawl", "stop", "speed_cv", "acceleration_rms"):
+                    valid = selector & archive[f"{target}_valid"].astype(bool)
+                    truth = archive[target].astype(float)
+                    candidate = predictions[f"pred_{target}"].astype(float)
+                    valid &= np.isfinite(truth) & np.isfinite(candidate)
+                    count = int(valid.sum())
+                    result[group][target] = {
+                        "count": count,
+                        "mae": float(np.mean(np.abs(candidate[valid] - truth[valid]))) if count else None,
+                    }
+                stop_valid = selector & archive["stop_valid"].astype(bool)
+                stop_truth = archive["stop"].astype(float)
+                stop_valid &= np.isfinite(stop_truth)
+                result[group]["stop_two_part"] = stop_two_part_metrics(
+                    stop_truth[stop_valid],
+                    predictions["stop_occurrence_probability"].astype(float)[stop_valid],
+                    predictions["stop_positive_share"].astype(float)[stop_valid],
+                )
+            return result
+
+        metrics = grouped_metrics(np.ones(len(groups), dtype=bool))
+        metrics_by_date = {
+            date: {"groups": grouped_metrics(dates == date)}
+            for date in sorted(np.unique(dates))
+        }
         unique_count = int(len(archive["features"]))
     report = {
         "schema_version": "stage2_v5_2_m0_evaluation.1", "status": "PASS",
         "protocol_id": protocol_id, "protocol_hash": get_protocol(protocol_id).digest,
         "model_id": "M0", "role": role, "evaluation_dates": manifest["evaluation_dates"],
         "metrics_by_support": metrics,
+        "metrics_by_date": metrics_by_date,
         "core_mae": {target: metrics["overall"][target]["mae"] for target in ("crawl", "stop", "speed_cv", "acceleration_rms")},
         "low_support_core_mae": {target: metrics["low"][target]["mae"] for target in ("crawl", "stop", "speed_cv", "acceleration_rms")},
         "unseen_core_mae": {target: metrics["unseen"][target]["mae"] for target in ("crawl", "stop", "speed_cv", "acceleration_rms")},

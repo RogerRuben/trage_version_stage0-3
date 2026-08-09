@@ -1,0 +1,750 @@
+{
+  "artifact_sha256": "c34554b48ba3eb1492f89a572167bdafbe2b39ad87a16bf1ccdf9bcc7bfc4345",
+  "comparisons": {
+    "M4_vs_M1": {
+      "low": {
+        "acceleration_rms": 0.0011179285280813833,
+        "crawl": 0.0392118810083518,
+        "speed_cv": 0.04260562976558971,
+        "stop": -0.05854882490673842
+      },
+      "low_four_target_mean_relative_improvement": 0.006096653598821119,
+      "overall": {
+        "acceleration_rms": 0.0034133517364214818,
+        "crawl": 0.015037493579030767,
+        "speed_cv": 0.004998973436248725,
+        "stop": -0.02393736469111048
+      },
+      "overall_four_target_mean_relative_improvement": -0.00012188648485237676,
+      "pace_p50_relative_improvement": 0.01157719400270687,
+      "unseen": {
+        "acceleration_rms": -0.012867592257042322,
+        "crawl": 0.051626547203286466,
+        "speed_cv": -0.025483726895752973,
+        "stop": -0.18617824712408915
+      },
+      "unseen_four_target_mean_relative_improvement": -0.043225754768399495
+    },
+    "M4_vs_M2": {
+      "low": {
+        "acceleration_rms": 0.007541955938395094,
+        "crawl": -0.002391153762199912,
+        "speed_cv": -0.002257405023122981,
+        "stop": -0.06016590936041609
+      },
+      "low_four_target_mean_relative_improvement": -0.01431812805183597,
+      "overall": {
+        "acceleration_rms": 0.00033018593867420535,
+        "crawl": 0.0012353204259794792,
+        "speed_cv": 0.00043118139766289663,
+        "stop": 0.0015965010713626182
+      },
+      "overall_four_target_mean_relative_improvement": 0.0008982972084197998,
+      "pace_p50_relative_improvement": 0.0006225684971729846,
+      "unseen": {
+        "acceleration_rms": -0.010838564073637954,
+        "crawl": 0.015595018325645638,
+        "speed_cv": -0.013217522226221447,
+        "stop": -0.06738869900639591
+      },
+      "unseen_four_target_mean_relative_improvement": -0.018962441745152415
+    },
+    "M4_vs_M3": {
+      "low": {
+        "acceleration_rms": 0.004170575786385568,
+        "crawl": -0.006438460342384927,
+        "speed_cv": 0.0013208367664324175,
+        "stop": -0.021608378576218328
+      },
+      "low_four_target_mean_relative_improvement": -0.0056388565914463175,
+      "overall": {
+        "acceleration_rms": -4.1884913018522425e-06,
+        "crawl": 0.0006373568968477362,
+        "speed_cv": -8.143272511581265e-05,
+        "stop": -0.004353684692097685
+      },
+      "overall_four_target_mean_relative_improvement": -0.0009504872529169033,
+      "pace_p50_relative_improvement": -2.82173826219499e-05,
+      "unseen": {
+        "acceleration_rms": -0.007884902210586605,
+        "crawl": 0.03244507984304595,
+        "speed_cv": -0.029808320516807964,
+        "stop": -0.0895801304932661
+      },
+      "unseen_four_target_mean_relative_improvement": -0.02370706834440368
+    }
+  },
+  "directional_gate": {
+    "adopt": false,
+    "adoption_target_count": 4,
+    "decision_status": "RETAIN_V5_1_NEGATIVE_OR_INSUFFICIENT_TRANSFER",
+    "evaluation_dates": [
+      "20161025",
+      "20161026",
+      "20161027"
+    ],
+    "low_support_mean_relative_improvement": 0.006096653598821119,
+    "low_support_target_wins": 3,
+    "overall_no_target_degrades_over_2pct": false,
+    "protocol_id": "development",
+    "role": "evaluation",
+    "rts_role": "legacy_descriptive_diagnostic_not_stage3_deployable",
+    "schema_version": "stage2_v5_2_adoption.2",
+    "source_evaluation_hashes": {
+      "M1": "86f0e2e9e12100d4783a456648dc1830845f056bd1e159c4929a069481b81281",
+      "M2": "dd5fe857bd46846be43c9757d4255cf933ce6eb7df33520d5b06ff20e967a3c1",
+      "M4": "acafdc8aec5bf12955ce86fd6c01a1c4652bd9ab23fdf02e772dec3729da2fed"
+    },
+    "status": "PASS",
+    "unseen_not_worse_than_structure_only": false,
+    "verification_status": "PASS"
+  },
+  "execution_base_commit": "7a95a685042d41ded7143c4cac015fc04761af90",
+  "interpretation": "Support-aware transfer is weak/preliminary on the development window: M4 wins three low-support targets versus M1 but misses the 2% mean-improvement gate, and the frozen overall-stability and unseen-versus-M2 gates do not pass.",
+  "m5_authorized": false,
+  "metrics": {
+    "M0": {
+      "counts": {
+        "low": {
+          "acceleration_rms": 208,
+          "crawl": 654,
+          "speed_cv": 337,
+          "stop": 654
+        },
+        "overall": {
+          "acceleration_rms": 363917,
+          "crawl": 780240,
+          "speed_cv": 529941,
+          "stop": 780240
+        },
+        "unseen": {
+          "acceleration_rms": 56,
+          "crawl": 176,
+          "speed_cv": 85,
+          "stop": 176
+        }
+      },
+      "low": {
+        "acceleration_rms": 0.12945944069084975,
+        "crawl": 0.36743827301815063,
+        "speed_cv": 0.09175582873856074,
+        "stop": 0.10385089960632454
+      },
+      "overall": {
+        "acceleration_rms": 0.11980486165213941,
+        "crawl": 0.19936692992742241,
+        "speed_cv": 0.06347956212849494,
+        "stop": 0.006030248354021348
+      },
+      "pace_p50_mae": null,
+      "per_date": {
+        "20161025": {
+          "low": {
+            "acceleration_rms": 0.12799493420699762,
+            "crawl": 0.36440541601971854,
+            "speed_cv": 0.09014665952680079,
+            "stop": 0.10972582752026948
+          },
+          "overall": {
+            "acceleration_rms": 0.1196147263296594,
+            "crawl": 0.20263985319961073,
+            "speed_cv": 0.06359842628556601,
+            "stop": 0.006090788895512935
+          },
+          "pace_p50_mae": null,
+          "unseen": {
+            "acceleration_rms": 0.12727339141556765,
+            "crawl": 0.42709521571993275,
+            "speed_cv": 0.0907407607843422,
+            "stop": 0.09878859694666393
+          }
+        },
+        "20161026": {
+          "low": {
+            "acceleration_rms": 0.14001148464452404,
+            "crawl": 0.36716838684425107,
+            "speed_cv": 0.09702312683146974,
+            "stop": 0.10769210086088295
+          },
+          "overall": {
+            "acceleration_rms": 0.11997072945603081,
+            "crawl": 0.19712713958793868,
+            "speed_cv": 0.06351015076046683,
+            "stop": 0.006017521199960354
+          },
+          "pace_p50_mae": null,
+          "unseen": {
+            "acceleration_rms": 0.1517378230954267,
+            "crawl": 0.4473679088195989,
+            "speed_cv": 0.07977649999831628,
+            "stop": 0.13905459373624257
+          }
+        },
+        "20161027": {
+          "low": {
+            "acceleration_rms": 0.11605922199453053,
+            "crawl": 0.37162058257210523,
+            "speed_cv": 0.0869569930019996,
+            "stop": 0.09139736600405511
+          },
+          "overall": {
+            "acceleration_rms": 0.11982949842164456,
+            "crawl": 0.1983314103659311,
+            "speed_cv": 0.06332971223581711,
+            "stop": 0.005982255789371862
+          },
+          "pace_p50_mae": null,
+          "unseen": {
+            "acceleration_rms": 0.1276472784476847,
+            "crawl": 0.3502664402924997,
+            "speed_cv": 0.08561574914587368,
+            "stop": 0.10329056463523986
+          }
+        }
+      },
+      "unseen": {
+        "acceleration_rms": 0.1322591717431678,
+        "crawl": 0.4006424655465333,
+        "speed_cv": 0.08632542400226353,
+        "stop": 0.1114087417783471
+      }
+    },
+    "M1": {
+      "counts": {
+        "low": {
+          "acceleration_rms": 208,
+          "crawl": 654,
+          "speed_cv": 337,
+          "stop": 654
+        },
+        "overall": {
+          "acceleration_rms": 363917,
+          "crawl": 780240,
+          "speed_cv": 529941,
+          "stop": 780240
+        },
+        "unseen": {
+          "acceleration_rms": 56,
+          "crawl": 176,
+          "speed_cv": 85,
+          "stop": 176
+        }
+      },
+      "low": {
+        "acceleration_rms": 0.12407619554477815,
+        "crawl": 0.36151708365455043,
+        "speed_cv": 0.0955801699847052,
+        "stop": 0.10507257220774799
+      },
+      "overall": {
+        "acceleration_rms": 0.11927676085570518,
+        "crawl": 0.17192227728521958,
+        "speed_cv": 0.06304142621348861,
+        "stop": 0.005321143597057741
+      },
+      "pace_p50_mae": 0.029355608699984527,
+      "per_date": {
+        "20161025": {
+          "low": {
+            "acceleration_rms": 0.11971952681300006,
+            "crawl": 0.37072335611786933,
+            "speed_cv": 0.09032134748303809,
+            "stop": 0.11509100573601803
+          },
+          "overall": {
+            "acceleration_rms": 0.11897780324156608,
+            "crawl": 0.17506588520259297,
+            "speed_cv": 0.06312936428459587,
+            "stop": 0.005415406847018408
+          },
+          "pace_p50_mae": 0.029716675552934387,
+          "unseen": {
+            "acceleration_rms": 0.11402270363436805,
+            "crawl": 0.4837558870203793,
+            "speed_cv": 0.08870369059344133,
+            "stop": 0.07713551481512175
+          }
+        },
+        "20161026": {
+          "low": {
+            "acceleration_rms": 0.1372284230764036,
+            "crawl": 0.35209716566993543,
+            "speed_cv": 0.10419611483699615,
+            "stop": 0.10766195700289245
+          },
+          "overall": {
+            "acceleration_rms": 0.11944076258061542,
+            "crawl": 0.16971176375468208,
+            "speed_cv": 0.06307834733921078,
+            "stop": 0.005371424828515937
+          },
+          "pace_p50_mae": 0.029385860224041303,
+          "unseen": {
+            "acceleration_rms": 0.15913757614114069,
+            "crawl": 0.4513839134510527,
+            "speed_cv": 0.07461242936551571,
+            "stop": 0.13424035778734833
+          }
+        },
+        "20161027": {
+          "low": {
+            "acceleration_rms": 0.1112195668885341,
+            "crawl": 0.36225004200034777,
+            "speed_cv": 0.09117620303012339,
+            "stop": 0.08903043835056193
+          },
+          "overall": {
+            "acceleration_rms": 0.11941171344452692,
+            "crawl": 0.17098716915538198,
+            "speed_cv": 0.06291624357326377,
+            "stop": 0.005175990364422914
+          },
+          "pace_p50_mae": 0.028963553666687528,
+          "unseen": {
+            "acceleration_rms": 0.1369133638658645,
+            "crawl": 0.35728406702002435,
+            "speed_cv": 0.09324596566099129,
+            "stop": 0.10120727238923069
+          }
+        }
+      },
+      "unseen": {
+        "acceleration_rms": 0.1339211219169556,
+        "crawl": 0.42265403691933234,
+        "speed_cv": 0.08813532056976649,
+        "stop": 0.1023694121026479
+      }
+    },
+    "M2": {
+      "counts": {
+        "low": {
+          "acceleration_rms": 208,
+          "crawl": 654,
+          "speed_cv": 337,
+          "stop": 654
+        },
+        "overall": {
+          "acceleration_rms": 363917,
+          "crawl": 780240,
+          "speed_cv": 529941,
+          "stop": 780240
+        },
+        "unseen": {
+          "acceleration_rms": 56,
+          "crawl": 176,
+          "speed_cv": 85,
+          "stop": 176
+        }
+      },
+      "low": {
+        "acceleration_rms": 0.12487932156699781,
+        "crawl": 0.34651275351358757,
+        "speed_cv": 0.09130181148154605,
+        "stop": 0.10491230368607143
+      },
+      "overall": {
+        "acceleration_rms": 0.11890888936017373,
+        "crawl": 0.1695464413265736,
+        "speed_cv": 0.06275334187212059,
+        "stop": 0.005457230225816468
+      },
+      "pace_p50_mae": 0.029033828670079566,
+      "per_date": {
+        "20161025": {
+          "low": {
+            "acceleration_rms": 0.12268112769609765,
+            "crawl": 0.34145037049137344,
+            "speed_cv": 0.08709667622962268,
+            "stop": 0.11244815127731697
+          },
+          "overall": {
+            "acceleration_rms": 0.11859988678824634,
+            "crawl": 0.17284662882403737,
+            "speed_cv": 0.06285855960017722,
+            "stop": 0.005517900073140417
+          },
+          "pace_p50_mae": 0.02940088324064528,
+          "unseen": {
+            "acceleration_rms": 0.11349736899137497,
+            "crawl": 0.474985967822639,
+            "speed_cv": 0.09459535342951615,
+            "stop": 0.10109597808332182
+          }
+        },
+        "20161026": {
+          "low": {
+            "acceleration_rms": 0.13652650116906537,
+            "crawl": 0.3493659577856306,
+            "speed_cv": 0.10039732138528827,
+            "stop": 0.10994606878161903
+          },
+          "overall": {
+            "acceleration_rms": 0.11914671308460828,
+            "crawl": 0.1672998560734749,
+            "speed_cv": 0.06280380788525268,
+            "stop": 0.005530590379956944
+          },
+          "pace_p50_mae": 0.029050907063732437,
+          "unseen": {
+            "acceleration_rms": 0.15867735784162174,
+            "crawl": 0.4334793592743734,
+            "speed_cv": 0.07185096433386207,
+            "stop": 0.14373552861890973
+          }
+        },
+        "20161027": {
+          "low": {
+            "acceleration_rms": 0.11097210015241916,
+            "crawl": 0.34916106746353903,
+            "speed_cv": 0.08488648129313851,
+            "stop": 0.08879818119148596
+          },
+          "overall": {
+            "acceleration_rms": 0.11898047684944377,
+            "crawl": 0.16849037676368003,
+            "speed_cv": 0.06259725807799356,
+            "stop": 0.005322615547907521
+          },
+          "pace_p50_mae": 0.0286490341759529,
+          "unseen": {
+            "acceleration_rms": 0.13800862791214497,
+            "crawl": 0.3382414229316254,
+            "speed_cv": 0.09217230184551739,
+            "stop": 0.1041805933633092
+          }
+        }
+      },
+      "unseen": {
+        "acceleration_rms": 0.1341899380666161,
+        "crawl": 0.4071839088521136,
+        "speed_cv": 0.08920230357885242,
+        "stop": 0.11376209052997927
+      }
+    },
+    "M3": {
+      "counts": {
+        "low": {
+          "acceleration_rms": 208,
+          "crawl": 654,
+          "speed_cv": 337,
+          "stop": 654
+        },
+        "overall": {
+          "acceleration_rms": 363917,
+          "crawl": 780240,
+          "speed_cv": 529941,
+          "stop": 780240
+        },
+        "unseen": {
+          "acceleration_rms": 56,
+          "crawl": 176,
+          "speed_cv": 85,
+          "stop": 176
+        }
+      },
+      "low": {
+        "acceleration_rms": 0.12445654266943726,
+        "crawl": 0.345119281977398,
+        "speed_cv": 0.09162894352688439,
+        "stop": 0.10887190255374557
+      },
+      "overall": {
+        "acceleration_rms": 0.11886912943460894,
+        "crawl": 0.169444994080064,
+        "speed_cv": 0.06272117624216028,
+        "stop": 0.005424899450221681
+      },
+      "pace_p50_mae": 0.02901493439749161,
+      "per_date": {
+        "20161025": {
+          "low": {
+            "acceleration_rms": 0.12103366927255559,
+            "crawl": 0.34807098105356293,
+            "speed_cv": 0.0863782814161437,
+            "stop": 0.1157803028112996
+          },
+          "overall": {
+            "acceleration_rms": 0.11852928145339889,
+            "crawl": 0.17267984375574907,
+            "speed_cv": 0.06281007907853833,
+            "stop": 0.005474039084486537
+          },
+          "pace_p50_mae": 0.029378874895462793,
+          "unseen": {
+            "acceleration_rms": 0.11861763811773723,
+            "crawl": 0.47532566932828296,
+            "speed_cv": 0.0887517999857664,
+            "stop": 0.0924584771083963
+          }
+        },
+        "20161026": {
+          "low": {
+            "acceleration_rms": 0.13562202545536028,
+            "crawl": 0.34444303465425036,
+            "speed_cv": 0.10046123680164232,
+            "stop": 0.11417452752605944
+          },
+          "overall": {
+            "acceleration_rms": 0.11911197752405116,
+            "crawl": 0.16725489801091017,
+            "speed_cv": 0.06277656664328356,
+            "stop": 0.005501291344602455
+          },
+          "pace_p50_mae": 0.029044336012312967,
+          "unseen": {
+            "acceleration_rms": 0.15904604508118195,
+            "crawl": 0.4398732802018206,
+            "speed_cv": 0.0756232738494873,
+            "stop": 0.1353385401629605
+          }
+        },
+        "20161027": {
+          "low": {
+            "acceleration_rms": 0.11312317389708298,
+            "crawl": 0.34228024848538346,
+            "speed_cv": 0.08693045963430264,
+            "stop": 0.09319720062560177
+          },
+          "overall": {
+            "acceleration_rms": 0.11896646586673285,
+            "crawl": 0.16839777040094805,
+            "speed_cv": 0.06257651852410315,
+            "stop": 0.005298814510903122
+          },
+          "pace_p50_mae": 0.028620856731805134,
+          "unseen": {
+            "acceleration_rms": 0.1352605408636144,
+            "crawl": 0.350960659335227,
+            "speed_cv": 0.09198758800656111,
+            "stop": 0.11062673989273544
+          }
+        }
+      },
+      "unseen": {
+        "acceleration_rms": 0.1345831890237475,
+        "crawl": 0.4142750555871647,
+        "speed_cv": 0.08776520368730202,
+        "stop": 0.11144510294260809
+      }
+    },
+    "M4": {
+      "counts": {
+        "low": {
+          "acceleration_rms": 208,
+          "crawl": 654,
+          "speed_cv": 337,
+          "stop": 654
+        },
+        "overall": {
+          "acceleration_rms": 363917,
+          "crawl": 780240,
+          "speed_cv": 529941,
+          "stop": 780240
+        },
+        "unseen": {
+          "acceleration_rms": 56,
+          "crawl": 176,
+          "speed_cv": 85,
+          "stop": 176
+        }
+      },
+      "low": {
+        "acceleration_rms": 0.12393748722612284,
+        "crawl": 0.34734131878780183,
+        "speed_cv": 0.09150791664940472,
+        "stop": 0.11122444784044005
+      },
+      "overall": {
+        "acceleration_rms": 0.11886962731692363,
+        "crawl": 0.16933699714445075,
+        "speed_cv": 0.06272628379846415,
+        "stop": 0.00544851775191428
+      },
+      "pace_p50_mae": 0.029015753122997257,
+      "per_date": {
+        "20161025": {
+          "low": {
+            "acceleration_rms": 0.12075346331053143,
+            "crawl": 0.3524390418864625,
+            "speed_cv": 0.08597384716807151,
+            "stop": 0.11779627212666195
+          },
+          "overall": {
+            "acceleration_rms": 0.11852541679575798,
+            "crawl": 0.17258214523116827,
+            "speed_cv": 0.06281453301541871,
+            "stop": 0.005499541347348592
+          },
+          "pace_p50_mae": 0.029378090186324788,
+          "unseen": {
+            "acceleration_rms": 0.11979235625929302,
+            "crawl": 0.45054074809221284,
+            "speed_cv": 0.0988716101894776,
+            "stop": 0.11743384518194944
+          }
+        },
+        "20161026": {
+          "low": {
+            "acceleration_rms": 0.13540212476214805,
+            "crawl": 0.3440400832662514,
+            "speed_cv": 0.10053933464244393,
+            "stop": 0.11534354284873795
+          },
+          "overall": {
+            "acceleration_rms": 0.11910773987569848,
+            "crawl": 0.16714266142848208,
+            "speed_cv": 0.06278972346909353,
+            "stop": 0.0055270582458176575
+          },
+          "pace_p50_mae": 0.029049325593362364,
+          "unseen": {
+            "acceleration_rms": 0.15883688967336307,
+            "crawl": 0.4395160204830005,
+            "speed_cv": 0.07467369409278035,
+            "stop": 0.1504647677808881
+          }
+        },
+        "20161027": {
+          "low": {
+            "acceleration_rms": 0.11179827182338788,
+            "crawl": 0.3452359771997225,
+            "speed_cv": 0.08691999709641408,
+            "stop": 0.09752677455022829
+          },
+          "overall": {
+            "acceleration_rms": 0.11897601877126149,
+            "crawl": 0.16828369398171586,
+            "speed_cv": 0.06257421556022337,
+            "stop": 0.005318382705023003
+          },
+          "pace_p50_mae": 0.028619083809948265,
+          "unseen": {
+            "acceleration_rms": 0.1367635630442776,
+            "crawl": 0.33779761603433794,
+            "speed_cv": 0.09029451883587825,
+            "stop": 0.10579799548148701
+          }
+        }
+      },
+      "unseen": {
+        "acceleration_rms": 0.13564436430838864,
+        "crawl": 0.40083386833165685,
+        "speed_cv": 0.09038133700903606,
+        "stop": 0.1214283698070424
+      }
+    }
+  },
+  "pace_guard_M4_vs_M1": {
+    "maximum": 0.02,
+    "relative_degradation": -0.01157719400270687,
+    "status": "PASS"
+  },
+  "phase_c_direction": "WEAK",
+  "phase_c_formal_spatial_adopt": false,
+  "phase_d_authorized": false,
+  "protocol": {
+    "calibration_dates": [
+      "20161024"
+    ],
+    "evaluation_dates": [
+      "20161025",
+      "20161026",
+      "20161027"
+    ],
+    "id": "development",
+    "sha256": "725a71e76c4685f3a8ba0b0b584a9e10b29df426723a11313cf3a89b2bac6790",
+    "train_dates": [
+      "20161009",
+      "20161010",
+      "20161011",
+      "20161012",
+      "20161013",
+      "20161014",
+      "20161015",
+      "20161016",
+      "20161017",
+      "20161018",
+      "20161019",
+      "20161020",
+      "20161021"
+    ],
+    "validation_dates": [
+      "20161022",
+      "20161023"
+    ]
+  },
+  "runtime": {
+    "coverage": "instrumented_commands_including_reconnected_M0_to_M4_execution",
+    "measurement": "observed_shell_wall_clock_seconds",
+    "peak_rss_mb": null,
+    "peak_rss_note": "not available: host-wide CIM memory query was permission denied; no estimate substituted",
+    "seconds": {
+      "M0_build_train_matrix": 346.4,
+      "M0_evaluate_validation_and_evaluation": 54.6,
+      "M0_train": 107.9,
+      "M0_transform_evaluation": 45.7,
+      "M0_transform_validation": 56.7,
+      "M1_evaluate_validation_and_evaluation": 56.8,
+      "M1_train": 27.3,
+      "M2_evaluate_validation_and_evaluation": 53.8,
+      "M2_train": 559.8,
+      "M3_evaluate_validation_and_evaluation": 57.0,
+      "M3_train": 467.5,
+      "M4_evaluate_validation_and_evaluation": 56.9,
+      "M4_train": 463.5,
+      "transfer_shards": 670.0
+    }
+  },
+  "schema_version": "stage2_v5_2_phase_c_report.1",
+  "selected_candidate": "p25",
+  "selected_checkpoints": {
+    "M0": {
+      "path": "stage2/output_v5_2/development/M0/model/m0_micro_tree.joblib",
+      "sha256": "1139c9aba37f20444c8d9c7ed6e8592328b7fbc9b3c77d07536d2f23a82542f8",
+      "size_bytes": 2264615
+    },
+    "M1": {
+      "path": "stage2/output_v5_1/development/deep_model/best_model.pt",
+      "sha256": "d4e05f4197ab163d5537e98b16ca5b46746284db9ca4ee3029c55a3295982bb2",
+      "size_bytes": 4404675
+    },
+    "M2": {
+      "path": "stage2/output_v5_2/development/M2/epoch_004.pt",
+      "sha256": "bf2ef5f45a10b6a91282fadc99e3638be4d1569088de6c76cc2226b8b65dd0fc",
+      "size_bytes": 5665346
+    },
+    "M3": {
+      "path": "stage2/output_v5_2/development/M3/epoch_004.pt",
+      "sha256": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde",
+      "size_bytes": 5665346
+    },
+    "M4": {
+      "path": "stage2/output_v5_2/development/M4/epoch_004.pt",
+      "sha256": "dba21e9ae3c0e78e68a8986ef4119228d7707eb5ab7118c972ffa82872fc92a2",
+      "size_bytes": 5665346
+    }
+  },
+  "selected_tau": 3.0,
+  "status": "PASS",
+  "tau_freeze": {
+    "path": "stage2/output_v5_2/transfer_tuning/stage2_v5_2_tau_freeze.json",
+    "sha256": "5900d6184d151d8093528f1fa04a1afd73a75d07fd0187da7da22abdb44296ec",
+    "size_bytes": 1211
+  },
+  "temporal_leakage_count": {
+    "M1": 0,
+    "M2": 0,
+    "M3": 0,
+    "M4": 0
+  },
+  "test_evidence": {
+    "artifact": {
+      "path": "stage2/docs/v5_2/stage2_v5_2_phase_c_test_evidence.json",
+      "sha256": "5b716206fa5e6d571cfc87ae5908639004ba7f2b3854f87515b3c10f1082b7d2",
+      "size_bytes": 513
+    },
+    "base_passed": 123,
+    "compileall_status": "PASS",
+    "gpu_v5_2_passed": 76
+  }
+}

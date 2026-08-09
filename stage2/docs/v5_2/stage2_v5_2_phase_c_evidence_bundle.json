@@ -1,0 +1,214 @@
+{
+  "artifact_sha256": "0ce45c57d1eb12aa6439010761de36079bb568d21b4bdfbe9c6dc3ce194e9004",
+  "code": {
+    "evaluation": {
+      "path": "stage2/v5_2/evaluation.py",
+      "sha256": "c093388caa28dd962a0b18fc06708199d625602eb14e775f91bd1951358aec09",
+      "size_bytes": 27899
+    },
+    "m0_features": {
+      "path": "stage2/v5_2/m0_features.py",
+      "sha256": "6d7b6829462ca9b93f4d5aa12661a76929446d6c46456f82d97a051f35ad77fd",
+      "size_bytes": 25526
+    },
+    "phase_c_report": {
+      "path": "stage2/v5_2/phase_c_report.py",
+      "sha256": "3abb2258acde9d6df1182799d083a596425a34599bbf1c446e68f539e176c150",
+      "size_bytes": 27883
+    },
+    "training": {
+      "path": "stage2/v5_2/training.py",
+      "sha256": "f66284bfcf9bd4222782ea5f78ae7799e2ed9314920356f1f11af10537b4ca95",
+      "size_bytes": 44951
+    }
+  },
+  "directional_decision": {
+    "path": "stage2/output_v5_2/development/spatial_direction_decision.json",
+    "sha256": "95da7884ff4c228fb472a907ee41259b29d6f2cfbe7b00ce0aa767aa77f97824",
+    "size_bytes": 886
+  },
+  "execution_base_commit": "7a95a685042d41ded7143c4cac015fc04761af90",
+  "frozen_bindings": {
+    "b1_evidence": {
+      "path": "stage2/docs/v5_2/stage2_v5_2_phase_b1_evidence_bundle.json",
+      "sha256": "e44629ed30ac86d951012e438d8448eed7fe226edaa915ea6d5305322765d934",
+      "size_bytes": 12325
+    },
+    "phase_c_authorization": {
+      "path": "stage2/docs/v5_2/stage2_v5_2_phase_c_authorization.json",
+      "sha256": "5a3789a29135d02c32783d2d1b7a0d0d1ae77979b5d1fcb5483fcc81b3ca2b9e",
+      "size_bytes": 1742
+    },
+    "phase_c_config": {
+      "path": "stage2/config/stage2_v5_2.json",
+      "sha256": "b6f3a68dafdaa6f043d6e26fbea58c3fb5a830e9a0f79a1f1343ebccc2d14e73",
+      "size_bytes": 10654
+    },
+    "source_config": {
+      "path": "stage2/config/stage2_v5_1_development.json",
+      "sha256": "4f1a9f6ec7d9f2e218ef52117ff6dc3c9c8b89c747aa2e076fab3af731c9d20d",
+      "size_bytes": 569
+    },
+    "tau_freeze": {
+      "path": "stage2/output_v5_2/transfer_tuning/stage2_v5_2_tau_freeze.json",
+      "sha256": "5900d6184d151d8093528f1fa04a1afd73a75d07fd0187da7da22abdb44296ec",
+      "size_bytes": 1211
+    }
+  },
+  "models": {
+    "M0": {
+      "development_evaluation": {
+        "path": "stage2/output_v5_2/development/M0/evaluation.json",
+        "sha256": "f883d2e31398756697581790925efa9660bccbc4bf6bcf871fd96fff83016638",
+        "size_bytes": 30994
+      },
+      "selected_checkpoint": {
+        "path": "stage2/output_v5_2/development/M0/model/m0_micro_tree.joblib",
+        "sha256": "1139c9aba37f20444c8d9c7ed6e8592328b7fbc9b3c77d07536d2f23a82542f8",
+        "size_bytes": 2264615
+      },
+      "training_manifest": {
+        "path": "stage2/output_v5_2/development/M0/model/model_manifest.json",
+        "sha256": "799d96a8e3dfd03e8cd2deda15f23c8cd003a34771d5e2102397308cca7b5cea",
+        "size_bytes": 1130
+      },
+      "validation_evaluation": {
+        "path": "stage2/output_v5_2/development/M0/validation_evaluation.json",
+        "sha256": "0243ccb8938de8b0ae14a5369ca658f3fdde1f0fd2de09b9e7ee0752015c612f",
+        "size_bytes": 22303
+      }
+    },
+    "M1": {
+      "development_evaluation": {
+        "path": "stage2/output_v5_2/development/M1/evaluation.json/evaluation_manifest.json",
+        "sha256": "2a70ccdc15cce82811b7c6677acb8229203be03bc919d20a50a9399a2b4b4825",
+        "size_bytes": 10656
+      },
+      "selected_checkpoint": {
+        "path": "stage2/output_v5_1/development/deep_model/best_model.pt",
+        "sha256": "d4e05f4197ab163d5537e98b16ca5b46746284db9ca4ee3029c55a3295982bb2",
+        "size_bytes": 4404675
+      },
+      "training_manifest": {
+        "path": "stage2/output_v5_2/development/M1/model_manifest.json",
+        "sha256": "5e5fea6d3b34d93cfc2fe5f7a4a0916d03e81aae55c909f4857c3525df85d4a8",
+        "size_bytes": 11484
+      },
+      "validation_evaluation": {
+        "path": "stage2/output_v5_2/development/M1/validation_evaluation.json/evaluation_manifest.json",
+        "sha256": "cd9262aa0a50aa5507f782fa11afe1928574d7a6ee394626a274af09bbfcee10",
+        "size_bytes": 8579
+      }
+    },
+    "M2": {
+      "development_evaluation": {
+        "path": "stage2/output_v5_2/development/M2/evaluation/evaluation_manifest.json",
+        "sha256": "ea5ff3fe1be950b579b62590cec2f0a3950cfad2088609afcd618de553215a84",
+        "size_bytes": 10646
+      },
+      "selected_checkpoint": {
+        "path": "stage2/output_v5_2/development/M2/epoch_004.pt",
+        "sha256": "bf2ef5f45a10b6a91282fadc99e3638be4d1569088de6c76cc2226b8b65dd0fc",
+        "size_bytes": 5665346
+      },
+      "training_manifest": {
+        "path": "stage2/output_v5_2/development/M2/model_manifest.json",
+        "sha256": "a4728300280e0148b406cbec700ecc4377a578a7f461f672f8a62f596b1f58d8",
+        "size_bytes": 16700
+      },
+      "validation_evaluation": {
+        "path": "stage2/output_v5_2/development/M2/validation_evaluation/evaluation_manifest.json",
+        "sha256": "57ae64a727760f598deb38a93c81a9a3699cc15808b66afe41ff72cc47a955f6",
+        "size_bytes": 8574
+      }
+    },
+    "M3": {
+      "development_evaluation": {
+        "path": "stage2/output_v5_2/development/M3/evaluation/evaluation_manifest.json",
+        "sha256": "e39fe46948f85d747d116e25520ae2ff5a12197999cc1c6c07d2a3853e6285dc",
+        "size_bytes": 10638
+      },
+      "selected_checkpoint": {
+        "path": "stage2/output_v5_2/development/M3/epoch_004.pt",
+        "sha256": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde",
+        "size_bytes": 5665346
+      },
+      "training_manifest": {
+        "path": "stage2/output_v5_2/development/M3/model_manifest.json",
+        "sha256": "2f4acbe5244498598021395382f4bd20a39e22b23b77c4453c19e2914709a388",
+        "size_bytes": 16691
+      },
+      "validation_evaluation": {
+        "path": "stage2/output_v5_2/development/M3/validation_evaluation/evaluation_manifest.json",
+        "sha256": "add569601d0b8f576d221cbc3cf25780d587949e6622318b6a4af3d8306e8c37",
+        "size_bytes": 8577
+      }
+    },
+    "M4": {
+      "development_evaluation": {
+        "path": "stage2/output_v5_2/development/M4/evaluation/evaluation_manifest.json",
+        "sha256": "27f38088d51ce57ea9c5f436b3540ae8d4efc59d684f9ce3562e5d3c7fb6cef5",
+        "size_bytes": 10715
+      },
+      "selected_checkpoint": {
+        "path": "stage2/output_v5_2/development/M4/epoch_004.pt",
+        "sha256": "dba21e9ae3c0e78e68a8986ef4119228d7707eb5ab7118c972ffa82872fc92a2",
+        "size_bytes": 5665346
+      },
+      "training_manifest": {
+        "path": "stage2/output_v5_2/development/M4/model_manifest.json",
+        "sha256": "64c58a64192bf89cbcaeb66d9db291b884eb6b41e7ddf0266797079ba0b355c6",
+        "size_bytes": 17310
+      },
+      "validation_evaluation": {
+        "path": "stage2/output_v5_2/development/M4/validation_evaluation/evaluation_manifest.json",
+        "sha256": "d3b2d8d7c7c75e92c37ef90126a507a7b31a91d41c9497ffe43b2b57742d27ed",
+        "size_bytes": 8637
+      }
+    }
+  },
+  "phase_c_authorization_commit": "7a95a685042d41ded7143c4cac015fc04761af90",
+  "phase_c_direction": "WEAK",
+  "phase_d_authorized": false,
+  "reports": {
+    "json": {
+      "path": "stage2/docs/v5_2/stage2_v5_2_phase_c_report.json",
+      "sha256": "40025063586f1e98f9a024a322fe5f4ece1686a23e52fbacf4f48d32f567f76f",
+      "size_bytes": 24645
+    },
+    "markdown": {
+      "path": "stage2/docs/v5_2/stage2_v5_2_phase_c_report.md",
+      "sha256": "b7ed7ed0c229db0b896b154527249eeea5278849722bbe0efb8b4e738f31e774",
+      "size_bytes": 5427
+    }
+  },
+  "schema_version": "stage2_v5_2_phase_c_evidence_bundle.1",
+  "status": "PASS",
+  "test_evidence": {
+    "path": "stage2/docs/v5_2/stage2_v5_2_phase_c_test_evidence.json",
+    "sha256": "5b716206fa5e6d571cfc87ae5908639004ba7f2b3854f87515b3c10f1082b7d2",
+    "size_bytes": 513
+  },
+  "train_only_artifacts": {
+    "static": {
+      "path": "stage2/output_v5_2/development/artifacts/static.json",
+      "sha256": "60f535316f984f3c6f8137cc7d31896a564034b3511a1d717baa94706cc38ac8",
+      "size_bytes": 3074
+    },
+    "support": {
+      "path": "stage2/output_v5_2/development/artifacts/support.json",
+      "sha256": "4bc907af5990c93f23730978ab4f2c049a5ed2ff7fb87ca9c5157bd6b33c2d98",
+      "size_bytes": 605314
+    },
+    "temporal_audit": {
+      "path": "stage2/output_v5_2/transfer_shards/protocol=development/temporal_audit.json",
+      "sha256": "5cbe39bc6c37d28ae40eedd88ee4d00d30691da033415323d8ab859d8572567e",
+      "size_bytes": 559
+    },
+    "transfer_manifest": {
+      "path": "stage2/output_v5_2/transfer_shards/protocol=development/transfer_manifest.json",
+      "sha256": "204da7ade534af9eecf5cbf79966b843beda29f3a81366a14b20e6985c862f4c",
+      "size_bytes": 118160
+    }
+  }
+}

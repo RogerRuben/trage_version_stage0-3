@@ -330,13 +330,21 @@ def train_micro_tree_baseline_from_npz(
         missing = sorted(required - set(archive.files))
         if missing:
             raise Stage2V52ContractError(f"M0 matrix is missing arrays: {missing}")
-        split, dates = archive["split"].astype(str), archive["date"].astype(str)
+        # NPZ members are already fixed-width Unicode/float32 arrays.  Avoid
+        # redundant copies here: the development M0 matrix has 9M+ rows, so a
+        # second feature matrix or Unicode identity copy can exhaust the host
+        # page file before sklearn receives any data.
+        split, dates = archive["split"], archive["date"]
         protocol = get_protocol(protocol_id)
         if not np.all(split == "train") or tuple(sorted(np.unique(dates))) != tuple(sorted(protocol.train_dates)):
             raise Stage2V52ContractError("M0 matrix is not the exact protocol Train partition")
-        features = archive["features"].copy()
-        targets = {name: archive[name].copy() for name in ("crawl", "stop", "speed_cv", "acceleration_rms", "rts")}
-        masks = {name: archive[f"{name}_valid"].copy() for name in targets}
+        del split, dates
+        features = archive["features"]
+        targets = {
+            name: archive[name]
+            for name in ("crawl", "stop", "speed_cv", "acceleration_rms", "rts")
+        }
+        masks = {name: archive[f"{name}_valid"] for name in targets}
     model = MicroTreeBaseline(random_state=random_seed).fit(
         features, targets, masks, feature_schema_hash=feature_schema_hash,
         train_dates=protocol.train_dates,
