@@ -2,16 +2,19 @@
 
 ## Status and scope
 
-This commit completes Phase A.2 static-review implementation only. No tests, bucket PoC,
-model training, development evaluation, rolling backtest, legacy benchmark, or
-performance benchmark has been run. Stage 2 therefore remains
-`NOT_READY_IMPLEMENTATION_ONLY`.
+Phase A.2 execution verification and Phase B0 have passed. Phase B1 transfer
+tuning has run only on the frozen `20161009-20161018 -> 20161019-20161020`
+protocol: M0/M1/M2/M3 and the three M4 tau candidates were evaluated, and tau
+was selected once and frozen at `3.0` (`Train-support p25`). Rolling folds,
+Phase C/D, the legacy 20161031 benchmark, and Stage 3 remain unopened.
 
 The frozen research question is dispatch-time prediction, using only then-known
 history, of multidimensional micro operating conditions along the historical
-original service route. The formal targets are crawl share, stop share, bounded
-speed CV, bounded acceleration RMS, and raw RTS. Pace/travel-time P50 remains a
-common operational variable, not the source of HV/AV differentiation.
+original service route. The predicted targets are crawl share, stop share,
+bounded speed CV, bounded acceleration RMS, and raw RTS. The first four are the
+core transfer targets and the only Stage 3 deployable micro conditions; RTS is a
+legacy/descriptive diagnostic. Pace/travel-time P50 remains a common operational
+variable, not the source of HV/AV differentiation.
 
 HV always uses the historical order's original route. Stage 2 does not replan.
 Stage 3 may later assess a constrained AV fallback only when the original route
@@ -50,8 +53,9 @@ diagnostic. Every micro dimension has its own distance coverage field.
 `service_time_complete_flag` requires at least 0.999 pace-distance coverage;
 admissible lower coverage is labeled `partial_coverage_estimate`.
 
-RTS is reported with time and distance weighting; time weighting is the formal
-downstream default. No composite grade is created.
+RTS is reported with time and distance weighting as a diagnostic only. Its
+coverage and summaries do not affect deployable micro coverage, `unknown_flag`,
+or any Stage 3 assignment decision. No composite grade is created.
 
 Static route complexity is separate. The bounded frozen-schema audit found
 `canonical_highway`, `road_class`, `bridge`, and `tunnel`. Stable joinable
@@ -132,8 +136,11 @@ both preserved.
 
 ## Phase gates
 
-Phase B0 begins with a Parquet-metadata-only schema audit, then one fixed Train
-bucket and one fixed Validation bucket. Phase B1 is
-the frozen transfer-tuning protocol. Phase C is one development day. Full rolling
-is allowed only after product, leakage, scientific, and real-kernel performance
-gates pass. This implementation-only commit authorizes none of those runs.
+Phase B0 begins with a Parquet-metadata-only schema audit, then fits protocol-
+Train-only support and static artifacts before running one fixed Train bucket
+and one fixed Validation bucket. These two preparation commands cannot read
+Validation labels for fitting and do not train a model. Phase B1 is the frozen
+transfer-tuning protocol and is now complete with a hash-bound tau freeze.
+Phase C is one development day. Full rolling remains allowed only after its
+product, leakage, scientific, and real-kernel gates pass; completing B1 does not
+implicitly authorize Phase C or D.

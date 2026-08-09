@@ -1,0 +1,29 @@
+{
+  "artifact_sha256": "83d42c642fb9327de6dd3bf5924df5767e62f3e518670568beee9344c5355af0",
+  "candidate_table": {
+    "p25": {
+      "score": 0.9867471126649979,
+      "support_tau_value": 3.0
+    },
+    "p50": {
+      "score": 0.9871989301708131,
+      "support_tau_value": 39.0
+    },
+    "p75": {
+      "score": 0.9870410659374413,
+      "support_tau_value": 382.0
+    }
+  },
+  "metrics_manifest_embedded_sha256": "e1ae4c0e78fac3633d4f8b44e6a259507640903823b274fadf720700e366c61d",
+  "metrics_manifest_sha256": "cbde55c13a7b6e70daf8ff5a186eba8bd7aa091911fd61ad7f6fe80fa9e1f0a4",
+  "rolling_reselection_allowed": false,
+  "schema_version": "stage2_v5_2_tau_freeze.1",
+  "selected_candidate": "p25",
+  "selected_tau": 3.0,
+  "selection_protocol": "transfer_tuning",
+  "status": "PASS",
+  "tau_selection_artifact_sha256": "01b8e06b62e5d34cad25032da24f24d37b2791ed3111c8e62e6d4eb7b876c721",
+  "tau_selection_embedded_sha256": "e3f146acd6c0749c03c8647986e63931c32c844e362169389b152eb9e315c0dc",
+  "transfer_tuning_support_embedded_sha256": "c455b5668352d4e5737430d48d9a66a6a4859af89ca2809be5c72febc42cd651",
+  "transfer_tuning_support_sha256": "12303d329143440041f5271413796dfb69ee12e7dcb1023a235345f908bcfdae"
+}

@@ -73,6 +73,21 @@ def test_missing_micro_value_remains_missing_and_reduces_coverage() -> None:
     }
     result = aggregate_original_route_micro_conditions(frame, cdf).iloc[0]
     assert np.isnan(result["rts_weighted_mean"])
+    assert result["rts_prediction_coverage"] == 0.0
+    assert result["micro_condition_coverage"] == 1.0
+    assert result["unknown_flag"] == False  # noqa: E712
+
+
+def test_missing_core_micro_value_reduces_deployable_coverage() -> None:
+    frame = _tokens()
+    frame.loc[:, "pred_crawl_share"] = np.nan
+    cdf = {
+        "fit_split": "train", "evaluation_rows_used": 0, "protocol_id": "development",
+        "model_id": "M4", "prediction_source": "fixture",
+        "thresholds": {name: 0.8 for name in DIMENSIONS},
+    }
+    result = aggregate_original_route_micro_conditions(frame, cdf).iloc[0]
+    assert result["crawl_prediction_coverage"] == 0.0
     assert result["micro_condition_coverage"] == 0.0
     assert result["unknown_flag"] == True  # noqa: E712
 

@@ -56,7 +56,7 @@ class _RssSampler:
 
 def _tensor_inputs(payload: Mapping[str, np.ndarray]) -> tuple[tuple[Any, ...], dict[str, Any]]:
     import torch
-    from .structure_features import TEMPORAL_FEATURE_NAMES
+    from .temporal_adapter import TEMPORAL_FEATURE_NAMES
 
     def tensor(name: str, dtype: Any) -> Any:
         return torch.as_tensor(payload[name], dtype=dtype)
@@ -166,9 +166,19 @@ def _load_explicit_bucket_frame(
     identity = ["order_id", "traversal_id"]
     if traversal.empty or labels.empty or traversal.duplicated(identity).any() or labels.duplicated(identity).any():
         raise Stage2V52ContractError(f"Phase B0 {role} traversal/label identity is empty or duplicated")
-    reconciliation = traversal[identity].merge(labels[identity], on=identity, how="outer", indicator=True)
-    if reconciliation["_merge"].ne("both").any():
+    reconciliation = traversal[[*identity, "measurement_source"]].merge(
+        labels[identity], on=identity, how="outer", indicator=True,
+    )
+    orphan_labels = int(reconciliation["_merge"].eq("right_only").sum())
+    missing_direct = int(
+        (
+            reconciliation["_merge"].eq("left_only")
+            & reconciliation["measurement_source"].eq("direct_observed")
+        ).sum()
+    )
+    if orphan_labels or missing_direct:
         raise Stage2V52ContractError(f"Phase B0 {role} traversal/label reconciliation failed")
+    non_direct_without_label = int(reconciliation["_merge"].eq("left_only").sum())
     target = service_time_target_arrays(
         traversal["measurement_source"].to_numpy(),
         traversal["observed_travel_time_s"].to_numpy(),
@@ -204,7 +214,11 @@ def _load_explicit_bucket_frame(
         "route_feature_sha256": sha256_file(route_feature_path),
         "traversal_path": traversal_path.as_posix(), "traversal_sha256": sha256_file(traversal_path),
         "label_path": label_path.as_posix(), "label_sha256": sha256_file(label_path),
-        "traversal_label_reconciliation_mismatch_count": 0,
+        "labelled_direct_traversal_count": int(reconciliation["_merge"].eq("both").sum()),
+        "non_direct_without_label_count": non_direct_without_label,
+        "orphan_label_count": orphan_labels,
+        "missing_direct_label_count": missing_direct,
+        "traversal_label_reconciliation_mismatch_count": orphan_labels + missing_direct,
     }
 
 

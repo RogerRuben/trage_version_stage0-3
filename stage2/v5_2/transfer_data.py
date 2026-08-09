@@ -103,14 +103,19 @@ def _payload_source_positions(payload: Mapping[str, np.ndarray], frame: pd.DataF
     traversal = payload["traversal_id"][valid].astype(np.int64)
     query = pd.MultiIndex.from_arrays(
         (
-            np.full(len(order), split, dtype=str), np.full(len(order), date, dtype=str),
+            np.full(len(order), split, dtype=object), np.full(len(order), date, dtype=object),
             order, traversal,
         ),
         names=identity,
     )
     positions = source.get_indexer(query)
     if np.any(positions < 0):
-        raise Stage2V52ContractError("chunk token cannot be aligned to full source identity")
+        missing = query[positions < 0]
+        raise Stage2V52ContractError(
+            "chunk token cannot be aligned to full source identity: "
+            f"missing_count={len(missing)}, sample={list(missing[:3])}, "
+            f"source_dtypes={source_frame.dtypes.astype(str).to_dict()}"
+        )
     aligned = np.full(valid.shape, -1, dtype=np.int64)
     aligned[valid] = positions
     return aligned
@@ -125,7 +130,7 @@ def _gather_aligned(values: np.ndarray, positions: np.ndarray, fill: float | int
     return np.where(valid[..., None], gathered, fill)
 
 
-def _temporal_source(frame: pd.DataFrame) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+def _temporal_source(frame: pd.DataFrame) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     decision = pd.to_numeric(frame["decision_time"], errors="coerce").to_numpy(float)
     if "feature_cutoff_time" in frame:
         cutoff = pd.to_numeric(frame["feature_cutoff_time"], errors="coerce").to_numpy(float)
@@ -135,11 +140,30 @@ def _temporal_source(frame: pd.DataFrame) -> tuple[np.ndarray, np.ndarray, np.nd
         cutoff = decision - age_input
     age = decision - cutoff
     invalid = ~np.isfinite(decision) | ~np.isfinite(cutoff) | ~np.isfinite(age) | (age <= 0)
+    no_history_fallback = np.zeros(len(frame), dtype=bool)
+    if invalid.any() and {
+        "feature_time_check", "history_count", "dynamic_available_mask"
+    } <= set(frame.columns):
+        history_count = pd.to_numeric(frame["history_count"], errors="coerce").to_numpy(float)
+        dynamic_available = frame["dynamic_available_mask"].fillna(False).to_numpy(bool)
+        no_history_fallback = (
+            invalid
+            & frame["feature_time_check"].astype(str).eq("NO_HISTORY").to_numpy()
+            & np.isfinite(decision)
+            & (history_count == 0)
+            & ~dynamic_available
+        )
+        cutoff[no_history_fallback] = decision[no_history_fallback] - 1.0
+        age[no_history_fallback] = 1.0
+        invalid &= ~no_history_fallback
     if invalid.any():
         raise Stage2V52ContractError(
             f"transfer source has {int(invalid.sum())} rows violating feature_cutoff_time < decision_time"
         )
-    return decision.astype(np.float64), cutoff.astype(np.float64), age.astype(np.float64)
+    return (
+        decision.astype(np.float64), cutoff.astype(np.float64), age.astype(np.float64),
+        no_history_fallback,
+    )
 
 
 def build_transfer_chunk_payload(
@@ -162,8 +186,12 @@ def build_transfer_chunk_payload(
     if row_id.isna().any() or row_id.duplicated().any() or (row_id % 1 != 0).any():
         raise Stage2V52ContractError("transfer row_id must be a unique finite integer")
     payload = vectorized_chunk_payload(frame, v5_artifacts, max_seq_len=max_seq_len, overlap=overlap)
-    payload["split"] = np.full(len(payload["order_id"]), split, dtype=str)
-    payload["date"] = np.full(len(payload["order_id"]), date, dtype=str)
+    payload["split"] = np.full(
+        len(payload["order_id"]), split, dtype=f"<U{max(1, len(split))}"
+    )
+    payload["date"] = np.full(
+        len(payload["order_id"]), date, dtype=f"<U{max(1, len(date))}"
+    )
     static, feature_names, static_row_id = build_static_structure_features(frame, static_artifact)
     validate_feature_alignment(frame["row_id"].to_numpy(), static_row_id)
     support, support_group = lookup_train_support(frame["observed_directed_edge_uid"], support_artifact)
@@ -171,7 +199,7 @@ def build_transfer_chunk_payload(
         {"unseen": 0, "low": 1, "medium": 2, "high": 3}
     ).to_numpy(np.int8)
     temporal = build_temporal_features(frame)
-    decision, cutoff, age = _temporal_source(frame)
+    decision, cutoff, age, no_history_fallback = _temporal_source(frame)
     positions = _payload_source_positions(payload, frame)
     payload.update({
         "static_edge_features": _gather_aligned(static, positions, 0.0).astype(np.float32),
@@ -181,6 +209,9 @@ def build_transfer_chunk_payload(
         "decision_time": _gather_aligned(decision, positions, np.nan).astype(np.float64),
         "feature_cutoff_time": _gather_aligned(cutoff, positions, np.nan).astype(np.float64),
         "feature_age_s": _gather_aligned(age, positions, np.nan).astype(np.float64),
+        "no_history_temporal_fallback": _gather_aligned(
+            no_history_fallback, positions, False
+        ).astype(bool),
         "row_id": _gather_aligned(row_id.to_numpy(np.int64), positions, -1),
     })
     return payload, {
@@ -240,6 +271,7 @@ def build_transfer_shards(
     temporal_age_sample: list[np.ndarray] = []
     temporal_token_count = 0
     temporal_invalid_count = 0
+    no_history_temporal_fallback_count = 0
     minimum_valid_age = np.inf
     for role, dates in protocol_role_dates(protocol_id).items():
         for date in dates:
@@ -249,7 +281,9 @@ def build_transfer_shards(
                 date, split=role, repo_root=root, route_feature_root=route_root,
                 extra_columns=(
                     "canonical_highway", "road_class", "observed_direction", "bridge", "tunnel",
-                    "synthetic_reverse_edge", "osm_direction_disagreement", "feature_age_s",
+                    "synthetic_reverse_edge", "osm_direction_disagreement", "decision_time",
+                    "feature_age_s", "feature_time_check", "history_count",
+                    "dynamic_available_mask",
                 ),
             ).copy()
             frame["split"] = role
@@ -265,6 +299,9 @@ def build_transfer_shards(
             valid_ages = ages[~invalid]
             temporal_token_count += int(len(ages))
             temporal_invalid_count += int(invalid.sum())
+            no_history_temporal_fallback_count += int(
+                payload["no_history_temporal_fallback"][valid].sum()
+            )
             if len(valid_ages):
                 minimum_valid_age = min(minimum_valid_age, float(valid_ages.min()))
                 remaining = max(0, 1_000_000 - sum(len(item) for item in temporal_age_sample))
@@ -308,6 +345,7 @@ def build_transfer_shards(
         "protocol_id": protocol_id,
         "protocol_hash": protocol.digest,
         "temporal_leakage_count": temporal_invalid_count,
+        "no_history_temporal_fallback_token_count": no_history_temporal_fallback_count,
         "audited_token_count": temporal_token_count,
         "minimum_feature_age_s": float(minimum_valid_age) if np.isfinite(minimum_valid_age) else None,
         "p01_feature_age_s": float(np.quantile(valid_age, 0.01)) if len(valid_age) else None,

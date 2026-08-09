@@ -1,0 +1,74 @@
+{
+  "artifact_sha256": "e3f146acd6c0749c03c8647986e63931c32c844e362169389b152eb9e315c0dc",
+  "candidate_labels": [
+    "p25",
+    "p50",
+    "p75"
+  ],
+  "candidate_table": {
+    "p25": {
+      "score": 0.9867471126649979,
+      "support_tau_value": 3.0
+    },
+    "p50": {
+      "score": 0.9871989301708131,
+      "support_tau_value": 39.0
+    },
+    "p75": {
+      "score": 0.9870410659374413,
+      "support_tau_value": 382.0
+    }
+  },
+  "core_targets": [
+    "crawl",
+    "stop",
+    "speed_cv",
+    "acceleration_rms"
+  ],
+  "metrics_manifest_embedded_sha256": "e1ae4c0e78fac3633d4f8b44e6a259507640903823b274fadf720700e366c61d",
+  "metrics_manifest_provenance": {
+    "evaluation_code_sha256": "c093388caa28dd962a0b18fc06708199d625602eb14e775f91bd1951358aec09",
+    "evaluation_schema": "unique_traversal_overlap_mean_then_stratified_mae.1",
+    "feature_artifact_sha256": "6842c388e870ec8b378251de41722bcac028cdb127e7278057dbdb2f91a2a0a7",
+    "m1_checkpoint_sha256": "6a71afcfa5bf2f9532b56566969b09839df075fc6190ad8af07244a3977a87ed",
+    "m1_evaluation_manifest_sha256": "33fcb7cf374da407bf2856d3a677fd5bc8405296faf6aa9313ae5b779c7ffdbb",
+    "m1_source_checkpoint_sha256": "6a71afcfa5bf2f9532b56566969b09839df075fc6190ad8af07244a3977a87ed",
+    "protocol_hash": "32cc07da657296d2ac37ea8f68df1f01cfc1a2e296d5412e006e6516e15d35ce",
+    "support_artifact_sha256": "12303d329143440041f5271413796dfb69ee12e7dcb1023a235345f908bcfdae"
+  },
+  "metrics_manifest_schema_version": "stage2_v5_2_tau_evaluation.2",
+  "metrics_manifest_sha256": "cbde55c13a7b6e70daf8ff5a186eba8bd7aa091911fd61ad7f6fe80fa9e1f0a4",
+  "pace_used": false,
+  "rolling_reselection_allowed": false,
+  "rts_used": false,
+  "schema_version": "stage2_v5_2_tau_selection.2",
+  "scores": {
+    "p25": 0.9867471126649979,
+    "p50": 0.9871989301708131,
+    "p75": 0.9870410659374413
+  },
+  "selected_candidate": "p25",
+  "selected_tau": 3.0,
+  "selection_metric": "macro_normalized_mae_over_4_core_micro_targets",
+  "selection_protocol": "transfer_tuning",
+  "status": "PASS",
+  "tie_break": "candidate_label_order_p25_p50_p75",
+  "train_dates": [
+    "20161009",
+    "20161010",
+    "20161011",
+    "20161012",
+    "20161013",
+    "20161014",
+    "20161015",
+    "20161016",
+    "20161017",
+    "20161018"
+  ],
+  "transfer_tuning_support_embedded_sha256": "c455b5668352d4e5737430d48d9a66a6a4859af89ca2809be5c72febc42cd651",
+  "transfer_tuning_support_sha256": "12303d329143440041f5271413796dfb69ee12e7dcb1023a235345f908bcfdae",
+  "validation_dates": [
+    "20161019",
+    "20161020"
+  ]
+}

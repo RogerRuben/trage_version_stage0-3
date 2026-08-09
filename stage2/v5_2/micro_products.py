@@ -37,13 +37,16 @@ AVAILABILITY_ALIASES = {
     "acceleration_target_available": "acceleration_rms_target_valid",
     "rts_target_available": "rts_target_valid",
 }
-DIMENSIONS = {
+CORE_DEPLOYABLE_DIMENSIONS = {
     "crawl": "pred_crawl_share",
     "stop": "pred_stop_share",
     "speed_cv": "pred_speed_cv_bounded",
     "acceleration": "pred_acceleration_rms_bounded",
+}
+DIAGNOSTIC_DIMENSIONS = {
     "rts": "pred_rts_raw",
 }
+DIMENSIONS = {**CORE_DEPLOYABLE_DIMENSIONS, **DIAGNOSTIC_DIMENSIONS}
 ALLOWED_ROUTE_PROVENANCE = frozenset({
     (
         "revealed_route_proxy",
@@ -142,6 +145,11 @@ def build_micro_condition_tokens(
     else:
         raise Stage2V52ContractError("route context has no frozen history support field")
     result["history_support"] = pd.to_numeric(merged[history_source], errors="coerce").fillna(0).astype("int64")
+    decision = pd.to_numeric(merged["decision_time"], errors="coerce")
+    cutoff = pd.to_numeric(merged["feature_cutoff_time"], errors="coerce")
+    age = decision - cutoff
+    if decision.isna().any() or cutoff.isna().any() or (age <= 0).any():
+        raise Stage2V52ContractError("every feature_cutoff_time must be strictly earlier than decision_time")
     support, group = lookup_train_support(result["observed_directed_edge_uid"], support_artifact)
     result["edge_train_support"] = support
     result["edge_seen_in_train"] = support > 0
@@ -150,11 +158,6 @@ def build_micro_condition_tokens(
     result["prediction_source"] = str(prediction_source)
     result["model_id"] = str(model_id)
     result["model_hash"] = str(model_hash)
-    decision = pd.to_numeric(merged["decision_time"], errors="coerce")
-    cutoff = pd.to_numeric(merged["feature_cutoff_time"], errors="coerce")
-    age = decision - cutoff
-    if decision.isna().any() or cutoff.isna().any() or (age <= 0).any():
-        raise Stage2V52ContractError("every feature_cutoff_time must be strictly earlier than decision_time")
     result["decision_time"] = decision
     result["feature_cutoff_time"] = cutoff
     result["feature_age_s"] = age
@@ -339,7 +342,7 @@ def aggregate_original_route_micro_conditions(
     physical_time = pace_valid
     total_time = partial_time
     common_valid = pace_valid.copy()
-    for column in DIMENSIONS.values():
+    for column in CORE_DEPLOYABLE_DIMENSIONS.values():
         common_valid &= np.isfinite(pd.to_numeric(working[column], errors="coerce").to_numpy(np.float64))
     covered_distance = np.bincount(
         codes, weights=np.where(common_valid, distance_weight, 0.0), minlength=group_count
@@ -355,7 +358,7 @@ def aggregate_original_route_micro_conditions(
     for name, mask in (("low_support_route_share", groups == "low"), ("unseen_edge_route_share", groups == "unseen")):
         numerator = np.bincount(codes, weights=np.where(physical_distance & mask, distance_weight, 0.0), minlength=group_count)
         result[name] = _divide(numerator, total_distance)
-    for name, column in DIMENSIONS.items():  # Fixed five-dimension loop, never per route.
+    for name, column in DIMENSIONS.items():  # Fixed predicted-target loop, never per route.
         value = pd.to_numeric(working[column], errors="coerce").to_numpy(np.float64)
         valid = physical_time & np.isfinite(value)
         dimension_distance = np.bincount(
@@ -436,7 +439,10 @@ def aggregate_static_route_complexity(tokens: pd.DataFrame) -> pd.DataFrame:
     same_group = codes == np.r_[-1, codes[:-1]]
     prior_known = np.r_[False, known[:-1]]
     transition_eligible = same_group & known & prior_known
-    changed = transition_eligible & (road_class.astype(str).to_numpy() != np.r_["", road_class.astype(str).to_numpy()[:-1]])
+    road_class_text = road_class.astype(str).to_numpy()
+    changed = transition_eligible & (
+        road_class_text != np.concatenate((np.array([""], dtype=object), road_class_text[:-1]))
+    )
     eligible_count = np.bincount(codes, weights=transition_eligible.astype(float), minlength=group_count)
     changed_count = np.bincount(codes, weights=changed.astype(float), minlength=group_count)
     result["road_class_transition_rate"] = _divide(changed_count, eligible_count)
@@ -445,7 +451,9 @@ def aggregate_static_route_complexity(tokens: pd.DataFrame) -> pd.DataFrame:
     prior_highway_known = np.r_[False, highway_known[:-1]]
     highway_transition_eligible = same_group & highway_known & prior_highway_known
     highway_text = highway.astype(str).to_numpy()
-    highway_changed = highway_transition_eligible & (highway_text != np.r_["", highway_text[:-1]])
+    highway_changed = highway_transition_eligible & (
+        highway_text != np.concatenate((np.array([""], dtype=object), highway_text[:-1]))
+    )
     highway_eligible_count = np.bincount(
         codes, weights=highway_transition_eligible.astype(float), minlength=group_count
     )
@@ -525,6 +533,11 @@ def write_partition_products(
         "split": split,
         "date": date,
         "route_semantics": "historical_original_service_route",
+        "coverage_semantics": {
+            "micro_condition_coverage": list(CORE_DEPLOYABLE_DIMENSIONS),
+            "unknown_flag_micro_dimensions": list(CORE_DEPLOYABLE_DIMENSIONS),
+            "diagnostic_dimensions_with_independent_coverage": list(DIAGNOSTIC_DIMENSIONS),
+        },
         "product_schema_versions": {
             "micro_condition_tokens": "stage2_v5_2_micro_condition_tokens.2",
             "original_route_micro_conditions": "stage2_v5_2_original_route_micro_conditions.2",

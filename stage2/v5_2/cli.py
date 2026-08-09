@@ -48,8 +48,8 @@ COMMAND_AUTHORIZATIONS = {
     "verify-phase-b": {"PHASE_B0", "PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
     "verify-one-bucket-correctness": {"PHASE_B0", "PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
     "phase-b0-smoke": {"PHASE_B0"},
-    "fit-support": {"PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
-    "fit-static-artifact": {"PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
+    "fit-support": {"PHASE_B0", "PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
+    "fit-static-artifact": {"PHASE_B0", "PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
     "fit-train-cdf": {"PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
     "build-transfer-shards": {"PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
     "build-m0-feature-matrix": {"PHASE_B1", "PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"},
@@ -80,7 +80,7 @@ def _json(path: str | Path) -> dict[str, Any]:
 def _write_json(path: str | Path, payload: dict[str, Any]) -> None:
     destination = Path(path); destination.parent.mkdir(parents=True, exist_ok=True)
     temporary = destination.with_name(f".{destination.name}.tmp")
-    temporary.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    temporary.write_bytes((json.dumps(payload, indent=2, sort_keys=True) + "\n").encode("utf-8"))
     os.replace(temporary, destination)
 
 

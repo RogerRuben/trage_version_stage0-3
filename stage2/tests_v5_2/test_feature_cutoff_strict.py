@@ -5,6 +5,7 @@ import pytest
 
 from stage2.v5_2.contracts import Stage2V52ContractError
 from stage2.v5_2.micro_products import build_micro_condition_tokens
+from stage2.v5_2.transfer_data import _temporal_source
 
 
 def _inputs(cutoff: float):
@@ -38,3 +39,22 @@ def test_cutoff_equal_to_or_after_decision_fails(cutoff: float) -> None:
             predictions, context, support_artifact=support, protocol_id="development",
             prediction_source="model", model_id="M4", model_hash="fixture",
         )
+
+
+def test_no_history_temporal_provenance_gets_explicit_strict_fallback() -> None:
+    frame = pd.DataFrame({
+        "decision_time": [100.0], "feature_age_s": [float("nan")],
+        "feature_time_check": ["NO_HISTORY"], "history_count": [0],
+        "dynamic_available_mask": [False],
+    })
+    decision, cutoff, age, fallback = _temporal_source(frame)
+    assert decision.tolist() == [100.0]
+    assert cutoff.tolist() == [99.0]
+    assert age.tolist() == [1.0]
+    assert fallback.tolist() == [True]
+
+
+def test_unproven_missing_temporal_provenance_still_fails_closed() -> None:
+    frame = pd.DataFrame({"decision_time": [100.0], "feature_age_s": [float("nan")]})
+    with pytest.raises(Stage2V52ContractError, match="violating"):
+        _temporal_source(frame)

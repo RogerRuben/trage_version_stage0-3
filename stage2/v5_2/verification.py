@@ -163,6 +163,19 @@ def _git_head(repo_root: Path) -> str:
     return result.stdout.strip()
 
 
+def training_tau_freeze_binding_valid(
+    training: Mapping[str, Any], *, tau_freeze_sha256: str,
+) -> bool:
+    """Require tau consumption only for final models that actually use tau."""
+    model_id = str(training.get("model_id", ""))
+    provenance = training.get("constructor", {}).get("support_tau_provenance", {})
+    if model_id == "M1":
+        return provenance.get("kind") == "neutral_not_used_by_model"
+    if model_id in {"M4", "M5"}:
+        return provenance.get("tau_freeze_artifact_sha256") == tau_freeze_sha256
+    return False
+
+
 def build_release_manifest(
     *, repo_root: str | Path, config_path: str | Path, protocol_id: str,
     source_checkpoint_path: str | Path, feature_artifact_path: str | Path,
@@ -232,7 +245,9 @@ def build_release_manifest(
         "training_selected_checkpoint_bound": training.get("selected_checkpoint_sha256") == selected_sha,
         "training_transfer_bound": training.get("tensor_manifest_sha256") == transfer_sha,
         "training_source_bound": training.get("source", {}).get("source_checkpoint_sha256") == source_checkpoint_sha and training.get("source", {}).get("feature_artifact_sha256") == sha256_file(feature_artifact_path),
-        "training_tau_freeze_bound": training.get("constructor", {}).get("support_tau_provenance", {}).get("tau_freeze_artifact_sha256") == tau_freeze_sha,
+        "final_model_tau_policy_bound": training_tau_freeze_binding_valid(
+            training, tau_freeze_sha256=tau_freeze_sha,
+        ),
         "evaluation_protocol_bound": evaluation.get("schema_version") == "stage2_v5_2_evaluation.2" and evaluation.get("status") == "PASS" and evaluation.get("protocol_id") == protocol_id,
         "evaluation_checkpoint_bound": evaluation.get("checkpoint_sha256") == selected_sha,
         "evaluation_training_bound": evaluation.get("training_manifest_sha256") == training_sha,
@@ -431,16 +446,26 @@ def verify_one_train_one_validation_bucket(
             raise Stage2V52ContractError(f"Phase B0 {role} bucket is empty")
         if traversal.duplicated(list(required)).any() or labels.duplicated(list(required)).any():
             raise Stage2V52ContractError(f"Phase B0 {role} bucket identity is not unique")
-        joined = traversal.loc[:, list(required)].merge(
+        joined = traversal.loc[:, [*list(required), "measurement_source"]].merge(
             labels.loc[:, list(required)], on=list(required), how="outer", indicator=True,
         )
-        mismatch = int(joined["_merge"].ne("both").sum())
+        orphan_labels = int(joined["_merge"].eq("right_only").sum())
+        missing_direct = int(
+            (joined["_merge"].eq("left_only") & joined["measurement_source"].eq("direct_observed")).sum()
+        )
+        mismatch = orphan_labels + missing_direct
         if mismatch:
             raise Stage2V52ContractError(f"Phase B0 {role} traversal/label reconciliation failed")
+        non_direct_without_label = int(joined["_merge"].eq("left_only").sum())
         results[role] = {
             "traversal_path": traversal_path.as_posix(), "traversal_sha256": sha256_file(traversal_path),
             "label_path": label_path.as_posix(), "label_sha256": sha256_file(label_path),
-            "unique_traversal_count": int(len(joined)), "reconciliation_mismatch_count": mismatch,
+            "unique_traversal_count": int(len(traversal)),
+            "labelled_direct_traversal_count": int(joined["_merge"].eq("both").sum()),
+            "non_direct_without_label_count": non_direct_without_label,
+            "orphan_label_count": orphan_labels,
+            "missing_direct_label_count": missing_direct,
+            "reconciliation_mismatch_count": mismatch,
         }
     return {
         "schema_version": "stage2_v5_2_phase_b0_one_bucket_correctness.1",

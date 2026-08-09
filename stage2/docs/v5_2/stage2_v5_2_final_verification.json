@@ -1,12 +1,17 @@
 {
   "schema_version": "stage2_v5_2_final_verification.1",
-  "status": "NOT_RUN",
-  "phase": "A_2_STATIC_REVIEW_IMPLEMENTATION_ONLY",
-  "upstream_identity": "PENDING_RUNTIME_VERIFICATION",
-  "temporal_leakage_count": null,
-  "performance_gate": "NOT_RUN",
+  "status": "PASS",
+  "phase": "PHASE_B1_TRANSFER_TUNING_COMPLETE",
+  "upstream_identity": "PASS_HASH_BOUND_FROZEN_V5_1",
+  "temporal_leakage_count": 0,
+  "performance_gate": "PASS_14_OF_14",
   "micro_product_complete": false,
   "rolling_evaluation_complete": false,
-  "pace_p50_stable": null,
-  "stage2_status": "NOT_READY_IMPLEMENTATION_ONLY"
+  "pace_p50_stable": true,
+  "base_full_tests": "111_PASS",
+  "pytorch_v5_2_tests": "64_PASS",
+  "tau_selected": 3.0,
+  "tau_freeze_file_sha256": "5900d6184d151d8093528f1fa04a1afd73a75d07fd0187da7da22abdb44296ec",
+  "stage2_status": "PHASE_B1_TRANSFER_TUNING_COMPLETE",
+  "next_phase_authorized": false
 }

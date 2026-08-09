@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import pandas as pd
 import pytest
@@ -8,7 +9,9 @@ import pytest
 from stage2.v5_2.contracts import Stage2V52ContractError
 from stage2.v5_2.micro_products import DIMENSIONS, aggregate_original_route_micro_conditions
 from stage2.v5_2.support_transfer import fit_train_support
-from stage2.v5_2.verification import FINAL_REQUIRED_GATES, verify_artifact_payload, verify_final_gate_bundle
+from stage2.v5_2.verification import (
+    FINAL_REQUIRED_GATES, sha256_file, verify_artifact_payload, verify_final_gate_bundle,
+)
 
 
 def test_artifact_verifier_uses_type_specific_evaluation_fields() -> None:
@@ -61,10 +64,19 @@ def test_service_time_complete_is_near_one_coverage_only() -> None:
     assert result["service_time_status"] == "complete"
 
 
-def test_config_schema_and_phase_b_are_static_only() -> None:
+def test_config_schema_and_phase_execution_is_gate_bound() -> None:
     config = json.loads(open("stage2/config/stage2_v5_2.json", encoding="utf-8").read())
     assert config["schema_version"] == "stage2_v5_2_config.3"
-    assert config["execution_authorization"] == "NONE_PHASE_A_2"
+    authorization = config["execution_authorization"]
+    assert authorization in {"NONE_PHASE_A_2", "PHASE_B0", "PHASE_B1"}
+    if authorization == "PHASE_B1":
+        gate = config["phase_b0_gate"]
+        report_path = Path(gate["report_path"])
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+        assert sha256_file(report_path) == gate["report_sha256"]
+        assert report["schema_version"] == "stage2_v5_2_phase_b0_smoke.1"
+        assert report["status"] == "PASS"
+        assert report["authorizes_phase_b1"] is True
     assert config["performance"]["warmup_runs"] == 2
     assert config["performance"]["repeat_runs"] == 3
     assert config["training"]["loss_weights"]["rts"] == 0.0

@@ -1,0 +1,35 @@
+{
+  "schema_version": "stage2_v5_2_phase_b1_transfer_tuning_report.1",
+  "status": "PASS",
+  "phase": "PHASE_B1_TRANSFER_TUNING_COMPLETE",
+  "protocol_id": "transfer_tuning",
+  "train_dates": ["20161009", "20161010", "20161011", "20161012", "20161013", "20161014", "20161015", "20161016", "20161017", "20161018"],
+  "validation_dates": ["20161019", "20161020"],
+  "transfer_source_row_count": 8594152,
+  "audited_temporal_token_count": 9954428,
+  "temporal_leakage_count": 0,
+  "unique_validation_traversal_count": 1439737,
+  "models_completed": ["M0", "M1", "M2", "M3", "M4_p25", "M4_p50", "M4_p75"],
+  "all_formal_evaluations_passed": true,
+  "tau_selection": {
+    "metric": "macro_normalized_mae_over_4_core_micro_targets",
+    "pace_used": false,
+    "rts_used": false,
+    "scores": {"p25": 0.9867471126649979, "p50": 0.9871989301708131, "p75": 0.9870410659374413},
+    "selected_candidate": "p25",
+    "selected_tau": 3.0,
+    "rolling_reselection_allowed": false
+  },
+  "tau_freeze": {
+    "path": "stage2/output_v5_2/transfer_tuning/stage2_v5_2_tau_freeze.json",
+    "file_sha256": "5900d6184d151d8093528f1fa04a1afd73a75d07fd0187da7da22abdb44296ec",
+    "embedded_artifact_sha256": "83d42c642fb9327de6dd3bf5924df5767e62f3e518670568beee9344c5355af0"
+  },
+  "phase_b0_smoke_status": "PASS",
+  "metadata_audit_status": "PASS",
+  "one_bucket_correctness_status": "PASS",
+  "performance_benchmark_status": "PASS",
+  "performance_scaling_checks_passed": 14,
+  "next_phase_authorized": false,
+  "notes": "B1 completion freezes tau but does not constitute rolling spatial adoption or authorize M5/Phase C/Phase D."
+}

@@ -6,26 +6,25 @@
     "documentation_head": "4137ded50abe7c4d4b1351e8fc3d095342ef4a74",
     "frozen_v5_1": true
   },
-  "phase": "A_2_2_REVIEW_FIX_CODE_READY",
-  "execution_authorization": "NONE_PHASE_A_2",
-  "phase_b_allowed": false,
+  "phase": "B1_TRANSFER_TUNING",
+  "execution_authorization": "PHASE_B1",
+  "phase_b_allowed": true,
   "phase_b0_gate": {
-    "report_path": null,
-    "report_sha256": null
+    "report_path": "stage2/docs/v5_2/stage2_v5_2_phase_b0_smoke.json",
+    "report_sha256": "3fcdf953f07d5dd7c32d5efd4952e67bd3ced80d8275644b4d1dc3289ffccdc7"
   },
   "tau_freeze": {
     "artifact_name": "stage2_v5_2_tau_freeze.json",
-    "expected_file_sha256": null,
+    "expected_file_sha256": "5900d6184d151d8093528f1fa04a1afd73a75d07fd0187da7da22abdb44296ec",
     "write_once_in_phase": "PHASE_B1",
     "required_for_phases": ["PHASE_C", "PHASE_D", "PHASE_D_COMPLETE"]
   },
   "research_scope": {
     "route": "frozen_historical_original_service_route",
-    "formal_micro_targets": ["crawl", "stop", "speed_cv", "acceleration_rms", "rts"],
+    "predicted_micro_targets": ["crawl", "stop", "speed_cv", "acceleration_rms", "rts"],
     "core_transfer_targets": ["crawl", "stop", "speed_cv", "acceleration_rms"],
-    "secondary_frozen_reference_targets": ["rts"],
     "stage3_deployable_micro_targets": ["crawl", "stop", "speed_cv", "acceleration_rms"],
-    "diagnostic_only_not_stage3_deployable": ["rts"],
+    "diagnostic_targets": ["rts"],
     "common_operational_targets": ["pace_p50", "travel_time_p50"],
     "path_planning": false,
     "stage4_optimization": false,
@@ -223,5 +222,5 @@
     ]
   },
   "final_status_requires_experiments": "READY_FOR_AV_ROUTE_SUITABILITY_STAGE",
-  "current_status": "PHASE_A2_2_CODE_READY_FOR_VERIFICATION"
+  "current_status": "PHASE_B1_TRANSFER_TUNING_COMPLETE"
 }

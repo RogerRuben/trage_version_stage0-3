@@ -247,6 +247,9 @@ def test_m0_validation_transform_uses_train_schema(tmp_path: Path, monkeypatch: 
     )
     with np.load(matrix, allow_pickle=False) as archive:
         assert archive["features"].tolist() == [[7.0], [7.0]]
+        assert archive["split"].dtype.kind == "U"
+        assert archive["date"].dtype.kind == "U"
+        assert archive["order_id"].dtype.kind == "U"
     assert result["train_feature_schema_hash"] == "schema-hash"
     assert result["evaluation_dates"] == ["20161019", "20161020"]
 

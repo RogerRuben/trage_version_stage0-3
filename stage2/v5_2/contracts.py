@@ -20,8 +20,11 @@ MICRO_TARGETS = (
     "acceleration_rms",
     "rts",
 )
+PREDICTED_MICRO_TARGETS = MICRO_TARGETS
 CORE_TRANSFER_TARGETS = ("crawl", "stop", "speed_cv", "acceleration_rms")
 SECONDARY_TRANSFER_TARGETS = ("rts",)
+STAGE3_DEPLOYABLE_MICRO_TARGETS = CORE_TRANSFER_TARGETS
+DIAGNOSTIC_TARGETS = SECONDARY_TRANSFER_TARGETS
 COMMON_OPERATIONAL_TARGETS = ("pace_p50", "travel_time_p50")
 TOKEN_IDENTITY_COLUMNS = (
     "order_id",
@@ -135,9 +138,12 @@ STAGE3_ALLOWED_FIELDS = STAGE3_ALLOWED_FIELDS - STAGE3_DIAGNOSTIC_ONLY_FIELDS
 
 RESEARCH_CONTRACT = {
     "schema_version": SCHEMA_VERSION,
-    "formal_micro_targets": list(MICRO_TARGETS),
+    "predicted_micro_targets": list(PREDICTED_MICRO_TARGETS),
+    "core_transfer_targets": list(CORE_TRANSFER_TARGETS),
+    "stage3_deployable_micro_targets": list(STAGE3_DEPLOYABLE_MICRO_TARGETS),
+    "diagnostic_targets": list(DIAGNOSTIC_TARGETS),
     "common_operational_targets": list(COMMON_OPERATIONAL_TARGETS),
-    "travel_time_is_only_formal_target": False,
+    "travel_time_is_only_prediction_target": False,
     "route_identity": "historical_original_service_route",
     "hv_route_policy": "original_route_only",
     "av_route_policy": "evaluate_original_route_first; fallback is deferred to Stage 3",
@@ -170,11 +176,20 @@ def validate_model_inputs(columns: Iterable[str]) -> None:
 
 
 def validate_research_contract(payload: Mapping[str, object]) -> None:
-    targets = tuple(payload.get("formal_micro_targets", ()))
-    if targets != MICRO_TARGETS:
-        raise Stage2V52ContractError("formal micro targets differ from the frozen v5.2 contract")
-    if payload.get("travel_time_is_only_formal_target") is not False:
-        raise Stage2V52ContractError("travel time cannot be the only formal Stage 2 target")
+    expected_targets = {
+        "predicted_micro_targets": PREDICTED_MICRO_TARGETS,
+        "core_transfer_targets": CORE_TRANSFER_TARGETS,
+        "stage3_deployable_micro_targets": STAGE3_DEPLOYABLE_MICRO_TARGETS,
+        "diagnostic_targets": DIAGNOSTIC_TARGETS,
+    }
+    mismatches = {
+        name: tuple(payload.get(name, ())) for name, expected in expected_targets.items()
+        if tuple(payload.get(name, ())) != expected
+    }
+    if mismatches:
+        raise Stage2V52ContractError(f"research target roles differ from the frozen v5.2 contract: {mismatches}")
+    if payload.get("travel_time_is_only_prediction_target") is not False:
+        raise Stage2V52ContractError("travel time cannot be the only Stage 2 prediction target")
     if payload.get("hv_route_policy") != "original_route_only":
         raise Stage2V52ContractError("HV must always retain the original route")
 

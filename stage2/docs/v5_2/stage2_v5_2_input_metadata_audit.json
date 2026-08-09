@@ -1,0 +1,21 @@
+{
+  "audit_mode": "parquet_metadata_only",
+  "dates": [
+    "20161009",
+    "20161010",
+    "20161011",
+    "20161012",
+    "20161013",
+    "20161014",
+    "20161015",
+    "20161016",
+    "20161017",
+    "20161018",
+    "20161019",
+    "20161020"
+  ],
+  "findings": [],
+  "protocol_id": "transfer_tuning",
+  "schema_version": "stage2_v5_2_phase_b0_metadata_audit.1",
+  "status": "PASS"
+}

@@ -13,12 +13,13 @@ from stage2.v5_2.support_transfer import (
     select_tau_once,
 )
 from stage2.v5_2.verification import (
-    FINAL_GATE_SPECS, FINAL_REQUIRED_GATES, sha256_file, verify_final_gate_bundle,
+    FINAL_GATE_SPECS, FINAL_REQUIRED_GATES, sha256_file,
+    training_tau_freeze_binding_valid, verify_final_gate_bundle,
 )
 
 
 def _write(path: Path, payload: dict[str, object]) -> str:
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    path.write_bytes((json.dumps(payload, indent=2, sort_keys=True) + "\n").encode("utf-8"))
     return sha256_file(path)
 
 
@@ -84,6 +85,61 @@ def test_non_tuning_tau_requires_exact_config_bound_freeze(tmp_path: Path) -> No
     assert tau == 1.0 and provenance["tau_freeze_artifact_sha256"] == freeze_sha
     with pytest.raises(Stage2V52ContractError):
         _resolve_training_tau(args, {"tau_freeze": {"expected_file_sha256": "0" * 64}})
+
+
+def test_phase_b0_tensor_inputs_executes_real_temporal_schema_import() -> None:
+    torch = pytest.importorskip("torch")
+    import numpy as np
+    from stage2.v5_2.phase_b0_smoke import _tensor_inputs
+    from stage2.v5_2.temporal_adapter import TEMPORAL_FEATURE_NAMES
+
+    payload = {
+        "numeric": np.zeros((1, 2, 3), dtype=np.float32),
+        "numeric_missing": np.zeros((1, 2, 3), dtype=bool),
+        "categorical": np.zeros((1, 2, 2), dtype=np.int64),
+        "route_sequence": np.array([[0, 1]], dtype=np.int64),
+        "pad_mask": np.zeros((1, 2), dtype=bool),
+        "static_edge_features": np.zeros((1, 2, 4), dtype=np.float32),
+        "edge_train_support": np.ones((1, 2), dtype=np.float32),
+        "temporal_features": np.zeros((1, 2, len(TEMPORAL_FEATURE_NAMES)), dtype=np.float32),
+        "recent_history": np.zeros((1, 2, 4), dtype=np.float32),
+        "profile_history": np.zeros((1, 2, 3), dtype=np.float32),
+        "forecast_horizon_s": np.ones((1, 2), dtype=np.float32),
+        "history_age_s": np.ones((1, 2), dtype=np.float32),
+        "history_support": np.ones((1, 2), dtype=np.float32),
+    }
+    positional, keyword = _tensor_inputs(payload)
+    assert len(positional) == 5
+    assert tuple(keyword["temporal_features"]) == TEMPORAL_FEATURE_NAMES
+    assert all(isinstance(value, torch.Tensor) for value in positional)
+
+
+def test_phase_b0_can_prepare_train_only_support_and_static_artifacts() -> None:
+    pytest.importorskip("torch")
+    from stage2.v5_2.cli import COMMAND_AUTHORIZATIONS
+
+    assert "PHASE_B0" in COMMAND_AUTHORIZATIONS["fit-support"]
+    assert "PHASE_B0" in COMMAND_AUTHORIZATIONS["fit-static-artifact"]
+
+
+def test_release_tau_binding_is_conditional_on_final_model() -> None:
+    freeze_sha = "f" * 64
+    assert training_tau_freeze_binding_valid({
+        "model_id": "M1",
+        "constructor": {"support_tau_provenance": {"kind": "neutral_not_used_by_model"}},
+    }, tau_freeze_sha256=freeze_sha)
+    assert training_tau_freeze_binding_valid({
+        "model_id": "M4",
+        "constructor": {"support_tau_provenance": {"tau_freeze_artifact_sha256": freeze_sha}},
+    }, tau_freeze_sha256=freeze_sha)
+    assert not training_tau_freeze_binding_valid({
+        "model_id": "M1",
+        "constructor": {"support_tau_provenance": {"kind": "frozen_transfer_tuning_selection"}},
+    }, tau_freeze_sha256=freeze_sha)
+    assert not training_tau_freeze_binding_valid({
+        "model_id": "M4",
+        "constructor": {"support_tau_provenance": {"tau_freeze_artifact_sha256": "0" * 64}},
+    }, tau_freeze_sha256=freeze_sha)
 
 
 def _final_bundle(tmp_path: Path) -> dict[str, object]:

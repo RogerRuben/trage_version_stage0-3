@@ -107,8 +107,8 @@ def _matrix_arrays(
             numeric.fillna(pd.Series(median)).to_numpy(np.float32)
         )
         pieces["split"].append(np.full(len(frame), split, dtype="U16"))
-        pieces["date"].append(frame["date"].astype(str).to_numpy())
-        pieces["order_id"].append(frame["order_id"].astype(str).to_numpy())
+        pieces["date"].append(np.asarray(frame["date"].astype(str).tolist(), dtype="U8"))
+        pieces["order_id"].append(np.asarray(frame["order_id"].astype(str).tolist(), dtype=str))
         pieces["traversal_id"].append(pd.to_numeric(frame["traversal_id"], errors="raise").to_numpy(np.int64))
         if support_artifact is None:
             group = np.full(len(frame), "medium", dtype="U8")

@@ -1,30 +1,25 @@
 {
-  "schema_version": "stage2_v5_2_static_schema_audit.1",
-  "status": "PASS_BOUNDED_SCHEMA_AUDIT",
-  "audit_scope": "frozen schema declarations and pipeline projections only",
-  "data_products_read": false,
-  "upstream_rerun": false,
-  "route_sources": [
-    "stage1/v3/schema.py",
-    "stage1/v3/pipeline.py",
-    "stage2/v5/shards.py"
-  ],
-  "available_route_fields": [
+  "audit_type": "bounded_frozen_schema_only",
+  "formal_static_complexity": {
+    "bridge": "AVAILABLE",
+    "canonical_highway": "AVAILABLE",
+    "ramp": "NA",
+    "road_class": "AVAILABLE",
+    "tunnel": "AVAILABLE",
+    "turn_signal_merge": "NA"
+  },
+  "movement_candidate_fields_available": [],
+  "movement_identity_joinable": true,
+  "movement_physical_semantics_available": false,
+  "na_policy": "NA_not_zero_and_no_reconstruction",
+  "route_static_fields_available": [
+    "bridge",
     "canonical_highway",
     "road_class",
-    "bridge",
-    "tunnel",
-    "observed_direction",
-    "synthetic_reverse_edge",
-    "osm_direction_disagreement"
+    "speed_limit",
+    "tunnel"
   ],
-  "movement_product_identity_fields_available": true,
-  "stable_joinable_movement_semantics": {
-    "turning_type": false,
-    "signal": false,
-    "merge": false,
-    "ramp": false,
-    "intersection_type": false
-  },
-  "decision": "use canonical_highway/road_class/bridge/tunnel; emit unavailable movement semantics as NA; do not rerun Stage 0 or Stage 1"
+  "schema_version": "stage2_v5_2_static_schema_audit.1",
+  "stage0_or_stage1_rerun": false,
+  "status": "PASS"
 }
