@@ -1,0 +1,35 @@
+{
+  "schema_version": "stage2_v5_2_final_closure_test_evidence.1",
+  "status": "PASS",
+  "scope": "S0_STAGE2_FINAL_CLOSURE_ONLY",
+  "training_or_inference_run": false,
+  "checks": {
+    "targeted_final_freeze": {
+      "command": "python -m pytest stage2/tests_v5_2/test_final_freeze.py -q",
+      "passed": 10,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "full_stage2_regression": {
+      "command": "python -m pytest stage2/tests stage2/tests_v4 stage2/tests_v5 stage2/tests_v5_2 -q",
+      "passed": 165,
+      "failed": 0,
+      "warnings": 10,
+      "status": "PASS"
+    },
+    "compileall": {
+      "command": "python -m compileall -q stage2",
+      "status": "PASS"
+    },
+    "scientific_evidence_deep_verification": {
+      "bound_bundle_count": 4,
+      "failed": 0,
+      "status": "PASS"
+    }
+  },
+  "known_environment_warnings": [
+    "Pandas reports bottleneck 1.3.5 below its preferred 1.3.6 version.",
+    "Three Stage 2 v4 route-alignment tests emit existing pandas downcasting FutureWarning messages."
+  ],
+  "next_phase_authorized": false
+}
