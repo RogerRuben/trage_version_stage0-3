@@ -1,0 +1,31 @@
+{
+  "artifact_sha256": "fde3acf187d64ae01cb1ba882c5fa0eb9d89d02e28e81e25180de19b9a75d7f0",
+  "authorized_base": "c9b6bcdf136ee11fc2863609218a198f60a332c8",
+  "checks": {
+    "dynamic_support_gate": "PASS",
+    "identity_gate": "PASS",
+    "profile_nestedness": "PASS",
+    "route_parser_gate": "PASS",
+    "scope_guard": "PASS",
+    "static_support_gate": "PASS",
+    "test31_hard_guard": "PASS",
+    "validation_profile_immutability": "PASS"
+  },
+  "compileall": "PASS",
+  "environment_note": "pytorch is the frozen M3 inference runtime; base supplies fiona/pyproj for the full Stage3 test collection",
+  "focused_tests": {
+    "environment": "pytorch",
+    "passed": 75,
+    "status": "PASS"
+  },
+  "full_tests": {
+    "environment": "base",
+    "passed": 149,
+    "status": "PASS",
+    "warnings": 1
+  },
+  "next_phase_authorized": false,
+  "s4_authorized": false,
+  "schema_version": "stage3_s3_test_evidence.1",
+  "test31_used": false
+}

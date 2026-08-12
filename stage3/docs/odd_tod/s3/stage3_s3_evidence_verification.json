@@ -1,0 +1,33 @@
+{
+  "artifact_sha256": "48c2f4d9180bdf357089927f3f9aa9ba117b82a7767829be0e619cae6bce7bab",
+  "failures": [],
+  "next_phase_authorized": false,
+  "observed_dates": [
+    "20161009",
+    "20161010",
+    "20161011",
+    "20161012",
+    "20161013",
+    "20161014",
+    "20161015",
+    "20161016",
+    "20161017",
+    "20161018",
+    "20161019",
+    "20161020",
+    "20161021",
+    "20161022",
+    "20161023",
+    "20161024",
+    "20161025",
+    "20161026",
+    "20161027"
+  ],
+  "profile_sha256": "909e8efb7c2b6274d965da28e486434ea29d5afc655d2a5672bf7783da06e635",
+  "s4_authorized": false,
+  "schema_version": "stage3_s3_evidence_verification.1",
+  "status": "PASS",
+  "test31_used": false,
+  "verified_frozen_input_count": 17,
+  "verified_product_count": 7
+}

@@ -84,7 +84,11 @@ def atomic_json(path: Path, payload: Mapping[str, Any]) -> None:
 def atomic_text(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(f".{path.name}.tmp")
-    temporary.write_text(text, encoding="utf-8", newline="\n")
+    # pathlib.Path.write_text gained ``newline`` after the Python 3.9 runtime
+    # used by the frozen Stage2/M3 environment. Keep byte-stable LF output via
+    # the compatible built-in file API.
+    with temporary.open("w", encoding="utf-8", newline="\n") as handle:
+        handle.write(text)
     os.replace(temporary, path)
 
 

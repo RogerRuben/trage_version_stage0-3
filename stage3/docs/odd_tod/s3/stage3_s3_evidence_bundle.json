@@ -1,0 +1,54 @@
+{
+  "artifact_sha256": "5ce37fbc31b4f794da1847d224024ddd8d5014f5918b43895f5de78f2c8e85ae",
+  "evidence_verification": "ALL_BOUND_HASHES_VERIFIED",
+  "independent_verification": {
+    "path": "stage3/docs/odd_tod/s3/stage3_s3_evidence_verification.json",
+    "sha256": "44e1d02270daf28d3f22c737a6bdacf3abdfeb9df3ea2efd319015c1d91aa41a",
+    "size_bytes": 790
+  },
+  "next_phase_authorized": false,
+  "phase_status": "STAGE3_S3_CAPABILITY_ENVELOPE_FROZEN",
+  "profile_sha256": "909e8efb7c2b6274d965da28e486434ea29d5afc655d2a5672bf7783da06e635",
+  "release_manifest": {
+    "path": "stage3/docs/odd_tod/s3/stage3_s3_release_manifest.json",
+    "sha256": "7061d741a886dc32aff2f70b33cc58c7f75273e67e25e50826302e17c53872d8",
+    "size_bytes": 10910
+  },
+  "reports": {
+    "stage3_s3_dynamic_calibration_report.md": {
+      "path": "stage3/docs/odd_tod/s3/stage3_s3_dynamic_calibration_report.md",
+      "sha256": "f72659df49d4dc085f346b5f071d7fca9b27de858f546a6b143992bd6a9194c0",
+      "size_bytes": 5973
+    },
+    "stage3_s3_identity_resolution_report.md": {
+      "path": "stage3/docs/odd_tod/s3/stage3_s3_identity_resolution_report.md",
+      "sha256": "31c849a8264360ae3f43086a5dfd0124c9f2d5f4a78eb7b4df11b2f7b70c5291",
+      "size_bytes": 772
+    },
+    "stage3_s3_methodology.md": {
+      "path": "stage3/docs/odd_tod/s3/stage3_s3_methodology.md",
+      "sha256": "502fd20aa09db1c0851bd228ecfc8758a6df8cfff2d12d4da6116bfe4087d103",
+      "size_bytes": 1522
+    },
+    "stage3_s3_static_calibration_report.md": {
+      "path": "stage3/docs/odd_tod/s3/stage3_s3_static_calibration_report.md",
+      "sha256": "04957a817cd8b91b24e750f627c9c183ba7fe7f283ce325a54d510262f193b5d",
+      "size_bytes": 1292
+    },
+    "stage3_s3_validation_sanity_report.md": {
+      "path": "stage3/docs/odd_tod/s3/stage3_s3_validation_sanity_report.md",
+      "sha256": "2d50ddd46d6f86d1f076430476758e57b02f3aa5147f19116c592717b7d06d05",
+      "size_bytes": 2606
+    }
+  },
+  "s4_authorized": false,
+  "schema_version": "stage3_s3_evidence_bundle.1",
+  "test31_used": false,
+  "test_evidence": {
+    "path": "stage3/docs/odd_tod/s3/stage3_s3_test_evidence.json",
+    "sha256": "0d398798d6995e893d4713b2d0597fed413dca90501fa62b9806f39c9d50cd21",
+    "size_bytes": 973
+  },
+  "train_summary_sha256": "5ea09b1d8428f92b94409e488bf7de469b124d267451baf0f9b5fed0309dd17d",
+  "validation_summary_sha256": "9e1af8adf99050f04235d8c7b1b51a20bfb575903fed6bada600b457ffad3d8f"
+}

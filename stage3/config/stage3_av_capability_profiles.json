@@ -1,0 +1,176 @@
+{
+  "artifact_sha256": "4b41aa46708ff81fe79cf5664c499deaa36b5f008cd3e9fd5e011989c0e13a5c",
+  "calibration_dates": [
+    "20161009",
+    "20161010",
+    "20161011",
+    "20161012",
+    "20161013",
+    "20161014",
+    "20161015",
+    "20161016",
+    "20161017",
+    "20161018",
+    "20161019",
+    "20161020",
+    "20161021",
+    "20161022",
+    "20161023",
+    "20161024"
+  ],
+  "dynamic_cdf": "global Train predicted-time-weighted mid-distribution CDF",
+  "next_phase_authorized": false,
+  "non_compensatory": true,
+  "phase_status": "STAGE3_S3_CAPABILITY_ENVELOPE_FROZEN",
+  "profiles": [
+    {
+      "claim_boundary": "hypothetical capability compatibility, not safety, legality, failure, disengagement, or accident probability",
+      "dynamic_caps": {
+        "acceleration_rms": {
+          "C": 35.430419921875,
+          "E": 0.5690889512773325,
+          "Q": 0.15820892784961513
+        },
+        "crawl": {
+          "C": 17.38727879524231,
+          "E": 0.5682082239828036,
+          "Q": 0.1272915703882459
+        },
+        "speed_cv": {
+          "C": 15.246209859848022,
+          "E": 0.5581614191200186,
+          "Q": 0.12348028313331466
+        },
+        "stop": {
+          "C": 15.390246272087097,
+          "E": 0.5570088403263446,
+          "Q": 0.1227780518768715
+        }
+      },
+      "grade_bridge_tunnel_rule": "DESCRIPTIVE_ONLY",
+      "movement_rules": {
+        "LEFT": {
+          "SIGNALIZED": "COMPATIBLE",
+          "STOP_OR_YIELD_CONTROLLED": "INCOMPATIBLE",
+          "UNKNOWN_CONTROL": "UNKNOWN"
+        },
+        "RIGHT": "COMPATIBLE",
+        "STRAIGHT": "COMPATIBLE",
+        "UNKNOWN": "UNKNOWN",
+        "UTURN": "INCOMPATIBLE"
+      },
+      "profile_id": "C",
+      "quantile_anchor": 0.75,
+      "restriction_rule": "CERTIFIED_PROHIBITED_IS_INCOMPATIBLE; NOT_CERTIFIED_OR_UNKNOWN_DOES_NOT_IMPLY_PERMISSION",
+      "roundabout_rule": "INCOMPATIBLE",
+      "speed_domain_max_kmh": 60,
+      "static_caps": {
+        "external_physical_connection_count": 4.0,
+        "internal_length_m": 10.0,
+        "road_class_diversity": 1.0,
+        "topological_movement_count": 9.0
+      },
+      "unknown_policy": "decision-critical missing evidence is UNKNOWN; no imputation"
+    },
+    {
+      "claim_boundary": "hypothetical capability compatibility, not safety, legality, failure, disengagement, or accident probability",
+      "dynamic_caps": {
+        "acceleration_rms": {
+          "C": 49.6020393371582,
+          "E": 0.6306201624389113,
+          "Q": 0.26215669616307136
+        },
+        "crawl": {
+          "C": 25.087300300598145,
+          "E": 0.6241390545868514,
+          "Q": 0.17003045875634004
+        },
+        "speed_cv": {
+          "C": 27.488512754440308,
+          "E": 0.6036337951288139,
+          "Q": 0.172142227954889
+        },
+        "stop": {
+          "C": 27.606656312942505,
+          "E": 0.6068592837229865,
+          "Q": 0.16725340891067783
+        }
+      },
+      "grade_bridge_tunnel_rule": "DESCRIPTIVE_ONLY",
+      "movement_rules": {
+        "LEFT": "COMPATIBLE",
+        "RIGHT": "COMPATIBLE",
+        "STRAIGHT": "COMPATIBLE",
+        "UNKNOWN": "UNKNOWN",
+        "UTURN": "INCOMPATIBLE"
+      },
+      "profile_id": "M",
+      "quantile_anchor": 0.9,
+      "restriction_rule": "CERTIFIED_PROHIBITED_IS_INCOMPATIBLE; NOT_CERTIFIED_OR_UNKNOWN_DOES_NOT_IMPLY_PERMISSION",
+      "roundabout_rule": "COMPATIBLE_SUBJECT_TO_CONTINUOUS_CAPS",
+      "speed_domain_max_kmh": 80,
+      "static_caps": {
+        "external_physical_connection_count": 5.0,
+        "internal_length_m": 34.0,
+        "road_class_diversity": 1.0,
+        "topological_movement_count": 16.0
+      },
+      "unknown_policy": "decision-critical missing evidence is UNKNOWN; no imputation"
+    },
+    {
+      "claim_boundary": "hypothetical capability compatibility, not safety, legality, failure, disengagement, or accident probability",
+      "dynamic_caps": {
+        "acceleration_rms": {
+          "C": 70.31354999542236,
+          "E": 0.6992742675268209,
+          "Q": 0.3846151074680746
+        },
+        "crawl": {
+          "C": 39.347623109817505,
+          "E": 0.6896760714084573,
+          "Q": 0.2289018561790946
+        },
+        "speed_cv": {
+          "C": 49.362043619155884,
+          "E": 0.6559180208179823,
+          "Q": 0.24952281729327144
+        },
+        "stop": {
+          "C": 50.97938847541809,
+          "E": 0.6671463861211416,
+          "Q": 0.23790501639098996
+        }
+      },
+      "grade_bridge_tunnel_rule": "DESCRIPTIVE_ONLY",
+      "movement_rules": {
+        "LEFT": "COMPATIBLE",
+        "RIGHT": "COMPATIBLE",
+        "STRAIGHT": "COMPATIBLE",
+        "UNKNOWN": "UNKNOWN",
+        "UTURN": "COMPATIBLE"
+      },
+      "profile_id": "A",
+      "quantile_anchor": 0.975,
+      "restriction_rule": "CERTIFIED_PROHIBITED_IS_INCOMPATIBLE; NOT_CERTIFIED_OR_UNKNOWN_DOES_NOT_IMPLY_PERMISSION",
+      "roundabout_rule": "COMPATIBLE_SUBJECT_TO_CONTINUOUS_CAPS",
+      "speed_domain_max_kmh": 120,
+      "static_caps": {
+        "external_physical_connection_count": 9.0,
+        "internal_length_m": 73.0,
+        "road_class_diversity": 2.0,
+        "topological_movement_count": 25.0
+      },
+      "unknown_policy": "decision-critical missing evidence is UNKNOWN; no imputation"
+    }
+  ],
+  "q_tail": 0.9,
+  "quantile_method": "higher",
+  "s4_authorized": false,
+  "schema_version": "stage3_av_capability_profiles.1",
+  "test31_used": false,
+  "validation_sanity_dates": [
+    "20161025",
+    "20161026",
+    "20161027"
+  ]
+}
