@@ -754,20 +754,21 @@ def render_qa(qa, complexes_by_r, memberships_by_r, candidates, nodes, edges, ou
 
 
 def recommend(metrics: Sequence[Mapping[str, Any]], stability_rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
-    # Scope-safe deterministic rule: discard any tolerance with disconnected
-    # merges, then choose the smallest unless a larger radius materially raises
-    # multi-node share (>2 pp) without increasing anti-merge flags.
-    acceptable = [row for row in metrics if row["red_flag_counts"]["RED_FLAG_DISCONNECTED_MERGE"] == 0]
-    selected = min(acceptable, key=lambda row: row["tolerance_m"])
-    for row in sorted(acceptable, key=lambda item: item["tolerance_m"]):
-        anti = row["red_flag_counts"]["RED_FLAG_LAYER_CONFLICT"] + row["red_flag_counts"]["RED_FLAG_BRIDGE_SURFACE_MIX"] + row["red_flag_counts"]["RED_FLAG_TUNNEL_SURFACE_MIX"] + row["red_flag_counts"]["RED_FLAG_ROUNDABOUT_MIXED_WITH_UNRELATED_JUNCTION"]
-        chosen_anti = selected["red_flag_counts"]["RED_FLAG_LAYER_CONFLICT"] + selected["red_flag_counts"]["RED_FLAG_BRIDGE_SURFACE_MIX"] + selected["red_flag_counts"]["RED_FLAG_TUNNEL_SURFACE_MIX"] + selected["red_flag_counts"]["RED_FLAG_ROUNDABOUT_MIXED_WITH_UNRELATED_JUNCTION"]
-        if row["multi_node_complex_share"] - selected["multi_node_complex_share"] > .02 and anti <= chosen_anti:
-            selected = row
+    """Return a review state, not an algorithmic tolerance choice.
+
+    The former rule structurally favored smaller radii and therefore could not
+    establish under/over merging.  S2B-1.1 reserves the 5m/10m choice for
+    targeted paired visual adjudication.
+    """
+    available = sorted(int(row["tolerance_m"]) for row in metrics)
     return {
-        "recommended_tolerance_m": selected["tolerance_m"], "recommendation_only": True,
+        "recommended_tolerance_m": None, "recommendation_only": True,
+        "recommendation_status": "NOT_YET_CLOSED",
+        "final_review_pair_m": [value for value in (5, 10) if value in available],
+        "rejected_baselines_m": [value for value in (15, 20) if value in available],
         "tolerance_frozen": False,
-        "basis": "topological correctness, consolidation gain, grade-separation/roundabout QA flags, stability, smaller-radius tie-break",
+        "basis": "targeted paired 5m-vs-10m under/over-merge adjudication required; no smaller-radius tie-break",
+        "stability_rows_available": len(stability_rows),
         "forbidden_inputs_used": [],
     }
 
