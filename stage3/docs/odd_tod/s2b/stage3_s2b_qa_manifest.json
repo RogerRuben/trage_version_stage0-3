@@ -1,0 +1,34 @@
+{
+  "artifact_sha256": "10000115b3425d14b4a7313afa831cf458c540f7c1e9fb597f8f5990a0f4f914",
+  "av_feasibility_used": false,
+  "phase_status": "STAGE3_S2B1_CALIBRATION_PACK_COMPLETE",
+  "png_set_sha256": "5ac60aa0ac6e139d288c196491c70b742508c4a916debed61a1d101d5f7e04fb",
+  "png_total_size_bytes": 1292618,
+  "sample_size": 200,
+  "schema_version": "stage3_s2b1_qa_manifest.1",
+  "seed": 20261009,
+  "strata_counts": {
+    "bridge_context": 16,
+    "changed_05_10": 98,
+    "changed_10_15": 101,
+    "changed_15_20": 102,
+    "grade_separated": 32,
+    "high_degree": 72,
+    "large_internal_length": 16,
+    "multi_node": 79,
+    "ordinary_singleton": 121,
+    "roundabout": 16,
+    "signalized": 18,
+    "tunnel_context": 16
+  },
+  "test31_used": false,
+  "visual_index": {
+    "path": "stage3/output/odd_tod/s2b/calibration/qa_visualizations/qa_visual_index.parquet",
+    "row_count": 200,
+    "schema": "qa_case_id: large_string\ntolerance_m: int64\nintersection_complex_uid: large_string\npng_path: large_string\npng_size_bytes: int64\npng_sha256: large_string\nlayers_shown: large_string\nauditable_not_publication_quality: bool\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1106",
+    "schema_sha256": "412bb6bde51c04308bce8c853da92bb24218f9a11b0a4761c7496ecbd713c1d2",
+    "sha256": "eecc10b95413977f5b4af1159fdaf583cd12d1954f5f9d53078b5c220524e2b8",
+    "size_bytes": 21420
+  },
+  "visualization_count": 200
+}

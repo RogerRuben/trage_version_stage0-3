@@ -1,0 +1,80 @@
+{
+  "schema_version": "stage3_s2b1_intersection_complex_config.1",
+  "phase": "S2B1_CANDIDATE_CALIBRATION_QA",
+  "execution_authorization": "S2B1_ONLY",
+  "execution_base_commit": "79276e0b133679c12e54116053c0ff6593785486",
+  "s2a_commit": "4f036187e0921493894263f7999944a9193a5b2d",
+  "s2a1_commit": "79276e0b133679c12e54116053c0ff6593785486",
+  "paths": {
+    "edges": "stage3/output/odd_tod/s2a/stage3_full_network_edges.parquet",
+    "nodes": "stage3/output/odd_tod/s2a/stage3_full_network_nodes.parquet",
+    "observed_mapping": "stage3/output/odd_tod/s2a/stage3_observed_full_network_mapping.parquet",
+    "controls": "stage3/output/odd_tod/s2a/stage3_control_evidence.parquet",
+    "restrictions": "stage3/output/odd_tod/s2a/stage3_turn_restrictions.parquet",
+    "speed_domain": "stage3/output/odd_tod/s2a/stage3_speed_domain.parquet",
+    "reverse_overlay": "stage3/output/odd_tod/s2a/stage3_historical_direction_overlay.parquet",
+    "s2a_evidence": "stage3/docs/odd_tod/s2a/stage3_s2a_evidence_bundle.json",
+    "s2a1_evidence": "stage3/docs/odd_tod/s2a/stage3_s2a1_scientific_closure_evidence.json",
+    "output": "stage3/output/odd_tod/s2b/calibration",
+    "docs": "stage3/docs/odd_tod/s2b"
+  },
+  "bindings": {
+    "edges_sha256": "25ed4caf250cacbe251ae258d8e77ff2f0b286884f0376c72b9ef09e33687204",
+    "nodes_sha256": "158bbb8b5b2578de73e6fcc6fe4431169e8729cf8f66d553780bb4b052cd2625",
+    "observed_mapping_sha256": "1dda71f6b227e5a148c98d4ce322163ae8fe81a59b7ccb4c08dfb424ddade8c2",
+    "controls_sha256": "97c38791c0d14dd3e491de6021517917384c6f94ba6853228b8e8f71910d63b9",
+    "restrictions_sha256": "719e0bc3907da297df3e2f63373bedb9b4d814249c7772fd27ee47fd1733e274",
+    "speed_domain_sha256": "ae1c8e70e4dff905cb04dac5bb55e3b24a94a40e1ce6b74855ef7b9f4de3c25e",
+    "reverse_overlay_sha256": "3ff51db9fd424954951ad08a27644f95875354845ad346903c0212f3a6c894c4"
+  },
+  "metric_crs": "EPSG:32649",
+  "candidate_tolerances_m": [5, 10, 15, 20],
+  "spatial_buffer_overlap_rule": "candidate center distance <= 2 * tolerance_m",
+  "complex_uid_algorithm": "s3ic_ + sha256('S2B1|r=' + tolerance + '|' + sorted member node uids joined by '|')[:24]",
+  "physical_connection_uid_algorithm": "s3pc_ + sha256(osm_way_id + sorted endpoint node uids)[:24]",
+  "turn_type_thresholds_deg": {"straight_max_abs": 30, "uturn_min_abs": 150},
+  "qa": {
+    "sample_size": 200,
+    "seed": 20261009,
+    "image_width_px": 720,
+    "image_height_px": 720,
+    "excessive_internal_length_m": 500,
+    "extreme_member_count": 50
+  },
+  "selection_rule": [
+    "avoid disconnected/clear over-merge",
+    "merge multi-node physical intersections",
+    "protect grade separation",
+    "protect roundabout semantics",
+    "choose smaller tolerance when materially equivalent"
+  ],
+  "forbidden_selection_inputs": ["AV feasibility", "Test31", "fallback success", "Stage4 objective"],
+  "frozen_speed": {"quantile": 0.85, "method": "MAP_SPEED_AND_ROAD_CLASS", "caps_kmh": [60, 80, 120]},
+  "authorizations": {
+    "s2b1": true,
+    "s2b2": false,
+    "s3": false,
+    "s4": false,
+    "s5": false,
+    "s6": false,
+    "s7": false,
+    "s8": false,
+    "stage4": false
+  },
+  "scope_guards": {
+    "full_network_reexported": false,
+    "stage3_edge_identity_modified": false,
+    "speed_model_retrained": false,
+    "speed_quantile_reselected": false,
+    "speed_method_reselected": false,
+    "speed_domain_reinferred": false,
+    "dynamic_eqc_calibrated": false,
+    "av_profile_calibrated": false,
+    "test31_used": false,
+    "fallback_routing_performed": false,
+    "stage4_metric_used": false,
+    "weighted_risk_score_created": false,
+    "tolerance_frozen": false
+  },
+  "next_phase_authorized": false
+}
