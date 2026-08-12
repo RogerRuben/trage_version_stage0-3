@@ -1,5 +1,5 @@
 {
-  "artifact_sha256": "48c2f4d9180bdf357089927f3f9aa9ba117b82a7767829be0e619cae6bce7bab",
+  "artifact_sha256": "455ce1f44245b636db4f140b31f0c9586192cba99f2af1a48397371bf2ff436b",
   "failures": [],
   "next_phase_authorized": false,
   "observed_dates": [
@@ -23,11 +23,12 @@
     "20161026",
     "20161027"
   ],
-  "profile_sha256": "909e8efb7c2b6274d965da28e486434ea29d5afc655d2a5672bf7783da06e635",
+  "profile_sha256": "bea54c12a0c013995c3644a0bab84b35413d5df8a6785dfdd6a03fd49f32978e",
   "s4_authorized": false,
   "schema_version": "stage3_s3_evidence_verification.1",
   "status": "PASS",
   "test31_used": false,
   "verified_frozen_input_count": 17,
-  "verified_product_count": 7
+  "verified_product_count": 10,
+  "verified_train_m3_cache_count": 16
 }

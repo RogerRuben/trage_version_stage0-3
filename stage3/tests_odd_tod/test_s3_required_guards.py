@@ -8,7 +8,7 @@ import pandas as pd
 import pyarrow.parquet as pq
 
 from stage3.odd_tod.capability_envelope import (
-    DYNAMIC_DIMS, M3_SHA256, PI, Q_TAIL, SPEED_CAPS,
+    DYNAMIC_DIMS, M3_SHA256, PI, Q_TAIL, SPEED_CAPS, S31_AUTHORIZED_BASE,
     apply_mid_cdf, build_profiles, movement_compatibility,
     quantile_higher, resolve_route_tokens, route_eqc, validate_s3_date,
     verify_categorical_nestedness, verify_nestedness,
@@ -73,6 +73,12 @@ def test_static_reference_not_encounter_weighted():
 
 def test_static_dimensions_exactly_a_m_d_l():
     assert set(_profile()["profiles"][0]["static_caps"]) == {"external_physical_connection_count", "topological_movement_count", "road_class_diversity", "internal_length_m"}
+
+
+def test_static_d_is_boundary_road_class_diversity():
+    profile = _profile()
+    assert "INCOMING/OUTGOING boundary edges" in profile["static_dimension_definitions"]["D_c"]
+    assert "INTERNAL edges excluded" in profile["static_dimension_definitions"]["D_c"]
 
 
 def test_static_quantile_method_higher():
@@ -172,6 +178,8 @@ def test_dynamic_support_gate():
 
 def test_pi_values_exactly_075_090_0975():
     assert PI == {"C": .75, "M": .90, "A": .975}
+    assert "marginal" in _profile()["quantile_anchor_semantics"]
+    assert "not joint route acceptance" in _profile()["quantile_anchor_semantics"]
 
 
 def test_speed_caps_exactly_60_80_120():
@@ -278,3 +286,57 @@ def test_persisted_m3_caches_contain_no_realized_targets():
         for path in cache_root.glob("*.parquet"):
             columns = pq.ParquetFile(path).schema_arrow.names
             assert not [c for c in columns if c.startswith("target_") or c.endswith("_target_valid")]
+
+
+def test_s31_reviewed_base_is_bound():
+    assert S31_AUTHORIZED_BASE == "309da4e5164eb99314c34b15ae2652f587a29f0b"
+
+
+def test_all_train_m3_cache_manifests_bind_frozen_checkpoint_and_current_files():
+    for date in (f"201610{day:02d}" for day in range(9, 25)):
+        path = ROOT / f"stage3/output/odd_tod/s3/cache/m3/date={date}.parquet"
+        manifest_path = path.with_suffix(".json")
+        if not path.is_file():
+            continue
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        assert manifest["model_id"] == "M3"
+        assert manifest["checkpoint_sha256"] == M3_SHA256
+        assert manifest["prediction_sha256"] == sha256_file(path)
+        assert manifest["row_count"] == pq.ParquetFile(path).metadata.num_rows
+        assert manifest["decision_time_only"] is True
+        assert manifest["predicted_progression_only"] is True
+        assert manifest["realized_target_columns_persisted"] is False
+
+
+def test_s31_frozen_static_caps_change_only_boundary_d():
+    path = ROOT / "stage3/output/odd_tod/s3/s31_closure_summary.json"
+    if not path.is_file():
+        return
+    closure = json.loads(path.read_text(encoding="utf-8"))
+    assert closure["a_m_l_unchanged"] is True
+    assert closure["d_changed_only"] is True
+    assert [closure["new_static_caps"][p]["D_c"] for p in ("C", "M", "A")] == [2.0, 3.0, 3.0]
+    assert closure["dynamic_caps_unchanged"] is True
+    assert closure["dynamic_product_hashes_before"] == closure["dynamic_product_hashes_after"]
+
+
+def test_s31_train_static_reference_has_positive_boundary_d_and_provenance():
+    path = ROOT / "stage3/output/odd_tod/s3/train_static_complex_reference.parquet"
+    if not path.is_file():
+        return
+    frame = pd.read_parquet(path)
+    assert (frame["D_c"] == frame["boundary_road_class_diversity"]).all()
+    assert (frame["D_c"] >= 1).all()
+    assert set(frame["road_class_diversity_definition"]) == {"UNIQUE_VALHALLA_ROAD_CLASS_ON_INCOMING_OUTGOING_BOUNDARY_EDGES"}
+
+
+def test_s31_release_binds_all_train_prediction_caches():
+    path = ROOT / "stage3/docs/odd_tod/s3/stage3_s3_release_manifest.json"
+    if not path.is_file():
+        return
+    release = json.loads(path.read_text(encoding="utf-8"))
+    if release["phase_status"] != "STAGE3_S31_CLOSURE_COMPLETE":
+        return
+    assert release["base_commit"] == S31_AUTHORIZED_BASE
+    assert len(release["train_m3_prediction_caches"]) == 16
+    assert all(value["checkpoint_sha256"] == M3_SHA256 for value in release["train_m3_prediction_caches"].values())

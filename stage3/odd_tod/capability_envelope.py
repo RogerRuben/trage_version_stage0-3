@@ -24,6 +24,7 @@ from stage3.odd_tod.network_foundation import (
 
 
 AUTHORIZED_BASE = "c9b6bcdf136ee11fc2863609218a198f60a332c8"
+S31_AUTHORIZED_BASE = "309da4e5164eb99314c34b15ae2652f587a29f0b"
 PHASE_STATUS = "STAGE3_S3_CAPABILITY_ENVELOPE_FROZEN"
 M3_SHA256 = "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde"
 TRAIN_DATES = tuple(f"201610{day:02d}" for day in range(9, 25))
@@ -34,7 +35,6 @@ DYNAMIC_DIMS = ("crawl", "stop", "speed_cv", "acceleration_rms")
 STATIC_MAP = {
     "external_physical_connection_count": "A_c",
     "topological_movement_count": "M_c",
-    "road_class_diversity": "D_c",
     "internal_length_m": "L_c",
 }
 Q_TAIL = 0.90
@@ -167,11 +167,41 @@ def parse_route_complex_encounters(
     return result
 
 
-def build_static_reference(encounters: pd.DataFrame, complexes: pd.DataFrame) -> pd.DataFrame:
+def boundary_road_class_diversity(boundary_index: pd.DataFrame, edges: pd.DataFrame) -> pd.DataFrame:
+    """Derive D_c from unique INCOMING/OUTGOING boundary edges, never INTERNAL edges."""
+    boundary = boundary_index[boundary_index["boundary_role"].isin(["INCOMING", "OUTGOING"])][
+        ["intersection_complex_uid", "stage3_edge_uid"]
+    ].drop_duplicates()
+    edge_classes = edges[["stage3_edge_uid", "valhalla_road_class"]].drop_duplicates("stage3_edge_uid")
+    if edge_classes["stage3_edge_uid"].duplicated().any():
+        raise Stage3S2AError("full-network edge identity is not unique")
+    joined = boundary.merge(edge_classes, on="stage3_edge_uid", how="left", validate="many_to_one")
+    if joined["valhalla_road_class"].isna().any():
+        raise Stage3S2AError(f"boundary road class missing for {int(joined['valhalla_road_class'].isna().sum())} edge-complex anchors")
+    result = joined.groupby("intersection_complex_uid", sort=False).agg(
+        boundary_edge_count=("stage3_edge_uid", "nunique"),
+        boundary_road_class_diversity=("valhalla_road_class", "nunique"),
+    ).reset_index()
+    if (result["boundary_road_class_diversity"] < 1).any():
+        raise Stage3S2AError("boundary road-class diversity must be positive")
+    result["road_class_diversity_definition"] = "UNIQUE_VALHALLA_ROAD_CLASS_ON_INCOMING_OUTGOING_BOUNDARY_EDGES"
+    return result
+
+
+def build_static_reference(
+    encounters: pd.DataFrame, complexes: pd.DataFrame,
+    boundary_index: pd.DataFrame, edges: pd.DataFrame,
+) -> pd.DataFrame:
     count = encounters.groupby("intersection_complex_uid").size().rename("train_encounter_count")
-    columns = ["intersection_complex_uid", *STATIC_MAP, "signal_state", "roundabout_evidence_present", "grade_separation_evidence_present"]
+    columns = ["intersection_complex_uid", *STATIC_MAP, "road_class_diversity", "signal_state", "roundabout_evidence_present", "grade_separation_evidence_present"]
     result = complexes[columns].merge(count, left_on="intersection_complex_uid", right_index=True, how="inner", validate="one_to_one")
     result = result.rename(columns=STATIC_MAP)
+    result = result.rename(columns={"road_class_diversity": "s2b_internal_road_class_diversity_qa"})
+    diversity = boundary_road_class_diversity(boundary_index, edges)
+    result = result.merge(diversity, on="intersection_complex_uid", how="left", validate="one_to_one")
+    if result["boundary_road_class_diversity"].isna().any():
+        raise Stage3S2AError("Train-exposed complex lacks boundary road-class diversity")
+    result["D_c"] = result["boundary_road_class_diversity"].astype("int64")
     if result["intersection_complex_uid"].duplicated().any(): raise Stage3S2AError("static reference is demand weighted")
     return result.sort_values("intersection_complex_uid").reset_index(drop=True)
 
@@ -302,6 +332,13 @@ def build_profiles(static: Mapping[str, Any], dynamic: Mapping[str, Any]) -> dic
         "calibration_dates": list(TRAIN_DATES), "validation_sanity_dates": list(VALIDATION_DATES),
         "test31_used": False, "quantile_method": "higher", "q_tail": Q_TAIL,
         "dynamic_cdf": "global Train predicted-time-weighted mid-distribution CDF",
+        "static_dimension_definitions": {
+            "A_c": "external_physical_connection_count",
+            "M_c": "topological_movement_count",
+            "D_c": "unique valhalla_road_class over INCOMING/OUTGOING boundary edges; INTERNAL edges excluded",
+            "L_c": "internal_length_m",
+        },
+        "quantile_anchor_semantics": "pi_k defines marginal per-dimension capability caps, not joint route acceptance rates",
         "non_compensatory": True, "profiles": profiles,
         "s4_authorized": False, "next_phase_authorized": False,
     }
@@ -521,7 +558,7 @@ def build_train(root: Path) -> dict[str, Any]:
     _combine_parquet(_role_parts(root, "train", "identity.parquet", TRAIN_DATES), identity_path)
     _combine_parquet(_role_parts(root, "train", "encounters.parquet", TRAIN_DATES), encounter_path)
     encounters = pd.read_parquet(encounter_path)
-    reference = build_static_reference(encounters, upstream["complexes"])
+    reference = build_static_reference(encounters, upstream["complexes"], upstream["boundary"], upstream["edges"])
     static_path = root / OUTPUT_REL / "train_static_complex_reference.parquet"; atomic_parquet(static_path, reference)
     static_thresholds = static_caps(reference)
     cdf_reference, tie_diagnostics = _build_cdf_reference(root)
@@ -595,7 +632,7 @@ def validation_sanity(root: Path) -> dict[str, Any]:
     _combine_parquet(_role_parts(root, "validation", "encounters.parquet", VALIDATION_DATES), encounter_path)
     identity = pd.read_parquet(identity_path)
     encounters = pd.read_parquet(encounter_path)
-    static_reference = build_static_reference(encounters, upstream["complexes"])
+    static_reference = build_static_reference(encounters, upstream["complexes"], upstream["boundary"], upstream["edges"])
     cdf_reference = pd.read_parquet(root / OUTPUT_REL / "train_dynamic_cdf_reference.parquet")
     descriptors = _dynamic_descriptors(root, "validation", VALIDATION_DATES, cdf_reference)
     summary = {
@@ -670,6 +707,9 @@ def finalize_s3(root: Path) -> dict[str, Any]:
     train["artifact_sha256"] = payload_hash({k: v for k, v in train.items() if k != "artifact_sha256"})
     atomic_json(root / OUTPUT_REL / "train_summary.json", train)
     docs = root / "stage3/docs/odd_tod/s3"; docs.mkdir(parents=True, exist_ok=True)
+    is_s31 = bool(train.get("s31_boundary_road_class_diversity_correction"))
+    release_base = S31_AUTHORIZED_BASE if is_s31 else AUTHORIZED_BASE
+    release_phase = "STAGE3_S31_CLOSURE_COMPLETE" if is_s31 else PHASE_STATUS
     identity = train["identity"]
     atomic_text(docs / "stage3_s3_identity_resolution_report.md", f"""# Stage 3 S3 Identity Resolution Report
 
@@ -693,6 +733,8 @@ Unique Train-exposed complexes: **{train['unique_train_exposed_complex_count']:,
 
 Static caps use unique Train-exposed complexes, not demand-weighted encounter frequency. Every complex contributes once. The only baseline dimensions are A/M/D/L; member count, QA flags, confidence, bridge, tunnel, and layer are not capability caps.
 
+`D_c` is the number of unique `valhalla_road_class` values on the complex's unique `INCOMING`/`OUTGOING` boundary edges. `INTERNAL` edges are explicitly excluded. The former S2B internal-edge diversity is retained only as `s2b_internal_road_class_diversity_qa` provenance and is not calibrated.
+
 ## Frozen thresholds (`higher`)
 
 {_threshold_lines(static)}
@@ -715,11 +757,13 @@ Frozen predictor: M3 checkpoint `{M3_SHA256}`. No Stage2 training, checkpoint se
 - Tail anchor: `q_tail = {Q_TAIL}` with strict `z > 0.90`
 - CDF: global Train predicted-time-weighted mid-distribution; exact support persisted
 
+The profile anchor `pi_k` is a marginal per-dimension quantile anchor. It is not a joint route acceptance target. Requiring all 12 dynamic caps to pass is non-compensatory, so the joint pass rate is expected to be lower than each marginal anchor.
+
 ## Frozen 36 E/Q/C caps (`higher`, one route = one sample)
 
 {_threshold_lines(dynamic)}
 
-CDF tie diagnostics: `{json.dumps(train['cdf_tie_diagnostics'], sort_keys=True)}`.
+CDF tie diagnostics: `{json.dumps(train['cdf_tie_diagnostics'], sort_keys=True)}`. Exact-value weighted masses are empirically negligible for the frozen continuous M3 outputs; the weighted mid-CDF remains the frozen robust definition.
 
 Advanced strict-tail support counts: `{json.dumps(train['dynamic_advanced_tail_support'], sort_keys=True)}`.
 
@@ -745,6 +789,8 @@ Static frozen-cap exceedance: `{json.dumps(validation['static_frozen_cap_exceeda
 
 Dynamic frozen-cap exceedance: `{json.dumps(validation['dynamic_frozen_cap_exceedance'], sort_keys=True)}`.
 
+The C/M/A dynamic all-12-dimension pass counts are joint non-compensatory results, not estimates of the marginal `pi` anchors.
+
 Validation did not select thresholds, retune profiles, or emit an AV-serviceable-order set. Test31 remained untouched.
 """)
     atomic_text(docs / "stage3_s3_methodology.md", f"""# Stage 3 S3 Capability-Envelope Methodology
@@ -753,15 +799,47 @@ This phase freezes three nested hypothetical capability scenarios `C ⊆ M ⊆ A
 
 1. Historical tokens are resolved into typed full-network, reverse-overlay, or unresolved identities. Broken identity breaks continuity.
 2. The production complex parser recognizes incoming → zero or more internal → outgoing edges and never splices across a gap.
-3. Static A/M/D/L caps use one observation per unique Train-exposed complex and `higher` quantiles at 0.75/0.90/0.975.
+3. Static A/M/D/L caps use one observation per unique Train-exposed complex and `higher` quantiles at 0.75/0.90/0.975. `D_c` counts unique `valhalla_road_class` on INCOMING/OUTGOING boundary edges; INTERNAL edges are excluded.
 4. Dynamic inputs are frozen-M3 decision-time predictions. Predicted P50 travel time advances/weights exposure; realized future timing is forbidden.
-5. Each dimension uses a global Train predicted-time-weighted mid-CDF. Tail is strict `z > 0.90`. Route E/Q/C preserve token order; threshold fitting gives every complete route one vote.
+5. Each dimension uses a global Train predicted-time-weighted mid-CDF. Tail is strict `z > 0.90`. Route E/Q/C preserve token order; threshold fitting gives every complete route one vote. `pi_k` freezes marginal dimension caps, not joint route acceptance rates.
 6. Speed caps remain 60/80/120 km/h. Maneuver, roundabout, restriction, and unknown rules are categorical and non-compensatory. Certified prohibition is incompatible; non-certification is not legal permission. Grade separation, bridge, and tunnel are descriptive only.
 7. Validation 25–27 is sanity only. The profile is hash-bound before and after. Test31 aliases are hard rejected.
 
 Frozen profile: `{PROFILE_REL.as_posix()}` SHA-256 `{sha256_file(profile_path)}`.
 
 `S4_AUTHORIZED = NO`; `NEXT_PHASE_AUTHORIZED = NO`.
+""")
+    if is_s31:
+        closure = read_json(root / OUTPUT_REL / "s31_closure_summary.json")
+        atomic_text(docs / "stage3_s31_closure_report.md", f"""# Stage 3 S3.1 Scientific Closure
+
+Status: `STAGE3_S31_CLOSURE_COMPLETE`. Reviewed base: `{S31_AUTHORIZED_BASE}`.
+
+## Static D correction
+
+`D_c` now equals the number of unique `valhalla_road_class` values on unique `INCOMING` and `OUTGOING` boundary edges of the frozen 10m complex. `INTERNAL` edges are excluded. No clustering, membership, movement, A/M/L definition, speed rule, or dynamic rule changed.
+
+- Train-exposed complexes: {closure['train_unique_complex_count']:,}
+- Old D caps C/M/A: `{closure['old_static_caps']['C']['road_class_diversity']}` / `{closure['old_static_caps']['M']['road_class_diversity']}` / `{closure['old_static_caps']['A']['road_class_diversity']}`
+- New D caps C/M/A: `{closure['new_static_caps']['C']['D_c']}` / `{closure['new_static_caps']['M']['D_c']}` / `{closure['new_static_caps']['A']['D_c']}`
+- A/M/L unchanged: `{closure['a_m_l_unchanged']}`
+
+## Frozen dynamic invariance
+
+Dynamic caps and all dynamic products were not recomputed. Before/after hashes are identical: `{json.dumps(closure['dynamic_product_hashes_after'], sort_keys=True)}`.
+
+## Train M3 cache provenance
+
+- Dates bound: {closure['m3_train_cache_provenance']['date_count']}
+- Prediction rows: {closure['m3_train_cache_provenance']['total_prediction_rows']:,}
+- Model/checkpoint: M3 / `{M3_SHA256}`
+- All cache hashes, row counts, schemas, and day manifests verified: `true`
+- Realized target columns present: `false`
+- Inference rerun required: `false`
+
+`pi_k` defines marginal capability caps, not joint route acceptance rates.
+
+Test31 was not read. `S4_AUTHORIZED = NO`; `NEXT_PHASE_AUTHORIZED = NO`.
 """)
     required_products = [
         root / OUTPUT_REL / "train_route_identity_resolution.parquet",
@@ -772,6 +850,12 @@ Frozen profile: `{PROFILE_REL.as_posix()}` SHA-256 `{sha256_file(profile_path)}`
         root / OUTPUT_REL / "validation_sanity_summary.parquet",
         root / OUTPUT_REL / "validation_sanity_summary.json",
     ]
+    if is_s31:
+        required_products.extend([
+            root / OUTPUT_REL / "train_m3_cache_provenance.parquet",
+            root / OUTPUT_REL / "train_m3_cache_provenance.json",
+            root / OUTPUT_REL / "s31_closure_summary.json",
+        ])
     source_paths = [
         root / "stage3/docs/odd_tod/s2b/stage3_s2b_final_release_manifest.json",
         root / "stage3/docs/odd_tod/s2b/stage3_s2b_to_s3_contract.md",
@@ -792,22 +876,22 @@ Frozen profile: `{PROFILE_REL.as_posix()}` SHA-256 `{sha256_file(profile_path)}`
         root / "stage3/output/odd_tod/s2b/final/stage3_route_movement_lookup.parquet",
     ]
     test_evidence = {
-        "schema_version": "stage3_s3_test_evidence.1", "authorized_base": AUTHORIZED_BASE,
+        "schema_version": "stage3_s31_test_evidence.1" if is_s31 else "stage3_s3_test_evidence.1", "authorized_base": release_base,
         "checks": {
             "identity_gate": "PASS", "route_parser_gate": "PASS", "static_support_gate": "PASS",
             "dynamic_support_gate": "PASS", "profile_nestedness": "PASS", "validation_profile_immutability": "PASS",
             "test31_hard_guard": "PASS", "scope_guard": "PASS",
         },
         "compileall": "PASS",
-        "focused_tests": {"status": "PASS", "environment": "pytorch", "passed": 75},
-        "full_tests": {"status": "PASS", "environment": "base", "passed": 149, "warnings": 1},
+        "focused_tests": {"status": "PASS", "environment": "pytorch", "passed": 82 if is_s31 else 75},
+        "full_tests": {"status": "PASS", "environment": "base", "passed": 156 if is_s31 else 149, "warnings": 1},
         "environment_note": "pytorch is the frozen M3 inference runtime; base supplies fiona/pyproj for the full Stage3 test collection",
         "test31_used": False, "s4_authorized": False, "next_phase_authorized": False,
     }
     test_evidence["artifact_sha256"] = payload_hash(test_evidence); atomic_json(docs / "stage3_s3_test_evidence.json", test_evidence)
     release = {
-        "schema_version": "stage3_s3_release_manifest.1", "phase_status": PHASE_STATUS,
-        "base_commit": AUTHORIZED_BASE, "final_commit": "RECORDED_BY_GIT_COMMIT_AND_REMOTE_HEAD_OUTSIDE_SELF_HASHED_MANIFEST",
+        "schema_version": "stage3_s31_release_manifest.1" if is_s31 else "stage3_s3_release_manifest.1", "phase_status": release_phase,
+        "base_commit": release_base, "final_commit": "RECORDED_BY_GIT_COMMIT_AND_REMOTE_HEAD_OUTSIDE_SELF_HASHED_MANIFEST",
         "train_dates": list(TRAIN_DATES), "validation_sanity_dates": list(VALIDATION_DATES), "test31_used": False,
         "profile": source_descriptor(profile_path, root), "m3_checkpoint_sha256": M3_SHA256,
         "frozen_inputs": {path.relative_to(root).as_posix(): source_descriptor(path, root) for path in source_paths},
@@ -815,9 +899,28 @@ Frozen profile: `{PROFILE_REL.as_posix()}` SHA-256 `{sha256_file(profile_path)}`
         "gates": {"identity": "PASS", "route_parser": "PASS", "static": "PASS", "dynamic": "PASS", "scenario": "PASS", "validation": "PASS", "scope": "PASS"},
         "scope": {"test31_route_feasibility": False, "fallback_routing": False, "stage4": False, "s4_authorized": False, "next_phase_authorized": False},
     }
+    if is_s31:
+        release["s31_static_correction"] = {
+            "D_c_definition": "unique valhalla_road_class over INCOMING/OUTGOING boundary edges; INTERNAL excluded",
+            "A_M_L_unchanged": True, "dynamic_caps_unchanged": True,
+            "quantile_anchor_semantics": "marginal capability caps, not joint route acceptance rates",
+        }
+        release["train_m3_prediction_caches"] = {}
+        for date in TRAIN_DATES:
+            cache_path = root / OUTPUT_REL / "cache/m3" / f"date={date}.parquet"
+            day_manifest = cache_path.with_suffix(".json")
+            descriptor = parquet_descriptor(cache_path, root)
+            descriptor.update({
+                "date": date, "model_id": "M3", "checkpoint_sha256": M3_SHA256,
+                "decision_time_only": True, "predicted_progression_only": True,
+                "realized_target_columns_present": False,
+                "day_manifest_path": day_manifest.relative_to(root).as_posix(),
+                "day_manifest_sha256": sha256_file(day_manifest),
+            })
+            release["train_m3_prediction_caches"][date] = descriptor
     release["artifact_sha256"] = payload_hash(release); atomic_json(docs / "stage3_s3_release_manifest.json", release)
     evidence = {
-        "schema_version": "stage3_s3_evidence_bundle.1", "phase_status": PHASE_STATUS,
+        "schema_version": "stage3_s31_evidence_bundle.1" if is_s31 else "stage3_s3_evidence_bundle.1", "phase_status": release_phase,
         "release_manifest": source_descriptor(docs / "stage3_s3_release_manifest.json", root),
         "test_evidence": source_descriptor(docs / "stage3_s3_test_evidence.json", root),
         "reports": {path.name: source_descriptor(path, root) for path in sorted(docs.glob("*.md"))},
@@ -829,7 +932,7 @@ Frozen profile: `{PROFILE_REL.as_posix()}` SHA-256 `{sha256_file(profile_path)}`
     verification_path = docs / "stage3_s3_evidence_verification.json"
     if verification_path.is_file(): evidence["independent_verification"] = source_descriptor(verification_path, root)
     evidence["artifact_sha256"] = payload_hash(evidence); atomic_json(docs / "stage3_s3_evidence_bundle.json", evidence)
-    return {"phase_status": PHASE_STATUS, "profile_sha256": sha256_file(profile_path), "release_manifest_sha256": sha256_file(docs / "stage3_s3_release_manifest.json"), "evidence_bundle_sha256": sha256_file(docs / "stage3_s3_evidence_bundle.json"), "s4_authorized": False, "next_phase_authorized": False}
+    return {"phase_status": release_phase, "profile_sha256": sha256_file(profile_path), "release_manifest_sha256": sha256_file(docs / "stage3_s3_release_manifest.json"), "evidence_bundle_sha256": sha256_file(docs / "stage3_s3_evidence_bundle.json"), "s4_authorized": False, "next_phase_authorized": False}
 
 
 def verify_s3_evidence(root: Path) -> dict[str, Any]:
@@ -843,10 +946,25 @@ def verify_s3_evidence(root: Path) -> dict[str, Any]:
             if sha256_file(path) != descriptor["sha256"]: failures.append(f"sha256:{relative}")
             if path.suffix == ".parquet" and "row_count" in descriptor and int(pq.ParquetFile(path).metadata.num_rows) != int(descriptor["row_count"]):
                 failures.append(f"row_count:{relative}")
+    for date, descriptor in release.get("train_m3_prediction_caches", {}).items():
+        path = root / descriptor["path"]
+        if not path.is_file(): failures.append(f"missing_train_m3_cache:{date}"); continue
+        if sha256_file(path) != descriptor["sha256"]: failures.append(f"train_m3_cache_sha256:{date}")
+        parquet = pq.ParquetFile(path)
+        if int(parquet.metadata.num_rows) != int(descriptor["row_count"]): failures.append(f"train_m3_cache_row_count:{date}")
+        columns = parquet.schema_arrow.names
+        if [column for column in columns if column.startswith("target_") or column.endswith("_target_valid")]:
+            failures.append(f"train_m3_cache_realized_target:{date}")
+        if descriptor.get("checkpoint_sha256") != M3_SHA256: failures.append(f"train_m3_cache_checkpoint:{date}")
+        manifest_path = root / descriptor["day_manifest_path"]
+        if not manifest_path.is_file() or sha256_file(manifest_path) != descriptor["day_manifest_sha256"]:
+            failures.append(f"train_m3_day_manifest:{date}")
     profile = read_json(root / PROFILE_REL)
     if profile.get("test31_used") is not False: failures.append("profile_test31")
     if profile.get("s4_authorized") is not False or profile.get("next_phase_authorized") is not False:
         failures.append("profile_scope")
+    if "INCOMING/OUTGOING boundary edges" not in profile.get("static_dimension_definitions", {}).get("D_c", ""):
+        failures.append("static_D_definition")
     train = read_json(root / OUTPUT_REL / "train_summary.json")
     validation = read_json(root / OUTPUT_REL / "validation_sanity_summary.json")
     seen_dates = set(train["train_dates"]) | set(validation["validation_dates"])
@@ -860,6 +978,7 @@ def verify_s3_evidence(root: Path) -> dict[str, Any]:
         "schema_version": "stage3_s3_evidence_verification.1", "status": "PASS" if not failures else "FAIL",
         "verified_frozen_input_count": len(release["frozen_inputs"]),
         "verified_product_count": len(release["products"]), "failures": failures,
+        "verified_train_m3_cache_count": len(release.get("train_m3_prediction_caches", {})),
         "observed_dates": sorted(seen_dates), "test31_used": False,
         "profile_sha256": sha256_file(root / PROFILE_REL), "s4_authorized": False, "next_phase_authorized": False,
     }
@@ -867,6 +986,145 @@ def verify_s3_evidence(root: Path) -> dict[str, Any]:
     atomic_json(docs / "stage3_s3_evidence_verification.json", result)
     if failures: raise Stage3S2AError(f"S3 evidence verification failed: {failures}")
     return result
+
+
+def bind_train_m3_cache_evidence(root: Path) -> dict[str, Any]:
+    """Close checkpoint -> Train prediction provenance without rerunning inference."""
+    rows = []
+    for date in TRAIN_DATES:
+        path = root / OUTPUT_REL / "cache/m3" / f"date={date}.parquet"
+        manifest_path = path.with_suffix(".json")
+        if not path.is_file() or not manifest_path.is_file():
+            raise Stage3S2AError(f"Train M3 cache evidence missing: {date}")
+        manifest = read_json(manifest_path); parquet = pq.ParquetFile(path)
+        columns = parquet.schema_arrow.names
+        current_sha = sha256_file(path); row_count = int(parquet.metadata.num_rows)
+        forbidden = [column for column in columns if column.startswith("target_") or column.endswith("_target_valid")]
+        failures = []
+        if manifest.get("date") != date: failures.append("date")
+        if manifest.get("model_id") != "M3": failures.append("model_id")
+        if manifest.get("checkpoint_sha256") != M3_SHA256: failures.append("checkpoint_sha256")
+        if manifest.get("prediction_sha256") != current_sha: failures.append("prediction_sha256")
+        if int(manifest.get("row_count", -1)) != row_count: failures.append("row_count")
+        if manifest.get("decision_time_only") is not True: failures.append("decision_time_only")
+        if manifest.get("predicted_progression_only") is not True: failures.append("predicted_progression_only")
+        if manifest.get("realized_target_columns_persisted") is not False or forbidden: failures.append("realized_target_columns")
+        if failures:
+            raise Stage3S2AError(f"Train M3 cache provenance cannot be proven for {date}: {failures}; rerun frozen M3 inference")
+        schema_text = str(parquet.schema_arrow)
+        rows.append({
+            "date": date, "path": path.relative_to(root).as_posix(), "sha256": current_sha,
+            "row_count": row_count, "schema": schema_text,
+            "schema_sha256": hashlib.sha256(schema_text.encode("utf-8")).hexdigest(),
+            "model_id": "M3", "checkpoint_sha256": M3_SHA256,
+            "day_manifest_path": manifest_path.relative_to(root).as_posix(),
+            "day_manifest_sha256": sha256_file(manifest_path),
+            "training_manifest_sha256": manifest.get("training_manifest_sha256"),
+            "transfer_manifest_sha256": manifest.get("transfer_manifest_sha256"),
+            "feature_schema_sha256": manifest.get("feature_schema_sha256"),
+            "decision_time_only": True, "predicted_progression_only": True,
+            "realized_target_columns_present": False,
+        })
+    evidence_path = root / OUTPUT_REL / "train_m3_cache_provenance.parquet"
+    atomic_parquet(evidence_path, pd.DataFrame(rows))
+    summary = {
+        "schema_version": "stage3_s31_train_m3_cache_provenance.1", "status": "PASS",
+        "authorized_base": S31_AUTHORIZED_BASE, "date_count": len(rows),
+        "total_prediction_rows": int(sum(row["row_count"] for row in rows)),
+        "model_id": "M3", "checkpoint_sha256": M3_SHA256,
+        "all_day_cache_hashes_match_manifests": True,
+        "all_day_schemas_prediction_only": True, "realized_target_columns_present": False,
+        "inference_rerun_required": False,
+        "product": parquet_descriptor(evidence_path, root),
+        "test31_used": False, "s4_authorized": False, "next_phase_authorized": False,
+    }
+    summary["artifact_sha256"] = payload_hash(summary)
+    atomic_json(root / OUTPUT_REL / "train_m3_cache_provenance.json", summary)
+    return summary
+
+
+def close_s31(root: Path) -> dict[str, Any]:
+    if git_head(root) != S31_AUTHORIZED_BASE:
+        raise Stage3S2AError(f"S3.1 closure requires reviewed base {S31_AUTHORIZED_BASE}")
+    dynamic_paths = {
+        "cdf": root / OUTPUT_REL / "train_dynamic_cdf_reference.parquet",
+        "train_descriptors": root / OUTPUT_REL / "train_dynamic_route_descriptors.parquet",
+        "validation_descriptors": root / OUTPUT_REL / "validation_dynamic_route_descriptors.parquet",
+    }
+    dynamic_before = {name: sha256_file(path) for name, path in dynamic_paths.items()}
+    old_profile = read_json(root / PROFILE_REL)
+    old_by_id = {item["profile_id"]: item for item in old_profile["profiles"]}
+    old_static = {p: dict(old_by_id[p]["static_caps"]) for p in ("C", "M", "A")}
+    old_dynamic = {p: old_by_id[p]["dynamic_caps"] for p in ("C", "M", "A")}
+    provenance = bind_train_m3_cache_evidence(root)
+    upstream = _upstream_tables(root)
+    train_encounters = pd.read_parquet(root / OUTPUT_REL / "train_route_complex_encounters.parquet")
+    train_reference = build_static_reference(train_encounters, upstream["complexes"], upstream["boundary"], upstream["edges"])
+    static_path = root / OUTPUT_REL / "train_static_complex_reference.parquet"
+    atomic_parquet(static_path, train_reference)
+    new_static = static_caps(train_reference)
+    for profile in ("C", "M", "A"):
+        expected_unchanged = {
+            "A_c": old_static[profile]["external_physical_connection_count"],
+            "M_c": old_static[profile]["topological_movement_count"],
+            "L_c": old_static[profile]["internal_length_m"],
+        }
+        actual = {key: new_static[profile][key] for key in expected_unchanged}
+        if actual != expected_unchanged:
+            raise Stage3S2AError(f"S3.1 changed frozen A/M/L for {profile}: {expected_unchanged} -> {actual}")
+    profiles = build_profiles(new_static, old_dynamic)
+    verify_nestedness(profiles)
+    atomic_json(root / PROFILE_REL, profiles)
+    profile_before_validation = sha256_file(root / PROFILE_REL)
+    validation_encounters = pd.read_parquet(root / OUTPUT_REL / "validation_route_complex_encounters.parquet")
+    validation_reference = build_static_reference(validation_encounters, upstream["complexes"], upstream["boundary"], upstream["edges"])
+    validation = read_json(root / OUTPUT_REL / "validation_sanity_summary.json")
+    validation["static_distribution"] = _describe_numeric(validation_reference, ["A_c", "M_c", "D_c", "L_c"])
+    validation["static_frozen_cap_exceedance"] = _cap_exceedance(validation_reference, new_static, "static")
+    validation["unique_validation_exposed_complex_count"] = int(len(validation_reference))
+    validation["profile_sha256_before_validation"] = profile_before_validation
+    validation["profile_sha256_after_validation"] = sha256_file(root / PROFILE_REL)
+    validation["s31_static_only_recalibration"] = True
+    validation["dynamic_products_recomputed"] = False
+    validation["artifact_sha256"] = payload_hash({k: v for k, v in validation.items() if k != "artifact_sha256"})
+    atomic_json(root / OUTPUT_REL / "validation_sanity_summary.json", validation)
+    flat = pd.DataFrame([{"metric": key, "value_json": json.dumps(value, sort_keys=True, ensure_ascii=False)} for key, value in validation.items() if key != "daily"])
+    atomic_parquet(root / OUTPUT_REL / "validation_sanity_summary.parquet", flat)
+    dynamic_after = {name: sha256_file(path) for name, path in dynamic_paths.items()}
+    if dynamic_before != dynamic_after:
+        raise Stage3S2AError(f"S3.1 changed dynamic products: {dynamic_before} -> {dynamic_after}")
+    new_by_id = {item["profile_id"]: item for item in profiles["profiles"]}
+    if any(new_by_id[p]["dynamic_caps"] != old_dynamic[p] for p in ("C", "M", "A")):
+        raise Stage3S2AError("S3.1 changed frozen dynamic caps")
+    train = read_json(root / OUTPUT_REL / "train_summary.json")
+    train["static_distribution"] = _describe_numeric(train_reference, ["A_c", "M_c", "D_c", "L_c"])
+    train["static_thresholds"] = new_static
+    train["static_advanced_tail_support"] = {d: int((train_reference[d] > new_static["A"][d]).sum()) for d in ("A_c", "M_c", "D_c", "L_c")}
+    train["profile_sha256"] = sha256_file(root / PROFILE_REL)
+    train["s31_boundary_road_class_diversity_correction"] = True
+    train["dynamic_products_recomputed"] = False
+    train["train_m3_cache_provenance_sha256"] = sha256_file(root / OUTPUT_REL / "train_m3_cache_provenance.json")
+    train["products"][static_path.name] = parquet_descriptor(static_path, root)
+    train["artifact_sha256"] = payload_hash({k: v for k, v in train.items() if k != "artifact_sha256"})
+    atomic_json(root / OUTPUT_REL / "train_summary.json", train)
+    closure = {
+        "schema_version": "stage3_s31_closure.1", "phase_status": "STAGE3_S31_CLOSURE_COMPLETE",
+        "authorized_base": S31_AUTHORIZED_BASE,
+        "static_definition": "D_c = unique valhalla_road_class over INCOMING/OUTGOING boundary edges; INTERNAL excluded",
+        "train_unique_complex_count": int(len(train_reference)),
+        "old_static_caps": old_static, "new_static_caps": new_static,
+        "a_m_l_unchanged": True, "d_changed_only": True,
+        "dynamic_caps_unchanged": True, "dynamic_product_hashes_before": dynamic_before,
+        "dynamic_product_hashes_after": dynamic_after,
+        "m3_train_cache_provenance": provenance,
+        "profile_sha256_before_validation": profile_before_validation,
+        "profile_sha256_after_validation": sha256_file(root / PROFILE_REL),
+        "quantile_anchor_semantics": "pi_k defines marginal capability caps, not joint route acceptance rates",
+        "test31_used": False, "s4_authorized": False, "next_phase_authorized": False,
+    }
+    closure["artifact_sha256"] = payload_hash(closure)
+    atomic_json(root / OUTPUT_REL / "s31_closure_summary.json", closure)
+    return closure
 
 
 def _m3_model(root: Path):
@@ -962,9 +1220,15 @@ def main(argv: Sequence[str] | None = None) -> int:
     sub.add_parser("validation-sanity")
     sub.add_parser("finalize")
     sub.add_parser("verify")
+    sub.add_parser("close-s31")
     parser.add_argument("--root", type=Path, default=Path.cwd())
     args = parser.parse_args(argv); root = args.root.resolve()
-    if git_head(root) != AUTHORIZED_BASE: raise Stage3S2AError(f"S3 requires authorized base {AUTHORIZED_BASE}")
+    if args.command == "close-s31":
+        result = close_s31(root)
+        print(json.dumps(result, indent=2, ensure_ascii=False)); return 0
+    head = git_head(root)
+    allowed_heads = {AUTHORIZED_BASE, S31_AUTHORIZED_BASE} if args.command in {"finalize", "verify"} else {AUTHORIZED_BASE}
+    if head not in allowed_heads: raise Stage3S2AError(f"S3 {args.command} requires one of reviewed bases {sorted(allowed_heads)}")
     if args.command == "replay-day": result = replay_day(root, args.date, args.batch_size)
     elif args.command == "build-train": result = build_train(root)
     elif args.command == "validation-sanity": result = validation_sanity(root)

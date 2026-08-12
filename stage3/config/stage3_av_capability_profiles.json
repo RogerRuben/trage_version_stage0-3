@@ -1,5 +1,5 @@
 {
-  "artifact_sha256": "4b41aa46708ff81fe79cf5664c499deaa36b5f008cd3e9fd5e011989c0e13a5c",
+  "artifact_sha256": "d54de303ba985f1609112a29ef181117494d7d33d79059ee9271ef5a0ad56859",
   "calibration_dates": [
     "20161009",
     "20161010",
@@ -67,7 +67,7 @@
       "static_caps": {
         "external_physical_connection_count": 4.0,
         "internal_length_m": 10.0,
-        "road_class_diversity": 1.0,
+        "road_class_diversity": 2.0,
         "topological_movement_count": 9.0
       },
       "unknown_policy": "decision-critical missing evidence is UNKNOWN; no imputation"
@@ -112,7 +112,7 @@
       "static_caps": {
         "external_physical_connection_count": 5.0,
         "internal_length_m": 34.0,
-        "road_class_diversity": 1.0,
+        "road_class_diversity": 3.0,
         "topological_movement_count": 16.0
       },
       "unknown_policy": "decision-critical missing evidence is UNKNOWN; no imputation"
@@ -157,16 +157,23 @@
       "static_caps": {
         "external_physical_connection_count": 9.0,
         "internal_length_m": 73.0,
-        "road_class_diversity": 2.0,
+        "road_class_diversity": 3.0,
         "topological_movement_count": 25.0
       },
       "unknown_policy": "decision-critical missing evidence is UNKNOWN; no imputation"
     }
   ],
   "q_tail": 0.9,
+  "quantile_anchor_semantics": "pi_k defines marginal per-dimension capability caps, not joint route acceptance rates",
   "quantile_method": "higher",
   "s4_authorized": false,
   "schema_version": "stage3_av_capability_profiles.1",
+  "static_dimension_definitions": {
+    "A_c": "external_physical_connection_count",
+    "D_c": "unique valhalla_road_class over INCOMING/OUTGOING boundary edges; INTERNAL edges excluded",
+    "L_c": "internal_length_m",
+    "M_c": "topological_movement_count"
+  },
   "test31_used": false,
   "validation_sanity_dates": [
     "20161025",

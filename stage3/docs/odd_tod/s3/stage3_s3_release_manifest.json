@@ -1,6 +1,6 @@
 {
-  "artifact_sha256": "d023b15b43e3fc8d575a64bc7117bcc6455d961c3aaf8edd50a13bdf66522fae",
-  "base_commit": "c9b6bcdf136ee11fc2863609218a198f60a332c8",
+  "artifact_sha256": "e3731f91cd08a0d37334ada531eb65d617b92ea35abd28557a1393e5cc855dea",
+  "base_commit": "309da4e5164eb99314c34b15ae2652f587a29f0b",
   "final_commit": "RECORDED_BY_GIT_COMMIT_AND_REMOTE_HEAD_OUTSIDE_SELF_HASHED_MANIFEST",
   "frozen_inputs": {
     "stage2/docs/v5_2/stage2_v5_2_final_release_manifest.json": {
@@ -99,8 +99,13 @@
     "validation": "PASS"
   },
   "m3_checkpoint_sha256": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde",
-  "phase_status": "STAGE3_S3_CAPABILITY_ENVELOPE_FROZEN",
+  "phase_status": "STAGE3_S31_CLOSURE_COMPLETE",
   "products": {
+    "stage3/output/odd_tod/s3/s31_closure_summary.json": {
+      "path": "stage3/output/odd_tod/s3/s31_closure_summary.json",
+      "sha256": "a741af2cc0166eff5402edd5ca2fc50e150056d411277e61f8997d2aa70a2a3d",
+      "size_bytes": 4041
+    },
     "stage3/output/odd_tod/s3/train_dynamic_cdf_reference.parquet": {
       "path": "stage3/output/odd_tod/s3/train_dynamic_cdf_reference.parquet",
       "row_count": 33937460,
@@ -116,6 +121,19 @@
       "schema_sha256": "353610bfa6bdde7fb2955cf9d7549835a3674389c2a52b269eab807aa963c333",
       "sha256": "4edb5522a224d0cdc4efda1c2e53ba736ff45b6db9c0e2fe67a257a510071b27",
       "size_bytes": 19179429
+    },
+    "stage3/output/odd_tod/s3/train_m3_cache_provenance.json": {
+      "path": "stage3/output/odd_tod/s3/train_m3_cache_provenance.json",
+      "sha256": "e6043176535db065f52669f4ccdec58d3456e7d959da1e9015663044882d3541",
+      "size_bytes": 1528
+    },
+    "stage3/output/odd_tod/s3/train_m3_cache_provenance.parquet": {
+      "path": "stage3/output/odd_tod/s3/train_m3_cache_provenance.parquet",
+      "row_count": 16,
+      "schema": "date: string\npath: string\nsha256: string\nrow_count: int64\nschema: string\nschema_sha256: string\nmodel_id: string\ncheckpoint_sha256: string\nday_manifest_path: string\nday_manifest_sha256: string\ntraining_manifest_sha256: string\ntransfer_manifest_sha256: string\nfeature_schema_sha256: string\ndecision_time_only: bool\npredicted_progression_only: bool\nrealized_target_columns_present: bool\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 2151",
+      "schema_sha256": "3fc2b85cc72b8fb33f2e227d6b20495c7be40f8c921c5beeb9b4a59661208b27",
+      "sha256": "499120f7a9d2fc625866cfb9821992ce8ec2de22c2fb794cb833d32658280899",
+      "size_bytes": 18191
     },
     "stage3/output/odd_tod/s3/train_route_complex_encounters.parquet": {
       "path": "stage3/output/odd_tod/s3/train_route_complex_encounters.parquet",
@@ -136,31 +154,37 @@
     "stage3/output/odd_tod/s3/train_static_complex_reference.parquet": {
       "path": "stage3/output/odd_tod/s3/train_static_complex_reference.parquet",
       "row_count": 2425,
-      "schema": "intersection_complex_uid: string\nA_c: int64\nM_c: int64\nD_c: int64\nL_c: double\nsignal_state: string\nroundabout_evidence_present: bool\ngrade_separation_evidence_present: bool\ntrain_encounter_count: int64\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1212",
-      "schema_sha256": "b2287d28d68d4424f3eb88ce35810be5645b4ceee390a4dd74e4d627ba3dd565",
-      "sha256": "bc23678e7f8cd8f12911cbda1a9822a68cafabf1e3903779e9b0c50229c7a847",
-      "size_bytes": 51611
+      "schema": "intersection_complex_uid: string\nA_c: int64\nM_c: int64\nL_c: double\ns2b_internal_road_class_diversity_qa: int64\nsignal_state: string\nroundabout_evidence_present: bool\ngrade_separation_evidence_present: bool\ntrain_encounter_count: int64\nboundary_edge_count: int64\nboundary_road_class_diversity: int64\nroad_class_diversity_definition: string\nD_c: int64\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1833",
+      "schema_sha256": "b6e94e5af953809a35d1bfd87e1920b50b8dc51b48ad526766980824f79dc037",
+      "sha256": "8285e90326ec11a33bcabffd2374ba11f34896699e40476b800683371bb68199",
+      "size_bytes": 57351
     },
     "stage3/output/odd_tod/s3/validation_sanity_summary.json": {
       "path": "stage3/output/odd_tod/s3/validation_sanity_summary.json",
-      "sha256": "9e1af8adf99050f04235d8c7b1b51a20bfb575903fed6bada600b457ffad3d8f",
-      "size_bytes": 10938
+      "sha256": "a94a68e8837e5711e3a74ebc49d759c8a05d3fe88329c174a2477a8a7af8a03e",
+      "size_bytes": 11022
     },
     "stage3/output/odd_tod/s3/validation_sanity_summary.parquet": {
       "path": "stage3/output/odd_tod/s3/validation_sanity_summary.parquet",
-      "row_count": 20,
+      "row_count": 22,
       "schema": "metric: string\nvalue_json: string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 307",
       "schema_sha256": "f885bf7dd89e98671175e7130b68de44ee52aa2d6ccf530fa60984f30694c1c4",
-      "sha256": "6a970a8362833a95c9bf433fea1c06d0327a503eb3deac45e0f4358bc2dcf7d0",
-      "size_bytes": 12096
+      "sha256": "8293464e0a855b28e9f32f0bfea1bf497c71f6bd62e5df30164ea731f9f3fd4e",
+      "size_bytes": 12142
     }
   },
   "profile": {
     "path": "stage3/config/stage3_av_capability_profiles.json",
-    "sha256": "909e8efb7c2b6274d965da28e486434ea29d5afc655d2a5672bf7783da06e635",
-    "size_bytes": 5713
+    "sha256": "bea54c12a0c013995c3644a0bab84b35413d5df8a6785dfdd6a03fd49f32978e",
+    "size_bytes": 6106
   },
-  "schema_version": "stage3_s3_release_manifest.1",
+  "s31_static_correction": {
+    "A_M_L_unchanged": true,
+    "D_c_definition": "unique valhalla_road_class over INCOMING/OUTGOING boundary edges; INTERNAL excluded",
+    "dynamic_caps_unchanged": true,
+    "quantile_anchor_semantics": "marginal capability caps, not joint route acceptance rates"
+  },
+  "schema_version": "stage3_s31_release_manifest.1",
   "scope": {
     "fallback_routing": false,
     "next_phase_authorized": false,
@@ -187,6 +211,264 @@
     "20161023",
     "20161024"
   ],
+  "train_m3_prediction_caches": {
+    "20161009": {
+      "checkpoint_sha256": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde",
+      "date": "20161009",
+      "day_manifest_path": "stage3/output/odd_tod/s3/cache/m3/date=20161009.json",
+      "day_manifest_sha256": "927a39d792f317e5d6fad1837815ba42ce799d604c2e7936d56fb452490da334",
+      "decision_time_only": true,
+      "model_id": "M3",
+      "path": "stage3/output/odd_tod/s3/cache/m3/date=20161009.parquet",
+      "predicted_progression_only": true,
+      "realized_target_columns_present": false,
+      "row_count": 714536,
+      "schema": "date: string\norder_id: string\ntraversal_id: int64\nsplit: string\nsupport_group_code: int8\nallocated_distance_m: float\npred_crawl: float\npred_stop: float\npred_speed_cv: float\npred_acceleration_rms: float\npred_rts: float\npred_pace_p50: float\ntravel_time_p50_s: float\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1691",
+      "schema_sha256": "40b2d30331d9f994c6ababde5dd1877bca335df024b16a2068aa9fe748545ece",
+      "sha256": "ffb5490e293d614b1c33776afe5412f9e440999a25eda5ce2022b32a6e0236b1",
+      "size_bytes": 22868480
+    },
+    "20161010": {
+      "checkpoint_sha256": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde",
+      "date": "20161010",
+      "day_manifest_path": "stage3/output/odd_tod/s3/cache/m3/date=20161010.json",
+      "day_manifest_sha256": "e1fa7546a59e00d81e5b7b62a328bc78e52d3ddf1dc1f25684e5999fd29c17af",
+      "decision_time_only": true,
+      "model_id": "M3",
+      "path": "stage3/output/odd_tod/s3/cache/m3/date=20161010.parquet",
+      "predicted_progression_only": true,
+      "realized_target_columns_present": false,
+      "row_count": 706886,
+      "schema": "date: string\norder_id: string\ntraversal_id: int64\nsplit: string\nsupport_group_code: int8\nallocated_distance_m: float\npred_crawl: float\npred_stop: float\npred_speed_cv: float\npred_acceleration_rms: float\npred_rts: float\npred_pace_p50: float\ntravel_time_p50_s: float\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1691",
+      "schema_sha256": "40b2d30331d9f994c6ababde5dd1877bca335df024b16a2068aa9fe748545ece",
+      "sha256": "546f261d2b008905ce8711604066a5e90ea790b9529666a7e249725ccb440e44",
+      "size_bytes": 22680015
+    },
+    "20161011": {
+      "checkpoint_sha256": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde",
+      "date": "20161011",
+      "day_manifest_path": "stage3/output/odd_tod/s3/cache/m3/date=20161011.json",
+      "day_manifest_sha256": "d7e7540f9dbfa5e50beb0408ae53c7dda4eb3b07b576ded2e29f7aa9c77d0403",
+      "decision_time_only": true,
+      "model_id": "M3",
+      "path": "stage3/output/odd_tod/s3/cache/m3/date=20161011.parquet",
+      "predicted_progression_only": true,
+      "realized_target_columns_present": false,
+      "row_count": 718689,
+      "schema": "date: string\norder_id: string\ntraversal_id: int64\nsplit: string\nsupport_group_code: int8\nallocated_distance_m: float\npred_crawl: float\npred_stop: float\npred_speed_cv: float\npred_acceleration_rms: float\npred_rts: float\npred_pace_p50: float\ntravel_time_p50_s: float\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1691",
+      "schema_sha256": "40b2d30331d9f994c6ababde5dd1877bca335df024b16a2068aa9fe748545ece",
+      "sha256": "5c9a8de182a0e5ad2446f2bfdde64fc27bb69844e9b1be34c9fe631a3944c049",
+      "size_bytes": 22975711
+    },
+    "20161012": {
+      "checkpoint_sha256": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde",
+      "date": "20161012",
+      "day_manifest_path": "stage3/output/odd_tod/s3/cache/m3/date=20161012.json",
+      "day_manifest_sha256": "eb88b5f640b2a8317350b0e9381bcba45274157d3611cb2ffffc41cc4a6e9d4d",
+      "decision_time_only": true,
+      "model_id": "M3",
+      "path": "stage3/output/odd_tod/s3/cache/m3/date=20161012.parquet",
+      "predicted_progression_only": true,
+      "realized_target_columns_present": false,
+      "row_count": 712116,
+      "schema": "date: string\norder_id: string\ntraversal_id: int64\nsplit: string\nsupport_group_code: int8\nallocated_distance_m: float\npred_crawl: float\npred_stop: float\npred_speed_cv: float\npred_acceleration_rms: float\npred_rts: float\npred_pace_p50: float\ntravel_time_p50_s: float\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1691",
+      "schema_sha256": "40b2d30331d9f994c6ababde5dd1877bca335df024b16a2068aa9fe748545ece",
+      "sha256": "a3a8b0a59da06e043b6c2f9a01fa640ec89ef2eaacce2216b7103b15a8b8363e",
+      "size_bytes": 22804380
+    },
+    "20161013": {
+      "checkpoint_sha256": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde",
+      "date": "20161013",
+      "day_manifest_path": "stage3/output/odd_tod/s3/cache/m3/date=20161013.json",
+      "day_manifest_sha256": "201b8105a69fd6d0428ce41dd83ae6741409bffa66d3cfcb3aff07250fcfbd84",
+      "decision_time_only": true,
+      "model_id": "M3",
+      "path": "stage3/output/odd_tod/s3/cache/m3/date=20161013.parquet",
+      "predicted_progression_only": true,
+      "realized_target_columns_present": false,
+      "row_count": 716983,
+      "schema": "date: string\norder_id: string\ntraversal_id: int64\nsplit: string\nsupport_group_code: int8\nallocated_distance_m: float\npred_crawl: float\npred_stop: float\npred_speed_cv: float\npred_acceleration_rms: float\npred_rts: float\npred_pace_p50: float\ntravel_time_p50_s: float\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1691",
+      "schema_sha256": "40b2d30331d9f994c6ababde5dd1877bca335df024b16a2068aa9fe748545ece",
+      "sha256": "a4e27e1e7eeaf438c7d8b626027fb9635243c63b49d4e1a81f57aeec078a072e",
+      "size_bytes": 22940586
+    },
+    "20161014": {
+      "checkpoint_sha256": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde",
+      "date": "20161014",
+      "day_manifest_path": "stage3/output/odd_tod/s3/cache/m3/date=20161014.json",
+      "day_manifest_sha256": "fd7d626429de800ca90637aef48ee76cf4d0fa36b23d6c2e8afd8b7a922bce6c",
+      "decision_time_only": true,
+      "model_id": "M3",
+      "path": "stage3/output/odd_tod/s3/cache/m3/date=20161014.parquet",
+      "predicted_progression_only": true,
+      "realized_target_columns_present": false,
+      "row_count": 707124,
+      "schema": "date: string\norder_id: string\ntraversal_id: int64\nsplit: string\nsupport_group_code: int8\nallocated_distance_m: float\npred_crawl: float\npred_stop: float\npred_speed_cv: float\npred_acceleration_rms: float\npred_rts: float\npred_pace_p50: float\ntravel_time_p50_s: float\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1691",
+      "schema_sha256": "40b2d30331d9f994c6ababde5dd1877bca335df024b16a2068aa9fe748545ece",
+      "sha256": "e2f25d9369a3b4c6018d34c347b76e7093930975a29baa9aa60c6a012af26761",
+      "size_bytes": 22672293
+    },
+    "20161015": {
+      "checkpoint_sha256": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde",
+      "date": "20161015",
+      "day_manifest_path": "stage3/output/odd_tod/s3/cache/m3/date=20161015.json",
+      "day_manifest_sha256": "620163db5f8e1d8bdd3143c97ec1f92d44f8615342d0271916f72d20456115d0",
+      "decision_time_only": true,
+      "model_id": "M3",
+      "path": "stage3/output/odd_tod/s3/cache/m3/date=20161015.parquet",
+      "predicted_progression_only": true,
+      "realized_target_columns_present": false,
+      "row_count": 717050,
+      "schema": "date: string\norder_id: string\ntraversal_id: int64\nsplit: string\nsupport_group_code: int8\nallocated_distance_m: float\npred_crawl: float\npred_stop: float\npred_speed_cv: float\npred_acceleration_rms: float\npred_rts: float\npred_pace_p50: float\ntravel_time_p50_s: float\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1691",
+      "schema_sha256": "40b2d30331d9f994c6ababde5dd1877bca335df024b16a2068aa9fe748545ece",
+      "sha256": "31408f42af63747efac9a8e709128cad9cb53152fbb382d90a3cd25287d603b5",
+      "size_bytes": 22934939
+    },
+    "20161016": {
+      "checkpoint_sha256": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde",
+      "date": "20161016",
+      "day_manifest_path": "stage3/output/odd_tod/s3/cache/m3/date=20161016.json",
+      "day_manifest_sha256": "d85e157ebc4d2e4b506d505447a4bfeae61d7cad7270efed74f0224ad77140d0",
+      "decision_time_only": true,
+      "model_id": "M3",
+      "path": "stage3/output/odd_tod/s3/cache/m3/date=20161016.parquet",
+      "predicted_progression_only": true,
+      "realized_target_columns_present": false,
+      "row_count": 726756,
+      "schema": "date: string\norder_id: string\ntraversal_id: int64\nsplit: string\nsupport_group_code: int8\nallocated_distance_m: float\npred_crawl: float\npred_stop: float\npred_speed_cv: float\npred_acceleration_rms: float\npred_rts: float\npred_pace_p50: float\ntravel_time_p50_s: float\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1691",
+      "schema_sha256": "40b2d30331d9f994c6ababde5dd1877bca335df024b16a2068aa9fe748545ece",
+      "sha256": "e329205e021cda8abe280ed9ba23579523a4adf1a53eec8861f4b20451ba614f",
+      "size_bytes": 23182686
+    },
+    "20161017": {
+      "checkpoint_sha256": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde",
+      "date": "20161017",
+      "day_manifest_path": "stage3/output/odd_tod/s3/cache/m3/date=20161017.json",
+      "day_manifest_sha256": "82a61cea5e81b4f95567ce4191bd2b0866bee9dd92e23b60f45f7d6374655bde",
+      "decision_time_only": true,
+      "model_id": "M3",
+      "path": "stage3/output/odd_tod/s3/cache/m3/date=20161017.parquet",
+      "predicted_progression_only": true,
+      "realized_target_columns_present": false,
+      "row_count": 715275,
+      "schema": "date: string\norder_id: string\ntraversal_id: int64\nsplit: string\nsupport_group_code: int8\nallocated_distance_m: float\npred_crawl: float\npred_stop: float\npred_speed_cv: float\npred_acceleration_rms: float\npred_rts: float\npred_pace_p50: float\ntravel_time_p50_s: float\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1691",
+      "schema_sha256": "40b2d30331d9f994c6ababde5dd1877bca335df024b16a2068aa9fe748545ece",
+      "sha256": "144bc5e042ef19fc78e25dc8d78f908c976903ca334cb42b5b7f655d86198c37",
+      "size_bytes": 22896338
+    },
+    "20161018": {
+      "checkpoint_sha256": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde",
+      "date": "20161018",
+      "day_manifest_path": "stage3/output/odd_tod/s3/cache/m3/date=20161018.json",
+      "day_manifest_sha256": "9eca9193817b7740be77987b850abf288ddb98b858a445050f2840bf819cb8f0",
+      "decision_time_only": true,
+      "model_id": "M3",
+      "path": "stage3/output/odd_tod/s3/cache/m3/date=20161018.parquet",
+      "predicted_progression_only": true,
+      "realized_target_columns_present": false,
+      "row_count": 719000,
+      "schema": "date: string\norder_id: string\ntraversal_id: int64\nsplit: string\nsupport_group_code: int8\nallocated_distance_m: float\npred_crawl: float\npred_stop: float\npred_speed_cv: float\npred_acceleration_rms: float\npred_rts: float\npred_pace_p50: float\ntravel_time_p50_s: float\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1691",
+      "schema_sha256": "40b2d30331d9f994c6ababde5dd1877bca335df024b16a2068aa9fe748545ece",
+      "sha256": "bda09da3ad96d2edf0313d064c75895d20843da9d2fd8663ff90879d48a9ae17",
+      "size_bytes": 22983299
+    },
+    "20161019": {
+      "checkpoint_sha256": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde",
+      "date": "20161019",
+      "day_manifest_path": "stage3/output/odd_tod/s3/cache/m3/date=20161019.json",
+      "day_manifest_sha256": "d1d023a9b863612b7e94c3c197cd655266bfceb779c063927289929dce922735",
+      "decision_time_only": true,
+      "model_id": "M3",
+      "path": "stage3/output/odd_tod/s3/cache/m3/date=20161019.parquet",
+      "predicted_progression_only": true,
+      "realized_target_columns_present": false,
+      "row_count": 718860,
+      "schema": "date: string\norder_id: string\ntraversal_id: int64\nsplit: string\nsupport_group_code: int8\nallocated_distance_m: float\npred_crawl: float\npred_stop: float\npred_speed_cv: float\npred_acceleration_rms: float\npred_rts: float\npred_pace_p50: float\ntravel_time_p50_s: float\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1691",
+      "schema_sha256": "40b2d30331d9f994c6ababde5dd1877bca335df024b16a2068aa9fe748545ece",
+      "sha256": "77d366650b6bf3959d199eaf79949818c79beb67f9a60a4f0a25cd5a1323457d",
+      "size_bytes": 22980356
+    },
+    "20161020": {
+      "checkpoint_sha256": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde",
+      "date": "20161020",
+      "day_manifest_path": "stage3/output/odd_tod/s3/cache/m3/date=20161020.json",
+      "day_manifest_sha256": "df9395b80db61dce123ee8104d06d50f313ca67921d47a74a3235510da45e2b5",
+      "decision_time_only": true,
+      "model_id": "M3",
+      "path": "stage3/output/odd_tod/s3/cache/m3/date=20161020.parquet",
+      "predicted_progression_only": true,
+      "realized_target_columns_present": false,
+      "row_count": 720877,
+      "schema": "date: string\norder_id: string\ntraversal_id: int64\nsplit: string\nsupport_group_code: int8\nallocated_distance_m: float\npred_crawl: float\npred_stop: float\npred_speed_cv: float\npred_acceleration_rms: float\npred_rts: float\npred_pace_p50: float\ntravel_time_p50_s: float\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1691",
+      "schema_sha256": "40b2d30331d9f994c6ababde5dd1877bca335df024b16a2068aa9fe748545ece",
+      "sha256": "533c1172f2c61969e7b81cba27eede021eb26d73baee281ae6f8f4ec6955eeac",
+      "size_bytes": 23040603
+    },
+    "20161021": {
+      "checkpoint_sha256": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde",
+      "date": "20161021",
+      "day_manifest_path": "stage3/output/odd_tod/s3/cache/m3/date=20161021.json",
+      "day_manifest_sha256": "1d6198406a9492ab3cd2222976b533c497294657796082b1c3c6b9019bdde2fd",
+      "decision_time_only": true,
+      "model_id": "M3",
+      "path": "stage3/output/odd_tod/s3/cache/m3/date=20161021.parquet",
+      "predicted_progression_only": true,
+      "realized_target_columns_present": false,
+      "row_count": 719805,
+      "schema": "date: string\norder_id: string\ntraversal_id: int64\nsplit: string\nsupport_group_code: int8\nallocated_distance_m: float\npred_crawl: float\npred_stop: float\npred_speed_cv: float\npred_acceleration_rms: float\npred_rts: float\npred_pace_p50: float\ntravel_time_p50_s: float\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1691",
+      "schema_sha256": "40b2d30331d9f994c6ababde5dd1877bca335df024b16a2068aa9fe748545ece",
+      "sha256": "681dbbe9088472ddaf5db344f7bbe00d8f91e64c7353142314aa6b0322069584",
+      "size_bytes": 23003588
+    },
+    "20161022": {
+      "checkpoint_sha256": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde",
+      "date": "20161022",
+      "day_manifest_path": "stage3/output/odd_tod/s3/cache/m3/date=20161022.json",
+      "day_manifest_sha256": "77648bfe1069dc316fefbc1d4ac7c58547c6eb6ab75e157fc33296f62193766b",
+      "decision_time_only": true,
+      "model_id": "M3",
+      "path": "stage3/output/odd_tod/s3/cache/m3/date=20161022.parquet",
+      "predicted_progression_only": true,
+      "realized_target_columns_present": false,
+      "row_count": 713631,
+      "schema": "date: string\norder_id: string\ntraversal_id: int64\nsplit: string\nsupport_group_code: int8\nallocated_distance_m: float\npred_crawl: float\npred_stop: float\npred_speed_cv: float\npred_acceleration_rms: float\npred_rts: float\npred_pace_p50: float\ntravel_time_p50_s: float\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1691",
+      "schema_sha256": "40b2d30331d9f994c6ababde5dd1877bca335df024b16a2068aa9fe748545ece",
+      "sha256": "e1ffc5f21b28a69ac2e9dbf5be10f2cf005734e01265a20600be3ff840d32194",
+      "size_bytes": 22827735
+    },
+    "20161023": {
+      "checkpoint_sha256": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde",
+      "date": "20161023",
+      "day_manifest_path": "stage3/output/odd_tod/s3/cache/m3/date=20161023.json",
+      "day_manifest_sha256": "83c1784f7a639593a83755b1fc2c1edf7a9825c485884dc8b46ea933311b5cb5",
+      "decision_time_only": true,
+      "model_id": "M3",
+      "path": "stage3/output/odd_tod/s3/cache/m3/date=20161023.parquet",
+      "predicted_progression_only": true,
+      "realized_target_columns_present": false,
+      "row_count": 707742,
+      "schema": "date: string\norder_id: string\ntraversal_id: int64\nsplit: string\nsupport_group_code: int8\nallocated_distance_m: float\npred_crawl: float\npred_stop: float\npred_speed_cv: float\npred_acceleration_rms: float\npred_rts: float\npred_pace_p50: float\ntravel_time_p50_s: float\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1691",
+      "schema_sha256": "40b2d30331d9f994c6ababde5dd1877bca335df024b16a2068aa9fe748545ece",
+      "sha256": "a7f64c8ed2dcc0c4f236dd975138ff802599b47845e033ad25b54b0ef659d5e7",
+      "size_bytes": 22706694
+    },
+    "20161024": {
+      "checkpoint_sha256": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde",
+      "date": "20161024",
+      "day_manifest_path": "stage3/output/odd_tod/s3/cache/m3/date=20161024.json",
+      "day_manifest_sha256": "568a36e0c6fbc2221fb70df98bd5110ffdd58477075d49ed252394fc00f013e8",
+      "decision_time_only": true,
+      "model_id": "M3",
+      "path": "stage3/output/odd_tod/s3/cache/m3/date=20161024.parquet",
+      "predicted_progression_only": true,
+      "realized_target_columns_present": false,
+      "row_count": 697204,
+      "schema": "date: string\norder_id: string\ntraversal_id: int64\nsplit: string\nsupport_group_code: int8\nallocated_distance_m: float\npred_crawl: float\npred_stop: float\npred_speed_cv: float\npred_acceleration_rms: float\npred_rts: float\npred_pace_p50: float\ntravel_time_p50_s: float\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1691",
+      "schema_sha256": "40b2d30331d9f994c6ababde5dd1877bca335df024b16a2068aa9fe748545ece",
+      "sha256": "84ad370d5dc74ce2db80842d8125870b299e815932b7d92219a0e297916d69d6",
+      "size_bytes": 22433676
+    }
+  },
   "validation_sanity_dates": [
     "20161025",
     "20161026",

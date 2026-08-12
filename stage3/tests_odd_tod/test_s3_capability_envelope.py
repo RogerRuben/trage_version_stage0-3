@@ -5,7 +5,7 @@ import pandas as pd
 
 from stage3.odd_tod.capability_envelope import (
     AUTHORIZED_BASE, DYNAMIC_DIMS, M3_SHA256, PHASE_STATUS, PI, Q_TAIL, SPEED_CAPS, TRAIN_DATES, VALIDATION_DATES, apply_mid_cdf,
-    build_profiles, build_static_reference, dynamic_caps, movement_rules,
+    boundary_road_class_diversity, build_profiles, build_static_reference, dynamic_caps, movement_rules,
     movement_compatibility, verify_categorical_nestedness,
     parse_route_complex_encounters, quantile_higher, resolve_route_tokens,
     route_eqc, static_caps, validate_s3_date, verify_nestedness,
@@ -96,10 +96,33 @@ def test_static_reference_unique_not_demand_weighted_and_exact_dimensions():
         "signal_state": ["SIGNALIZED", "UNKNOWN_CONTROL"], "roundabout_evidence_present": [False, False],
         "grade_separation_evidence_present": [False, True],
     })
-    result = build_static_reference(encounters, complexes)
+    boundary = pd.DataFrame({
+        "stage3_edge_uid": ["a_in", "a_out", "a_internal", "b_in"],
+        "intersection_complex_uid": ["a", "a", "a", "b"],
+        "boundary_role": ["INCOMING", "OUTGOING", "INTERNAL", "INCOMING"],
+    })
+    edges = pd.DataFrame({
+        "stage3_edge_uid": ["a_in", "a_out", "a_internal", "b_in"],
+        "valhalla_road_class": [1, 2, 99, 3],
+    })
+    result = build_static_reference(encounters, complexes, boundary, edges)
     assert len(result) == 2
-    assert set(result.columns) == {"intersection_complex_uid", "A_c", "M_c", "D_c", "L_c", "signal_state", "roundabout_evidence_present", "grade_separation_evidence_present", "train_encounter_count"}
+    assert {"intersection_complex_uid", "A_c", "M_c", "D_c", "L_c", "signal_state", "roundabout_evidence_present", "grade_separation_evidence_present", "train_encounter_count"}.issubset(result.columns)
     assert result.set_index("intersection_complex_uid").loc["a", "train_encounter_count"] == 2
+    assert result.set_index("intersection_complex_uid").loc["a", "D_c"] == 2
+    assert result.set_index("intersection_complex_uid").loc["b", "D_c"] == 1
+    assert result.set_index("intersection_complex_uid").loc["a", "s2b_internal_road_class_diversity_qa"] == 1
+
+
+def test_boundary_road_class_diversity_excludes_internal_edges():
+    boundary = pd.DataFrame({
+        "stage3_edge_uid": ["in", "out", "internal"], "intersection_complex_uid": ["c"] * 3,
+        "boundary_role": ["INCOMING", "OUTGOING", "INTERNAL"],
+    })
+    edges = pd.DataFrame({"stage3_edge_uid": ["in", "out", "internal"], "valhalla_road_class": [1, 2, 9]})
+    result = boundary_road_class_diversity(boundary, edges).iloc[0]
+    assert result["boundary_road_class_diversity"] == 2
+    assert result["boundary_edge_count"] == 2
 
 
 def test_higher_quantile_and_static_support_gate():
