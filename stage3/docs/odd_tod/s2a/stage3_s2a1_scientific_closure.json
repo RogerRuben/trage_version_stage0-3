@@ -1,0 +1,111 @@
+{
+  "anchor_reconciliation": {
+    "anchor_speed_class_distribution": {
+      "20.0": 61,
+      "30.0": 11,
+      "50.0": 54,
+      "60.0": 78,
+      "70.0": 298
+    },
+    "canonical_segment_anchor_count": 502,
+    "collapse_reason": "multiple canonical split segments map to the same frozen Valhalla directed edge; deployment is one row per stage3_edge_uid",
+    "directed_identity_claim_withdrawn": true,
+    "known_full_network_speed_rows": 180,
+    "mapped_canonical_segment_anchor_count": 500,
+    "unique_full_network_directed_edges_after_mapping": 180,
+    "unit": "canonical_segment_anchor",
+    "unmapped_canonical_segment_anchor_count": 2
+  },
+  "artifact_sha256": "5c586612bd4f02c5f59a319d5ae50437cc972c67fc9366c9ffe384685200932e",
+  "authorized_base": "4f036187e0921493894263f7999944a9193a5b2d",
+  "av_caps_changed": false,
+  "b0_vs_b2_compatibility_disagreement": [
+    {
+      "b2_applicable_denominator": 4898,
+      "b2_applicable_disagreement_count": 26,
+      "b2_applicable_disagreement_rate": 0.005308289097590854,
+      "cap_kmh": 60,
+      "comparison_semantics": "known anchors invariant; B2 applied only to INFERRED_SPEED_AND_CLASS; B0 fallback elsewhere",
+      "full_network_denominator": 209454,
+      "full_network_disagreement_count": 26,
+      "full_network_disagreement_rate": 0.00012413226770555827
+    },
+    {
+      "b2_applicable_denominator": 4898,
+      "b2_applicable_disagreement_count": 3,
+      "b2_applicable_disagreement_rate": 0.0006124948958758677,
+      "cap_kmh": 80,
+      "comparison_semantics": "known anchors invariant; B2 applied only to INFERRED_SPEED_AND_CLASS; B0 fallback elsewhere",
+      "full_network_denominator": 209454,
+      "full_network_disagreement_count": 3,
+      "full_network_disagreement_rate": 1.4322953966025953e-05
+    },
+    {
+      "b2_applicable_denominator": 4898,
+      "b2_applicable_disagreement_count": 0,
+      "b2_applicable_disagreement_rate": 0.0,
+      "cap_kmh": 120,
+      "comparison_semantics": "known anchors invariant; B2 applied only to INFERRED_SPEED_AND_CLASS; B0 fallback elsewhere",
+      "full_network_denominator": 209454,
+      "full_network_disagreement_count": 0,
+      "full_network_disagreement_rate": 0.0
+    }
+  ],
+  "cap_identification": [
+    {
+      "anchor_gt_cap_count": 298,
+      "anchor_le_cap_count": 204,
+      "cap_kmh": 60,
+      "empirically_identified": true,
+      "interpretation": "EMPIRICALLY_IDENTIFIED_BINARY_BOUNDARY",
+      "selected_cv_accuracy": 0.8067729083665338
+    },
+    {
+      "anchor_gt_cap_count": 0,
+      "anchor_le_cap_count": 502,
+      "cap_kmh": 80,
+      "empirically_identified": false,
+      "interpretation": "NOT_EMPIRICALLY_IDENTIFIED_TRIVIAL_UNDER_CURRENT_ANCHOR_SUPPORT",
+      "selected_cv_accuracy": 1.0
+    },
+    {
+      "anchor_gt_cap_count": 0,
+      "anchor_le_cap_count": 502,
+      "cap_kmh": 120,
+      "empirically_identified": false,
+      "interpretation": "NOT_EMPIRICALLY_IDENTIFIED_TRIVIAL_UNDER_CURRENT_ANCHOR_SUPPORT",
+      "selected_cv_accuracy": 1.0
+    }
+  ],
+  "frozen_selection": {
+    "caps_kmh": [
+      60,
+      80,
+      120
+    ],
+    "method": "MAP_SPEED_AND_ROAD_CLASS",
+    "quantile": 0.85
+  },
+  "identified_boundary_accuracy": 0.8067729083665338,
+  "macro_interpretation": "MECHANICAL_THREE_THRESHOLD_AVERAGE_NOT_THREE_PROFILE_EMPIRICAL_VALIDATION",
+  "network_reexported": false,
+  "next_phase_authorized": false,
+  "phase_status": "STAGE3_S2A1_SCIENTIFIC_CLOSURE_COMPLETE",
+  "reported_macro_accuracy": 0.9355909694555112,
+  "reverse_direction_closure": {
+    "eligible_for_av_routing": false,
+    "historical_observations_retained": true,
+    "missing_count": 0,
+    "reverse_overlay_count": 6502,
+    "semantic_status": "HISTORICAL_DIRECTION_OVERLAY_PLUS_AV_ROUTABILITY_VIOLATION",
+    "with_mapped_forward_physical_reference": 6388,
+    "without_mapped_forward_physical_reference": 114
+  },
+  "s2b_authorized": false,
+  "schema_version": "stage3_s2a1_scientific_closure.1",
+  "scientific_conclusion": "speed-domain is retained chiefly for the empirically identified Conservative 60-km/h boundary; intersection/movement and dynamic E/Q/C remain the intended primary C/M/A discriminators",
+  "scientific_products_rebuilt": false,
+  "speed_method_reselected": false,
+  "speed_model_retrained": false,
+  "speed_quantile_reselected": false
+}
