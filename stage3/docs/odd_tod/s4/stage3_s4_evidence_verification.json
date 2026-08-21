@@ -1,0 +1,100 @@
+{
+  "artifact_sha256": "88cf89c6d585bd22d54f7224edc900616a49c463ae0d4d774319c157d01e4d7b",
+  "atomic_row_count": 14182296,
+  "atomic_to_suitability_reconciliation": {
+    "atomic_row_count": 14182296,
+    "duplicate_evidence_id_count": 0,
+    "evidence_id_distinct_method": "memory_bounded_external_merge_sort_exact",
+    "evidence_id_sort_temporary_bytes": 1326360722,
+    "evidence_id_unique_count": 14182296,
+    "family_state_mismatch_counts": {
+      "control_state": 0,
+      "directional_routability_state": 0,
+      "dynamic_state": 0,
+      "movement_state": 0,
+      "restriction_state": 0,
+      "roundabout_state": 0,
+      "speed_state": 0,
+      "static_A_state": 0,
+      "static_D_state": 0,
+      "static_L_state": 0,
+      "static_M_state": 0
+    },
+    "final_state_mismatch_count": 0,
+    "invalid_reason_count": 0,
+    "invalid_state_count": 0,
+    "known_atomic_count_mismatch_count": 0,
+    "known_distinct_count_mismatch_count": 0,
+    "known_reason_set_mismatch_count": 0,
+    "null_evidence_id_count": 0,
+    "unknown_atomic_count_mismatch_count": 0,
+    "unknown_distinct_count_mismatch_count": 0,
+    "unknown_reason_set_mismatch_count": 0
+  },
+  "evidence_bundle_sha256": "8120838abf8124705afefccc4a5f92d2bff1a2580ba6b76fa173efcef0a2dc12",
+  "failures": [],
+  "nestedness": {
+    "capability_regression_count": 0,
+    "feasible_to_unknown_count": 0,
+    "pass": true,
+    "rank_regression_count": 0,
+    "status": "PASS",
+    "transitions": {
+      "C_to_M": {
+        "feasible_to_unknown_count": 0,
+        "matrix": {
+          "FEASIBLE->FEASIBLE": 16,
+          "FEASIBLE->INFEASIBLE": 0,
+          "FEASIBLE->UNKNOWN": 0,
+          "INFEASIBLE->FEASIBLE": 546,
+          "INFEASIBLE->INFEASIBLE": 29351,
+          "INFEASIBLE->UNKNOWN": 85,
+          "UNKNOWN->FEASIBLE": 2,
+          "UNKNOWN->INFEASIBLE": 0,
+          "UNKNOWN->UNKNOWN": 0
+        },
+        "rank_regression_count": 0
+      },
+      "M_to_A": {
+        "feasible_to_unknown_count": 0,
+        "matrix": {
+          "FEASIBLE->FEASIBLE": 564,
+          "FEASIBLE->INFEASIBLE": 0,
+          "FEASIBLE->UNKNOWN": 0,
+          "INFEASIBLE->FEASIBLE": 2357,
+          "INFEASIBLE->INFEASIBLE": 25790,
+          "INFEASIBLE->UNKNOWN": 1204,
+          "UNKNOWN->FEASIBLE": 0,
+          "UNKNOWN->INFEASIBLE": 0,
+          "UNKNOWN->UNKNOWN": 85
+        },
+        "rank_regression_count": 0
+      }
+    }
+  },
+  "next_phase_authorized": false,
+  "order_profile_row_count": 90000,
+  "overall_acceptance_status": "PASS",
+  "prediction_gates": {
+    "checkpoint": true,
+    "decision_time_only": true,
+    "loss_path": true,
+    "order_count": true,
+    "predicted_progression_only": true,
+    "prediction_sha": true,
+    "realized_future_time_used": true,
+    "realized_targets_persisted": true,
+    "route_sha": true,
+    "row_count": true,
+    "strict_prediction_only_schema": true,
+    "target_arrays": true
+  },
+  "s5_authorized": false,
+  "schema_version": "stage3_s4_evidence_verification.1",
+  "status": "PASS",
+  "test31_order_count": 30000,
+  "verified_evidence_descriptor_count": 5,
+  "verified_frozen_input_count": 23,
+  "verified_product_count": 9,
+  "verified_report_count": 7
+}

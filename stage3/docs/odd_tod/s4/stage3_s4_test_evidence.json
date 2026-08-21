@@ -1,0 +1,32 @@
+{
+  "artifact_sha256": "9f5b249a9caa0fefb89dbfe109803d3e6e5c872cc8904c1f7f10b6b0ec654955",
+  "authorized_base": "a18dcdb42bd622273eccf2347ab6c61f4fef955f",
+  "behavioral_gates": {
+    "cdf_immutable": true,
+    "decision_time_only": true,
+    "fallback": false,
+    "known_violation_precedence": "PASS",
+    "nestedness": "PASS",
+    "order_count_30000": true,
+    "order_profile_count_90000": true,
+    "original_route_only": true,
+    "prediction_schema_no_realized_targets": true,
+    "profile_immutable": true,
+    "route_search": false
+  },
+  "compileall": {
+    "status": "PASS"
+  },
+  "focused_tests": {
+    "passed": 37,
+    "status": "PASS"
+  },
+  "full_tests": {
+    "passed": 202,
+    "status": "PASS",
+    "warnings": 1
+  },
+  "next_phase_authorized": false,
+  "s5_authorized": false,
+  "schema_version": "stage3_s4_test_evidence.1"
+}
