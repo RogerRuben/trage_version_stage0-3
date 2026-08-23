@@ -1,0 +1,407 @@
+{
+  "artifact_sha256": "bde10f7f55176028eb2efd516420967c05a87587cd2d8b49d975208d51b46cd0",
+  "authorized_base": "514db0933493578463de0c37b9cfd31cc730ed7a",
+  "canonical_products": {
+    "fallback_candidate_status": {
+      "path": "stage3/output/odd_tod/final/test31_fallback_candidates.parquet",
+      "row_count": 17668,
+      "schema": "order_id: large_string\ncandidate_status: large_string\ncandidate_count: int64\ncandidate_distance_m: double\nfallback_distance_ratio: double\nvalhalla_route_time_s: double\nroute_reference: large_string\nfailure_reason: large_string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1141",
+      "schema_sha256": "9e0db1b5c68707d23066082b9b4d73354b6d71f23435899c608eb7181e2c2836",
+      "sha256": "1bfb1a4ba62ee2c81702e66c130b00ab5858983c63d33fe1b1ec9ca37c11c032",
+      "size_bytes": 1079567
+    },
+    "fallback_route_edges": {
+      "path": "stage3/output/odd_tod/final/test31_fallback_route_edges.parquet",
+      "row_count": 599379,
+      "schema": "date: large_string\norder_id: large_string\nroute_reference: large_string\nroute_sequence: int64\nstage3_edge_uid: large_string\nvalhalla_directed_edge_id: int64\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 833",
+      "schema_sha256": "81e7afd9cf83efff70f1568d5f135154744268de2bd02942594fc40be9cbdde6",
+      "sha256": "0e5089a65319acc21dae77cc00b6976ae90f55d58d85f1aaf442fbfd6b396e35",
+      "size_bytes": 2372096
+    },
+    "interface": {
+      "path": "stage3/output/odd_tod/final/test31_stage3_to_stage4_interface.parquet",
+      "row_count": 90000,
+      "schema": "date: large_string\norder_id: large_string\nprofile_id: large_string\nselected_route_type: large_string\nhard_state: large_string\nevidence_complete: bool\nfallback_attempted: bool\nfallback_candidate_count: int64\nfallback_hard_feasible_count: int64\nselected_route_distance_m: double\nselected_service_time_p50_s: double\nrho_static: double\nrho_dynamic: double\nrho_speed: double\nrho_overall: double\nstatic_vector: large_string\ndynamic_vector: large_string\nhard_reason_codes: large_string\nunknown_reason_codes: large_string\nsoft_reason_codes: large_string\noriginal_route_hard_state: large_string\noriginal_route_rho_static: double\noriginal_route_rho_dynamic: double\noriginal_route_rho_speed: double\nfallback_distance_ratio: double\nselected_route_reference: large_string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 3557",
+      "schema_sha256": "3e395365703a4f87bd92b8ca401a02ee9dc8ca57a0a8b217adefd835c72a05ec",
+      "sha256": "18fa2b58eb90a24046e41b88ef2f53b7fbe00fc9cc60746b35cf6e6fb5eb4d4a",
+      "size_bytes": 8414493
+    },
+    "summary": {
+      "path": "stage3/output/odd_tod/final/stage3_final_summary.json",
+      "sha256": "fe192e7a5e54b373140a37ad4cc60f4180f5d719513a22c0264479c0ad45f3c8",
+      "size_bytes": 7842
+    }
+  },
+  "cdf_sha256_after": "a09f284959008890e8a31bab0839bb142f1f66d43bc7012efc3dfeeeec3adc26",
+  "cdf_sha256_before": "a09f284959008890e8a31bab0839bb142f1f66d43bc7012efc3dfeeeec3adc26",
+  "frozen_state": {
+    "stage0": "FROZEN",
+    "stage1": "FROZEN",
+    "stage2": "FROZEN",
+    "stage3_capability_profiles": "FROZEN",
+    "stage3_final_frozen": true,
+    "stage3_intersections": "FROZEN",
+    "stage3_minimal_fallback": "FROZEN",
+    "stage3_network": "FROZEN",
+    "stage3_original_route_suitability": "FROZEN",
+    "stage3_to_stage4_interface": "FROZEN",
+    "stage4_dispatch_authorized": false
+  },
+  "major_inputs": {
+    "configuration": {
+      "path": "stage3/config/stage3_finalization.json",
+      "sha256": "ab3b9a4182d78498037aef1d1e5a613fc696f8fc7ce4c06714609f4088523f5e",
+      "size_bytes": 559
+    },
+    "frozen_m3_checkpoint": {
+      "path": "stage2/output_v5_2/development/M3/epoch_004.pt",
+      "sha256": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde",
+      "size_bytes": 5665346
+    },
+    "full_network_edges": {
+      "path": "stage3/output/odd_tod/s2a/stage3_full_network_edges.parquet",
+      "row_count": 209454,
+      "schema": "stage3_edge_uid: large_string\nvalhalla_directed_edge_id: int64\nosm_way_id: int64\ndirection: large_string\ngeometry: large_string\ngeometry_point_count: int64\nstart_lon: double\nstart_lat: double\nend_lon: double\nend_lat: double\nlength_m: double\nauto_routable: bool\nvalhalla_access_mask: int64\nvalhalla_road_class: large_string\nvalhalla_road_class_code: int64\nvalhalla_use_code: int64\nvalhalla_speed_limit_kmh: double\nbridge_valhalla: bool\ntunnel_valhalla: bool\nroundabout_valhalla: bool\nvalhalla_layer: uint64\nmotor_vehicle_routability_source: large_string\nfrom_osm_node_id: double\nto_osm_node_id: double\nosm_highway: large_string\nosm_maxspeed_raw: large_string\nosm_layer: int64\nbridge_osm: bool\nbridge_effective: bool\nbridge_conflict: bool\ntunnel_osm: bool\ntunnel_effective: bool\ntunnel_conflict: bool\njunction_roundabout_way: bool\nmini_roundabout_node_exposure: bool\nroundabout_evidence_source: large_string\ngrade_separation_evidence: bool\nroad_class_provenance: large_string\nfrom_valhalla_node_id: double\nto_valhalla_node_id: double\nfrom_stage3_node_uid: large_string\nto_stage3_node_uid: large_string\nobserved_network_member: bool\ncanonical_edge_uid: string\ncanonical_traversal_direction: string\nmapping_status: large_string\nmapping_method: large_string\nmapping_confidence: large_string\nstage0_road_class: string\nbridge_stage0: bool\ntunnel_stage0: bool\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 6745",
+      "schema_sha256": "17c5129fa8dc0bdd3a4eeef356b6f212d746b3b30f47e82cf78f5f705ab4e099",
+      "sha256": "25ed4caf250cacbe251ae258d8e77ff2f0b286884f0376c72b9ef09e33687204",
+      "size_bytes": 19170318
+    },
+    "intersection_complexes": {
+      "path": "stage3/output/odd_tod/s2b/final/stage3_intersection_complexes.parquet",
+      "row_count": 43685,
+      "schema": "intersection_complex_uid: string\nbuffer_radius_m: int64\ntolerance_m: int64\nmember_node_count: int64\nmember_node_uids: string\ncandidate_member_count: int64\ninternal_edge_count: int64\ninternal_length_m: double\nincoming_directed_edge_count: int64\noutgoing_directed_edge_count: int64\nexternal_physical_connection_count: int64\ntopological_movement_count: int64\nsignal_evidence_present: bool\nsignal_evidence_count: int64\nsignal_state: string\ncontrol_conflict: bool\nroundabout_evidence_present: bool\nbridge_internal_present: bool\ntunnel_internal_present: bool\nnonzero_layer_present: bool\ngrade_separation_evidence_present: bool\nroad_class_diversity: int64\nmax_member_undirected_degree: int64\nmapping_confidence: string\nRED_FLAG_DISCONNECTED_MERGE: bool\nRED_FLAG_LAYER_CONFLICT: bool\nRED_FLAG_BRIDGE_SURFACE_MIX: bool\nRED_FLAG_TUNNEL_SURFACE_MIX: bool\nRED_FLAG_EXCESSIVE_INTERNAL_LENGTH: bool\nRED_FLAG_EXTREME_MEMBER_COUNT: bool\nRED_FLAG_ROUNDABOUT_MIXED_WITH_UNRELATED_JUNCTION: bool\nRED_FLAG_NO_BOUNDARY_CONNECTION: bool\nred_flag_count: int64\nred_flags_are_qa_only: bool\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 4983",
+      "schema_sha256": "0891352a337d1ecbe2a96523785cafad04910531d769c5cb074fffa6ca142d26",
+      "sha256": "4c23c7a8a5f49007ce367e21d24405549a979c82bf367d086b4fcf1d281bdeed",
+      "size_bytes": 1589317
+    },
+    "intersection_movements": {
+      "path": "stage3/output/odd_tod/s2b/final/stage3_intersection_movements.parquet",
+      "row_count": 419907,
+      "schema": "intersection_complex_uid: large_string\ntolerance_m: int64\nincoming_stage3_edge_uid: large_string\noutgoing_stage3_edge_uid: large_string\nincoming_physical_boundary_connection_id: large_string\noutgoing_physical_boundary_connection_id: large_string\ntopological_path_exists: bool\nrestriction_evidence_present: bool\nrestriction_enforcement_certified: bool\nmovement_legality_state: large_string\nentry_bearing_deg: double\nexit_bearing_deg: double\nsigned_turn_angle_deg: double\nroute_turn_type: large_string\nturn_type_semantics: large_string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 2262",
+      "schema_sha256": "c277c3fc681da4d5438a4342987ec686a61700bed6a40c1864512d642fb623ff",
+      "sha256": "aabe997d06ffc80556ba68551b32805619f548dfe5ad83f2a5a9f043572db811",
+      "size_bytes": 13215206
+    },
+    "original_route": {
+      "path": "stage2/output_v4/route_conditioned_dataset/revealed_route_proxy/day=20161031.parquet",
+      "row_count": 2116712,
+      "schema": "split: large_string\ndate: large_string\norder_id: large_string\nroute_sequence: int64\ntraversal_id: int64\ncanonical_edge_uid: large_string\nobserved_directed_edge_uid: large_string\nobserved_from_node: int64\nobserved_to_node: int64\nobserved_direction: large_string\ndecision_time: double\ndecision_time_source: large_string\nstart_node: double\nend_node: double\nroute_part_length_m: double\ncanonical_length_m: double\ncanonical_highway: large_string\nroad_class: large_string\nbridge: bool\ntunnel: bool\nsynthetic_reverse_edge: bool\nosm_direction_disagreement: bool\nsequence_feature_mask: bool\ndirected_edge_model_scope: large_string\nlabel_available: bool\ncrawl_time_share: double\nstop_time_share: double\nspeed_cv_bounded: double\nacceleration_rms_bounded: double\ncrawl_target_valid: bool\nstop_target_valid: bool\nspeed_cv_target_valid: bool\nacceleration_rms_target_valid: bool\nlcs_raw: double\nlcs_pct: double\nlcs_tail_event: bool\nlcs_available: bool\nlcs_target_valid: bool\nrts_raw: double\nrts_pct: double\nrts_tail_event: bool\nrts_available: bool\nrts_measurement_available: bool\nrts_target_valid: bool\nroute_token_count: int32\nroute_position_ratio: double\ndistance_to_destination_ratio: double\nentry_time_pass_1: double\nentry_time_pass_2: double\nestimated_entry_time: double\nestimated_time_bin: int16\nestimated_hour: int16\nestimated_weekday_type: large_string\nforecast_horizon_s: double\nestimated_travel_time_s: double\nestimated_travel_time_source: large_string\nestimated_travel_time_support: int64\nestimated_entry_std_s: double\nentry_time_support: int64\nentry_time_fallback_level: large_string\ncrawl_time_share_profile_mean: double\ncrawl_time_share_profile_std: double\ncrawl_time_share_profile_count: int64\ncrawl_time_share_profile_maximum_event_time: double\ncrawl_time_share_profile_fallback_level: large_string\nstop_time_share_profile_mean: double\nstop_time_share_profile_std: double\nstop_time_share_profile_count: int64\nstop_time_share_profile_maximum_event_time: double\nstop_time_share_profile_fallback_level: large_string\nspeed_cv_bounded_profile_mean: double\nspeed_cv_bounded_profile_std: double\nspeed_cv_bounded_profile_count: int64\nspeed_cv_bounded_profile_maximum_event_time: double\nspeed_cv_bounded_profile_fallback_level: large_string\nacceleration_rms_bounded_profile_mean: double\nacceleration_rms_bounded_profile_std: double\nacceleration_rms_bounded_profile_count: int64\nacceleration_rms_bounded_profile_maximum_event_time: double\nacceleration_rms_bounded_profile_fallback_level: large_string\nlcs_raw_profile_mean: double\nlcs_raw_profile_std: double\nlcs_raw_profile_count: int64\nlcs_raw_profile_maximum_event_time: double\nlcs_raw_profile_fallback_level: large_string\nrts_raw_profile_mean: double\nrts_raw_profile_std: double\nrts_raw_profile_count: int64\nrts_raw_profile_maximum_event_time: double\nrts_raw_profile_fallback_level: large_string\nlcs_tail_event_profile_mean: double\nlcs_tail_event_profile_std: double\nlcs_tail_event_profile_count: int64\nlcs_tail_event_profile_maximum_event_time: double\nlcs_tail_event_profile_fallback_level: large_string\nrts_tail_event_profile_mean: double\nrts_tail_event_profile_std: double\nrts_tail_event_profile_count: int64\nrts_tail_event_profile_maximum_event_time: double\nrts_tail_event_profile_fallback_level: large_string\nobserved_sec_per_m_profile_mean: double\nobserved_sec_per_m_profile_std: double\nobserved_sec_per_m_profile_count: int64\nobserved_sec_per_m_profile_maximum_event_time: double\nobserved_sec_per_m_profile_fallback_level: large_string\nedge_5m_completed_traversal_count: int64\nedge_5m_maximum_event_time: double\nedge_5m_feature_age_s: double\nedge_5m_feature_available: bool\nedge_5m_crawl_time_share_mean: double\nedge_5m_crawl_time_share_available_label_count: int64\nedge_5m_stop_time_share_mean: double\nedge_5m_stop_time_share_available_label_count: int64\nedge_5m_speed_cv_bounded_mean: double\nedge_5m_speed_cv_bounded_available_label_count: int64\nedge_5m_acceleration_rms_bounded_mean: double\nedge_5m_acceleration_rms_bounded_available_label_count: int64\nedge_5m_lcs_raw_mean: double\nedge_5m_lcs_raw_available_label_count: int64\nedge_5m_rts_raw_mean: double\nedge_5m_rts_raw_available_label_count: int64\nedge_5m_lcs_tail_event_mean: double\nedge_5m_lcs_tail_event_available_label_count: int64\nedge_5m_rts_tail_event_mean: double\nedge_5m_rts_tail_event_available_label_count: int64\nedge_5m_observed_sec_per_m_mean: double\nedge_5m_observed_sec_per_m_available_label_count: int64\nedge_15m_completed_traversal_count: int64\nedge_15m_maximum_event_time: double\nedge_15m_feature_age_s: double\nedge_15m_feature_available: bool\nedge_15m_crawl_time_share_mean: double\nedge_15m_crawl_time_share_available_label_count: int64\nedge_15m_stop_time_share_mean: double\nedge_15m_stop_time_share_available_label_count: int64\nedge_15m_speed_cv_bounded_mean: double\nedge_15m_speed_cv_bounded_available_label_count: int64\nedge_15m_acceleration_rms_bounded_mean: double\nedge_15m_acceleration_rms_bounded_available_label_count: int64\nedge_15m_lcs_raw_mean: double\nedge_15m_lcs_raw_available_label_count: int64\nedge_15m_rts_raw_mean: double\nedge_15m_rts_raw_available_label_count: int64\nedge_15m_lcs_tail_event_mean: double\nedge_15m_lcs_tail_event_available_label_count: int64\nedge_15m_rts_tail_event_mean: double\nedge_15m_rts_tail_event_available_label_count: int64\nedge_15m_observed_sec_per_m_mean: double\nedge_15m_observed_sec_per_m_available_label_count: int64\nedge_30m_completed_traversal_count: int64\nedge_30m_maximum_event_time: double\nedge_30m_feature_age_s: double\nedge_30m_feature_available: bool\nedge_30m_crawl_time_share_mean: double\nedge_30m_crawl_time_share_available_label_count: int64\nedge_30m_stop_time_share_mean: double\nedge_30m_stop_time_share_available_label_count: int64\nedge_30m_speed_cv_bounded_mean: double\nedge_30m_speed_cv_bounded_available_label_count: int64\nedge_30m_acceleration_rms_bounded_mean: double\nedge_30m_acceleration_rms_bounded_available_label_count: int64\nedge_30m_lcs_raw_mean: double\nedge_30m_lcs_raw_available_label_count: int64\nedge_30m_rts_raw_mean: double\nedge_30m_rts_raw_available_label_count: int64\nedge_30m_lcs_tail_event_mean: double\nedge_30m_lcs_tail_event_available_label_count: int64\nedge_30m_rts_tail_event_mean: double\nedge_30m_rts_tail_event_available_label_count: int64\nedge_30m_observed_sec_per_m_mean: double\nedge_30m_observed_sec_per_m_available_label_count: int64\nedge_60m_completed_traversal_count: int64\nedge_60m_maximum_event_time: double\nedge_60m_feature_age_s: double\nedge_60m_feature_available: bool\nedge_60m_crawl_time_share_mean: double\nedge_60m_crawl_time_share_available_label_count: int64\nedge_60m_stop_time_share_mean: double\nedge_60m_stop_time_share_available_label_count: int64\nedge_60m_speed_cv_bounded_mean: double\nedge_60m_speed_cv_bounded_available_label_count: int64\nedge_60m_acceleration_rms_bounded_mean: double\nedge_60m_acceleration_rms_bounded_available_label_count: int64\nedge_60m_lcs_raw_mean: double\nedge_60m_lcs_raw_available_label_count: int64\nedge_60m_rts_raw_mean: double\nedge_60m_rts_raw_available_label_count: int64\nedge_60m_lcs_tail_event_mean: double\nedge_60m_lcs_tail_event_available_label_count: int64\nedge_60m_rts_tail_event_mean: double\nedge_60m_rts_tail_event_available_label_count: int64\nedge_60m_observed_sec_per_m_mean: double\nedge_60m_observed_sec_per_m_available_label_count: int64\nhighway_15m_completed_traversal_count: int64\nhighway_15m_maximum_event_time: double\nhighway_15m_feature_age_s: double\nhighway_15m_feature_available: bool\nhighway_15m_crawl_time_share_mean: double\nhighway_15m_crawl_time_share_available_label_count: int64\nhighway_15m_stop_time_share_mean: double\nhighway_15m_stop_time_share_available_label_count: int64\nhighway_15m_speed_cv_bounded_mean: double\nhighway_15m_speed_cv_bounded_available_label_count: int64\nhighway_15m_acceleration_rms_bounded_mean: double\nhighway_15m_acceleration_rms_bounded_available_label_count: int64\nhighway_15m_lcs_raw_mean: double\nhighway_15m_lcs_raw_available_label_count: int64\nhighway_15m_rts_raw_mean: double\nhighway_15m_rts_raw_available_label_count: int64\nhighway_15m_lcs_tail_event_mean: double\nhighway_15m_lcs_tail_event_available_label_count: int64\nhighway_15m_rts_tail_event_mean: double\nhighway_15m_rts_tail_event_available_label_count: int64\nhighway_15m_observed_sec_per_m_mean: double\nhighway_15m_observed_sec_per_m_available_label_count: int64\nglobal_15m_completed_traversal_count: int64\nglobal_15m_maximum_event_time: double\nglobal_15m_feature_age_s: double\nglobal_15m_feature_available: bool\nglobal_15m_crawl_time_share_mean: double\nglobal_15m_crawl_time_share_available_label_count: int64\nglobal_15m_stop_time_share_mean: double\nglobal_15m_stop_time_share_available_label_count: int64\nglobal_15m_speed_cv_bounded_mean: double\nglobal_15m_speed_cv_bounded_available_label_count: int64\nglobal_15m_acceleration_rms_bounded_mean: double\nglobal_15m_acceleration_rms_bounded_available_label_count: int64\nglobal_15m_lcs_raw_mean: double\nglobal_15m_lcs_raw_available_label_count: int64\nglobal_15m_rts_raw_mean: double\nglobal_15m_rts_raw_available_label_count: int64\nglobal_15m_lcs_tail_event_mean: double\nglobal_15m_lcs_tail_event_available_label_count: int64\nglobal_15m_rts_tail_event_mean: double\nglobal_15m_rts_tail_event_available_label_count: int64\nglobal_15m_observed_sec_per_m_mean: double\nglobal_15m_observed_sec_per_m_available_label_count: int64\nupstream_15m_crawl_time_share_mean: double\ndownstream_15m_crawl_time_share_mean: double\nupstream_15m_stop_time_share_mean: double\ndownstream_15m_stop_time_share_mean: double\nupstream_15m_speed_cv_bounded_mean: double\ndownstream_15m_speed_cv_bounded_mean: double\nupstream_15m_acceleration_rms_bounded_mean: double\ndownstream_15m_acceleration_rms_bounded_mean: double\nupstream_15m_lcs_raw_mean: double\ndownstream_15m_lcs_raw_mean: double\nupstream_15m_rts_raw_mean: double\ndownstream_15m_rts_raw_mean: double\nupstream_15m_observed_sec_per_m_mean: double\ndownstream_15m_observed_sec_per_m_mean: double\navailability_timestamp: double\nfeature_timestamp: double\nfeature_age_s: double\nhistory_count: int64\nsource_event_count: int64\ndynamic_available_mask: bool\nself_order_excluded: bool\nfeature_time_check: large_string\nnumeric_missing_mask: uint16\noracle_timing_available: bool\nroute_proxy_track: large_string\nfully_deployable: bool\nstage3_eligible_track: bool\nlabel_alignment_status: large_string\nstage1_model_id: large_string\nstage1_schema_version: large_string\nstage2_dataset_schema_version: large_string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 42581",
+      "schema_sha256": "e03f1df908afe671b394d914ac8ff980b7dde98a9df1fe8c160aff8d0e61a416",
+      "sha256": "9da0bc2fc0b676d6eac3f5cfb9398bf5103ecadae31f8f2be611f36774f10c9f",
+      "size_bytes": 718089833
+    },
+    "original_suitability": {
+      "path": "stage3/output/odd_tod/s4/test31_av_operational_suitability.parquet",
+      "row_count": 90000,
+      "schema": "date: string\norder_id: string\nprofile_id: string\nhard_state: string\nrho_static: double\nrho_dynamic: double\nrho_speed: double\nrho_overall: double\nstatic_A_ratio: double\nstatic_M_ratio: double\nstatic_D_ratio: double\nstatic_L_ratio: double\ndynamic_12_ratios: string\nstatic_vector: string\ndynamic_vector: string\nhard_reason_codes: string\nunknown_reason_codes: string\nsoft_exceedance_reason_codes: string\nreason_codes: string\ndominant_utilization_family: string\ndirection_hard_constraint: bool\npassenger_acceptance_probability: double\noriginal_route: string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 3093",
+      "schema_sha256": "63dde70bc9ffc63eb2211cc978a6570de2933b353166bb24a8458b18a79d8908",
+      "sha256": "fefcaa60e4a15a213c025d6aad1750f848244cb32a636c31a74c7c9943517e9c",
+      "size_bytes": 23771513
+    },
+    "profiles": {
+      "path": "stage3/config/stage3_av_capability_profiles.json",
+      "sha256": "bea54c12a0c013995c3644a0bab84b35413d5df8a6785dfdd6a03fd49f32978e",
+      "size_bytes": 6106
+    },
+    "raw_order_od_manifest": {
+      "path": "stage0/work_v6_final/candidate_manifests/date=20161031.parquet",
+      "row_count": 105460,
+      "schema": "order_id: large_string\ndriver_id: large_string\npoint_count: int64\nvalid_point_count: int64\nstart_time: int64\nend_time: int64\nstart_lon: double\nstart_lat: double\nend_lon: double\nend_lat: double\ndate: large_string\nsource_member: large_string\nduration_s: int64\ntime_order_valid: bool\neligible: bool\nineligibility_reason: large_string\nselection_hash: large_string\ncandidate_bucket: int64\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 2243",
+      "schema_sha256": "097c9fb64f1a0f2e5c0aa4f4f2bc6698b9b66d83d030df20c1843db39bf36364",
+      "sha256": "3000abf4931845d0b28fe2ed03ad1fec5f5a62aa3fe4e1101a32b5c8f3cd2640",
+      "size_bytes": 5382604
+    },
+    "train_weighted_mid_cdf": {
+      "path": "stage3/output/odd_tod/s3/train_dynamic_cdf_reference.parquet",
+      "row_count": 33937460,
+      "schema": "dimension: string\nvalue: double\npredicted_time_weight_s: double\nmid_cdf: double\ntotal_predicted_time_weight_s: double\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 725",
+      "schema_sha256": "e630dd772e8022a9650d1d777c0136b736a87175e12b69ae44a23e2fee26b3d7",
+      "sha256": "a09f284959008890e8a31bab0839bb142f1f66d43bc7012efc3dfeeeec3adc26",
+      "size_bytes": 458020621
+    }
+  },
+  "phase_status": "STAGE3_FINAL_FROZEN",
+  "policy": {
+    "dispatch_solver": false,
+    "fallback_dynamic_imputation": false,
+    "hard_trigger_only": true,
+    "maximum_candidates": 1,
+    "maximum_fallback_distance_ratio": 1.25,
+    "passenger_model": false,
+    "soft_rho_does_not_trigger": true,
+    "unknown_does_not_trigger": true
+  },
+  "profile_sha256_after": "bea54c12a0c013995c3644a0bab84b35413d5df8a6785dfdd6a03fd49f32978e",
+  "profile_sha256_before": "bea54c12a0c013995c3644a0bab84b35413d5df8a6785dfdd6a03fd49f32978e",
+  "schema_version": "stage3_final_manifest.1",
+  "summary": {
+    "date": "20161031",
+    "order_count": 30000,
+    "order_profile_row_count": 90000,
+    "phase_status": "STAGE3_FINAL_FROZEN",
+    "profiles": {
+      "A": {
+        "dynamic_evidence_complete_share": 0.5033333333333333,
+        "fallback_attempted_count": 14837,
+        "fallback_distance_ratio": {
+          "above_one_count": 4137,
+          "above_two_count": 0,
+          "finite_count": 7548,
+          "max": 1.249888442659527,
+          "missing_count": 0,
+          "near_one_0p9_to_1p1_count": 5472,
+          "p50": 1.0019540938529206,
+          "p90": 1.1328752216065539,
+          "p95": 1.1811198811521126,
+          "p99": 1.2333532146405286
+        },
+        "fallback_found_hard_feasible_count": 7548,
+        "final_hard_state_counts": {
+          "FEASIBLE": 17396,
+          "INFEASIBLE": 7289,
+          "UNKNOWN": 5315
+        },
+        "hard_infeasibility_recovery_by_original_reason_family": {
+          "certified_restriction": {
+            "recovered": 0,
+            "triggered": 0
+          },
+          "maneuver": {
+            "recovered": 0,
+            "triggered": 0
+          },
+          "reverse_direction": {
+            "recovered": 7548,
+            "triggered": 14837
+          },
+          "roundabout": {
+            "recovered": 0,
+            "triggered": 0
+          }
+        },
+        "original_hard_state_counts": {
+          "FEASIBLE": 9848,
+          "INFEASIBLE": 14837,
+          "UNKNOWN": 5315
+        },
+        "rho_dynamic": {
+          "above_one_count": 2692,
+          "above_two_count": 17,
+          "finite_count": 15100,
+          "max": 2.534263049297808,
+          "missing_count": 14900,
+          "near_one_0p9_to_1p1_count": 4001,
+          "p50": 0.8525791307465922,
+          "p90": 1.0971489947851738,
+          "p95": 1.2292734397205953,
+          "p99": 1.5964446872289408
+        },
+        "rho_speed": {
+          "above_one_count": 0,
+          "above_two_count": 0,
+          "finite_count": 22711,
+          "max": 0.9583333333333334,
+          "missing_count": 7289,
+          "near_one_0p9_to_1p1_count": 30,
+          "p50": 0.5833333333333334,
+          "p90": 0.5833333333333334,
+          "p95": 0.5833333333333334,
+          "p99": 0.5833333333333334
+        },
+        "rho_static": {
+          "above_one_count": 16666,
+          "above_two_count": 9894,
+          "finite_count": 22711,
+          "max": 5.287671232876712,
+          "missing_count": 7289,
+          "near_one_0p9_to_1p1_count": 3626,
+          "p50": 1.643835616438356,
+          "p90": 4.712328767123288,
+          "p95": 4.863013698630137,
+          "p99": 5.287671232876712
+        },
+        "selected_route_type_counts": {
+          "FALLBACK": 7548,
+          "NONE": 7289,
+          "ORIGINAL": 15163
+        }
+      },
+      "C": {
+        "dynamic_evidence_complete_share": 0.4094,
+        "fallback_attempted_count": 17668,
+        "fallback_distance_ratio": {
+          "above_one_count": 1651,
+          "above_two_count": 0,
+          "finite_count": 3370,
+          "max": 1.249683143219265,
+          "missing_count": 0,
+          "near_one_0p9_to_1p1_count": 2673,
+          "p50": 1.0,
+          "p90": 1.0734292681772033,
+          "p95": 1.136483253381162,
+          "p99": 1.2195806878655924
+        },
+        "fallback_found_hard_feasible_count": 3370,
+        "final_hard_state_counts": {
+          "FEASIBLE": 9191,
+          "INFEASIBLE": 14298,
+          "UNKNOWN": 6511
+        },
+        "hard_infeasibility_recovery_by_original_reason_family": {
+          "certified_restriction": {
+            "recovered": 0,
+            "triggered": 0
+          },
+          "maneuver": {
+            "recovered": 248,
+            "triggered": 2050
+          },
+          "reverse_direction": {
+            "recovered": 3156,
+            "triggered": 14837
+          },
+          "roundabout": {
+            "recovered": 236,
+            "triggered": 4480
+          }
+        },
+        "original_hard_state_counts": {
+          "FEASIBLE": 5821,
+          "INFEASIBLE": 17668,
+          "UNKNOWN": 6511
+        },
+        "rho_dynamic": {
+          "above_one_count": 9342,
+          "above_two_count": 1723,
+          "finite_count": 12282,
+          "max": 5.452938624702964,
+          "missing_count": 17718,
+          "near_one_0p9_to_1p1_count": 3712,
+          "p50": 1.1885651397649317,
+          "p90": 2.1625830918762334,
+          "p95": 2.5528432609225957,
+          "p99": 3.3330176994284364
+        },
+        "rho_speed": {
+          "above_one_count": 12232,
+          "above_two_count": 0,
+          "finite_count": 15702,
+          "max": 1.9166666666666667,
+          "missing_count": 14298,
+          "near_one_0p9_to_1p1_count": 2503,
+          "p50": 1.1666666666666667,
+          "p90": 1.1666666666666667,
+          "p95": 1.1666666666666667,
+          "p99": 1.1666666666666667
+        },
+        "rho_static": {
+          "above_one_count": 15121,
+          "above_two_count": 14344,
+          "finite_count": 15702,
+          "max": 35.5,
+          "missing_count": 14298,
+          "near_one_0p9_to_1p1_count": 546,
+          "p50": 7.7,
+          "p90": 19.4,
+          "p95": 20.4,
+          "p99": 35.5
+        },
+        "selected_route_type_counts": {
+          "FALLBACK": 3370,
+          "NONE": 14298,
+          "ORIGINAL": 12332
+        }
+      },
+      "M": {
+        "dynamic_evidence_complete_share": 0.47073333333333334,
+        "fallback_attempted_count": 15822,
+        "fallback_distance_ratio": {
+          "above_one_count": 3208,
+          "above_two_count": 0,
+          "finite_count": 6401,
+          "max": 1.249683143219265,
+          "missing_count": 0,
+          "near_one_0p9_to_1p1_count": 4875,
+          "p50": 1.0001983339944467,
+          "p90": 1.0929571303587051,
+          "p95": 1.1519389701207883,
+          "p99": 1.224873949579832
+        },
+        "fallback_found_hard_feasible_count": 6401,
+        "final_hard_state_counts": {
+          "FEASIBLE": 15659,
+          "INFEASIBLE": 9421,
+          "UNKNOWN": 4920
+        },
+        "hard_infeasibility_recovery_by_original_reason_family": {
+          "certified_restriction": {
+            "recovered": 0,
+            "triggered": 0
+          },
+          "maneuver": {
+            "recovered": 553,
+            "triggered": 2050
+          },
+          "reverse_direction": {
+            "recovered": 6144,
+            "triggered": 14837
+          },
+          "roundabout": {
+            "recovered": 0,
+            "triggered": 0
+          }
+        },
+        "original_hard_state_counts": {
+          "FEASIBLE": 9258,
+          "INFEASIBLE": 15822,
+          "UNKNOWN": 4920
+        },
+        "rho_dynamic": {
+          "above_one_count": 6623,
+          "above_two_count": 383,
+          "finite_count": 14122,
+          "max": 3.7792732970472334,
+          "missing_count": 15878,
+          "near_one_0p9_to_1p1_count": 5147,
+          "p50": 0.9850690438414336,
+          "p90": 1.52966744048217,
+          "p95": 1.7821382700186696,
+          "p99": 2.2783777016706264
+        },
+        "rho_speed": {
+          "above_one_count": 37,
+          "above_two_count": 0,
+          "finite_count": 20579,
+          "max": 1.4375,
+          "missing_count": 9421,
+          "near_one_0p9_to_1p1_count": 3,
+          "p50": 0.875,
+          "p90": 0.875,
+          "p95": 0.875,
+          "p99": 0.875
+        },
+        "rho_static": {
+          "above_one_count": 19203,
+          "above_two_count": 14124,
+          "finite_count": 20579,
+          "max": 11.352941176470589,
+          "missing_count": 9421,
+          "near_one_0p9_to_1p1_count": 662,
+          "p50": 2.8,
+          "p90": 9.5,
+          "p95": 10.441176470588236,
+          "p99": 11.352941176470589
+        },
+        "selected_route_type_counts": {
+          "FALLBACK": 6401,
+          "NONE": 9421,
+          "ORIGINAL": 14178
+        }
+      }
+    },
+    "schema_version": "stage3_final_summary.1",
+    "stage3_final_frozen": true,
+    "stage3_to_stage4_interface_frozen": true,
+    "stage4_dispatch_authorized": false
+  }
+}
