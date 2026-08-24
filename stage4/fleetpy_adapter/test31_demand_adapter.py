@@ -177,3 +177,89 @@ def attach_fleetpy_requests(
         record.native_request = native
         request_db[record.native_id] = native
     return request_db
+
+
+def load_all_test31_requests(
+    root: str | Path,
+    *,
+    start: pd.Timestamp,
+    end: pd.Timestamp,
+    profile_id: str,
+) -> list[SpikeRequest]:
+    """Load full bounded Test31 demand without future-outcome filtering.
+
+    Missing decision-time service predictions are retained. They cannot form HV
+    admission arcs; realized service time is used only after valid assignment.
+    """
+    path = Path(root).resolve() / ORDER_BASE_REL
+    required = [
+        "order_id",
+        "request_time",
+        "pickup_lon_wgs84",
+        "pickup_lat_wgs84",
+        "dropoff_lon_wgs84",
+        "dropoff_lat_wgs84",
+        "realized_service_time_s",
+        "predicted_service_time_s",
+        "profile_id",
+        "hard_state",
+        "evidence_complete",
+        "rho_static",
+        "rho_dynamic",
+        "rho_speed",
+    ]
+    frame = pd.read_parquet(path, columns=required)
+    frame["request_time"] = pd.to_datetime(
+        frame["request_time"], utc=True
+    ).dt.tz_convert(TIMEZONE)
+    frame = frame.loc[
+        frame["profile_id"].astype(str).eq(str(profile_id))
+        & frame["request_time"].ge(start)
+        & frame["request_time"].lt(end)
+    ].copy()
+    coordinate_columns = [
+        "pickup_lon_wgs84",
+        "pickup_lat_wgs84",
+        "dropoff_lon_wgs84",
+        "dropoff_lat_wgs84",
+    ]
+    numeric = frame[coordinate_columns + ["realized_service_time_s"]].apply(
+        pd.to_numeric, errors="coerce"
+    )
+    valid = np.isfinite(numeric).all(axis=1) & numeric["realized_service_time_s"].gt(0)
+    if not bool(valid.all()):
+        raise FleetPyCompatibilityError(
+            "bounded replay contains invalid coordinates or realized progression time"
+        )
+    if frame["order_id"].astype(str).duplicated().any():
+        raise FleetPyCompatibilityError(
+            "profile-specific Test31 order_id is not unique"
+        )
+    frame = frame.sort_values(["request_time", "order_id"], kind="mergesort")
+    records: list[SpikeRequest] = []
+    for native_id, row in enumerate(frame.itertuples(index=False)):
+        seconds = (pd.Timestamp(row.request_time) - start).total_seconds()
+        predicted = pd.to_numeric(
+            pd.Series([row.predicted_service_time_s]), errors="coerce"
+        ).iloc[0]
+        records.append(
+            SpikeRequest(
+                native_id=native_id,
+                order_id=str(row.order_id),
+                request_time=pd.Timestamp(row.request_time),
+                sim_time_s=int(round(seconds)),
+                pickup_lon_wgs84=float(row.pickup_lon_wgs84),
+                pickup_lat_wgs84=float(row.pickup_lat_wgs84),
+                dropoff_lon_wgs84=float(row.dropoff_lon_wgs84),
+                dropoff_lat_wgs84=float(row.dropoff_lat_wgs84),
+                realized_service_time_s=float(row.realized_service_time_s),
+                predicted_service_time_s=float(predicted),
+                profile_id=str(row.profile_id),
+                hard_state=str(row.hard_state),
+                evidence_complete=bool(row.evidence_complete),
+                rho_static=float(row.rho_static),
+                rho_dynamic=float(row.rho_dynamic),
+                rho_speed=float(row.rho_speed),
+            )
+        )
+    return records

@@ -1,0 +1,18 @@
+{
+  "test_date": "20161031",
+  "benchmark_start_time": "08:00:00",
+  "benchmark_end_time": "09:00:00",
+  "profile_id": "M",
+  "av_vehicle_hour_share": 0.25,
+  "passenger_acceptance_policy": "ALL_ACCEPT_AV",
+  "dispatch_interval_s": 30,
+  "max_pickup_wait_s": 300,
+  "search_radius_initial_m": 2000,
+  "search_radius_step_m": 1000,
+  "search_radius_cap_m": 8000,
+  "candidate_top_k": 20,
+  "fleet_sampling_seed": 20260824,
+  "max_hv_vehicle_hour_error_pct": 2.0,
+  "benchmark_runtime_guard_s": 3600,
+  "fleetpy_commit": "0379f9725a147ff33c674de4884cdf89fd787fa9"
+}

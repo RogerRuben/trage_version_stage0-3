@@ -1,0 +1,93 @@
+{
+  "phase_status": "STAGE4_S3_ROLLING_OR_BASELINE_COMPLETE",
+  "recommendation": "GO_ROLLING_OR_BASELINE",
+  "scientific_scope": "ONE_BOUNDED_QA_025_COMPUTATIONAL_BENCHMARK_NOT_POLICY_EVIDENCE",
+  "interval": {
+    "demand_start": "2016-10-31 08:00:00+08:00",
+    "demand_end": "09:00:00",
+    "matching_end": "2016-10-31 09:05:00+08:00"
+  },
+  "fleet": {
+    "h_base_vehicle_hours": 14369.5,
+    "requested_q_a": 0.25,
+    "achieved_q_a": 0.2505306378092488,
+    "av_count": 150,
+    "requested_hv_vehicle_hours": 10769.5,
+    "achieved_hv_vehicle_hours": 10863.40888888889,
+    "vehicle_hour_error_pct": 0.8719893113783288,
+    "selected_hv_session_count": 7395,
+    "native_benchmark_hv_count": 1454,
+    "native_benchmark_av_count": 150,
+    "hv_sampling_fraction": 0.8770425093773729,
+    "av_initial_position_rule": "ACTIVE_OR_STARTING_WITHIN_30_MINUTES",
+    "hv_unit_semantics": "EFFECTIVE_HV_SERVICE_SESSION_TEMPLATE"
+  },
+  "matching": {
+    "requests": 1458,
+    "matched": 1212,
+    "completed": 1212,
+    "patience_expired": 246,
+    "still_in_progress_at_drain_start": 224
+  },
+  "waiting": {
+    "request_to_pickup_mean_s": 128.35811896452145,
+    "p50_s": 126.13497050000001,
+    "p90_s": 267.4991583,
+    "p95_s": 283.3995684
+  },
+  "queue": {
+    "first_window_match_rate": 0.7558299039780522,
+    "carry_over_entry_rate": 0.24417009602194786,
+    "carry_over_recovery_rate": 0.3089887640449438,
+    "critical_order_count": 247,
+    "critical_order_recovery_rate": 0.004048582995951417,
+    "mean_matching_attempts": 2.735939643347051,
+    "expanded_radius_match_share": 0.09075907590759076
+  },
+  "assignment": {
+    "hv": 1067,
+    "av": 145,
+    "solver_backend": "SCIPY_HIGHS_MILP_SEQUENTIAL_LEXICOGRAPHIC"
+  },
+  "computation": {
+    "dispatch_epoch_count": 131,
+    "waiting_orders_mean": 30.450381679389313,
+    "waiting_orders_max": 47,
+    "available_vehicles_mean": 415.87786259541986,
+    "available_vehicles_max": 549,
+    "candidate_spatial_pairs": 581740,
+    "candidate_topk_pairs": 78447,
+    "valid_or_arcs": 5324,
+    "candidate_reduction_ratio": 0.8651510984288514,
+    "routing_queries": 3739,
+    "routing_cache_hits": 22619,
+    "routing_cache_hit_rate": 0.28833479929124123,
+    "routing_failures": 1860,
+    "candidate_generation_time_s": 12.652616699895589,
+    "routing_time_s": 126.31393090006895,
+    "solver_time_s": 1.0228954000922386,
+    "fleetpy_time_s": 2.526555299962638,
+    "total_runtime_s": 142.51599830001942,
+    "solver_time_p50": 0.004325000016251579,
+    "solver_time_p95": 0.01936579999164678,
+    "solver_time_max": 0.13406310000573285,
+    "peak_topk_pairs_per_epoch": 940,
+    "peak_valid_or_arcs_per_epoch": 133,
+    "assignment_matrix_representation": "CSR_SPARSE_ARCS_ONLY",
+    "gpu_usage": "NONE_CPU_ONLY"
+  },
+  "limitations": [
+    "Stage3 suitability gates passenger service routes only; AV pickup legs are checked only for Valhalla routability.",
+    "HV supply units are effective service-session templates, not a physical fleet count.",
+    "Passengers use the S3 ALL_ACCEPT_AV baseline."
+  ],
+  "failures": {
+    "runtime_guard_exceeded": false,
+    "activation_count_mismatch": false,
+    "terminal_outcome_mismatch": false,
+    "av_availability_violations": 0,
+    "position_reconciliation_failures": 0,
+    "request_state_reconciliation_failures": 0,
+    "vehicle_state_reconciliation_failures": 0
+  }
+}
