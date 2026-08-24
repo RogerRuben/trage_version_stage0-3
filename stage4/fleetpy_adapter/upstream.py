@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import subprocess
 import sys
+import types
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -22,8 +23,52 @@ class FleetPyBindings:
     commit: str
     basic_request: type
     external_vehicle: type
+    simulation_vehicle: type
     vehicle_route_leg: type
     states: Any
+    immediate_simulation: type
+    demand: type
+    broker_basic: type
+    fleet_control_base: type
+    network_base: type
+    traveller_offer: type
+
+
+class _SilentProgress:
+    """Minimal tqdm-compatible wrapper used only when tqdm is unavailable."""
+
+    def __init__(self, iterable=None, total=None, **kwargs):
+        del kwargs
+        self.iterable = iterable
+        self.total = total
+        self.n = 0
+
+    def __iter__(self):
+        return iter(self.iterable or [])
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, traceback):
+        return False
+
+    def update(self, value):
+        self.n += value
+
+    def set_description(self, value):
+        del value
+
+    def set_postfix(self, value):
+        del value
+
+
+def _install_optional_tqdm_shim() -> None:
+    try:
+        __import__("tqdm")
+    except ImportError:
+        module = types.ModuleType("tqdm")
+        module.tqdm = _SilentProgress
+        sys.modules["tqdm"] = module
 
 
 def load_fleetpy_bindings(fleetpy_root: str | Path) -> FleetPyBindings:
@@ -40,18 +85,35 @@ def load_fleetpy_bindings(fleetpy_root: str | Path) -> FleetPyBindings:
         )
     if str(root) not in sys.path:
         sys.path.insert(0, str(root))
+    _install_optional_tqdm_shim()
+    from src.broker.BrokerBasic import BrokerBasic
     from src.demand.TravelerModels import BasicRequest
+    from src.demand.demand import Demand
+    from src.fleetctrl.FleetControlBase import FleetControlBase
+    from src.ImmediateDecisionsSimulation import ImmediateDecisionsSimulation
     from src.misc.globals import VRL_STATES
+    from src.routing.NetworkBase import NetworkBase
     from src.simulation.Legs import VehicleRouteLeg
-    from src.simulation.Vehicles import ExternallyMovingSimulationVehicle
+    from src.simulation.Offers import TravellerOffer
+    from src.simulation.Vehicles import (
+        ExternallyMovingSimulationVehicle,
+        SimulationVehicle,
+    )
 
     return FleetPyBindings(
         root=root,
         commit=commit,
         basic_request=BasicRequest,
         external_vehicle=ExternallyMovingSimulationVehicle,
+        simulation_vehicle=SimulationVehicle,
         vehicle_route_leg=VehicleRouteLeg,
         states=VRL_STATES,
+        immediate_simulation=ImmediateDecisionsSimulation,
+        demand=Demand,
+        broker_basic=BrokerBasic,
+        fleet_control_base=FleetControlBase,
+        network_base=NetworkBase,
+        traveller_offer=TravellerOffer,
     )
 
 

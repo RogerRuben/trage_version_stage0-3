@@ -142,8 +142,11 @@ def create_native_vehicles(
     registry: CoordinateRegistry,
     request_db: dict[int, Any],
     runtime_dir: str | Path,
+    *,
+    native_movement: bool = False,
+    routing_engine: Any | None = None,
 ) -> tuple[list[VehicleRuntime], list[dict[str, Any]]]:
-    """Instantiate upstream ExternallyMovingSimulationVehicle objects."""
+    """Instantiate pinned upstream FleetPy vehicle objects."""
     runtime = Path(runtime_dir)
     vehicle_dir = runtime / "vehicles"
     vehicle_dir.mkdir(parents=True, exist_ok=True)
@@ -162,13 +165,19 @@ def create_native_vehicles(
 
     native_output: list[dict[str, Any]] = []
     result: list[VehicleRuntime] = []
+    engine = routing_engine or registry
     for fixture in fixtures:
-        vehicle = bindings.external_vehicle(
+        vehicle_class = (
+            bindings.simulation_vehicle
+            if native_movement
+            else bindings.external_vehicle
+        )
+        vehicle = vehicle_class(
             0,
             fixture.native_id,
             str(vehicle_dir),
             vehicle_type,
-            registry,
+            engine,
             request_db,
             native_output,
             False,

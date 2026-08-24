@@ -1,0 +1,66 @@
+{
+  "phase_status": "STAGE4_S2_NATIVE_FLEETPY_SHELL_COMPLETE",
+  "recommendation": "GO_NATIVE_FLEETPY_SHELL",
+  "fleetpy": {
+    "repository": "https://github.com/TUM-VT/FleetPy.git",
+    "commit": "0379f9725a147ff33c674de4884cdf89fd787fa9",
+    "core_modifications": "NONE"
+  },
+  "native_path": {
+    "simulation_class": "Stage4NativeImmediateDecisionsSimulation",
+    "run_method": "FleetSimulationBase.run",
+    "step_method": "ImmediateDecisionsSimulation.step",
+    "fleet_control_class": "Stage4NativeFleetControl",
+    "fleet_control_hook": "Stage4NativeFleetControl.time_trigger",
+    "demand_hook": "Demand.get_new_travelers",
+    "broker_class": "BrokerBasic",
+    "vehicle_progression_hook": "SimulationVehicle.update_veh_state",
+    "network_class": "Stage4ValhallaNetworkBridge",
+    "network_movement_hook": "Stage4ValhallaNetworkBridge.move_along_route",
+    "s1_custom_event_loop_used": false
+  },
+  "interval": {
+    "start": "2016-10-31T08:00:00+08:00",
+    "end": "2016-10-31T09:00:00+08:00"
+  },
+  "simulation_time_step_s": 60,
+  "engineering_fixture": {
+    "profile_id": "M",
+    "request_count": 200,
+    "hv_count": 40,
+    "av_count": 10,
+    "scientifically_normalized": false
+  },
+  "diagnostics": {
+    "requests_loaded": 200,
+    "requests_natively_activated": 200,
+    "requests_assigned": 70,
+    "requests_completed": 53,
+    "hv_assignments": 45,
+    "av_assignments": 25,
+    "activation_lag_s_mean": 28.235,
+    "activation_lag_s_max": 59.0,
+    "corrected_pickup_eta_s_mean": 798.283247450123,
+    "corrected_pickup_eta_s_max": 2063.535373530227,
+    "candidate_arc_evaluations": 13285,
+    "valhalla_calls": 13285,
+    "valhalla_cache_hits": 0,
+    "valhalla_route_failures": 0,
+    "hv_session_end_candidate_arc_exclusions": 12965,
+    "hv_realized_session_overrun_count": 0,
+    "hv_realized_session_overrun_seconds_mean": 0.0,
+    "hv_realized_session_overrun_seconds_max": 0.0,
+    "av_availability_violations": 0,
+    "position_reconciliation_failures": 0,
+    "request_state_reconciliation_failures": 0,
+    "vehicle_state_reconciliation_failures": 0,
+    "native_route_leg_rows": 236
+  },
+  "availability_semantics": {
+    "hv": "RECONSTRUCTED_S0_SESSION_WINDOW",
+    "av": "FULL_SIMULATION_HORIZON_UNLESS_BUSY",
+    "hv_realized_overrun": "FINISH_ACCEPTED_TRIP_THEN_PERMANENTLY_OFFLINE"
+  },
+  "scientific_service_rate_interpretation": false,
+  "rolling_or_dispatch_started": false
+}
