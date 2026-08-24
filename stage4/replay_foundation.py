@@ -11,6 +11,8 @@ from typing import Any, Iterable, Mapping
 import numpy as np
 import pandas as pd
 
+from stage0.v6.coordinates import gcj02_to_wgs84
+
 TIMEZONE = "Asia/Shanghai"
 FULL_ORDERS_REL = Path("stage0/work_v6_final/candidate_manifests/date=20161031.parquet")
 REPLAY_ORDER_GLOB = (
@@ -24,11 +26,19 @@ ORIGINAL_DESCRIPTOR_REL = Path(
 )
 STAGE3_FINALIZATION_CONFIG_REL = Path("stage3/config/stage3_finalization.json")
 AUTO_ROUTE_CACHE_NAME = "historical_valhalla_auto_eta.parquet"
+ROUTING_COORDINATE_SYSTEM = "WGS84_FROM_GCJ02"
 OUTPUT_REL = Path("stage4/input/replay_foundation")
 REPORT_REL = Path(
     "stage4/docs/replay_foundation/stage4_s0_replay_foundation_summary.md"
 )
 EXPECTED_REPLAY_ORDERS = 30_000
+PRE_CORRECTION_BASELINE = {
+    "session_count": 29_604,
+    "fleet_size": 8_442,
+    "supply_fit_mae": 24.59375,
+    "global_beta": 1.9055717401529642,
+    "global_beta_note": "invalidated because Valhalla received GCJ-02 as WGS84",
+}
 CONFIG_KEYS = frozenset(
     {
         "test_date",
@@ -133,6 +143,8 @@ def load_full_test31_orders(
     coords = work[["start_lon", "start_lat", "end_lon", "end_lat"]].apply(
         pd.to_numeric, errors="coerce"
     )
+    work[["start_lon", "start_lat", "end_lon", "end_lat"]] = coords
+    work = add_coordinate_lineage(work)
     finite_coords = np.isfinite(coords.to_numpy(dtype=float)).all(axis=1)
     valid_duration = (
         work["time_order_valid"].fillna(False).astype(bool)
@@ -155,6 +167,23 @@ def load_full_test31_orders(
         "request_at_or_after_day_end_count": int(work["request_time"].ge(end).sum()),
     }
     return work, diagnostics
+
+
+def add_coordinate_lineage(frame: pd.DataFrame) -> pd.DataFrame:
+    """Preserve source GCJ-02 coordinates and derive WGS84 routing coordinates."""
+    _require_columns(
+        frame, ("start_lon", "start_lat", "end_lon", "end_lat"), "OD coordinates"
+    )
+    result = frame.copy()
+    for prefix in ("start", "end"):
+        lon = pd.to_numeric(result[f"{prefix}_lon"], errors="coerce").to_numpy()
+        lat = pd.to_numeric(result[f"{prefix}_lat"], errors="coerce").to_numpy()
+        result[f"{prefix}_lon_gcj02"] = lon
+        result[f"{prefix}_lat_gcj02"] = lat
+        wgs_lon, wgs_lat = gcj02_to_wgs84(lon, lat)
+        result[f"{prefix}_lon_wgs84"] = wgs_lon
+        result[f"{prefix}_lat_wgs84"] = wgs_lat
+    return result
 
 
 def load_replay_orders(root: Path) -> pd.DataFrame:
@@ -206,9 +235,12 @@ def reconstruct_driver_sessions(
         else orders.copy()
     )
     work = work.sort_values(["driver_id", "request_time", "order_id"], kind="mergesort")
-    previous_end = work.groupby("driver_id", sort=False)["arrival_time"].shift()
-    gap_s = (work["request_time"] - previous_end).dt.total_seconds()
-    first = previous_end.isna()
+    if "start_lon_wgs84" not in work.columns:
+        work = add_coordinate_lineage(work)
+    running_end = work.groupby("driver_id", sort=False)["arrival_time"].cummax()
+    previous_running_end = running_end.groupby(work["driver_id"], sort=False).shift()
+    gap_s = (work["request_time"] - previous_running_end).dt.total_seconds()
+    first = previous_running_end.isna()
     starts_session = first | gap_s.gt(float(session_gap_split_min) * 60.0)
     work["inter_order_gap_s"] = gap_s
     work["session_seq"] = (
@@ -224,7 +256,9 @@ def reconstruct_driver_sessions(
             group["inter_order_gap_s"].iloc[1:], errors="coerce"
         ).dropna()
         session_start = group["request_time"].iloc[0]
-        session_end = group["arrival_time"].iloc[-1]
+        latest_arrival_index = group["arrival_time"].idxmax()
+        latest_arrival = group.loc[latest_arrival_index]
+        session_end = latest_arrival["arrival_time"]
         rows.append(
             {
                 "session_id": f"{driver_id}__S{int(sequence):03d}",
@@ -232,11 +266,15 @@ def reconstruct_driver_sessions(
                 "session_start_time": session_start,
                 "session_end_time": session_end,
                 "first_order_id": str(group["order_id"].iloc[0]),
-                "last_order_id": str(group["order_id"].iloc[-1]),
-                "initial_pickup_lon": float(group["start_lon"].iloc[0]),
-                "initial_pickup_lat": float(group["start_lat"].iloc[0]),
-                "final_dropoff_lon": float(group["end_lon"].iloc[-1]),
-                "final_dropoff_lat": float(group["end_lat"].iloc[-1]),
+                "last_order_id": str(latest_arrival["order_id"]),
+                "initial_pickup_lon_gcj02": float(group["start_lon_gcj02"].iloc[0]),
+                "initial_pickup_lat_gcj02": float(group["start_lat_gcj02"].iloc[0]),
+                "initial_pickup_lon_wgs84": float(group["start_lon_wgs84"].iloc[0]),
+                "initial_pickup_lat_wgs84": float(group["start_lat_wgs84"].iloc[0]),
+                "final_dropoff_lon_gcj02": float(latest_arrival["end_lon_gcj02"]),
+                "final_dropoff_lat_gcj02": float(latest_arrival["end_lat_gcj02"]),
+                "final_dropoff_lon_wgs84": float(latest_arrival["end_lon_wgs84"]),
+                "final_dropoff_lat_wgs84": float(latest_arrival["end_lat_wgs84"]),
                 "order_count": int(len(group)),
                 "session_span_s": float((session_end - session_start).total_seconds()),
                 "max_internal_gap_s": float(internal.max()) if len(internal) else 0.0,
@@ -362,8 +400,10 @@ def select_fleet_template(
             "source_driver_id": chosen["driver_id"].astype("string"),
             "availability_start_time": chosen["session_start_time"],
             "availability_end_time": chosen["session_end_time"],
-            "initial_lon": chosen["initial_pickup_lon"].astype(float),
-            "initial_lat": chosen["initial_pickup_lat"].astype(float),
+            "initial_lon_gcj02": chosen["initial_pickup_lon_gcj02"].astype(float),
+            "initial_lat_gcj02": chosen["initial_pickup_lat_gcj02"].astype(float),
+            "initial_lon_wgs84": chosen["initial_pickup_lon_wgs84"].astype(float),
+            "initial_lat_wgs84": chosen["initial_pickup_lat_wgs84"].astype(float),
             "source_order_count": chosen["order_count"].astype(np.int64),
             "source_session_span_s": chosen["session_span_s"].astype(float),
         }
@@ -392,6 +432,23 @@ def add_simulated_supply(scaling: pd.DataFrame, fleet: pd.DataFrame) -> pd.DataF
     return result
 
 
+def _top_supply_error_bins(
+    scaling: pd.DataFrame, error_column: str
+) -> list[dict[str, Any]]:
+    sample = scaling.loc[np.isfinite(scaling[error_column])].nlargest(5, error_column)
+    return [
+        {
+            "time_bin_index": int(row.time_bin_index),
+            "time_bin_start": pd.Timestamp(row.time_bin_start).isoformat(),
+            "target_active_supply": int(row.target_active_supply),
+            "simulated_active_supply": int(row.simulated_active_supply),
+            "absolute_supply_error": float(row.absolute_supply_error),
+            "relative_supply_error": float(row.relative_supply_error),
+        }
+        for row in sample.itertuples(index=False)
+    ]
+
+
 def load_or_build_valhalla_auto_times(
     root: Path,
     replay_orders: pd.DataFrame,
@@ -403,21 +460,41 @@ def load_or_build_valhalla_auto_times(
     cache_path = output / AUTO_ROUTE_CACHE_NAME
     columns = [
         "order_id",
+        "routing_coordinate_system",
+        "origin_lon_wgs84",
+        "origin_lat_wgs84",
+        "destination_lon_wgs84",
+        "destination_lat_wgs84",
         "valhalla_route_time_s",
         "valhalla_route_distance_m",
         "valhalla_route_status",
         "valhalla_failure_reason",
     ]
-    existing = (
-        pd.read_parquet(cache_path)
-        if cache_path.is_file()
-        else pd.DataFrame(columns=columns)
-    )
-    if len(existing):
-        _require_columns(existing, columns, str(cache_path))
-        existing = existing[columns].drop_duplicates("order_id", keep="last")
+    cache_invalidated = False
+    if cache_path.is_file():
+        candidate = pd.read_parquet(cache_path)
+        is_current = (
+            set(columns).issubset(candidate.columns)
+            and len(candidate) > 0
+            and candidate["routing_coordinate_system"]
+            .eq(ROUTING_COORDINATE_SYSTEM)
+            .all()
+        )
+        if is_current:
+            existing = candidate[columns].drop_duplicates("order_id", keep="last")
+        else:
+            existing = pd.DataFrame(columns=columns)
+            cache_invalidated = len(candidate) > 0
+    else:
+        existing = pd.DataFrame(columns=columns)
     coordinates = full_orders[
-        ["order_id", "start_lon", "start_lat", "end_lon", "end_lat"]
+        [
+            "order_id",
+            "start_lon_wgs84",
+            "start_lat_wgs84",
+            "end_lon_wgs84",
+            "end_lat_wgs84",
+        ]
     ]
     pending = replay_orders[["order_id", "request_time"]].merge(
         coordinates, on="order_id", how="left", validate="one_to_one"
@@ -442,13 +519,13 @@ def load_or_build_valhalla_auto_times(
             request = {
                 "locations": [
                     {
-                        "lon": float(row.start_lon),
-                        "lat": float(row.start_lat),
+                        "lon": float(row.start_lon_wgs84),
+                        "lat": float(row.start_lat_wgs84),
                         "type": "break",
                     },
                     {
-                        "lon": float(row.end_lon),
-                        "lat": float(row.end_lat),
+                        "lon": float(row.end_lon_wgs84),
+                        "lat": float(row.end_lat_wgs84),
                         "type": "break",
                     },
                 ],
@@ -460,6 +537,14 @@ def load_or_build_valhalla_auto_times(
                     "value": local_time.strftime("%Y-%m-%dT%H:%M"),
                 },
             }
+            route_lineage = {
+                "order_id": str(row.order_id),
+                "routing_coordinate_system": ROUTING_COORDINATE_SYSTEM,
+                "origin_lon_wgs84": float(row.start_lon_wgs84),
+                "origin_lat_wgs84": float(row.start_lat_wgs84),
+                "destination_lon_wgs84": float(row.end_lon_wgs84),
+                "destination_lat_wgs84": float(row.end_lat_wgs84),
+            }
             try:
                 trip = actor.route(request)["trip"]
                 summary = trip["summary"]
@@ -469,7 +554,7 @@ def load_or_build_valhalla_auto_times(
                     )
                 additions.append(
                     {
-                        "order_id": str(row.order_id),
+                        **route_lineage,
                         "valhalla_route_time_s": float(summary["time"]),
                         "valhalla_route_distance_m": float(summary["length"]) * 1000.0,
                         "valhalla_route_status": "OK",
@@ -479,7 +564,7 @@ def load_or_build_valhalla_auto_times(
             except Exception as exc:
                 additions.append(
                     {
-                        "order_id": str(row.order_id),
+                        **route_lineage,
                         "valhalla_route_time_s": np.nan,
                         "valhalla_route_distance_m": np.nan,
                         "valhalla_route_status": "ERROR",
@@ -487,9 +572,11 @@ def load_or_build_valhalla_auto_times(
                     }
                 )
             if number % int(checkpoint_every) == 0 or number == len(pending):
-                current = pd.concat(
-                    [existing, pd.DataFrame(additions, columns=columns)],
-                    ignore_index=True,
+                new_rows = pd.DataFrame(additions, columns=columns)
+                current = (
+                    pd.concat([existing, new_rows], ignore_index=True)
+                    if len(existing)
+                    else new_rows
                 ).drop_duplicates("order_id", keep="last")
                 _write_parquet(current[columns], cache_path)
                 print(f"Valhalla auto ETA: {number}/{len(pending)}", flush=True)
@@ -512,6 +599,8 @@ def load_or_build_valhalla_auto_times(
             .items()
         },
         "valhalla_auto_route_policy": "single_deterministic_auto_route_at_request_time",
+        "valhalla_routing_coordinate_system": ROUTING_COORDINATE_SYSTEM,
+        "legacy_coordinate_cache_invalidated": bool(cache_invalidated),
     }
 
 
@@ -606,13 +695,27 @@ def build_order_replay_base(
     root: Path, replay_orders: pd.DataFrame, full_orders: pd.DataFrame
 ) -> pd.DataFrame:
     coordinates = full_orders[
-        ["order_id", "start_lon", "start_lat", "end_lon", "end_lat"]
+        [
+            "order_id",
+            "start_lon_gcj02",
+            "start_lat_gcj02",
+            "start_lon_wgs84",
+            "start_lat_wgs84",
+            "end_lon_gcj02",
+            "end_lat_gcj02",
+            "end_lon_wgs84",
+            "end_lat_wgs84",
+        ]
     ].rename(
         columns={
-            "start_lon": "pickup_lon",
-            "start_lat": "pickup_lat",
-            "end_lon": "dropoff_lon",
-            "end_lat": "dropoff_lat",
+            "start_lon_gcj02": "pickup_lon_gcj02",
+            "start_lat_gcj02": "pickup_lat_gcj02",
+            "start_lon_wgs84": "pickup_lon_wgs84",
+            "start_lat_wgs84": "pickup_lat_wgs84",
+            "end_lon_gcj02": "dropoff_lon_gcj02",
+            "end_lat_gcj02": "dropoff_lat_gcj02",
+            "end_lon_wgs84": "dropoff_lon_wgs84",
+            "end_lat_wgs84": "dropoff_lat_wgs84",
         }
     )
     base = replay_orders[["order_id", "request_time", "realized_service_time_s"]].merge(
@@ -644,10 +747,14 @@ def build_order_replay_base(
     ordered = [
         "order_id",
         "request_time",
-        "pickup_lon",
-        "pickup_lat",
-        "dropoff_lon",
-        "dropoff_lat",
+        "pickup_lon_gcj02",
+        "pickup_lat_gcj02",
+        "pickup_lon_wgs84",
+        "pickup_lat_wgs84",
+        "dropoff_lon_gcj02",
+        "dropoff_lat_gcj02",
+        "dropoff_lon_wgs84",
+        "dropoff_lat_wgs84",
         "realized_service_time_s",
         "predicted_service_time_s",
         *interface_columns[1:],
@@ -689,6 +796,17 @@ def _write_report(root: Path, summary: Mapping[str, Any]) -> None:
     lines = [
         "# Stage4 S0 Replay Foundation Summary",
         "",
+        "## S0 correction comparison",
+        "",
+        "| Metric | Before correction | After correction |",
+        "|---|---:|---:|",
+        f"| Session count | {summary['correction_comparison']['before']['session_count']:,} | {summary['correction_comparison']['after']['session_count']:,} |",
+        f"| Fleet size | {summary['correction_comparison']['before']['fleet_size']:,} | {summary['correction_comparison']['after']['fleet_size']:,} |",
+        f"| Supply-fit MAE | {summary['correction_comparison']['before']['supply_fit_mae']:.6f} | {summary['correction_comparison']['after']['supply_fit_mae']:.6f} |",
+        f"| Global beta | {summary['correction_comparison']['before']['global_beta']:.6f} | {summary['correction_comparison']['after']['global_beta']:.6f} |",
+        "",
+        "The pre-correction beta is retained only as lineage and is scientifically invalid because the legacy Valhalla requests interpreted GCJ-02 as WGS84.",
+        "",
         "## Driver/session reconstruction",
         "",
         f"- Full Test31 source drivers: {source_driver_count:,}",
@@ -700,7 +818,7 @@ def _write_report(root: Path, summary: Mapping[str, Any]) -> None:
         f"- Orders/session: `{driver['orders_per_session']}`",
         f"- Inter-order gap (s): `{driver['inter_order_gap_s']}`",
         "",
-        "These sessions are effective observed service episodes, not true online or employment shifts.",
+        "Effective gaps use the previous running-maximum arrival time. Session end and final drop-off come from the order with the maximum arrival time. These sessions are effective observed service episodes, not true online or employment shifts.",
         "",
         "## 15-minute fleet scaling",
         "",
@@ -713,6 +831,8 @@ def _write_report(root: Path, summary: Mapping[str, Any]) -> None:
         f"- Supply-fit maximum absolute error: {fleet['max_absolute_error']:.3f}",
         f"- Mean relative error where target > 0: {fleet['mean_relative_error']:.4%}",
         f"- Exactly matched bins: {fleet['exact_match_bin_count']}/96",
+        f"- Top-5 absolute-error bins: `{fleet['top_5_absolute_error_bins']}`",
+        f"- Top-5 relative-error bins: `{fleet['top_5_relative_error_bins']}`",
         "",
         "Target supply uses deterministic nearest-integer rounding (`floor(x + 0.5)`). Complete sessions are selected within start-time bins by a seed-bound SHA-256 priority; no fleet optimizer is used.",
         "",
@@ -738,13 +858,13 @@ def _write_report(root: Path, summary: Mapping[str, Any]) -> None:
         "",
         "## Input selection",
         "",
-        "The Stage0 Test31 candidate manifest is the canonical full-order activity source because it contains all 105,460 source orders with driver, timestamps, and OD coordinates. The Stage1 frozen Test31 order base defines the exact 30,000 replay orders. No independent canonical auto-route ETA product existed, so S0 computes exactly one deterministic Valhalla `auto` route per replay OD at request time using the same frozen config and tiles as Stage3. Stage1 trace-route elapsed values are not used because they inherit observed trajectory timing. Frozen Stage3 descriptors and the final Stage3→Stage4 interface supply decision-time service predictions and per-profile capability fields.",
+        "The Stage0 Test31 candidate manifest is the canonical full-order activity source because it contains all 105,460 source orders with driver, timestamps, and OD coordinates. Manifest GCJ-02 coordinates are preserved for lineage and converted with `stage0.v6.coordinates.gcj02_to_wgs84`; Valhalla and every future vehicle-to-pickup route must use only the explicit WGS84 fields. The Stage1 frozen Test31 order base defines the exact 30,000 replay orders. No independent canonical auto-route ETA product existed, so S0 computes exactly one deterministic Valhalla `auto` route per replay OD at request time using the same frozen config and tiles as Stage3. Stage1 trace-route elapsed values are not used because they inherit observed trajectory timing. Frozen Stage3 descriptors and the final Stage3→Stage4 interface supply decision-time service predictions and per-profile capability fields.",
         "",
         "## Known limitations",
         "",
         "- Sessions represent observed service episodes; unseen idle/online drivers are not inferred.",
         "- Fleet scaling samples complete sessions by start-time bin and may leave a small 15-minute supply error.",
-        "- ETA calibration is a Test31 time-of-day median ratio, not a new route-level prediction model.",
+        "- ETA calibration is a day-specific replay traffic calibration using Test31 aggregate time-of-day medians; it is not a strict out-of-sample decision-time ETA predictor.",
         "- Small source-day timestamp spillover beyond local midnight is clipped to the final Test31 bin and counted in the local summary JSON.",
         "- Existing legacy Stage4 dispatch/simulator code was not invoked or modified by S0.",
         "",
@@ -822,6 +942,11 @@ def build(root: str | Path, config_path: str | Path | None = None) -> dict[str, 
             "original_descriptor": str(ORIGINAL_DESCRIPTOR_REL).replace("\\", "/"),
         },
         "source_diagnostics": {**source_diagnostics, **route_time_diagnostics},
+        "coordinate_policy": {
+            "source_coordinate_system": "GCJ02",
+            "valhalla_coordinate_system": "WGS84",
+            "conversion": "stage0.v6.coordinates.gcj02_to_wgs84",
+        },
         "driver_sessions": {
             **session_diagnostics,
             "sessions_per_driver": _distribution(
@@ -852,8 +977,23 @@ def build(root: str | Path, config_path: str | Path | None = None) -> dict[str, 
             ),
             "exact_match_bin_count": int(scaling["absolute_supply_error"].eq(0).sum()),
             "zero_full_demand_bin_count": int(scaling["full_order_count"].eq(0).sum()),
+            "top_5_absolute_error_bins": _top_supply_error_bins(
+                scaling, "absolute_supply_error"
+            ),
+            "top_5_relative_error_bins": _top_supply_error_bins(
+                scaling, "relative_supply_error"
+            ),
         },
         "pickup_eta_calibration": eta_diagnostics,
+        "correction_comparison": {
+            "before": PRE_CORRECTION_BASELINE,
+            "after": {
+                "session_count": int(len(sessions)),
+                "fleet_size": int(len(fleet)),
+                "supply_fit_mae": float(scaling["absolute_supply_error"].mean()),
+                "global_beta": float(eta_diagnostics["global_median_ratio"]),
+            },
+        },
         "product_row_counts": {
             "full_test31_driver_sessions": int(len(sessions)),
             "replay_fleet_template": int(len(fleet)),
