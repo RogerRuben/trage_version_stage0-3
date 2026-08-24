@@ -31,6 +31,12 @@ def test_candidate_hard_state_ignores_soft_rho():
     assert final.candidate_hard_state(["PROHIBITED"], []) == "INFEASIBLE"
 
 
+def test_limited_k1_failure_is_unknown_not_od_infeasible():
+    assert final.final_hard_state("INFEASIBLE", fallback_selected=True) == "FEASIBLE"
+    assert final.final_hard_state("INFEASIBLE", fallback_selected=False) == "UNKNOWN"
+    assert "LIMITED_K1_SEARCH" in final.LIMITED_SEARCH_NOT_ESTABLISHED_REASON
+
+
 def test_feasible_selection_minimizes_p50_then_distance():
     candidates = [
         {"hard_state": "FEASIBLE", "service_time_p50_s": 10.0, "distance_m": 20.0, "route_reference": "b"},
@@ -50,8 +56,12 @@ def test_missing_candidate_m3_stays_unknown_without_imputation():
 def test_output_schema_is_frozen_90000_contract():
     assert final.EXPECTED_ORDER_COUNT == 30_000
     assert final.EXPECTED_ORDER_PROFILE_COUNT == 90_000
-    assert len(final.FINAL_COLUMNS) == 26
+    assert len(final.FINAL_COLUMNS) == 28
     assert {"selected_route_type", "hard_state", "rho_static", "rho_dynamic", "rho_speed"}.issubset(final.FINAL_COLUMNS)
+    assert {
+        "fallback_search_state",
+        "original_route_hard_reason_codes",
+    }.issubset(final.FINAL_COLUMNS)
 
 
 def test_stage3_profiles_cdf_checkpoint_are_not_modified():

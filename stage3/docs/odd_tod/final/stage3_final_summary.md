@@ -4,9 +4,9 @@ Stage3 finalization is complete. Stage4 dispatch remains unauthorized.
 
 | Profile | Original F/U/I | Fallback attempted | Hard-feasible recovered | Final F/U/I | ORIGINAL/FALLBACK/NONE | Dynamic complete |
 |---|---:|---:|---:|---:|---:|---:|
-| C | 5,821/6,511/17,668 | 17,668 | 3,370 | 9,191/6,511/14,298 | 12,332/3,370/14,298 | 40.94% |
-| M | 9,258/4,920/15,822 | 15,822 | 6,401 | 15,659/4,920/9,421 | 14,178/6,401/9,421 | 47.07% |
-| A | 9,848/5,315/14,837 | 14,837 | 7,548 | 17,396/5,315/7,289 | 15,163/7,548/7,289 | 50.33% |
+| C | 5,821/6,511/17,668 | 17,668 | 3,370 | 9,191/20,809/0 | 12,332/3,370/14,298 | 40.94% |
+| M | 9,258/4,920/15,822 | 15,822 | 6,401 | 15,659/14,341/0 | 14,178/6,401/9,421 | 47.07% |
+| A | 9,848/5,315/14,837 | 14,837 | 7,548 | 17,396/12,604/0 | 15,163/7,548/7,289 | 50.33% |
 
 ## Fallback distance and selected suitability
 
@@ -26,4 +26,4 @@ Stage3 finalization is complete. Stage4 dispatch remains unauthorized.
 
 Fallback dynamic evidence is intentionally unknown when the exact frozen M3 input contract cannot be constructed. This is a declared limitation, not imputed evidence.
 
-Manifest artifact hash: `bde10f7f55176028eb2efd516420967c05a87587cd2d8b49d975208d51b46cd0`
+Manifest artifact hash: `5e7b7d85f7929e3b35dc363fb70d557a1ac060e08518f4b08fafc9e6bb1a89ce`

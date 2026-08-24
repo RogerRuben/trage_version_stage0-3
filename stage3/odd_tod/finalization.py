@@ -98,6 +98,7 @@ FINAL_COLUMNS = (
     "fallback_attempted",
     "fallback_candidate_count",
     "fallback_hard_feasible_count",
+    "fallback_search_state",
     "selected_route_distance_m",
     "selected_service_time_p50_s",
     "rho_static",
@@ -110,6 +111,7 @@ FINAL_COLUMNS = (
     "unknown_reason_codes",
     "soft_reason_codes",
     "original_route_hard_state",
+    "original_route_hard_reason_codes",
     "original_route_rho_static",
     "original_route_rho_dynamic",
     "original_route_rho_speed",
@@ -118,7 +120,9 @@ FINAL_COLUMNS = (
 )
 
 DYNAMIC_UNKNOWN_REASON = "FROZEN_M3_EXACT_INPUT_CONTRACT_UNAVAILABLE_FOR_NEW_ROUTE"
-NO_FALLBACK_REASON = "NO_BOUNDED_HARD_FEASIBLE_AV_FALLBACK"
+LIMITED_SEARCH_NOT_ESTABLISHED_REASON = (
+    "NO_HARD_FEASIBLE_FALLBACK_FOUND_UNDER_LIMITED_K1_SEARCH"
+)
 STRUCTURAL_UNKNOWN_REASONS = frozenset(
     {
         "MOVEMENT_LOOKUP_UNRESOLVED",
@@ -189,6 +193,13 @@ def candidate_hard_state(
     if structural_unknown_reasons:
         return "UNKNOWN"
     return "FEASIBLE"
+
+
+def final_hard_state(original_hard_state: str, fallback_selected: bool) -> str:
+    """Existence is provable by one success; K=1 failure remains unknown."""
+    if str(original_hard_state) != "INFEASIBLE":
+        return str(original_hard_state)
+    return "FEASIBLE" if fallback_selected else "UNKNOWN"
 
 
 def select_hard_feasible_candidate(candidates: Sequence[Mapping[str, Any]]) -> Mapping[str, Any] | None:
@@ -598,6 +609,7 @@ def _build_interface(
             "fallback_candidate_count": int(row.candidate_count or 0) if attempted else 0,
             "fallback_hard_feasible_count": int(selected is not None),
             "original_route_hard_state": str(row.hard_state),
+            "original_route_hard_reason_codes": row.hard_reason_codes,
             "original_route_rho_static": row.rho_static,
             "original_route_rho_dynamic": row.rho_dynamic,
             "original_route_rho_speed": row.rho_speed,
@@ -611,7 +623,8 @@ def _build_interface(
             rows.append({
                 **base,
                 "selected_route_type": "ORIGINAL",
-                "hard_state": str(row.hard_state),
+                "hard_state": final_hard_state(row.hard_state, False),
+                "fallback_search_state": "NOT_ATTEMPTED_ORIGINAL_RETAINED",
                 "evidence_complete": bool(complete),
                 "selected_route_distance_m": row.original_route_distance_m,
                 "selected_service_time_p50_s": row.predicted_route_time_p50_s,
@@ -632,7 +645,8 @@ def _build_interface(
             rows.append({
                 **base,
                 "selected_route_type": "FALLBACK",
-                "hard_state": "FEASIBLE",
+                "hard_state": final_hard_state(row.hard_state, True),
+                "fallback_search_state": "HARD_FEASIBLE_FOUND",
                 "evidence_complete": False,
                 "selected_route_distance_m": row.candidate_distance_m,
                 "selected_service_time_p50_s": np.nan,
@@ -648,15 +662,15 @@ def _build_interface(
                 "selected_route_reference": row.route_reference,
             })
         else:
-            hard = set(_json_list(row.hard_reason_codes))
-            hard.add(NO_FALLBACK_REASON)
             unknown = set(_json_list(row.unknown_reason_codes))
+            unknown.add(LIMITED_SEARCH_NOT_ESTABLISHED_REASON)
             if candidate_available and str(row.candidate_hard_state) == "UNKNOWN":
                 unknown.update(_json_list(row.candidate_structural_unknown_reason_codes))
             rows.append({
                 **base,
                 "selected_route_type": "NONE",
-                "hard_state": "INFEASIBLE",
+                "hard_state": final_hard_state(row.hard_state, False),
+                "fallback_search_state": "NOT_ESTABLISHED_UNDER_LIMITED_K1_SEARCH",
                 "evidence_complete": False,
                 "selected_route_distance_m": np.nan,
                 "selected_service_time_p50_s": np.nan,
@@ -666,7 +680,7 @@ def _build_interface(
                 "rho_overall": np.nan,
                 "static_vector": None,
                 "dynamic_vector": None,
-                "hard_reason_codes": _json(hard),
+                "hard_reason_codes": "[]",
                 "unknown_reason_codes": _json(unknown),
                 "soft_reason_codes": "[]",
                 "selected_route_reference": None,
@@ -722,6 +736,11 @@ def _summary(interface: pd.DataFrame, original: pd.DataFrame) -> dict[str, Any]:
                 key: int(frame["selected_route_type"].value_counts().get(key, 0))
                 for key in ("ORIGINAL", "FALLBACK", "NONE")
             },
+            "fallback_not_established_under_limited_search_count": int(
+                frame["fallback_search_state"].eq(
+                    "NOT_ESTABLISHED_UNDER_LIMITED_K1_SEARCH"
+                ).sum()
+            ),
             "fallback_distance_ratio": _distribution(
                 frame.loc[frame["selected_route_type"].eq("FALLBACK"), "fallback_distance_ratio"]
             ),
@@ -732,7 +751,7 @@ def _summary(interface: pd.DataFrame, original: pd.DataFrame) -> dict[str, Any]:
             "hard_infeasibility_recovery_by_original_reason_family": recovery,
         }
     return {
-        "schema_version": "stage3_final_summary.1",
+        "schema_version": "stage3_final_summary.2",
         "phase_status": PHASE_STATUS,
         "date": TEST_DATE,
         "order_count": int(interface["order_id"].nunique()),
@@ -747,6 +766,15 @@ def _summary(interface: pd.DataFrame, original: pd.DataFrame) -> dict[str, Any]:
 def _write_docs(root: Path, summary: Mapping[str, Any], manifest: Mapping[str, Any]) -> None:
     methodology = """# Stage3 Final Methodology\n\nStage3 finalization preserves the frozen M3 checkpoint, Train weighted mid-CDF, C/M/A profiles, A/M/D/L definitions, movement rules, restrictions, roundabout semantics, speed caps, and all 36 dynamic caps.\n\nOnly an original-route structural `INFEASIBLE` state triggers fallback. A single deterministic Valhalla `auto` route is requested from the frozen raw-GPS OD at the original decision time. The routed shape is passed back to the same Valhalla engine with `edge_walk`; every returned directed edge ID must exist in the frozen Stage3 full-network table. No reverse overlay, synthetic reverse, geometry-nearest repair, or forward substitution is permitted. Candidates beyond the fixed 1.25 distance ratio are rejected.\n\nCandidate movement evidence reuses the production intersection-complex parser and frozen movement/control/restriction rules. Static, dynamic, and speed envelope exceedance never changes hard feasibility. Because a new route lacks the exact frozen M3 historical feature rows, fallback dynamic evidence and service time remain null; no imputation or historical-route prediction copying is performed.\n\nCandidate selection is frozen as minimum M3 P50 followed by distance. The baseline produces one candidate, so a hard-feasible candidate with unavailable soft dynamic evidence may still be selected, with `evidence_complete=false`.\n"""
     contract = """# Frozen Stage3 → Stage4 Contract\n\nThe canonical input is `stage3/output/odd_tod/final/test31_stage3_to_stage4_interface.parquet`, exactly 30,000 Test31 orders × three C/M/A profiles.\n\n- `hard_state == INFEASIBLE`: Stage4 must forbid the AV assignment.\n- `hard_state == UNKNOWN`: Stage4 chooses whether baseline policy excludes or allows it.\n- `rho_static`, `rho_dynamic`, and `rho_speed` remain separate continuous capability-utilization families. They are not a safety score and must not be collapsed into a Stage3 binary label.\n- `selected_service_time_p50_s == null`: Stage4 may exclude that AV arc under its baseline policy; Stage3 does not impute it.\n- Passenger acceptance is supplied separately by Stage4. Stage3 contains no passenger model or dispatch solver.\n- `selected_route_reference` resolves either to the frozen historical route (`ORIGINAL:<order_id>`) or `test31_fallback_route_edges.parquet` (`FALLBACK:<order_id>:<digest>`).\n\nA fallback means only that a bounded route exists on the frozen AV-routable network under the hypothetical capability profile. It is not AV safety, legal, or commercial certification.\n"""
+    methodology += (
+        "\nThe frozen baseline produced exactly one candidate and every fallback M3 P50 was unavailable. "
+        "Therefore no time ranking occurred: the sole candidate was selected only when structurally hard-feasible. K=1 failure is recorded as not established, never as proof of OD-level infeasibility.\n"
+    )
+    contract += (
+        "\n## Limited-search and Stage4 eligibility semantics\n\n"
+        "`selected_route_type=NONE` with `fallback_search_state=NOT_ESTABLISHED_UNDER_LIMITED_K1_SEARCH` means the frozen bounded K=1 procedure did not establish a hard-feasible AV route. It is `hard_state=UNKNOWN`, not proof that no AV route exists for the OD.\n\n"
+        "Stage4 should distinguish structural route availability from evidence completeness. Under the conservative baseline, an AV arc is dispatch-ready only when a hard-feasible route is selected and static, dynamic, speed, and service-time evidence are complete; passenger acceptance is then applied separately.\n"
+    )
     lines = [
         "# Stage3 Final Summary",
         "",
@@ -860,7 +888,7 @@ def finalize(root: str | Path, *, force: bool = False) -> dict[str, Any]:
         "frozen_m3_checkpoint": source_descriptor(checkpoint, root),
     }
     manifest = {
-        "schema_version": "stage3_final_manifest.1",
+        "schema_version": "stage3_final_manifest.2",
         "authorized_base": AUTHORIZED_BASE,
         "phase_status": PHASE_STATUS,
         "frozen_state": {
@@ -881,6 +909,9 @@ def finalize(root: str | Path, *, force: bool = False) -> dict[str, Any]:
             "maximum_fallback_distance_ratio": float(config["maximum_fallback_distance_ratio"]),
             "hard_trigger_only": True,
             "unknown_does_not_trigger": True,
+            "fallback_success_proves_route_existence": True,
+            "limited_k1_failure_semantics": "UNKNOWN_NOT_ESTABLISHED",
+            "limited_k1_failure_proves_od_infeasible": False,
             "soft_rho_does_not_trigger": True,
             "fallback_dynamic_imputation": False,
             "passenger_model": False,

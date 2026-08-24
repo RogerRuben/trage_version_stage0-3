@@ -10,3 +10,9 @@ The canonical input is `stage3/output/odd_tod/final/test31_stage3_to_stage4_inte
 - `selected_route_reference` resolves either to the frozen historical route (`ORIGINAL:<order_id>`) or `test31_fallback_route_edges.parquet` (`FALLBACK:<order_id>:<digest>`).
 
 A fallback means only that a bounded route exists on the frozen AV-routable network under the hypothetical capability profile. It is not AV safety, legal, or commercial certification.
+
+## Limited-search and Stage4 eligibility semantics
+
+`selected_route_type=NONE` with `fallback_search_state=NOT_ESTABLISHED_UNDER_LIMITED_K1_SEARCH` means the frozen bounded K=1 procedure did not establish a hard-feasible AV route. It is `hard_state=UNKNOWN`, not proof that no AV route exists for the OD.
+
+Stage4 should distinguish structural route availability from evidence completeness. Under the conservative baseline, an AV arc is dispatch-ready only when a hard-feasible route is selected and static, dynamic, speed, and service-time evidence are complete; passenger acceptance is then applied separately.

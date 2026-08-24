@@ -1,5 +1,5 @@
 {
-  "artifact_sha256": "bde10f7f55176028eb2efd516420967c05a87587cd2d8b49d975208d51b46cd0",
+  "artifact_sha256": "5e7b7d85f7929e3b35dc363fb70d557a1ac060e08518f4b08fafc9e6bb1a89ce",
   "authorized_base": "514db0933493578463de0c37b9cfd31cc730ed7a",
   "canonical_products": {
     "fallback_candidate_status": {
@@ -21,15 +21,15 @@
     "interface": {
       "path": "stage3/output/odd_tod/final/test31_stage3_to_stage4_interface.parquet",
       "row_count": 90000,
-      "schema": "date: large_string\norder_id: large_string\nprofile_id: large_string\nselected_route_type: large_string\nhard_state: large_string\nevidence_complete: bool\nfallback_attempted: bool\nfallback_candidate_count: int64\nfallback_hard_feasible_count: int64\nselected_route_distance_m: double\nselected_service_time_p50_s: double\nrho_static: double\nrho_dynamic: double\nrho_speed: double\nrho_overall: double\nstatic_vector: large_string\ndynamic_vector: large_string\nhard_reason_codes: large_string\nunknown_reason_codes: large_string\nsoft_reason_codes: large_string\noriginal_route_hard_state: large_string\noriginal_route_rho_static: double\noriginal_route_rho_dynamic: double\noriginal_route_rho_speed: double\nfallback_distance_ratio: double\nselected_route_reference: large_string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 3557",
-      "schema_sha256": "3e395365703a4f87bd92b8ca401a02ee9dc8ca57a0a8b217adefd835c72a05ec",
-      "sha256": "18fa2b58eb90a24046e41b88ef2f53b7fbe00fc9cc60746b35cf6e6fb5eb4d4a",
-      "size_bytes": 8414493
+      "schema": "date: large_string\norder_id: large_string\nprofile_id: large_string\nselected_route_type: large_string\nhard_state: large_string\nevidence_complete: bool\nfallback_attempted: bool\nfallback_candidate_count: int64\nfallback_hard_feasible_count: int64\nfallback_search_state: large_string\nselected_route_distance_m: double\nselected_service_time_p50_s: double\nrho_static: double\nrho_dynamic: double\nrho_speed: double\nrho_overall: double\nstatic_vector: large_string\ndynamic_vector: large_string\nhard_reason_codes: large_string\nunknown_reason_codes: large_string\nsoft_reason_codes: large_string\noriginal_route_hard_state: large_string\noriginal_route_hard_reason_codes: large_string\noriginal_route_rho_static: double\noriginal_route_rho_dynamic: double\noriginal_route_rho_speed: double\nfallback_distance_ratio: double\nselected_route_reference: large_string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 3855",
+      "schema_sha256": "d0548eed0f9209d5e3e7087743e838e97fbdc86c0d739d6b838f6f9bb0b7e585",
+      "sha256": "695dcacfd0d6306cb813d565c8867d5c58191206d4228f4dfb45472c92e4f5d3",
+      "size_bytes": 8438031
     },
     "summary": {
       "path": "stage3/output/odd_tod/final/stage3_final_summary.json",
-      "sha256": "fe192e7a5e54b373140a37ad4cc60f4180f5d719513a22c0264479c0ad45f3c8",
-      "size_bytes": 7842
+      "sha256": "9788ebacff52794206a6b9e60745ed4d031599e130dd578cefcdd3e223ec713a",
+      "size_bytes": 8040
     }
   },
   "cdf_sha256_after": "a09f284959008890e8a31bab0839bb142f1f66d43bc7012efc3dfeeeec3adc26",
@@ -124,7 +124,10 @@
   "policy": {
     "dispatch_solver": false,
     "fallback_dynamic_imputation": false,
+    "fallback_success_proves_route_existence": true,
     "hard_trigger_only": true,
+    "limited_k1_failure_proves_od_infeasible": false,
+    "limited_k1_failure_semantics": "UNKNOWN_NOT_ESTABLISHED",
     "maximum_candidates": 1,
     "maximum_fallback_distance_ratio": 1.25,
     "passenger_model": false,
@@ -133,7 +136,7 @@
   },
   "profile_sha256_after": "bea54c12a0c013995c3644a0bab84b35413d5df8a6785dfdd6a03fd49f32978e",
   "profile_sha256_before": "bea54c12a0c013995c3644a0bab84b35413d5df8a6785dfdd6a03fd49f32978e",
-  "schema_version": "stage3_final_manifest.1",
+  "schema_version": "stage3_final_manifest.2",
   "summary": {
     "date": "20161031",
     "order_count": 30000,
@@ -156,10 +159,11 @@
           "p99": 1.2333532146405286
         },
         "fallback_found_hard_feasible_count": 7548,
+        "fallback_not_established_under_limited_search_count": 7289,
         "final_hard_state_counts": {
           "FEASIBLE": 17396,
-          "INFEASIBLE": 7289,
-          "UNKNOWN": 5315
+          "INFEASIBLE": 0,
+          "UNKNOWN": 12604
         },
         "hard_infeasibility_recovery_by_original_reason_family": {
           "certified_restriction": {
@@ -242,10 +246,11 @@
           "p99": 1.2195806878655924
         },
         "fallback_found_hard_feasible_count": 3370,
+        "fallback_not_established_under_limited_search_count": 14298,
         "final_hard_state_counts": {
           "FEASIBLE": 9191,
-          "INFEASIBLE": 14298,
-          "UNKNOWN": 6511
+          "INFEASIBLE": 0,
+          "UNKNOWN": 20809
         },
         "hard_infeasibility_recovery_by_original_reason_family": {
           "certified_restriction": {
@@ -328,10 +333,11 @@
           "p99": 1.224873949579832
         },
         "fallback_found_hard_feasible_count": 6401,
+        "fallback_not_established_under_limited_search_count": 9421,
         "final_hard_state_counts": {
           "FEASIBLE": 15659,
-          "INFEASIBLE": 9421,
-          "UNKNOWN": 4920
+          "INFEASIBLE": 0,
+          "UNKNOWN": 14341
         },
         "hard_infeasibility_recovery_by_original_reason_family": {
           "certified_restriction": {
@@ -399,7 +405,7 @@
         }
       }
     },
-    "schema_version": "stage3_final_summary.1",
+    "schema_version": "stage3_final_summary.2",
     "stage3_final_frozen": true,
     "stage3_to_stage4_interface_frozen": true,
     "stage4_dispatch_authorized": false

@@ -7,3 +7,5 @@ Only an original-route structural `INFEASIBLE` state triggers fallback. A single
 Candidate movement evidence reuses the production intersection-complex parser and frozen movement/control/restriction rules. Static, dynamic, and speed envelope exceedance never changes hard feasibility. Because a new route lacks the exact frozen M3 historical feature rows, fallback dynamic evidence and service time remain null; no imputation or historical-route prediction copying is performed.
 
 Candidate selection is frozen as minimum M3 P50 followed by distance. The baseline produces one candidate, so a hard-feasible candidate with unavailable soft dynamic evidence may still be selected, with `evidence_complete=false`.
+
+The frozen baseline produced exactly one candidate and every fallback M3 P50 was unavailable. Therefore no time ranking occurred: the sole candidate was selected only when structurally hard-feasible. K=1 failure is recorded as not established, never as proof of OD-level infeasibility.
