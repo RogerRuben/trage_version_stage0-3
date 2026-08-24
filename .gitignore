@@ -31,6 +31,7 @@
 /stage3/results/
 /stage4/output/
 /stage4/data/
+/stage4/input/
 /tmp/
 
 # Canonical artifact payloads stay local; manifests, audits, and compact reports
