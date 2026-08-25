@@ -110,7 +110,60 @@ class SparseValhallaMatrixAdapter(ValhallaPickupTimeAdapter):
         self.routing_queries = 0
         self.routing_arc_evaluations = 0
         self.routing_failures = 0
+        self.matrix_failed_arcs = 0
+        self.route_fallback_attempts = 0
+        self.route_fallback_successes = 0
+        self.route_fallback_failures = 0
         self.routing_time_s = 0.0
+        self.failed_arc_records: list[dict[str, Any]] = []
+
+    def _record_failed_arc(
+        self,
+        vehicle: SpatialVehicle,
+        pickup_lon: float,
+        pickup_lat: float,
+        timestamp: pd.Timestamp,
+        reason: str,
+    ) -> None:
+        self.failed_arc_records.append(
+            {
+                "origin_lon_wgs84": vehicle.lon_wgs84,
+                "origin_lat_wgs84": vehicle.lat_wgs84,
+                "pickup_lon_wgs84": float(pickup_lon),
+                "pickup_lat_wgs84": float(pickup_lat),
+                "timestamp_value": pd.Timestamp(timestamp).strftime("%Y-%m-%dT%H:%M"),
+                "matrix_failure_reason": reason,
+            }
+        )
+
+    def _route_fallback(
+        self,
+        vehicle: SpatialVehicle,
+        pickup_lon: float,
+        pickup_lat: float,
+        timestamp: pd.Timestamp,
+        matrix_cache_key: tuple,
+    ) -> PickupEstimate | None:
+        self.route_fallback_attempts += 1
+        started = time.perf_counter()
+        try:
+            estimate = ValhallaPickupTimeAdapter.estimate(
+                self,
+                vehicle.lon_wgs84,
+                vehicle.lat_wgs84,
+                pickup_lon,
+                pickup_lat,
+                timestamp,
+            )
+        except Exception:
+            self.route_fallback_failures += 1
+            self.routing_failures += 1
+            self.routing_time_s += time.perf_counter() - started
+            return None
+        self.routing_time_s += time.perf_counter() - started
+        self.route_fallback_successes += 1
+        self.cache[matrix_cache_key] = estimate
+        return estimate
 
     def estimate_many(
         self,
@@ -159,9 +212,17 @@ class SparseValhallaMatrixAdapter(ValhallaPickupTimeAdapter):
         self.routing_arc_evaluations += len(missing)
         try:
             matrix = self.actor.matrix(request).get("sources_to_targets", [])
-        except Exception:
-            self.routing_failures += len(missing)
+        except Exception as exc:
+            self.matrix_failed_arcs += len(missing)
             self.routing_time_s += time.perf_counter() - started
+            reason = f"MATRIX_BATCH_EXCEPTION:{type(exc).__name__}"
+            for vehicle, key in missing:
+                self._record_failed_arc(vehicle, pickup_lon, pickup_lat, local, reason)
+                fallback = self._route_fallback(
+                    vehicle, pickup_lon, pickup_lat, local, key
+                )
+                if fallback is not None:
+                    found[vehicle.native_vehicle_id] = fallback
             return found
         self.routing_time_s += time.perf_counter() - started
         for source_index, (vehicle, key) in enumerate(missing):
@@ -172,7 +233,19 @@ class SparseValhallaMatrixAdapter(ValhallaPickupTimeAdapter):
                 if not np.isfinite(raw_time) or raw_time < 0:
                     raise ValueError("invalid matrix time")
             except (IndexError, KeyError, TypeError, ValueError):
-                self.routing_failures += 1
+                self.matrix_failed_arcs += 1
+                self._record_failed_arc(
+                    vehicle,
+                    pickup_lon,
+                    pickup_lat,
+                    local,
+                    "INVALID_MATRIX_CELL",
+                )
+                fallback = self._route_fallback(
+                    vehicle, pickup_lon, pickup_lat, local, key
+                )
+                if fallback is not None:
+                    found[vehicle.native_vehicle_id] = fallback
                 continue
             estimate = PickupEstimate(
                 raw_time, raw_time * beta, distance, beta, bin_index, False

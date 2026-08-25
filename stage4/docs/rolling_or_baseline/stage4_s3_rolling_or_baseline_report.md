@@ -6,26 +6,43 @@ This is one bounded qA=0.25 scientific-interface and computational benchmark, no
 
 ## Result
 
-- Requests/matched/completed/expired: 1458/1212/1212/246
-- HV/AV assignments: 1067/145
+- Requests/matched/completed/expired: 1458/1215/1215/243
+- HV/AV assignments: 1072/143
 - Requested/achieved qA: 0.250000/0.250531
 - HV vehicle-hour error: 0.872%
 
 ## Queue
 
-- First-window match rate: 0.755830
-- Carry-over entry/recovery: 0.244170/0.308989
-- Critical count/recovery: 247/0.004049
+- First-window match rate: 0.775720
+- Carry-over entry/recovery: 0.224280/0.256881
+- Critical count/recovery: 244/0.004098
 
 ## Computation
 
-- Runtime: 142.516s
-- Spatial/Top-K/valid pairs: 581740/78447/5324
-- Peak Top-K/valid OR arcs per epoch: 940/133
+- Runtime: 43.404s
+- Spatial/Top-K/valid pairs: 559624/76441/5406
+- Peak Top-K/valid OR arcs per epoch: 915/105
 - Memory design: cKDTree + Top-K 20 + CSR sparse constraints; no order-by-fleet dense matrix and no per-vehicle tick trace.
 - GPU usage: none (CPU-only SciPy/HiGHS and Valhalla).
-- Routing queries/cache hits/failures: 3739/22619/1860
-- Solver p50/p95/max: 0.004325/0.019366/0.134063s
+- Matrix batches/uncached arcs/cache hits: 3655/54071/22370
+- Matrix failed arcs/fallback success/fallback failure/final failed arcs: 0/0/0/0
+- Matrix/final arc failure rates: 0.000000/0.000000
+- Solver p50/p95/max: 0.003765/0.016364/0.021611s
+
+## Matrix failure vs single route cat-eye
+
+- Sampled matrix failures: 0
+- Single route success/failure: 0/0
+- Single route success rate: N/A
+
+## Matrix-route closure
+
+- Original 9eed065 observation: 1,860 matrix-failed arcs from approximately 55,828 uncached arcs (3.332%).
+- Exact production-adapter reproduction: 0 matrix-failed arcs.
+- Requested/available failed-arc sample: 100/0.
+- The original failure population was not reproducible, so no empirical 100-failure equivalence rate is claimed.
+- Production policy now retries only failed matrix cells with an identical single route; an arc is deleted only if both calls fail.
+- Closure: `CLOSED_WITH_NON_REPRODUCTION_AND_FAILED_CELL_ROUTE_FALLBACK`
 
 ## Interpretation limits
 

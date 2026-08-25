@@ -14,5 +14,7 @@
   "fleet_sampling_seed": 20260824,
   "max_hv_vehicle_hour_error_pct": 2.0,
   "benchmark_runtime_guard_s": 3600,
+  "matrix_failure_route_audit_sample_size": 100,
+  "matrix_failure_route_audit_seed": 20260825,
   "fleetpy_commit": "0379f9725a147ff33c674de4884cdf89fd787fa9"
 }

@@ -4,6 +4,7 @@ import pandas as pd
 
 from stage4.dispatch.candidate_graph import (
     SparseCandidateIndex,
+    SparseValhallaMatrixAdapter,
     SpatialVehicle,
     search_radius_m,
 )
@@ -78,6 +79,28 @@ def test_sparse_top_k_never_exceeds_twenty():
     )
     assert spatial_count == 30
     assert len(candidates) == 20
+
+    class MatrixFailsRouteSucceeds:
+        def matrix(self, request):
+            del request
+            return {"sources_to_targets": [[{"time": None, "distance": None}]]}
+
+        def route(self, request):
+            del request
+            return {
+                "trip": {
+                    "status": 0,
+                    "legs": [{}],
+                    "summary": {"time": 45.0, "length": 0.5},
+                }
+            }
+
+    adapter = SparseValhallaMatrixAdapter(ROOT, actor=MatrixFailsRouteSucceeds())
+    fallback = adapter.estimate_many([vehicles[0]], 108.95, 34.27, START)
+    assert vehicles[0].native_vehicle_id in fallback
+    assert adapter.matrix_failed_arcs == 1
+    assert adapter.route_fallback_successes == 1
+    assert adapter.routing_failures == 0
 
 
 def test_exact_lexicographic_solver_protects_critical_request():

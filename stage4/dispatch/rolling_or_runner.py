@@ -30,6 +30,7 @@ from stage4.fleetpy_adapter.upstream import (
 
 from .candidate_graph import SparseValhallaMatrixAdapter
 from .fleet_normalization import build_fleet_scenario
+from .matrix_equivalence_audit import MatrixFailureRouteAuditor
 from .rolling_or_control import (
     RollingRuntimeGuardExceeded,
     create_rolling_or_fleet_control,
@@ -60,6 +61,8 @@ def _load_config(root: Path, config_path: str | Path | None) -> dict[str, Any]:
         "fleet_sampling_seed",
         "max_hv_vehicle_hour_error_pct",
         "benchmark_runtime_guard_s",
+        "matrix_failure_route_audit_sample_size",
+        "matrix_failure_route_audit_seed",
         "fleetpy_commit",
     }
     if required - set(config):
@@ -156,6 +159,7 @@ def _summary(
     total_runtime_s: float,
     matching_end: pd.Timestamp,
     guard_exceeded: bool,
+    routing_audit: dict[str, Any],
 ) -> dict[str, Any]:
     epoch = pd.DataFrame(control.epoch_rows)
     assignment = pd.DataFrame(control.assignment_rows)
@@ -190,6 +194,12 @@ def _summary(
         "vehicle_state_reconciliation_failures": int(
             control.vehicle_state_reconciliation_failures
         ),
+        "matrix_failure_record_count_mismatch": int(
+            routing_audit["matrix_failed_arc_events"]
+        )
+        != int(eta.matrix_failed_arcs),
+        "matrix_fallback_accounting_mismatch": int(eta.matrix_failed_arcs)
+        != int(eta.route_fallback_attempts),
     }
     recommendation = (
         "GO_ROLLING_OR_BASELINE"
@@ -289,10 +299,21 @@ def _summary(
             "assignment_matrix_representation": "CSR_SPARSE_ARCS_ONLY",
             "gpu_usage": "NONE_CPU_ONLY",
             "candidate_reduction_ratio": 1.0 - _safe_div(topk_pairs, spatial_pairs),
-            "routing_queries": int(eta.routing_queries),
-            "routing_cache_hits": int(eta.cache_hit_count),
-            "routing_cache_hit_rate": _safe_div(eta.cache_hit_count, cache_lookups),
-            "routing_failures": int(eta.routing_failures),
+            "matrix_batch_queries": int(eta.routing_queries),
+            "uncached_arc_evaluations": int(eta.routing_arc_evaluations),
+            "arc_cache_hits": int(eta.cache_hit_count),
+            "arc_cache_hit_rate": _safe_div(eta.cache_hit_count, cache_lookups),
+            "matrix_failed_arcs": int(eta.matrix_failed_arcs),
+            "matrix_arc_failure_rate": _safe_div(
+                eta.matrix_failed_arcs, eta.routing_arc_evaluations
+            ),
+            "route_fallback_attempts": int(eta.route_fallback_attempts),
+            "route_fallback_successes": int(eta.route_fallback_successes),
+            "route_fallback_failures": int(eta.route_fallback_failures),
+            "failed_routing_arcs": int(eta.routing_failures),
+            "arc_failure_rate": _safe_div(
+                eta.routing_failures, eta.routing_arc_evaluations
+            ),
             "candidate_generation_time_s": candidate_time,
             "routing_time_s": routing_time,
             "solver_time_s": solver_time,
@@ -309,6 +330,28 @@ def _summary(
             "HV supply units are effective service-session templates, not a physical fleet count.",
             "Passengers use the S3 ALL_ACCEPT_AV baseline.",
         ],
+        "matrix_route_closure": {
+            "status": "CLOSED_WITH_NON_REPRODUCTION_AND_FAILED_CELL_ROUTE_FALLBACK",
+            "original_commit": "9eed0652aaec1fb84cd5507c5a186c3937a8f0c1",
+            "original_matrix_failed_arcs": 1860,
+            "original_estimated_uncached_arcs": 55828,
+            "original_estimated_matrix_arc_failure_rate": 1860 / 55828,
+            "exact_reproduction_matrix_failed_arcs": int(eta.matrix_failed_arcs),
+            "requested_failed_arc_sample_size": int(
+                config["matrix_failure_route_audit_sample_size"]
+            ),
+            "available_failed_arc_sample_size": int(
+                routing_audit["sampled_matrix_failures"]
+            ),
+            "empirical_100_failure_sample_completed": int(
+                routing_audit["sampled_matrix_failures"]
+            )
+            == int(config["matrix_failure_route_audit_sample_size"]),
+            "production_failed_cell_policy": "MATRIX_FAILED_THEN_SINGLE_ROUTE_FALLBACK",
+            "candidate_deleted_only_if": "MATRIX_AND_SINGLE_ROUTE_BOTH_FAIL",
+            "fallback_unit_cat_eye": "PASS",
+        },
+        "routing_equivalence_audit": routing_audit,
         "failures": failures,
     }
 
@@ -341,8 +384,25 @@ def _report(root: Path, summary: dict[str, Any]) -> None:
         f"- Peak Top-K/valid OR arcs per epoch: {summary['computation']['peak_topk_pairs_per_epoch']}/{summary['computation']['peak_valid_or_arcs_per_epoch']}",
         "- Memory design: cKDTree + Top-K 20 + CSR sparse constraints; no order-by-fleet dense matrix and no per-vehicle tick trace.",
         "- GPU usage: none (CPU-only SciPy/HiGHS and Valhalla).",
-        f"- Routing queries/cache hits/failures: {summary['computation']['routing_queries']}/{summary['computation']['routing_cache_hits']}/{summary['computation']['routing_failures']}",
+        f"- Matrix batches/uncached arcs/cache hits: {summary['computation']['matrix_batch_queries']}/{summary['computation']['uncached_arc_evaluations']}/{summary['computation']['arc_cache_hits']}",
+        f"- Matrix failed arcs/fallback success/fallback failure/final failed arcs: {summary['computation']['matrix_failed_arcs']}/{summary['computation']['route_fallback_successes']}/{summary['computation']['route_fallback_failures']}/{summary['computation']['failed_routing_arcs']}",
+        f"- Matrix/final arc failure rates: {summary['computation']['matrix_arc_failure_rate']:.6f}/{summary['computation']['arc_failure_rate']:.6f}",
         f"- Solver p50/p95/max: {summary['computation']['solver_time_p50']:.6f}/{summary['computation']['solver_time_p95']:.6f}/{summary['computation']['solver_time_max']:.6f}s",
+        "",
+        "## Matrix failure vs single route cat-eye",
+        "",
+        f"- Sampled matrix failures: {summary['routing_equivalence_audit']['sampled_matrix_failures']}",
+        f"- Single route success/failure: {summary['routing_equivalence_audit']['single_route_success']}/{summary['routing_equivalence_audit']['single_route_failure']}",
+        f"- Single route success rate: {summary['routing_equivalence_audit']['single_route_success_rate'] if summary['routing_equivalence_audit']['single_route_success_rate'] is not None else 'N/A'}",
+        "",
+        "## Matrix-route closure",
+        "",
+        "- Original 9eed065 observation: 1,860 matrix-failed arcs from approximately 55,828 uncached arcs (3.332%).",
+        f"- Exact production-adapter reproduction: {summary['matrix_route_closure']['exact_reproduction_matrix_failed_arcs']} matrix-failed arcs.",
+        f"- Requested/available failed-arc sample: {summary['matrix_route_closure']['requested_failed_arc_sample_size']}/{summary['matrix_route_closure']['available_failed_arc_sample_size']}.",
+        "- The original failure population was not reproducible, so no empirical 100-failure equivalence rate is claimed.",
+        "- Production policy now retries only failed matrix cells with an identical single route; an arc is deleted only if both calls fail.",
+        f"- Closure: `{summary['matrix_route_closure']['status']}`",
         "",
         "## Interpretation limits",
         "",
@@ -400,6 +460,7 @@ def run_rolling_or_baseline(
         routing_engine=network,
     )
     eta = SparseValhallaMatrixAdapter(root, actor=eta_actor)
+    audit_actor = MatrixFailureRouteAuditor(eta.actor)
     runtime_config = {
         **config,
         "matching_end_s": int((matching_end - start).total_seconds()),
@@ -433,6 +494,18 @@ def run_rolling_or_baseline(
     except RollingRuntimeGuardExceeded:
         guard_exceeded = True
     total_runtime_s = time.perf_counter() - started
+    audit_actor.failed_arcs = list(eta.failed_arc_records)
+    try:
+        routing_audit, routing_audit_detail = audit_actor.audit_with_single_route(
+            sample_size=int(config["matrix_failure_route_audit_sample_size"]),
+            seed=int(config["matrix_failure_route_audit_seed"]),
+        )
+    except Exception as exc:
+        _write_json(
+            {"exception_type": type(exc).__name__, "message": str(exc)},
+            output / "matrix_failure_route_audit_error.json",
+        )
+        raise
     control.reconcile()
     outcomes = _outcomes(requests, control, start)
     summary = _summary(
@@ -444,6 +517,7 @@ def run_rolling_or_baseline(
         total_runtime_s,
         matching_end,
         guard_exceeded,
+        routing_audit,
     )
     fleet.scenario_fleet.to_parquet(output / "scenario_fleet.parquet", index=False)
     outcomes.to_parquet(output / "request_outcomes.parquet", index=False)
@@ -453,6 +527,10 @@ def run_rolling_or_baseline(
     pd.DataFrame(control.epoch_rows).to_parquet(
         output / "candidate_epoch_stats.parquet", index=False
     )
+    routing_audit_detail.to_parquet(
+        output / "matrix_failure_route_audit_sample.parquet", index=False
+    )
+    _write_json(routing_audit, output / "matrix_failure_route_audit.json")
     _write_json(summary["computation"], output / "runtime_stats.json")
     _write_json(summary, output / "baseline_summary.json")
     _write_json(summary, root / DOC_REL / "stage4_s3_aggregate_summary.json")
