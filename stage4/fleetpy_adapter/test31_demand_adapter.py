@@ -34,6 +34,8 @@ class SpikeRequest:
     rho_static: float
     rho_dynamic: float
     rho_speed: float
+    passenger_accepts_av: bool | None = None
+    acceptance_source: str | None = None
     native_request: Any = None
     pickup_position: tuple | None = None
     dropoff_position: tuple | None = None

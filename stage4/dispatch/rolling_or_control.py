@@ -1,4 +1,4 @@
-"""Patience-aware sparse rolling OR control on FleetPy-native state."""
+"""Patience-aware sparse rolling OR control with optional S4 decision layers."""
 
 from __future__ import annotations
 
@@ -11,11 +11,18 @@ import pandas as pd
 from stage4.fleetpy_adapter.native_fleet_control import _NativeFleetControlCore
 from stage4.fleetpy_adapter.upstream import FleetPyBindings
 
+from .acceptance import passenger_acceptance
 from .candidate_graph import (
     SparseCandidateIndex,
     SparseValhallaMatrixAdapter,
     SpatialVehicle,
     search_radius_m,
+)
+from .exposure import (
+    CumulativeExposureState,
+    ExposureExcess,
+    exposure_excess,
+    parse_gammas,
 )
 from .solver import AssignmentArc, solve_lexicographic
 
@@ -57,8 +64,22 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
         self.request_meta: dict[int, dict[str, Any]] = {}
         self.expired_rids: set[int] = set()
         self.epoch_rows: list[dict[str, Any]] = []
+        self.exposure_rows: list[dict[str, Any]] = []
         self.candidate_generation_time_s = 0.0
         self.solver_time_s = 0.0
+        self.acceptance_rate = float(config.get("passenger_acceptance_rate", 1.0))
+        self.acceptance_seed = int(config.get("passenger_acceptance_seed", 0))
+        self.gammas = parse_gammas(config)
+        self.exposure_state = CumulativeExposureState()
+        self.eta_cost_av_to_hv = float(config.get("eta_cost_av_to_hv", 1.0))
+        if not isfinite(self.eta_cost_av_to_hv) or self.eta_cost_av_to_hv < 0.0:
+            raise ValueError("eta_cost_av_to_hv must be finite and >= 0")
+        self.cost_level_enabled = bool(config.get("cost_level_enabled", False))
+        self.pickup_cost_epsilon = float(config.get("pickup_cost_epsilon", 0.0))
+        self.solver_tolerance = float(config.get("solver_numerical_tolerance", 1e-7))
+        self.av_candidates_pruned_by_acceptance = 0
+        self.av_candidates_pruned_by_missing_exposure = 0
+        self.cost_level_solve_count = 0
 
     def record_tick(self, simulation_time: int) -> None:
         """Avoid retaining an O(ticks x fleet) trace; epoch aggregates are enough."""
@@ -85,6 +106,14 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
         self.offers[rid] = self.bindings.traveller_offer(
             rid, self.op_id, 0.0, offer_time, 0
         )
+        acceptance = passenger_acceptance(
+            request.order_id, self.acceptance_rate, self.acceptance_seed
+        )
+        request.passenger_accepts_av = acceptance.passenger_accepts_av
+        request.acceptance_source = acceptance.acceptance_source
+        exposure = exposure_excess(
+            request.rho_static, request.rho_dynamic, request.rho_speed
+        )
         self.request_meta[rid] = {
             "first_attempt_time": None,
             "attempt_count": 0,
@@ -93,6 +122,9 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
             "pickup_deadline_s": int(request.sim_time_s + self.max_pickup_wait_s),
             "final_search_radius_m": float(self.config["search_radius_initial_m"]),
             "entered_critical": False,
+            "passenger_accepts_av": acceptance.passenger_accepts_av,
+            "acceptance_source": acceptance.acceptance_source,
+            "exposure": exposure,
         }
 
     def _expire(self, rid: int, simulation_time: int) -> None:
@@ -151,7 +183,10 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
         topk_pairs = 0
         invalid_patience = 0
         invalid_hv_window = 0
+        invalid_cost_evidence = 0
         critical_count = 0
+        pruned_acceptance_epoch = 0
+        pruned_exposure_epoch = 0
         routing_before = self.eta_adapter.routing_time_s
         for rid in waiting_ids:
             request = self.request_by_rid[rid]
@@ -170,12 +205,30 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                 self.config["search_radius_cap_m"],
             )
             meta["final_search_radius_m"] = radius
+            exposure: ExposureExcess | None = meta["exposure"]
+            av_ready = bool(request.av_smoke_eligible)
+            accepts = bool(meta["passenger_accepts_av"])
+            av_eligible = av_ready and accepts and exposure is not None
+            if av_ready and not accepts:
+                pruned_acceptance_epoch += index.count_vehicle_type_within(
+                    request.pickup_lon_wgs84,
+                    request.pickup_lat_wgs84,
+                    radius,
+                    "AV",
+                )
+            elif av_ready and accepts and exposure is None:
+                pruned_exposure_epoch += index.count_vehicle_type_within(
+                    request.pickup_lon_wgs84,
+                    request.pickup_lat_wgs84,
+                    radius,
+                    "AV",
+                )
             candidates, raw_count = index.query(
                 request.pickup_lon_wgs84,
                 request.pickup_lat_wgs84,
                 radius,
                 int(self.config["candidate_top_k"]),
-                request.av_smoke_eligible,
+                av_eligible,
             )
             spatial_pairs += raw_count
             topk_pairs += len(candidates)
@@ -193,14 +246,13 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                     invalid_patience += 1
                     continue
                 runtime = by_vid[vehicle.native_vehicle_id]
+                predicted = float(request.predicted_service_time_s)
                 if vehicle.vehicle_type == "HV":
-                    if not isfinite(request.predicted_service_time_s):
+                    if not isfinite(predicted):
                         invalid_hv_window += 1
                         continue
                     predicted_end = (
-                        simulation_time
-                        + estimate.corrected_pickup_eta_s
-                        + request.predicted_service_time_s
+                        simulation_time + estimate.corrected_pickup_eta_s + predicted
                     )
                     if predicted_end > self._fixture_seconds(
                         runtime.fixture.availability_end_time
@@ -210,6 +262,16 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                             (simulation_time, vehicle.native_vehicle_id, rid)
                         )
                         continue
+                elif self.cost_level_enabled and not isfinite(predicted):
+                    invalid_cost_evidence += 1
+                    continue
+                factor = self.eta_cost_av_to_hv if vehicle.vehicle_type == "AV" else 1.0
+                operating_cost = (
+                    factor * (estimate.corrected_pickup_eta_s + predicted)
+                    if isfinite(predicted)
+                    else 0.0
+                )
+                arc_exposure = exposure if vehicle.vehicle_type == "AV" else None
                 arcs.append(
                     AssignmentArc(
                         vehicle.native_vehicle_id,
@@ -218,25 +280,61 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                         critical,
                         bool(meta["carry_over_flag"]),
                         (runtime, request, estimate),
+                        vehicle_type=vehicle.vehicle_type,
+                        exposure_static=arc_exposure.static if arc_exposure else 0.0,
+                        exposure_dynamic=arc_exposure.dynamic if arc_exposure else 0.0,
+                        exposure_speed=arc_exposure.speed if arc_exposure else 0.0,
+                        operating_cost=operating_cost,
                     )
                 )
         candidate_elapsed = time.perf_counter() - epoch_started
         routing_elapsed = self.eta_adapter.routing_time_s - routing_before
         pure_candidate_elapsed = max(0.0, candidate_elapsed - routing_elapsed)
         self.candidate_generation_time_s += pure_candidate_elapsed
+        self.av_candidates_pruned_by_acceptance += pruned_acceptance_epoch
+        self.av_candidates_pruned_by_missing_exposure += pruned_exposure_epoch
         solver_started = time.perf_counter()
-        result = solve_lexicographic(arcs)
+        result = solve_lexicographic(
+            arcs,
+            exposure_state=self.exposure_state,
+            gammas=self.gammas,
+            cost_level_enabled=self.cost_level_enabled,
+            pickup_cost_epsilon=self.pickup_cost_epsilon,
+            numerical_tolerance=self.solver_tolerance,
+        )
         solver_elapsed = time.perf_counter() - solver_started
         self.solver_time_s += solver_elapsed
+        self.cost_level_solve_count += int(result.cost_level_solved)
         selected_rids: set[int] = set()
+        selected_av_exposures: list[ExposureExcess] = []
         for arc_index in result.selected_indices:
             arc = arcs[arc_index]
             runtime, request, estimate = arc.payload
             self._assign(runtime, request, estimate, simulation_time)
-            self.assignment_rows[-1][
-                "dispatch_policy"
-            ] = "GLOBAL_SPARSE_EXACT_LEXICOGRAPHIC_OR"
+            self.assignment_rows[-1].update(
+                {
+                    "dispatch_policy": "GLOBAL_SPARSE_EXACT_LEXICOGRAPHIC_OR",
+                    "passenger_accepts_av": self.request_meta[arc.request_id][
+                        "passenger_accepts_av"
+                    ],
+                    "acceptance_source": self.request_meta[arc.request_id][
+                        "acceptance_source"
+                    ],
+                    "exposure_static": arc.exposure_static,
+                    "exposure_dynamic": arc.exposure_dynamic,
+                    "exposure_speed": arc.exposure_speed,
+                    "normalized_operating_cost": arc.operating_cost,
+                }
+            )
+            if arc.vehicle_type == "AV":
+                selected_av_exposures.append(
+                    ExposureExcess(
+                        arc.exposure_static, arc.exposure_dynamic, arc.exposure_speed
+                    )
+                )
             selected_rids.add(arc.request_id)
+        epoch_excess = self.exposure_state.update(selected_av_exposures)
+        self.exposure_state.validate(self.gammas, self.solver_tolerance)
         for rid in waiting_ids:
             if rid not in selected_rids:
                 meta = self.request_meta[rid]
@@ -254,6 +352,11 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                 "valid_or_arcs": len(arcs),
                 "patience_arc_exclusions": invalid_patience,
                 "hv_window_arc_exclusions": invalid_hv_window,
+                "cost_evidence_arc_exclusions": invalid_cost_evidence,
+                "av_candidates_pruned_by_acceptance": pruned_acceptance_epoch,
+                "av_candidates_pruned_by_missing_exposure": pruned_exposure_epoch,
+                "enabled_gamma_constraint_count": result.enabled_gamma_constraint_count,
+                "cost_level_solved": result.cost_level_solved,
                 "matched": len(result.selected_indices),
                 "critical_matched": result.critical_matched,
                 "carry_over_matched": result.carry_over_matched,
@@ -261,6 +364,26 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                 "routing_time_s": routing_elapsed,
                 "solver_time_s": solver_elapsed,
                 "solver_backend": result.backend,
+            }
+        )
+        n_av = self.exposure_state.av_assignments
+        self.exposure_rows.append(
+            {
+                "simulation_time_s": int(simulation_time),
+                "av_assignments_this_epoch": len(selected_av_exposures),
+                "cumulative_av_assignments": n_av,
+                "static_excess_this_epoch": epoch_excess.static,
+                "dynamic_excess_this_epoch": epoch_excess.dynamic,
+                "speed_excess_this_epoch": epoch_excess.speed,
+                "cumulative_static_excess": self.exposure_state.static,
+                "cumulative_dynamic_excess": self.exposure_state.dynamic,
+                "cumulative_speed_excess": self.exposure_state.speed,
+                "cumulative_mean_static_excess": self.exposure_state.mean("static"),
+                "cumulative_mean_dynamic_excess": self.exposure_state.mean("dynamic"),
+                "cumulative_mean_speed_excess": self.exposure_state.mean("speed"),
+                "gamma_static": self.gammas["static"],
+                "gamma_dynamic": self.gammas["dynamic"],
+                "gamma_speed": self.gammas["speed"],
             }
         )
 

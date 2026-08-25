@@ -1,0 +1,69 @@
+{
+  "phase_status": "STAGE4_S4_ODD_AWARE_DECISION_KERNEL_COMPLETE",
+  "recommendation": "GO_ODD_AWARE_DECISION_KERNEL",
+  "canonical_base": {
+    "s3_commit": "84783ca1696c325cc3ed31ab3efd8747f4133ece",
+    "fleetpy_commit": "0379f9725a147ff33c674de4884cdf89fd787fa9",
+    "expected": {
+      "requests": 1458,
+      "matched": 1215,
+      "completed": 1215,
+      "patience_expired": 243,
+      "first_window_matched": 1131,
+      "carry_over_recovered": 84,
+      "critical_matched": 1
+    }
+  },
+  "canonical_reproduction": {
+    "requests": 1458,
+    "matched": 1215,
+    "completed": 1215,
+    "patience_expired": 243,
+    "first_window_matched": 1131,
+    "carry_over_recovered": 84,
+    "critical_matched": 1
+  },
+  "canonical_reproduction_pass": true,
+  "canonical_outcome_fingerprint_sha256": "a90f1285813cfe5fc9fedeeb6514ed5b204ad5de7a5e230316639d8e1ff2c961",
+  "neutral_configuration": true,
+  "mechanisms": {
+    "passenger_acceptance": "PASS",
+    "three_family_cumulative_exposure": "PASS",
+    "normalized_cost_lexicographic_level": "PASS"
+  },
+  "cat_eyes": {
+    "acceptance": "PASS",
+    "cumulative_exposure": "PASS",
+    "cost_tie_break": "PASS"
+  },
+  "canonical_gamma_rows_enabled": 0,
+  "canonical_cost_level_enabled": false,
+  "computation": {
+    "total_runtime_s": 42.02432360000239,
+    "candidate_generation_time_s": 7.4068968000938185,
+    "routing_time_s": 31.685874599897943,
+    "solver_time_s": 0.7058555000330671,
+    "solver_time_p50": 0.003726000002643559,
+    "solver_time_p95": 0.01619244999892544,
+    "solver_time_max": 0.02396670000598533,
+    "valid_or_arcs": 5406,
+    "av_candidates_pruned_by_acceptance": 0,
+    "av_candidates_pruned_by_missing_exposure": 0,
+    "enabled_gamma_constraint_count": 0,
+    "cost_level_solve_count": 0,
+    "assignment_matrix_representation": "CSR_SPARSE_ARCS_ONLY",
+    "gpu_usage": "NONE_CPU_ONLY"
+  },
+  "s3_reference_runtime_s": 43.40438930000005,
+  "failures": {
+    "canonical_outcome_mismatch": false,
+    "runtime_guard_exceeded": false,
+    "configuration_not_neutral": false,
+    "native_reconciliation_or_accounting_failure": false
+  },
+  "limitations": [
+    "Gamma values, acceptance rates, and normalized cost ratios are scenario inputs, not identified estimates.",
+    "Exposure is reference-envelope exceedance, not safety or failure probability.",
+    "S4 runs no parameter sweep and makes no economic or safety claim."
+  ]
+}

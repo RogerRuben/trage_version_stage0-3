@@ -101,6 +101,16 @@ class SparseCandidateIndex:
         candidates.sort(key=lambda item: (item[1], item[0].vehicle_id))
         return candidates[: int(top_k)], spatial_count
 
+    def count_vehicle_type_within(
+        self, pickup_lon: float, pickup_lat: float, radius_m: float, vehicle_type: str
+    ) -> int:
+        """Count pre-routing candidates for a compact pruning diagnostic."""
+        point = _xy(
+            np.asarray([pickup_lon]), np.asarray([pickup_lat]), self.reference_lat
+        )[0]
+        _group, tree = self._groups[vehicle_type]
+        return 0 if tree is None else len(tree.query_ball_point(point, float(radius_m)))
+
 
 class SparseValhallaMatrixAdapter(ValhallaPickupTimeAdapter):
     """Evaluate only sparse arcs, batching K vehicle sources to one pickup target."""

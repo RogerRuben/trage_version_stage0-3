@@ -1,0 +1,17 @@
+{
+  "scope": "TINY_DETERMINISTIC_ENGINEERING_FIXTURES_ONLY",
+  "acceptance": {
+    "status": "PASS",
+    "false_case": "AV absent before routing; HV remains eligible",
+    "true_case": "AV can enter the sparse candidate set"
+  },
+  "cumulative_exposure": {
+    "status": "PASS",
+    "families": ["static", "dynamic", "speed"],
+    "result": "high-excess AV arc rejected; low-excess AV arc selected; cumulative N/Z persisted across epochs"
+  },
+  "cost_tie_break": {
+    "status": "PASS",
+    "result": "lower normalized operating cost selected after identical critical, total, carry-over, and pickup optima"
+  }
+}
