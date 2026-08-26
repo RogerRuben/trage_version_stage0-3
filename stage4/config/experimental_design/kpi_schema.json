@@ -1,0 +1,66 @@
+{
+  "schema_version": "stage4_s5b_kpi_v1",
+  "passenger_service": [
+    "request_count",
+    "matched",
+    "completed",
+    "patience_expired",
+    "service_rate",
+    "first_window_match_rate",
+    "carry_over_entry_rate",
+    "carry_over_recovery_rate",
+    "critical_recovery"
+  ],
+  "waiting_seconds": [
+    "request_to_pickup_mean",
+    "request_to_pickup_p50",
+    "request_to_pickup_p90",
+    "request_to_pickup_p95"
+  ],
+  "fleet_utilization": [
+    "HV_assignments",
+    "AV_assignments",
+    "HV_assignment_share",
+    "AV_assignment_share",
+    "available_HV_supply_diagnostics",
+    "available_AV_supply_diagnostics"
+  ],
+  "matching_computation": [
+    "mean_attempts",
+    "expanded_radius_match_share",
+    "candidate_spatial_pairs",
+    "candidate_topk_pairs",
+    "valid_or_arcs",
+    "routing_workload",
+    "solver_workload",
+    "runtime_s"
+  ],
+  "acceptance_realization": [
+    "target_p_A",
+    "realized_accepted_order_share",
+    "accepted_order_count"
+  ],
+  "exposure_for_each_family": [
+    "mean_assigned_exposure",
+    "positive_assigned_exposure_share",
+    "final_cumulative_mean_exposure",
+    "maximum_cumulative_mean_exposure"
+  ],
+  "gamma_enabled_for_each_family": [
+    "binding_epoch_count",
+    "near_binding_epoch_count",
+    "minimum_slack",
+    "mean_slack"
+  ],
+  "cost_enabled": [
+    "normalized_operating_cost_total",
+    "normalized_operating_cost_per_matched_order",
+    "HV_equivalent_operating_seconds",
+    "pickup_ETA_objective_value",
+    "relative_pickup_ETA_degradation_vs_epsilon_0_reference"
+  ],
+  "prohibitions": [
+    "no_collapsed_risk_or_safety_score",
+    "no_currency_conversion"
+  ]
+}

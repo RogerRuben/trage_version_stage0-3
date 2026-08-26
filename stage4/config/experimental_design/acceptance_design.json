@@ -1,0 +1,21 @@
+{
+  "schema_version": "stage4_s5b_acceptance_v1",
+  "acceptance_seed": 20260827,
+  "probability_levels": [
+    0.4,
+    0.7,
+    1.0
+  ],
+  "probability_parameter": "p_A",
+  "realized_indicator": "a_o^A = 1(u_o <= p_A)",
+  "uniform_draw": "SHA256(f'{seed}|{order_id}') first 8 bytes / 2**64",
+  "common_random_numbers": true,
+  "nested_acceptance_required": true,
+  "synthetic_construction_check_order_count": 2048,
+  "synthetic_construction_check_nested": true,
+  "interpretation": {
+    "0.4": "conservative_low_acceptance_scenario_not_xian_estimate",
+    "0.7": "literature_anchored_central_scenario_not_xian_estimate",
+    "1.0": "all_accept_upper_bound"
+  }
+}

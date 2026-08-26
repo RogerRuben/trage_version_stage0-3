@@ -1,0 +1,36 @@
+{
+  "schema_version": "stage4_s5b_gamma_policy_v1",
+  "families": [
+    "static",
+    "dynamic",
+    "speed"
+  ],
+  "near_binding_tolerance": 1e-07,
+  "policies": {
+    "STRICT": {
+      "static": 0.0,
+      "dynamic": 0.0,
+      "speed": 0.0
+    },
+    "REFERENCE": {
+      "static": 2.145067625590382,
+      "dynamic": 0.14934256810554178,
+      "speed": 0.0
+    },
+    "UNCONSTRAINED": {
+      "static": null,
+      "dynamic": null,
+      "speed": null
+    }
+  },
+  "path_diagnostic_only": {
+    "static": 2.2008744038155803,
+    "dynamic": 0.4011750995716139,
+    "speed": 0.0,
+    "dynamic_path_max_assignment_rank": 1,
+    "dynamic_path_max_assignment_time": "2016-10-31T08:01:00+08:00"
+  },
+  "path_exclusion_reason": "dynamic PATH is determined by assignment rank 1 and is an initialization envelope, not the primary long-run policy anchor",
+  "interpretation": "reference-envelope exposure budget, not a safety, failure, or legal threshold",
+  "required_wording": "The model retains all three operational-envelope dimensions, while their empirical activity and binding relevance are allowed to vary by capability profile and operating condition."
+}
