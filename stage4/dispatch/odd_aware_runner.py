@@ -156,9 +156,11 @@ def run_odd_aware_decision_kernel(
     config_path: str | Path | None = None,
     *,
     eta_actor: Any | None = None,
+    expected: dict[str, int] | None = None,
 ) -> dict[str, Any]:
     root = Path(root).resolve()
     config = load_odd_config(root, config_path)
+    expected_values = expected or EXPECTED
     start, demand_end, matching_end = _timestamps(config)
     requests = load_all_test31_requests(
         root, start=start, end=demand_end, profile_id=config["profile_id"]
@@ -274,7 +276,7 @@ def run_odd_aware_decision_kernel(
         ),
         "critical_matched": int(epoch["critical_matched"].sum()),
     }
-    reproduction_pass = observed == EXPECTED
+    reproduction_pass = observed == expected_values
     runtime_pass = total_runtime_s <= float(
         config["canonical_reproduction_runtime_guard_s"]
     )
@@ -329,7 +331,7 @@ def run_odd_aware_decision_kernel(
         "canonical_base": {
             "s3_commit": S3_COMMIT,
             "fleetpy_commit": FLEETPY_COMMIT,
-            "expected": EXPECTED,
+            "expected": expected_values,
         },
         "canonical_reproduction": observed,
         "canonical_reproduction_pass": reproduction_pass,

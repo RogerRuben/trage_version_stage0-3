@@ -48,8 +48,8 @@ def test_gamma_path_is_maximum_cumulative_mean():
 def test_q025_reproduces_frozen_av_count_and_share():
     fleet = fleet_vehicle_hour_scenarios(ROOT)
     row = fleet.loc[np.isclose(fleet["requested_q_A"], 0.25)].iloc[0]
-    assert int(row["AV_vehicle_count"]) == 150
-    assert np.isclose(row["achieved_q_A"], 0.2505306378092488)
+    assert int(row["AV_vehicle_count"]) == 128
+    assert np.isclose(row["achieved_q_A"], 0.25017638597959885)
 
 
 def test_q0_has_zero_avs():
@@ -61,11 +61,12 @@ def test_q0_has_zero_avs():
 
 def test_applicable_hv_accounting_stays_within_frozen_tolerance():
     fleet = fleet_vehicle_hour_scenarios(ROOT)
-    calibrated = fleet["requested_q_A"].isin([0.25, 0.50, 0.75])
+    calibrated = fleet["target_HV_vehicle_hours"] >= 0.0
     assert (
         fleet.loc[calibrated, "HV_vehicle_hour_error_pct"] <= HV_TOLERANCE_PCT
     ).all()
     q1 = fleet.loc[np.isclose(fleet["requested_q_A"], 1.0)].iloc[0]
-    assert q1["target_HV_vehicle_hours"] < 0.0
+    assert q1["raw_HV_residual_vehicle_hours"] < 0.0
+    assert q1["target_HV_vehicle_hours"] == 0.0
     assert int(q1["selected_HV_session_count"]) == 0
-    assert pd.isna(q1["HV_vehicle_hour_error_pct"])
+    assert q1["HV_vehicle_hour_error_pct"] == 0.0

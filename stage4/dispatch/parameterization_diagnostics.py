@@ -13,7 +13,12 @@ import pandas as pd
 
 from stage4.fleetpy_adapter.upstream import FleetPyCompatibilityError
 
-from .fleet_normalization import FLEET_REL, SCALING_REL, _priority
+from .fleet_normalization import (
+    FLEET_REL,
+    SCALING_REL,
+    _priority,
+    exact_baseline_vehicle_hours,
+)
 
 STAGE3_REL = Path(
     "stage3/output/odd_tod/final/test31_stage3_to_stage4_interface.parquet"
@@ -127,7 +132,11 @@ def distribution_summaries(
 
 
 def build_neutral_exposure_path(
-    root: str | Path, exposure: pd.DataFrame
+    root: str | Path,
+    exposure: pd.DataFrame,
+    *,
+    assignment_path: str | Path | None = None,
+    exposure_state_path: str | Path | None = None,
 ) -> pd.DataFrame:
     root = Path(root).resolve()
     columns = [
@@ -138,7 +147,10 @@ def build_neutral_exposure_path(
         "exposure_dynamic",
         "exposure_speed",
     ]
-    assignment = pd.read_parquet(root / ASSIGNMENT_REL, columns=columns)
+    assignment_source = (
+        Path(assignment_path) if assignment_path is not None else root / ASSIGNMENT_REL
+    )
+    assignment = pd.read_parquet(assignment_source, columns=columns)
     assignment = assignment.loc[assignment["vehicle_type"].astype(str).eq("AV")].copy()
     if assignment.empty or assignment["order_id"].astype(str).duplicated().any():
         raise FleetPyCompatibilityError(
@@ -172,7 +184,12 @@ def build_neutral_exposure_path(
         assignment[f"cumulative_mean_{family}_excess"] = (
             assignment[f"cumulative_{family}_excess"] / assignment["av_assignment_rank"]
         )
-    state = pd.read_parquet(root / EXPOSURE_STATE_REL)
+    state_source = (
+        Path(exposure_state_path)
+        if exposure_state_path is not None
+        else root / EXPOSURE_STATE_REL
+    )
+    state = pd.read_parquet(state_source)
     if state.empty or int(state.iloc[-1]["cumulative_av_assignments"]) != len(
         assignment
     ):
@@ -238,7 +255,8 @@ def fleet_vehicle_hour_scenarios(
     scaling = pd.read_parquet(root / SCALING_REL, columns=["simulated_active_supply"])
     if len(scaling) != 96:
         raise FleetPyCompatibilityError("frozen fleet scaling must contain 96 bins")
-    h_base = 0.25 * float(scaling["simulated_active_supply"].sum())
+    h_base_15min_equivalent = 0.25 * float(scaling["simulated_active_supply"].sum())
+    h_base_exact = exact_baseline_vehicle_hours(root)
     template = pd.read_parquet(
         root / FLEET_REL,
         columns=[
@@ -266,49 +284,47 @@ def fleet_vehicle_hour_scenarios(
         .map(lambda value: _priority("HV", seed, value))
     )
     total_template_hours = float(template["vehicle_hours"].sum())
+    if not np.isclose(total_template_hours, h_base_exact, rtol=0.0, atol=1e-9):
+        raise FleetPyCompatibilityError("exact baseline hours disagree with template")
     rows: list[dict[str, Any]] = []
     for requested_q in q_levels:
-        requested_av_hours = float(requested_q) * h_base
+        requested_av_hours = float(requested_q) * h_base_exact
         av_count = int(round(requested_av_hours / 24.0))
         achieved_av_hours = 24.0 * av_count
-        achieved_q = achieved_av_hours / h_base
-        target_hv_hours = h_base - achieved_av_hours
+        achieved_q = achieved_av_hours / h_base_exact
+        raw_hv_residual = h_base_exact - achieved_av_hours
+        target_hv_hours = max(raw_hv_residual, 0.0)
+        fraction = target_hv_hours / total_template_hours
         selected_indices: list[int] = []
-        if target_hv_hours > 0.0:
-            fraction = target_hv_hours / total_template_hours
-            for _, group in template.groupby("start_bin_15m", sort=True):
-                count = int(round(len(group) * fraction))
-                ordered = group.sort_values(
-                    ["_priority", "source_session_id"], kind="mergesort"
-                )
-                selected_indices.extend(ordered.head(count).index.tolist())
+        for _, group in template.groupby("start_bin_15m", sort=True):
+            count = int(round(len(group) * fraction))
+            ordered = group.sort_values(
+                ["_priority", "source_session_id"], kind="mergesort"
+            )
+            selected_indices.extend(ordered.head(count).index.tolist())
         selected = template.loc[selected_indices]
         achieved_hv_hours = float(selected["vehicle_hours"].sum())
         hv_error = (
             abs(achieved_hv_hours - target_hv_hours) / target_hv_hours * 100.0
             if target_hv_hours > 0.0
-            else None
+            else 0.0
         )
         rows.append(
             {
                 "requested_q_A": float(requested_q),
                 "achieved_q_A": achieved_q,
-                "H_base": h_base,
+                "H_base_exact": h_base_exact,
+                "H_base_15min_equivalent": h_base_15min_equivalent,
                 "requested_AV_vehicle_hours": requested_av_hours,
                 "achieved_AV_vehicle_hours": achieved_av_hours,
                 "AV_vehicle_count": av_count,
                 "AV_rounding_residual_hours": achieved_av_hours - requested_av_hours,
+                "raw_HV_residual_vehicle_hours": raw_hv_residual,
                 "target_HV_vehicle_hours": target_hv_hours,
                 "achieved_HV_vehicle_hours": achieved_hv_hours,
                 "HV_vehicle_hour_error_pct": hv_error,
-                "HV_template_support_sufficient": (
-                    0.0 <= target_hv_hours <= total_template_hours
-                ),
-                "HV_within_frozen_tolerance": (
-                    hv_error is not None and hv_error <= HV_TOLERANCE_PCT
-                ),
+                "HV_within_frozen_tolerance": hv_error <= HV_TOLERANCE_PCT,
                 "selected_HV_session_count": int(len(selected)),
-                "HV_target_nonpositive_due_to_AV_rounding": target_hv_hours <= 0.0,
             }
         )
     return pd.DataFrame(rows)
@@ -465,14 +481,14 @@ def _write_report(
                     "target_HV_vehicle_hours",
                     "achieved_HV_vehicle_hours",
                     "HV_vehicle_hour_error_pct",
-                    "HV_template_support_sufficient",
+                    "raw_HV_residual_vehicle_hours",
                     "selected_HV_session_count",
                 ],
             ),
             "",
-            "Rows with HV_template_support_sufficient=false at positive targets saturate all 8,435 frozen effective HV sessions; no synthetic supply or optimizer was introduced.",
+            "All positive effective HV targets remain within the frozen 2% whole-session selection tolerance; q_A=0 uses all 8,435 frozen effective HV sessions.",
             "",
-            "The q_A=1 target is slightly negative when 24-hour AV count rounding overshoots H_base; no HV sessions are selected and the relative HV error is reported as N/A.",
+            "At q_A=1, integer AV rounding makes raw HV residual slightly negative; the effective HV target is zero, no HV sessions are selected, and the effective-target error is zero.",
             "",
             "## Interpretation",
             "",
@@ -527,7 +543,8 @@ def run_parameterization_diagnostics(root: str | Path) -> dict[str, Any]:
         "recommendation": "GO_S5B_EXPERIMENTAL_DESIGN",
         "dispatch_ready_exposure_N": len(exposure),
         "neutral_AV_assignment_N": len(path),
-        "H_base": float(fleet.iloc[0]["H_base"]),
+        "H_base_exact": float(fleet.iloc[0]["H_base_exact"]),
+        "H_base_15min_equivalent": float(fleet.iloc[0]["H_base_15min_equivalent"]),
         "runtime_s": runtime_s,
         "fleetpy_launched": False,
         "valhalla_launched": False,

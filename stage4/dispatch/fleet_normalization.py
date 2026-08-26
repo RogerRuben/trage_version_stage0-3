@@ -30,6 +30,29 @@ def _priority(namespace: str, seed: int, value: str) -> str:
     ).hexdigest()
 
 
+def exact_baseline_vehicle_hours(root: str | Path) -> float:
+    """Return exact continuous hours in the frozen replay fleet template."""
+    path = Path(root).resolve() / FLEET_REL
+    template = pd.read_parquet(
+        path,
+        columns=[
+            "source_session_id",
+            "availability_start_time",
+            "availability_end_time",
+        ],
+    )
+    if template["source_session_id"].astype(str).duplicated().any():
+        raise FleetPyCompatibilityError("source_session_id must be unique")
+    start = pd.to_datetime(template["availability_start_time"], utc=True)
+    end = pd.to_datetime(template["availability_end_time"], utc=True)
+    duration_hours = (end - start).dt.total_seconds() / 3600.0
+    if not np.isfinite(duration_hours).all() or (duration_hours <= 0.0).any():
+        raise FleetPyCompatibilityError(
+            "non-positive or non-finite HV session duration"
+        )
+    return float(duration_hours.sum())
+
+
 def build_fleet_scenario(
     root: str | Path,
     *,
@@ -44,11 +67,14 @@ def build_fleet_scenario(
     scaling = pd.read_parquet(root / SCALING_REL)
     if len(scaling) != 96 or "simulated_active_supply" not in scaling:
         raise FleetPyCompatibilityError("frozen fleet scaling must contain 96 bins")
-    h_base = 0.25 * float(scaling["simulated_active_supply"].sum())
-    n_av = int(round(float(requested_q_a) * h_base / 24.0))
-    achieved_q_a = 24.0 * n_av / h_base
-    requested_hv_hours = h_base - 24.0 * n_av
-
+    h_base_15min_equivalent = 0.25 * float(scaling["simulated_active_supply"].sum())
+    h_base_exact = exact_baseline_vehicle_hours(root)
+    requested_av_hours = float(requested_q_a) * h_base_exact
+    n_av = int(round(requested_av_hours / 24.0))
+    achieved_av_hours = 24.0 * n_av
+    achieved_q_a = achieved_av_hours / h_base_exact
+    raw_hv_residual_hours = h_base_exact - achieved_av_hours
+    target_hv_hours = max(raw_hv_residual_hours, 0.0)
     template = pd.read_parquet(root / FLEET_REL).copy()
     for column in ("availability_start_time", "availability_end_time"):
         template[column] = pd.to_datetime(template[column], utc=True).dt.tz_convert(
@@ -62,9 +88,11 @@ def build_fleet_scenario(
     if (template["vehicle_hours"] <= 0).any():
         raise FleetPyCompatibilityError("non-positive HV service-session duration")
     total_template_hours = float(template["vehicle_hours"].sum())
-    if requested_hv_hours > total_template_hours:
+    if not np.isclose(total_template_hours, h_base_exact, rtol=0.0, atol=1e-9):
+        raise FleetPyCompatibilityError("exact baseline hours disagree with template")
+    if target_hv_hours > total_template_hours:
         raise FleetPyCompatibilityError("insufficient HV service-session hours")
-    fraction = requested_hv_hours / total_template_hours
+    fraction = target_hv_hours / total_template_hours
     template["start_bin_15m"] = (
         template["availability_start_time"].dt.hour * 60
         + template["availability_start_time"].dt.minute
@@ -84,7 +112,9 @@ def build_fleet_scenario(
     selected_hv = template.loc[selected_indices].copy()
     achieved_hv_hours = float(selected_hv["vehicle_hours"].sum())
     hv_hour_error_pct = (
-        abs(achieved_hv_hours - requested_hv_hours) / requested_hv_hours * 100.0
+        abs(achieved_hv_hours - target_hv_hours) / target_hv_hours * 100.0
+        if target_hv_hours > 0.0
+        else 0.0
     )
     if hv_hour_error_pct > float(max_hv_hour_error_pct):
         raise FleetPyCompatibilityError(
@@ -201,11 +231,15 @@ def build_fleet_scenario(
         ["vehicle_type", "vehicle_id"], kind="mergesort"
     )
     accounting = {
-        "h_base_vehicle_hours": h_base,
+        "h_base_exact": h_base_exact,
+        "h_base_15min_equivalent": h_base_15min_equivalent,
         "requested_q_a": float(requested_q_a),
         "achieved_q_a": achieved_q_a,
         "av_count": n_av,
-        "requested_hv_vehicle_hours": requested_hv_hours,
+        "requested_av_vehicle_hours": requested_av_hours,
+        "achieved_av_vehicle_hours": achieved_av_hours,
+        "raw_hv_residual_vehicle_hours": raw_hv_residual_hours,
+        "target_hv_vehicle_hours": target_hv_hours,
         "achieved_hv_vehicle_hours": achieved_hv_hours,
         "vehicle_hour_error_pct": hv_hour_error_pct,
         "selected_hv_session_count": int(len(selected_hv)),
