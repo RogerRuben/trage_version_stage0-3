@@ -222,9 +222,8 @@ def run(root: Path) -> None:
     observability = build_observability_table(observed)
     observed.to_csv(output / "observed_gate_diagnostics.csv", index=False)
     observability.to_csv(output / "gate_observability.csv", index=False)
-    pd.DataFrame(
-        [
-            {
+    registry_path = enhancement / "experiment_registry.csv"
+    audit_row = {
                 "run_id": "GATE_LOG_AUDIT_4_ANCHORS",
                 "workstream": "gate_decomposition",
                 "base_scenario": "MAIN_Q25_M_P70|MAIN_Q50_M_P70|MAIN_Q75_M_P70|BENCH_AV_M",
@@ -238,8 +237,13 @@ def run(root: Path) -> None:
                 "output_path": "stage4/output/paper_enhancement/gate_decomposition",
                 "notes": "Complete funnel prohibited because like-for-like denominators and AV-only pickup/Gamma gates are absent.",
             }
-        ]
-    ).to_csv(enhancement / "experiment_registry.csv", index=False)
+    if registry_path.is_file():
+        registry = pd.read_csv(registry_path, dtype=str).fillna("")
+        if not registry["run_id"].eq(audit_row["run_id"]).any():
+            registry = pd.concat([registry, pd.DataFrame([audit_row])], ignore_index=True)
+    else:
+        registry = pd.DataFrame([audit_row])
+    registry.to_csv(registry_path, index=False)
     (docs / "gate_decomposition_observability.md").write_text(
         render_report(observed), encoding="utf-8"
     )

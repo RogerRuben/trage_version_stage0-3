@@ -24,6 +24,12 @@ from .exposure import (
     exposure_excess,
     parse_gammas,
 )
+from .gate_diagnostics import (
+    empty_gate_counts,
+    evidence_contract_complete,
+    structural_reason,
+    validate_gate_counts,
+)
 from .solver import AssignmentArc, solve_lexicographic
 
 
@@ -80,6 +86,9 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
         self.av_candidates_pruned_by_acceptance = 0
         self.av_candidates_pruned_by_missing_exposure = 0
         self.cost_level_solve_count = 0
+        self.prospective_gate_logging = bool(
+            config.get("prospective_gate_logging", False)
+        )
 
     def record_tick(self, simulation_time: int) -> None:
         """Avoid retaining an O(ticks x fleet) trace; epoch aggregates are enough."""
@@ -187,6 +196,7 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
         critical_count = 0
         pruned_acceptance_epoch = 0
         pruned_exposure_epoch = 0
+        gate_counts = empty_gate_counts() if self.prospective_gate_logging else None
         routing_before = self.eta_adapter.routing_time_s
         for rid in waiting_ids:
             request = self.request_by_rid[rid]
@@ -208,6 +218,31 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
             exposure: ExposureExcess | None = meta["exposure"]
             av_ready = bool(request.av_smoke_eligible)
             accepts = bool(meta["passenger_accepts_av"])
+            if gate_counts is not None:
+                nearby_av = index.count_vehicle_type_within(
+                    request.pickup_lon_wgs84,
+                    request.pickup_lat_wgs84,
+                    radius,
+                    "AV",
+                )
+                gate_counts["gate_av_n0_spatial"] += nearby_av
+                if accepts:
+                    gate_counts["gate_av_n1_passenger_compatible"] += nearby_av
+                    reason = structural_reason(request)
+                    if reason == "NO_SELECTED_ROUTE":
+                        gate_counts["gate_av_loss_no_selected_route"] += nearby_av
+                    elif reason == "HARD_INFEASIBLE":
+                        gate_counts["gate_av_loss_hard_infeasible"] += nearby_av
+                    elif reason == "HARD_UNKNOWN":
+                        gate_counts["gate_av_loss_hard_unknown"] += nearby_av
+                    else:
+                        gate_counts["gate_av_n2_structurally_ready"] += nearby_av
+                        if evidence_contract_complete(request, exposure):
+                            gate_counts["gate_av_n3_evidence_complete"] += nearby_av
+                        else:
+                            gate_counts[
+                                "gate_av_loss_evidence_incomplete"
+                            ] += nearby_av
             av_eligible = av_ready and accepts and exposure is not None
             if av_ready and not accepts:
                 pruned_acceptance_epoch += index.count_vehicle_type_within(
@@ -239,12 +274,19 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                 timestamp,
             )
             for vehicle, _distance in candidates:
+                is_av = vehicle.vehicle_type == "AV"
+                if gate_counts is not None and is_av:
+                    gate_counts["gate_av_n3a_shared_topk"] += 1
                 estimate = estimates.get(vehicle.native_vehicle_id)
                 if estimate is None:
                     continue
+                if gate_counts is not None and is_av:
+                    gate_counts["gate_av_n3b_route_returned"] += 1
                 if not patience_feasible(estimate.corrected_pickup_eta_s, remaining):
                     invalid_patience += 1
                     continue
+                if gate_counts is not None and is_av:
+                    gate_counts["gate_av_n4_pickup_within_patience"] += 1
                 runtime = by_vid[vehicle.native_vehicle_id]
                 predicted = float(request.predicted_service_time_s)
                 if vehicle.vehicle_type == "HV":
@@ -287,6 +329,8 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                         operating_cost=operating_cost,
                     )
                 )
+                if gate_counts is not None and is_av:
+                    gate_counts["gate_av_n5_solver_eligible"] += 1
         candidate_elapsed = time.perf_counter() - epoch_started
         routing_elapsed = self.eta_adapter.routing_time_s - routing_before
         pure_candidate_elapsed = max(0.0, candidate_elapsed - routing_elapsed)
@@ -333,6 +377,33 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                     )
                 )
             selected_rids.add(arc.request_id)
+        if gate_counts is not None:
+            gate_counts["gate_av_n6_selected"] = len(selected_av_exposures)
+            gate_counts["gate_av_loss_acceptance"] = (
+                gate_counts["gate_av_n0_spatial"]
+                - gate_counts["gate_av_n1_passenger_compatible"]
+            )
+            gate_counts["gate_av_loss_shared_topk"] = (
+                gate_counts["gate_av_n3_evidence_complete"]
+                - gate_counts["gate_av_n3a_shared_topk"]
+            )
+            gate_counts["gate_av_loss_routing_failure"] = (
+                gate_counts["gate_av_n3a_shared_topk"]
+                - gate_counts["gate_av_n3b_route_returned"]
+            )
+            gate_counts["gate_av_loss_patience"] = (
+                gate_counts["gate_av_n3b_route_returned"]
+                - gate_counts["gate_av_n4_pickup_within_patience"]
+            )
+            gate_counts["gate_av_loss_other_arc_condition"] = (
+                gate_counts["gate_av_n4_pickup_within_patience"]
+                - gate_counts["gate_av_n5_solver_eligible"]
+            )
+            gate_counts["gate_av_loss_dispatch_competition"] = (
+                gate_counts["gate_av_n5_solver_eligible"]
+                - gate_counts["gate_av_n6_selected"]
+            )
+            validate_gate_counts(gate_counts)
         epoch_excess = self.exposure_state.update(selected_av_exposures)
         self.exposure_state.validate(self.gammas, self.solver_tolerance)
         for rid in waiting_ids:
@@ -340,8 +411,7 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                 meta = self.request_meta[rid]
                 meta["carry_over_flag"] = True
                 meta["failed_round_count"] += 1
-        self.epoch_rows.append(
-            {
+        epoch_row = {
                 "simulation_time_s": int(simulation_time),
                 "timestamp": timestamp,
                 "waiting_orders": len(waiting_ids),
@@ -365,7 +435,9 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                 "solver_time_s": solver_elapsed,
                 "solver_backend": result.backend,
             }
-        )
+        if gate_counts is not None:
+            epoch_row.update(gate_counts)
+        self.epoch_rows.append(epoch_row)
         n_av = self.exposure_state.av_assignments
         self.exposure_rows.append(
             {

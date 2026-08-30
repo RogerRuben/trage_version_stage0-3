@@ -9,6 +9,7 @@ from typing import Any, Iterable
 
 import numpy as np
 import pandas as pd
+import pyarrow.parquet as pq
 
 from .upstream import CoordinateRegistry, FleetPyBindings, FleetPyCompatibilityError
 
@@ -34,6 +35,7 @@ class SpikeRequest:
     rho_static: float
     rho_dynamic: float
     rho_speed: float
+    selected_route_type: str = "ORIGINAL"
     passenger_accepts_av: bool | None = None
     acceptance_source: str | None = None
     native_request: Any = None
@@ -47,6 +49,16 @@ class SpikeRequest:
 
 def _priority(order_id: str, seed: int) -> str:
     return hashlib.sha256(f"{int(seed)}|{order_id}".encode("utf-8")).hexdigest()
+
+
+def _read_replay(path: Path, required: list[str]) -> pd.DataFrame:
+    """Read the frozen schema while keeping legacy unit-test fixtures valid."""
+    available = set(pq.read_schema(path).names)
+    columns = [name for name in required if name in available]
+    frame = pd.read_parquet(path, columns=columns)
+    if "selected_route_type" not in frame.columns:
+        frame["selected_route_type"] = "ORIGINAL"
+    return frame
 
 
 def load_test31_requests(
@@ -70,13 +82,14 @@ def load_test31_requests(
         "realized_service_time_s",
         "predicted_service_time_s",
         "profile_id",
+        "selected_route_type",
         "hard_state",
         "evidence_complete",
         "rho_static",
         "rho_dynamic",
         "rho_speed",
     ]
-    frame = pd.read_parquet(path, columns=required)
+    frame = _read_replay(path, required)
     frame["request_time"] = pd.to_datetime(
         frame["request_time"], utc=True
     ).dt.tz_convert(TIMEZONE)
@@ -133,6 +146,7 @@ def load_test31_requests(
                 realized_service_time_s=float(row.realized_service_time_s),
                 predicted_service_time_s=float(row.predicted_service_time_s),
                 profile_id=str(row.profile_id),
+                selected_route_type=str(row.selected_route_type),
                 hard_state=str(row.hard_state),
                 evidence_complete=bool(row.evidence_complete),
                 rho_static=float(row.rho_static),
@@ -204,13 +218,14 @@ def load_all_test31_requests(
         "realized_service_time_s",
         "predicted_service_time_s",
         "profile_id",
+        "selected_route_type",
         "hard_state",
         "evidence_complete",
         "rho_static",
         "rho_dynamic",
         "rho_speed",
     ]
-    frame = pd.read_parquet(path, columns=required)
+    frame = _read_replay(path, required)
     frame["request_time"] = pd.to_datetime(
         frame["request_time"], utc=True
     ).dt.tz_convert(TIMEZONE)
@@ -257,6 +272,7 @@ def load_all_test31_requests(
                 realized_service_time_s=float(row.realized_service_time_s),
                 predicted_service_time_s=float(predicted),
                 profile_id=str(row.profile_id),
+                selected_route_type=str(row.selected_route_type),
                 hard_state=str(row.hard_state),
                 evidence_complete=bool(row.evidence_complete),
                 rho_static=float(row.rho_static),

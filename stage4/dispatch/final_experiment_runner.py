@@ -515,6 +515,12 @@ def execute_scenario(
         "assignment_matrix_representation": config["assignment_matrix_representation"],
         "gpu_usage": config["gpu_usage"],
         "matching_end_s": int((matching_end - start).total_seconds()),
+        "prospective_gate_logging": bool(
+            config.get("prospective_gate_logging", False)
+        ),
+        "gate_diagnostic_bin_minutes": int(
+            config.get("gate_diagnostic_bin_minutes", 15)
+        ),
     }
     config_hash = scenario_config_sha256(row)
     scenario_config = {
