@@ -1,0 +1,5 @@
+scenario_id,requested_q_A,target_p_A,gamma_policy,request_count,passenger_accepting_requests,acceptance_rejected_nearby_av_opportunities,missing_exposure_nearby_av_opportunities,eligible_all_fleet_spatial_pairs,eligible_all_fleet_topk_pairs,all_fleet_patience_arc_exclusions,all_fleet_valid_or_arcs,selected_av_assignments,selected_total_assignments,final_assigned_av_share,enabled_gamma_constraint_count_max
+MAIN_Q25_M_P70,0.25,0.7000000000000001,UNCONSTRAINED,30000,21031,621898,0,16492350,2152956,2047960,79999,1187,21891,0.05422319674752181,0
+MAIN_Q50_M_P70,0.5,0.7000000000000001,UNCONSTRAINED,30000,21031,1835602,0,14586132,2724596,2653140,52397,2207,18133,0.12171179617272376,0
+MAIN_Q75_M_P70,0.75,0.7000000000000001,UNCONSTRAINED,30000,21031,4107009,0,12321636,3400231,3353235,35472,3134,12039,0.2603206246365977,0
+BENCH_AV_M,1.0,1.0,UNCONSTRAINED,30000,30000,0,0,13453855,1012556,985131,27425,4545,4545,1.0,0

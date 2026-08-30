@@ -1,0 +1,2 @@
+run_id,workstream,base_scenario,variant,scientific_question,changed_component,unchanged_components,seed,status,runtime,output_path,notes
+GATE_LOG_AUDIT_4_ANCHORS,gate_decomposition,MAIN_Q25_M_P70|MAIN_Q50_M_P70|MAIN_Q75_M_P70|BENCH_AV_M,existing_frozen_logs_only,Where are nominal AV opportunities lost?,none_read_only_analysis,all_frozen_scenarios_and_outputs,not_applicable,STOPPED_UNIDENTIFIABLE,not_applicable_read_only,stage4/output/paper_enhancement/gate_decomposition,Complete funnel prohibited because like-for-like denominators and AV-only pickup/Gamma gates are absent.
