@@ -36,6 +36,10 @@ from stage4.fleetpy_adapter.upstream import (
 )
 
 from .candidate_graph import SparseValhallaMatrixAdapter
+from .deterministic_routing import (
+    DETERMINISTIC_ROUTING_MODES,
+    ArcDeterministicValhallaAdapter,
+)
 from .fleet_normalization import build_fleet_scenario
 from .rolling_or_control import (
     RollingRuntimeGuardExceeded,
@@ -528,6 +532,7 @@ def execute_scenario(
             config.get("gate_diagnostic_bin_minutes", 15)
         ),
         "repositioning_enabled": bool(config.get("repositioning_enabled", False)),
+        "routing_mode": str(config.get("routing_mode", "MULTI_SOURCE_MATRIX")),
     }
     repositioning_reference = None
     repositioning_manifest = None
@@ -597,7 +602,12 @@ def execute_scenario(
         native_movement=True,
         routing_engine=network,
     )
-    eta = SparseValhallaMatrixAdapter(root)
+    if runtime_config["routing_mode"] in DETERMINISTIC_ROUTING_MODES:
+        eta = ArcDeterministicValhallaAdapter(
+            root, routing_mode=runtime_config["routing_mode"]
+        )
+    else:
+        eta = SparseValhallaMatrixAdapter(root)
     repositioning_manager = None
     if runtime_config["repositioning_enabled"]:
         repositioning_manager = TrainTODRepositioningManager(
