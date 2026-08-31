@@ -1,5 +1,7 @@
 # Effective-capacity gate observability audit
 
+> Historical audit note: this document records the frozen-log limitation found before prospective logging was authorized. The limitation is now resolved by the four-anchor same-unit rerun documented in `prospective_gate_decomposition_report.md`; the old audit is retained for provenance rather than used as the current conclusion.
+
 ## Status
 
 `STOPPED_AT_TASKBOOK_GATE_D4`: a complete candidate-opportunity funnel is not identifiable from the frozen logs. No missing gate is inferred, and no new simulation was started.

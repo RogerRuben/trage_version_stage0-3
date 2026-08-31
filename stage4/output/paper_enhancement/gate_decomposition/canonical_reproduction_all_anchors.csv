@@ -1,0 +1,5 @@
+scenario_id,summary_difference_count,request_outcomes_exact,assignments_exact,canonical_reproduction_pass
+MAIN_Q25_M_P70,0,True,True,True
+MAIN_Q50_M_P70,0,True,True,True
+MAIN_Q75_M_P70,0,True,True,True
+BENCH_AV_M,0,True,True,True

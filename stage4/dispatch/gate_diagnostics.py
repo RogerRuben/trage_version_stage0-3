@@ -133,7 +133,11 @@ def aggregate_gate_epochs(epoch: pd.DataFrame, bin_minutes: int = 15) -> pd.Data
     if missing:
         raise ValueError(f"gate epoch log missing columns: {sorted(missing)}")
     frame = epoch[["timestamp", *GATE_COLUMNS, *LOSS_COLUMNS]].copy()
-    frame["timestamp"] = pd.to_datetime(frame["timestamp"], utc=True)
+    frame["timestamp"] = pd.to_datetime(frame["timestamp"])
+    if frame["timestamp"].dt.tz is None:
+        frame["timestamp"] = frame["timestamp"].dt.tz_localize("Asia/Shanghai")
+    else:
+        frame["timestamp"] = frame["timestamp"].dt.tz_convert("Asia/Shanghai")
     frame["time_bin_start"] = frame["timestamp"].dt.floor(f"{int(bin_minutes)}min")
     result = (
         frame.groupby("time_bin_start", as_index=False, sort=True)[

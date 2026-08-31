@@ -1,0 +1,32 @@
+{
+  "scenario_id": "BENCH_AV_M",
+  "checked_summary_fields": [
+    "request_count",
+    "matched",
+    "completed",
+    "patience_expired",
+    "HV_assignments",
+    "AV_assignments",
+    "service_rate",
+    "AV_assignment_share",
+    "request_to_pickup_mean",
+    "request_to_pickup_p50",
+    "request_to_pickup_p90",
+    "request_to_pickup_p95",
+    "first_window_match_rate",
+    "carry_over_entry_rate",
+    "carry_over_recovery_rate",
+    "critical_order_count",
+    "critical_recovery",
+    "expanded_radius_match_share",
+    "pickup_ETA_objective_value"
+  ],
+  "summary_differences": {},
+  "request_outcome_fingerprint_canonical": "fa655c4fbe9e0fc4e7b1a1bbf3b4a4a78dcd17e15f093f0eebef75641a16249e",
+  "request_outcome_fingerprint_rerun": "fa655c4fbe9e0fc4e7b1a1bbf3b4a4a78dcd17e15f093f0eebef75641a16249e",
+  "assignment_fingerprint_canonical": "9797f3e9aa61a8ba5a1b7cc4f8e8ec34233004e525daa70e187334aba02380b4",
+  "assignment_fingerprint_rerun": "9797f3e9aa61a8ba5a1b7cc4f8e8ec34233004e525daa70e187334aba02380b4",
+  "request_outcomes_exact": true,
+  "assignments_exact": true,
+  "canonical_reproduction_pass": true
+}

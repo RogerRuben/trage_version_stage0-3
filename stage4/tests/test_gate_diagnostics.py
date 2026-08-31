@@ -76,6 +76,7 @@ def test_gate_counts_reconcile_and_aggregate_to_15_minutes() -> None:
     binned = aggregate_gate_epochs(epoch)
     assert len(binned) == 1
     assert int(binned.iloc[0]["gate_av_n0_spatial"]) == 200
+    assert str(binned.iloc[0]["time_bin_start"].tz) == "Asia/Shanghai"
 
 
 def test_invalid_non_nested_gate_counts_fail_closed() -> None:

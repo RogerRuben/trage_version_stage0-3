@@ -90,3 +90,9 @@ Supporting modules enter the main text only to the extent needed to explain scie
 - **Use “ODD-aware mixed-fleet dispatch”** if prediction differences are negligible at the decision layer, even if predictive accuracy differs.
 - **Change the fleet-transition story** if simple Train-only repositioning largely restores high-penetration service.
 - **Stop for implementation review** if any extension reveals future leakage, cumulative-budget violation, or inconsistent frozen semantics.
+
+## Measured effective-capacity decision
+
+The prospective four-anchor shadow-logging rerun closes the former observability gap. Every counter uses the same `(waiting order, available AV, decision epoch)` unit, and canonical outcomes reproduce exactly. For the p=.70 anchors, N5/N0 falls from 0.0939% at q=.25 to 0.0445% at q=.75. Passenger compatibility retention changes only slightly, whereas structural readiness, evidence completeness, and pickup feasibility under patience weaken more clearly.
+
+This result qualifies rather than overturns the storyline. Effective capacity is a multi-gate conversion mechanism, not a passenger-acceptance-only mechanism. N0 is an endogenous rolling opportunity stock, shared Top-K is algorithmic compression rather than safety attrition, and N5→N6 is dispatch competition. The next decision point is repositioning robustness.

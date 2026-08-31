@@ -5,7 +5,7 @@
 - Branch: `codex/stage2-v5-micro-transfer`
 - Canonical manuscript commit: `3ed344d7a86ec232db10e0d8913fb08a06ec98d5`
 - Frozen canonical experiments: unchanged
-- Enhancement experiments: separate registry; no simulation run was started
+- Enhancement experiments: separate registry; four authorized shadow-logging reruns completed
 
 ## Storyline redesign
 
@@ -28,15 +28,17 @@ Seven scientific layers have explicit inputs, outputs, information regimes, pape
 
 ## Effective-capacity gate decomposition
 
-Status: `STOPPED_AT_TASKBOOK_GATE_D4`.
+Status: `PASS — GO_REPOSITIONING_ROBUSTNESS`.
 
-Directly observable evidence includes nearby AV opportunities rejected by passenger acceptance, nearby AV opportunities removed for missing exposure, selected AV assignments, and final assigned-AV share. The logs do not preserve a common nominal nearby-AV denominator, route-ready AV opportunity counts, AV-only patience-feasible counts, or candidate-level Gamma attrition. Mixed units cannot be chained into retained/lost shares.
+Prospective shadow counters were added for one common unit: `(waiting order, available AV, decision epoch)`. The four authorized anchors were rerun in isolation, and all 19 canonical summary metrics, request-outcome fingerprints, and assignment fingerprints reproduced exactly. Canonical experiment products were not overwritten.
 
-Main finding: selected attrition diagnostics are available, but an end-to-end effective-capacity funnel is not identified from the frozen logs. The scientific story is therefore `QUALIFIES CURRENT STORY`, not rejected.
+The comparable p=.70 anchors show that N5/N0 dispatch-eligibility conversion declines from 0.0939% at q=.25 to 0.0445% at q=.75, a 52.6% relative reduction. Passenger retention changes only modestly; structural readiness, complete decision evidence, and pickup feasibility under patience deteriorate more clearly. Shared Top-K is separately reported as algorithmic compression, while routing return is 100% and N5→N6 is treated as dispatch competition rather than eligibility attrition.
+
+Main finding: the end-to-end effective-capacity mechanism is now directly observed. It `QUALIFIES CURRENT STORY`: the result is not primarily an acceptance story, but a joint conversion through structural, evidence, sparse-candidate, and patience gates.
 
 ## Downstream workstreams
 
-Under the taskbook stop condition, the following were not executed:
+The following later workstreams remain unexecuted in this gate-specific authorization:
 
 - AV repositioning robustness;
 - Gamma service–exposure frontier;
@@ -45,15 +47,12 @@ Under the taskbook stop condition, the following were not executed:
 - central AV transition curve;
 - optional P1/P2 robustness.
 
-No implementation defect, future-information leakage, or cumulative-budget violation was observed; execution stopped solely because completing the requested gate funnel would require invented states or a prospective logging rerun.
+No implementation defect, future-information leakage, or cumulative-budget violation was observed. Gamma remains outside this funnel because all four anchors are `UNCONSTRAINED`.
 
 ## Recommendation
 
-`REVISE_SCIENTIFIC_STRENGTHENING`
+`GO_REPOSITIONING_ROBUSTNESS`
 
-Before authorizing later workstreams, choose one of two scientifically clean paths:
-
-1. accept a partial gate-attribution result and explicitly authorize continuation from repositioning; or
-2. authorize prospective gate counters plus reruns of the four anchors, preserving the frozen canonical outputs and writing only to the enhancement registry.
+The prospective gate decision point is closed. The next scientific robustness task is the pre-specified repositioning analysis; it should remain separate from the frozen canonical experiment products.
 
 Do not rewrite Manuscript v2 yet.
