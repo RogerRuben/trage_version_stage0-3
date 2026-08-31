@@ -116,8 +116,17 @@ def prepare_registry(root: Path) -> pd.DataFrame:
     for row in _registry_spec(config):
         mask = registry["run_id"].eq(row["run_id"])
         if bool(mask.any()):
+            protected = {
+                "COMPLETED",
+                "RUNNING",
+                "STOPPED_NOT_COST_EFFECTIVE",
+                "NOT_RUN_COST_STOP",
+            }
             for key, value in row.items():
-                if registry.loc[mask, "status"].iloc[0] not in {"COMPLETED", "RUNNING"} or key not in {"status", "runtime", "notes"}:
+                if (
+                    registry.loc[mask, "status"].iloc[0] not in protected
+                    or key not in {"status", "runtime", "notes"}
+                ):
                     registry.loc[mask, key] = value
         else:
             registry = pd.concat([registry, pd.DataFrame([row])], ignore_index=True)

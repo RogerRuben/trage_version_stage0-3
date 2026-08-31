@@ -1,0 +1,21 @@
+{
+  "protocol_id": "STAGE4_PAPER_ENH_R0.5c",
+  "decision": "REPOSITIONING_ROBUSTNESS_NOT_COST_EFFECTIVE",
+  "recommendation": "STOP_NOT_COST_EFFECTIVE",
+  "scenario": "DET_Q50_CONTROL_A",
+  "scenario_started_at": "2026-09-01T01:52:17+08:00",
+  "scenario_stopped_at": "2026-09-01T04:28:57+08:00",
+  "observed_wall_time_s": 9400,
+  "observed_wall_time_h": 2.6111111111,
+  "completed": false,
+  "scientific_output_valid": false,
+  "conservative_five_run_projection_h": 13.0555555556,
+  "soft_budget_h": 8,
+  "hard_reconsideration_h": 10,
+  "per_scenario_not_cost_effective_range_h": "2.5-3.0",
+  "peak_observed_rss_mb": 1917.7,
+  "gpu_used": false,
+  "dense_matrix_constructed": false,
+  "subsequent_runs_launched": false,
+  "stop_reason": "The first full-day deterministic control remained incomplete after 156.7 minutes. Even the lower-bound five-run projection exceeded the protocol's 10-hour hard reconsideration point."
+}
