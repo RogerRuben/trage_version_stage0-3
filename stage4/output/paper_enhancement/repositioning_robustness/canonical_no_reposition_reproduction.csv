@@ -1,0 +1,5 @@
+base_scenario,execution_status,exact_reproduction,summary_difference_count,request_outcomes_exact,assignments_exact,matched_canonical,matched_rerun,service_rate_canonical,service_rate_rerun,matrix_failed_arcs_canonical,matrix_failed_arcs_rerun,decision
+MAIN_Q25_M_P70,COMPLETED,true,0,true,true,21891,21891,0.7297,0.7297,0,0,PASS
+MAIN_Q50_M_P70,COMPLETED,false,18,false,false,18133,18141,0.6044333333333334,0.6047,0,980,STOP
+MAIN_Q75_M_P70,NOT_RUN_AFTER_STOP,,,,,,,,,,,NOT_EVALUATED
+BENCH_AV_M,NOT_RUN_AFTER_STOP,,,,,,,,,,,NOT_EVALUATED

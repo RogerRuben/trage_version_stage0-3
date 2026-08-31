@@ -1,0 +1,13 @@
+{
+  "base_scenario": "MAIN_Q25_M_P70",
+  "repositioning_enabled": false,
+  "summary_difference_count": 0,
+  "summary_differences": {},
+  "request_fingerprint_canonical": "e2f67df66235b2dbaaa098e99541f8b34287413ba878ddd40a88fa1c7bcf6309",
+  "request_fingerprint_rerun": "e2f67df66235b2dbaaa098e99541f8b34287413ba878ddd40a88fa1c7bcf6309",
+  "assignment_fingerprint_canonical": "973709e000ce0aec69065d605ce52682ada6c81356105c05f3b1d06a5f0ed909",
+  "assignment_fingerprint_rerun": "973709e000ce0aec69065d605ce52682ada6c81356105c05f3b1d06a5f0ed909",
+  "request_outcomes_exact": true,
+  "assignments_exact": true,
+  "exact_reproduction": true
+}
