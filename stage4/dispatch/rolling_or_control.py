@@ -57,6 +57,7 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
         start: pd.Timestamp,
         end: pd.Timestamp,
         config: dict[str, Any],
+        repositioning_manager: Any | None = None,
     ) -> None:
         super().__init__(
             bindings, vehicles, requests, demand, network, eta_adapter, start, end
@@ -89,6 +90,7 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
         self.prospective_gate_logging = bool(
             config.get("prospective_gate_logging", False)
         )
+        self.repositioning_manager = repositioning_manager
 
     def record_tick(self, simulation_time: int) -> None:
         """Avoid retaining an O(ticks x fleet) trace; epoch aggregates are enough."""
@@ -157,6 +159,8 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
 
     def time_trigger(self, simulation_time: int) -> None:
         self.sim_time = int(simulation_time)
+        if self.repositioning_manager is not None:
+            self.repositioning_manager.before_normal_dispatch(simulation_time)
         if time.perf_counter() - self.run_started_perf > self.runtime_guard_s:
             raise RollingRuntimeGuardExceeded(
                 "bounded benchmark runtime guard exceeded"
@@ -458,6 +462,13 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                 "gamma_speed": self.gammas["speed"],
             }
         )
+        if self.repositioning_manager is not None:
+            self.repositioning_manager.after_normal_dispatch(self, simulation_time)
+
+    def reconcile(self) -> None:
+        super().reconcile()
+        if self.repositioning_manager is not None:
+            self.repositioning_manager.finalize(self.sim_time)
 
 
 def create_rolling_or_fleet_control(
@@ -470,6 +481,7 @@ def create_rolling_or_fleet_control(
     start: pd.Timestamp,
     end: pd.Timestamp,
     config: dict[str, Any],
+    repositioning_manager: Any | None = None,
 ) -> Any:
     fleet_control_class = type(
         "Stage4RollingORFleetControl",
@@ -477,5 +489,14 @@ def create_rolling_or_fleet_control(
         {},
     )
     return fleet_control_class(
-        bindings, vehicles, requests, demand, network, eta_adapter, start, end, config
+        bindings,
+        vehicles,
+        requests,
+        demand,
+        network,
+        eta_adapter,
+        start,
+        end,
+        config,
+        repositioning_manager,
     )

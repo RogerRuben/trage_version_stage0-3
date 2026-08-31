@@ -42,6 +42,12 @@ from .rolling_or_control import (
     create_rolling_or_fleet_control,
 )
 from .rolling_or_runner import _outcomes, _summary
+from .repositioning_policy import (
+    POLICY_NAME as REPOSITIONING_POLICY_NAME,
+    POLICY_VERSION as REPOSITIONING_POLICY_VERSION,
+    TrainTODRepositioningManager,
+    load_train_demand_reference,
+)
 
 CONFIG_REL = Path("stage4/config/final_experiment_execution.json")
 OUTPUT_FILES = (
@@ -521,7 +527,18 @@ def execute_scenario(
         "gate_diagnostic_bin_minutes": int(
             config.get("gate_diagnostic_bin_minutes", 15)
         ),
+        "repositioning_enabled": bool(config.get("repositioning_enabled", False)),
     }
+    repositioning_reference = None
+    repositioning_manifest = None
+    if runtime_config["repositioning_enabled"]:
+        repositioning_reference, repositioning_manifest = load_train_demand_reference(root)
+        expected_reference_sha = config.get("repositioning_reference_sha256")
+        if (
+            expected_reference_sha
+            and repositioning_manifest["reference_sha256"] != expected_reference_sha
+        ):
+            raise FleetPyCompatibilityError("repositioning reference SHA mismatch")
     config_hash = scenario_config_sha256(row)
     scenario_config = {
         "scenario_id": row["scenario_id"],
@@ -535,6 +552,13 @@ def execute_scenario(
         "FleetPy_commit": config["fleetpy_commit"],
         "runtime_configuration": runtime_config,
     }
+    if repositioning_manifest is not None:
+        scenario_config["repositioning"] = {
+            "policy_name": REPOSITIONING_POLICY_NAME,
+            "policy_version": REPOSITIONING_POLICY_VERSION,
+            "train_reference": repositioning_manifest,
+            "empty_route_odd_qualification": "OPERATIONAL_ABSTRACTION_NOT_ODD_CERTIFIED",
+        }
     _atomic_json(scenario_config, directory / "scenario_config.json")
     requests = load_all_test31_requests(
         root, start=start, end=demand_end, profile_id=row["profile_id"]
@@ -574,6 +598,17 @@ def execute_scenario(
         routing_engine=network,
     )
     eta = SparseValhallaMatrixAdapter(root)
+    repositioning_manager = None
+    if runtime_config["repositioning_enabled"]:
+        repositioning_manager = TrainTODRepositioningManager(
+            bindings=bindings,
+            runtimes=vehicles,
+            network=network,
+            eta_adapter=eta,
+            reference=repositioning_reference,
+            start=start,
+            policy_end=demand_end,
+        )
     control = create_rolling_or_fleet_control(
         bindings,
         vehicles,
@@ -584,6 +619,7 @@ def execute_scenario(
         start,
         simulation_end,
         runtime_config,
+        repositioning_manager,
     )
     simulation = create_native_simulation(
         bindings,
@@ -649,6 +685,18 @@ def execute_scenario(
         started_at,
         ended_at,
     )
+    if repositioning_manager is not None:
+        horizon_seconds = float((demand_end - start).total_seconds())
+        repositioning_summary = repositioning_manager.summary(
+            av_count=int(fleet.accounting["av_count"]), horizon_seconds=horizon_seconds
+        )
+        summary["repositioning"] = {
+            "enabled": True,
+            "train_reference_sha256": repositioning_manifest["reference_sha256"],
+            **repositioning_summary,
+        }
+        if repositioning_summary["position_reconciliation_failure_count"]:
+            raise FleetPyCompatibilityError("repositioning position reconciliation failed")
     integrity = summary["integrity"]
     if not (
         summary["matched"] <= summary["request_count"]
@@ -663,6 +711,16 @@ def execute_scenario(
     assignments.to_parquet(directory / "assignment_log.parquet", index=False)
     epoch.to_parquet(directory / "epoch_stats.parquet", index=False)
     exposure.to_parquet(directory / "exposure_state.parquet", index=False)
+    if repositioning_manager is not None:
+        pd.DataFrame(repositioning_manager.trip_rows).to_parquet(
+            directory / "repositioning_log.parquet", index=False
+        )
+        pd.DataFrame(repositioning_manager.epoch_rows).to_parquet(
+            directory / "repositioning_epoch.parquet", index=False
+        )
+        pd.DataFrame(repositioning_manager.distribution_rows).to_parquet(
+            directory / "idle_av_distribution.parquet", index=False
+        )
     _atomic_json(summary["runtime"], directory / "runtime_diagnostics.json")
     _atomic_json(summary, directory / "summary.json")
     return summary
