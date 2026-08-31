@@ -1,0 +1,18 @@
+{
+  "protocol_id": "STAGE4_PAPER_ENH_R0.5b_V2",
+  "routing_mode": "SINGLE_SOURCE_MATRIX",
+  "routing_mode_decision": "stage4/output/paper_enhancement/routing_determinism/routing_mode_decision.json",
+  "routing_arc_sample_sha256": "3bfb4d3781e45efb2a09810c599d1b381566c7af5b01f0c09aa038bb86af1e2c",
+  "full_day_runtime_guard_s": 14400,
+  "assignment_matrix_representation": "ARC_LEVEL_1X1_MATRIX_WITH_SPARSE_CANDIDATES",
+  "gpu_usage": "NONE_CPU_ONLY",
+  "prospective_gate_logging": true,
+  "gate_diagnostic_bin_minutes": 15,
+  "control_output_root": "stage4/output/paper_enhancement/repositioning_robustness_det/controls",
+  "treatment_output_root": "stage4/output/paper_enhancement/repositioning_robustness_det/treatments",
+  "q50_repeatability_output_root": "stage4/output/paper_enhancement/repositioning_robustness_det/q50_repeatability",
+  "repositioning_reference_sha256": "97f9931d9a0d114059699ea92b692df80bb1d54e065c757c075d723d7291ab07",
+  "empty_reposition_route_semantics": "OPERATIONAL_ABSTRACTION_NOT_ODD_CERTIFIED",
+  "canonical_outputs_overwritten": false,
+  "gamma_frontier_authorized": false
+}
