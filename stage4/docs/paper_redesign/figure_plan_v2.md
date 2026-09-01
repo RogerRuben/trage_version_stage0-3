@@ -55,3 +55,6 @@ Real GPS + orders + road network
 
 Framework figure specification completed: **YES**
 Framework figure drawn: **NO**
+# V3 priority update
+
+Main figures are now: (1) data-to-decision framework; (2) real network, map matching, and empirical system; (3) prediction-to-suitability route example; (4) fleet transition plus effective-capacity mechanism; and (5) ODD policy/family activity. Fleet representativeness, routing reproducibility, fixed-state prediction ablation, and cost robustness remain appendix candidates. The incomplete repositioning experiment must not appear as a main result figure.

@@ -1,0 +1,12 @@
+source_content,destination_v3,action,rationale
+paper_storyline_v2.md,Introduction and Discussion,REWRITE,Center effective-capacity conversion and measured prediction relevance
+manuscript_structure_v2.md,manuscript_structure_v3.md,REPLACE,Integrate theory and fixed-state ablation
+main_claims_v2.md,main_claims_v3.md,REPLACE,Remove overbroad prediction and repositioning implications
+scientific_strengthening_summary.md,Methods and Results,SELECTIVE_MERGE,Retain frozen empirical findings only
+gate_decomposition_observability.md,Appendix,RETAIN_WITH_QUALIFICATION,Do not mix units or infer missing denominators
+prospective_gate_decomposition_report.md,Results effective-capacity subsection,PROMOTE,Use same-unit evidence
+fleet_spatial_representativeness.md,Appendix and one main-text sentence,RETAIN,Closes fleet reconstruction
+routing_determinism_closure_v2.md,Appendix,CONDENSE,Technical reproducibility boundary
+repositioning_robustness_report.md,Limitations,REPLACE_WITH_CLOSURE,Effect is not identified
+prediction_decision_ablation_report.md,Results prediction-to-decision subsection,NEW_INSERT,Local decision relevance only
+theory_maintext_insert.md,Methods rolling control,NEW_INSERT,Formal structural properties
