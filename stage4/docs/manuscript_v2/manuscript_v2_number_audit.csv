@@ -1,1 +1,43 @@
 number_id,manuscript_section,quoted_value,definition,scenario_or_population,source_file,source_field_or_row,status
+N001,2.1,30000,requests replayed per scenario,Test31,stage4/docs/paper_redesign/paper_storyline_v3.md,experimental design,PASS
+N002,2.2,removed,earlier approximate mapping rate lacked a unique authoritative denominator,upstream retained data,stage1/docs/stage1_input_coverage_report.md,not quoted in manuscript,REMOVED_NOT_TRACEABLE
+N003,2.4,12279.336389 h,exact all-HV baseline active hours,all-HV baseline,stage4/docs/paper_redesign/fleet_spatial_representativeness.md,H_base_exact,PASS
+N004,4.1,30 s,rolling epoch length,all scenarios,stage4/docs/full_paper/full_manuscript_draft.md,rolling configuration,PASS
+N005,4.1,5 min,maximum order patience carry-over,all scenarios,stage4/docs/full_paper/full_manuscript_draft.md,rolling configuration,PASS
+N006,4.1,2-8 km,expanding candidate radius,all scenarios,stage4/docs/full_paper/full_manuscript_draft.md,candidate configuration,PASS
+N007,4.1,20,Top-K vehicles per order,all scenarios,stage4/docs/full_paper/full_manuscript_draft.md,candidate configuration,PASS
+N008,5.1,27,main factorial scenarios,3x3x3,stage4/docs/paper_redesign/paper_storyline_v3.md,design summary,PASS
+N009,5.1,"0.25;0.50;0.75",q_A levels,main factorial,stage4/output/result_analysis/factorial_effects.csv,q_A,PASS
+N010,5.1,"0.40;0.70;1.00",passenger acceptance levels,main factorial,stage4/output/result_analysis/factorial_effects.csv,p_accept,PASS
+N011,5.2,41,canonical scenario count,full experiment,stage4/docs/paper_redesign/paper_storyline_v3.md,scenario count,PASS
+N012,5.2,0.05,cost service tolerance,cost robustness,stage4/output/result_analysis/cost_pairwise_robustness.csv,epsilon,PASS
+N013,6.2,0.7258,mean service rate,q_A=.25 across 9 cells,stage4/output/result_analysis/factorial_effects.csv,mean_service_rate,PASS
+N014,6.2,0.5984,mean service rate,q_A=.50 across 9 cells,stage4/output/result_analysis/factorial_effects.csv,mean_service_rate,PASS
+N015,6.2,0.3924,mean service rate,q_A=.75 across 9 cells,stage4/output/result_analysis/factorial_effects.csv,mean_service_rate,PASS
+N016,6.2,-0.3334,absolute service change,q_A .25 to .75,stage4/docs/paper_redesign/results_storyboard_v2.md,fleet transition,PASS
+N017,6.2,-45.9%,relative service change,q_A .25 to .75,stage4/docs/paper_redesign/results_storyboard_v2.md,fleet transition,PASS
+N018,6.2,0.7889,service rate,all-HV benchmark,stage4/output/result_analysis/benchmark_comparison.csv,service_rate,PASS
+N019,6.2,"0.7297;0.6044;0.4013",service rates,M p=.70 q=.25/.50/.75,stage4/output/result_analysis/benchmark_comparison.csv,service_rate,PASS
+N020,6.2,0.1515,service rate,all-AV Moderate,stage4/output/result_analysis/benchmark_comparison.csv,service_rate,PASS
+N021,6.3,"0.0939%;0.0720%;0.0445%",N5/N0 opportunity survival,q=.25/.50/.75,stage4/docs/paper_redesign/prospective_gate_decomposition_report.md,same-unit ledger,PASS
+N022,6.3,"68.32%;67.49%;66.82%",passenger gate retention,q=.25/.50/.75,stage4/docs/paper_redesign/prospective_gate_decomposition_report.md,passenger retention,PASS
+N023,6.3,"47.15%;43.10%",structural retention endpoints,q=.25 to .75,stage4/docs/paper_redesign/prospective_gate_decomposition_report.md,structure retention,PASS
+N024,6.3,"52.21%;42.59%",evidence retention endpoints,q=.25 to .75,stage4/docs/paper_redesign/prospective_gate_decomposition_report.md,evidence retention,PASS
+N025,6.3,"6.44%;4.20%",patience retention endpoints,q=.25 to .75,stage4/docs/paper_redesign/prospective_gate_decomposition_report.md,patience retention,PASS
+N026,6.4,"0.0087;0.0477",service gain p=1-.4,M at q=.25/.75,stage4/output/result_analysis/interaction_contrasts.csv,acceptance contrast,PASS
+N027,6.4,0.0330,service gain C to A,q=.75 p=.70,stage4/output/result_analysis/interaction_contrasts.csv,capability contrast,PASS
+N028,6.4,".9248;.7739;.7073",static dynamic speed activity,Conservative,stage4/output/result_analysis/family_activity_summary.csv,activity_share,PASS
+N029,6.4,".8698;.4764;.0006",static dynamic speed activity,Moderate,stage4/output/result_analysis/family_activity_summary.csv,activity_share,PASS
+N030,6.4,".6394;.1822;0",static dynamic speed activity,Advanced,stage4/output/result_analysis/family_activity_summary.csv,activity_share,PASS
+N031,6.5,".5532;.0113",service and AV share,strict central,stage4/output/result_analysis/odd_policy_tradeoff.csv,service_rate av_share,PASS
+N032,6.5,".6038;.1244",service and AV share,reference central,stage4/output/result_analysis/odd_policy_tradeoff.csv,service_rate av_share,PASS
+N033,6.5,".6044;.1217",service and AV share,unconstrained central,stage4/output/result_analysis/odd_policy_tradeoff.csv,service_rate av_share,PASS
+N034,6.5,"9.6%;5.6%",static and dynamic exposure reduction,reference vs unconstrained,stage4/output/result_analysis/odd_policy_tradeoff.csv,exposure contrasts,PASS
+N035,6.6,9/10,states with P-H decision change,fixed-state ablation,stage4/docs/paper_redesign/prediction_decision_ablation_report.md,state comparison,PASS
+N036,6.6,0.10,AV arc Jaccard,fixed-state ablation,stage4/docs/paper_redesign/prediction_decision_ablation_report.md,av_arc_jaccard,PASS
+N037,6.6,9.1%,extra solver AV arcs under H,fixed-state ablation,stage4/docs/paper_redesign/prediction_decision_ablation_report.md,solver arc contrast,PASS
+N038,6.6,2.402,extra selected dynamic exposure under H,fixed-state ablation,stage4/docs/paper_redesign/prediction_decision_ablation_report.md,dynamic exposure contrast,PASS
+N039,6.6,64.02 s,worse pickup objective under H,fixed-state ablation,stage4/docs/paper_redesign/prediction_decision_ablation_report.md,pickup contrast,PASS
+N040,6.6,14374,sparse arcs,fixed-state ablation,stage4/docs/paper_redesign/prediction_decision_ablation_report.md,arc count,PASS
+N041,6.6,91.19 CPU s,ablation runtime,fixed-state ablation,stage4/docs/paper_redesign/prediction_decision_ablation_report.md,runtime,PASS
+N042,6.7,"-1.60%;-1.01%;-0.54%;-1.14%",cost changes eta .5/.75/1/1.25,cost robustness,stage4/output/result_analysis/cost_pairwise_robustness.csv,pairwise percent difference,PASS

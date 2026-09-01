@@ -1,1 +1,16 @@
 claim_id,section,claim_text,evidence_source,evidence_strength,qualification_present,overclaim_risk,status
+C001,Abstract,Nominal AV supply does not map one-to-one to effective capacity,S13 and S10,strong,TRUE,medium,PASS
+C002,2.2,Directed identity is preserved and reverse history is not projected,S19 and Stage3 resolver,strong,TRUE,low,PASS
+C003,3.1,Prediction inputs are decision-time only,S09 and frozen manifests,strong,TRUE,high,PASS
+C004,3.4,Overall suitability is a maximum not a weighted score,Stage3 interface and S08,strong,TRUE,medium,PASS
+C005,4.1,Candidate accounting uses opportunity unit o-v-t,S10,strong,TRUE,high,PASS
+C006,4.4,Sparse implementation avoids dense O-by-V matrix,implementation and benchmark reports,strong,TRUE,medium,PASS
+C007,6.2,Service declines across tested q_A levels,S13,strong,TRUE,low,PASS
+C008,6.2,All-AV is a composition extreme not upper bound,S14 and structural argument,strong,TRUE,high,PASS
+C009,6.3,Gate ledger supports effective-capacity conversion mechanism,S10,strong,TRUE,medium,PASS
+C010,6.4,Static and dynamic families are more active than speed for M/A,S16,strong,TRUE,medium,PASS
+C011,6.5,Reference nearly matches unconstrained service with lower exposure,S17,strong,TRUE,high,PASS
+C012,6.6,Prediction is decision relevant but not universally more accurate,S09,strong,TRUE,high,PASS
+C013,6.7,Cost reduction is limited to tested eta and epsilon,S18,strong,TRUE,high,PASS
+C014,7.1,Observed decline is conditional not universal,S13 S10 and design,strong,TRUE,high,PASS
+C015,7.4,Operational envelopes are not safety certification,definitions and scope,strong,TRUE,high,PASS

@@ -1,1 +1,13 @@
 equation_id,section,meaning,implemented_or_conceptual,source_code_or_doc,notation_consistent,notes
+E001,2.1,request deadline r plus maximum wait,implemented,stage4/docs/full_paper/full_manuscript_draft.md,TRUE,pickup feasibility uses remaining patience
+E002,2.4,baseline-normalized realized AV active-hour share,implemented,stage4/docs/paper_redesign/fleet_spatial_representativeness.md,TRUE,exact fixed denominator
+E003,3.3,three-state hard readiness,implemented,Stage3 final interface,TRUE,not a safety label
+E004,3.4,descriptor-to-cap ratio,implemented,Stage3 suitability interface,TRUE,positive caps
+E005,3.4,family maximum utilization,implemented,Stage3 suitability interface,TRUE,no weighted average
+E006,3.4,overall maximum utilization,implemented,Stage3 suitability interface,TRUE,bottleneck preserving
+E007,3.4,positive-part exposure,implemented,Stage4 decision kernel,TRUE,operational exceedance only
+E008,4.2,one vehicle per order constraint,implemented,Stage4 sparse optimizer,TRUE,binary assignment
+E009,4.2,one order per vehicle constraint,implemented,Stage4 sparse optimizer,TRUE,binary assignment
+E010,4.3,family cumulative exposure inequality,implemented,Stage4 ODD-aware kernel,TRUE,separate s-d-v
+E011,6.3,nominal hours not equivalent to effective capacity,conceptual,stage4/docs/paper_redesign/theory_notes_v2.md,TRUE,supported by counterexample and ledger
+E012,Appendix B,boundary road-class diversity,implemented,Stage3 S3.1 closure,TRUE,incoming and outgoing boundary edges
