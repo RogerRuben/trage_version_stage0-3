@@ -1,0 +1,9 @@
+table_id,section,scientific_question,data_source,columns,main_or_appendix
+T1,2,What empirical system is modeled?,Stage0-3 frozen reports,"demand|network|routes|fleet",MAIN
+T2,5,What are the frozen factors and controls?,scenario_registry.csv,"factor|levels|meaning|status",MAIN
+T3,6,What are the principal fleet-transition anchors?,factorial_effects.csv; benchmark_comparison.csv,"scenario|service|expiration|AV share",MAIN
+T4,6,How do ODD policies change service and exposure?,odd_policy_tradeoff.csv,"policy|service|AV share|static|dynamic",MAIN
+T5,6,Does prediction change frozen decisions?,frozen_state_prediction_ablation,"variant|errors|eligible arcs|overlap",MAIN
+TA1,Appendix A,What QA supports route products?,Stage0 final reports,"gate|metric|result",APPENDIX
+TA2,Appendix F,How are same-unit gates defined?,gate_transition_retention.csv,"gate|unit|retention|interpretation",APPENDIX
+TA3,Appendix I,What are detailed cost results?,cost_pairwise_robustness.csv,"eta|epsilon|cost|service|pickup",APPENDIX

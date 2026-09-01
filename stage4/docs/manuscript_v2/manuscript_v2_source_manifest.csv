@@ -1,0 +1,23 @@
+source_id,tier,path,role,exists,frozen_authority
+S01,1,stage4/docs/paper_redesign/paper_storyline_v3.md,central storyline,TRUE,f333b0f
+S02,1,stage4/docs/paper_redesign/manuscript_structure_v3.md,section architecture,TRUE,f333b0f
+S03,1,stage4/docs/paper_redesign/main_claims_v3.md,claim hierarchy,TRUE,f333b0f
+S04,1,stage4/docs/paper_redesign/claim_evidence_map_v2.csv,claim evidence,TRUE,f333b0f
+S05,1,stage4/docs/paper_redesign/results_storyboard_v2.md,result order,TRUE,f333b0f
+S06,1,stage4/docs/paper_redesign/discussion_storyboard_v2.md,discussion boundaries,TRUE,f333b0f
+S07,1,stage4/docs/paper_redesign/limitations_v2.md,mandatory limitations,TRUE,f333b0f
+S08,2,stage4/docs/paper_redesign/theory_notes_v2.md,propositions and proofs,TRUE,f333b0f
+S09,2,stage4/docs/paper_redesign/prediction_decision_ablation_report.md,prediction decision evidence,TRUE,f333b0f
+S10,2,stage4/docs/paper_redesign/prospective_gate_decomposition_report.md,same-unit gate evidence,TRUE,frozen enhancement
+S11,2,stage4/docs/paper_redesign/fleet_spatial_representativeness.md,fleet spatial audit,TRUE,frozen enhancement
+S12,2,stage4/docs/paper_redesign/repositioning_and_fleet_reconstruction_closure.md,repositioning boundary,TRUE,f333b0f
+S13,3,stage4/output/result_analysis/factorial_effects.csv,main factorial results,TRUE,canonical 41
+S14,3,stage4/output/result_analysis/benchmark_comparison.csv,benchmark anchors,TRUE,canonical 41
+S15,3,stage4/output/result_analysis/interaction_contrasts.csv,acceptance capability contrasts,TRUE,canonical 41
+S16,3,stage4/output/result_analysis/family_activity_summary.csv,family activity,TRUE,canonical 41
+S17,3,stage4/output/result_analysis/odd_policy_tradeoff.csv,ODD policy comparison,TRUE,canonical 41
+S18,3,stage4/output/result_analysis/cost_pairwise_robustness.csv,cost robustness,TRUE,canonical 41
+S19,4,stage0/docs/stage0_v6_final_report.md,map matching provenance,TRUE,Stage0 frozen
+S20,4,stage1/docs/stage1_input_coverage_report.md,Stage1 coverage,TRUE,Stage1 frozen
+S21,4,stage3/output/odd_tod/final/test31_stage3_to_stage4_interface.parquet,operational interface,TRUE,Stage3 frozen
+S22,5,stage4/docs/full_paper/full_manuscript_draft.md,verified prose reservoir,TRUE,subordinate

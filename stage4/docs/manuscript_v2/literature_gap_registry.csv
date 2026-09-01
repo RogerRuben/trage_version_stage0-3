@@ -1,0 +1,10 @@
+gap_id,manuscript_section,claim_needing_support,literature_theme,priority,suggested_journal_family
+L01,1,Integrated mixed HV/AV dispatch remains fragmented,mixed HV/AV ride-hailing operations,CRITICAL,TRC/TR-E
+L02,1,Route capability should connect ODD evidence to dispatch,route-level ODD operational compatibility,CRITICAL,TRC
+L03,3,Decision-time multivariate traffic estimates support downstream operations,traffic prediction for transportation operations,CRITICAL,TRC
+L04,3,Passenger AV acceptance constrains assignment,passenger acceptance in autonomous mobility,HIGH,TRC/TR-A
+L05,4,Rolling lexicographic matching with patience,lexicographic and epsilon-constrained assignment,HIGH,TR-B/TR-C
+L06,4,Separate cumulative family budgets retain attribution,cumulative resource or exposure control,HIGH,EJOR/TRC
+L07,4,Sparse rolling candidates support tractable matching,sparse rolling ride-hailing matching,SUPPORTING,TR-B/TR-C
+L08,2,Directed map matching grounds route observations,map matching and directed-network reconstruction,SUPPORTING,TRC
+L09,7,Rebalancing can alter fleet outcomes,ride-hailing vehicle repositioning,HIGH,TR-B/TR-C
