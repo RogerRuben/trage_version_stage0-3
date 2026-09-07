@@ -26,6 +26,16 @@ class VehicleFixture:
     availability_end_time: pd.Timestamp
     source_session_id: str
     av_source_session_end_inherited: bool
+    availability_policy: str | None = None
+
+    def __post_init__(self) -> None:
+        # Resolve once: dataclasses.replace(vehicle_type=...) then preserves
+        # the physical admission policy rather than changing it with a label.
+        if self.availability_policy is None:
+            object.__setattr__(self, "availability_policy",
+                               "EMPIRICAL_SESSION" if self.vehicle_type == "HV" else "FULL_HORIZON")
+        if self.availability_policy not in {"EMPIRICAL_SESSION", "FULL_HORIZON"}:
+            raise ValueError(f"Unknown availability policy: {self.availability_policy}")
 
 
 @dataclass

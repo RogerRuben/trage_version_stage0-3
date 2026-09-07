@@ -16,6 +16,7 @@ def test_sparse_matching_and_actual_neutral_session_branch():
         native_id: int
         vehicle_type: str
         availability_end_time: pd.Timestamp
+        availability_policy: str = 'EMPIRICAL_SESSION'
     ts = pd.Timestamp('2016-10-31T12:00:00+08:00')
     fixture = Fixture(0, 'HV', ts + pd.Timedelta(seconds=60))
     request = SimpleNamespace(native_id=0, sim_time_s=0, request_time=ts,
@@ -28,4 +29,16 @@ def test_sparse_matching_and_actual_neutral_session_branch():
     hv = [SpatialVehicle('same_id', 0, 'HV', 108.9, 34.2)]
     av = [SpatialVehicle('same_id', 0, 'AV', 108.9, 34.2)]
     assert len(production_neutral_arcs(hv, [fixture], waiting, ts, ts, config, adapter)) == 0
+    assert len(production_neutral_arcs(av, [fixture], waiting, ts, ts, config, adapter)) == 0
+    # Canonical full-horizon AV policy still admits the arc as before.
+    fixture.availability_policy = 'FULL_HORIZON'
     assert len(production_neutral_arcs(av, [fixture], waiting, ts, ts, config, adapter)) == 1
+
+    from dataclasses import replace
+    from stage4.fleetpy_adapter.mixed_fleet_adapter import VehicleFixture
+    hv_fixture = VehicleFixture('v', 0, 'HV', 108.9, 34.2, ts,
+                                ts + pd.Timedelta(seconds=60), 's', False)
+    assert replace(hv_fixture, vehicle_type='AV').availability_policy == 'EMPIRICAL_SESSION'
+    av_fixture = VehicleFixture('v', 0, 'AV', 108.9, 34.2, ts,
+                                ts + pd.Timedelta(days=1), 's', False)
+    assert av_fixture.availability_policy == 'FULL_HORIZON'

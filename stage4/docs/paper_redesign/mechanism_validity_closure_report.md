@@ -1,27 +1,27 @@
-# Mechanism validity closure
+# Mechanism validity closure: B/C complete, RT pending
 
-Base SHA: b2e3f9cabfff9855cc50bbf23be17a0436a84685. Branch: codex/stage2-v5-micro-transfer. Working tree was clean before edits.
+Base SHA: e467a3c5450b5d2159977976cfbd179413aa435a. Branch: codex/stage2-v5-micro-transfer. The working tree was clean before changes. Canonical full-day outputs remain frozen.
 
-**Scientific classification: IMPLEMENTATION_DEFECT**, using the taskbook's narrow definition: AV-neutral relabeling changes the candidate graph before explicit AV restrictions. This is a failed neutral-session invariant, not proof that the published service decline is caused by this branch. Taskbook B5 stopped the experiment sequence at the first failing snapshot.
+The earlier 07:30 result was vehicle-type / availability-policy coupling in the AV-favoring direction. It did not demonstrate an anti-AV canonical defect or invalidate the 41 scenarios. The earlier IMPLEMENTATION_DEFECT classification is superseded. Explicit inherited availability policy now makes the controlled identity comparison pass.
 
-1. **Does neutral relabeling preserve the problem?** No. In the hash-verified 07:30 state, candidate E changes 109 -> 110 because the same session-end timestamp is enforced for HV but bypassed for AV. U=25, M=24, selected identities, and pickup objective remain identical. One snapshot was run; the other nine remain pending.
-2. **Which substantive gates remove capacity?** Not established. The neutral counterexample itself removes/adds a redundant edge, but C was not run. Earlier opportunity-edge percentages must not be presented as demonstrated maximum-matchable-order loss.
-3. **Does K20 preserve capacity?** Not established; K10/20/40/80 sensitivity remains pending. No canonical K was changed.
-4. **Is the mechanism request-time robust?** Not established. D1 identifies zero-lead observed-departure release and 300-second patience in all 41 canonical configurations, confirmed on 30,000/30,000 replay orders. RT-Low/Base/High describe a different ABM pipeline. D2–D5 were not run.
-5. **Does the current story survive?** It remains unvalidated at the requested mechanism level. The recorded full-day scenario results are unchanged, but the stronger conversion-to-matchable-capacity explanation needs B/C/D closure. The discovered branch favors the AV-labeled clone, so it is not evidence that hidden anti-AV filtering explains the full-day decline.
-6. **Common evaluator?** NOT_RUN. Retain DECISION-RELEVANT. Differences in the variants' own selected exposure measures do not establish superiority under a shared external evaluator.
+**Closure remains INCOMPLETE because frozen RT parameters have not been recovered.** Completed evidence supports the current story conditional on zero-lead timing. A final SUPPORTS/QUALIFIES/CHANGES classification awaits RT sensitivity.
 
-## Delivered correction and evidence
+1. **Neutral identity:** PASS_IDENTITY, 10/10. Exact candidate and selected identities and pickup objectives agree. Canonical defaults remain HV -> EMPIRICAL_SESSION, AV -> FULL_HORIZON. Diagnostic relabeling preserves inherited policy.
+2. **Capacity funnel:** passenger/structural/evidence/patience gates remove 225/255/114/112 maximum-matching units across sampled states. M evolves 718 -> 493 -> 238 -> 124 -> 124 -> 12. These are instantaneous-capacity sums, not daily orders. Top-K removes 91.31% of pre-compression edges without M loss.
+3. **Top-K:** K20_CAPACITY_STABLE. K10/20/40/80 have identical M at each state, including four evening states. Final E totals are 38/48/50/55; aggregate U=M=12 at every K.
+4. **Request time:** canonical lead=0 and patience=300 seconds. RT-Low/Base/High were not used in the 41 scenarios. The original transform is located but frozen Train gap quantiles are missing. Status: BLOCKED_MISSING_FROZEN_RT_PARAMETERS. Arbitrary offsets and summary means were not substituted.
+5. **Story:** substantive matching-capacity attrition is demonstrated at these zero-lead states; Top-K does not drive the sample loss. Timing robustness and full-day generalization remain unproven. No scenario rerun or paper-wide rewrite occurred.
+6. **Common evaluator:** NOT_RUN, optional/lower priority. DECISION-RELEVANT remains supported; own-variant exposure does not establish value under an independent evaluator.
 
-- Corrected 9.1% to mean 9.1 additional solver-input AV arcs in the manuscript and number audit.
-- Corrected candidate-arc Jaccard to mean selected-AV-arc Jaccard.
-- Preserved all other numerical results and frozen experiment products.
-- Added a bounded production-path neutral diagnostic and one focused test.
-- Retained exact candidate and assignment identities in neutral_av_identity.csv; summary.json records the fail-fast result.
-- Other required result CSVs explicitly contain NOT_RUN status with empty metrics, never fabricated zeros.
+## Evidence and QA
 
-## Scope and next decision
+- Ten physical-state hashes reproduce the prior frozen registry.
+- Neutral comparison exercises actual production candidate construction.
+- K20 G5 AV identities match production in every state.
+- E/U/M use exactly the same sparse graph at each stage.
+- K comparisons share physical inputs and per-arc routing.
+- Focused test covers matching redundancy, inherited empirical admission, and unchanged full-horizon AV admission.
+- B plus C/Top-K runtime: 132.54 seconds; 30,779 routed arcs; zero failures; no GPU.
+- Focused test, touched-file compileall, CSV schema checks, and git diff --check are verified before commit.
 
-The actionable issue is whether session-end admissibility should be inherited independently of the HV/AV label in the neutral experiment. A local explicit session-policy field would make that comparison reviewable; changing the canonical operational semantics or rerunning full days was not undertaken. Resume the remaining analyses after that policy is settled. No model training, broad tests, full-day simulation, new fleet protocol, paper-wide rewrite, or literature search occurred.
-
-QA: one focused test PASS; touched-file compileall PASS; result CSV schema check PASS; git diff --check PASS. Candidate construction uses the actual production method, routing is identical for paired coordinates, and the maximum matching is computed from the captured candidate graph using sparse matrices.
+Remaining input: original decoupled_environment/manifest.json with request_time_chain_stats, or an equivalent frozen Train parameter artifact with provenance. Then resume the existing RT transform on Test31 and bounded q_A=.50/.75 sensitivity. Missing inputs do not authorize new calibration or invented request-time scenarios.

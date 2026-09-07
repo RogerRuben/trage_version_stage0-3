@@ -20,8 +20,11 @@ from scipy.sparse.csgraph import maximum_bipartite_matching
 
 from stage4.analysis import frozen_state_prediction_ablation as frozen
 from stage4.dispatch import rolling_or_control as production
+from stage4.dispatch.acceptance import passenger_acceptance
+from stage4.dispatch.candidate_graph import SparseCandidateIndex, search_radius_m
 from stage4.dispatch.deterministic_routing import ArcDeterministicValhallaAdapter, SINGLE_SOURCE_MATRIX
-from stage4.dispatch.exposure import CumulativeExposureState, ExposureExcess
+from stage4.dispatch.exposure import CumulativeExposureState, ExposureExcess, exposure_excess
+from stage4.dispatch.gate_diagnostics import structural_reason, evidence_contract_complete
 from stage4.dispatch.solver import solve_lexicographic
 
 OUT = Path('stage4/output/paper_enhancement/mechanism_validity')
@@ -45,13 +48,8 @@ class _Captured(Exception):
     pass
 
 
-def production_neutral_arcs(vehicles, fixtures, waiting, timestamp, start, config, adapter):
-    """Exercise the production branch, disabling only explicit AV restrictions.
-
-    Positions, IDs, windows, predicted durations and request state are shared.
-    An implicit vehicle-label-dependent window branch is intentionally NOT
-    patched out: finding such a branch is the purpose of this diagnostic.
-    """
+def production_neutral_arcs(vehicles, fixtures, waiting, timestamp, start, config, adapter, *, neutral=True):
+    """Capture production arcs with inherited availability policy and fixed state."""
     core = production._RollingORFleetControlCore.__new__(production._RollingORFleetControlCore)
     sim_s = int((timestamp - start).total_seconds())
     core.repositioning_manager = None
@@ -72,15 +70,16 @@ def production_neutral_arcs(vehicles, fixtures, waiting, timestamp, start, confi
     core.request_by_rid = {}
     core.request_meta = {}
     for r, failed, carry, critical in waiting:
-        neutral = SimpleNamespace(**r.__dict__)
-        neutral.av_smoke_eligible = True
-        core.request_by_rid[r.native_id] = neutral
+        request = SimpleNamespace(**r.__dict__)
+        request.av_smoke_eligible = True if neutral else r.av_smoke_eligible
+        core.request_by_rid[r.native_id] = request
         core.request_meta[r.native_id] = {
             'first_attempt_time': None, 'attempt_count': 0,
             'pickup_deadline_s': r.sim_time_s + 300,
             'entered_critical': critical, 'failed_round_count': failed,
-            'carry_over_flag': carry, 'passenger_accepts_av': True,
-            'exposure': ExposureExcess(0., 0., 0.)}
+            'carry_over_flag': carry,
+            'passenger_accepts_av': True if neutral else passenger_acceptance(r.order_id, .7, 20260827).passenger_accepts_av,
+            'exposure': ExposureExcess(0., 0., 0.) if neutral else exposure_excess(r.rho_static, r.rho_dynamic, r.rho_speed)}
     core.prospective_gate_logging = False
     core.eta_adapter = adapter
     core.cost_level_enabled = False
@@ -146,12 +145,59 @@ def load_states(root):
         yield row, vehicles, waiting, fleet.native_fixtures, config, start
 
 
+GATES = ('G0_SPATIAL', 'G1_PASSENGER', 'G2_STRUCTURAL', 'G3_EVIDENCE',
+         'TOPK_COMPRESSION', 'ROUTE_RETURNED', 'G4_PATIENCE', 'G5_SOLVER')
+
+
+def gate_graphs(vehicles, waiting, timestamp, start, config, adapter, k):
+    """Mirror the production order; report Top-K and routing independently."""
+    index = SparseCandidateIndex(vehicles)
+    graphs = {g: [] for g in GATES}
+    sim_s = (timestamp - start).total_seconds()
+    for request, failed, *_ in waiting:
+        radius = search_radius_m(failed, config['search_radius_initial_m'],
+                                 config['search_radius_step_m'], config['search_radius_cap_m'])
+        nearby, _ = index.query(request.pickup_lon_wgs84, request.pickup_lat_wgs84,
+                                radius, len(vehicles), True)
+        av = [(request.native_id, v.native_vehicle_id) for v, _ in nearby if v.vehicle_type == 'AV']
+        graphs['G0_SPATIAL'].extend(av)
+        accepts = passenger_acceptance(request.order_id, .7, 20260827).passenger_accepts_av
+        if not accepts:
+            continue
+        graphs['G1_PASSENGER'].extend(av)
+        if structural_reason(request) is not None:
+            continue
+        graphs['G2_STRUCTURAL'].extend(av)
+        excess = exposure_excess(request.rho_static, request.rho_dynamic, request.rho_speed)
+        if not evidence_contract_complete(request, excess):
+            continue
+        graphs['G3_EVIDENCE'].extend(av)
+        selected, _ = index.query(request.pickup_lon_wgs84, request.pickup_lat_wgs84,
+                                  radius, k, True)
+        av_vehicles = [v for v, _ in selected if v.vehicle_type == 'AV']
+        graphs['TOPK_COMPRESSION'].extend((request.native_id, v.native_vehicle_id) for v in av_vehicles)
+        estimates = adapter.estimate_many(av_vehicles, request.pickup_lon_wgs84,
+                                          request.pickup_lat_wgs84, timestamp)
+        remaining = request.sim_time_s + 300 - sim_s
+        for v in av_vehicles:
+            estimate = estimates.get(v.native_vehicle_id)
+            if estimate is None:
+                continue
+            pair = (request.native_id, v.native_vehicle_id)
+            graphs['ROUTE_RETURNED'].append(pair)
+            if production.patience_feasible(estimate.corrected_pickup_eta_s, remaining):
+                graphs['G4_PATIENCE'].append(pair)
+                # Canonical AVs retain FULL_HORIZON and cost is disabled.
+                graphs['G5_SOLVER'].append(pair)
+    return graphs
+
+
 def run(root):
     root = Path(root).resolve()
     output = root / OUT
     output.mkdir(parents=True, exist_ok=True)
     adapter = ArcDeterministicValhallaAdapter(root, routing_mode=SINGLE_SOURCE_MATRIX)
-    neutral_rows = []
+    neutral_rows, gate_rows, topk_rows = [], [], []
     started = time.perf_counter()
     for registry, vehicles, waiting, fixtures, config, start in load_states(root):
         ts = pd.Timestamp(registry.timestamp)
@@ -175,16 +221,62 @@ def run(root):
                 'neutral_classification': 'HIDDEN_ASYMMETRY',
                 'first_differing_epoch': registry.epoch_id,
                 'snapshots_tested': len(neutral_rows) // 2,
-                'cause': 'production HV-only predicted-service-end / finite-service gate is removed by relabeling identical session to AV',
+                'cause': 'new difference after availability policy isolation; inspect captured arcs',
                 'runtime_s': time.perf_counter() - started,
                 'routing_arcs': adapter.routing_arc_evaluations,
                 'routing_failures': adapter.routing_failures,
                 'state_identity_verified': True, 'full_day_simulation': False}
             (output / 'summary.json').write_text(json.dumps(summary, indent=2), encoding='utf-8')
             return summary
-    summary = {'classification': 'PASS_IDENTITY', 'snapshots_tested': len(neutral_rows)//2}
+        adapter.cache.clear()  # bounded per-state routing memory
+    # B first, then C and K. Reuse the exact ten frozen states, without progression.
+    for registry, vehicles, waiting, fixtures, config, start in load_states(root):
+        ts = pd.Timestamp(registry.timestamp)
+        for k in (10, 20, 40, 80):
+            graphs = gate_graphs(vehicles, waiting, ts, start, config, adapter, k)
+            metrics = graph_metrics(graphs['G5_SOLVER'])
+            topk_rows.append({'epoch_id': registry.epoch_id, 'period': registry.period,
+                              'physical_state_sha256': registry.state_sha256, 'K': k, **metrics})
+            if k == 20:
+                actual = production_neutral_arcs(vehicles, fixtures, waiting, ts, start, config, adapter, neutral=False)
+                actual_av = {(a.request_id, a.vehicle_id) for a in actual if a.vehicle_type == 'AV'}
+                assert actual_av == set(graphs['G5_SOLVER']), f'Production graph mismatch {registry.epoch_id}'
+                previous = None
+                for gate in GATES:
+                    result = graph_metrics(graphs[gate])
+                    gate_rows.append({'epoch_id': registry.epoch_id, 'period': registry.period,
+                        'physical_state_sha256': registry.state_sha256, 'gate': gate, **result,
+                        **{f'delta_{m}': previous[m] - result[m] if previous else 0 for m in ('E','U','M')}})
+                    if previous:
+                        assert all(previous[m] >= result[m] for m in ('E','U','M'))
+                    previous = result
+        frozen._atomic_csv(pd.DataFrame(gate_rows), output / 'snapshot_gate_matching.csv')
+        frozen._atomic_csv(pd.DataFrame(topk_rows), output / 'topk_sensitivity.csv')
+        print(json.dumps({'epoch': registry.epoch_id, 'topk_M': [r['M'] for r in topk_rows[-4:]]}), flush=True)
+        adapter.cache.clear()
+    gate_df = pd.DataFrame(gate_rows)
+    capacity = gate_df.groupby('gate', sort=False)[['E','U','M','delta_E','delta_U','delta_M']].sum().reset_index()
+    frozen._atomic_csv(capacity, output / 'matching_capacity_summary.csv')
+    export_funnel(root)
+    summary = {'classification': 'B_C_COMPLETE_RT_PENDING', 'neutral_classification': 'PASS_IDENTITY',
+               'snapshots_tested': len(neutral_rows)//2, 'runtime_s': time.perf_counter() - started,
+               'routing_arcs': adapter.routing_arc_evaluations, 'routing_failures': adapter.routing_failures,
+               'state_identity_verified': True, 'full_day_simulation': False}
     (output / 'summary.json').write_text(json.dumps(summary, indent=2), encoding='utf-8')
     return summary
+
+
+def export_funnel(root):
+    """Section-11 filenames expose the same results, without new computation."""
+    root = Path(root)
+    target = root / 'stage4/output/paper_enhancement/matching_capacity_funnel'
+    for source, destination in (
+        ('snapshot_gate_matching.csv', 'snapshot_gate_metrics.csv'),
+        ('topk_sensitivity.csv', 'topk_matching_sensitivity.csv'),
+        ('matching_capacity_summary.csv', 'matching_capacity_summary.csv'),
+    ):
+        frame = pd.read_csv(root / OUT / source, dtype={'epoch_id': str})
+        frozen._atomic_csv(frame, target / destination)
 
 
 if __name__ == '__main__':

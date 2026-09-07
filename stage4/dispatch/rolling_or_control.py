@@ -293,7 +293,7 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                     gate_counts["gate_av_n4_pickup_within_patience"] += 1
                 runtime = by_vid[vehicle.native_vehicle_id]
                 predicted = float(request.predicted_service_time_s)
-                if vehicle.vehicle_type == "HV":
+                if runtime.fixture.availability_policy == "EMPIRICAL_SESSION":
                     if not isfinite(predicted):
                         invalid_hv_window += 1
                         continue
