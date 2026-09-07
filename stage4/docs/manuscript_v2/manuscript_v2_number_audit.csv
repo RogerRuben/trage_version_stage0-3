@@ -34,8 +34,8 @@ N032,6.5,".6038;.1244",service and AV share,reference central,stage4/output/resu
 N033,6.5,".6044;.1217",service and AV share,unconstrained central,stage4/output/result_analysis/odd_policy_tradeoff.csv,service_rate av_share,PASS
 N034,6.5,"9.6%;5.6%",static and dynamic exposure reduction,reference vs unconstrained,stage4/output/result_analysis/odd_policy_tradeoff.csv,exposure contrasts,PASS
 N035,6.6,9/10,states with P-H decision change,fixed-state ablation,stage4/docs/paper_redesign/prediction_decision_ablation_report.md,state comparison,PASS
-N036,6.6,0.10,AV arc Jaccard,fixed-state ablation,stage4/docs/paper_redesign/prediction_decision_ablation_report.md,av_arc_jaccard,PASS
-N037,6.6,9.1%,extra solver AV arcs under H,fixed-state ablation,stage4/docs/paper_redesign/prediction_decision_ablation_report.md,solver arc contrast,PASS
+N036,6.6,0.10,mean selected-AV-arc Jaccard,fixed-state ablation,stage4/docs/paper_redesign/prediction_decision_ablation_report.md,p_vs_h_mean_selected_av_arc_jaccard,PASS
+N037,6.6,9.1 arcs,mean additional solver-input AV arcs under H,fixed-state ablation,stage4/docs/paper_redesign/prediction_decision_ablation_report.md,p_vs_h_mean_solver_eligible_av_arc_difference,PASS
 N038,6.6,2.402,extra selected dynamic exposure under H,fixed-state ablation,stage4/docs/paper_redesign/prediction_decision_ablation_report.md,dynamic exposure contrast,PASS
 N039,6.6,64.02 s,worse pickup objective under H,fixed-state ablation,stage4/docs/paper_redesign/prediction_decision_ablation_report.md,pickup contrast,PASS
 N040,6.6,14374,sparse arcs,fixed-state ablation,stage4/docs/paper_redesign/prediction_decision_ablation_report.md,arc count,PASS

@@ -1,0 +1,12 @@
+{
+  "classification": "IMPLEMENTATION_DEFECT",
+  "neutral_classification": "HIDDEN_ASYMMETRY",
+  "first_differing_epoch": "0730",
+  "snapshots_tested": 1,
+  "cause": "production HV-only predicted-service-end / finite-service gate is removed by relabeling identical session to AV",
+  "runtime_s": 10.10591199999908,
+  "routing_arcs": 1099,
+  "routing_failures": 0,
+  "state_identity_verified": true,
+  "full_day_simulation": false
+}
