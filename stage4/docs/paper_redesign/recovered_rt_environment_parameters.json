@@ -1,0 +1,226 @@
+{
+  "status": "RECOVERED_FINGERPRINT_VERIFIED",
+  "identification_status": "latent RT scenario; not observed passenger request times",
+  "provenance_statement": "reconstructed from the original generator and verified against surviving frozen RT summary outputs",
+  "original_manifest_recovered": false,
+  "original_numeric_stats_independently_verified": false,
+  "train_dates": [
+    "20161019",
+    "20161020",
+    "20161021",
+    "20161022"
+  ],
+  "parameters": {
+    "date": "20161023",
+    "matching_response_sec": 30.0,
+    "minimum_pickup_sec": 90.0,
+    "max_request_lead_sec": 1800.0,
+    "warmup_minutes": 60,
+    "grid_size": 0.02
+  },
+  "request_time_chain_stats": {
+    "gap_p25_sec": 420.0,
+    "gap_p50_sec": 748.0,
+    "gap_p75_sec": 1733.0,
+    "gap_p90_sec": 3693.0,
+    "empty_speed_p50_mps": 1.0836658495076241,
+    "chain_rows": 440049,
+    "feasible_chain_rows": 302772
+  },
+  "endpoint_source": "all-order prescan manifests; original GCJ02-to-WGS84 conversion",
+  "endpoint_caveat": "Original OD files are missing. Raw-point validity and population are checked; endpoint tie selection is not independently recoverable. Aggregate fingerprint agreement is not per-order hash equivalence.",
+  "business_boundary_timezone": "UTC (unchanged original convention)",
+  "sources": [
+    {
+      "date": "20161019",
+      "path": "stage0/work_v6_final/candidate_manifests/date=20161019.parquet",
+      "sha256": "b6b257fce019180f1eae3fd1cd9c75b9b620215dd06bb403ceaefcbd9c811722",
+      "orders": 100348,
+      "invalid_raw_point_count": 0,
+      "population": "all raw orders"
+    },
+    {
+      "date": "20161020",
+      "path": "stage0/work_v6_final/candidate_manifests/date=20161020.parquet",
+      "sha256": "e6ff4418cf4f6366d945b8abda9500cd09fcd1ba5434bf6e9950fbe6b38c166b",
+      "orders": 104047,
+      "invalid_raw_point_count": 0,
+      "population": "all raw orders"
+    },
+    {
+      "date": "20161021",
+      "path": "stage0/work_v6_final/candidate_manifests/date=20161021.parquet",
+      "sha256": "3363061f751ab21e5d9761858c1ea2279eedb4bf781f4543daac123aa449f67d",
+      "orders": 115187,
+      "invalid_raw_point_count": 0,
+      "population": "all raw orders"
+    },
+    {
+      "date": "20161022",
+      "path": "stage0/work_v6_final/candidate_manifests/date=20161022.parquet",
+      "sha256": "5de73b38783099f60c2002f13c78359dd726711dfbfc0fcd3b008f804b3bf383",
+      "orders": 120467,
+      "invalid_raw_point_count": 0,
+      "population": "all raw orders"
+    },
+    {
+      "date": "20161023",
+      "path": "stage0/work_v6_final/candidate_manifests/date=20161023.parquet",
+      "sha256": "8b888f403498c0d56425f01f39e25e89b40864d87c8f9f2dd0a66bac3ea5e9e8",
+      "orders": 114356,
+      "invalid_raw_point_count": 0,
+      "population": "all raw orders"
+    }
+  ],
+  "code_sources": {
+    "stage4/scripts/build_decoupled_abm_environment.py": "30f95c130bffab1906139026eeefc1fb74dba582759dcbc146fcee233e358b5d",
+    "stage0/scripts/run_full_day_2017.py": "2767a6d8e39e9fcfc5362228426fee60acaac32335280a6fe7e4ef15354e00f0",
+    "stage0/scripts/extract_order_od.py": "cbf62ca3685106caed6d4a4119fd9832aa5aeae99ea6475d0199d52df50aeaff",
+    "stage0/v5/archive.py": "8bc99f4c4237c95293c2a732fed24c8d6c98150e603c875f36da6cca57d23efd",
+    "stage4/analysis/recover_rt_parameters.py": "9a719c1df6d7233eb8926225ef90a987ef2f0a206588774ce5249517df6c1f3a"
+  },
+  "fingerprint_source": {
+    "path": "stage4/docs/results/request_time_reconstruction_summary.csv",
+    "sha256": "7a45be83a0427a35dc6cbe08c37078f3a0c927562404fe328a7dfaaa6f1b0305"
+  },
+  "fingerprint_checks": [
+    {
+      "scenario": "RT-Low",
+      "metric": "orders",
+      "recovered": 114356.0,
+      "reference": 114356.0,
+      "absolute_error": 0.0,
+      "atol": 0.0,
+      "passed": true
+    },
+    {
+      "scenario": "RT-Low",
+      "metric": "mean_lead_sec",
+      "recovered": 318.50330106916647,
+      "reference": 318.5033010691664,
+      "absolute_error": 5.684341886080802e-14,
+      "atol": 1e-06,
+      "passed": true
+    },
+    {
+      "scenario": "RT-Low",
+      "metric": "p50_lead_sec",
+      "recovered": 289.5808632833151,
+      "reference": 289.5808632833151,
+      "absolute_error": 0.0,
+      "atol": 1e-06,
+      "passed": true
+    },
+    {
+      "scenario": "RT-Low",
+      "metric": "p90_lead_sec",
+      "recovered": 506.1923605348263,
+      "reference": 506.1923605348263,
+      "absolute_error": 0.0,
+      "atol": 1e-06,
+      "passed": true
+    },
+    {
+      "scenario": "RT-Low",
+      "metric": "clipped_share",
+      "recovered": 0.2012574766518591,
+      "reference": 0.2012574766518591,
+      "absolute_error": 0.0,
+      "atol": 1e-12,
+      "passed": true
+    },
+    {
+      "scenario": "RT-Base",
+      "metric": "orders",
+      "recovered": 114356.0,
+      "reference": 114356.0,
+      "absolute_error": 0.0,
+      "atol": 0.0,
+      "passed": true
+    },
+    {
+      "scenario": "RT-Base",
+      "metric": "mean_lead_sec",
+      "recovered": 501.9096013928667,
+      "reference": 501.9096013928667,
+      "absolute_error": 0.0,
+      "atol": 1e-06,
+      "passed": true
+    },
+    {
+      "scenario": "RT-Base",
+      "metric": "p50_lead_sec",
+      "recovered": 497.97856176370203,
+      "reference": 497.978561763702,
+      "absolute_error": 5.684341886080802e-14,
+      "atol": 1e-06,
+      "passed": true
+    },
+    {
+      "scenario": "RT-Base",
+      "metric": "p90_lead_sec",
+      "recovered": 626.9027962306016,
+      "reference": 626.9027962306016,
+      "absolute_error": 0.0,
+      "atol": 1e-06,
+      "passed": true
+    },
+    {
+      "scenario": "RT-Base",
+      "metric": "clipped_share",
+      "recovered": 0.0,
+      "reference": 0.0,
+      "absolute_error": 0.0,
+      "atol": 1e-12,
+      "passed": true
+    },
+    {
+      "scenario": "RT-High",
+      "metric": "orders",
+      "recovered": 114356.0,
+      "reference": 114356.0,
+      "absolute_error": 0.0,
+      "atol": 0.0,
+      "passed": true
+    },
+    {
+      "scenario": "RT-High",
+      "metric": "mean_lead_sec",
+      "recovered": 1308.7568309649687,
+      "reference": 1308.756830964969,
+      "absolute_error": 2.2737367544323206e-13,
+      "atol": 1e-06,
+      "passed": true
+    },
+    {
+      "scenario": "RT-High",
+      "metric": "p50_lead_sec",
+      "recovered": 1364.176402753013,
+      "reference": 1364.176402753013,
+      "absolute_error": 0.0,
+      "atol": 1e-06,
+      "passed": true
+    },
+    {
+      "scenario": "RT-High",
+      "metric": "p90_lead_sec",
+      "recovered": 1486.3696770491251,
+      "reference": 1486.3696770491251,
+      "absolute_error": 0.0,
+      "atol": 1e-06,
+      "passed": true
+    },
+    {
+      "scenario": "RT-High",
+      "metric": "clipped_share",
+      "recovered": 0.0,
+      "reference": 0.0,
+      "absolute_error": 0.0,
+      "atol": 1e-12,
+      "passed": true
+    }
+  ],
+  "runtime_s": 7.8931148999981815,
+  "full_day_simulation": false,
+  "parameter_optimization": false
+}
