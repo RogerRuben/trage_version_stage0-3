@@ -1,5 +1,7 @@
 # Figure and visual-evidence plan v2
 
+V2.2 scope update: the Figure 4 mechanism design below is superseded by [figure_table_design_v2_2.md](../manuscript_v2/figure_table_design_v2_2.md). It separates canonical full-day service, ten-state E/U/M validation, and four-state RT-sensitive qualification. Earlier suggestions for new experiments below are historical planning items, not current authorization; no new mechanism experiment is authorized.
+
 No figure is drawn in this planning phase. Every item below answers a specific scientific question.
 
 | figure_id | scientific_question | data_source | required_fields | visual_form | placement | expected_message | new_simulation_required |

@@ -2,7 +2,7 @@
 
 ## Abstract
 
-Mixed fleets of human-driven vehicles (HVs) and autonomous vehicles (AVs) are often analyzed as if replacing an HV with an AV preserved an equivalent unit of service capacity. That assumption can fail when AV service depends simultaneously on passenger acceptance, route identity, operational-design-domain (ODD) compatibility, decision-time evidence, pickup deadlines, and assignment competition. We develop an end-to-end empirical framework connecting ride-hailing trajectories to a directed road network, leakage-safe multivariate prediction, hard route readiness, family-specific continuous capability utilization, and sparse rolling assignment. A full-day Test31 replay uses 30,000 common requests and empirically reconstructed vehicle sessions. Across 27 mixed-fleet scenarios, mean service rate decreases from 0.7258 at a baseline-normalized realized AV active-hour share of 0.25 to 0.3924 at 0.75. Same-unit prospective accounting shows that the share of AV opportunity arcs surviving the pre-optimizer gates falls from 0.0939% to 0.0445%. Passenger acceptance and broader capability envelopes recover service, but do not eliminate spatial, temporal, evidentiary, and competitive losses. Under a central scenario, a frozen family-exposure policy nearly matches unconstrained service while reducing selected static and dynamic exposure. In ten fixed decision states, leakage-safe predictions materially change candidate identity and selected assignments despite mixed target-wise accuracy. The findings identify a conversion gap between nominal AV supply and effective dispatchable service capacity, and show how hard feasibility, continuous suitability, and prediction-aware sparse optimization can represent that gap without treating operational compatibility as safety certification.
+Mixed human-driven vehicle (HV) and autonomous vehicle (AV) fleets need not convert nominal availability into equivalent service. We connect empirical ride-hailing trajectories, directed road identity, leakage-safe prediction, hard route readiness, continuous capability utilization, and sparse rolling assignment. The 41 frozen Test31 scenarios use 30,000 common requests, observed trajectory departure/boarding proxies as request release (zero lead), and 300-second pickup patience. Within the 27-scenario factorial, mean service rate decreases from 0.7258 to 0.3924 as baseline-normalized realized AV active-hour share increases from 0.25 to 0.75. Separate mechanism validation in ten fixed states shows that passenger, structural, evidence, and patience gates reduce state-summed maximum AV matching from 718 to 493, 238, 124, and 12. Neutral relabeling preserves candidate and selected identities in all ten states when availability policy is held fixed; K=10/20/40/80 preserves final matching capacity in every sampled state. However, fingerprint-verified request-time reconstruction materially changes matching magnitudes in four paired physical states: zero/Low/Base/High lead scenarios yield summed matching capacities of 8/26/25/40. These are instantaneous capacities, not daily service counts. The evidence supports a conditional mechanism: genuine matchable-capacity losses interact with request timing and remaining pickup patience. Prediction is decision-relevant, but superiority under a common independent evaluator is not established. The framework represents operational compatibility without claiming AV safety certification.
 
 **Keywords:** autonomous ride-hailing; mixed-fleet dispatch; operational design domain; decision-time prediction; effective service capacity; lexicographic assignment
 
@@ -207,11 +207,13 @@ The implementation is designed around sparsity. A cKDTree retrieves local candid
 
 ### 5.1 Demand, fleet normalization, and factorial design
 
+**Canonical timing assumption.** All 41 formal scenarios treat the observed trajectory departure/boarding proxy as simulated request release: lead time is zero and pickup patience is 300 seconds. These are not observed platform request timestamps. An order released at \(r_o\) has deadline \(D_o=r_o+300\), with decisions every 30 seconds. Recovered RT sensitivity shows that this assumption affects mechanism magnitudes; the full-day numbers must not be interpreted as timing-invariant effects.
+
 The main experiment is a full-day deterministic replay of 30,000 Test31 requests. Demand, request patience, vehicle sessions, route interface, M3 prediction checkpoint, random acceptance uniforms, candidate construction, and optimizer settings are frozen before scenario execution. The main factorial combines three baseline-normalized realized AV active-hour shares \(q_A\in\{0.25,0.50,0.75\}\), three capability profiles \(k\in\{C,M,A\}\), and three passenger acceptance levels \(p\in\{0.40,0.70,1.00\}\), yielding 27 mixed-fleet scenarios.
 
 The primary outcome is service rate: served requests divided by 30,000. Secondary outcomes include AV service share, patience expiration, candidate survival through same-unit gates, selected family exposure, pickup objective, and computation diagnostics. The main factorial disables cumulative \(\Gamma\) controls and additional cost penalties so that the effects of fleet composition, acceptance, and capability are not confounded by a second policy layer.
 
-The factorial estimands are paired finite-population contrasts on this demand day. For example, the acceptance contrast compares two nested passenger gates holding the fleet session realization, profile, and request stream fixed. The capability contrast changes the frozen envelope while holding acceptance and composition fixed. The composition contrast changes which empirical sessions are labeled AV at a fixed baseline-normalized target and thus includes the spatial-temporal consequence of those sessions. We report these as operational scenario contrasts rather than estimates of a population-wide behavioral causal effect.
+The factorial estimands are paired finite-population contrasts on this demand day. For example, the acceptance contrast compares two nested passenger gates holding the fleet session realization, profile, and request stream fixed. The capability contrast changes the frozen envelope while holding acceptance and composition fixed. The composition contrast changes the mix of empirical HV sessions and full-horizon AV availability at a fixed baseline-normalized target; it is not a label-only intervention and includes the corresponding spatial-temporal consequences. We report these as operational scenario contrasts rather than estimates of a population-wide behavioral causal effect.
 
 No hyperparameter, profile cap, policy allowance, or routing fallback is changed after inspecting the 27 outcomes. This freeze is especially important for the reference exposure policy: it is transferred from one designated calibration trajectory and is not selected because it happens to look favorable at the central scenario.
 
@@ -235,6 +237,14 @@ The main full-day scenarios use no active repositioning. This baseline preserves
 
 Computational diagnostics are treated as part of experimental validity. All scenario runners process one day and one sparse epoch state at a time, release intermediate data, and avoid GPU dependence. Route caches are bounded by the candidate process rather than precomputing a citywide matrix. Scenario manifests record completion and routing failures. This architecture supports exact replay on the available workstation while preventing a change in memory strategy from becoming an unreported difference between treatments.
 
+### 5.4 Fixed-state mechanism and timing diagnostics
+
+Mechanism validation is separate from the 41 full-day outcomes. Ten existing zero-lead states are used for neutral identity and AV gate graphs. Relabeling holds inherited availability policy fixed; canonical HV empirical sessions and AV full-horizon availability are unchanged. For each sparse gate graph, \(E_t^g=|A_t^g|\) counts distinct order–vehicle edges, \(U_t^g\) counts waiting orders with an AV option, and \(M_t^g=\nu(G_t^g)\) is maximum bipartite matching cardinality. This M denotes matching capacity, not the Moderate profile or static movement descriptor. K=10/20/40/80 changes only sparsification; selected assignments are not an additional feasibility gate.
+
+Timing sensitivity uses q_A=.50/.75, Moderate capability, acceptance=.70, and 12:00/17:30 local time: four physical states, each paired across zero lead and RT-Low/Base/High. The unchanged original transform uses Train 20161019–22 gap P25/P50/P75/P90 = 420/748/1733/3693 seconds, OD-dependent lower bounds, stable order/scenario jitter, clipping and the original UTC business-day convention. Fifteen surviving summary fingerprints on 114,356 legacy orders reproduce with maximum error approximately \(2.27\times10^{-13}\) seconds. This is a **fingerprint-verified reconstruction**, not recovery of the original missing manifest or per-order hashes.
+
+The transform covers all 30,000 Test31 orders. Within each state, vehicles, availability, canonical prior assignments, route descriptors, routing clock and gate rules stay fixed; release and its derived waiting membership, failed-round proxy and remaining patience change. This is conditional-state sensitivity, not a new RT vehicle history or a full-day replay. Frozen descriptors are not asserted available at earlier release, and no earlier-decision prediction validation is implied. Aggregate patience retention divides summed post-patience M by summed pre-patience M, rather than averaging state percentages.
+
 ## 6. Results
 
 ### 6.1 Empirical grounding
@@ -245,33 +255,57 @@ Static and dynamic descriptors are available on the selected service routes used
 
 ### 6.2 Fleet transition and benchmark anchors
 
-Across the 27 mixed-fleet factorial scenarios, mean service rate falls monotonically with the baseline-normalized realized AV active-hour share. At \(q_A=0.25\), the mean over profiles and acceptance settings is 0.7258. It decreases to 0.5984 at \(q_A=0.50\) and 0.3924 at \(q_A=0.75\). The change from 0.25 to 0.75 is \(-0.3334\), a relative decline of approximately 45.9%. Because demand and total baseline-normalized active-hour exposure are paired, this pattern is not caused by sampling different request days. It indicates that substituting nominal AV active hours for HV active hours does not preserve the same dispatchable service opportunity.
+Under the canonical zero-lead, 300-second-patience replay, mean service rate across the 27 mixed-fleet factorial scenarios falls monotonically with the baseline-normalized realized AV active-hour share. At \(q_A=0.25\), the mean over profiles and acceptance settings is 0.7258. It decreases to 0.5984 at \(q_A=0.50\) and 0.3924 at \(q_A=0.75\). The change from 0.25 to 0.75 is \(-0.3334\), a relative decline of approximately 45.9%. Because demand and total baseline-normalized active-hour exposure are paired, this pattern is not caused by sampling different request days. It indicates that substituting nominal AV active hours for HV active hours does not preserve the same dispatchable service opportunity.
 
 Benchmark cases sharpen the interpretation. The all-HV replay serves 0.7889 of requests. Under the Moderate profile and \(p=0.70\), service rates are 0.7297, 0.6044, and 0.4013 for \(q_A=0.25,0.50,0.75\), respectively. The all-AV Moderate case serves only 0.1515. This all-AV result is not an AV performance ceiling; it is a composition extreme in which no HV capacity remains to serve passengers or routes filtered out of the AV candidate set. The comparison demonstrates why nominal fleet share and effective service capacity must be separated.
 
 [Table 1 about here]
 
-### 6.3 Same-unit effective-capacity mechanism
+### 6.3 Matching-capacity mechanism and timing qualification
 
-To locate the conversion loss, we follow the same opportunity unit \((o,v,t)\) through the prospective gate ledger. Let \(N_0\) be the rolling stock of spatially considered opportunities and \(N_5\) the stock surviving passenger, structural, evidence, patience, and related pre-optimizer filters under the frozen ledger. The survival fraction is extremely small and declines as AV supply rises: \(N_5/N_0=0.0939\%\) at \(q_A=0.25\), 0.0720% at 0.50, and 0.0445% at 0.75. These percentages must not be read as passenger-level acceptance rates. The same order and vehicle can recur at multiple epochs, so both numerator and denominator are opportunity counts.
+#### 6.3.1 Neutral identity and genuine capacity loss
 
-The decomposition identifies multiple nonexclusive losses. Passenger-gate retention is 68.32%, 67.49%, and 66.82% across increasing \(q_A\). Structural retention declines from 47.15% to 43.10%, evidence retention from 52.21% to 42.59%, and patience retention from 6.44% to 4.20%. The very low patience-stage retention is consistent with time-space competition: a nominally active AV contributes only if it is in a useful location early enough to reach a waiting passenger. Larger AV share does not automatically repair this alignment and may remove HV alternatives that previously covered difficult requests.
+Neutral identity passes in all ten states: candidate graphs, selected assignments and pickup objectives agree when only labels change while availability policy is inherited. The previously coupled session rule favors AV admission rather than suppressing it. This diagnostic neither modifies canonical HV=empirical-session/AV=full-horizon definitions nor establishes equality between those different policies.
 
-Two downstream compression stages require separate interpretation. Shared Top-K retention is roughly 8–9%, but it is an algorithmic sparsification step rather than a behavioral or ODD rejection. All candidates reaching the routing/post-patience stage pass that recorded stage in the audited runs. Finally, the \(N_5\rightarrow N_6\) difference is caused by dispatch competition, not by another eligibility filter: individually valid arcs compete for orders and vehicles under one-to-one assignment. Taken together, the ledger supports the mechanism
+**Table MC1. Gate-level AV capacity summed over ten canonical zero-lead fixed states.** Counts are not unique daily orders or selected assignments.
+
+| Gate | E: edges | U: orders with AV option | M: maximum matching | Loss of M |
+| --- | ---: | ---: | ---: | ---: |
+| Spatial opportunity | 95180 | 720 | 718 | — |
+| Passenger compatible | 65444 | 493 | 493 | 225 |
+| Structural ready | 31153 | 238 | 238 | 255 |
+| Evidence complete | 15775 | 124 | 124 | 114 |
+| Top-K compression | 1371 | 124 | 124 | 0 |
+| Route returned | 1371 | 124 | 124 | 0 |
+| Pickup/patience feasible | 48 | 12 | 12 | 112 |
+| Solver eligible | 48 | 12 | 12 | 0 |
+
+Passenger, structural, evidence and patience gates remove genuine maximum-matchable orders. Top-K instead removes 14,404 of 15,775 pre-compression edges (91.31%) without M loss. Final M is identical at K=10/20/40/80 in every sampled state, although final E totals are 38/48/50/55. Thus K20 is not driving the sampled loss; this is not a guarantee over all states. U and M differ when orders compete for vehicles, as spatial U=720 versus M=718 illustrates.
+
+#### 6.3.2 Supporting full-day opportunity accounting
+
+The prospective \((o,v,t)\) ledger reports solver-input/spatial-opportunity ratios of 0.0939%, 0.0720% and 0.0445% at q_A=.25/.50/.75. These repeated-epoch edge ratios are neither passenger acceptance rates nor fractions of matching capacity retained. They supply opportunity-volume context; Table MC1 is the primary matching-capacity evidence. The ten-state result does not causally allocate the entire full-day service decline among gates. Final assignment competition must also remain separate from eligibility.
+
+#### 6.3.3 Sensitivity qualification
+
+**Table RT1. Conditional timing sensitivity summed over four physical states.** This population differs from Table MC1 and must not be pooled with it.
+
+| Request-time variant | Pre-patience M | Final M | Aggregate patience retention |
+| --- | ---: | ---: | ---: |
+| Canonical zero lead | 53 | 8 | 15.09% |
+| RT-Low | 130 | 26 | 20.00% |
+| RT-Base | 128 | 25 | 19.53% |
+| RT-High | 156 | 40 | 25.64% |
+
+Operational/passenger gates still reduce M, but timing materially changes its magnitude. Local q ordering also changes: at noon final M for q_A=.50/.75 is 4/3 under zero lead and 10/11 under RT-High; at 17:30 it is 1/0 and 8/11. Because waiting cohorts differ and canonical vehicle histories are held fixed, these are not order-level treatment effects or evidence of a reversed full-day service ordering.
+
+The classification is **RT_SENSITIVE**, qualifying rather than overturning the mechanism. Genuine matching-capacity attrition remains, but the magnitude of conversion loss interacts with request reconstruction and remaining pickup patience:
 
 \[
-\text{nominal AV active hours}
-\;\not\equiv\;
-\text{effective dispatchable service capacity}.
+M_t^g=M_t^g(\text{operational gates},\text{request timing},\text{pickup patience}\mid\text{fixed physical state}).
 \]
 
-The evidence does not imply that AV technology intrinsically reduces service. It shows that, under the tested acceptance, capability, spatial state, no-repositioning baseline, and rolling deadlines, each substituted AV hour has fewer usable assignment opportunities than the HV hour it replaces.
-
-The monotone decline in \(N_5/N_0\) also indicates congestion in opportunity space rather than a shortage of nominal candidates alone. At higher AV share, more potential pairings enter the AV-specific gate sequence, but the useful combinations do not expand proportionately. Passengers and compatible routes are finite, vehicles compete for the same temporally reachable pickups, and removed HV sessions no longer provide a universal fallback. In this sense, the conversion efficiency of an additional AV hour is endogenous to fleet composition. It depends on the remaining mix, not just the standalone capability of the entering vehicle.
-
-This perspective differs from defining effective capacity as completed AV trips divided by AV hours. That ex post ratio is influenced by the optimizer and realized competition but does not show where potential service disappeared. The prospective ledger complements completed-trip productivity by locating losses before selection. Both measures may be useful, but only the former preserves the gate-specific mechanism studied here.
-
-[Figure 4 about here]
+[Figure 4A–C about here: canonical full-day service; ten-state E/U/M mechanism; four-state RT qualification. Separate populations and denominators.]
 
 ### 6.4 Acceptance, capability, and family activity
 
@@ -315,17 +349,17 @@ Within the tested tolerance \(\epsilon=0.05\), adding the operating-cost term re
 
 ## 7. Discussion and limitations
 
-### 7.1 Effective-capacity conversion
+### 7.1 Conditional effective-capacity conversion
 
-The principal finding is not merely that service falls in one AV experiment. It is that nominal supply and effective capacity are connected by a sequence of lossy, state-dependent transformations. An AV active hour becomes useful service only when a compatible passenger, a sufficiently evidenced and operationally compatible route, a reachable pickup, and a winning assignment coincide in time and space. As \(q_A\) increases, the fleet loses HV flexibility faster than the tested AV opportunities can replace it. The all-AV Moderate result makes this boundary visible: a composition extreme can perform far below a mixed fleet and therefore cannot be treated as an upper benchmark.
+Under the canonical zero-lead, 300-s-patience replay, increasing nominal AV active-hour share is associated with lower realized service. Fixed-state mechanism analysis shows that passenger and operational gates remove genuine maximum-matchable capacity rather than merely redundant candidate edges; however, the magnitude of this conversion loss interacts materially with request-time reconstruction and remaining pickup patience.
 
-This mechanism changes how fleet-transition studies should report supply. A count-based AV fraction is insufficient when vehicle sessions differ in duration or time of day. Even active-hour normalization is only the start: the opportunity ledger shows how little of nominal AV availability reaches the optimizer under the tested conditions. Because the ledger preserves \((o,v,t)\) as its unit, it avoids combining passenger-level, order-level, and arc-level percentages. It also separates true eligibility loss from Top-K algorithmic compression and from final assignment competition.
+Three evidence levels remain separate. The 41 full-day scenarios establish operational contrasts on common demand. Ten-state E/U/M validates substantive gate attrition and distinguishes redundant Top-K edges from lost matching capacity. Four-state RT sensitivity qualifies magnitudes and local cross-fleet ordering. Neither fixed-state analysis causally decomposes the whole daily service curve.
 
-The resulting service curve is nonlinear in an operational sense even though only three \(q_A\) levels are tested. The mean loss from 0.25 to 0.50 is smaller than the loss from 0.50 to 0.75, and the high-share scenarios also show lower prospective survival. We do not fit a continuous response curve from three points. Instead, the pattern motivates a complementarity interpretation: HV capacity has option value because it can serve requests outside the modeled AV-compatible subset, while AV capacity becomes more valuable when acceptance, capability, and spatial availability jointly expand. Removing the flexible option at high \(q_A\) exposes constraints that were previously absorbed by HVs.
+Active-hour normalization is necessary but insufficient to measure dispatch capacity. Availability becomes useful when passengers, routes, evidence and pickup reachability permit simultaneous matching. Neutral identity excludes label-only asymmetry in the controlled sample; it does not erase the intended distinction between empirical-session HVs and full-horizon AVs.
 
-This option-value view also explains why all-AV performance should not be used as an upper bound. An upper bound would require the all-AV technology to weakly dominate the HV on every relevant assignment. The tested profiles explicitly violate that condition. The all-AV extreme is useful because it reveals the consequence of eliminating the flexible class, not because it estimates a future mature AV fleet.
+HV flexibility is a plausible interpretation of the canonical substitution pattern, not a timing-invariant productivity theorem. The all-AV Moderate result is a composition extreme under the tested assumptions, not a technology ceiling. RT sensitivity warns against generalizing either effect sizes or fleet ordering. The scientific classification is QUALIFIES_CURRENT_STORY: the mechanism survives with a substantive timing/patience qualification.
 
-The decline should not be generalized into a claim that AV deployment necessarily reduces service. It is conditional on the observed Xi'an demand, reconstructed sessions, tested profiles and acceptance rates, fixed route policy, pickup patience, and no-active-repositioning main baseline. Alternative vehicle technology, higher acceptance, different spatial deployment, route replanning, or targeted rebalancing could change the conversion. The contribution is the measurement framework and the demonstrated possibility of a large conversion gap, not a universal numerical penalty.
+Opportunity counts, maximum matching and realized service measure different objects. M describes simultaneous feasibility before selection; service additionally reflects assignments and vehicle evolution. Explicit timing assumptions and E/U/M reporting prevent these quantities from being treated as interchangeable.
 
 ### 7.2 Operational envelopes and prediction as decision information
 
@@ -333,7 +367,7 @@ The hard-plus-continuous interface provides a more useful dispatch abstraction t
 
 The central policy comparison shows why continuous exposure matters. Strict zero exposure excludes most AV service and lowers total service. The frozen reference allowance nearly reproduces unconstrained service while reducing selected static and dynamic exposure. This does not identify an optimal ODD policy. It demonstrates that a platform can represent and enforce a transparent family-level operating posture rather than relying on a binary label or an unreported weighted score. Such an interface can later support regulator-, operator-, or manufacturer-specified limits without changing the underlying dispatch formulation.
 
-Prediction must also be interpreted as decision information. In the fixed-state ablation, the prediction-informed model is not uniformly better on all four reported targets, yet it produces a substantially different AV candidate graph and better audited selection outcomes on exposure and pickup objective. Forecast evaluation that stops at aggregate MAE would miss this pathway. Conversely, a decision difference alone does not prove full-day benefit. Both views are needed: target-space diagnostics establish what the model predicts, while decision-space diagnostics establish whether those predictions are operationally consequential [CITATION NEEDED — predict-then-optimize and decision-focused evaluation].
+Prediction remains decision information, not proven decision superiority. The fixed-state ablation changes candidate and selected-assignment identities despite mixed target-wise accuracy. Its reported exposure and pickup-objective differences are diagnostics under the existing comparison; they are not evaluation under a common independent outcome layer. That evaluator has not been run. The supported classification remains DECISION-RELEVANT, not decision-superior, and neither the prediction ablation nor RT sensitivity establishes full-day prediction benefit [CITATION NEEDED — predict-then-optimize and decision-focused evaluation].
 
 ### 7.3 Passenger acceptance and managerial interpretation
 
@@ -344,6 +378,10 @@ For platform managers, the results suggest three operational metrics beyond nomi
 Capability expansion also has targeted value. The Advanced profile recovers more service than Conservative capability in the high-\(q_A\) condition, but static structure remains active even under the broad profile. Investment priorities should therefore be informed by family attribution rather than by a generic “broader ODD” objective. In this case, improving intersection and dynamic-condition handling is more relevant than expanding speed capability beyond the Moderate boundary. This is a contextual diagnostic, not an engineering prescription for all cities.
 
 ### 7.4 Limitations and future research
+
+Timing is a substantive design limitation, not a secondary implementation detail. Trajectory departure/boarding is not an observed platform request time. All 41 formal scenarios use zero lead and 300-second patience. Fingerprint-verified RT reconstruction reproduces aggregate summaries but does not recover the original manifest or per-order hashes, and true request times remain unidentified. The original UTC boundary convention is retained.
+
+The four-state timing diagnostic holds canonical history and descriptors fixed while release changes waiting cohorts and remaining patience. It cannot establish RT-specific daily service, full-day q ordering or prediction validity at earlier release. State-summed M is not a daily unique-order or selected-assignment count. Neutral identity and Top-K stability also have sampled-state scope.
 
 Several limitations bound the conclusions. First, the empirical setting is one city and one historical period. Demand structure, road geometry, signalization quality, and driver sessions may differ elsewhere. Multi-city and multi-season validation is needed before estimating transferable effect sizes.
 
