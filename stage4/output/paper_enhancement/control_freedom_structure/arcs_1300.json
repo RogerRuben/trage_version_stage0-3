@@ -1,0 +1,242 @@
+{
+  "epoch_id": "1300",
+  "timestamp": "2016-10-31 13:00:00+08:00",
+  "state_sha256": "50b8e9abe49a9d288dadbd01a42b17c5c39b90f0fa47e18a9d10fdc57e05eb24",
+  "exposure_state": {
+    "av_assignments": 1023,
+    "static": 2182.7654411764734,
+    "dynamic": 144.77437752150843,
+    "speed": 0.0
+  },
+  "gammas": {
+    "static": 2.145067625590382,
+    "dynamic": 0.14934256810554178,
+    "speed": 0.0
+  },
+  "arcs": [
+    {
+      "vehicle_id": 1463,
+      "request_id": 10423,
+      "pickup_eta_s": 73.18818666552376,
+      "critical": false,
+      "carry_over": false,
+      "payload": [
+        "7d95d58b0aacfd078e1cd1f0c0980e9b",
+        "HV_S3_01463"
+      ],
+      "vehicle_type": "HV",
+      "exposure_static": 0.0,
+      "exposure_dynamic": 0.0,
+      "exposure_speed": 0.0,
+      "operating_cost": 402.62432660673926
+    },
+    {
+      "vehicle_id": 1541,
+      "request_id": 10423,
+      "pickup_eta_s": 240.4754704724352,
+      "critical": false,
+      "carry_over": false,
+      "payload": [
+        "7d95d58b0aacfd078e1cd1f0c0980e9b",
+        "HV_S3_01541"
+      ],
+      "vehicle_type": "HV",
+      "exposure_static": 0.0,
+      "exposure_dynamic": 0.0,
+      "exposure_speed": 0.0,
+      "operating_cost": 569.9116104136507
+    },
+    {
+      "vehicle_id": 1452,
+      "request_id": 10424,
+      "pickup_eta_s": 215.38237790139848,
+      "critical": false,
+      "carry_over": false,
+      "payload": [
+        "a53593af3630252ed4da2e3d679791a8",
+        "HV_S3_01452"
+      ],
+      "vehicle_type": "HV",
+      "exposure_static": 0.0,
+      "exposure_dynamic": 0.0,
+      "exposure_speed": 0.0,
+      "operating_cost": 442.0238825383642
+    },
+    {
+      "vehicle_id": 713,
+      "request_id": 10424,
+      "pickup_eta_s": 278.1151093289903,
+      "critical": false,
+      "carry_over": false,
+      "payload": [
+        "a53593af3630252ed4da2e3d679791a8",
+        "HV_S3_00713"
+      ],
+      "vehicle_type": "HV",
+      "exposure_static": 0.0,
+      "exposure_dynamic": 0.0,
+      "exposure_speed": 0.0,
+      "operating_cost": 504.756613965956
+    },
+    {
+      "vehicle_id": 4344,
+      "request_id": 10427,
+      "pickup_eta_s": 219.56455999657126,
+      "critical": false,
+      "carry_over": false,
+      "payload": [
+        "83429475c1f3c1e22d39f309006d31a5",
+        "AV_S3_0156"
+      ],
+      "vehicle_type": "AV",
+      "exposure_static": 1.7352941176470589,
+      "exposure_dynamic": 0.0,
+      "exposure_speed": 0.0,
+      "operating_cost": 684.6044470076224
+    },
+    {
+      "vehicle_id": 4257,
+      "request_id": 10427,
+      "pickup_eta_s": 236.29328837726243,
+      "critical": false,
+      "carry_over": false,
+      "payload": [
+        "83429475c1f3c1e22d39f309006d31a5",
+        "AV_S3_0069"
+      ],
+      "vehicle_type": "AV",
+      "exposure_static": 1.7352941176470589,
+      "exposure_dynamic": 0.0,
+      "exposure_speed": 0.0,
+      "operating_cost": 701.3331753883136
+    },
+    {
+      "vehicle_id": 4279,
+      "request_id": 10427,
+      "pickup_eta_s": 234.20219732967604,
+      "critical": false,
+      "carry_over": false,
+      "payload": [
+        "83429475c1f3c1e22d39f309006d31a5",
+        "AV_S3_0091"
+      ],
+      "vehicle_type": "AV",
+      "exposure_static": 1.7352941176470589,
+      "exposure_dynamic": 0.0,
+      "exposure_speed": 0.0,
+      "operating_cost": 699.2420843407272
+    },
+    {
+      "vehicle_id": 4413,
+      "request_id": 10427,
+      "pickup_eta_s": 280.20620037657665,
+      "critical": false,
+      "carry_over": false,
+      "payload": [
+        "83429475c1f3c1e22d39f309006d31a5",
+        "AV_S3_0225"
+      ],
+      "vehicle_type": "AV",
+      "exposure_static": 1.7352941176470589,
+      "exposure_dynamic": 0.0,
+      "exposure_speed": 0.0,
+      "operating_cost": 745.2460873876278
+    },
+    {
+      "vehicle_id": 4295,
+      "request_id": 10427,
+      "pickup_eta_s": 227.92892418691684,
+      "critical": false,
+      "carry_over": false,
+      "payload": [
+        "83429475c1f3c1e22d39f309006d31a5",
+        "AV_S3_0107"
+      ],
+      "vehicle_type": "AV",
+      "exposure_static": 1.7352941176470589,
+      "exposure_dynamic": 0.0,
+      "exposure_speed": 0.0,
+      "operating_cost": 692.9688111979681
+    },
+    {
+      "vehicle_id": 4414,
+      "request_id": 10427,
+      "pickup_eta_s": 278.1151093289903,
+      "critical": false,
+      "carry_over": false,
+      "payload": [
+        "83429475c1f3c1e22d39f309006d31a5",
+        "AV_S3_0226"
+      ],
+      "vehicle_type": "AV",
+      "exposure_static": 1.7352941176470589,
+      "exposure_dynamic": 0.0,
+      "exposure_speed": 0.0,
+      "operating_cost": 743.1549963400414
+    },
+    {
+      "vehicle_id": 1657,
+      "request_id": 10428,
+      "pickup_eta_s": 186.107103235189,
+      "critical": false,
+      "carry_over": false,
+      "payload": [
+        "c8263cf72deb7e3331b711832eb7af4e",
+        "HV_S3_01657"
+      ],
+      "vehicle_type": "HV",
+      "exposure_static": 0.0,
+      "exposure_dynamic": 0.0,
+      "exposure_speed": 0.0,
+      "operating_cost": 1509.7629245585838
+    },
+    {
+      "vehicle_id": 1606,
+      "request_id": 10428,
+      "pickup_eta_s": 56.459458284832614,
+      "critical": false,
+      "carry_over": false,
+      "payload": [
+        "c8263cf72deb7e3331b711832eb7af4e",
+        "HV_S3_01606"
+      ],
+      "vehicle_type": "HV",
+      "exposure_static": 0.0,
+      "exposure_dynamic": 0.0,
+      "exposure_speed": 0.0,
+      "operating_cost": 1380.1152796082274
+    },
+    {
+      "vehicle_id": 1383,
+      "request_id": 10428,
+      "pickup_eta_s": 60.6416403800054,
+      "critical": false,
+      "carry_over": false,
+      "payload": [
+        "c8263cf72deb7e3331b711832eb7af4e",
+        "HV_S3_01383"
+      ],
+      "vehicle_type": "HV",
+      "exposure_static": 0.0,
+      "exposure_dynamic": 0.0,
+      "exposure_speed": 0.0,
+      "operating_cost": 1384.2974617034001
+    },
+    {
+      "vehicle_id": 1635,
+      "request_id": 10428,
+      "pickup_eta_s": 248.8398346627808,
+      "critical": false,
+      "carry_over": false,
+      "payload": [
+        "c8263cf72deb7e3331b711832eb7af4e",
+        "HV_S3_01635"
+      ],
+      "vehicle_type": "HV",
+      "exposure_static": 0.0,
+      "exposure_dynamic": 0.0,
+      "exposure_speed": 0.0,
+      "operating_cost": 1572.4956559861755
+    }
+  ]
+}

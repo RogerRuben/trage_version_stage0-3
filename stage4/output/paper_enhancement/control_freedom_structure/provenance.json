@@ -1,0 +1,24 @@
+{
+  "source_config_sha256": "3fdf2cf53c04ee3262d6060c318e468426d77321b4ef9e8e4a3483b639f3bbe4",
+  "registry_sha256": "ec83ef79439d46085fd8fcdf4cca2d9ef005145cf0f7723531b02d2e1c28c719",
+  "routing_config_path": "D:\\pycodes\\didi_xian_raw\\valhalla_data\\valhalla.json",
+  "routing_config_sha256": "f2eb80488a2ec832208b8ee1a7433aa4905e58243fe1c0d5b81d48a3368ec696",
+  "routing_mode": "SINGLE_SOURCE_MATRIX",
+  "costing": "auto",
+  "clock": "Asia/Shanghai minute precision",
+  "beta_sha256": "d7bc9bedd76b6a996fd9643c24546e5eb28c36b827d16ad8e58ca097c492476b",
+  "tiles_path": "D:\\pycodes\\didi_xian_raw\\valhalla_data\\tiles",
+  "tile_count": 23,
+  "tile_inventory_sha256": "b1a7fb7efc40324268fc10c3eae79aa9db60426cd11d91517c7b000b2eccecf9",
+  "tile_inventory_is_content_hash": false,
+  "historical_full_tiles_sha": "2e29e7849d2ab4523039088f34986494f4438c196ea131e7da416a26cb5ef698",
+  "historical_full_tiles_sha_recomputed": false,
+  "input_code_sha256": "1e71c6f92ea6723629b798c1524d8f8c7d7ae99e6f8d17db22d5066e78e7e41a",
+  "limits": {
+    "rss_bytes": 2147483648,
+    "wall_s": 600,
+    "milp_s": 10,
+    "arcs_per_state": 5000,
+    "routing_arc_total": 20000
+  }
+}

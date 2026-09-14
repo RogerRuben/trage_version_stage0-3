@@ -1,5 +1,7 @@
 # Control freedom and joint-fleet structure: bounded findings
 
+历史阶段说明：本文记录授权重建前的输入盘点。用户随后授权的有界重建与真实 A1/A2 求解已完成，输入缺口已关闭；最新结果见 [行动空间诊断报告](action_space_diagnostic_report.md)，本文 Toy 2 结论不变。
+
 日期：2026-09-14；起始 commit：d4c32fff9fad4f6733be8efc9cddad5c4e2ccb23。
 
 本轮仅做冻结输入盘点与第二个有限合成例子。生产 solver、路由、预测、FleetPy、V3 和 41 场景不变。

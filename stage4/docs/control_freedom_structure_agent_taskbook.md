@@ -2,6 +2,8 @@
 
 日期：2026-09-14。只检查动态价值是否有可选动作以及固定单车规则的结构边界。不是 Stage5，不建立 predictor 或 controller。
 
+执行补记：用户随后明确授权有界确定性路由重建；十个原登记状态已完成，见 [最终诊断报告](control_freedom_structure/action_space_diagnostic_report.md)。以下保留原执行设计及输入门槛，不构成再跑授权。
+
 ## 0. 当前执行状态与授权边界
 
 已完成：输入盘点、有限 joint-fleet 反例，见 [结果报告](control_freedom_structure/structure_and_input_report.md)。未完成：真实候选图的 A1/A2 求解，因为已检查归档缺少完整带权 mixed arcs。
