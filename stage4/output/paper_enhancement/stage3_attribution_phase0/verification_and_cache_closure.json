@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "route_semantics_fixture_assertions": 3,
+  "condition_input_rows": 50,
+  "required_state_arcs": 17621,
+  "directly_archived_state_arcs": 130,
+  "archive_key_reusable_state_arcs": 133,
+  "unique_required_routing_keys": 16386,
+  "unique_missing_routing_keys": 16261,
+  "routing_calls": 0,
+  "scientific_MILPs": 0,
+  "claim": "Exact production-cache-key reuse; no spatial interpolation"
+}

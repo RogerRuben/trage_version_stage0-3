@@ -1,0 +1,17 @@
+{
+  "status": "READY_AFTER_BOUNDED_PICKUP_ETA_COMPLETION",
+  "physical_states": 10,
+  "unique_waiting_orders": 720,
+  "required_state_arcs": 17621,
+  "archived_state_arcs": 130,
+  "missing_state_arcs": 17491,
+  "route_counterfactual_unresolved": 0,
+  "existing_fallback_routes_evaluated": 373,
+  "fallback_hardF_evidenceIncomplete_state_orders": 161,
+  "fallback_state_orders_with_AV_spatial": 161,
+  "fallback_state_orders_with_D3_AV_topk": 114,
+  "routing_calls": 0,
+  "scientific_condition_MILPs": 0,
+  "next_step_requires_user_authorization": true,
+  "archive_scope": "Certified old same-state solver arcs only; other routing samples not certified for exact keys"
+}

@@ -1,5 +1,7 @@
 # Stage3 → action-space attribution: pre-experiment review
 
+最新：用户冻结v1协议后，Q0 + Phase0已经完成，见 [阶段报告](Q0_Phase0_report.md) 和 [冻结协议v1](stage3_action_space_attribution_protocol_v1.md)。Q0 PASS；输入状态 READY_AFTER_BOUNDED_PICKUP_ETA_COMPLETION；独立缺失pickup keys=16261。未补路由，未运行最终50条件。
+
 2026-09-18。只完成审计、数学说明、实验提案；**没有启动新实验**。
 
 1. [A0 — 仓库审计](A0_repository_audit.md)
@@ -10,4 +12,4 @@
 
 状态：A0_COMPLETE / A1_COMPLETE / A2_DRAFT_FOR_FREEZE / EXPERIMENT_NOT_RUN。
 
-下一步由用户统一冻结协议，并解决既有 pickup ETA 覆盖与路线语义。未授权新增路由、训练、全天模拟、Stage3修改或Stage5。
+上述A0/A1/A2保留为冻结前草案，冲突处以v1协议为准。下一步由用户审查Q0/Phase0后授权，才补pickup ETA并运行最终50条件；训练、全天模拟、Stage3修改与Stage5均不在范围内。
