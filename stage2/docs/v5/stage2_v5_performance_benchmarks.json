@@ -1,0 +1,78 @@
+{
+  "maximum_peak_rss_delta_mb": 283.6060667037964,
+  "maximum_process_rss_mb": 253.3203125,
+  "scaling_checks": [
+    {
+      "high_rows": 50000,
+      "hotspot": "cdf_mapping",
+      "low_rows": 10000,
+      "runtime_ratio": 5.028424605442459,
+      "status": "PASS"
+    },
+    {
+      "high_rows": 500000,
+      "hotspot": "cdf_mapping",
+      "low_rows": 100000,
+      "runtime_ratio": 4.96107473485698,
+      "status": "PASS"
+    },
+    {
+      "high_rows": 50000,
+      "hotspot": "route_aggregation",
+      "low_rows": 10000,
+      "runtime_ratio": 3.7029212543388255,
+      "status": "PASS"
+    },
+    {
+      "high_rows": 500000,
+      "hotspot": "route_aggregation",
+      "low_rows": 100000,
+      "runtime_ratio": 5.044431298376646,
+      "status": "PASS"
+    },
+    {
+      "high_rows": 50000,
+      "hotspot": "prediction_shard_merge",
+      "low_rows": 10000,
+      "runtime_ratio": 0.9459981425838133,
+      "status": "PASS"
+    },
+    {
+      "high_rows": 500000,
+      "hotspot": "prediction_shard_merge",
+      "low_rows": 100000,
+      "runtime_ratio": 3.395534754675215,
+      "status": "PASS"
+    },
+    {
+      "high_rows": 50000,
+      "hotspot": "history_lookup",
+      "low_rows": 10000,
+      "runtime_ratio": 4.11159328477257,
+      "status": "PASS"
+    },
+    {
+      "high_rows": 500000,
+      "hotspot": "history_lookup",
+      "low_rows": 100000,
+      "runtime_ratio": 4.8804938688826365,
+      "status": "PASS"
+    },
+    {
+      "high_rows": 50000,
+      "hotspot": "scenario_aggregation",
+      "low_rows": 10000,
+      "runtime_ratio": 4.5473740184997355,
+      "status": "PASS"
+    },
+    {
+      "high_rows": 500000,
+      "hotspot": "scenario_aggregation",
+      "low_rows": 100000,
+      "runtime_ratio": 5.196520789230341,
+      "status": "PASS"
+    }
+  ],
+  "schema_version": "stage2_v5_performance_benchmarks.1",
+  "status": "PASS"
+}

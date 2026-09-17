@@ -1,0 +1,28 @@
+symbol,description,domain_or_unit
+o,Order,index
+v,Vehicle,index
+t,Rolling decision epoch,time
+f,Operational-envelope family,"{static; dynamic; speed}"
+r_o,Order request time,timestamp
+D_o,Order pickup deadline,timestamp
+W_max,Maximum permitted pickup wait,300 s
+w_o(t),Elapsed waiting time of order o at epoch t,s
+p_hat_vo_t,Predicted pickup travel time from vehicle v to order o at epoch t,s
+q_A,Requested AV active vehicle-hour share,share
+H_base_exact,Exact continuous vehicle-hours in the reconstructed baseline HV fleet,12279.336389 vehicle-hours
+N_AV,Number of full-horizon AVs,count
+p_A,Scenario-level probability that an order accepts AV service,"[0;1]"
+a_o_A,Realized order-level AV acceptance indicator,"{0;1}"
+H_ok,Hard AV route state for order o and capability profile k,"{FEASIBLE; INFEASIBLE; UNKNOWN}"
+rho_ok_f,Family-specific route suitability ratio,nonnegative ratio
+e_ok_f,Positive family-specific reference-envelope exceedance,"max(rho_ok_f-1;0)"
+x_H_vo_t,HV assignment decision for feasible arc (v;o) at epoch t,"{0;1}"
+x_A_vo_t,AV assignment decision for feasible arc (v;o) at epoch t,"{0;1}"
+Z_t_f,Cumulative assigned AV exposure before epoch t for family f,exposure sum
+N_t_A,Cumulative AV assignment count before epoch t,count
+Gamma_f,Cumulative mean-exposure allowance for family f,nonnegative or unconstrained
+kappa_H,Normalized HV operating-time cost coefficient,reference coefficient
+kappa_A,Normalized AV operating-time cost coefficient,coefficient
+eta_c,Normalized AV-to-HV operating-cost ratio kappa_A/kappa_H,"{0.50;0.75;1.00;1.25}"
+epsilon_W,Local pickup-objective relaxation before cost minimization,"{0;0.05}"
+mathcal_A_t,Sparse feasible assignment-arc set at epoch t,set

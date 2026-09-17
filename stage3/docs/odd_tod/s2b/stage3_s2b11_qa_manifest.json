@@ -1,0 +1,49 @@
+{
+  "adjudication_cases": {
+    "path": "stage3/output/odd_tod/s2b/closure_5v10/s2b11_adjudication_cases.parquet",
+    "row_count": 70,
+    "schema": "adjudication_case_id: large_string\ncomplex_r10: large_string\nselection_stratum: large_string\nselection_rank: large_string\nreused_existing_qa: bool\ncomplexes_r05: large_string\nmember_node_count_r05_total: int64\nmember_node_count_r10: int64\nadjudication_label: large_string\nreviewer_note: large_string\nallowed_labels: large_string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1522",
+    "schema_sha256": "f0627ccf30e597d337b8c399e70d5a8fe01a96dbef46285959815ee509dc5466",
+    "sha256": "b6345ec4d10952e3aecf3250ed6c1df2b53307c0e4b1df2cf63f4cde9f056911",
+    "size_bytes": 14686
+  },
+  "adjudication_sheet_csv": {
+    "path": "stage3/output/odd_tod/s2b/closure_5v10/s2b11_adjudication_sheet.csv",
+    "sha256": "7674f933a7f2b3151f86924557fd6b15db8ba6c71c25fa77a33486b7fde35d27",
+    "size_bytes": 22030
+  },
+  "artifact_sha256": "35b288dd7331e95a8f9bae0a8430361695770db451cf2ea0c28b2cc456837663",
+  "av_feasibility_used": false,
+  "case_count": 70,
+  "existing_qa_reused_count": 23,
+  "labels_allowed": [
+    "5_CORRECT",
+    "10_CORRECT",
+    "BOTH_ACCEPTABLE",
+    "NEITHER",
+    "UNCERTAIN"
+  ],
+  "labels_filled": 0,
+  "left_panel": "5m",
+  "phase_status": "STAGE3_S2B11_FINAL_REVIEW_PAIR_READY",
+  "png_set_sha256": "71fc737a3125437977e4df572626a18412c22d4a2a832fe6d6e32bbfc10b36b9",
+  "png_total_size_bytes": 992460,
+  "right_panel": "10m",
+  "schema_version": "stage3_s2b11_qa_manifest.1",
+  "strata_counts": {
+    "grade_separated": 10,
+    "high_degree": 10,
+    "multi_node_divided_road": 20,
+    "random_changed": 10,
+    "signalized": 20
+  },
+  "test31_used": false,
+  "visual_index": {
+    "path": "stage3/output/odd_tod/s2b/closure_5v10/s2b11_visual_index.parquet",
+    "row_count": 70,
+    "schema": "adjudication_case_id: large_string\ncomplex_r10: large_string\nselection_stratum: large_string\npng_path: large_string\npng_sha256: large_string\npng_size_bytes: int64\nleft_panel: large_string\nright_panel: large_string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1064",
+    "schema_sha256": "1e1dcd41a233392acb0d87028ed58c6d4ecca4ee14c7b28487fc50c4673f221d",
+    "sha256": "8c756f881bbc20a92d1e524dcfa11107a7db31105eceb6e615316c832f4e46e5",
+    "size_bytes": 11404
+  }
+}

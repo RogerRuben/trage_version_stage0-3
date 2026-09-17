@@ -1,0 +1,100 @@
+{
+  "base_stage2_commit": "70cb70265cbb95e5fc9981024a554de28ee2be85",
+  "base_stage2_tag": "stage2-v4-final",
+  "config_sha256": "b8b3ebdd5ccda8ae3a561d961c13a46485b3d25c00e3ef3b6cd135746d37163c",
+  "development_model_id": "c98d73b58b7f6cd70d2abd95a1075f17996e4189b39b353f398f97e419402319",
+  "freeze_status": "FROZEN_BEFORE_ROLLING_ORIGIN",
+  "implementation_commit": "ceab263cb248e82bc6172e1b7171146fd3a7255d",
+  "percentile_targets_used_for_selection": false,
+  "post_rolling_tuning_allowed": false,
+  "rolling_fold_definition": [
+    {
+      "calibration_dates": [
+        "20161021"
+      ],
+      "evaluation_dates": [
+        "20161022",
+        "20161023"
+      ],
+      "fold_id": "fold_1",
+      "train_dates": [
+        "20161009",
+        "20161010",
+        "20161011",
+        "20161012",
+        "20161013",
+        "20161014",
+        "20161015",
+        "20161016",
+        "20161017",
+        "20161018"
+      ],
+      "validation_model_dates": [
+        "20161019",
+        "20161020"
+      ]
+    },
+    {
+      "calibration_dates": [
+        "20161023"
+      ],
+      "evaluation_dates": [
+        "20161024",
+        "20161025"
+      ],
+      "fold_id": "fold_2",
+      "train_dates": [
+        "20161009",
+        "20161010",
+        "20161011",
+        "20161012",
+        "20161013",
+        "20161014",
+        "20161015",
+        "20161016",
+        "20161017",
+        "20161018",
+        "20161019",
+        "20161020"
+      ],
+      "validation_model_dates": [
+        "20161021",
+        "20161022"
+      ]
+    },
+    {
+      "calibration_dates": [
+        "20161025"
+      ],
+      "evaluation_dates": [
+        "20161026",
+        "20161027"
+      ],
+      "fold_id": "fold_3",
+      "train_dates": [
+        "20161009",
+        "20161010",
+        "20161011",
+        "20161012",
+        "20161013",
+        "20161014",
+        "20161015",
+        "20161016",
+        "20161017",
+        "20161018",
+        "20161019",
+        "20161020",
+        "20161021",
+        "20161022"
+      ],
+      "validation_model_dates": [
+        "20161023",
+        "20161024"
+      ]
+    }
+  ],
+  "schema_version": "stage2_v5_development_freeze.2",
+  "selected_history_mode": "ordinary_concatenation",
+  "split_freeze_sha256": "c6945721a9311f4695d540e0046409adad0f4ac7957081b1d8b53c2a3d427c66",
+  "upstream_rebuild_performed": false
+}

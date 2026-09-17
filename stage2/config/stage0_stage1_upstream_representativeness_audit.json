@@ -1,0 +1,82 @@
+{
+  "schema_version": "stage0_stage1_upstream_representativeness_audit_config.1",
+  "audit_scope": "DESCRIPTIVE_REPRESENTATIVENESS_AUDIT_ONLY",
+  "frozen_base_commit": "035c265596dc86754edc1c683a0f18223ce5ee8d",
+  "dates": {
+    "train": [
+      "20161009", "20161010", "20161011", "20161012",
+      "20161013", "20161014", "20161015", "20161016",
+      "20161017", "20161018", "20161019", "20161020",
+      "20161021", "20161022", "20161023", "20161024"
+    ],
+    "validation": ["20161025", "20161026", "20161027"],
+    "test": ["20161031"]
+  },
+  "selection": {
+    "seed": 20261009,
+    "hash_inputs": ["date", "order_id", "seed"],
+    "normalized_rank_definition": "(zero_based_stable_hash_rank + 0.5) / daily_candidate_count"
+  },
+  "time_bin": {
+    "timezone": "Asia/Shanghai",
+    "minutes": 30,
+    "count": 48,
+    "definition": "local_hour * 2 + (local_minute >= 30)"
+  },
+  "spatial_grid": {
+    "crs": "EPSG:32649",
+    "cell_size_m": 1000,
+    "origin_m": [0, 0],
+    "minimum_raw_count_for_cell_rate": 30
+  },
+  "support": {
+    "fit_split": "train",
+    "quantiles": [0.25, 0.50, 0.75, 0.90],
+    "groups": ["unseen", "low", "medium", "high"],
+    "primary_raw_context": "origin_grid_x_time_bin",
+    "rare_groups": ["unseen", "low"],
+    "common_group": "high"
+  },
+  "bootstrap": {
+    "replicates": 1000,
+    "confidence_level": 0.95,
+    "seed": 20261009,
+    "cluster_unit": "date"
+  },
+  "classification_thresholds": {
+    "raw_rare_share_max_for_concentrated_demand": 0.10,
+    "maximum_small_distribution_tv": 0.05,
+    "maximum_small_distribution_jsd": 0.01,
+    "maximum_sampling_rank_mean_gap": 0.02,
+    "minimum_material_rate_ratio": 0.85,
+    "minimum_material_percentage_point_gap": 0.02,
+    "minimum_targets_for_supervision_attrition": 2
+  },
+  "paths": {
+    "stage0_config": "stage0/config/stage0_v6_final.yaml",
+    "stage0_code": "stage0/v6",
+    "candidate_manifests": "stage0/work_v6_final/candidate_manifests",
+    "stage1_input": "stage1/input_v1",
+    "stage1_output": "stage1/output_v3",
+    "stage1_release_manifest": "stage1/docs/stage1_v3_release_manifest.json",
+    "stage1_scientific_review_json": "stage1/docs/stage1_v3_scientific_review.json",
+    "stage1_scientific_review_markdown": "stage1/docs/stage1_v3_scientific_review.md",
+    "stage2_sparsity_evidence": "stage2/docs/v5_2/sparsity_diagnostic/stage2_v5_2_spatiotemporal_sparsity_evidence_bundle.json",
+    "output": "stage2/docs/v5_2/upstream_sampling_audit"
+  },
+  "optional_context_reweighting": {
+    "authorized": false,
+    "policy": "SKIP_UNLESS_ORDER_TO_TRAVERSAL_CONTEXT_MAPPING_IS_DIRECT_AND_AUDITABLE"
+  },
+  "authorizations": {
+    "stage0_production": false,
+    "stage1_production": false,
+    "model_training": false,
+    "model_inference": false,
+    "tau_selection": false,
+    "sparsity_stress_test": false,
+    "transfer_v2": false,
+    "phase_d": false,
+    "stage3": false
+  }
+}

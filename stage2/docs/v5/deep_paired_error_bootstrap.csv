@@ -1,0 +1,4 @@
+split,date,left_model,right_model,left_minus_right_absolute_error,ci95,replicates,order_count
+validation_model,20161025,rc_mstnet_v5_mean,hist_gradient_boosting,-0.0013297711148786808,"[-0.0014055252306824386, -0.0012578797136635269]",500,10000
+validation_model,20161026,rc_mstnet_v5_mean,hist_gradient_boosting,-0.0010481534193867825,"[-0.0011585794234753467, -0.0008742683781212162]",500,10000
+calibration,20161027,rc_mstnet_v5_mean,hist_gradient_boosting,-0.0012177373926460131,"[-0.001270540697842528, -0.001166157701791733]",500,10000

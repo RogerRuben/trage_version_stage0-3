@@ -1,0 +1,14 @@
+{
+  "base_config": "rolling_or_baseline",
+  "phase": "STAGE4_S5A1_VEHICLE_HOUR_NORMALIZATION_CORRECTION",
+  "passenger_acceptance_rate": 1.0,
+  "passenger_acceptance_seed": 20260826,
+  "gamma_static": null,
+  "gamma_dynamic": null,
+  "gamma_speed": null,
+  "eta_cost_av_to_hv": 1.0,
+  "cost_level_enabled": false,
+  "pickup_cost_epsilon": 0.0,
+  "solver_numerical_tolerance": 1e-7,
+  "canonical_reproduction_runtime_guard_s": 3600
+}

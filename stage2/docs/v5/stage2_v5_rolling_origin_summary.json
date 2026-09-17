@@ -1,0 +1,38 @@
+{
+  "aggregate_baseline_result": "LOSS_OR_TIE",
+  "aggregate_relative_mae_change": 0.14968466113805468,
+  "daily_comparison_count": 6,
+  "daily_win_count": 5,
+  "evaluation_dates": [
+    "20161022",
+    "20161023",
+    "20161024",
+    "20161025",
+    "20161026",
+    "20161027"
+  ],
+  "execution_status": "COMPLETED",
+  "fold_count": 3,
+  "fold_results": {
+    "fold_1": "WIN",
+    "fold_2": "WIN",
+    "fold_3": "LOSS_OR_MIXED"
+  },
+  "fold_win_count": 2,
+  "percentile_targets_used_for_model_selection": false,
+  "protocol_model_ids": {
+    "fold_1": "2ac3af674a8135cb93708b11f3440ab0a2f0e0259f3f5d3531e7c737d61e459c",
+    "fold_2": "0bb6452eb1cfd8ddb28bdca1c723f802006a013b8b3981efc4c91cf4126e0465",
+    "fold_3": "1d9383e0391968808e33ca983d0c134706467f52e770ca55a52d9089be8da5a9"
+  },
+  "route_scenario_coverage": {
+    "p50_coverage": 0.4851,
+    "p90_coverage": 0.8802333333333333,
+    "p95_coverage": 0.9234333333333333
+  },
+  "schema_version": "stage2_v5_rolling_origin_summary.1",
+  "scientific_status": "BASELINE_NOT_BEATEN",
+  "tree_aggregate_mae": 0.02982219503493256,
+  "upstream_rebuild_performed": false,
+  "v5_aggregate_mae": 0.03428612019312942
+}

@@ -1,0 +1,300 @@
+{
+  "artifact_sha256": "436ff700393aea32fa16469b6443b34e085f18b1239408aaff7659be8a6f9966",
+  "base_commit": "800c9e9d0747b6fe875c00e5c1d8932626b29fc0",
+  "buffer_radius_not_pairwise_threshold": true,
+  "control_claim_boundary": "MISSING_CONTROL_EVIDENCE_IS_UNKNOWN_NOT_UNSIGNALIZED",
+  "final_commit": "RECORDED_BY_GIT_COMMIT_AND_REMOTE_HEAD_OUTSIDE_SELF_HASHED_MANIFEST",
+  "final_commit_recording_note": "A Git commit cannot embed its own SHA without changing that SHA; the authoritative final commit is the commit containing this manifest and is reported after push.",
+  "final_outputs": {
+    "boundary_index": {
+      "path": "stage3/output/odd_tod/s2b/final/stage3_edge_complex_boundary_index.parquet",
+      "row_count": 289295,
+      "schema": "stage3_edge_uid: string\nintersection_complex_uid: string\nboundary_role: string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 497",
+      "schema_sha256": "3bf26c808685f91e807331f2010f40fe28fd72ea3beadbbeb0e6d05709243f34",
+      "sha256": "fb46c8d53763c3bca014be26b5a74cbcf546d8ee65859d46569c99702844a532",
+      "size_bytes": 5722242
+    },
+    "complexes": {
+      "path": "stage3/output/odd_tod/s2b/final/stage3_intersection_complexes.parquet",
+      "row_count": 43685,
+      "schema": "intersection_complex_uid: string\nbuffer_radius_m: int64\ntolerance_m: int64\nmember_node_count: int64\nmember_node_uids: string\ncandidate_member_count: int64\ninternal_edge_count: int64\ninternal_length_m: double\nincoming_directed_edge_count: int64\noutgoing_directed_edge_count: int64\nexternal_physical_connection_count: int64\ntopological_movement_count: int64\nsignal_evidence_present: bool\nsignal_evidence_count: int64\nsignal_state: string\ncontrol_conflict: bool\nroundabout_evidence_present: bool\nbridge_internal_present: bool\ntunnel_internal_present: bool\nnonzero_layer_present: bool\ngrade_separation_evidence_present: bool\nroad_class_diversity: int64\nmax_member_undirected_degree: int64\nmapping_confidence: string\nRED_FLAG_DISCONNECTED_MERGE: bool\nRED_FLAG_LAYER_CONFLICT: bool\nRED_FLAG_BRIDGE_SURFACE_MIX: bool\nRED_FLAG_TUNNEL_SURFACE_MIX: bool\nRED_FLAG_EXCESSIVE_INTERNAL_LENGTH: bool\nRED_FLAG_EXTREME_MEMBER_COUNT: bool\nRED_FLAG_ROUNDABOUT_MIXED_WITH_UNRELATED_JUNCTION: bool\nRED_FLAG_NO_BOUNDARY_CONNECTION: bool\nred_flag_count: int64\nred_flags_are_qa_only: bool\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 4983",
+      "schema_sha256": "0891352a337d1ecbe2a96523785cafad04910531d769c5cb074fffa6ca142d26",
+      "sha256": "4c23c7a8a5f49007ce367e21d24405549a979c82bf367d086b4fcf1d281bdeed",
+      "size_bytes": 1589317
+    },
+    "membership": {
+      "path": "stage3/output/odd_tod/s2b/final/stage3_intersection_node_membership.parquet",
+      "row_count": 59052,
+      "schema": "tolerance_m: int64\nintersection_complex_uid: large_string\nstage3_node_uid: large_string\ncandidate_node: bool\nmembership_source: large_string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 735",
+      "schema_sha256": "5e6858a6726bf7209349020c3689ff3724dec3969e7f632c5bff2b156e2f10f3",
+      "sha256": "55aefa6843aacff111dccb39dd967f4d21e2fab408b6372dfc3b9bbd4304be02",
+      "size_bytes": 1459836
+    },
+    "movement_lookup": {
+      "path": "stage3/output/odd_tod/s2b/final/stage3_route_movement_lookup.parquet",
+      "row_count": 419907,
+      "schema": "intersection_complex_uid: large_string\ntolerance_m: int64\nincoming_stage3_edge_uid: large_string\noutgoing_stage3_edge_uid: large_string\nincoming_physical_boundary_connection_id: large_string\noutgoing_physical_boundary_connection_id: large_string\ntopological_path_exists: bool\nrestriction_evidence_present: bool\nrestriction_enforcement_certified: bool\nmovement_legality_state: large_string\nentry_bearing_deg: double\nexit_bearing_deg: double\nsigned_turn_angle_deg: double\nroute_turn_type: large_string\nturn_type_semantics: large_string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 2262",
+      "schema_sha256": "c277c3fc681da4d5438a4342987ec686a61700bed6a40c1864512d642fb623ff",
+      "sha256": "aabe997d06ffc80556ba68551b32805619f548dfe5ad83f2a5a9f043572db811",
+      "size_bytes": 13215206
+    },
+    "movements": {
+      "path": "stage3/output/odd_tod/s2b/final/stage3_intersection_movements.parquet",
+      "row_count": 419907,
+      "schema": "intersection_complex_uid: large_string\ntolerance_m: int64\nincoming_stage3_edge_uid: large_string\noutgoing_stage3_edge_uid: large_string\nincoming_physical_boundary_connection_id: large_string\noutgoing_physical_boundary_connection_id: large_string\ntopological_path_exists: bool\nrestriction_evidence_present: bool\nrestriction_enforcement_certified: bool\nmovement_legality_state: large_string\nentry_bearing_deg: double\nexit_bearing_deg: double\nsigned_turn_angle_deg: double\nroute_turn_type: large_string\nturn_type_semantics: large_string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 2262",
+      "schema_sha256": "c277c3fc681da4d5438a4342987ec686a61700bed6a40c1864512d642fb623ff",
+      "sha256": "aabe997d06ffc80556ba68551b32805619f548dfe5ad83f2a5a9f043572db811",
+      "size_bytes": 13215206
+    }
+  },
+  "frozen_inputs": {
+    "completed_adjudication": {
+      "header": [
+        "adjudication_case_id",
+        "complex_r10",
+        "selection_stratum",
+        "selection_rank",
+        "reused_existing_qa",
+        "complexes_r05",
+        "member_node_count_r05_total",
+        "member_node_count_r10",
+        "adjudication_label",
+        "reviewer_note",
+        "allowed_labels"
+      ],
+      "header_sha256": "b033eff877543bebdb4b0c9362f2961f4577927cbe6acd638988277abb443e19",
+      "label_counts": {
+        "10_CORRECT": 7,
+        "5_CORRECT": 0,
+        "BOTH_ACCEPTABLE": 61,
+        "NEITHER": 2,
+        "UNCERTAIN": 0
+      },
+      "path": "stage3/docs/odd_tod/s2b/stage3_s2b_completed_adjudication.csv",
+      "per_stratum_counts": {
+        "grade_separated": {
+          "10_CORRECT": 2,
+          "5_CORRECT": 0,
+          "BOTH_ACCEPTABLE": 7,
+          "NEITHER": 1,
+          "UNCERTAIN": 0
+        },
+        "high_degree": {
+          "10_CORRECT": 0,
+          "5_CORRECT": 0,
+          "BOTH_ACCEPTABLE": 10,
+          "NEITHER": 0,
+          "UNCERTAIN": 0
+        },
+        "multi_node_divided_road": {
+          "10_CORRECT": 1,
+          "5_CORRECT": 0,
+          "BOTH_ACCEPTABLE": 19,
+          "NEITHER": 0,
+          "UNCERTAIN": 0
+        },
+        "random_changed": {
+          "10_CORRECT": 1,
+          "5_CORRECT": 0,
+          "BOTH_ACCEPTABLE": 9,
+          "NEITHER": 0,
+          "UNCERTAIN": 0
+        },
+        "signalized": {
+          "10_CORRECT": 3,
+          "5_CORRECT": 0,
+          "BOTH_ACCEPTABLE": 16,
+          "NEITHER": 1,
+          "UNCERTAIN": 0
+        }
+      },
+      "row_count": 70,
+      "sha256": "f1c7c0e4c4086c08c89729a2d844ff6335930a139691137746d70dc8dc43b3a0",
+      "size_bytes": 23239
+    },
+    "complexes_r10": {
+      "path": "stage3/output/odd_tod/s2b/calibration/complexes_r10.parquet",
+      "row_count": 43685,
+      "schema": "intersection_complex_uid: large_string\ntolerance_m: int64\nmember_node_count: int64\nmember_node_uids: large_string\ncandidate_member_count: int64\ninternal_edge_count: int64\ninternal_length_m: double\nincoming_directed_edge_count: int64\noutgoing_directed_edge_count: int64\nexternal_physical_connection_count: int64\ntopological_movement_count: int64\nsignal_evidence_present: bool\nsignal_evidence_count: int64\nsignal_state: large_string\ncontrol_conflict: bool\nroundabout_evidence_present: bool\nbridge_internal_present: bool\ntunnel_internal_present: bool\nnonzero_layer_present: bool\ngrade_separation_evidence_present: bool\nroad_class_diversity: int64\nmax_member_undirected_degree: int64\nmapping_confidence: large_string\nRED_FLAG_DISCONNECTED_MERGE: bool\nRED_FLAG_LAYER_CONFLICT: bool\nRED_FLAG_BRIDGE_SURFACE_MIX: bool\nRED_FLAG_TUNNEL_SURFACE_MIX: bool\nRED_FLAG_EXCESSIVE_INTERNAL_LENGTH: bool\nRED_FLAG_EXTREME_MEMBER_COUNT: bool\nRED_FLAG_ROUNDABOUT_MIXED_WITH_UNRELATED_JUNCTION: bool\nRED_FLAG_NO_BOUNDARY_CONNECTION: bool\nred_flag_count: int64\nred_flags_are_qa_only: bool\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 4840",
+      "schema_sha256": "47b7bdb9342e3c62f86d9cc4787e98125f61f143459a47b0ce64a7724a30197a",
+      "sha256": "4b70223a4d8e655e1a467253979250787e1ab03310df7160ef9ae4432391f8dc",
+      "size_bytes": 1588470
+    },
+    "control_evidence": {
+      "path": "stage3/output/odd_tod/s2a/stage3_control_evidence.parquet",
+      "row_count": 4081,
+      "schema": "control_evidence_type: large_string\nevidence_id: large_string\nlat: double\nlon: double\nosm_entity_type: large_string\nosm_node_id: double\nosm_way_id: double\npositive_evidence_only: bool\nraw_highway: large_string\nraw_junction: large_string\nsource: large_string\nmapped_full_network_edge_count: int64\nmapped_stage3_edge_uids: large_string\nmissing_tag_means_negative_control: bool\npoi_used: bool\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1991",
+      "schema_sha256": "730617d46d904a940e0c1b7e994b5901516e5ee1d0d8526398d6705e7107cb9b",
+      "sha256": "97c38791c0d14dd3e491de6021517917384c6f94ba6853228b8e8f71910d63b9",
+      "size_bytes": 315468
+    },
+    "full_network_edges": {
+      "path": "stage3/output/odd_tod/s2a/stage3_full_network_edges.parquet",
+      "row_count": 209454,
+      "schema": "stage3_edge_uid: large_string\nvalhalla_directed_edge_id: int64\nosm_way_id: int64\ndirection: large_string\ngeometry: large_string\ngeometry_point_count: int64\nstart_lon: double\nstart_lat: double\nend_lon: double\nend_lat: double\nlength_m: double\nauto_routable: bool\nvalhalla_access_mask: int64\nvalhalla_road_class: large_string\nvalhalla_road_class_code: int64\nvalhalla_use_code: int64\nvalhalla_speed_limit_kmh: double\nbridge_valhalla: bool\ntunnel_valhalla: bool\nroundabout_valhalla: bool\nvalhalla_layer: uint64\nmotor_vehicle_routability_source: large_string\nfrom_osm_node_id: double\nto_osm_node_id: double\nosm_highway: large_string\nosm_maxspeed_raw: large_string\nosm_layer: int64\nbridge_osm: bool\nbridge_effective: bool\nbridge_conflict: bool\ntunnel_osm: bool\ntunnel_effective: bool\ntunnel_conflict: bool\njunction_roundabout_way: bool\nmini_roundabout_node_exposure: bool\nroundabout_evidence_source: large_string\ngrade_separation_evidence: bool\nroad_class_provenance: large_string\nfrom_valhalla_node_id: double\nto_valhalla_node_id: double\nfrom_stage3_node_uid: large_string\nto_stage3_node_uid: large_string\nobserved_network_member: bool\ncanonical_edge_uid: string\ncanonical_traversal_direction: string\nmapping_status: large_string\nmapping_method: large_string\nmapping_confidence: large_string\nstage0_road_class: string\nbridge_stage0: bool\ntunnel_stage0: bool\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 6745",
+      "schema_sha256": "17c5129fa8dc0bdd3a4eeef356b6f212d746b3b30f47e82cf78f5f705ab4e099",
+      "sha256": "25ed4caf250cacbe251ae258d8e77ff2f0b286884f0376c72b9ef09e33687204",
+      "size_bytes": 19170318
+    },
+    "full_network_nodes": {
+      "path": "stage3/output/odd_tod/s2a/stage3_full_network_nodes.parquet",
+      "row_count": 89607,
+      "schema": "valhalla_node_id: int64\nstage3_node_uid: large_string\nlon: double\nlat: double\nvalhalla_node_type: int64\nvalhalla_traffic_signal: bool\nosm_node_id: double\nosm_node_mapping_status: large_string\nincident_auto_edge_count: int64\ngraph_degree_undirected_proxy: int64\nsource_provenance: large_string\nintersection_complex_id: null\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1675",
+      "schema_sha256": "9f3a60343676ca63e4f7b5531e47b5071806d717d7d288c370556251ffea6438",
+      "sha256": "158bbb8b5b2578de73e6fcc6fe4431169e8729cf8f66d553780bb4b052cd2625",
+      "size_bytes": 2730726
+    },
+    "historical_direction_overlay": {
+      "path": "stage3/output/odd_tod/s2a/stage3_historical_direction_overlay.parquet",
+      "row_count": 6502,
+      "schema": "canonical_edge_uid: large_string\ncanonical_traversal_direction: large_string\nobserved_valhalla_edge_id: int64\nobserved_osm_way_id: int64\nobserved_begin_osm_node_id: int64\nobserved_end_osm_node_id: int64\noriginal_mapping_status: large_string\nphysical_forward_stage3_edge_uid: large_string\nphysical_forward_mapping_status: large_string\nhistorical_direction_status: large_string\nhistorical_observation_accepted: bool\nav_routability_status: large_string\ndownstream_handling: large_string\nmissing_identity: bool\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 2121",
+      "schema_sha256": "e173eb20048170d00d755dc99e0e5e2eeb06d4fa5e46d39f1c6644a786a4b7e2",
+      "sha256": "3ff51db9fd424954951ad08a27644f95875354845ad346903c0212f3a6c894c4",
+      "size_bytes": 147298
+    },
+    "junction_candidates": {
+      "path": "stage3/output/odd_tod/s2b/calibration/junction_candidates.parquet",
+      "row_count": 58240,
+      "schema": "stage3_node_uid: large_string\nvalhalla_node_id: int64\nosm_node_id: double\nlon: double\nlat: double\nphysical_undirected_degree: int64\ndistinct_incoming_neighbor_count: int64\ndistinct_outgoing_neighbor_count: int64\nrule_a_physical_branching: bool\nrule_b_directed_merge_diverge: bool\nrule_c_signal: bool\nrule_d_roundabout: bool\nrule_e_restriction_context: bool\nrule_f_merge_diverge: bool\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1986",
+      "schema_sha256": "b00b0b1215cd4515784f26fc82c65cb84d7863ed12e8f2da2430209ea7905215",
+      "sha256": "5144201d0b557ad8aeff68d21a15be08c928319bcfcd8020e48a5098f09a4d34",
+      "size_bytes": 2065607
+    },
+    "membership_r10": {
+      "path": "stage3/output/odd_tod/s2b/calibration/node_membership_r10.parquet",
+      "row_count": 59052,
+      "schema": "tolerance_m: int64\nintersection_complex_uid: large_string\nstage3_node_uid: large_string\ncandidate_node: bool\nmembership_source: large_string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 735",
+      "schema_sha256": "5e6858a6726bf7209349020c3689ff3724dec3969e7f632c5bff2b156e2f10f3",
+      "sha256": "55aefa6843aacff111dccb39dd967f4d21e2fab408b6372dfc3b9bbd4304be02",
+      "size_bytes": 1459836
+    },
+    "movements_r10": {
+      "path": "stage3/output/odd_tod/s2b/calibration/movements_r10.parquet",
+      "row_count": 419907,
+      "schema": "intersection_complex_uid: large_string\ntolerance_m: int64\nincoming_stage3_edge_uid: large_string\noutgoing_stage3_edge_uid: large_string\nincoming_physical_boundary_connection_id: large_string\noutgoing_physical_boundary_connection_id: large_string\ntopological_path_exists: bool\nrestriction_evidence_present: bool\nrestriction_enforcement_certified: bool\nmovement_legality_state: large_string\nentry_bearing_deg: double\nexit_bearing_deg: double\nsigned_turn_angle_deg: double\nroute_turn_type: large_string\nturn_type_semantics: large_string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 2262",
+      "schema_sha256": "c277c3fc681da4d5438a4342987ec686a61700bed6a40c1864512d642fb623ff",
+      "sha256": "aabe997d06ffc80556ba68551b32805619f548dfe5ad83f2a5a9f043572db811",
+      "size_bytes": 13215206
+    },
+    "s2b11_closure": {
+      "path": "stage3/docs/odd_tod/s2b/stage3_s2b11_5v10_closure.json",
+      "sha256": "c4e2610749ac4827d0d2f4c551eb91ad5f5f9273fa0a189be820fbe2628d6d55",
+      "size_bytes": 5882
+    },
+    "s2b11_evidence": {
+      "path": "stage3/docs/odd_tod/s2b/stage3_s2b11_evidence_bundle.json",
+      "sha256": "d85fc613be95b74244521c7a8cde4783b29d4f2bef25c632c2aa4413c7c2de08",
+      "size_bytes": 12974
+    },
+    "speed_domain": {
+      "path": "stage3/output/odd_tod/s2a/stage3_speed_domain.parquet",
+      "row_count": 209454,
+      "schema": "stage3_edge_uid: large_string\nvalhalla_directed_edge_id: int64\nobserved_network_member: bool\nspeed_domain_value_kmh: double\nspeed_domain_provenance: large_string\nspeed_domain_confidence: large_string\nposted_speed_observed: bool\nhistorical_freeflow_speed_kmh: double\nhistorical_speed_support_n: int64\nroad_class_prior_kmh: double\nroad_class_context: large_string\nspeed_inference_method: large_string\nselected_freeflow_quantile: double\nspeed_compatible_C: bool\nspeed_compatible_M: bool\nspeed_compatible_A: bool\nis_verified_posted_speed_limit: bool\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 2495",
+      "schema_sha256": "546b4fb74ef1b4110aa0756f30dc53aaa6c2717f384fd442a65e2f49c81d14cd",
+      "sha256": "ae1c8e70e4dff905cb04dac5bb55e3b24a94a40e1ce6b74855ef7b9f4de3c25e",
+      "size_bytes": 3626070
+    },
+    "tolerance_comparison": {
+      "path": "stage3/docs/odd_tod/s2b/stage3_s2b_tolerance_comparison.json",
+      "sha256": "f33af62b5dfdcbcd4055d25594898570c44d5c6123c2c4a21ccca1dae9634d87",
+      "size_bytes": 10258
+    },
+    "turn_restrictions": {
+      "path": "stage3/output/odd_tod/s2a/stage3_turn_restrictions.parquet",
+      "row_count": 20,
+      "schema": "restriction_id: int64\nrelation_type: large_string\nrestriction_type: large_string\nmembers: large_string\nfrom_member: large_string\nvia_members: large_string\nto_member: large_string\nfrom_stage3_edge_uids: large_string\nto_stage3_edge_uids: large_string\nmapping_status: large_string\ndirected_enforcement_certified: bool\ngeometry_guessing_used: bool\nreader: large_string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1726",
+      "schema_sha256": "94bb902a99efc066458b308e5fb902afbec753713f2f86466ad96b57804d23b3",
+      "sha256": "719e0bc3907da297df3e2f63373bedb9b4d814249c7772fd27ee47fd1733e274",
+      "size_bytes": 12129
+    }
+  },
+  "human_adjudication_counts": {
+    "10_CORRECT": 7,
+    "5_CORRECT": 0,
+    "BOTH_ACCEPTABLE": 61,
+    "NEITHER": 2,
+    "UNCERTAIN": 0
+  },
+  "phase_status": "STAGE3_S2B_INTERSECTION_COMPLEX_FROZEN",
+  "qa_flags_semantics": "QA_ONLY_NOT_AV_CAPABILITY_THRESHOLDS",
+  "rejected_baseline_radii_m": [
+    5,
+    15,
+    20
+  ],
+  "restriction_claim_boundary": "TOPOLOGICAL_MOVEMENT_NOT_LEGALLY_CERTIFIED_MOVEMENT",
+  "reverse_overlay_semantics": {
+    "av_routability_status": "AV_ROUTABILITY_VIOLATION",
+    "historical_direction_status": "HISTORICAL_DIRECTION_OVERLAY",
+    "inserted_into_av_topology": false,
+    "mapped_forward_physical_reference_count": 6388,
+    "missing_identity_count": 0,
+    "row_count": 6502,
+    "without_forward_physical_reference_count": 114
+  },
+  "schema_version": "stage3_s2b2_release_manifest.1",
+  "scope_guards": {
+    "av_profile_calibrated": false,
+    "candidate_products_recomputed": false,
+    "dynamic_eqc_calibrated": false,
+    "fallback_routing_performed": false,
+    "full_network_reexported": false,
+    "large_interchange_rule_created": false,
+    "manual_topology_override_created": false,
+    "new_tolerance_tested": false,
+    "next_phase_authorized": false,
+    "s3_authorized": false,
+    "speed_model_changed": false,
+    "stage2_inference_performed": false,
+    "stage4_performed": false,
+    "test31_route_assessment_performed": false,
+    "tolerance_recalibration_performed": false
+  },
+  "selected_buffer_radius_m": 10,
+  "selection_evidence": {
+    "completed_human_adjudication": {
+      "path": "stage3/docs/odd_tod/s2b/stage3_s2b_completed_adjudication.csv",
+      "sha256": "f1c7c0e4c4086c08c89729a2d844ff6335930a139691137746d70dc8dc43b3a0",
+      "size_bytes": 23239
+    },
+    "s2b11_closure": {
+      "path": "stage3/docs/odd_tod/s2b/stage3_s2b11_5v10_closure.json",
+      "sha256": "c4e2610749ac4827d0d2f4c551eb91ad5f5f9273fa0a189be820fbe2628d6d55",
+      "size_bytes": 5882
+    },
+    "s2b1_calibration": {
+      "path": "stage3/docs/odd_tod/s2b/stage3_s2b1_evidence_bundle.json",
+      "sha256": "aec37a256ecd15a73ae9e59173c683e612c37c8a223b170a17c1122d2504badd",
+      "size_bytes": 25658
+    }
+  },
+  "source_to_final_provenance": {
+    "complexes": {
+      "derived_field": "buffer_radius_m = tolerance_m = 10",
+      "final_sha256": "4c23c7a8a5f49007ce367e21d24405549a979c82bf367d086b4fcf1d281bdeed",
+      "method": "FROZEN_R10_PLUS_BUFFER_RADIUS_ALIAS",
+      "source_columns_value_identity": true,
+      "source_sha256": "4b70223a4d8e655e1a467253979250787e1ab03310df7160ef9ae4432391f8dc"
+    },
+    "membership": {
+      "content_identity": true,
+      "final_sha256": "55aefa6843aacff111dccb39dd967f4d21e2fab408b6372dfc3b9bbd4304be02",
+      "method": "BYTE_IDENTICAL_IMMUTABLE_PROMOTION",
+      "source_sha256": "55aefa6843aacff111dccb39dd967f4d21e2fab408b6372dfc3b9bbd4304be02"
+    },
+    "movement_lookup": {
+      "content_identity": true,
+      "final_sha256": "aabe997d06ffc80556ba68551b32805619f548dfe5ad83f2a5a9f043572db811",
+      "method": "HARDLINK_ALIAS_NO_DUPLICATE_PAYLOAD",
+      "same_file_identity": true,
+      "source_sha256": "aabe997d06ffc80556ba68551b32805619f548dfe5ad83f2a5a9f043572db811"
+    },
+    "movements": {
+      "content_identity": true,
+      "final_sha256": "aabe997d06ffc80556ba68551b32805619f548dfe5ad83f2a5a9f043572db811",
+      "method": "BYTE_IDENTICAL_IMMUTABLE_PROMOTION",
+      "source_sha256": "aabe997d06ffc80556ba68551b32805619f548dfe5ad83f2a5a9f043572db811"
+    }
+  },
+  "spatial_candidate_overlap_condition": "center_distance_m <= 20"
+}

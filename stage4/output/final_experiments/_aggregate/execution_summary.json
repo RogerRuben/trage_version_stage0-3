@@ -1,0 +1,35 @@
+{
+  "recommendation": "GO_STAGE4_RESULT_ANALYSIS",
+  "completed_unique": 41,
+  "failed": 0,
+  "reused": 1,
+  "main_structural_count": 27,
+  "benchmark_count": 4,
+  "odd_policy_resolved_count": 3,
+  "cost_count": 8,
+  "first_start": "2026-08-27T19:10:25.352089+08:00",
+  "last_end": "2026-08-28T11:49:14.031174+08:00",
+  "total_wall_clock_s": 59928.679085,
+  "execution_commit": "6b6d3410fadc80a25d60a4affc9a439c71c3f174",
+  "registry_commit": "b82cd3fda60a39c7474de49bdf4f205850a6725d",
+  "fleetpy_commit": "0379f9725a147ff33c674de4884cdf89fd787fa9",
+  "horizon_start": "2016-10-31T00:00:00+08:00",
+  "horizon_end": "2016-11-01T00:01:00+08:00",
+  "max_parallel_scenarios": 2,
+  "sum_scenario_runtime_s": 88586.05934659994,
+  "peak_rss_mb": 1674.7265625,
+  "total_output_size_bytes": 291100463,
+  "phase_A_runtimes_s": {
+    "MAIN_Q25_M_P70": 1523.1843124000006,
+    "MAIN_Q50_M_P70": 1895.1089152999994,
+    "ODD_Q50_M_P70_REFERENCE": 1761.3617254000055
+  },
+  "figures": [
+    "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\final_experiments\\_aggregate\\figures\\01_service_rate_vs_qA.png",
+    "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\final_experiments\\_aggregate\\figures\\02_p95_wait_vs_qA.png",
+    "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\final_experiments\\_aggregate\\figures\\03_av_assignment_share_vs_qA.png",
+    "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\final_experiments\\_aggregate\\figures\\04_family_activity_by_capability.png",
+    "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\final_experiments\\_aggregate\\figures\\05_odd_policy_comparison.png",
+    "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\final_experiments\\_aggregate\\figures\\06_cost_vs_pickup_degradation.png"
+  ]
+}

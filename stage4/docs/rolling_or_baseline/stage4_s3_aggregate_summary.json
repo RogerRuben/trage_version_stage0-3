@@ -1,0 +1,126 @@
+{
+  "phase_status": "STAGE4_S3_ROLLING_OR_BASELINE_COMPLETE",
+  "recommendation": "GO_ROLLING_OR_BASELINE",
+  "scientific_scope": "ONE_BOUNDED_QA_025_COMPUTATIONAL_BENCHMARK_NOT_POLICY_EVIDENCE",
+  "interval": {
+    "demand_start": "2016-10-31 08:00:00+08:00",
+    "demand_end": "09:00:00",
+    "matching_end": "2016-10-31 09:05:00+08:00"
+  },
+  "fleet": {
+    "h_base_vehicle_hours": 14369.5,
+    "requested_q_a": 0.25,
+    "achieved_q_a": 0.2505306378092488,
+    "av_count": 150,
+    "requested_hv_vehicle_hours": 10769.5,
+    "achieved_hv_vehicle_hours": 10863.40888888889,
+    "vehicle_hour_error_pct": 0.8719893113783288,
+    "selected_hv_session_count": 7395,
+    "native_benchmark_hv_count": 1454,
+    "native_benchmark_av_count": 150,
+    "hv_sampling_fraction": 0.8770425093773729,
+    "av_initial_position_rule": "ACTIVE_OR_STARTING_WITHIN_30_MINUTES",
+    "hv_unit_semantics": "EFFECTIVE_HV_SERVICE_SESSION_TEMPLATE"
+  },
+  "matching": {
+    "requests": 1458,
+    "matched": 1215,
+    "completed": 1215,
+    "patience_expired": 243,
+    "still_in_progress_at_drain_start": 223
+  },
+  "waiting": {
+    "request_to_pickup_mean_s": 127.64612631275718,
+    "p50_s": 125.486274,
+    "p90_s": 267.77493940000005,
+    "p95_s": 285.1781653
+  },
+  "queue": {
+    "first_window_match_rate": 0.7757201646090535,
+    "carry_over_entry_rate": 0.2242798353909465,
+    "carry_over_recovery_rate": 0.25688073394495414,
+    "critical_order_count": 244,
+    "critical_order_recovery_rate": 0.004098360655737705,
+    "mean_matching_attempts": 2.6714677640603566,
+    "expanded_radius_match_share": 0.0691358024691358
+  },
+  "assignment": {
+    "hv": 1072,
+    "av": 143,
+    "solver_backend": "SCIPY_HIGHS_MILP_SEQUENTIAL_LEXICOGRAPHIC"
+  },
+  "computation": {
+    "dispatch_epoch_count": 131,
+    "waiting_orders_mean": 29.732824427480917,
+    "waiting_orders_max": 46,
+    "available_vehicles_mean": 415.23664122137404,
+    "available_vehicles_max": 550,
+    "candidate_spatial_pairs": 559624,
+    "candidate_topk_pairs": 76441,
+    "valid_or_arcs": 5406,
+    "peak_topk_pairs_per_epoch": 915,
+    "peak_valid_or_arcs_per_epoch": 105,
+    "assignment_matrix_representation": "CSR_SPARSE_ARCS_ONLY",
+    "gpu_usage": "NONE_CPU_ONLY",
+    "candidate_reduction_ratio": 0.8634065015081555,
+    "matrix_batch_queries": 3655,
+    "uncached_arc_evaluations": 54071,
+    "arc_cache_hits": 22370,
+    "arc_cache_hit_rate": 0.29264399994767204,
+    "matrix_failed_arcs": 0,
+    "matrix_arc_failure_rate": 0.0,
+    "route_fallback_attempts": 0,
+    "route_fallback_successes": 0,
+    "route_fallback_failures": 0,
+    "failed_routing_arcs": 0,
+    "arc_failure_rate": 0.0,
+    "candidate_generation_time_s": 7.681637700002511,
+    "routing_time_s": 32.73791539999729,
+    "solver_time_s": 0.7310697999994318,
+    "fleetpy_time_s": 2.2537664000008135,
+    "total_runtime_s": 43.40438930000005,
+    "solver_time_p50": 0.003764699999919685,
+    "solver_time_p95": 0.016364400000043133,
+    "solver_time_max": 0.021610599999803526
+  },
+  "limitations": [
+    "Stage3 suitability gates passenger service routes only; AV pickup legs are checked only for Valhalla routability.",
+    "HV supply units are effective service-session templates, not a physical fleet count.",
+    "Passengers use the S3 ALL_ACCEPT_AV baseline."
+  ],
+  "routing_equivalence_audit": {
+    "matrix_failed_arc_events": 0,
+    "sample_seed": 20260825,
+    "requested_sample_size": 100,
+    "sampled_matrix_failures": 0,
+    "single_route_success": 0,
+    "single_route_failure": 0,
+    "single_route_success_rate": null,
+    "audit_runtime_s": 0.0
+  },
+  "failures": {
+    "runtime_guard_exceeded": false,
+    "activation_count_mismatch": false,
+    "terminal_outcome_mismatch": false,
+    "av_availability_violations": 0,
+    "position_reconciliation_failures": 0,
+    "request_state_reconciliation_failures": 0,
+    "vehicle_state_reconciliation_failures": 0,
+    "matrix_failure_record_count_mismatch": false,
+    "matrix_fallback_accounting_mismatch": false
+  },
+  "matrix_route_closure": {
+    "status": "CLOSED_WITH_NON_REPRODUCTION_AND_FAILED_CELL_ROUTE_FALLBACK",
+    "original_commit": "9eed0652aaec1fb84cd5507c5a186c3937a8f0c1",
+    "original_matrix_failed_arcs": 1860,
+    "original_estimated_uncached_arcs": 55828,
+    "original_estimated_matrix_arc_failure_rate": 0.03331661531847818,
+    "exact_reproduction_matrix_failed_arcs": 0,
+    "requested_failed_arc_sample_size": 100,
+    "available_failed_arc_sample_size": 0,
+    "empirical_100_failure_sample_completed": false,
+    "production_failed_cell_policy": "MATRIX_FAILED_THEN_SINGLE_ROUTE_FALLBACK",
+    "candidate_deleted_only_if": "MATRIX_AND_SINGLE_ROUTE_BOTH_FAIL",
+    "fallback_unit_cat_eye": "PASS"
+  }
+}

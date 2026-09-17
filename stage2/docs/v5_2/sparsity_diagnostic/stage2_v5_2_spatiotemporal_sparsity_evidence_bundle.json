@@ -1,0 +1,360 @@
+{
+  "analysis": {
+    "config": {
+      "path": "stage2/config/stage2_v5_2_sparsity_diagnostic.json",
+      "sha256": "be850570dc706179f42fe6e4da2e3beab707326c3edcad4ce8740e158be5f7dd",
+      "size_bytes": 1444
+    },
+    "diagnostic_code": {
+      "path": "stage2/v5_2/sparsity_diagnostic.py",
+      "sha256": "9538ac9fa4f1bc4b8defe8d74306dc133e3457a4f3ebe019b5bc79da1d20ac2c",
+      "size_bytes": 89245
+    },
+    "support_code": {
+      "path": "stage2/v5_2/sparsity_support.py",
+      "sha256": "af6d1e64192c5257f347cf559ae6ddfcab88e830321553a30d7e429d92f41424",
+      "size_bytes": 11147
+    }
+  },
+  "artifact_sha256": "35a69e60894aa4f3e274591f7a00dd7218747114fa37fc4a4c7fdef8c56cf850",
+  "authorizations": {
+    "phase_d_authorized": false,
+    "stage3_authorized": false,
+    "transfer_v2_authorized": false
+  },
+  "bootstrap": {
+    "cluster_unit": [
+      "observed_directed_edge_uid",
+      "estimated_time_bin"
+    ],
+    "confidence_level": 0.95,
+    "resamples": 1000,
+    "seed": 20261009
+  },
+  "diagnostic_scope": "PART_A_ONLY",
+  "evaluation_route_inputs": [
+    {
+      "path": "stage2/output_v4/route_conditioned_dataset/revealed_route_proxy/day=20161025.parquet",
+      "sha256": "34e080f36c5c33a4c6cd12b63026facacd96f1b2413791d3ea8e64107f5090fa",
+      "size_bytes": 208687560
+    },
+    {
+      "path": "stage2/output_v4/route_conditioned_dataset/revealed_route_proxy/day=20161026.parquet",
+      "sha256": "73d9baf493c2df6e7a891ae7638d5591d852d44710ae164e0cad0356de5b0904",
+      "size_bytes": 209793271
+    },
+    {
+      "path": "stage2/output_v4/route_conditioned_dataset/revealed_route_proxy/day=20161027.parquet",
+      "sha256": "7ea15f894be5ba035eaef05b781d0c05fcda5b76945c90091a2d33a213a7736b",
+      "size_bytes": 207678447
+    }
+  ],
+  "figures": {
+    "m1_mae_vs_spatiotemporal_support": {
+      "path": "stage2/docs/v5_2/sparsity_diagnostic/figures/m1_mae_vs_spatiotemporal_support.png",
+      "sha256": "134885557a4273f46e1200c16dd9dcb5f36abd2eecf36c87c64e4c6c294bdcbf",
+      "size_bytes": 63317
+    },
+    "m1_mae_vs_target_specific_support": {
+      "path": "stage2/docs/v5_2/sparsity_diagnostic/figures/m1_mae_vs_target_specific_support.png",
+      "sha256": "eee07ee07b321545be7583c4c8615c90a1575a660407c7011c1796be47290c83",
+      "size_bytes": 64587
+    },
+    "spatial_support_distribution": {
+      "path": "stage2/docs/v5_2/sparsity_diagnostic/figures/spatial_support_distribution.png",
+      "sha256": "2a2a1505f0fa28fb7785b0a2bc3a3fe866744d40ebb89b0b06913701bde8b562",
+      "size_bytes": 32959
+    },
+    "spatial_temporal_support_heatmap": {
+      "path": "stage2/docs/v5_2/sparsity_diagnostic/figures/spatial_temporal_support_heatmap.png",
+      "sha256": "d31d5738fbb7207ee8fa373e19daec25dd1283b1f360930a8ec415b5794e391c",
+      "size_bytes": 58215
+    },
+    "spatiotemporal_support_distribution": {
+      "path": "stage2/docs/v5_2/sparsity_diagnostic/figures/spatiotemporal_support_distribution.png",
+      "sha256": "e7482b79bd760474d1a063055397112f5312d02dfb5fc33513dfa51688786878",
+      "size_bytes": 31637
+    },
+    "transfer_improvement_vs_support": {
+      "path": "stage2/docs/v5_2/sparsity_diagnostic/figures/transfer_improvement_vs_support.png",
+      "sha256": "b61cb98fd34fb5be4304cc39492173ba55e9f4cba972195d0a1df2183819bc83",
+      "size_bytes": 145411
+    }
+  },
+  "phase_c_frozen": {
+    "evidence": {
+      "path": "stage2/docs/v5_2/stage2_v5_2_phase_c_evidence_bundle.json",
+      "sha256": "ebbe3ce9d6d0d11351564e0d99664b6ca91a121b470ab8a90e5b330cff6f6644",
+      "size_bytes": 9603
+    },
+    "report": {
+      "path": "stage2/docs/v5_2/stage2_v5_2_phase_c_report.json",
+      "sha256": "e7c4c105f2d6ccb0d32675a8821ec69bf1be3cb1805b3f357ccd665438aab9d3",
+      "size_bytes": 24534
+    },
+    "selected_checkpoints": {
+      "M1": {
+        "path": "stage2/output_v5_1/development/deep_model/best_model.pt",
+        "sha256": "d4e05f4197ab163d5537e98b16ca5b46746284db9ca4ee3029c55a3295982bb2",
+        "size_bytes": 4404675
+      },
+      "M3": {
+        "path": "stage2/output_v5_2/development/M3/epoch_004.pt",
+        "sha256": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde",
+        "size_bytes": 5665346
+      },
+      "M4": {
+        "path": "stage2/output_v5_2/development/M4/epoch_004.pt",
+        "sha256": "dba21e9ae3c0e78e68a8986ef4119228d7707eb5ab7118c972ffa82872fc92a2",
+        "size_bytes": 5665346
+      }
+    },
+    "status_manifest": {
+      "path": "stage2/docs/v5_2/stage2_v5_2_status_manifest.json",
+      "sha256": "a2f06df52cfc2bbde69ce8a54f493c36cddb24470c93a7dfe9a26528c563007b",
+      "size_bytes": 2890
+    }
+  },
+  "prediction_level_artifacts": {
+    "M1": {
+      "manifest": {
+        "path": "stage2/output_v5_2/development/M1/evaluation.json/evaluation_manifest.json",
+        "sha256": "2a70ccdc15cce82811b7c6677acb8229203be03bc919d20a50a9399a2b4b4825",
+        "size_bytes": 10656
+      },
+      "predictions": {
+        "path": "stage2/output_v5_2/development/M1/evaluation.json/unique_traversal_predictions.parquet",
+        "sha256": "75a7984a10a8b28c0a547a39e9f0377a6e12bee18cd1e2f418aafa880994c36a",
+        "size_bytes": 121812352
+      },
+      "unique_physical_traversal_count": 2100209
+    },
+    "M3": {
+      "manifest": {
+        "path": "stage2/output_v5_2/development/M3/evaluation/evaluation_manifest.json",
+        "sha256": "e39fe46948f85d747d116e25520ae2ff5a12197999cc1c6c07d2a3853e6285dc",
+        "size_bytes": 10638
+      },
+      "predictions": {
+        "path": "stage2/output_v5_2/development/M3/evaluation/unique_traversal_predictions.parquet",
+        "sha256": "2ceaf6d18027ee35b61931b12e1b337f2334a731e69b325036bd87cab835ac18",
+        "size_bytes": 122225428
+      },
+      "unique_physical_traversal_count": 2100209
+    },
+    "M4": {
+      "manifest": {
+        "path": "stage2/output_v5_2/development/M4/evaluation/evaluation_manifest.json",
+        "sha256": "27f38088d51ce57ea9c5f436b3540ae8d4efc59d684f9ce3562e5d3c7fb6cef5",
+        "size_bytes": 10715
+      },
+      "predictions": {
+        "path": "stage2/output_v5_2/development/M4/evaluation/unique_traversal_predictions.parquet",
+        "sha256": "61a85e8fcf2edd8faa8c57f57163d25207118ec588159e39f3334b218e5ba836",
+        "size_bytes": 122234602
+      },
+      "unique_physical_traversal_count": 2100209
+    }
+  },
+  "reports": {
+    "json": {
+      "path": "stage2/docs/v5_2/sparsity_diagnostic/stage2_v5_2_spatiotemporal_sparsity_report.json",
+      "sha256": "c76599642f7367e054e0963631ab49af9aa632e55a37ca3e2f3d1fd3326fc586",
+      "size_bytes": 87893
+    },
+    "markdown": {
+      "path": "stage2/docs/v5_2/sparsity_diagnostic/stage2_v5_2_spatiotemporal_sparsity_report.md",
+      "sha256": "1aeb11b4d28bb8bad203741163e4c24b334f3b94955ac95d74585c30f7c07895",
+      "size_bytes": 7343
+    }
+  },
+  "rts_excluded": true,
+  "schema_version": "stage2_v5_2_spatiotemporal_sparsity_evidence_bundle.1",
+  "status": "PASS",
+  "support_artifacts": {
+    "spatial": {
+      "path": "stage2/docs/v5_2/sparsity_diagnostic/spatial_support.json",
+      "sha256": "eb85e425614730ef29af7e38c3da1c36f3703c77133d9ad857b63be0b704641c",
+      "size_bytes": 1618
+    },
+    "spatiotemporal": {
+      "path": "stage2/docs/v5_2/sparsity_diagnostic/spatiotemporal_support.json",
+      "sha256": "94cd27710f32b94714222cdb4fb231c18040c9153fbf2fdc95dbc60187a24459",
+      "size_bytes": 1848
+    },
+    "target_specific": {
+      "path": "stage2/docs/v5_2/sparsity_diagnostic/target_specific_support.json",
+      "sha256": "af7bac7cbf15c82c451a4f9346b899e158382f8668751b3e1a3e4bdb5de1ba83",
+      "size_bytes": 9705
+    }
+  },
+  "tables": {
+    "cluster_bootstrap_uncertainty": {
+      "path": "stage2/docs/v5_2/sparsity_diagnostic/tables/cluster_bootstrap_uncertainty.csv",
+      "sha256": "6337a772f86795880063592e770610351ff652ec2a691a929756b9828725b92c",
+      "size_bytes": 2010
+    },
+    "daily_and_aggregate_mismatch_metrics": {
+      "path": "stage2/docs/v5_2/sparsity_diagnostic/tables/daily_and_aggregate_mismatch_metrics.csv",
+      "sha256": "0bd4d1e6e4d185c1cba5c1d34cda4e923310a2392608afb7b13f60ad47648b33",
+      "size_bytes": 8234
+    },
+    "daily_spatial_high_temporal_sparse_counts": {
+      "path": "stage2/docs/v5_2/sparsity_diagnostic/tables/daily_spatial_high_temporal_sparse_counts.csv",
+      "sha256": "fa96044589b26009034024f281d653291a0376da7ed41c3837e3f02242f00b60",
+      "size_bytes": 417
+    },
+    "structure_top_signatures": {
+      "path": "stage2/docs/v5_2/sparsity_diagnostic/tables/structure_top_signatures.csv",
+      "sha256": "8b926d9711b6da5ea5f83c43176a93a1c6b0097bc76670f5fc85a70ba763f251",
+      "size_bytes": 1494
+    },
+    "structure_within_signature_heterogeneity": {
+      "path": "stage2/docs/v5_2/sparsity_diagnostic/tables/structure_within_signature_heterogeneity.csv",
+      "sha256": "22d8da973863cb2312d4faea2fc230e089321ba1e0a8655338d9052619e283bf",
+      "size_bytes": 646
+    },
+    "support_error_correlations": {
+      "path": "stage2/docs/v5_2/sparsity_diagnostic/tables/support_error_correlations.csv",
+      "sha256": "848ca759d5752b9dbcb181a49de16b7a7c37f04d0a022f971530d3b895697596",
+      "size_bytes": 3467
+    },
+    "table_1_spatial_sparsity": {
+      "path": "stage2/docs/v5_2/sparsity_diagnostic/tables/table_1_spatial_sparsity.csv",
+      "sha256": "9d5da2890e2aca937e1904d6ff157ba1b13eae3b94169124bf79c87cd3dd2865",
+      "size_bytes": 1027
+    },
+    "table_2_spatiotemporal_sparsity": {
+      "path": "stage2/docs/v5_2/sparsity_diagnostic/tables/table_2_spatiotemporal_sparsity.csv",
+      "sha256": "15cee76d2855a7aafb3742761119623b29a5a444f1346dac7368e80afed762e0",
+      "size_bytes": 1089
+    },
+    "table_3_spatial_temporal_cross_tab": {
+      "path": "stage2/docs/v5_2/sparsity_diagnostic/tables/table_3_spatial_temporal_cross_tab.csv",
+      "sha256": "56d94c4b34e4c3ccdebfb11867eaaf8689704a32e242e715cd61d7611018e675",
+      "size_bytes": 4391
+    },
+    "table_4_m1_error_by_support": {
+      "path": "stage2/docs/v5_2/sparsity_diagnostic/tables/table_4_m1_error_by_support.csv",
+      "sha256": "bfb8968062aef5723328d3af26406b96388e39dee15e1794c409b67b8dcad873",
+      "size_bytes": 45759
+    },
+    "table_5_transfer_improvement_by_spatiotemporal_support": {
+      "path": "stage2/docs/v5_2/sparsity_diagnostic/tables/table_5_transfer_improvement_by_spatiotemporal_support.csv",
+      "sha256": "13487341b40291e775225e7edb15613fbd26e01cfb984fd70d1e7053fef23e86",
+      "size_bytes": 27710
+    },
+    "table_6_spatial_high_temporal_sparse": {
+      "path": "stage2/docs/v5_2/sparsity_diagnostic/tables/table_6_spatial_high_temporal_sparse.csv",
+      "sha256": "94ab055015c5eb636f7a7ea0e6846efd58c5f255e3991fcee79b025e7bc24c75",
+      "size_bytes": 1574
+    },
+    "table_7_target_specific_sparsity": {
+      "path": "stage2/docs/v5_2/sparsity_diagnostic/tables/table_7_target_specific_sparsity.csv",
+      "sha256": "83bc0a9eeedf491c3bc2a464f8deea92fe2a908e3f15e351dac789ffa23cd25c",
+      "size_bytes": 3551
+    },
+    "table_8_structure_representation": {
+      "path": "stage2/docs/v5_2/sparsity_diagnostic/tables/table_8_structure_representation.csv",
+      "sha256": "687e3591bdffe1ea51352d683a522dc42e4fb184b5e87c046706154da3f4d0f5",
+      "size_bytes": 4898
+    },
+    "transfer_improvement_by_all_support_dimensions": {
+      "path": "stage2/docs/v5_2/sparsity_diagnostic/tables/transfer_improvement_by_all_support_dimensions.csv",
+      "sha256": "67c82687c8ece992796f8e47080f324ee02cc3a263d83e8a93cf8ba0a701b374",
+      "size_bytes": 81434
+    }
+  },
+  "target_valid_mask_sources": {
+    "prediction_overlap_merge": {
+      "path": "stage2/v5_2/training.py",
+      "sha256": "f66284bfcf9bd4222782ea5f78ae7799e2ed9314920356f1f11af10537b4ca95",
+      "size_bytes": 44951
+    },
+    "route_dataset_schema": {
+      "path": "stage2/v5/data.py",
+      "sha256": "2f62df3654e108bdc73193a0720133b5ddec17dbb4ac75180d76bc59a7495ff0",
+      "size_bytes": 6316
+    },
+    "transfer_adapter": {
+      "path": "stage2/v5_2/transfer_data.py",
+      "sha256": "78e119c126339529ccc219f94899a769c58c2289cddc10b6b1561e8ac831be69",
+      "size_bytes": 18478
+    }
+  },
+  "time_bin_definition": {
+    "column": "estimated_time_bin",
+    "source": {
+      "path": "stage2/v4/entry_time.py",
+      "sha256": "fd477a681b767a7729fe80bd3cbce2061e4cd1e4e660da3ab232efd9dc7e7957",
+      "size_bytes": 7740
+    }
+  },
+  "train_traversal_inputs": [
+    {
+      "path": "stage2/output_v4/route_conditioned_dataset/revealed_route_proxy/day=20161009.parquet",
+      "sha256": "1e867bdf88751831eddbaaa7c6b51e45ece529815b167e220e53f6e9c3aac153",
+      "size_bytes": 197699098
+    },
+    {
+      "path": "stage2/output_v4/route_conditioned_dataset/revealed_route_proxy/day=20161010.parquet",
+      "sha256": "ce28cae433576b1903a811bd519a2afcdbc8967860aa5293f2d9607305d721b0",
+      "size_bytes": 205747040
+    },
+    {
+      "path": "stage2/output_v4/route_conditioned_dataset/revealed_route_proxy/day=20161011.parquet",
+      "sha256": "bedefed2acac52d370cae78454a8be57cfee3be6c77010ca27dbd05502c36e2a",
+      "size_bytes": 207967786
+    },
+    {
+      "path": "stage2/output_v4/route_conditioned_dataset/revealed_route_proxy/day=20161012.parquet",
+      "sha256": "ea0c46325981e0f6f8c046839064ad78bec20fb4fa77e1ca316cd685bb5ce2eb",
+      "size_bytes": 207947064
+    },
+    {
+      "path": "stage2/output_v4/route_conditioned_dataset/revealed_route_proxy/day=20161013.parquet",
+      "sha256": "c3f1800708cebcbf9effb4851283680813d1a065913ba569fd409933bd3db186",
+      "size_bytes": 208228959
+    },
+    {
+      "path": "stage2/output_v4/route_conditioned_dataset/revealed_route_proxy/day=20161014.parquet",
+      "sha256": "c3c39676275812530b70e05444f59a197c2fdbe6d3514d072e8fbd7a731a96da",
+      "size_bytes": 208313280
+    },
+    {
+      "path": "stage2/output_v4/route_conditioned_dataset/revealed_route_proxy/day=20161015.parquet",
+      "sha256": "25be04d34fd87a30173ba203f422d551f783beb808c75ce906c45418cf363cad",
+      "size_bytes": 213211326
+    },
+    {
+      "path": "stage2/output_v4/route_conditioned_dataset/revealed_route_proxy/day=20161016.parquet",
+      "sha256": "c95cdead580c9b6f2856f532a49b68fd43a21ff7904cbc757ffb6cb3ba2481d5",
+      "size_bytes": 212945010
+    },
+    {
+      "path": "stage2/output_v4/route_conditioned_dataset/revealed_route_proxy/day=20161017.parquet",
+      "sha256": "cf458bdb949ace62cf821b6a1a1714e6d4352cb1d179e4584f0640f3d3379057",
+      "size_bytes": 209912049
+    },
+    {
+      "path": "stage2/output_v4/route_conditioned_dataset/revealed_route_proxy/day=20161018.parquet",
+      "sha256": "e145d15a6a41ce626a9157e09c9b337b6e568f0bfc00a4f131f66b895b456941",
+      "size_bytes": 210155540
+    },
+    {
+      "path": "stage2/output_v4/route_conditioned_dataset/revealed_route_proxy/day=20161019.parquet",
+      "sha256": "c62071068b6a391df10db0a9e365196a0b6edf98cecc14a3d511aaaa607a4c70",
+      "size_bytes": 210752736
+    },
+    {
+      "path": "stage2/output_v4/route_conditioned_dataset/revealed_route_proxy/day=20161020.parquet",
+      "sha256": "6b946bcbeeba60efce79d9e406e2434058c857991422574284eea52c14b47af8",
+      "size_bytes": 212421310
+    },
+    {
+      "path": "stage2/output_v4/route_conditioned_dataset/revealed_route_proxy/day=20161021.parquet",
+      "sha256": "339cafc8e7591dcbe739c52383434452a71d7192421634c3279de245e5fc09cc",
+      "size_bytes": 213429324
+    }
+  ]
+}

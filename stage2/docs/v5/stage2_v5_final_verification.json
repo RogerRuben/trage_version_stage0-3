@@ -1,0 +1,158 @@
+{
+  "checks": {
+    "engineering": [
+      {
+        "detail": "PASS",
+        "name": "service_time_target_audit",
+        "status": "PASS"
+      },
+      {
+        "detail": {
+          "collected": 35,
+          "failed": 0,
+          "passed": 35,
+          "runtime_s": 45.8,
+          "status": "PASS"
+        },
+        "name": "regression_tests",
+        "status": "PASS"
+      },
+      {
+        "detail": {
+          "mixed_precision_fallback_batch_count": 1,
+          "nonfinite_availability_probability_count": 0
+        },
+        "name": "legacy_predictions_finite",
+        "status": "PASS"
+      }
+    ],
+    "performance": [
+      {
+        "detail": 0,
+        "name": "static_complexity",
+        "status": "PASS"
+      },
+      {
+        "detail": "PASS",
+        "name": "layered_preflight",
+        "status": "PASS"
+      }
+    ],
+    "rolling_scientific": [
+      {
+        "detail": 3,
+        "name": "three_rolling_folds",
+        "status": "PASS"
+      },
+      {
+        "detail": 0.14968466113805468,
+        "name": "rolling_aggregate_beats_tree",
+        "status": "FAIL"
+      },
+      {
+        "detail": {
+          "fold_1": "WIN",
+          "fold_2": "WIN",
+          "fold_3": "LOSS_OR_MIXED"
+        },
+        "name": "rolling_fold_stability",
+        "status": "PASS"
+      },
+      {
+        "detail": 0.8802333333333333,
+        "name": "rolling_p90_coverage",
+        "status": "PASS"
+      },
+      {
+        "detail": 0.9234333333333333,
+        "name": "rolling_p95_coverage",
+        "status": "PASS"
+      },
+      {
+        "detail": false,
+        "name": "no_percentile_selection",
+        "status": "PASS"
+      }
+    ],
+    "temporal": [
+      {
+        "detail": "FROZEN_BEFORE_PROTOCOL_RETRAIN",
+        "name": "split_frozen",
+        "status": "PASS"
+      },
+      {
+        "detail": [
+          "20161009",
+          "20161010",
+          "20161011",
+          "20161012",
+          "20161013",
+          "20161014",
+          "20161015",
+          "20161016",
+          "20161017",
+          "20161018",
+          "20161019",
+          "20161020",
+          "20161021"
+        ],
+        "name": "development_train",
+        "status": "PASS"
+      },
+      {
+        "detail": [
+          "20161022",
+          "20161023"
+        ],
+        "name": "development_validation",
+        "status": "PASS"
+      },
+      {
+        "detail": [
+          "20161024"
+        ],
+        "name": "development_calibration",
+        "status": "PASS"
+      },
+      {
+        "detail": [
+          "20161025",
+          "20161026",
+          "20161027"
+        ],
+        "name": "development_evaluation",
+        "status": "PASS"
+      },
+      {
+        "detail": 3,
+        "name": "rolling_fold_count",
+        "status": "PASS"
+      },
+      {
+        "detail": false,
+        "name": "no_upstream_rebuild",
+        "status": "PASS"
+      },
+      {
+        "detail": false,
+        "name": "percentile_not_used_for_rolling_selection",
+        "status": "PASS"
+      },
+      {
+        "detail": [
+          "20161031"
+        ],
+        "name": "legacy_identity",
+        "status": "PASS"
+      }
+    ]
+  },
+  "development_scientific_status": "PREDICTIVE_BASELINE_VALIDATED",
+  "engineering_status": "PASS",
+  "legacy_benchmark_status": "PASS",
+  "performance_gate_status": "PASS",
+  "rolling_origin_status": "FAIL",
+  "schema_version": "stage2_v5_final_verification.2",
+  "stage3_admission_status": "READY_FOR_ROUTE_SCENARIO_PROTOTYPE",
+  "temporal_contract_status": "PASS"
+}

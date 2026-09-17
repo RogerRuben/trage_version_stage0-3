@@ -1,0 +1,178 @@
+{
+  "epoch_id": "2100",
+  "timestamp": "2016-10-31 21:00:00+08:00",
+  "state_sha256": "2db731c0d16a2592a824854cfe316c7fe310e166f88d4abed85075cc562be33f",
+  "arc_count": 17,
+  "av_arc_count": 10,
+  "routed_arcs": 1544,
+  "runtime_s": 4.0172928000001775,
+  "counts": [
+    0,
+    3,
+    0
+  ],
+  "pstar_s": 623.9518859359825,
+  "reference": "HISTORICAL_P_SELECTED_SET_VERIFIED_OPTIMAL",
+  "results": [
+    {
+      "mode": "A1",
+      "alternative": "ANY_ARC_CHANGE",
+      "status": "OPTIMAL",
+      "solver_message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+      "pstar_s": 623.9518859359825,
+      "alternative_pickup_s": 626.0669770747486,
+      "gap_upper_s": 2.115091138766047,
+      "gap_lower_s": 2.115091138766047,
+      "runtime_s": 0.0011363000003257184,
+      "gap_relative": 0.0033898305084745835,
+      "budget_exists": {
+        "0": "NO",
+        "0.005": "YES_WITHIN_NUMERICAL_TOLERANCE",
+        "0.01": "YES_WITHIN_NUMERICAL_TOLERANCE",
+        "0.02": "YES_WITHIN_NUMERICAL_TOLERANCE",
+        "0.05": "YES_WITHIN_NUMERICAL_TOLERANCE"
+      },
+      "witness": [
+        {
+          "order_id": "cf28d17174bbf58e605107b276cf2be8",
+          "vehicle_id": "HV_S3_02837",
+          "vehicle_type": "HV",
+          "pickup_eta_s": 154.40165312992113,
+          "selected_before": true,
+          "selected_after": false
+        },
+        {
+          "order_id": "cf28d17174bbf58e605107b276cf2be8",
+          "vehicle_id": "HV_S3_02348",
+          "vehicle_type": "HV",
+          "pickup_eta_s": 156.51674426868715,
+          "selected_before": false,
+          "selected_after": true
+        }
+      ],
+      "served_order_set_changed": false,
+      "vehicle_identity_set_changed": true,
+      "same_order_hv_av_swap_count": 0
+    },
+    {
+      "mode": "A1",
+      "alternative": "AV_SERVICE_INDICATOR_CHANGE",
+      "status": "OPTIMAL",
+      "solver_message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+      "pstar_s": 623.9518859359825,
+      "alternative_pickup_s": 653.5631618787072,
+      "gap_upper_s": 29.61127594272466,
+      "gap_lower_s": 29.61127594272466,
+      "runtime_s": 0.0011334000000715605,
+      "gap_relative": 0.04745762711864417,
+      "budget_exists": {
+        "0": "NO",
+        "0.005": "NO",
+        "0.01": "NO",
+        "0.02": "NO",
+        "0.05": "YES_WITHIN_NUMERICAL_TOLERANCE"
+      },
+      "witness": [
+        {
+          "order_id": "1cf12426b88db4d8ed0fbcac19d060d8",
+          "vehicle_id": "AV_S3_0075",
+          "vehicle_type": "AV",
+          "pickup_eta_s": 249.58075437439305,
+          "selected_before": false,
+          "selected_after": true
+        },
+        {
+          "order_id": "1cf12426b88db4d8ed0fbcac19d060d8",
+          "vehicle_id": "HV_S3_03526",
+          "vehicle_type": "HV",
+          "pickup_eta_s": 219.96947843166845,
+          "selected_before": true,
+          "selected_after": false
+        }
+      ],
+      "served_order_set_changed": false,
+      "vehicle_identity_set_changed": true,
+      "same_order_hv_av_swap_count": 1
+    },
+    {
+      "mode": "A2",
+      "alternative": "ANY_ARC_CHANGE",
+      "status": "OPTIMAL",
+      "solver_message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+      "pstar_s": 623.9518859359825,
+      "alternative_pickup_s": 623.9518859359825,
+      "gap_upper_s": 0.0,
+      "gap_lower_s": 0.0,
+      "runtime_s": 0.0010257999992973055,
+      "gap_relative": 0.0,
+      "budget_exists": {
+        "0": "YES_WITHIN_NUMERICAL_TOLERANCE",
+        "0.005": "YES_WITHIN_NUMERICAL_TOLERANCE",
+        "0.01": "YES_WITHIN_NUMERICAL_TOLERANCE",
+        "0.02": "YES_WITHIN_NUMERICAL_TOLERANCE",
+        "0.05": "YES_WITHIN_NUMERICAL_TOLERANCE"
+      },
+      "witness": [
+        {
+          "order_id": "133bcec311f45edfd419bcd917898e6c",
+          "vehicle_id": "HV_S3_03006",
+          "vehicle_type": "HV",
+          "pickup_eta_s": 249.58075437439305,
+          "selected_before": false,
+          "selected_after": true
+        },
+        {
+          "order_id": "403e74b5456c4e987a95cab68969bfcd",
+          "vehicle_id": "HV_S3_03006",
+          "vehicle_type": "HV",
+          "pickup_eta_s": 249.58075437439305,
+          "selected_before": true,
+          "selected_after": false
+        }
+      ],
+      "served_order_set_changed": true,
+      "vehicle_identity_set_changed": false,
+      "same_order_hv_av_swap_count": 0
+    },
+    {
+      "mode": "A2",
+      "alternative": "AV_SERVICE_INDICATOR_CHANGE",
+      "status": "OPTIMAL",
+      "solver_message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+      "pstar_s": 623.9518859359825,
+      "alternative_pickup_s": 653.5631618787072,
+      "gap_upper_s": 29.61127594272466,
+      "gap_lower_s": 29.61127594272466,
+      "runtime_s": 0.0009919000003719702,
+      "gap_relative": 0.04745762711864417,
+      "budget_exists": {
+        "0": "NO",
+        "0.005": "NO",
+        "0.01": "NO",
+        "0.02": "NO",
+        "0.05": "YES_WITHIN_NUMERICAL_TOLERANCE"
+      },
+      "witness": [
+        {
+          "order_id": "1cf12426b88db4d8ed0fbcac19d060d8",
+          "vehicle_id": "AV_S3_0075",
+          "vehicle_type": "AV",
+          "pickup_eta_s": 249.58075437439305,
+          "selected_before": false,
+          "selected_after": true
+        },
+        {
+          "order_id": "1cf12426b88db4d8ed0fbcac19d060d8",
+          "vehicle_id": "HV_S3_03526",
+          "vehicle_type": "HV",
+          "pickup_eta_s": 219.96947843166845,
+          "selected_before": true,
+          "selected_after": false
+        }
+      ],
+      "served_order_set_changed": false,
+      "vehicle_identity_set_changed": true,
+      "same_order_hv_av_swap_count": 1
+    }
+  ]
+}

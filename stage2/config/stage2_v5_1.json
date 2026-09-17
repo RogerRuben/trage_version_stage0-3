@@ -1,0 +1,99 @@
+{
+  "schema_version": "stage2_v5_1.1",
+  "base_v5": {
+    "branch": "codex/stage2-v5-stochastic-service-state",
+    "commit": "3b581c5e6d108441ca623bcc03923f5893de7ea9",
+    "rolling_status": "FAIL",
+    "stage3_admission": "READY_FOR_ROUTE_SCENARIO_PROTOTYPE"
+  },
+  "stability_thresholds": {
+    "maximum_pace_mean_s_per_m": 5.0,
+    "maximum_mean_to_p50_ratio": 20.0,
+    "maximum_p99_9_pace_mean_s_per_m": 1.0,
+    "maximum_single_row_mae_contribution_share": 0.05,
+    "maximum_single_row_rmse_contribution_share": 0.10,
+    "maximum_route_mean_s": 7200.0,
+    "maximum_route_mean_rmse_s": 600.0,
+    "maximum_average_p90_p50_width_s": 900.0,
+    "maximum_average_p95_p50_width_s": 1200.0,
+    "extreme_route_interval_width_s": 3600.0,
+    "maximum_extreme_route_interval_share": 0.001,
+    "maximum_extreme_scenario_share": 0.001,
+    "maximum_route_cvar95_s": 14400.0
+  },
+  "threshold_rationale": {
+    "pace": "Operational numerical-stability bounds, frozen before any v5.1 training: 5 s/m is 0.2 m/s and the 20x mean/P50 cap prevents log-normal variance from dominating point risk.",
+    "tail": "P99.9 and single-row contribution limits require population-level stability rather than finite-but-explosive tails.",
+    "route": "Two-hour route mean, ten-minute RMSE, and interval-width caps are fail-closed engineering limits for a city taxi-order prototype, not fitted evaluation quantiles."
+  },
+  "checkpoint_selection": {
+    "hard_gates": [
+      "all_outputs_finite",
+      "quantiles_monotonic",
+      "pace_mean_stable",
+      "mean_to_p50_stable",
+      "route_scenario_smoke_stable"
+    ],
+    "primary": "validation_p50_mae",
+    "secondary": ["validation_distribution_loss", "validation_mean_mae", "validation_quantile_coverage_error"],
+    "requires_unique_traversal_merge": true
+  },
+  "formal_products": {
+    "output_root": "stage2/output_v5_1/formal_calibrated",
+    "protocols": ["development", "legacy"],
+    "quantile_fields_status": "ELIGIBLE",
+    "mean_std_cvar_fields_status": "BLOCKED",
+    "example_timeout_thresholds_are_diagnostics_only": true
+  },
+  "scenario_selection": {
+    "families": [
+      "independent_quantile",
+      "shared_route_quantile",
+      "residual_block_quantile",
+      "hierarchical_cross_order_quantile"
+    ],
+    "scenario_count": 1000,
+    "seed": 20261009,
+    "route_batch_size": 50,
+    "require_cross_order_coherence_for_formal": true,
+    "score_weights": {
+      "sample_crps": 1.0,
+      "calibration_error": 1.0,
+      "sharpness": 0.05,
+      "extreme_tail": 10.0
+    },
+    "calibration_dispersion_grid": [0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 2.5, 3.0],
+    "maximum_route_scenario_s": 14400.0,
+    "correlation_weights": {
+      "network_time": 0.12,
+      "region_time": 0.10,
+      "highway_time": 0.08,
+      "route": 0.20
+    }
+  },
+  "admission": {
+    "maximum_pace_quantile_coverage_error": 0.03,
+    "minimum_final_daily_mae_wins_vs_strong_baseline": 2,
+    "require_aggregate_mae_better_than_strong_baseline": true,
+    "require_paired_bootstrap_ci_below_zero": true,
+    "route_p90_coverage_minimum": 0.85,
+    "route_p90_coverage_maximum": 0.95,
+    "route_p95_coverage_minimum": 0.90,
+    "route_p95_coverage_maximum": 0.99
+  },
+  "field_status": {
+    "pace_pred_p50": "ELIGIBLE",
+    "pace_pred_p90": "ELIGIBLE",
+    "pace_pred_p95": "ELIGIBLE",
+    "route_service_time_p50_s": "ELIGIBLE",
+    "route_service_time_p90_s": "ELIGIBLE",
+    "route_service_time_p95_s": "ELIGIBLE",
+    "route_service_availability_probability": "ELIGIBLE",
+    "availability_probability": "ELIGIBLE",
+    "pace_pred_mean": "BLOCKED",
+    "route_service_time_mean_s": "BLOCKED",
+    "route_service_time_std_s": "BLOCKED",
+    "route_service_time_cvar90_s": "BLOCKED",
+    "route_service_time_cvar95_s": "BLOCKED"
+  }
+}

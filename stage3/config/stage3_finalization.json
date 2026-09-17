@@ -1,0 +1,13 @@
+{
+  "schema_version": "stage3_finalization.1",
+  "authorized_base": "514db0933493578463de0c37b9cfd31cc730ed7a",
+  "test_date": "20161031",
+  "profiles": ["C", "M", "A"],
+  "maximum_candidates": 1,
+  "maximum_fallback_distance_ratio": 1.25,
+  "candidate_policy": "single_deterministic_valhalla_auto_route",
+  "candidate_selection": "minimum_frozen_m3_p50_then_distance",
+  "valhalla_config": "D:/pycodes/didi_xian_raw/valhalla_data/valhalla.json",
+  "candidate_manifest": "stage0/work_v6_final/candidate_manifests/date=20161031.parquet",
+  "batch_size": 250
+}

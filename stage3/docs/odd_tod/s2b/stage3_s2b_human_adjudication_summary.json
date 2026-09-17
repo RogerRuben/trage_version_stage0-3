@@ -1,0 +1,146 @@
+{
+  "artifact_sha256": "6dbc71027dc0fb63975cb73d291169fcdc938725e2f47a9ab0d5f298d91a1a3e",
+  "completed_adjudication": {
+    "header": [
+      "adjudication_case_id",
+      "complex_r10",
+      "selection_stratum",
+      "selection_rank",
+      "reused_existing_qa",
+      "complexes_r05",
+      "member_node_count_r05_total",
+      "member_node_count_r10",
+      "adjudication_label",
+      "reviewer_note",
+      "allowed_labels"
+    ],
+    "header_sha256": "b033eff877543bebdb4b0c9362f2961f4577927cbe6acd638988277abb443e19",
+    "label_counts": {
+      "10_CORRECT": 7,
+      "5_CORRECT": 0,
+      "BOTH_ACCEPTABLE": 61,
+      "NEITHER": 2,
+      "UNCERTAIN": 0
+    },
+    "neither_cases": [
+      {
+        "adjudication_case_id": "s2b11_008",
+        "complex_r10": "s3ic_450c34e008b91b34933ee7a5",
+        "reviewer_note": "\"This is a massive interchange with tons of ramps and entrances, so a 10-meter range just isn't enough",
+        "selection_stratum": "signalized"
+      },
+      {
+        "adjudication_case_id": "s2b11_055",
+        "complex_r10": "s3ic_d5869d1f504d5b8035176df9",
+        "reviewer_note": "\"This is a massive interchange with tons of ramps and entrances, so a 10-meter range just isn't enough",
+        "selection_stratum": "grade_separated"
+      }
+    ],
+    "path": "stage3/docs/odd_tod/s2b/stage3_s2b_completed_adjudication.csv",
+    "per_stratum_counts": {
+      "grade_separated": {
+        "10_CORRECT": 2,
+        "5_CORRECT": 0,
+        "BOTH_ACCEPTABLE": 7,
+        "NEITHER": 1,
+        "UNCERTAIN": 0
+      },
+      "high_degree": {
+        "10_CORRECT": 0,
+        "5_CORRECT": 0,
+        "BOTH_ACCEPTABLE": 10,
+        "NEITHER": 0,
+        "UNCERTAIN": 0
+      },
+      "multi_node_divided_road": {
+        "10_CORRECT": 1,
+        "5_CORRECT": 0,
+        "BOTH_ACCEPTABLE": 19,
+        "NEITHER": 0,
+        "UNCERTAIN": 0
+      },
+      "random_changed": {
+        "10_CORRECT": 1,
+        "5_CORRECT": 0,
+        "BOTH_ACCEPTABLE": 9,
+        "NEITHER": 0,
+        "UNCERTAIN": 0
+      },
+      "signalized": {
+        "10_CORRECT": 3,
+        "5_CORRECT": 0,
+        "BOTH_ACCEPTABLE": 16,
+        "NEITHER": 1,
+        "UNCERTAIN": 0
+      }
+    },
+    "row_count": 70,
+    "sha256": "f1c7c0e4c4086c08c89729a2d844ff6335930a139691137746d70dc8dc43b3a0",
+    "size_bytes": 23239
+  },
+  "decision_statement": "10m selected because it reduces observed under-consolidation without observed strict 5m preference in the targeted review set, while 15m and 20m had already shown increasing structural over-consolidation.",
+  "known_limitation": "A single 10m radius can still under-consolidate very large interchange systems; no case-specific patch or manual topology override is introduced.",
+  "neither_reviewer_notes_verbatim": [
+    {
+      "adjudication_case_id": "s2b11_008",
+      "complex_r10": "s3ic_450c34e008b91b34933ee7a5",
+      "reviewer_note": "\"This is a massive interchange with tons of ramps and entrances, so a 10-meter range just isn't enough",
+      "selection_stratum": "signalized"
+    },
+    {
+      "adjudication_case_id": "s2b11_055",
+      "complex_r10": "s3ic_d5869d1f504d5b8035176df9",
+      "reviewer_note": "\"This is a massive interchange with tons of ramps and entrances, so a 10-meter range just isn't enough",
+      "selection_stratum": "grade_separated"
+    }
+  ],
+  "overall_label_counts": {
+    "10_CORRECT": 7,
+    "5_CORRECT": 0,
+    "BOTH_ACCEPTABLE": 61,
+    "NEITHER": 2,
+    "UNCERTAIN": 0
+  },
+  "per_stratum_counts": {
+    "grade_separated": {
+      "10_CORRECT": 2,
+      "5_CORRECT": 0,
+      "BOTH_ACCEPTABLE": 7,
+      "NEITHER": 1,
+      "UNCERTAIN": 0
+    },
+    "high_degree": {
+      "10_CORRECT": 0,
+      "5_CORRECT": 0,
+      "BOTH_ACCEPTABLE": 10,
+      "NEITHER": 0,
+      "UNCERTAIN": 0
+    },
+    "multi_node_divided_road": {
+      "10_CORRECT": 1,
+      "5_CORRECT": 0,
+      "BOTH_ACCEPTABLE": 19,
+      "NEITHER": 0,
+      "UNCERTAIN": 0
+    },
+    "random_changed": {
+      "10_CORRECT": 1,
+      "5_CORRECT": 0,
+      "BOTH_ACCEPTABLE": 9,
+      "NEITHER": 0,
+      "UNCERTAIN": 0
+    },
+    "signalized": {
+      "10_CORRECT": 3,
+      "5_CORRECT": 0,
+      "BOTH_ACCEPTABLE": 16,
+      "NEITHER": 1,
+      "UNCERTAIN": 0
+    }
+  },
+  "phase_status": "STAGE3_S2B_INTERSECTION_COMPLEX_FROZEN",
+  "sampling_warning": "Targeted stratified diagnostic review; not a population-random accuracy estimate.",
+  "schema_version": "stage3_s2b2_human_adjudication.1",
+  "selected_buffer_radius_m": 10,
+  "strict_5m_preference_count": 0
+}

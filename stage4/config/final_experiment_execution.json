@@ -1,0 +1,17 @@
+{
+  "registry_path": "stage4/config/experimental_design/scenario_registry.csv",
+  "output_root": "stage4/output/final_experiments",
+  "horizon_start": "2016-10-31T00:00:00+08:00",
+  "horizon_end": "2016-11-01T00:01:00+08:00",
+  "expected_request_count_per_profile": 30000,
+  "max_parallel_scenarios": 2,
+  "min_available_ram_gb_before_launch": 4.0,
+  "full_day_runtime_guard_s": 7200,
+  "poll_interval_s": 2.0,
+  "max_automatic_retries": 1,
+  "automatic_retry_policy": "TRANSIENT_INFRASTRUCTURE_ONLY",
+  "registry_commit": "b82cd3fda60a39c7474de49bdf4f205850a6725d",
+  "fleetpy_commit": "0379f9725a147ff33c674de4884cdf89fd787fa9",
+  "assignment_matrix_representation": "CSR_SPARSE_ARCS_ONLY",
+  "gpu_usage": "NONE_CPU_ONLY"
+}

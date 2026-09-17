@@ -1,0 +1,85 @@
+{
+  "schema_version": "stage3_s2a_network_foundation_config.1",
+  "phase": "S2A_FULL_NETWORK_FOUNDATION",
+  "execution_authorization": "S2A_ONLY",
+  "execution_base_commit": "573413e87d4fd6698bc13100425bb5aed6b6a621",
+  "upstream_frozen_commit": "e489343abb36a878cffe48e3a5eae34e6c4670c5",
+  "paths": {
+    "stage0_freeze_manifest": "stage0/docs/stage0_v6_freeze_manifest.json",
+    "stage1_release_manifest": "stage1/docs/stage1_v3_release_manifest.json",
+    "stage2_final_release_manifest": "stage2/docs/v5_2/stage2_v5_2_final_release_manifest.json",
+    "s1_inventory": "stage3/docs/odd_tod/stage3_static_data_inventory.json",
+    "s1_provenance": "stage3/docs/odd_tod/stage3_static_field_provenance.md",
+    "stage1_input": "stage1/input_v1",
+    "pbf": "D:/pycodes/didi_xian_raw/map_data/xian_roadmap_update.osm.pbf",
+    "valhalla_config": "D:/pycodes/didi_xian_raw/valhalla_data/valhalla.json",
+    "valhalla_build_manifest": "D:/pycodes/didi_xian_raw/valhalla_data/build_manifest.json",
+    "output": "stage3/output/odd_tod/s2a",
+    "docs": "stage3/docs/odd_tod/s2a"
+  },
+  "bindings": {
+    "pbf_sha256": "4d918b7ed2201a8f7a75fa7fb2974679343c89a10bf83638e7bcf21ac07c1526"
+  },
+  "train_only_dates": [
+    "20161009", "20161010", "20161011", "20161012",
+    "20161013", "20161014", "20161015", "20161016",
+    "20161017", "20161018", "20161019", "20161020",
+    "20161021", "20161022", "20161023", "20161024"
+  ],
+  "network_export": {
+    "mvt_zoom": 12,
+    "generalize": 0,
+    "auto_access_bit": 1,
+    "identity": "Valhalla GraphId uint64 from tile base plus directed edge local id",
+    "stage3_edge_uid_algorithm": "sha256('valhalla-3.8.2|' + uint64 GraphId)[:24]"
+  },
+  "speed_inference": {
+    "candidate_quantiles": [0.85, 0.9, 0.95],
+    "candidate_methods": [
+      "ROAD_CLASS_MODE_ONLY",
+      "V_FF_DIV_1P10_NEAREST_CLASS",
+      "MAP_SPEED_AND_ROAD_CLASS"
+    ],
+    "speed_class_grid_policy": {
+      "minimum_kmh": 5,
+      "maximum_kmh": 120,
+      "increment_kmh": 5,
+      "include_known_anchor_values": true
+    },
+    "minimum_historical_support_n": 5,
+    "minimum_class_anchor_support_n": 10,
+    "grouped_cv_folds": 5,
+    "grouping_key": "osm_way_id",
+    "seed": 20261009,
+    "selection_metrics": [
+      "macro_scenario_compatibility_accuracy",
+      "within_10_kmh_accuracy",
+      "exact_class_accuracy",
+      "model_simplicity",
+      "lower_quantile"
+    ],
+    "av_caps_kmh": [60, 80, 120]
+  },
+  "scope_guards": {
+    "test31_parameter_fitting": false,
+    "intersection_clustering_performed": false,
+    "intersection_tolerance_selected": false,
+    "stage2_training_performed": false,
+    "stage2_candidate_inference_performed": false,
+    "profile_calibration_performed": false,
+    "fallback_routing_performed": false,
+    "stage4_performed": false
+  },
+  "authorizations": {
+    "s2a": true,
+    "s2b": false,
+    "s3": false,
+    "s4": false,
+    "s5": false,
+    "s6": false,
+    "s7": false,
+    "s8": false,
+    "stage4": false
+  },
+  "next_phase_authorized": false
+}

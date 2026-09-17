@@ -1,0 +1,11 @@
+{
+  "base_config": "stage2/config/stage2_v5_1_training.json",
+  "split": {
+    "protocol_name": "v5_1_legacy_frozen_benchmark",
+    "train_dates": ["20161009", "20161010", "20161011", "20161012", "20161013", "20161014", "20161015", "20161016", "20161017", "20161018", "20161019", "20161020", "20161021", "20161022", "20161023", "20161024"],
+    "validation_model_dates": ["20161025", "20161026"],
+    "calibration_dates": ["20161027"],
+    "evaluation_dates": [],
+    "legacy_test_dates": ["20161031"]
+  }
+}
