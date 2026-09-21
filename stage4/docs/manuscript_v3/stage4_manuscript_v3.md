@@ -1,8 +1,8 @@
-# Effective Service Capacity in Mixed-Autonomy Ride-Hailing: State-Dependent Serviceability and Rolling Assignment
+# Instantaneous Effective Matching Capacity in Mixed-Autonomy Ride-Hailing: State-Dependent Serviceability and Rolling Assignment
 
 ## Abstract
 
-Fleet transitions are often described through the share of autonomous vehicles, yet heterogeneous serviceability can prevent nominal supply from replacing an equivalent amount of service. We formulate effective capacity through a state-dependent request–vehicle compatibility graph and its maximum matching, separating nominal availability, instantaneous matchable demand, and realized service over a rolling horizon. Passenger acceptance, route-level operational compatibility, information availability and pickup deadlines determine eligible assignments, while family-specific exposure controls preserve distinct operating constraints. In an empirical ride-hailing replay, mean service rate decreases from 0.726 to 0.392 as the baseline-normalized autonomous active-hour share increases from one quarter to three quarters under zero request lead and five-minute pickup patience. Matching-capacity analysis shows that substantive passenger and operational gates remove maximum-matchable demand, rather than only redundant candidate edges. Broader passenger acceptance and operational capability partially recover service. The magnitude of capacity loss, however, varies materially with reconstructed request timing and remaining patience. Fleet planning should therefore compare effective substitutable service capacity rather than assume equivalence from vehicle counts or available hours alone.
+Fleet transitions are often described through the share of autonomous vehicles, yet heterogeneous serviceability can prevent nominal supply from replacing an equivalent amount of service. We define instantaneous effective matching capacity through a state-dependent request–vehicle compatibility graph and its maximum matching, separating nominal availability, simultaneously matchable demand, and realized rolling service. Passenger acceptance, route readiness, required evidence and pickup deadlines determine eligible assignments under a specified interface policy. In an empirical replay with zero request lead and five-minute pickup patience, mean service rate decreases from 0.726 to 0.392 as the baseline-normalized AV active-hour level increases from one quarter to three quarters. Fixed-state AV-subgraph analysis shows that the implemented gates remove genuine maximum-matchable demand, not only redundant candidate edges. A provenance audit also identifies incomplete endpoint and movement representation, so excluded opportunities cannot all be attributed to physical AV limitations. Broader analytical capability and passenger acceptance partially recover service within the frozen system, while reconstructed request timing materially changes matching capacity. These findings concern the adopted capability, routing-readiness and evidence policy; they neither estimate an intrinsic AV productivity penalty nor decompose total mixed-fleet service losses. Fleet comparisons should distinguish nominal hours, interface-conditioned matching opportunities and realized service.
 
 **Keywords:** effective service capacity; mixed-autonomy ride-hailing; state-dependent serviceability; bipartite matching; rolling assignment; fleet substitution
 
@@ -31,7 +31,7 @@ Let \(\widetilde{\mathcal V}_t\) be vehicles active in the operating schedule at
 S_t^{nom}=|\widetilde{\mathcal V}_t|,\qquad
 H^b=\int_0^T|\widetilde{\mathcal V}_t^b|\,dt,\quad b\in\{H,A\}.
 \]
-The active-hour quantities have units of vehicle-hours. The dispatchable set \(\mathcal V_t\subseteq\widetilde{\mathcal V}_t\) contains idle vehicles available for a new assignment; it is not the full active fleet. To compare transition scenarios, define \(q_A=H^A/H^{base}\), where \(H^{base}\) is the all-HV baseline's active-hour denominator. This is not necessarily the within-scenario fraction \(H^A/(H^A+H^H)\).
+The active-hour quantities have units of vehicle-hours. The dispatchable set \(\mathcal V_t\subseteq\widetilde{\mathcal V}_t\) contains idle vehicles available for a new assignment; it is not the full active fleet. To compare transition scenarios, define the baseline-normalized AV active-hour level \(q_A=H^A/H^{base}\), where \(H^{base}\) is the all-HV baseline's active-hour denominator. This is not necessarily the within-scenario fraction \(H^A/(H^A+H^H)\).
 
 Equal counts or active hours need not imply equal serviceability. Substitution changes the types, locations and availability schedules of the vehicles offered to the waiting demand. We do not treat an AV label change and an availability-policy change as the same intervention.
 
@@ -54,7 +54,7 @@ These have distinct meanings: feasible pairs, orders with any option, and simult
 
 ### 2.3 Effective matching capacity
 
-The instantaneous graph-based capacity is
+The instantaneous effective matching capacity is
 \[
 C_t^{eff}=\nu(G_t)=
 \max_{x\in\{0,1\}^{|\mathcal A_t|}}
@@ -63,7 +63,7 @@ C_t^{eff}=\nu(G_t)=
 \]
 It is bounded by both demand with an option and available vehicles. For example, ten requests all connected to the same vehicle have ten edges and ten eligible requests but capacity one. Removing nine edges in a highly redundant graph may instead leave capacity unchanged.
 
-For AV-specific diagnosis, \(G_t^A\) restricts the vehicle side to AVs and \(C_t^{eff,A}=\nu(G_t^A)\). The matching-capacity results below concern this AV subgraph, not total mixed-fleet capacity. In general \(C_t^{eff}\) is not the sum of the HV and AV subgraph capacities because the same requests may appear in both.
+For AV-specific diagnosis, \(G_t^A\) restricts the vehicle side to AVs and \(C_t^{eff,A}=\nu(G_t^A)\). The matching-capacity results below concern this AV subgraph, not total mixed-fleet capacity. In general \(C_t^{eff}\) is not the sum of the HV and AV subgraph capacities because the same requests may appear in both. The AV-subgraph analysis identifies a mechanism of lost substitutability, not a decomposition of total mixed-fleet service. Capacity here is a count of simultaneous matches, not a per-hour service rate or daily throughput.
 
 Graph capacity represents pairwise serviceability before coupled policy constraints. For the cumulative exposure constraints introduced below, define the policy-feasible set \(\mathcal F_t(\Gamma)\) and, if needed,
 \[
@@ -104,6 +104,8 @@ Full-horizon AV availability does not inherit this empirical-session admission r
 ### 3.2 Hard and continuous compatibility
 
 For a route and profile \(k\), hard readiness is \(h_{ok}\in\{\text{feasible},\text{unknown},\text{infeasible}\}\). Known incompatible directions or prohibited movements can produce hard infeasibility. Missing critical identity or evidence remains unknown. The conservative AV admission rule requires hard readiness and complete required evidence. These are operational classifications under a specified representation, not safety certification.
+
+The representation itself is consequential. A subsequent provenance audit found that boundary extraction can recognize edge combinations excluded from movement construction because endpoint identities are incomplete. Such UNKNOWN outcomes reflect an interface-induced evidence gap, not independently established physical inability. The frozen original/fallback selection branch also affects which evidence is evaluated. These behaviors are retained and disclosed, not repaired or reinterpreted as physical restrictions for this study (Section 6.5 and Appendix G).
 
 For descriptor \(d_{oj}\) and positive profile cap \(B_{kj}\),
 \[
@@ -192,6 +194,8 @@ The main replay treats the observed trajectory departure/boarding proxy as reque
 
 A factorial combines \(q_A\in\{.25,.50,.75\}\), three analytical profiles and acceptance \(p_A\in\{.40,.70,1.00\}\), giving 27 mixed-fleet settings within 41 pre-specified full-day scenarios. All-HV and all-AV profile cases are composition benchmarks. Acceptance uses common random draws. The main factorial disables continuous budgets and the additional cost objective; route policy and candidate rules are unchanged. Service rate is served requests divided by the same 30,000 orders.
 
+All 41 outcomes refer to the same frozen network/interface version, including its subsequently identified endpoint and movement-coverage limitations. No corrected-network full-day counterfactual was run. Accepting this study boundary preserves reproducibility but does not validate every excluded route as physically unavailable. In the main 27 settings, continuous envelope exceedance alone does not remove an AV arc: hard readiness and evidence requirements remain active while Gamma and cost are disabled. The later provenance audits qualify interpretation rather than alter these scenario definitions or numerical outcomes.
+
 At \(q_A=.50\), Moderate capability and \(p_A=.70\), strict, reference and unconstrained exposure policies compare alternative operating limits. Reference limits are calibrated once using the designated q_A=.25, Moderate, universal-acceptance run and transferred without tuning to central outcomes. All-AV cases are composition extremes, not performance ceilings.
 
 ### 5.2 Mechanism validation
@@ -212,7 +216,7 @@ A ten-state information comparison substitutes historical estimates for model pr
 
 ### 6.1 Nominal supply versus realized service
 
-Under zero lead and 300-second patience, mean service rates across the factorial are .7258, .5984 and .3924 at q_A=.25, .50 and .75. The decrease from .25 to .75 is .3334, approximately 45.9% of the lower-share mean. This is an operational contrast on common demand, not a timing-invariant technological effect.
+Under zero lead and 300-second patience, mean service rates across the factorial are .7258, .5984 and .3924 at q_A=.25, .50 and .75. The decrease from .25 to .75 is .3334, approximately 45.9% of the lower-level mean. This is an operational contrast on common demand under the frozen interface, not a timing- or representation-invariant technological effect.
 
 | Fleet condition | Service rate |
 | --- | ---: |
@@ -281,13 +285,21 @@ Retention divides summed final M by summed pre-patience M. These four-state tota
 
 Information also changes compatibility. Prediction-based and historical-information decisions differ in nine of ten compared states, with mean selected-AV-arc Jaccard .10. This establishes operational relevance of graph information. It does not establish decision superiority under independently evaluated outcomes; no such common evaluator was run. Prediction thus remains a component of serviceability construction, rather than a second central paper claim.
 
+### 6.5 Interface provenance and the interpretation of excluded opportunities
+
+The follow-up audit of the ten-state cohort examined 720 unique orders and 13,378 recorded complex encounters. All 391 unresolved movement encounters (276 orders; 117 unique keys) involved endpoint-incomplete edges: movement construction excludes these edges, whereas boundary extraction retains them. Native-graph inspection recovered endpoint identities for the 88 implicated edges but found 19 conflicts with existing non-null endpoint identities and 55 missing-side native nodes absent from the frozen node table. Their relation to frozen complex membership was not certified; no movement was automatically declared feasible. This targeted audit establishes an interface-coverage limitation, not a full-network error rate or a corrected service effect.
+
+Direction restrictions have different provenance. The 14,837 evaluation-day orders flagged for historical reverse direction have supporting explicit oneway tags and opposed node order in the frozen OSM source. This supports the adopted network rule, not certification of actual 2016 legal restrictions or proof that no lawful alternative route exists. UNKNOWN movement evidence and supported frozen direction restrictions must therefore not be pooled as a single physical AV incapability category.
+
+These findings place the capacity mechanism at the level actually measured: eligibility under the frozen capability, route-selection, identity and evidence policy. Diagnostic gate removal is not a deployable repair, and its graph gains are not estimated gains from correcting the network. Appendix G records the audit trail. The research branch is closed without new clustering, interface repair or full-day reruns.
+
 ## 7. Discussion
 
 ### 7.1 Fleet substitutability
 
 The appropriate unit of fleet transition is substitutable service capacity, not vehicle count. One hundred AVs need not replace one hundred HVs; even equal active hours can support different request sets and matching structures. The meaningful operational comparisons are changes in instantaneous capacity, \(\Delta C^{eff}\), and in realized service, \(\Delta Y\), under specified demand and operating conditions.
 
-The results support a conditional interpretation. Greater AV active-hour share is associated with lower service under the main zero-lead, five-minute-patience replay. Separate graph analysis verifies genuine matchable-demand losses, while timing sensitivity changes their magnitude. This is not a universal AV productivity penalty. Nor does graph capacity alone determine daily performance: competition, dispatch priorities and vehicle evolution connect instantaneous opportunities to service.
+The results support a conditional interpretation. A greater baseline-normalized AV active-hour level is associated with lower service under the main zero-lead, five-minute-patience replay and frozen interface. Separate AV-subgraph analysis verifies genuine matchable-demand losses under that policy, while timing sensitivity changes their magnitude. Some scarcity is endogenous to route/evidence representation, including the documented movement-coverage gap; it is not solely a property of vehicle capability. This is not a universal AV productivity penalty. Nor does graph capacity alone determine daily performance: competition, dispatch priorities and vehicle evolution connect instantaneous opportunities to service.
 
 This view complements research on strategic mixed-fleet control and spatial rebalancing rather than replacing it. Those decisions shape the state in which compatibility is evaluated; our capacity object measures what that state can support. [Ao et al. (2024)](https://doi.org/10.1016/j.tre.2024.103680); [Pavone et al. (2012)](https://doi.org/10.1177/0278364912444766).
 
@@ -310,13 +322,15 @@ Pickup patience and request timing cut across all four levers. An operationally 
 
 Five limitations define the scope. First, the application concerns one city and one evaluation day with quality-screened orders, so effect sizes are not population-wide estimates. Second, true request times are unobserved; the main boarding proxy and reconstructed alternatives produce conditional timing results. Third, capability profiles are analytical operating envelopes, not certified manufacturer specifications. Fourth, the main comparison retains a fixed route-construction policy and no active repositioning, so it does not estimate gains from joint route and rebalance optimization. Fifth, passenger acceptance is exogenous and omits price-, wait- and passenger-specific behavior.
 
+A further, observed limitation is incomplete endpoint/movement representation in the frozen interface. It can conservatively exclude routes without establishing their physical infeasibility, and original/fallback branching can retain UNKNOWN despite an alternative represented route. We report these known behaviors explicitly rather than describe all gate attrition as intrinsic operational incompatibility. No corrected membership/interface scenario quantifies their contribution to daily service, and no causal fraction of the full-day decline is assigned to them. The retained results characterize the adopted system, not an error-free or universally applicable AV serviceability map.
+
 ## 8. Conclusion
 
 Nominal AV availability and effective service capacity are distinct: counts and active hours alone do not establish substitutability for human-driven service.
 
-State-dependent passenger and operational compatibility genuinely reduces maximum-matchable demand in the sampled system, rather than merely removing redundant candidate edges.
+The implemented passenger, routing-readiness and evidence gates reduce instantaneous effective matching capacity in the sampled AV subgraphs, rather than merely removing redundant candidate edges. This identifies lost substitutability under the adopted policy, not a decomposition of total service or proof of physical incapability for every excluded route.
 
-The magnitude depends on timing, passenger acceptance and operating capability. Fleet substitution should therefore be evaluated through compatibility-aware matching and rolling service outcomes, not fleet share alone.
+The magnitude depends on request timing, patience, analytical capability assumptions and the frozen network/evidence representation. Fleet substitution should therefore be evaluated through explicitly qualified compatibility graphs and rolling service outcomes, not nominal fleet hours alone. Correcting the documented interface limitations would define a new empirical system; its service effects remain unestimated here.
 
 ## References
 

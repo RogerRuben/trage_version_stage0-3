@@ -1,5 +1,11 @@
 # Manuscript V3 — TR-B / TR-E Dual-Target Story Reconstruction
 
+Current decision: **ACCEPT_FROZEN_INTERFACE_BOUNDARY / CONVERGE_MANUSCRIPT**.
+See [research closure and revision record](research_boundary_closure.md).
+The endpoint/movement coverage limitation is disclosed in the Abstract, Sections
+3.2, 5.1, 6.5, 7–8 and Appendix G. The interface has NOT been certified as corrected.
+Additional Stage3 audits, repair, clustering and Stage5 are stopped.
+
 Current main draft: [stage4_manuscript_v3.md](stage4_manuscript_v3.md).
 Supplement: [stage4_appendix_v3.md](stage4_appendix_v3.md).
 Visual decisions after story reconstruction: [figure_plan_v3.md](figure_plan_v3.md).

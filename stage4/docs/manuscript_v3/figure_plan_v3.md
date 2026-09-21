@@ -2,10 +2,17 @@
 
 This plan follows the completed V3 model/section reconstruction. It replaces pipeline-centered figure priorities. No final image is drawn and no additional experiment is authorized.
 
+Closure update: captions must distinguish implemented eligibility from physical
+AV capability. Figure 1 includes network/identity/evidence policy as a graph input.
+Figures 2–4 retain their numerical sources, labeled frozen-interface results.
+Figure 3 is AV-subgraph capacity, not a decomposition of mixed-fleet service; its
+caption/text must disclose the movement-coverage gap. No repair-gain plot is supported.
+Use “baseline-normalized AV active-hour level” for q_A, not within-fleet share.
+
 | Figure | Scientific role | Existing source | Proposed panels and units | Placement |
 | --- | --- | --- | --- | --- |
 | 1 | Define the capacity object | V3 Sections 2–3 | Nominal active supply → compatibility graph → maximum matching → rolling service; small graph illustrating E/U/M; note Gamma-constrained capacity is bounded by graph capacity | Section 2 |
-| 2 | Does nominal supply translate into service? | Existing factorial and benchmark results | Service rate versus baseline-normalized AV active-hour share; benchmark markers; zero lead/300-s patience annotation | Section 6.1 |
+| 2 | Does nominal supply translate into service? | Existing factorial and benchmark results | Service rate versus baseline-normalized AV active-hour level; benchmark markers; zero lead/300-s patience and frozen-interface annotation | Section 6.1 |
 | 3 | Do serviceability restrictions remove capacity? | mechanism_validity/matching_capacity_summary.csv | Primary U/M gate plot, secondary E strip; distinct Top-K compression marker | Section 6.2 |
 | 4 | Which levers recover service and manage exposure? | Existing acceptance/capability contrasts and ODD policy results | Acceptance/capability service contrasts; strict/reference/unconstrained service and family exposure, separately labeled | Section 6.3 |
 | 5 | How timing changes instantaneous capacity | mechanism_validity/request_time_sensitivity.csv | Four physical-state small multiples for zero/Low/Base/High; final M and pre/post-patience retention | Section 6.4 |

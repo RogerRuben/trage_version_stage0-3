@@ -2,7 +2,11 @@
 
 ## Central chain
 
-Real trajectories → directed road-network grounding → operational route representation → leakage-safe decision-time prediction → hard plus family-specific AV suitability → sparse rolling mixed-fleet assignment → frozen full-day counterfactual outcomes.
+Nominal supply → interface-conditioned compatibility graph → instantaneous effective matching capacity → rolling realized service.
+
+The graph depends on capability assumptions, passenger acceptance, route selection,
+network/identity coverage, evidence and patience. It is not a fully observed map
+of physical AV capability. Prediction supports graph construction, not a second headline.
 
 ## Empirical mechanism
 
@@ -14,4 +18,9 @@ Primary: effective-capacity conversion under operational compatibility. Secondar
 
 ## Final decision
 
-`GO_MANUSCRIPT_V2_REWRITE`. The theory and frozen-state evidence strengthen the contribution without contradicting the frozen 41-scenario experiment.
+`ACCEPT_FROZEN_INTERFACE_BOUNDARY / CONVERGE_MANUSCRIPT`.
+Retain the 41 results but disclose the known endpoint/movement interface gap in the
+main paper. Stop further Stage3 audit/repair/clustering, new gate experiments and Stage5.
+No universal AV productivity penalty, repaired-network effect or decision superiority
+is identified. Finish source-grounded figures, literature positioning and language.
+See [closure record](../manuscript_v3/research_boundary_closure.md).

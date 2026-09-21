@@ -103,3 +103,53 @@ Detailed sources: stage4/docs/paper_redesign/recovered_rt_environment_parameters
 Sparse neighborhood candidates and bounded routing caches avoid a dense order-by-vehicle matrix. Actual routing modes and failure handling belong to the corresponding pre-specified diagnostic configurations, not a new routing architecture. The ten-state identity/capacity checks use 30,779 routed arcs with zero failure; the RT comparison uses 5,979 with zero failure. These are different workloads and are not pooled as daily routing performance.
 
 No new mechanism, rebalancing, common-evaluator or full-day experiment was run for the manuscript reconstruction. The current claim remains QUALIFIES_CURRENT_STORY. Engineering logs, partition/resume design and source hashes are implementation support, not central paper results.
+
+## Appendix G. Frozen-interface provenance and research closure
+
+The follow-up action-space experiments are distinct from the original funnel in
+Section 6.2; their settings must not be pooled. The condition-local, Gamma/cost-off
+diagnostic reports final state-summed AV maximum matching of 12/39/44/41/113 for
+D0/D1/D3/D13/D4. D13 uses D1's route selection, then bypasses evidence only for an
+established FEASIBLE route. It is not the union of D1 and D3: 26 of 720 cohort
+orders are D3-eligible but not D13-eligible because D1 retains original UNKNOWN
+rather than selecting the prior fallback (23 movement lookup; 3 route identity).
+These are diagnostic semantics, not deployable repairs or corrected-network effects.
+
+The provenance audit covers 13,378 encounters from the 720 unique orders. All 391
+unresolved encounters (276 orders; 117 keys) involve endpoint-incomplete boundary
+edges excluded from movement construction. Internal reachability does not certify
+the complete movement; two recorded chains are discontinuous. Native inspection
+of the 88 implicated edges recovered exact endpoints, but found 19 conflicts with
+existing endpoint IDs: 18 explicit hierarchy transition associations and one
+different same-level node. No replacement was applied.
+
+The missing sides comprise 55 native GraphIds in 51 transition groups, absent from
+the frozen node table. Relative to existing candidate members, 17 are within 10 m
+and 14 within 10–20 m. Beyond 20 m, non-shortcut adjacency reaches one complex for
+16 nodes, multiple complexes for seven, and no direct complex anchor for one.
+These are context categories, not membership assignments. Excluding shortcuts,
+45 of 51 groups have branching or control evidence; they cannot uniformly be
+treated as ordinary shape points. No clustering, membership, movement, profile,
+reverse rule or production interface was changed.
+
+The reverse audit separately found explicit frozen OSM oneway and opposed node
+order supporting all 14,837 flagged evaluation-day orders (3,322 identities;
+85,538 tokens). Five unresolved identities in the full 6,502-identity overlay do
+not occur in this evaluation set. This is frozen-source support, not independent
+legal ground truth or proof that lawful alternative routes do not exist.
+
+The research decision retains the frozen system and its 41 outputs, discloses the
+interface limitation, and stops repair/ablation/control expansion in this study.
+No repaired-network daily effect or future-aware-control benefit is estimated.
+Prediction remains DECISION-RELEVANT, not decision-superior under a common evaluator.
+
+Repository sources:
+
+- [D13 diagnostic](../stage3_action_space_attribution/d13_report.md)
+- [Semantic provenance](../stage3_action_space_attribution/provenance_audit_report.md)
+- [Native endpoints](../stage3_action_space_attribution/native_endpoint_candidate_report.md)
+- [Shadow reconciliation](../stage3_action_space_attribution/endpoint_shadow_reconciliation_report.md)
+- [55-node context](../stage3_action_space_attribution/native_node_complex_context_report.md)
+
+Earlier reports' suggested next steps are historical and superseded by the closure
+decision; their measured results are preserved.
