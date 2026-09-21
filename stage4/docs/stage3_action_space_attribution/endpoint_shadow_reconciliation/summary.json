@@ -1,0 +1,40 @@
+{
+  "status": "SHADOW_COMPLETE_NO_PRODUCTION_REPAIR",
+  "edges": 88,
+  "endpoint_sides": 176,
+  "missing_side_status_counts": {
+    "NO_FROZEN_NODE_ANCHOR": 88
+  },
+  "all_side_status_counts": {
+    "UNIQUE_FROZEN_COMPLEX_ANCHOR": 87,
+    "NO_FROZEN_NODE_ANCHOR": 89
+  },
+  "original_encounters": 391,
+  "unique_movement_keys": 117,
+  "retained_unknown": 391,
+  "movement_repairs": 0,
+  "encounter_reason_counts": {
+    "UNANCHORED_NATIVE_ENDPOINT": 391,
+    "RECORDED_CHAIN_DISCONTINUOUS": 2,
+    "OLD_IDENTITY_NOT_NATIVE_ALIAS": 2,
+    "OLD_COMPLEX_NOT_PRESERVED": 2
+  },
+  "old_identity_not_native_alias": 1,
+  "old_complex_not_preserved": 1,
+  "input_hashes": {
+    "stage3\\output\\odd_tod\\s2a\\stage3_full_network_edges.parquet": "25ed4caf250cacbe251ae258d8e77ff2f0b286884f0376c72b9ef09e33687204",
+    "stage3\\output\\odd_tod\\s2a\\stage3_full_network_nodes.parquet": "158bbb8b5b2578de73e6fcc6fe4431169e8729cf8f66d553780bb4b052cd2625",
+    "stage3\\output\\odd_tod\\s2b\\final\\stage3_intersection_node_membership.parquet": "55aefa6843aacff111dccb39dd967f4d21e2fab408b6372dfc3b9bbd4304be02",
+    "stage3\\output\\odd_tod\\s2b\\final\\stage3_route_movement_lookup.parquet": "aabe997d06ffc80556ba68551b32805619f548dfe5ad83f2a5a9f043572db811",
+    "stage3\\output\\odd_tod\\s2b\\final\\stage3_edge_complex_boundary_index.parquet": "fb46c8d53763c3bca014be26b5a74cbcf546d8ee65859d46569c99702844a532",
+    "stage4\\output\\paper_enhancement\\native_endpoint_candidates_v2\\endpoint_candidates.parquet": "6ee234255f8fe08bd1e9e30501e909d1097796f441e980c5b900f54df2665420"
+  },
+  "encounter_source_sha256": "3ec21a1b2927d573ac91d948cf826c58db5151cc677f072412a379452b6b7e99",
+  "source_files_unchanged": true,
+  "native_tiles_unchanged": true,
+  "clustering_changed": false,
+  "production_interface_changed": false,
+  "routing_calls": 0,
+  "runtime_s": 0.6910663999988174,
+  "peak_working_set_mib": 227.296875
+}
