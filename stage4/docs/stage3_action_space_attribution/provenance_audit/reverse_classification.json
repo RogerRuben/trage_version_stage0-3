@@ -1,0 +1,18 @@
+[
+  {
+    "issue": "FROZEN_OSM_DIRECTION_SUPPORT",
+    "unique_overlay_identities": 6497,
+    "test31_tokens": 85538,
+    "test31_orders_overlapping": 14837,
+    "source": "frozen PBF way tags + observed directed endpoints + exported auto graph",
+    "real_world_legal_certification": false
+  },
+  {
+    "issue": "UNRESOLVED_WAY_OR_ENDPOINT_ORIENTATION",
+    "unique_overlay_identities": 5,
+    "test31_tokens": 0,
+    "test31_orders_overlapping": 0,
+    "source": "frozen PBF way tags + observed directed endpoints + exported auto graph",
+    "real_world_legal_certification": false
+  }
+]

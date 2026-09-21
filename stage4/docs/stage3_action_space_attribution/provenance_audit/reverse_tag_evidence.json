@@ -1,0 +1,16 @@
+[
+  {
+    "category": "FROZEN_OSM_DIRECTION_SUPPORT",
+    "oneway": "yes",
+    "implied_oneway": false,
+    "conditional": false,
+    "identities": 6497
+  },
+  {
+    "category": "UNRESOLVED_WAY_OR_ENDPOINT_ORIENTATION",
+    "oneway": "yes",
+    "implied_oneway": false,
+    "conditional": false,
+    "identities": 5
+  }
+]
