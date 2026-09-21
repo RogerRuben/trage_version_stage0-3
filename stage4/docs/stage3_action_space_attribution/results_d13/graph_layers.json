@@ -1,0 +1,702 @@
+[
+  {
+    "epoch_id": "0730",
+    "condition": "D13",
+    "layer": "SPATIAL",
+    "E_AV": 6816,
+    "U_AV": 55,
+    "M_AV": 55,
+    "O_HA": 55,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D13",
+    "layer": "PASSENGER",
+    "E_AV": 4675,
+    "U_AV": 36,
+    "M_AV": 36,
+    "O_HA": 36,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D13",
+    "layer": "STRUCTURAL_D13",
+    "E_AV": 2754,
+    "U_AV": 18,
+    "M_AV": 18,
+    "O_HA": 18,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D13",
+    "layer": "TOPK",
+    "E_AV": 258,
+    "U_AV": 18,
+    "M_AV": 18,
+    "O_HA": 18,
+    "E_HV": 713
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D13",
+    "layer": "VALID_ETA",
+    "E_AV": 258,
+    "U_AV": 18,
+    "M_AV": 18,
+    "O_HA": 18,
+    "E_HV": 713
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D13",
+    "layer": "PATIENCE",
+    "E_AV": 23,
+    "U_AV": 6,
+    "M_AV": 6,
+    "O_HA": 3,
+    "E_HV": 11
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D13",
+    "layer": "SESSION",
+    "E_AV": 23,
+    "U_AV": 6,
+    "M_AV": 6,
+    "O_HA": 2,
+    "E_HV": 10
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D13",
+    "layer": "SPATIAL",
+    "E_AV": 8422,
+    "U_AV": 67,
+    "M_AV": 67,
+    "O_HA": 67,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D13",
+    "layer": "PASSENGER",
+    "E_AV": 5734,
+    "U_AV": 44,
+    "M_AV": 44,
+    "O_HA": 44,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D13",
+    "layer": "STRUCTURAL_D13",
+    "E_AV": 3049,
+    "U_AV": 22,
+    "M_AV": 22,
+    "O_HA": 22,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D13",
+    "layer": "TOPK",
+    "E_AV": 310,
+    "U_AV": 22,
+    "M_AV": 22,
+    "O_HA": 22,
+    "E_HV": 914
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D13",
+    "layer": "VALID_ETA",
+    "E_AV": 310,
+    "U_AV": 22,
+    "M_AV": 22,
+    "O_HA": 22,
+    "E_HV": 914
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D13",
+    "layer": "PATIENCE",
+    "E_AV": 10,
+    "U_AV": 3,
+    "M_AV": 3,
+    "O_HA": 1,
+    "E_HV": 7
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D13",
+    "layer": "SESSION",
+    "E_AV": 10,
+    "U_AV": 3,
+    "M_AV": 3,
+    "O_HA": 1,
+    "E_HV": 3
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D13",
+    "layer": "SPATIAL",
+    "E_AV": 9088,
+    "U_AV": 76,
+    "M_AV": 76,
+    "O_HA": 76,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D13",
+    "layer": "PASSENGER",
+    "E_AV": 5480,
+    "U_AV": 50,
+    "M_AV": 50,
+    "O_HA": 50,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D13",
+    "layer": "STRUCTURAL_D13",
+    "E_AV": 3783,
+    "U_AV": 30,
+    "M_AV": 30,
+    "O_HA": 30,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D13",
+    "layer": "TOPK",
+    "E_AV": 414,
+    "U_AV": 30,
+    "M_AV": 30,
+    "O_HA": 29,
+    "E_HV": 896
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D13",
+    "layer": "VALID_ETA",
+    "E_AV": 414,
+    "U_AV": 30,
+    "M_AV": 30,
+    "O_HA": 29,
+    "E_HV": 896
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D13",
+    "layer": "PATIENCE",
+    "E_AV": 16,
+    "U_AV": 8,
+    "M_AV": 7,
+    "O_HA": 4,
+    "E_HV": 16
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D13",
+    "layer": "SESSION",
+    "E_AV": 16,
+    "U_AV": 8,
+    "M_AV": 7,
+    "O_HA": 1,
+    "E_HV": 9
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D13",
+    "layer": "SPATIAL",
+    "E_AV": 6104,
+    "U_AV": 50,
+    "M_AV": 50,
+    "O_HA": 49,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D13",
+    "layer": "PASSENGER",
+    "E_AV": 4371,
+    "U_AV": 34,
+    "M_AV": 34,
+    "O_HA": 34,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D13",
+    "layer": "STRUCTURAL_D13",
+    "E_AV": 2502,
+    "U_AV": 20,
+    "M_AV": 20,
+    "O_HA": 20,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D13",
+    "layer": "TOPK",
+    "E_AV": 253,
+    "U_AV": 20,
+    "M_AV": 20,
+    "O_HA": 20,
+    "E_HV": 640
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D13",
+    "layer": "VALID_ETA",
+    "E_AV": 253,
+    "U_AV": 20,
+    "M_AV": 20,
+    "O_HA": 20,
+    "E_HV": 640
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D13",
+    "layer": "PATIENCE",
+    "E_AV": 15,
+    "U_AV": 5,
+    "M_AV": 5,
+    "O_HA": 2,
+    "E_HV": 19
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D13",
+    "layer": "SESSION",
+    "E_AV": 15,
+    "U_AV": 5,
+    "M_AV": 5,
+    "O_HA": 1,
+    "E_HV": 8
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D13",
+    "layer": "SPATIAL",
+    "E_AV": 11035,
+    "U_AV": 80,
+    "M_AV": 80,
+    "O_HA": 80,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D13",
+    "layer": "PASSENGER",
+    "E_AV": 8917,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D13",
+    "layer": "STRUCTURAL_D13",
+    "E_AV": 4643,
+    "U_AV": 35,
+    "M_AV": 35,
+    "O_HA": 35,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D13",
+    "layer": "TOPK",
+    "E_AV": 336,
+    "U_AV": 35,
+    "M_AV": 35,
+    "O_HA": 35,
+    "E_HV": 1182
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D13",
+    "layer": "VALID_ETA",
+    "E_AV": 336,
+    "U_AV": 35,
+    "M_AV": 35,
+    "O_HA": 35,
+    "E_HV": 1182
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D13",
+    "layer": "PATIENCE",
+    "E_AV": 6,
+    "U_AV": 2,
+    "M_AV": 2,
+    "O_HA": 0,
+    "E_HV": 6
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D13",
+    "layer": "SESSION",
+    "E_AV": 6,
+    "U_AV": 2,
+    "M_AV": 2,
+    "O_HA": 0,
+    "E_HV": 3
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D13",
+    "layer": "SPATIAL",
+    "E_AV": 11813,
+    "U_AV": 85,
+    "M_AV": 85,
+    "O_HA": 85,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D13",
+    "layer": "PASSENGER",
+    "E_AV": 7129,
+    "U_AV": 52,
+    "M_AV": 52,
+    "O_HA": 52,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D13",
+    "layer": "STRUCTURAL_D13",
+    "E_AV": 3820,
+    "U_AV": 24,
+    "M_AV": 24,
+    "O_HA": 24,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D13",
+    "layer": "TOPK",
+    "E_AV": 267,
+    "U_AV": 24,
+    "M_AV": 24,
+    "O_HA": 24,
+    "E_HV": 1327
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D13",
+    "layer": "VALID_ETA",
+    "E_AV": 267,
+    "U_AV": 24,
+    "M_AV": 24,
+    "O_HA": 24,
+    "E_HV": 1327
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D13",
+    "layer": "PATIENCE",
+    "E_AV": 7,
+    "U_AV": 4,
+    "M_AV": 3,
+    "O_HA": 1,
+    "E_HV": 31
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D13",
+    "layer": "SESSION",
+    "E_AV": 7,
+    "U_AV": 4,
+    "M_AV": 3,
+    "O_HA": 0,
+    "E_HV": 19
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D13",
+    "layer": "SPATIAL",
+    "E_AV": 13462,
+    "U_AV": 94,
+    "M_AV": 94,
+    "O_HA": 94,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D13",
+    "layer": "PASSENGER",
+    "E_AV": 9582,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D13",
+    "layer": "STRUCTURAL_D13",
+    "E_AV": 5490,
+    "U_AV": 36,
+    "M_AV": 36,
+    "O_HA": 36,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D13",
+    "layer": "TOPK",
+    "E_AV": 375,
+    "U_AV": 36,
+    "M_AV": 36,
+    "O_HA": 36,
+    "E_HV": 1391
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D13",
+    "layer": "VALID_ETA",
+    "E_AV": 375,
+    "U_AV": 36,
+    "M_AV": 36,
+    "O_HA": 36,
+    "E_HV": 1391
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D13",
+    "layer": "PATIENCE",
+    "E_AV": 15,
+    "U_AV": 4,
+    "M_AV": 4,
+    "O_HA": 1,
+    "E_HV": 24
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D13",
+    "layer": "SESSION",
+    "E_AV": 15,
+    "U_AV": 4,
+    "M_AV": 4,
+    "O_HA": 1,
+    "E_HV": 18
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D13",
+    "layer": "SPATIAL",
+    "E_AV": 11162,
+    "U_AV": 80,
+    "M_AV": 80,
+    "O_HA": 80,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D13",
+    "layer": "PASSENGER",
+    "E_AV": 7638,
+    "U_AV": 57,
+    "M_AV": 57,
+    "O_HA": 57,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D13",
+    "layer": "STRUCTURAL_D13",
+    "E_AV": 4829,
+    "U_AV": 36,
+    "M_AV": 36,
+    "O_HA": 36,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D13",
+    "layer": "TOPK",
+    "E_AV": 306,
+    "U_AV": 35,
+    "M_AV": 35,
+    "O_HA": 35,
+    "E_HV": 1259
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D13",
+    "layer": "VALID_ETA",
+    "E_AV": 306,
+    "U_AV": 35,
+    "M_AV": 35,
+    "O_HA": 35,
+    "E_HV": 1259
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D13",
+    "layer": "PATIENCE",
+    "E_AV": 6,
+    "U_AV": 4,
+    "M_AV": 4,
+    "O_HA": 2,
+    "E_HV": 8
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D13",
+    "layer": "SESSION",
+    "E_AV": 6,
+    "U_AV": 4,
+    "M_AV": 4,
+    "O_HA": 2,
+    "E_HV": 5
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D13",
+    "layer": "SPATIAL",
+    "E_AV": 11008,
+    "U_AV": 86,
+    "M_AV": 84,
+    "O_HA": 86,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D13",
+    "layer": "PASSENGER",
+    "E_AV": 7922,
+    "U_AV": 59,
+    "M_AV": 59,
+    "O_HA": 59,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D13",
+    "layer": "STRUCTURAL_D13",
+    "E_AV": 4862,
+    "U_AV": 38,
+    "M_AV": 38,
+    "O_HA": 38,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D13",
+    "layer": "TOPK",
+    "E_AV": 425,
+    "U_AV": 38,
+    "M_AV": 38,
+    "O_HA": 38,
+    "E_HV": 1142
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D13",
+    "layer": "VALID_ETA",
+    "E_AV": 425,
+    "U_AV": 38,
+    "M_AV": 38,
+    "O_HA": 38,
+    "E_HV": 1142
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D13",
+    "layer": "PATIENCE",
+    "E_AV": 24,
+    "U_AV": 6,
+    "M_AV": 6,
+    "O_HA": 1,
+    "E_HV": 23
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D13",
+    "layer": "SESSION",
+    "E_AV": 24,
+    "U_AV": 6,
+    "M_AV": 6,
+    "O_HA": 1,
+    "E_HV": 7
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D13",
+    "layer": "SPATIAL",
+    "E_AV": 6270,
+    "U_AV": 47,
+    "M_AV": 47,
+    "O_HA": 47,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D13",
+    "layer": "PASSENGER",
+    "E_AV": 3996,
+    "U_AV": 35,
+    "M_AV": 35,
+    "O_HA": 35,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D13",
+    "layer": "STRUCTURAL_D13",
+    "E_AV": 3074,
+    "U_AV": 24,
+    "M_AV": 24,
+    "O_HA": 24,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D13",
+    "layer": "TOPK",
+    "E_AV": 247,
+    "U_AV": 24,
+    "M_AV": 24,
+    "O_HA": 24,
+    "E_HV": 596
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D13",
+    "layer": "VALID_ETA",
+    "E_AV": 247,
+    "U_AV": 24,
+    "M_AV": 24,
+    "O_HA": 24,
+    "E_HV": 596
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D13",
+    "layer": "PATIENCE",
+    "E_AV": 1,
+    "U_AV": 1,
+    "M_AV": 1,
+    "O_HA": 0,
+    "E_HV": 11
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D13",
+    "layer": "SESSION",
+    "E_AV": 1,
+    "U_AV": 1,
+    "M_AV": 1,
+    "O_HA": 0,
+    "E_HV": 0
+  }
+]

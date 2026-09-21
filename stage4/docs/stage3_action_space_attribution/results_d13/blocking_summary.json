@@ -1,0 +1,112 @@
+[
+  {
+    "epoch_id": "0730",
+    "witness_role": "BASELINE",
+    "witness_arcs": 15,
+    "counts": {
+      "PRESENT": 8,
+      "STAGE3_NOT_ESTABLISHED_OR_NOT_FEASIBLE": 7
+    },
+    "all_arcs_present": false,
+    "D13_A1_at_5pct": true
+  },
+  {
+    "epoch_id": "0730",
+    "witness_role": "A1_ALTERNATIVE",
+    "witness_arcs": 15,
+    "counts": {
+      "PRESENT": 8,
+      "STAGE3_NOT_ESTABLISHED_OR_NOT_FEASIBLE": 7
+    },
+    "all_arcs_present": false,
+    "D13_A1_at_5pct": true
+  },
+  {
+    "epoch_id": "0830",
+    "witness_role": "BASELINE",
+    "witness_arcs": 13,
+    "counts": {
+      "PRESENT": 4,
+      "STAGE3_NOT_ESTABLISHED_OR_NOT_FEASIBLE": 9
+    },
+    "all_arcs_present": false,
+    "D13_A1_at_5pct": false
+  },
+  {
+    "epoch_id": "0830",
+    "witness_role": "A1_ALTERNATIVE",
+    "witness_arcs": 13,
+    "counts": {
+      "PRESENT": 3,
+      "STAGE3_NOT_ESTABLISHED_OR_NOT_FEASIBLE": 10
+    },
+    "all_arcs_present": false,
+    "D13_A1_at_5pct": false
+  },
+  {
+    "epoch_id": "1300",
+    "witness_role": "BASELINE",
+    "witness_arcs": 14,
+    "counts": {
+      "STAGE3_NOT_ESTABLISHED_OR_NOT_FEASIBLE": 7,
+      "PRESENT": 7
+    },
+    "all_arcs_present": false,
+    "D13_A1_at_5pct": false
+  },
+  {
+    "epoch_id": "1300",
+    "witness_role": "A1_ALTERNATIVE",
+    "witness_arcs": 14,
+    "counts": {
+      "STAGE3_NOT_ESTABLISHED_OR_NOT_FEASIBLE": 8,
+      "PRESENT": 6
+    },
+    "all_arcs_present": false,
+    "D13_A1_at_5pct": false
+  },
+  {
+    "epoch_id": "1800",
+    "witness_role": "BASELINE",
+    "witness_arcs": 11,
+    "counts": {
+      "STAGE3_NOT_ESTABLISHED_OR_NOT_FEASIBLE": 5,
+      "PRESENT": 6
+    },
+    "all_arcs_present": false,
+    "D13_A1_at_5pct": true
+  },
+  {
+    "epoch_id": "1800",
+    "witness_role": "A1_ALTERNATIVE",
+    "witness_arcs": 11,
+    "counts": {
+      "STAGE3_NOT_ESTABLISHED_OR_NOT_FEASIBLE": 5,
+      "PRESENT": 6
+    },
+    "all_arcs_present": false,
+    "D13_A1_at_5pct": true
+  },
+  {
+    "epoch_id": "1830",
+    "witness_role": "BASELINE",
+    "witness_arcs": 9,
+    "counts": {
+      "STAGE3_NOT_ESTABLISHED_OR_NOT_FEASIBLE": 4,
+      "PRESENT": 5
+    },
+    "all_arcs_present": false,
+    "D13_A1_at_5pct": true
+  },
+  {
+    "epoch_id": "1830",
+    "witness_role": "A1_ALTERNATIVE",
+    "witness_arcs": 9,
+    "counts": {
+      "STAGE3_NOT_ESTABLISHED_OR_NOT_FEASIBLE": 4,
+      "PRESENT": 5
+    },
+    "all_arcs_present": false,
+    "D13_A1_at_5pct": true
+  }
+]
