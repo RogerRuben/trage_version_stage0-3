@@ -1,0 +1,21 @@
+{
+  "status": "DESIGN_EVIDENCE_COMPLETE_NOT_A_REPAIR",
+  "endpoints": 88,
+  "edges": 88,
+  "local_mvt_tiles": 16,
+  "stored_endpoints_on_tile_boundary": 0,
+  "unique_grid_candidates": 0,
+  "fragment_or_node_unresolved": 88,
+  "certified_repairs": 0,
+  "counts_by_fragment_count": {
+    "1": 85,
+    "2": 3
+  },
+  "runtime_s": 5.375107699997898,
+  "peak_sampled_rss_mib": 408.91796875,
+  "routing_calls": 0,
+  "matrix_calls": 0,
+  "production_modified": false,
+  "source_edges_sha256": "25ed4caf250cacbe251ae258d8e77ff2f0b286884f0376c72b9ef09e33687204",
+  "valhalla_config_sha256": "f2eb80488a2ec832208b8ee1a7433aa4905e58243fe1c0d5b81d48a3368ec696"
+}
