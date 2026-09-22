@@ -1,155 +1,148 @@
-# Supplementary material for Manuscript V3
+# Supplementary material: Instantaneous Effective Matching Capacity in Mixed-Autonomy Ride-Hailing
 
-## Appendix A. Empirical data and directed-route support
+## Appendix A. Data selection and route representation
 
-Core orders are screened separately for GPS quality, route agreement, dynamic timing support and canonical identity. A local outlier need not invalidate a supported main corridor; unresolved substantial gaps or corridor mismatch exclude an order from the core set. Raw GPS agreement is evaluated against the corresponding temporal subtrace and route component, not the nearest route anywhere in an order.
+Orders are screened separately for GPS quality, agreement between the observed trajectory and the represented route, usable dynamic timing observations, and consistent road identity. Limited local outliers need not invalidate an otherwise supported corridor. Substantial unresolved gaps and corridor disagreement exclude orders from the core sample. GPS-to-route distance is evaluated against the relevant temporal subtrace and route component, rather than against any nearby part of the trip.
 
-Physical traversals and direct timing intervals are separate. A continuous edge visit is one traversal; several GPS intervals can contribute timing observations without repeating that physical distance. Conservation and duplicate-allocation checks support the retained products. Historical reverse directions remain explicit overlays rather than being mapped onto forward identities; unresolved segments interrupt movement parsing.
+Physical traversals and directly timed GPS intervals are represented separately. A continuous road-edge visit constitutes one traversal; several GPS intervals can provide timing observations for that traversal without duplicating its physical distance. Time and distance conservation and duplicate-allocation checks support the retained observations. Historical reverse travel remains distinct from forward road identity, and unresolved route segments interrupt movement interpretation.
 
-Intersection consolidation uses the existing 10 m construction, selected after targeted 5 m/10 m visual review. Incoming, internal and outgoing directed edges define movements. Boundary road-class diversity is
+Intersection complexes use a 10 m consolidation distance selected through targeted comparison with a 5 m alternative. Incoming, internal and outgoing directed edges define movements. For complex \(c\), boundary road-class diversity is
 \[
-D_c=|\{\operatorname{roadclass}(e):e\in\delta^-(c)\cup\delta^+(c)\}|,
+D_c=|\{\operatorname{roadclass}(e):e\in\delta^-(c)\cup\delta^+(c)\}|.
 \]
-not the diversity of internal edges alone. Layer, bridge and tunnel evidence inform representation of separated structures.
+Internal edges alone do not define diversity. Layer, bridge and tunnel information describe grade separation.
 
-The evaluation set is a quality-selected 30,000-order subset, not all raw demand. Two orders have timestamps in the first minute after local midnight; the pre-specified replay horizon includes that minute. No new demand filtering is applied in the mechanism study.
+The 30,000 evaluation orders are a quality-selected subset of recorded demand. Two orders have timestamps in the first minute after local midnight; the specified replay horizon includes that minute. All scenario comparisons retain the same demand set.
 
-HVs retain empirical-session admission; AVs retain full-horizon availability. The denominator is 12,279.336389 all-HV vehicle-hours. Composition changes the mix of those policies, not merely labels attached to otherwise identical sessions. Exact fixtures and spatial state are restored from existing scenario configurations and logs for the fixed-state comparisons.
+HVs use empirical driver-session availability, whereas AVs remain available throughout the modeled horizon. The all-HV reference contains 12,279.336389 active vehicle-hours. Composition changes therefore alter availability-policy mixtures as well as vehicle types. Fixed-state comparisons preserve the relevant scenario's positions, session policies and prior assignment history.
 
-Implementation persists partitioned products with atomic writes and resume support. Rejected orders have lightweight records, not complete route archives. These are engineering choices, not claims of methodological novelty.
+## Appendix B. Route descriptors and operational prediction
 
-## Appendix B. Operational prediction and information comparison
+### B.1 Static and dynamic descriptors
 
-Four dynamic components—crawl, stop, speed variation and acceleration variation—are represented through the existing E/Q/C route descriptors. Training prediction values are transformed with the held-fixed weighted mid-CDF; route descriptors and analytical profile caps are not refit on evaluation outcomes. Marginal quantile caps do not imply equal joint route acceptance. Descriptor identities E/Q/C should not be confused with graph edge count E or effective matching capacity C.
+Static descriptors are the number of external physical connections, number of topological movements, boundary road-class diversity, and internal road length of each intersection complex. Route descriptors take the maximum encountered value in each dimension. Static caps are calibrated using one observation per distinct training-exposed complex rather than weighting frequently traversed complexes more heavily.
 
-The retained model identifier is M3. Its inputs use decision-time information and predicted progression, with training-only preprocessing and calibration. Cache/source records identify checkpoint and schema provenance; they do not turn operational predictions into safety outcomes. Evaluation-day realized travel time is reserved for post-assignment progression and diagnostic targets.
+Dynamic predictions cover crawl, stop, speed variability and acceleration variability. Let \(\widehat{x}_{o\ell d}\) be the prediction for component \(d\) on ordered route segment \(\ell\), and \(w_{o\ell}>0\) its predicted median traversal time in seconds. A component-specific, training-time-weighted distribution maps each prediction to \(z_{o\ell d}\). At an observed training support value \(x\), this mid-distribution is
+\[
+F_d^{mid}(x)=
+\frac{\sum_i w_i\mathbf1(x_i<x)+\tfrac12\sum_i w_i\mathbf1(x_i=x)}
+{\sum_iw_i}.
+\]
+Between support values, the mapping uses the cumulative weight below the new value. Route summaries are
+\[
+E_{od}=\frac{\sum_\ell w_{o\ell}z_{o\ell d}}{\sum_\ell w_{o\ell}},\qquad
+Q_{od}=\frac{\sum_\ell w_{o\ell}\mathbf1(z_{o\ell d}>0.90)}
+{\sum_\ell w_{o\ell}},
+\]
+and
+\[
+C_{od}=\max_{\mathcal R}
+\sum_{\ell\in\mathcal R}w_{o\ell},
+\]
+where \(\mathcal R\) ranges over consecutive runs above the threshold. If no segment exceeds the threshold, \(C_{od}=0\). \(E\) is mean percentile exposure, \(Q\) is a time share, and \(C\) is a duration in seconds. These descriptor symbols are distinct from graph edge count and matching capacity.
 
-In the ten-state prediction comparison, predicted (P) and historical (H) information produce different decisions in nine states. Mean selected-AV-arc Jaccard is .10. H supplies 9.1 more solver-input AV arcs on average; this is an arc count, not 9.1%. The earlier diagnostic reports H-minus-P selected dynamic exposure of 2.402 and pickup objective of 64.02 seconds. These are retained within-comparison diagnostics, not independent outcome-value estimates.
+Each complete training route contributes one observation when calibrating dynamic caps. Conservative, Moderate and Advanced caps use marginal quantile anchors of 0.75, 0.90 and 0.975, respectively. Meeting each marginal cap does not imply a corresponding joint route-acceptance rate. Speed caps are 60, 80 and 120 km/h. The profiles remain analytical scenarios, not validated operating domains.
 
-Target MAEs (P/H) are crawl .0636/.0669, speed variation .0224/.0252, stop .0179/.0023, and acceleration RMS .0739/.0572. No uniform accuracy dominance is claimed. A common independent outcome evaluator was not run. The supported interpretation is DECISION-RELEVANT, not decision-superior or a daily causal service gain.
+Categorical assumptions distinguish maneuver capability from these continuous caps. The Conservative profile excludes roundabouts and U-turns; it permits signalized left turns, excludes stop- or yield-controlled left turns, and leaves left turns with unknown control unclassified. The Moderate profile permits left turns but excludes U-turns, while the Advanced profile permits both. Unresolved movements remain unknown, and independently established movement prohibitions take precedence. These assumptions are not empirical estimates of what all vehicles at a given automation level can perform.
 
-## Appendix C. Matching diagnostics and opportunity-volume evidence
+### B.2 Prediction comparison
 
-For each sparse graph, duplicate order–vehicle pairs are removed before calculating E, U and maximum bipartite matching. AV subgraph M is a diagnostic of simultaneous AV serviceability; it is not mixed-fleet capacity or the selected AV count.
+The retained multivariate predictor uses decision-time inputs and predicted route progression, with training-only preprocessing and separate calibration. Evaluation-day realized travel times are used for subsequent simulation progression and diagnostic targets, not substituted for missing dispatch predictions.
 
-Ten physical-state reconstructions reproduce the existing registry. Controlled relabeling preserves availability policy, candidates, selected identities and pickup objective in all ten states. Earlier label/session coupling was AV-favoring and does not explain the observed decline in AV-heavy service. The comparison establishes invariance in the sampled states, not a proof about all possible branches or states.
+In ten fixed states, prediction-based (P) and historical-information (H) assignments differ in nine states. Mean selected-AV-pair Jaccard similarity is 0.10. Historical information supplies 9.1 more AV pairs to the assignment model on average; this is a count, not a percentage. Within that comparison, H-minus-P selected dynamic exposure is 2.402 and the pickup objective difference is 64.02 seconds. These are decision diagnostics, not independently evaluated gains.
 
-The gate totals in main-text Section 6.2 come from matching_capacity_summary.csv. At K=10/20/40/80, final E sums are 38/48/50/55 and final M sums are 12 at all K values, with equality at each state. Top-K removes 14,404/15,775 = 91.31% of pre-compression edges at K20 without M loss. Route-return and solver-eligibility rows are retained separately so that compression, routing failure and joint policy constraints are not conflated.
+Target mean absolute errors for P/H are 0.0636/0.0669 for crawl, 0.0224/0.0252 for speed variability, 0.0179/0.0023 for stop, and 0.0739/0.0572 for acceleration RMS, in their respective target scales. Neither source uniformly dominates. Since no common independent outcome evaluation was conducted, the supported conclusion is that information changes decisions, not that the prediction-based decisions are superior.
 
-The full-day prospective ledger counts repeated-epoch opportunities \((o,v,t)\). Solver-input/spatial-opportunity ratios .0939%/.0720%/.0445% for q_A=.25/.50/.75 are opportunity-volume evidence only. An order can occur in several epochs. These percentages do not estimate the fraction of unique passengers or maximum capacity retained. Selection is assignment competition, not another individually applied feasibility gate. Deadline-ever-eligible order coverage is not available from the retained aggregate logs and is not reconstructed.
+## Appendix C. Matching diagnostics
 
-## Appendix D. Structural proofs and local cost control
+Duplicate request–vehicle pairs are removed before calculating \(E\), \(U\) and maximum bipartite matching. AV-subgraph \(M\) measures simultaneous AV service opportunities, not total mixed-fleet matching or the AV assignments actually selected by the lexicographic objective.
 
-### Proposition 1: cumulative family-exposure guarantee
+Controlled relabeling preserves availability policy, physical candidates, selected identities and pickup objective in all ten states. This distinguishes a vehicle-type effect from a change in session rules. The control supports invariance in the observed states, not a proof covering every possible state.
 
-For every enabled family, assume additive updates
+At \(K=10,20,40,80\), final AV-pair totals are 38, 48, 50 and 55, respectively. Final maximum matching sums to 12 at every value, with equality within each state. At \(K=20\), candidate compression removes \(14{,}404/15{,}775=91.31\%\) of preceding pairs without a matching-capacity loss. Routing availability and assignment admission are recorded separately to avoid attributing routing or policy effects to compression.
+
+Full-day opportunity counts use repeated-epoch tuples \((o,v,t)\). The ratios of assignment-input pairs to spatially available pairs are 0.0939%, 0.0720% and 0.0445% for \(q_A=0.25,0.50,0.75\). A request can contribute to several epochs, so these ratios do not estimate unique-passenger coverage or retained maximum matching capacity. The available aggregate records do not establish how many requests had an eligible option at any time before expiry.
+
+## Appendix D. Exposure-policy properties and operating cost
+
+### D.1 Cumulative mean-exposure bound
+
+For every enabled family, additive updates give
 \[
 Z_{t+1}^f=Z_t^f+\sum_{\mathcal A_t^A}e_{ov}^fx_{ov},\qquad
 N_{t+1}^A=N_t^A+\sum_{\mathcal A_t^A}x_{ov}.
 \]
-Substitution into main-text (1) gives \(Z_{t+1}^f\le\Gamma_fN_{t+1}^A\). Division by a positive assignment count yields the mean-exposure bound. If no AV assignment exists, division is undefined; with zero initial state there is no incurred exposure. This is an assignment-weighted, system-level guarantee.
+Substitution into main-text Equation (1) yields \(Z_{t+1}^f\le\Gamma_fN_{t+1}^A\). Dividing by a positive assignment count establishes Proposition 1. With no AV assignments, the mean is undefined; from zero initial conditions, no exposure has been incurred. The bound is system-wide and assignment-weighted.
 
-### Proposition 2: same-epoch feasible-set monotonicity
+### D.2 Same-state feasible-set inclusion
 
-Hold the graph, current exposure state, objectives and all non-Gamma constraints fixed. For any old feasible x, \(N_t^A+\sum_{\mathcal A_t^A}x_{ov}\ge0\). Replacing each \(\Gamma_f\) by a weakly larger value increases or preserves the right side of (1). Thus every old feasible x remains feasible and \(\mathcal F_t(\Gamma)\subseteq\mathcal F_t(\Gamma')\).
+Fix the current graph, cumulative exposure state, objectives and all non-exposure constraints. For an assignment feasible under \(\Gamma\), the quantity \(N_t^A+\sum_{\mathcal A_t^A}x_{ov}\) is nonnegative. Increasing \(\Gamma\) componentwise therefore weakly increases the right-hand side of each exposure constraint. Every previously feasible assignment remains feasible, proving Proposition 2.
 
-Maximization of the highest-priority objective over a superset cannot yield a smaller optimum. No statement is made about the separate lower-priority optima if the higher-priority optimum changes, or about future states and daily service. The claim assumes a feasible original problem and holds the same current state fixed; it does not compare differently evolved policy histories.
+The highest-priority maximum over this enlarged feasible set cannot decrease. Separate lower-priority objective values need not be monotone if the higher-priority optimum changes. Nor does the argument compare different daily histories, since assignments change future states.
 
-### Proposition 3: separate budgets versus a weighted scalar
+### D.3 Separate and aggregated limits
 
-For positive cumulative assignment count, suppose \(\bar e_f=Z^f/N^A\le\Gamma_f\). Multiplying by \(w_f\ge0\) and summing proves
+For positive cumulative assignment count, let \(\bar e_f=Z^f/N^A\le\Gamma_f\). Multiplication by nonnegative weights and summation yield
 \[
 \sum_fw_f\bar e_f\le\sum_fw_f\Gamma_f.
 \]
-The converse fails: two unit family caps and weights (1,1) permit scalar total 2, so (2,0) passes the scalar inequality but violates the first family limit. The example concerns compensation across families; the cumulative mean may still compensate high and low exposures within the same family.
+The converse fails. With two unit caps and equal weights, \((\bar e_1,\bar e_2)=(2,0)\) satisfies the aggregate limit but violates the first family cap. Separate limits prevent compensation across exposure families, while still allowing variation among trips within a family.
 
-### Proposition 4: local epsilon pickup-quality guarantee
+### D.4 Bounded pickup relaxation for cost minimization
 
-Conditional on the critical-, total- and carry-over-match optima, let
+Conditional on the optimal critical-, total- and carry-over-match counts, define
 \[
 P_t^*=\min_x\sum_{\mathcal A_t}\widehat{\tau}_{ovt}x_{ov}.
 \]
-The optional cost level retains those count equalities and adds
+An optional cost-minimization step retains these count equalities and requires
 \[
 \sum_{\mathcal A_t}\widehat{\tau}_{ovt}x_{ov}
 \le(1+\epsilon_W)P_t^*+\delta,
 \]
-where \(\delta\) is the numerical tolerance. Every feasible cost-stage selection obeys the inequality by construction. This is a local aggregate pickup-ETA guarantee, not a service-count relaxation, a per-passenger bound, or a daily mean/P95 waiting guarantee.
+where \(\delta\) is numerical tolerance. Any resulting assignment satisfies this local aggregate pickup-time bound by construction. It is not a relaxation of service count, a per-passenger guarantee or a bound on daily mean waiting time.
 
-### Implementation correspondence and retained cost results
+The exposure constraint can equivalently be written with coefficient \(e_{ov}^f-\Gamma_f\) on each AV assignment and right-hand side \(\Gamma_fN_t^A-Z_t^f\). HV assignments have zero exposure coefficient. This form clarifies that the cumulative state is shared across AV assignments, not attached to individual vehicles.
 
-The solver row has coefficients \(e_{ov}^f-\Gamma_f\) on AV arcs, zero on HV arcs, and right side \(\Gamma_fN_t^A-Z_t^f\). This is algebraically identical to (1). State accumulates across AV assignments system-wide. No vehicle-indexed budget is implemented.
+At \(\epsilon_W=0.05\), the supplementary cost comparisons report reductions of 1.60%, 1.01%, 0.54% and 1.14% relative to the zero-weight cost case for cost weights \(\eta=0.50,0.75,1.00,1.25\), respectively. These results neither establish a monotone response nor identify an optimal weight.
 
-The actual hierarchy is critical, total, carry-over, pickup ETA, then optional operating cost. At \(\epsilon_W=.05\), the retained cost differences versus eta=0 are reductions of 1.60%/1.01%/.54%/1.14% for eta=.50/.75/1.00/1.25. They do not imply a monotone response or globally optimal coefficient. The earlier V2 description of an epsilon service band is superseded by the pickup-quality statement above.
+## Appendix E. Request-time reconstruction
 
-Local verification sources: stage4/dispatch/solver.py, stage4/dispatch/exposure.py, and stage4/docs/paper_redesign/theory_notes_v2.md. No production mathematics or code was changed for V3.
+The alternative timing scenarios use endpoint records for all available orders on 19–22 October, rather than only the quality-selected modeling sample. Inter-trip chains produce gap percentiles P25/P50/P75/P90 of 420/748/1733/3693 seconds. There are 440,049 chain rows, of which 302,772 meet the 60–7200-second feasible-gap criterion.
 
-## Appendix E. Request-time reconstruction and conditional-state scope
+Lead construction combines a 120-second response-and-pickup lower bound, an origin–destination-distance-dependent lower bound, training-gap quantiles capped at 1800 seconds, and stable request/scenario variation. Low, Base and High use positions 0.25, 0.50 and 0.75, respectively, rather than constant lead times. The reference procedure uses a UTC business boundary and a 60-minute warmup. Request time is the boarding proxy minus the generated lead.
 
-The original request-time generator is stage4/scripts/build_decoupled_abm_environment.py. Its original manifest and per-order output hashes are unavailable. Reconstruction uses retained all-order endpoint prescans, not only accepted modeling orders, for 20161019–22. Original coordinate conversion and chain processing yield gap P25/P50/P75/P90 = 420/748/1733/3693 seconds, 440,049 chain rows and 302,772 feasible rows. Feasible gaps are 60–7200 seconds.
+The original parameter manifest and per-order hashes are unavailable. Reconstruction reproduces all 15 retained summary statistics covering count, mean, median, 90th percentile and clipped proportion for 114,356 historical target-day orders; maximum discrepancy is approximately \(2.27\times10^{-13}\) seconds. This is a reconstruction verified against surviving aggregate outputs, not recovery of the original per-order records. Reconstructed chain counts and empty-speed statistics are not independently verified archival values.
 
-The unchanged transform uses a response/pickup lower bound of 120 seconds, an OD-distance-dependent lower bound, the three chain quantiles capped by 1800 seconds, stable order/scenario jitter, and the original UTC business boundary with 60-minute warmup. Scenario positions are .25/.50/.75, not fixed lead durations. Request time is boarding proxy minus generated lead.
+For the 30,000 evaluation orders, mean Low/Base/High leads are 311.013, 498.148 and 1308.781 seconds. The four-state comparison changes release times and resulting patience while retaining reference assignment history, vehicles, descriptors and routing time. It does not establish that those descriptors would have been available at the earlier reconstructed releases.
 
-All 15 retained count/mean/P50/P90/clipped-share fingerprints on 114,356 legacy target-day orders agree, with maximum error approximately 2.27e-13 seconds. The correct provenance is **fingerprint-verified reconstruction**. Aggregate agreement does not recover the missing manifest or certify unavailable per-order hashes; reconstructed chain counts and empty-speed statistics are not independently verified archived numbers.
+Pre-/post-deadline maximum matching pairs are \((53,8)\), \((130,26)\), \((128,25)\) and \((156,40)\) for zero/Low/Base/High, respectively. Retention is calculated as a ratio of sums. These counts are separate from the ten-state totals and do not estimate full-day service, expiry or assignment treatment effects.
 
-For the 30,000 evaluation orders, mean Low/Base/High leads are 311.013/498.148/1308.781 seconds. Four physical states hold canonical history, vehicles, descriptors and routing time fixed while release changes the waiting set and derived patience. This is not an earlier-decision forecast validation or an RT-specific rolling history. Original microsecond request times are retained.
+## Appendix F. Computational considerations
 
-The four-state pre/post-patience M pairs are (53,8), (130,26), (128,25), (156,40), aggregated by zero/Low/Base/High. Retentions are ratios of sums. Counts cannot be pooled with the ten-state mechanism totals. No selected-assignment or expired-order treatment effect is fabricated from these snapshots. The scope is RT-sensitive magnitude and local ordering, not full-day reversal.
+Neighborhood search and bounded routing caches produce sparse candidate graphs rather than dense request-by-vehicle matrices. The identity and matching-capacity checks evaluate 30,779 routed pairs without routing failures; the timing comparison evaluates 5,979, also without failures. These workloads are distinct and should not be combined into a daily routing-performance estimate.
 
-Detailed sources: stage4/docs/paper_redesign/recovered_rt_environment_parameters.json and request_time_patience_sensitivity_report.md; output CSVs under stage4/output/paper_enhancement/mechanism_validity. Their development identifiers, including Test31, are retained here solely for traceability.
+## Appendix G. Network representation and route-information limitations
 
-## Appendix F. Computational scope
+### G.1 Conditional route selection
 
-Sparse neighborhood candidates and bounded routing caches avoid a dense order-by-vehicle matrix. Actual routing modes and failure handling belong to the corresponding pre-specified diagnostic configurations, not a new routing architecture. The ten-state identity/capacity checks use 30,779 routed arcs with zero failure; the RT comparison uses 5,979 with zero failure. These are different workloads and are not pooled as daily routing performance.
+A separate action-space diagnostic examines changes in eligibility semantics while retaining fixed physical states. Current admission, removal of reverse-direction exclusion, relaxation of information completeness, their conditional combination, and neutral AV route eligibility yield final state-summed AV matching counts of 12, 39, 44, 41 and 113, respectively. These comparisons are distinct from the sequential requirements in main-text Table 2.
 
-No new mechanism, rebalancing, common-evaluator or full-day experiment was run for the manuscript reconstruction. The current claim remains QUALIFIES_CURRENT_STORY. Engineering logs, partition/resume design and source hashes are implementation support, not central paper results.
+The combined condition uses the route selection obtained after removing reverse exclusion and then relaxes information requirements only for an established feasible route. It is not the union of the two single changes. Among the 720 orders, 26 admitted under information relaxation are not admitted under the combination: 23 have unresolved movements and three have unresolved route identity. Removing reverse exclusion changes the primary route from infeasible to unknown, which prevents selection of the previously available alternative under the existing route-selection rule.
 
-## Appendix G. Frozen-interface provenance and research closure
+These counts describe a diagnostic change to admission semantics. They are not estimates of deployable repair gains or of service on a corrected road network.
 
-The follow-up action-space experiments are distinct from the original funnel in
-Section 6.2; their settings must not be pooled. The condition-local, Gamma/cost-off
-diagnostic reports final state-summed AV maximum matching of 12/39/44/41/113 for
-D0/D1/D3/D13/D4. D13 uses D1's route selection, then bypasses evidence only for an
-established FEASIBLE route. It is not the union of D1 and D3: 26 of 720 cohort
-orders are D3-eligible but not D13-eligible because D1 retains original UNKNOWN
-rather than selecting the prior fallback (23 movement lookup; 3 route identity).
-These are diagnostic semantics, not deployable repairs or corrected-network effects.
+### G.2 Endpoint and movement coverage
 
-The provenance audit covers 13,378 encounters from the 720 unique orders. All 391
-unresolved encounters (276 orders; 117 keys) involve endpoint-incomplete boundary
-edges excluded from movement construction. Internal reachability does not certify
-the complete movement; two recorded chains are discontinuous. Native inspection
-of the 88 implicated edges recovered exact endpoints, but found 19 conflicts with
-existing endpoint IDs: 18 explicit hierarchy transition associations and one
-different same-level node. No replacement was applied.
+The 720-order cohort contains 13,378 complex encounters. All 391 unresolved movement encounters, involving 276 orders and 117 unique keys, use endpoint-incomplete boundary edges excluded from movement construction. Internal connectivity alone does not establish a complete movement, and two recorded chains are discontinuous.
 
-The missing sides comprise 55 native GraphIds in 51 transition groups, absent from
-the frozen node table. Relative to existing candidate members, 17 are within 10 m
-and 14 within 10–20 m. Beyond 20 m, non-shortcut adjacency reaches one complex for
-16 nodes, multiple complexes for seven, and no direct complex anchor for one.
-These are context categories, not membership assignments. Excluding shortcuts,
-45 of 51 groups have branching or control evidence; they cannot uniformly be
-treated as ordinary shape points. No clustering, membership, movement, profile,
-reverse rule or production interface was changed.
+Inspection of the native routing graph recovers exact endpoints for 88 implicated edges. Nineteen conflict with existing non-null endpoint identities: 18 are associated with explicit transitions between network hierarchy levels, while one involves a different node at the same level. The missing sides include 55 native node identities in 51 transition groups that are absent from the node table used to construct complexes.
 
-The reverse audit separately found explicit frozen OSM oneway and opposed node
-order supporting all 14,837 flagged evaluation-day orders (3,322 identities;
-85,538 tokens). Five unresolved identities in the full 6,502-identity overlay do
-not occur in this evaluation set. This is frozen-source support, not independent
-legal ground truth or proof that lawful alternative routes do not exist.
+Relative to existing complex members, 17 of these nodes lie within 10 m and 14 within 10–20 m. For nodes farther than 20 m, adjacency excluding shortcut edges reaches one complex in 16 cases, multiple complexes in seven, and no directly anchored complex in one. These are contextual relationships, not established membership assignments. Forty-five of the 51 groups have branching or traffic-control evidence and cannot uniformly be interpreted as ordinary shape points.
 
-The research decision retains the frozen system and its 41 outputs, discloses the
-interface limitation, and stops repair/ablation/control expansion in this study.
-No repaired-network daily effect or future-aware-control benefit is estimated.
-Prediction remains DECISION-RELEVANT, not decision-superior under a common evaluator.
+The findings identify a mismatch between the road elements recognized along routes and those represented in the movement set. They do not justify automatically accepting the missing movements. The reported daily scenarios retain the original representation, so the service effect of reconciling these identities remains unmeasured.
 
-Repository sources:
+### G.3 Direction evidence
 
-- [D13 diagnostic](../stage3_action_space_attribution/d13_report.md)
-- [Semantic provenance](../stage3_action_space_attribution/provenance_audit_report.md)
-- [Native endpoints](../stage3_action_space_attribution/native_endpoint_candidate_report.md)
-- [Shadow reconciliation](../stage3_action_space_attribution/endpoint_shadow_reconciliation_report.md)
-- [55-node context](../stage3_action_space_attribution/native_node_complex_context_report.md)
+One-way tags and opposed node ordering in the source OSM network support the direction exclusions for all 14,837 flagged evaluation-day orders, comprising 3,322 road identities and 85,538 route tokens. Five unresolved identities among the full 6,502-identity reverse representation do not occur in the evaluation sample.
 
-Earlier reports' suggested next steps are historical and superseded by the closure
-decision; their measured results are preserved.
+This evidence supports the direction rule relative to the source network. It is not independent confirmation of restrictions in 2016, nor proof that no lawful alternative route existed. Direction evidence and unresolved movement coverage therefore carry different interpretations, even when both prevent AV admission.

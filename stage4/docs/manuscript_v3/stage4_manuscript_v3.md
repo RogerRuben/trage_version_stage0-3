@@ -1,346 +1,400 @@
-# Instantaneous Effective Matching Capacity in Mixed-Autonomy Ride-Hailing: State-Dependent Serviceability and Rolling Assignment
+# Instantaneous Effective Matching Capacity in Mixed-Autonomy Ride-Hailing
 
 ## Abstract
 
-Fleet transitions are often described through the share of autonomous vehicles, yet heterogeneous serviceability can prevent nominal supply from replacing an equivalent amount of service. We define instantaneous effective matching capacity through a state-dependent request–vehicle compatibility graph and its maximum matching, separating nominal availability, simultaneously matchable demand, and realized rolling service. Passenger acceptance, route readiness, required evidence and pickup deadlines determine eligible assignments under a specified interface policy. In an empirical replay with zero request lead and five-minute pickup patience, mean service rate decreases from 0.726 to 0.392 as the baseline-normalized AV active-hour level increases from one quarter to three quarters. Fixed-state AV-subgraph analysis shows that the implemented gates remove genuine maximum-matchable demand, not only redundant candidate edges. A provenance audit also identifies incomplete endpoint and movement representation, so excluded opportunities cannot all be attributed to physical AV limitations. Broader analytical capability and passenger acceptance partially recover service within the frozen system, while reconstructed request timing materially changes matching capacity. These findings concern the adopted capability, routing-readiness and evidence policy; they neither estimate an intrinsic AV productivity penalty nor decompose total mixed-fleet service losses. Fleet comparisons should distinguish nominal hours, interface-conditioned matching opportunities and realized service.
+Introducing autonomous vehicles into a ride-hailing fleet changes not only available supply but also the requests that each vehicle can serve. This paper examines how heterogeneous serviceability mediates the relationship between nominal supply and realized service. We represent passenger acceptance, route compatibility, information requirements and pickup deadlines through a state-dependent request–vehicle graph. Its maximum matching defines instantaneous effective matching capacity, distinct from vehicle-hours and daily throughput. A replay of 30,000 Xi'an trips compares 41 operating scenarios. Under zero request lead and five-minute pickup patience, the mean service rate decreases from 0.7258 to 0.3924 as the baseline-normalized autonomous active-hour level increases from 0.25 to 0.75. Across ten decision states, successive acceptance, route and information requirements reduce autonomous-vehicle matching capacity from 718 to 124; pickup deadlines reduce it further to 12. These are losses of simultaneously matchable demand, not merely reductions in redundant candidate pairs. Higher passenger acceptance and broader assumed capability partly recover service, while reconstructed request times materially alter the magnitude of capacity loss. Incomplete movement representation also excludes some opportunities without establishing physical infeasibility. The findings therefore identify a conditional loss of service substitutability, rather than an intrinsic productivity disadvantage of autonomous vehicles. Fleet-transition assessments should distinguish nominal availability, admissible matching opportunities and realized service, and state the operational and information assumptions connecting them.
 
-**Keywords:** effective service capacity; mixed-autonomy ride-hailing; state-dependent serviceability; bipartite matching; rolling assignment; fleet substitution
+**Keywords:** instantaneous effective matching capacity; mixed-autonomy ride-hailing; service substitutability; bipartite matching; rolling assignment
 
 ## 1. Introduction
 
-When a ride-hailing platform replaces human-driven vehicles (HVs) with autonomous vehicles (AVs), the strategic question is usually expressed as a fleet percentage. The operational question is more demanding: how much service can those vehicles substitute for? An available vehicle contributes little to a waiting passenger if the passenger will not accept it, the route is incompatible with its operating envelope, evidence needed to assess the route is absent, or pickup cannot occur before the deadline. Even individually compatible vehicles can compete for the same small set of requests. Nominal fleet supply is therefore not equivalent to effective service capacity when serviceability is state dependent.
+An autonomous vehicle added to a ride-hailing fleet does not necessarily replace an equivalent amount of human-driven service. A waiting passenger may decline an autonomous ride, the requested route may fall outside the assumed operating capability, or the vehicle may be unable to arrive before the pickup deadline. Moreover, vehicles that can each serve several requests may compete for the same small subset of demand. The operational value of supply therefore depends on both the availability of vehicles and the structure of their service opportunities.
 
-Existing research already models important forms of mixed-fleet heterogeneity. Mo, Chen and Zhang examine mixed on-demand services with congestion and market interactions; Ao, Lai and Li incorporate human-driver scheduling, strategic relocation and platform AV control. Dynamic matching and rebalancing studies also show that spatial allocation and assignment structure matter for service. These contributions should not be characterized as uniformly assuming interchangeable vehicles. Our narrower question concerns how request-level operating restrictions translate into an explicit instantaneous capacity object, complementing market-equilibrium and fleet-control perspectives. [Mo et al. (2022)](https://doi.org/10.1016/j.trb.2022.01.003); [Ao et al. (2024)](https://doi.org/10.1016/j.tre.2024.103680); [Alonso-Mora et al. (2017)](https://doi.org/10.1073/pnas.1611675114); [Pavone et al. (2012)](https://doi.org/10.1177/0278364912444766).
+Mixed-fleet research provides several explanations for differences between human-driven and autonomous service. Mo et al. (2022) examine mixed on-demand services with congestion and market interactions. Ao et al. (2024) model human-driver scheduling and strategic relocation alongside platform control of autonomous vehicles. These studies establish that fleet composition interacts with incentives, demand and spatial allocation. A complementary question arises at the point of dispatch: given the vehicles and requests currently present, how much demand can the available fleet simultaneously serve under heterogeneous service requirements?
 
-A second distinction concerns vehicle serviceability. Operational-design-domain descriptions recognize that automated operation is conditional on the operating environment, while recent network-design work explicitly considers where robotaxis can operate and which paths satisfy service requirements. We study a complementary operational link: route conditions and evidence determine a request–vehicle compatibility graph, and the connectivity of that graph determines maximum-matchable demand. The analytical capability envelopes used here are not manufacturer-certified domains. The purpose is to represent serviceability for fleet operations, not to infer autonomous-driving safety. [SAE International (2021)](https://doi.org/10.4271/J3016_202104); [AVSC (2020)](https://saemobilus.sae.org/reports/avsc-best-practice-describing-operational-design-domain-conceptual-framework-lexicon-avsc00002202004); [Li and Zardini (2026, preprint)](https://arxiv.org/abs/2602.19341).
+Compatibility is an established concern in operations research. Akçay et al. (2010) study dynamic assignment when service resources can accommodate overlapping subsets of jobs, and Tsitsiklis and Xu (2017) investigate flexibility in queueing architectures represented by bipartite graphs. In transportation, dynamic trip–vehicle assignment makes simultaneous service opportunities explicit (Alonso-Mora et al., 2017), while rebalancing changes the spatial distribution from which those opportunities arise (Pavone et al., 2012). Building on these perspectives, this paper treats maximum matching as an intermediate operational measure between nominal fleet supply and realized ride-hailing service. The contribution lies in the application and empirical interpretation of that measure, rather than a new matching algorithm.
 
-The central framework distinguishes nominal available supply, a state-dependent compatibility graph, instantaneous effective matching capacity, and rolling realized service:
-\[
-S_t^{nom}\ \longrightarrow\ G_t\ \longrightarrow\ C_t^{eff}=\nu(G_t)\ \longrightarrow\ Y_{1:T}.
-\]
-The arrows represent dependencies, not proportional conversions. Information can alter the graph as well as assignment costs: transportation research on demand information and decision-focused optimization motivates examining downstream decisions rather than forecast error alone. Here prediction supports graph construction; it is not a separate contribution or a new decision-focused learning algorithm. [Wen et al. (2019)](https://doi.org/10.1016/j.tra.2019.01.018); [Elmachtoub and Grigas (2022)](https://doi.org/10.1287/mnsc.2020.3922); [Wilder et al. (2019)](https://doi.org/10.1609/aaai.v33i01.33011658).
+Autonomous service introduces an additional distinction between physical capability and the information available to establish compatibility. Operational-design-domain descriptions characterize the conditions under which automated operation is intended (SAE International, 2021; Automated Vehicle Safety Consortium [AVSC], 2020). Operation-network design also addresses where robotaxis should operate and which paths support service requirements (Li & Zardini, 2026, preprint). At dispatch, however, an admissible route requires both compatibility with the adopted operating assumptions and sufficient information to evaluate it. A route with missing movement information may be withheld from autonomous service even when no physical prohibition has been established. This distinction is central to interpreting observed capacity loss.
 
-This paper asks when nominal AV supply fails to translate into service and which operating mechanisms determine or mitigate that conversion. It makes three contributions. Conceptually, it operationalizes effective matching capacity while distinguishing it from available hours and realized service. Methodologically, it constructs a state-dependent compatibility graph and embeds it in rolling assignment with hard readiness and separate continuous exposure controls. Empirically, it uses a real ride-hailing system to show genuine matching-capacity attrition, partial recovery through acceptance and capability, and substantial timing dependence. Maximum matching itself is classical; the contribution is its use as an explicit intermediate operational quantity connecting heterogeneous supply to service. Sections 2–3 formulate the model, Sections 4–5 describe implementation and design, and Sections 6–8 present findings and implications.
+We organize the analysis around four quantities: nominal active supply, the request–vehicle compatibility graph, instantaneous effective matching capacity, and rolling realized service. The graph records which individual assignments are admissible; its maximum matching records how many can be made simultaneously. Rolling service additionally depends on the assignments chosen and the vehicle states they create. This separation allows us to test whether restrictions remove meaningful service opportunities or merely redundant candidate pairs, without equating instantaneous matching counts with daily throughput.
 
-## 2. Effective capacity in heterogeneous ride-hailing fleets
+The empirical application replays 30,000 quality-screened trips from Xi'an under alternative autonomous active-hour levels, passenger acceptance assumptions and analytical capability profiles. Full-day scenarios measure realized service, while fixed-state comparisons examine matching capacity, candidate compression and sensitivity to request timing. Operational predictions supply route information rather than constitute a separate methodological contribution. Demand-information research motivates examining their operational role (Wen et al., 2019), while decision-focused optimization distinguishes predictive accuracy from downstream decision value (Elmachtoub & Grigas, 2022; Wilder et al., 2019).
 
-### 2.1 Nominal supply
+The paper contributes a graph-based account of service substitutability, a rolling assignment formulation that separates categorical eligibility from continuous exposure control, and empirical evidence on the conditions under which nominal autonomous supply translates poorly into service. The results are conditional on the adopted capability assumptions, network information and request timing. In particular, the autonomous-subgraph analysis identifies a mechanism of lost substitutability, not a decomposition of total mixed-fleet service. Section 2 defines the capacity measures, Section 3 presents the dispatch model, Sections 4–5 describe the data and experimental design, and Sections 6–8 discuss the results and their implications.
 
-Let \(\widetilde{\mathcal V}_t\) be vehicles active in the operating schedule at epoch \(t\), including vehicles currently serving a request. Nominal active supply is
+## 2. From nominal supply to matching capacity
+
+### 2.1 Nominal availability
+
+Let \(\widetilde{\mathcal V}_t\) denote vehicles active in the operating schedule at time \(t\), including those currently serving a request. Nominal active supply and type-specific active hours are
 \[
 S_t^{nom}=|\widetilde{\mathcal V}_t|,\qquad
-H^b=\int_0^T|\widetilde{\mathcal V}_t^b|\,dt,\quad b\in\{H,A\}.
+H^b=\int_0^T|\widetilde{\mathcal V}_t^b|\,dt,\quad b\in\{H,A\},
 \]
-The active-hour quantities have units of vehicle-hours. The dispatchable set \(\mathcal V_t\subseteq\widetilde{\mathcal V}_t\) contains idle vehicles available for a new assignment; it is not the full active fleet. To compare transition scenarios, define the baseline-normalized AV active-hour level \(q_A=H^A/H^{base}\), where \(H^{base}\) is the all-HV baseline's active-hour denominator. This is not necessarily the within-scenario fraction \(H^A/(H^A+H^H)\).
+where \(H\) and \(A\) indicate human-driven vehicles (HVs) and autonomous vehicles (AVs). Time is expressed in hours when computing \(H^b\). The dispatchable set \(\mathcal V_t\subseteq\widetilde{\mathcal V}_t\) contains idle vehicles available for a new assignment.
 
-Equal counts or active hours need not imply equal serviceability. Substitution changes the types, locations and availability schedules of the vehicles offered to the waiting demand. We do not treat an AV label change and an availability-policy change as the same intervention.
+We describe autonomous supply by the baseline-normalized AV active-hour level
+\[
+q_A=\frac{H^A}{H^{base}},
+\]
+where \(H^{base}\) is active availability in the all-HV baseline. This normalization compares AV hours with a common reference. It is not necessarily the within-scenario fraction \(H^A/(H^A+H^H)\), and it should not be interpreted as a vehicle-count share.
 
-### 2.2 State-dependent compatibility graph
+Active hours measure the amount of supply offered, but not its substitutability. Two fleets with equal active hours can differ in location, availability schedules and compatibility with waiting requests. The distinction between active and dispatchable vehicles is also important: a vehicle already carrying a passenger contributes to active supply but cannot receive another request in the unpooled service considered here.
 
-Let \(\mathcal O_t\) contain released, unassigned, unexpired requests. Order \(o\) has release \(r_o\), pickup deadline \(D_o\), origin, destination and a route representation. Define
+### 2.2 State-dependent serviceability
+
+Let \(\mathcal O_t\) contain released requests that remain unassigned and have not expired. Request \(o\) has release time \(r_o\), pickup deadline \(D_o\), an origin and destination, and a route representation. The compatibility graph is
 \[
 G_t=(\mathcal O_t,\mathcal V_t,\mathcal A_t),\qquad
 \mathcal A_t=\{(o,v):a_{ovt}=1\},
 \]
-where \(a_{ovt}\) indicates pairwise eligibility under the current information and operating rules. These rules include passenger acceptance for AVs, route readiness, required evidence, spatial consideration, routing success, pickup feasibility and applicable session-end admission. A continuous envelope exceedance is retained as an exposure quantity unless an explicit policy excludes it.
+where \(a_{ovt}\) indicates that vehicle \(v\) is eligible to serve request \(o\) under the information and operating rules at time \(t\).
 
-A gate sequence produces \(\mathcal A_t^{g+1}\subseteq\mathcal A_t^g\). At each gate,
+Eligibility combines passenger acceptance, route compatibility, required route information and pickup feasibility. Vehicle availability can impose an additional service-completion constraint. Candidate search and routing determine which pairs are evaluated. We distinguish these computational restrictions from the substantive service requirements, since removing candidate pairs need not reduce the number of requests that can be matched.
+
+For a sequence of nested admissible graphs, indexed by \(g\), define
 \[
 E_t^g=|\mathcal A_t^g|,\qquad
 U_t^g=|\{o:\deg_{G_t^g}(o)>0\}|,\qquad
 M_t^g=\nu(G_t^g).
 \]
-These have distinct meanings: feasible pairs, orders with any option, and simultaneously matchable orders. Attribution follows the implemented gate order; it is not a decomposition of independent causal effects. Algorithmic candidate compression is identified separately from substantive serviceability.
+Here \(E_t^g\) counts eligible pairs, \(U_t^g\) counts requests with at least one option, and \(M_t^g\) is maximum matching cardinality. Differences between successive graphs measure attrition in the stated sequence. Because the requirements interact, these differences are not independent causal effects.
 
-### 2.3 Effective matching capacity
+### 2.3 Instantaneous effective matching capacity
 
-The instantaneous effective matching capacity is
+We define instantaneous effective matching capacity as
 \[
 C_t^{eff}=\nu(G_t)=
 \max_{x\in\{0,1\}^{|\mathcal A_t|}}
 \left\{\sum_{(o,v)\in\mathcal A_t}x_{ov}:
 \sum_vx_{ov}\le1,\ \sum_ox_{ov}\le1\right\}.
 \]
-It is bounded by both demand with an option and available vehicles. For example, ten requests all connected to the same vehicle have ten edges and ten eligible requests but capacity one. Removing nine edges in a highly redundant graph may instead leave capacity unchanged.
+This quantity is the largest number of simultaneous unpooled assignments admitted by the graph. We use *matching capacity* as shorthand below. It is a count at a particular state, not a service rate per unit time.
 
-For AV-specific diagnosis, \(G_t^A\) restricts the vehicle side to AVs and \(C_t^{eff,A}=\nu(G_t^A)\). The matching-capacity results below concern this AV subgraph, not total mixed-fleet capacity. In general \(C_t^{eff}\) is not the sum of the HV and AV subgraph capacities because the same requests may appear in both. The AV-subgraph analysis identifies a mechanism of lost substitutability, not a decomposition of total mixed-fleet service. Capacity here is a count of simultaneous matches, not a per-hour service rate or daily throughput.
+The distinction from candidate volume is immediate. Ten requests connected only to one vehicle produce ten eligible pairs and ten requests with an option, but matching capacity is one. Conversely, removing many pairs from a graph with alternative assignments can leave its maximum matching unchanged. A capacity analysis must therefore examine the assignment structure rather than infer service losses from edge counts alone.
 
-Graph capacity represents pairwise serviceability before coupled policy constraints. For the cumulative exposure constraints introduced below, define the policy-feasible set \(\mathcal F_t(\Gamma)\) and, if needed,
+For AV-specific analysis, let \(G_t^A\) restrict the vehicle side to AVs and define \(C_t^{eff,A}=\nu(G_t^A)\). The empirical mechanism analysis uses this subgraph. Its capacity cannot generally be added to HV-subgraph capacity, because both vehicle types may serve the same requests. Accordingly, AV-subgraph losses identify reduced autonomous service opportunities, not the fraction of total mixed-fleet service lost.
+
+Matching capacity also differs from capacity under coupled operating constraints. If \(\mathcal F_t(\Gamma)\) contains assignments satisfying the cumulative exposure limits introduced in Section 3, then
 \[
 C_t^{eff,\Gamma}=\max_{x\in\mathcal F_t(\Gamma)}\sum x_{ov}
 \le C_t^{eff}.
 \]
-A system-wide exposure budget couples assignments and cannot generally be represented by independently deleting edges. The measured graph capacity is therefore not silently equated with the budget-constrained dispatch solution.
+A shared exposure limit can make a combination of individually eligible assignments inadmissible. Such a constraint cannot generally be represented by deleting individual pairs independently.
 
-### 2.4 Rolling realized service
+### 2.4 Realized service over time
 
-Let \(y_o=1\) if request \(o\) is counted as served in the rolling evaluation and zero otherwise. Then
+Let \(y_o=1\) when request \(o\) is counted as served in the rolling evaluation and zero otherwise. Total service and service rate are
 \[
 Y_{1:T}=\sum_{o\in\mathcal O_{1:T}}y_o,\qquad
-R_{1:T}=Y_{1:T}/|\mathcal O_{1:T}|.
+R_{1:T}=\frac{Y_{1:T}}{|\mathcal O_{1:T}|}.
 \]
-Requests are counted once, whereas a waiting request can appear in several graphs. Thus \(\sum_t C_t^{eff}\) is not daily service or a count of distinct orders. Assignments change subsequent vehicle positions, remaining availability and future competition; locally similar capacities can generate different rolling outcomes. A fixed-state change in \(C_t^{eff,A}\) does not itself identify a daily service effect.
+A request is counted once in \(Y_{1:T}\), although it can remain in several consecutive compatibility graphs. Thus, summing instantaneous capacities does not yield daily service.
 
-The experiments address different links of the framework. Fleet-transition scenarios compare nominal supply with \(Y\). Gate diagnostics measure how graph restrictions reduce \(C^{eff,A}\). Acceptance and capability alter graph eligibility or exposure values, and exposure budgets alter jointly feasible assignments. Timing and information sensitivity examine how the same physical setting supports different compatibility and matching outcomes.
+The conceptual relationship is
+\[
+S_t^{nom}\longrightarrow G_t
+\longrightarrow C_t^{eff}\longrightarrow Y_{1:T}.
+\]
+These dependencies are not proportional conversions. Compatibility determines the available choices, dispatch selects among them, and selected trips change subsequent vehicle positions and availability. Full-day comparisons and fixed-state diagnostics consequently address different questions: the former measure realized performance, whereas the latter reveal how a particular state limits simultaneous service.
 
-## 3. State-dependent mixed-fleet dispatch
+## 3. Rolling assignment with heterogeneous service requirements
 
-### 3.1 Passenger and operational eligibility
+### 3.1 Passenger acceptance and pickup feasibility
 
-Each request receives a common uniform draw \(u_o\). At acceptance level \(p_A\), its AV pairs pass the passenger gate if \(u_o\le p_A\); HV pairs do not require AV acceptance. This is an exogenous scenario parameter, not an estimated choice model.
+Passenger acceptance is represented by a scenario parameter \(p_A\). Each request receives a common uniform draw \(u_o\), and AV assignments are allowed when \(u_o\le p_A\). The same draws are used across compared scenarios, so higher acceptance admits nested sets of requests. HV service does not require AV acceptance. This specification represents willingness to use an AV exogenously; it is not an estimated passenger-choice model.
 
-At epoch \(t\), routed pickup estimate \(\widehat{\tau}_{ovt}\) must satisfy
+At epoch \(t\), the routed pickup-time estimate \(\widehat{\tau}_{ovt}\) must satisfy
 \[
 \widehat{\tau}_{ovt}\le D_o-t.
 \]
-Spatial neighborhoods expand as requests wait, and at most K nearby candidates per request proceed to the routed sparse graph. The search rule and K are held fixed across each paired comparison. Requests with \(0<D_o-t\le d^{crit}\) are critical; previously unsuccessful requests receive carry-over priority.
+Search neighborhoods expand as requests wait, with at most \(K\) nearby vehicles per request retained for pickup routing. Requests with \(0<D_o-t\le d^{crit}\) are classified as critical; those remaining after an unsuccessful decision epoch receive carry-over priority.
 
-Availability policy is explicit. For an empirical-session vehicle ending at \(b_v\), predicted pickup and service must finish within its admission window:
+Vehicle availability is treated separately from vehicle type. An HV whose empirical session ends at \(b_v\) is admitted only if predicted pickup and service can finish within that session:
 \[
 t+\widehat{\tau}_{ovt}+\widehat{s}_{ovt}\le b_v.
 \]
-Full-horizon AV availability does not inherit this empirical-session admission rule. Neutral label comparisons hold policy fixed; fleet-transition scenarios retain the intended policy difference.
+AVs available throughout the modeled horizon are not subject to an empirical-session endpoint. The fleet-transition comparison retains this scheduling distinction, while controlled vehicle-label comparisons hold availability policy fixed.
 
-### 3.2 Hard and continuous compatibility
+### 3.2 Route compatibility and information requirements
 
-For a route and profile \(k\), hard readiness is \(h_{ok}\in\{\text{feasible},\text{unknown},\text{infeasible}\}\). Known incompatible directions or prohibited movements can produce hard infeasibility. Missing critical identity or evidence remains unknown. The conservative AV admission rule requires hard readiness and complete required evidence. These are operational classifications under a specified representation, not safety certification.
+Route compatibility has three states: feasible, unknown and infeasible under the adopted operating assumptions. Incompatible travel directions, prohibited movements and profile-specific maneuver restrictions can establish infeasibility. Missing route or movement information instead produces an unknown classification. AV admission requires a feasible classification and complete information for the prescribed route assessment.
 
-The representation itself is consequential. A subsequent provenance audit found that boundary extraction can recognize edge combinations excluded from movement construction because endpoint identities are incomplete. Such UNKNOWN outcomes reflect an interface-induced evidence gap, not independently established physical inability. The frozen original/fallback selection branch also affects which evidence is evaluated. These behaviors are retained and disclosed, not repaired or reinterpreted as physical restrictions for this study (Section 6.5 and Appendix G).
+The distinction between unknown and infeasible is substantive even though both prevent admission. In the road representation used here, some boundary edges lack endpoint identities needed to construct movements. Their routes can therefore be excluded because the movement cannot be evaluated, not because it has been shown to be physically impossible. The selection of a primary or available alternative route also determines which information is assessed. Section 6.5 quantifies these limitations.
 
-For descriptor \(d_{oj}\) and positive profile cap \(B_{kj}\),
+Continuous operating requirements are represented separately. For route descriptor \(d_{oj}\) and positive capability cap \(B_{kj}\) for profile \(k\), define
 \[
-r_{ojk}=d_{oj}/B_{kj},\qquad
+r_{ojk}=\frac{d_{oj}}{B_{kj}},\qquad
 \rho^f_{ok}=\max_{j\in\mathcal J_f}r_{ojk},\qquad
 e^f_{ov}=[\rho^f_{ok(v)}-1]_+,
 \]
-for \(f\in\{\mathrm{static},\mathrm{dynamic},\mathrm{speed}\}\). The implemented route-level exposure is identical across vehicles sharing the route/profile, although an arc index permits heterogeneous profiles. Overall utilization is the maximum of the three family utilizations; it is not a weighted risk score. Exceeding a cap is continuous exposure, not automatically hard infeasibility. The separate treatment retains both operational meaning and attribution.
+where \(f\in\{\mathrm{static},\mathrm{dynamic},\mathrm{speed}\}\), \(\mathcal J_f\) is the corresponding descriptor set, and \([z]_+=\max(z,0)\). Vehicles sharing a route and profile have the same route exposure. Overall utilization is the maximum of the three family utilizations.
 
-### 3.3 Rolling assignment
+These ratios describe operating-envelope utilization, not accident risk. A ratio above one indicates that a descriptor exceeds its analytical reference cap. It does not by itself establish categorical infeasibility. Keeping the three families separate also prevents a low value in one family from concealing a high value in another.
 
-For \((o,v)\in\mathcal A_t\), binary \(x_{ov}\) obeys
+### 3.3 Assignment priorities
+
+For each eligible pair, binary assignment variable \(x_{ov}\) satisfies
 \[
 \sum_{v:(o,v)\in\mathcal A_t}x_{ov}\le1,\qquad
 \sum_{o:(o,v)\in\mathcal A_t}x_{ov}\le1.
 \]
-Within these and the enabled policy constraints, the objective hierarchy is
+The model assigns one request per available vehicle and does not pool passengers. This differs from pooled trip–vehicle formulations such as Alonso-Mora et al. (2017).
+
+Subject to these constraints and any enabled exposure limits, the objective is lexicographic:
 \[
 \operatorname{lexmax}
 \left(
-\sum c_o x_{ov},\
-\sum x_{ov},\
-\sum b_o x_{ov},\
--\sum\widehat{\tau}_{ovt}x_{ov}
+\sum_{(o,v)\in\mathcal A_t}c_ox_{ov},\
+\sum_{(o,v)\in\mathcal A_t}x_{ov},\
+\sum_{(o,v)\in\mathcal A_t}b_ox_{ov},\
+-\sum_{(o,v)\in\mathcal A_t}\widehat{\tau}_{ovt}x_{ov}
 \right),
 \]
-where \(c_o\) and \(b_o\) indicate critical and carry-over status. Each later level retains preceding optima. An optional operating-cost level follows the pickup objective and allows only the explicitly bounded pickup-quality relaxation in Appendix D; it does not relax the earlier service-count optima.
+where \(c_o\) and \(b_o\) indicate critical and carry-over requests. Each objective is optimized while preserving the optima of the preceding objectives. This prioritizes imminent expiry, then total service, then requests carried over from earlier epochs, and finally pickup time.
 
-The assignment is unpooled: each available vehicle receives at most one current request. This differs from trip–vehicle formulations supporting pooled multi-request trips, such as Alonso-Mora et al. (2017). The use of a compatibility graph here is not a claim to introduce dynamic assignment. Its role is to expose how heterogeneous serviceability restricts the service set before selection. [Alonso-Mora et al. (2017)](https://doi.org/10.1073/pnas.1611675114).
+An optional operating-cost objective follows pickup-time minimization. It preserves the three service-count optima and permits only a bounded relaxation of the aggregate pickup objective. The main factorial comparison excludes this additional cost objective; its formulation and supplementary results are provided in Appendix D.
 
-### 3.4 Cumulative exposure control
+### 3.4 Cumulative exposure limits
 
-Let \(Z_t^f\) be system-wide cumulative exposure in family \(f\) before epoch \(t\), and \(N_t^A\) the cumulative number of AV assignments. Let \(\mathcal A_t^A\) be AV arcs. For every enabled family, dispatch imposes
+Let \(Z_t^f\) be cumulative system-wide exposure in family \(f\) before epoch \(t\), and let \(N_t^A\) be the cumulative number of AV assignments. For each enabled family, impose
 \[
 Z_t^f+\sum_{(o,v)\in\mathcal A_t^A}e^f_{ov}x_{ov}
 \le
 \Gamma_f\left(N_t^A+\sum_{(o,v)\in\mathcal A_t^A}x_{ov}\right). \tag{1}
 \]
-The same AV-assignment count normalizes each family. The states update additively after selection. Equation (1) bounds day-to-date **mean exposure per AV assignment**, not exposure per vehicle, per hour, or per distance. It allows a high-exposure route to be balanced by lower exposure in the same family, while preventing compensation across families.
+The state is updated additively after each assignment. Equation (1) limits cumulative mean excess per AV assignment. It is neither a per-vehicle budget nor a time- or distance-weighted limit.
 
-Strict control sets all \(\Gamma_f=0\); from zero initial exposure and nonnegative excess, only zero-exposure AV selections satisfy it. Reference control uses pre-specified positive family limits transferred from a designated calibration run. Unconstrained control disables these continuous rows while retaining passenger, hard-readiness and evidence gates. These are operating postures, not optimized manufacturer capability limits.
+Three operating policies are compared. Strict control sets all \(\Gamma_f=0\), admitting only zero-excess AV assignments from an initially zero exposure state. Reference control uses positive family limits calibrated once in a designated scenario. Unconstrained exposure control removes (1) but retains categorical compatibility and information requirements. A high-exposure assignment can be offset by lower exposure within the same family under a positive mean limit; exposure in one family cannot be offset by another.
 
-### 3.5 Structural properties
+### 3.5 Properties of the exposure policy
 
-**Proposition 1 — Cumulative family-exposure guarantee.** Under additive updates, any selection satisfying (1) gives \(Z_{t+1}^f\le\Gamma_fN_{t+1}^A\). If \(N_{t+1}^A>0\), cumulative mean family exposure is at most \(\Gamma_f\). The guarantee concerns accumulated assignment exposure, not each trip or a safety probability.
+The following properties clarify what the operating limits guarantee.
 
-**Proposition 2 — Same-epoch feasible-set monotonicity.** Fix vehicles, waiting requests, candidates, acceptance, pickup estimates, exposure values and all non-budget constraints. For componentwise \(\Gamma'\ge\Gamma\), \(\mathcal F_t(\Gamma)\subseteq\mathcal F_t(\Gamma')\). Relaxing limits cannot worsen the highest-priority lexicographic optimum in that state. This does not guarantee monotone lower-priority objectives or daily service: a different selection changes subsequent states.
+**Proposition 1.** With additive updates, any assignment satisfying (1) gives \(Z_{t+1}^f\le\Gamma_fN_{t+1}^A\). When the assignment count is positive, cumulative mean exposure is at most \(\Gamma_f\).
 
-**Proposition 3 — Separate budgets versus a weighted scalar.** Family means \(\bar e_f\le\Gamma_f\) imply \(\sum_fw_f\bar e_f\le\sum_fw_f\Gamma_f\) for nonnegative weights, but the converse fails. Two unit family caps, equal weights and \((\bar e_1,\bar e_2)=(2,0)\) provide a counterexample. Separate limits preserve family meaning without claiming globally optimal caps.
+**Proposition 2.** Hold the current graph, cumulative exposure state, objectives and all other constraints fixed. If \(\Gamma'\ge\Gamma\) componentwise, then \(\mathcal F_t(\Gamma)\subseteq\mathcal F_t(\Gamma')\). Relaxing the limits cannot reduce the highest-priority lexicographic optimum in that state.
 
-Full proofs and Proposition 4, the local pickup-quality guarantee for the optional cost level, are in Appendix D. These elementary structural statements explain the implemented control, rather than constitute a new matching theorem.
+**Proposition 3.** Separate mean-exposure bounds \(\bar e_f\le\Gamma_f\) imply a weighted bound \(\sum_fw_f\bar e_f\le\sum_fw_f\Gamma_f\) for nonnegative weights, but the converse need not hold.
 
-## 4. Empirical implementation
+The first property follows by substitution, and the second by feasible-set inclusion. For the third, two unit caps with equal weights admit the vector \((2,0)\) under the aggregate bound while violating the first family cap. Full arguments appear in Appendix D. These properties characterize the exposure policy; they do not imply a safety guarantee, monotone daily service or a new matching theorem.
 
-### 4.1 Xi'an ride-hailing data
+## 4. Data and operational representation
 
-The empirical application uses ride-hailing GPS trajectories from Xi'an, China, in October 2016. The evaluation set contains 30,000 quality-screened orders from 31 October. All scenarios use the same set. Trajectory endpoints provide an observed departure/boarding proxy and completion location, not independently measured platform request times.
+### 4.1 Trajectories and evaluation sample
 
-Training precedes evaluation, with later dates used for validation and calibration. The evaluation day is a common temporal benchmark across system versions, not an untouched holdout for every upstream development choice. This study evaluates pre-specified operational contrasts on that day, rather than estimating a population-wide causal response. The retained subset prioritizes supported routes and direct timing observations; it is not a census of all raw requests. Appendix A describes selection and route quality.
+The application uses ride-hailing GPS trajectories from Xi'an, China, in October 2016. The evaluation sample contains 30,000 quality-screened orders from 31 October, shared by all scenarios. Screening requires a supported route, adequate GPS quality, consistent road identity and usable direct timing observations. The sample is therefore a selected subset of recorded trips rather than a census of demand.
 
-### 4.2 Directed route representation
+Trajectory endpoints provide an observed departure or boarding proxy and a completion location. They do not independently identify platform request times. Training precedes the evaluation day, with separate later dates used for validation and calibration. Because 31 October was also used in earlier system evaluations, it is a common temporal benchmark rather than an untouched holdout for every development choice. The present analysis reports operating contrasts on that sample, not population-level causal effects.
 
-GPS trajectories are map matched to a directed OpenStreetMap road network. Historical reverse directions are preserved rather than projected onto current forward edges because direction identity affects AV compatibility. Detailed map-matching validation is in Appendix A.
+### 4.2 Route and capability descriptors
 
-Static descriptors summarize intersection approaches, movements, boundary road-class diversity and extent. Boundary diversity uses incoming/outgoing edges, so a single-node intersection can have nonzero diversity without internal edges. Dynamic descriptors characterize crawl, stops, speed variability and acceleration variability. Route summaries retain family distinctions instead of collapsing them into one score. Routes follow the existing pre-specified selection/fallback rule and are not replanned in response to dispatch outcomes.
+Trajectories are map matched to a directed OpenStreetMap network. Historical travel in the reverse direction of a represented road remains distinct rather than being projected onto the forward direction. Intersections are represented as complexes of connected road elements, with movements defined by an incoming edge, any internal edges and an outgoing edge.
 
-The three analytical capability profiles—Conservative, Moderate and Advanced—have nested descriptor caps. Quantile anchors are marginal descriptor thresholds, not promised joint route-acceptance rates. Their operational interpretation follows the distinction between an environment description and a vehicle's actual validated operating domain; the profiles are not certifications. [AVSC (2020)](https://saemobilus.sae.org/reports/avsc-best-practice-describing-operational-design-domain-conceptual-framework-lexicon-avsc00002202004).
+Four static descriptors characterize each intersection complex: external physical connections, topological movements, boundary road-class diversity and internal road length. Boundary diversity counts distinct road classes among incoming and outgoing edges, so a single-node intersection can have nonzero diversity even without internal edges. Route-level static descriptors take the corresponding maxima over encountered complexes.
 
-### 4.3 Decision-time operational prediction
+Dynamic descriptors summarize crawl, stops, speed variability and acceleration variability. For each component, segment predictions are mapped to a training-derived distribution and combined using predicted median traversal times. The route summaries describe mean percentile exposure, the proportion of predicted time above the 90th-percentile threshold, and the longest consecutive duration above that threshold. Their definitions and units are given in Appendix B. Speed utilization is assessed separately against the profile's speed cap.
 
-A multivariate prediction model supplies travel-time/pace and raw operating-condition estimates. Training-only normalization, temporal calibration and distribution mappings are retained for evaluation. The decision representation uses predicted route progression rather than completed-route outcomes. Realized service duration is used for post-assignment progression, not substituted for a missing dispatch prediction.
+Conservative, Moderate and Advanced profiles provide nested analytical capability assumptions. They combine maneuver rules with descriptor caps; they are not specifications of deployed vehicles. Caps based on marginal quantiles do not imply that the same fraction of routes satisfies all dimensions jointly. This interpretation follows the distinction between describing operating conditions and validating an actual automated-driving domain (AVSC, 2020).
 
-Predictions enter graph evidence and exposure calculations. We therefore examine whether changing information changes candidates and selected assignments; we do not claim to train the model through dispatch loss. This distinction separates our validation from decision-focused learning methods and from independent evidence of superior realized decisions. [Elmachtoub and Grigas (2022)](https://doi.org/10.1287/mnsc.2020.3922); [Wilder et al. (2019)](https://doi.org/10.1609/aaai.v33i01.33011658). Descriptor construction and prediction validation details are in Appendix B.
+Route selection is determined before evaluating dispatch outcomes. The analysis uses the established primary-route and limited alternative-route procedure, rather than jointly optimizing service routes and vehicle assignment. Missing information for an alternative route can prevent its use even when its represented geometry is compatible.
 
-### 4.4 Fleet reconstruction
+### 4.3 Prediction and fleet availability
 
-HVs inherit empirical driver-session availability; AVs are available over the modeled full horizon. The all-HV denominator is \(H^{base}=12{,}279.336389\) vehicle-hours. Each transition targets \(q_A=H^A/H^{base}\), with realized availability checked against this denominator rather than inferred from vehicle counts.
+A multivariate model provides travel-time, pace and operating-condition predictions using decision-time inputs and predicted route progression. Preprocessing and distribution mappings are estimated from training data and retained for evaluation. Realized trip duration is used to advance the simulation after assignment, not to replace missing predictions at dispatch.
 
-Changing composition therefore changes the mix of availability schedules and spatial states, not only labels. All scenarios retain their pre-specified fleet construction. The controlled neutral-label comparison instead preserves availability policy and positions to isolate label-only behavior. Supply construction and representativeness details are in Appendix A.
+Prediction can affect both route assessment and continuous exposure. We examine whether replacing model estimates with historical estimates changes the available or selected assignments. This is a test of decision relevance, distinct from training through an optimization loss or demonstrating superior realized outcomes (Elmachtoub & Grigas, 2022; Wilder et al., 2019).
+
+HVs inherit empirical driver-session availability, while AVs are available throughout the modeled horizon. The all-HV reference contains \(H^{base}=12{,}279.336389\) vehicle-hours. Transition scenarios target \(q_A=H^A/H^{base}\). Consequently, a change in autonomous supply also changes the mix of availability schedules and evolving spatial states; it is not a vehicle-label-only intervention.
 
 ## 5. Experimental design
 
-### 5.1 Main fleet-transition scenarios
+### 5.1 Full-day comparisons
 
-The main replay treats the observed trajectory departure/boarding proxy as request release: **zero request lead and 300-second pickup patience**, with decisions every 30 seconds. This is a modeling assumption, not an observed request-time fact. Main outcomes are conditional on it.
+The reference replay treats the observed departure or boarding proxy as request release. Requests therefore have zero lead relative to that proxy and expire if pickup cannot occur within 300 seconds. Dispatch decisions occur every 30 seconds, with a 30-second critical window. These timing assumptions are explicit model inputs rather than observed passenger behavior.
 
-A factorial combines \(q_A\in\{.25,.50,.75\}\), three analytical profiles and acceptance \(p_A\in\{.40,.70,1.00\}\), giving 27 mixed-fleet settings within 41 pre-specified full-day scenarios. All-HV and all-AV profile cases are composition benchmarks. Acceptance uses common random draws. The main factorial disables continuous budgets and the additional cost objective; route policy and candidate rules are unchanged. Service rate is served requests divided by the same 30,000 orders.
+The main factorial combines three AV active-hour levels, \(q_A\in\{0.25,0.50,0.75\}\), three capability profiles, and three acceptance levels, \(p_A\in\{0.40,0.70,1.00\}\). These 27 settings form the main mixed-fleet comparison within 41 full-day scenarios. All-HV and all-AV cases provide composition benchmarks. All use the same 30,000 orders and common acceptance draws.
 
-All 41 outcomes refer to the same frozen network/interface version, including its subsequently identified endpoint and movement-coverage limitations. No corrected-network full-day counterfactual was run. Accepting this study boundary preserves reproducibility but does not validate every excluded route as physically unavailable. In the main 27 settings, continuous envelope exceedance alone does not remove an AV arc: hard readiness and evidence requirements remain active while Gamma and cost are disabled. The later provenance audits qualify interpretation rather than alter these scenario definitions or numerical outcomes.
+The main factorial excludes continuous exposure budgets and the optional cost objective. Thus, a continuous cap exceedance alone does not remove an AV assignment. Categorical route compatibility, information requirements and pickup feasibility remain active. The same road representation and route-selection procedure are used throughout, including the movement-information limitation quantified in Section 6.5. No full-day comparison evaluates a corrected representation.
 
-At \(q_A=.50\), Moderate capability and \(p_A=.70\), strict, reference and unconstrained exposure policies compare alternative operating limits. Reference limits are calibrated once using the designated q_A=.25, Moderate, universal-acceptance run and transferred without tuning to central outcomes. All-AV cases are composition extremes, not performance ceilings.
+A separate policy comparison holds \(q_A=0.50\), Moderate capability and \(p_A=0.70\) fixed. It contrasts strict, reference and unconstrained exposure control. Reference limits are calibrated in the designated \(q_A=0.25\), Moderate, universal-acceptance scenario and transferred without retuning to the central comparison. Idle-vehicle repositioning is not active in these main comparisons.
 
-### 5.2 Mechanism validation
+### 5.2 Fixed-state mechanism analysis
 
-Ten existing decision states span low-load, midday and evening periods. At each, AV gate graphs provide E, U and maximum matching M on the same arc set. Gate-level differences in M measure lost contemporaneous capacity rather than infer it from edge percentages. State sums are not daily unique orders.
+Ten decision states spanning low-load, midday and evening periods are used to examine the AV compatibility graph. For each successive requirement, we calculate eligible pairs \(E\), requests with an AV option \(U\), and maximum matching \(M\) on the same graph. This directly tests whether a reduction in candidate pairs also removes simultaneously matchable demand. Summed counts across these states are descriptive aggregates, not unique daily requests.
 
-A neutral identity comparison changes labels but preserves availability policy and physical inputs. Candidate and selected identities agree in all ten states. A separate candidate-compression check compares K=10/20/40/80 on the same states. Both are controls supporting mechanism interpretation, not independent fleet-transition experiments. Appendix C contains detailed outputs and definitions.
+Two controls distinguish serviceability restrictions from computational artifacts. First, vehicle-label comparisons preserve physical inputs and availability policy; candidate and selected identities agree in all ten states. Second, the candidate limit is varied over \(K=10,20,40,80\), with \(K=20\) used in the reference specification. This checks whether the observed capacity loss primarily reflects candidate compression.
 
-### 5.3 Sensitivity analyses
+The analysis is sequential: passenger acceptance is applied before route compatibility, followed by information completeness, candidate compression, pickup routing and the pickup deadline. Attribution is conditional on this order. It neither estimates independent effects of the requirements nor provides a causal decomposition of full-day service.
 
-Because historical trajectories record a boarding proxy rather than request time, three pre-specified lead scenarios are reconstructed from training-day driver chains and applied to the same evaluation orders. Four physical states—q_A=.50/.75 at noon and 17:30, Moderate profile and acceptance .70—are compared under zero lead and the three alternatives.
+### 5.3 Request timing and information sensitivity
 
-Vehicles, baseline prior-assignment history, route descriptors, routing clock and operating rules are held fixed within each comparison. Release changes waiting membership and remaining patience. This conditional-state design does not reconstruct alternate fleet histories; its fixed descriptors are not asserted to be available at an earlier reconstructed release. It measures timing dependence, not earlier-release forecast performance or full-day service effects. Appendix E records the reconstruction and its limitations.
+Three alternative request-lead scenarios are reconstructed from driver-chain statistics on 19–22 October. Low, Base and High scenarios use different positions in the observed inter-trip-gap distribution rather than fixed lead times. Request release is the boarding proxy minus the reconstructed lead.
 
-A ten-state information comparison substitutes historical estimates for model predictions while retaining physical and policy inputs. It measures graph and decision relevance, not superiority under a common independent outcome evaluator. Detailed target errors, numerical controls and cost robustness are supplementary material, not additional primary research questions.
+Timing comparisons use four physical states: \(q_A=0.50\) and \(0.75\), each at noon and 17:30, with Moderate capability and acceptance 0.70. Vehicle positions, prior assignment history, route descriptors, routing time and operating rules remain fixed. Changing release times changes the waiting cohort and remaining pickup patience. This design isolates conditional-state sensitivity; it does not simulate alternate daily histories or validate forecasts at earlier reconstructed request times.
+
+A separate ten-state comparison replaces model predictions with historical estimates while retaining physical and policy inputs. Its outcomes are changes in compatibility and selected assignments. An independent common outcome evaluator is not available, so these comparisons do not establish which information source yields better realized decisions. Additional prediction errors, timing-reconstruction checks and cost results are reported in the supplementary material.
 
 ## 6. Results
 
-### 6.1 Nominal supply versus realized service
+### 6.1 Autonomous availability and realized service
 
-Under zero lead and 300-second patience, mean service rates across the factorial are .7258, .5984 and .3924 at q_A=.25, .50 and .75. The decrease from .25 to .75 is .3334, approximately 45.9% of the lower-level mean. This is an operational contrast on common demand under the frozen interface, not a timing- or representation-invariant technological effect.
+A higher autonomous active-hour level is associated with lower service in the reference replay. Averaged across the capability and acceptance settings, service rates are 0.7258, 0.5984 and 0.3924 at \(q_A=0.25,0.50,0.75\), respectively. The decline from the lowest to the highest level is 0.3334, or approximately 45.9% of the lower-level mean.
+
+Table 1 shows the composition benchmarks and the Moderate-profile comparisons at acceptance 0.70. The all-AV result represents service without HV alternatives under the specified assumptions; it is not a performance ceiling for autonomous technology.
+
+**Table 1. Realized service under selected fleet conditions.** All scenarios share 30,000 orders, zero request lead and 300-second pickup patience. Service rate is the fraction of requests served.
 
 | Fleet condition | Service rate |
 | --- | ---: |
-| All HV | .7889 |
-| q_A=.25, Moderate, acceptance .70 | .7297 |
-| q_A=.50, Moderate, acceptance .70 | .6044 |
-| q_A=.75, Moderate, acceptance .70 | .4013 |
-| All AV, Moderate | .1515 |
+| All HV | 0.7889 |
+| \(q_A=0.25\), Moderate, acceptance 0.70 | 0.7297 |
+| \(q_A=0.50\), Moderate, acceptance 0.70 | 0.6044 |
+| \(q_A=0.75\), Moderate, acceptance 0.70 | 0.4013 |
+| All AV, Moderate | 0.1515 |
 
-The all-AV result illustrates a composition extreme without HV alternatives; it is not an upper bound or a prediction for mature autonomous technology. These daily results establish the supply-to-service pattern. The next analysis evaluates whether pairwise restrictions remove genuine matchable demand, rather than assuming this from service rates alone.
+These comparisons establish a supply-to-service pattern in the modeled system. They do not identify an intrinsic AV productivity penalty: fleet composition changes availability schedules and spatial evolution, while serviceability depends on route information and the timing assumptions. The fixed-state analysis examines one mechanism underlying this pattern.
 
-### 6.2 Matching-capacity conversion
+### 6.2 From candidate pairs to matchable demand
 
-The AV matching-capacity sequence over ten states is
-\[
-718\ \xrightarrow{\mathrm{passenger}}\ 493\
-\xrightarrow{\mathrm{structural}}\ 238\
-\xrightarrow{\mathrm{evidence}}\ 124\
-\xrightarrow{\mathrm{patience}}\ 12.
-\]
-The associated order counts establish that losses concern potential service as well as candidate volume.
+The service requirements reduce AV matching capacity, not merely candidate volume. Across the ten states, maximum matching decreases from 718 spatially available matches to 493 after passenger acceptance, 238 after categorical route assessment, and 124 after information requirements. Pickup deadlines reduce the remaining capacity to 12 (Table 2).
 
-| Gate | E: AV edges | U: orders with an AV option | M: maximum AV matching |
+**Table 2. AV opportunities and matching capacity across ten decision states.** Values are sums over states. \(E\) counts eligible request–vehicle pairs, \(U\) counts requests with at least one AV option, and \(M\) is maximum AV matching cardinality.
+
+| Admissible set | \(E\): AV pairs | \(U\): requests with an AV option | \(M\): maximum AV matching |
 | --- | ---: | ---: | ---: |
-| Spatial opportunity | 95180 | 720 | 718 |
-| Passenger compatible | 65444 | 493 | 493 |
-| Structural ready | 31153 | 238 | 238 |
-| Evidence complete | 15775 | 124 | 124 |
-| Candidate compression | 1371 | 124 | 124 |
-| Route returned | 1371 | 124 | 124 |
-| Pickup/patience feasible | 48 | 12 | 12 |
-| Solver eligible | 48 | 12 | 12 |
+| Spatial opportunity | 95,180 | 720 | 718 |
+| Passenger compatible | 65,444 | 493 | 493 |
+| Categorically route compatible | 31,153 | 238 | 238 |
+| Required route information available | 15,775 | 124 | 124 |
+| After candidate compression | 1,371 | 124 | 124 |
+| Pickup route available | 1,371 | 124 | 124 |
+| Pickup deadline satisfied | 48 | 12 | 12 |
+| Available to assignment | 48 | 12 | 12 |
 
-These are sums over states, not unique daily requests or selected assignments. Passenger, structural, evidence and patience gates remove 225, 255, 114 and 112 matching units in the sample. Candidate compression removes approximately 91% of pre-compression edges without changing final maximum matching at any of the tested K values in these states.
+In the stated sequence, acceptance, categorical route assessment, information requirements and pickup deadlines remove 225, 255, 114 and 112 matching units, respectively. By contrast, candidate compression removes approximately 91% of the preceding pairs without reducing matching capacity. Final maximum matching is identical at each state for all four tested values of \(K\).
 
-The evidence distinguishes redundant connectivity from usable capacity. Spatial U=720 but M=718 already shows competition for vehicles; a request having an option does not ensure all such requests can be served simultaneously. The graph sequence validates the serviceability mechanism locally, but it does not assign the entire daily service decline causally among gates. Repeated-epoch edge-survival percentages provide supplementary opportunity-volume evidence only (Appendix C).
+The difference between the first row's \(U=720\) and \(M=718\) illustrates vehicle competition: providing every request with an individual option need not make all requests simultaneously serviceable. The subsequent decreases in \(M\) establish that the eligibility requirements remove potential simultaneous service in these AV subgraphs. They do not partition the decline in mixed-fleet daily service, and requests appearing in multiple states must not be counted as distinct daily losses.
 
-### 6.3 Capacity recovery levers
+### 6.3 Passenger acceptance, capability and exposure control
 
-Acceptance and capability affect different parts of serviceability. Under Moderate capability, increasing acceptance from .40 to 1.00 raises service rate by .0087 at q_A=.25 and .0477 at q_A=.75. At q_A=.75 and acceptance .70, moving from Conservative to Advanced capability raises service by .0330. These levers partly recover service, but do not eliminate the larger composition contrast under the main timing assumption.
+Passenger acceptance has a larger service effect at the higher AV active-hour level in the reported comparisons. Under Moderate capability, increasing acceptance from 0.40 to 1.00 raises service rate by 0.0087 at \(q_A=0.25\) and by 0.0477 at \(q_A=0.75\). At \(q_A=0.75\) and acceptance 0.70, broadening the capability assumption from Conservative to Advanced raises service rate by 0.0330.
 
-A willing passenger does not create a compatible route, and a broader capability envelope does not ensure timely pickup. These changes alter graph eligibility or exposure severity; new edges may remain redundant for simultaneous matching. We report the measured service gains without claiming that every eligibility expansion produces a proportional capacity increase.
+These gains partly recover service but do not remove the larger composition contrast. Acceptance supplies permission to use an AV, whereas capability determines which routes are admissible. Neither ensures that a vehicle can arrive before the pickup deadline. Their effects therefore depend on the other constraints in the compatibility graph.
 
-Exposure control addresses a different trade-off: the jointly admissible operating conditions of selected AV service. At the central comparison:
+Exposure control addresses the operating conditions of selected AV trips rather than passenger willingness or categorical compatibility. In the central scenario, reference family limits retain a service rate close to unconstrained exposure control, whereas strict zero-excess limits reduce both service and the AV share of assignments (Table 3).
 
-| Exposure policy | Service rate | AV service share |
+**Table 3. Exposure policy comparison at \(q_A=0.50\), Moderate capability and acceptance 0.70.** AV assignment share is the fraction of selected assignments made to AVs, distinct from the active-hour normalization \(q_A\).
+
+| Exposure policy | Service rate | AV assignment share |
 | --- | ---: | ---: |
-| Strict zero excess | .5532 | .0113 |
-| Reference family limits | .6038 | .1244 |
-| Unconstrained continuous exposure | .6044 | .1217 |
+| Strict zero excess | 0.5532 | 0.0113 |
+| Reference family limits | 0.6038 | 0.1244 |
+| Unconstrained continuous exposure | 0.6044 | 0.1217 |
 
-Relative to unconstrained operation, reference control reduces selected static and dynamic exposure by 9.6% and 5.6%, while nearly retaining service. The difference computed from rounded service rates need not equal the unrounded comparison. These are tested policy outcomes, not evidence that the reference limits are optimal or safe. Because the budgets couple assignments, the policy comparison concerns \(\mathcal F_t(\Gamma)\) and realized service, not simply removal of individually infeasible edges.
+Relative to unconstrained exposure control, reference limits reduce selected static and dynamic exposure by 9.6% and 5.6%. This comparison illustrates a service–exposure trade-off for the tested limits, not their optimality or a safety benefit. Because cumulative limits couple assignments and alter later vehicle states, their daily effects cannot be inferred from individual route eligibility alone.
 
-### 6.4 Timing and information dependence
+### 6.4 Sensitivity to request timing and operational information
 
-Matching capacity remains constrained under alternative request leads, but its magnitude varies substantially. Across four physical states:
+Request timing materially changes the capacity available before and after pickup deadlines. Across the four physical states, final AV maximum matching is 8 under zero lead, compared with 26, 25 and 40 under Low, Base and High lead scenarios (Table 4). The fraction retained after the pickup constraint also increases, although Low and Base are not strictly ordered.
 
-| Request timing | Pre-patience M | Final M | Aggregate patience retention |
+**Table 4. Request-timing sensitivity across four physical states.** Retention is summed final \(M\) divided by summed pre-deadline \(M\). These states are distinct from the ten-state aggregation in Table 2.
+
+| Request timing | Pre-deadline \(M\) | Final \(M\) | Aggregate retention |
 | --- | ---: | ---: | ---: |
 | Zero lead | 53 | 8 | 15.09% |
-| Low lead scenario | 130 | 26 | 20.00% |
-| Base lead scenario | 128 | 25 | 19.53% |
-| High lead scenario | 156 | 40 | 25.64% |
+| Low lead | 130 | 26 | 20.00% |
+| Base lead | 128 | 25 | 19.53% |
+| High lead | 156 | 40 | 25.64% |
 
-Retention divides summed final M by summed pre-patience M. These four-state totals must not be pooled with the ten-state totals above. At noon, q_A=.50/.75 gives final M=4/3 under zero lead but 10/11 under high lead; at 17:30 the values are 1/0 and 8/11. Local ordering can change, but differing waiting cohorts and fixed fleet histories prevent inference of an order-level treatment effect or a reversed daily ordering. The evidence qualifies the mechanism's magnitude, not its existence.
+Local ordering can also change. At noon, final matching capacity for \(q_A=0.50/0.75\) is \(4/3\) under zero lead but \(10/11\) under High lead. At 17:30, the corresponding pairs are \(1/0\) and \(8/11\). These comparisons retain the same physical vehicle states but change waiting cohorts; they are not order-level treatment effects or evidence of reversed full-day performance.
 
-Information also changes compatibility. Prediction-based and historical-information decisions differ in nine of ten compared states, with mean selected-AV-arc Jaccard .10. This establishes operational relevance of graph information. It does not establish decision superiority under independently evaluated outcomes; no such common evaluator was run. Prediction thus remains a component of serviceability construction, rather than a second central paper claim.
+Operational information also affects decisions. Model-based and historical-information assignments differ in nine of ten compared states, with mean selected-AV-pair Jaccard similarity of 0.10. This demonstrates that prediction is relevant to the decision representation. It does not establish superior realized outcomes, since the alternatives were not evaluated with an independent common outcome measure.
 
-### 6.5 Interface provenance and the interpretation of excluded opportunities
+Together, the timing and information comparisons locate the empirical finding more precisely. The observed capacity loss depends on how requests become available, how much pickup time remains, and what route information supports admission. The full-day numerical contrast should therefore not be interpreted as invariant to those choices.
 
-The follow-up audit of the ten-state cohort examined 720 unique orders and 13,378 recorded complex encounters. All 391 unresolved movement encounters (276 orders; 117 unique keys) involved endpoint-incomplete edges: movement construction excludes these edges, whereas boundary extraction retains them. Native-graph inspection recovered endpoint identities for the 88 implicated edges but found 19 conflicts with existing non-null endpoint identities and 55 missing-side native nodes absent from the frozen node table. Their relation to frozen complex membership was not certified; no movement was automatically declared feasible. This targeted audit establishes an interface-coverage limitation, not a full-network error rate or a corrected service effect.
+### 6.5 Incomplete route information and excluded opportunities
 
-Direction restrictions have different provenance. The 14,837 evaluation-day orders flagged for historical reverse direction have supporting explicit oneway tags and opposed node order in the frozen OSM source. This supports the adopted network rule, not certification of actual 2016 legal restrictions or proof that no lawful alternative route exists. UNKNOWN movement evidence and supported frozen direction restrictions must therefore not be pooled as a single physical AV incapability category.
+Some excluded service opportunities arise from incomplete network representation rather than established physical incompatibility. Examination of the ten-state cohort covers 720 unique orders and 13,378 intersection-complex encounters. All 391 unresolved movement encounters, involving 276 orders and 117 distinct movement keys, include boundary edges whose incomplete endpoint identities prevent movement construction. Boundary recognition and movement construction therefore do not operate on the same fully represented set of roads.
 
-These findings place the capacity mechanism at the level actually measured: eligibility under the frozen capability, route-selection, identity and evidence policy. Diagnostic gate removal is not a deployable repair, and its graph gains are not estimated gains from correcting the network. Appendix G records the audit trail. The research branch is closed without new clustering, interface repair or full-day reruns.
+The underlying routing graph supplies endpoints for the 88 implicated edges, but inconsistencies with existing node identities and intersection membership prevent those endpoints from directly establishing admissible movements. The analysis identifies a specific information limitation; it neither measures a full-network error rate nor estimates the service gained by correcting it. Detailed topology findings are reported in Appendix G.
+
+Direction exclusions have a different basis. All 14,837 evaluation-day orders flagged for historical reverse travel are supported by one-way tags and opposed node ordering in the source OSM network. This supports the adopted direction rule, but it does not certify legal restrictions as they existed in 2016 or demonstrate that a lawful alternative route was unavailable. Missing movement information and source-supported direction restrictions should therefore not be treated as a single category of physical AV incapability.
+
+These findings qualify the interpretation of Table 2. Its capacity reductions are real within the assessed compatibility graphs, but the graphs reflect capability assumptions, available network information and route-selection rules together. They do not provide a direct measure of the physical service limits of autonomous vehicles.
 
 ## 7. Discussion
 
-### 7.1 Fleet substitutability
+### 7.1 Service substitutability as a fleet-transition criterion
 
-The appropriate unit of fleet transition is substitutable service capacity, not vehicle count. One hundred AVs need not replace one hundred HVs; even equal active hours can support different request sets and matching structures. The meaningful operational comparisons are changes in instantaneous capacity, \(\Delta C^{eff}\), and in realized service, \(\Delta Y\), under specified demand and operating conditions.
+Fleet transition requires evaluating the service that new supply can replace, rather than the number of vehicles or hours introduced. Matching capacity makes this distinction operational: it records whether available vehicles connect to enough distinct requests to support simultaneous assignments. Realized service then depends on how dispatch uses those opportunities over time.
 
-The results support a conditional interpretation. A greater baseline-normalized AV active-hour level is associated with lower service under the main zero-lead, five-minute-patience replay and frozen interface. Separate AV-subgraph analysis verifies genuine matchable-demand losses under that policy, while timing sensitivity changes their magnitude. Some scarcity is endogenous to route/evidence representation, including the documented movement-coverage gap; it is not solely a property of vehicle capability. This is not a universal AV productivity penalty. Nor does graph capacity alone determine daily performance: competition, dispatch priorities and vehicle evolution connect instantaneous opportunities to service.
+The Xi'an replay shows lower service at higher normalized AV active-hour levels under the reference timing and serviceability assumptions. Fixed-state analysis supplies a more specific explanation than candidate attrition alone: acceptance, route compatibility and information requirements remove maximum-matchable AV demand. Yet this remains a mechanism of lost substitutability, not an additive explanation of the entire mixed-system outcome. HV alternatives, vehicle competition and subsequent spatial evolution remain relevant.
 
-This view complements research on strategic mixed-fleet control and spatial rebalancing rather than replacing it. Those decisions shape the state in which compatibility is evaluated; our capacity object measures what that state can support. [Ao et al. (2024)](https://doi.org/10.1016/j.tre.2024.103680); [Pavone et al. (2012)](https://doi.org/10.1177/0278364912444766).
+This perspective complements mixed-fleet market and control models (Mo et al., 2022; Ao et al., 2024), as well as spatial rebalancing (Pavone et al., 2012). Those decisions influence the states in which dispatch operates. The matching-capacity measure describes what a state can support under specified service requirements. It connects fleet planning to operational opportunity without replacing an equilibrium model or a dynamic control policy.
 
-### 7.2 Operational and managerial implications
+### 7.2 Implications for operations and information provision
 
-Four managerial levers can be understood through the compatibility graph.
+Additional supply is most useful when it connects to requests that existing vehicles cannot collectively serve. Adding vehicles with highly overlapping service opportunities can create many eligible pairs while adding little matching capacity. Conversely, a modest expansion of compatibility can matter if it connects otherwise unserviceable demand to available vehicles. This is why pair counts, matching counts and realized service should be reported separately.
 
-| Lever | Immediate modeling effect | What must be evaluated |
-| --- | --- | --- |
-| Fleet expansion or substitution | Adds/removes vehicle nodes and changes future availability | Whether new supply connects to underserved requests, not only existing competitors |
-| Capability expansion | Changes hard compatibility or exposure values | Whether newly usable routes create additional matching and acceptable exposure |
-| Passenger acceptance | Restores otherwise excluded AV pairs | Whether accepted requests remain route- and pickup-feasible |
-| Information/evidence improvement | Changes known compatibility and exposure estimates | Whether reduced uncertainty changes admissible matching or decisions |
+Passenger acceptance, assumed maneuver capability and route information act at different points in that relationship. The reported gains from broader acceptance and capability show that both can matter, but neither overcomes every remaining constraint. Information improvement is also distinct from capability expansion: resolving an unknown movement may establish compatibility, or it may reveal a genuine incompatibility. Better information need not expand the admissible graph monotonically.
 
-These are graph-centered interpretations, not four separately estimated intervention effects. More information can also reveal incompatibility and remove previously presumed options. It need not monotonically expand the graph or improve service. Similarly, broader profiles do not restore missing evidence, and fleet expansion can add little instantaneous capacity if every new vehicle competes for the same orders. No evidence-investment model is estimated here.
+Pickup timing cuts across these distinctions. Even a willing passenger and an admissible route provide no current match if the vehicle cannot arrive before expiry. The sensitivity results are consistent with the broader importance of demand information in autonomous mobility operations (Wen et al., 2019), while providing no transferable optimal advance-request policy. Capacity assessments should state the assumed release and patience process alongside fleet availability.
 
-Pickup patience and request timing cut across all four levers. An operationally compatible vehicle contributes no current option if it cannot reach the passenger in time. Capacity planning should therefore report timing assumptions alongside fleet hours, graph-based capacity and realized service. The measured sensitivity is consistent with prior work emphasizing demand information and advance requests, without supplying a transferable optimal lead-time policy. [Wen et al. (2019)](https://doi.org/10.1016/j.tra.2019.01.018).
+Continuous exposure limits offer a separate means of controlling the operating conditions of selected service. The reference policy nearly preserves service in the central comparison while reducing two exposure families. Its managerial interpretation is a tested operating trade-off, not a recommendation that the same numerical limits be transferred to another fleet or treated as safety thresholds.
 
-### 7.3 Generalizability and limitations
+### 7.3 Scope and limitations
 
-Five limitations define the scope. First, the application concerns one city and one evaluation day with quality-screened orders, so effect sizes are not population-wide estimates. Second, true request times are unobserved; the main boarding proxy and reconstructed alternatives produce conditional timing results. Third, capability profiles are analytical operating envelopes, not certified manufacturer specifications. Fourth, the main comparison retains a fixed route-construction policy and no active repositioning, so it does not estimate gains from joint route and rebalance optimization. Fifth, passenger acceptance is exogenous and omits price-, wait- and passenger-specific behavior.
+The empirical findings concern one city, one evaluation day and a quality-selected trajectory sample. Observed effect sizes are descriptive scenario contrasts, without population-level uncertainty estimates. True request times are unavailable, and the request-lead sensitivity changes waiting cohorts while retaining physical states from the reference history. It cannot establish the daily service effect of a different release process.
 
-A further, observed limitation is incomplete endpoint/movement representation in the frozen interface. It can conservatively exclude routes without establishing their physical infeasibility, and original/fallback branching can retain UNKNOWN despite an alternative represented route. We report these known behaviors explicitly rather than describe all gate attrition as intrinsic operational incompatibility. No corrected membership/interface scenario quantifies their contribution to daily service, and no causal fraction of the full-day decline is assigned to them. The retained results characterize the adopted system, not an error-free or universally applicable AV serviceability map.
+The capability profiles are analytical scenarios rather than certified vehicle specifications. Passenger acceptance is exogenous, and the model omits price- and passenger-specific choice behavior. The main comparisons also retain a predetermined service-route procedure and no active idle-vehicle repositioning. They do not quantify gains from joint routing, rebalancing or endogenous demand management.
+
+A further limitation is directly observed: incomplete endpoint and movement representation can exclude routes without demonstrating physical infeasibility. Route-selection rules can also leave an uncertain primary route in place despite an available alternative representation. No corrected-network daily comparison measures the effect of these behaviors. Accordingly, the service results characterize the adopted information and admission policy, not an error-free map of AV capability.
+
+Finally, prediction comparisons establish changes in decisions rather than superiority under common outcome evaluation. Neither the route descriptors nor the exposure constraints estimate accident probabilities. The framework concerns operational serviceability and its consequences for assignment.
 
 ## 8. Conclusion
 
-Nominal AV availability and effective service capacity are distinct: counts and active hours alone do not establish substitutability for human-driven service.
+Nominal autonomous supply, instantaneous effective matching capacity and realized ride-hailing service measure different aspects of fleet performance. Their distinction becomes consequential when vehicles serve heterogeneous sets of requests.
 
-The implemented passenger, routing-readiness and evidence gates reduce instantaneous effective matching capacity in the sampled AV subgraphs, rather than merely removing redundant candidate edges. This identifies lost substitutability under the adopted policy, not a decomposition of total service or proof of physical incapability for every excluded route.
+In the Xi'an application, service decreases as the baseline-normalized AV active-hour level rises under zero request lead and five-minute pickup patience. Fixed-state analysis shows that passenger, route and information requirements remove maximum-matchable AV demand, while candidate compression does not explain the sampled capacity loss. Higher acceptance and broader capability assumptions partly recover service, and alternative request timing changes the magnitude of the remaining constraint.
 
-The magnitude depends on request timing, patience, analytical capability assumptions and the frozen network/evidence representation. Fleet substitution should therefore be evaluated through explicitly qualified compatibility graphs and rolling service outcomes, not nominal fleet hours alone. Correcting the documented interface limitations would define a new empirical system; its service effects remain unestimated here.
+These results support a conditional account of service substitutability. The observed opportunities depend on capability assumptions, network information and pickup deadlines, including a documented movement-representation limitation. Evaluating a fleet transition therefore requires more than counting autonomous vehicles or hours: it requires assessing which requests the fleet can collectively serve and how dispatch converts those opportunities into service over time.
+
+## Declarations
+
+**Data availability.** This study uses individual trip trajectories and derived road and assignment data. Access conditions for the underlying data and the final code-and-materials availability statement must be confirmed by the authors before submission.
+
+**Ethics.** The study is a retrospective computational analysis of mobility records. The applicable data-use authorization, privacy safeguards and institutional ethics determination must be supplied by the authors; no ethics approval or exemption is asserted here.
+
+**Author contributions.** Author names and CRediT roles remain to be provided.
+
+**Competing interests and funding.** The authors must provide their competing-interest declaration and funding information.
+
+**AI-assisted writing.** AI assistance was used for manuscript restructuring, language revision and consistency checks. The authors must review the resulting text and confirm the disclosure required by the selected journal.
 
 ## References
 
-1. Alonso-Mora, J., Samaranayake, S., Wallar, A., Frazzoli, E., and Rus, D. (2017). On-demand high-capacity ride-sharing via dynamic trip-vehicle assignment. *Proceedings of the National Academy of Sciences*, 114(3), 462–467. [DOI](https://doi.org/10.1073/pnas.1611675114).
-2. Ao, D., Lai, Z., and Li, S. (2024). Control of dynamic ride-hailing networks with a mixed fleet of autonomous vehicles and for-hire human drivers. *Transportation Research Part E*, 189, 103680. [DOI](https://doi.org/10.1016/j.tre.2024.103680).
-3. Automated Vehicle Safety Consortium (AVSC) (2020). *AVSC Best Practice for Describing an Operational Design Domain: Conceptual Framework and Lexicon*. AVSC00002202004. SAE International. [Official record](https://saemobilus.sae.org/reports/avsc-best-practice-describing-operational-design-domain-conceptual-framework-lexicon-avsc00002202004).
-4. Elmachtoub, A. N., and Grigas, P. (2022). Smart “Predict, then Optimize”. *Management Science*, 68(1), 9–26. [DOI](https://doi.org/10.1287/mnsc.2020.3922).
-5. Li, X., and Zardini, G. (2026). Where Should Robotaxis Operate? Strategic Network Design for Autonomous Mobility-on-Demand. *arXiv preprint*, arXiv:2602.19341. [Preprint](https://arxiv.org/abs/2602.19341).
-6. Mo, D., Chen, X. M., and Zhang, J. (2022). Modeling and Managing Mixed On-Demand Ride Services of Human-Driven Vehicles and Autonomous Vehicles. *Transportation Research Part B*, 157, 80–119. [DOI](https://doi.org/10.1016/j.trb.2022.01.003).
-7. Pavone, M., Smith, S. L., Frazzoli, E., and Rus, D. (2012). Robotic load balancing for mobility-on-demand systems. *The International Journal of Robotics Research*, 31(7), 839–854. [DOI](https://doi.org/10.1177/0278364912444766).
-8. SAE International (2021). *Taxonomy and Definitions for Terms Related to Driving Automation Systems for On-Road Motor Vehicles*. J3016_202104. [DOI](https://doi.org/10.4271/J3016_202104).
-9. Wen, J., Nassir, N., and Zhao, J. (2019). Value of demand information in autonomous mobility-on-demand systems. *Transportation Research Part A*, 121, 346–359. [DOI](https://doi.org/10.1016/j.tra.2019.01.018).
-10. Wilder, B., Dilkina, B., and Tambe, M. (2019). Melding the Data-Decisions Pipeline: Decision-Focused Learning for Combinatorial Optimization. *Proceedings of the AAAI Conference on Artificial Intelligence*, 33(1), 1658–1665. [DOI](https://doi.org/10.1609/aaai.v33i01.33011658).
+Akçay, Y., Balakrishnan, A., & Xu, S. H. (2010). Dynamic assignment of flexible service resources. *Production and Operations Management, 19*(3), 279–304. [DOI](https://doi.org/10.1111/j.1937-5956.2009.01095.x).
+
+Alonso-Mora, J., Samaranayake, S., Wallar, A., Frazzoli, E., & Rus, D. (2017). On-demand high-capacity ride-sharing via dynamic trip-vehicle assignment. *Proceedings of the National Academy of Sciences, 114*(3), 462–467. [DOI](https://doi.org/10.1073/pnas.1611675114).
+
+Ao, D., Lai, Z., & Li, S. (2024). Control of dynamic ride-hailing networks with a mixed fleet of autonomous vehicles and for-hire human drivers. *Transportation Research Part E, 189*, 103680. [DOI](https://doi.org/10.1016/j.tre.2024.103680).
+
+Automated Vehicle Safety Consortium. (2020). *AVSC best practice for describing an operational design domain: Conceptual framework and lexicon*. AVSC00002202004. SAE International. [Official record](https://saemobilus.sae.org/reports/avsc-best-practice-describing-operational-design-domain-conceptual-framework-lexicon-avsc00002202004).
+
+Elmachtoub, A. N., & Grigas, P. (2022). Smart “Predict, then Optimize”. *Management Science, 68*(1), 9–26. [DOI](https://doi.org/10.1287/mnsc.2020.3922).
+
+Li, X., & Zardini, G. (2026). *Where should robotaxis operate? Strategic network design for autonomous mobility-on-demand* [Preprint]. arXiv:2602.19341. [Preprint](https://arxiv.org/abs/2602.19341).
+
+Mo, D., Chen, X. M., & Zhang, J. (2022). Modeling and managing mixed on-demand ride services of human-driven vehicles and autonomous vehicles. *Transportation Research Part B, 157*, 80–119. [DOI](https://doi.org/10.1016/j.trb.2022.01.003).
+
+Pavone, M., Smith, S. L., Frazzoli, E., & Rus, D. (2012). Robotic load balancing for mobility-on-demand systems. *The International Journal of Robotics Research, 31*(7), 839–854. [DOI](https://doi.org/10.1177/0278364912444766).
+
+SAE International. (2021). *Taxonomy and definitions for terms related to driving automation systems for on-road motor vehicles*. J3016_202104. [DOI](https://doi.org/10.4271/J3016_202104).
+
+Tsitsiklis, J. N., & Xu, K. (2017). Flexible queueing architectures. *Operations Research, 65*(5), 1398–1413. [DOI](https://doi.org/10.1287/opre.2017.1620).
+
+Wen, J., Nassir, N., & Zhao, J. (2019). Value of demand information in autonomous mobility-on-demand systems. *Transportation Research Part A, 121*, 346–359. [DOI](https://doi.org/10.1016/j.tra.2019.01.018).
+
+Wilder, B., Dilkina, B., & Tambe, M. (2019). Melding the data-decisions pipeline: Decision-focused learning for combinatorial optimization. *Proceedings of the AAAI Conference on Artificial Intelligence, 33*(1), 1658–1665. [DOI](https://doi.org/10.1609/aaai.v33i01.33011658).

@@ -24,4 +24,42 @@ Verification date: 2026-09-12. This is a focused reference completion, not a sys
 - Wilder et al.: [AAAI proceedings record](https://ojs.aaai.org/index.php/AAAI/article/view/3982), authors/year/pages/DOI and decision-focused scope.
 - Wen et al.: [author-lab record](https://mobility.mit.edu/biblio/wen-value-demand-information-autonomous-mobility-demand-systems/) and [MIT publication digest](https://ilp.mit.edu/sites/default/files/public-surveys/Mobility%201019.pdf), DOI 10.1016/j.tra.2019.01.018.
 
-All ten entries are cited in the V3 main text with stable links and appear in References. No citation placeholders remain in V3. The research gap is framed as this paper's operational emphasis, not an exhaustive priority claim. Journal targeting is a writing aim, not a promise of novelty or acceptance.
+The original ten entries are retained. The supplied B manuscript adds the two
+flexible-resource references below, bringing the current main-text bibliography
+to twelve. The research gap is framed as an operational emphasis, not an
+exhaustive priority claim. Journal targeting is a writing aim, not a promise of
+novelty or acceptance.
+
+## B-version incorporation and targeted recheck, 2026-09-22
+
+- Akçay, Balakrishnan and Xu (2010), *Dynamic Assignment of Flexible Service
+  Resources*, POM 19(3), 279–304:
+  [publisher abstract](https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1937-5956.2009.01095.x).
+  Supports overlapping resource–job service sets and dynamic allocation.
+- Tsitsiklis and Xu (2017), *Flexible Queueing Architectures*, OR 65(5),
+  1398–1413:
+  [publisher record](https://pubsonline.informs.org/doi/pdf/10.1287/opre.2017.1620)
+  and [author manuscript](https://web.stanford.edu/~kuangxu/papers/FlexQueArc_TsiXu_16.pdf).
+  Supports graph-based service flexibility. Its queueing capacity region must
+  not be conflated with this paper's instantaneous matching cardinality.
+
+A bounded primary-source metadata and abstract-level check found no substantive
+bibliographic corrections needed in the twelve-entry B list. Publisher,
+institutional and author records support the narrow descriptions used in the
+revision. This is not a twelve-paper full-text review. In particular, the
+ScienceDirect full-page retrieval for Mo et al. remains unavailable; claims
+about that paper stay at the publicly visible abstract level.
+
+Date handling matters for two entries. Smart “Predict, then Optimize” is cited
+as the 2022 journal issue despite its 2021 online publication date. The SAE
+reference remains the specified J3016_202104 edition dated 2021-04-30, not a
+later revision surfaced by dynamic webpage metadata. Li and Zardini remains
+explicitly a preprint.
+
+Additional checked primary access points:
+
+- [Alonso-Mora institutional record](https://research.tudelft.nl/en/publications/on-demand-high-capacity-ride-sharing-via-dynamic-trip-vehicle-ass/)
+- [AVSC official document](https://go.sae.org/rs/525-RCG-129/images/AVSC00002202004.pdf)
+- [Li and Zardini v1](https://arxiv.org/html/2602.19341v1)
+- [Wen author-institution record](https://sites.mit.edu/jtl-tl/biblio/wen-value-demand-information-autonomous-mobility-demand-systems/)
+- [Grigas publication list](https://grigas.ieor.berkeley.edu/publications/)
