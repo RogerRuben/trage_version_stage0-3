@@ -1,0 +1,819 @@
+{
+  "scope": "read-only input inventory; not model validation",
+  "csv": {
+    "repository\\7-sample_data_and_code\\carpooling_one_day_sample_code\\speed_filled_step1_sample_2024-11-12.csv": {
+      "rows": 10781328,
+      "columns": [
+        "hour",
+        "id_y",
+        "weekday",
+        "avg_speed"
+      ],
+      "unique_orders": null,
+      "unique_vehicles": null,
+      "missing": {},
+      "categories": {
+        "weekday": {
+          "1": 10781328
+        },
+        "hour": {
+          "00:00:00": 449222,
+          "01:00:00": 449222,
+          "02:00:00": 449222,
+          "03:00:00": 449222,
+          "04:00:00": 449222,
+          "05:00:00": 449222,
+          "06:00:00": 449222,
+          "07:00:00": 449222,
+          "08:00:00": 449222,
+          "09:00:00": 449222,
+          "10:00:00": 449222,
+          "11:00:00": 449222,
+          "12:00:00": 449222,
+          "13:00:00": 449222,
+          "14:00:00": 449222,
+          "15:00:00": 449222,
+          "16:00:00": 449222,
+          "17:00:00": 449222,
+          "18:00:00": 449222,
+          "19:00:00": 449222,
+          "20:00:00": 449222,
+          "21:00:00": 449222,
+          "22:00:00": 449222,
+          "23:00:00": 449222
+        }
+      },
+      "timing_seconds": {}
+    },
+    "repository\\7-sample_data_and_code\\carpooling_one_day_sample_code\\v12-traj_sample_2024-11-12.csv": {
+      "rows": 6727,
+      "columns": [
+        "订单号",
+        "用户id",
+        "服务人次",
+        "订单来源",
+        "车辆id",
+        "订单状态",
+        "呼单起点",
+        "呼单终点",
+        "起点经度",
+        "起点纬度",
+        "终点经度",
+        "终点纬度",
+        "日期",
+        "呼单时间",
+        "接单时间",
+        "出发接驾时间",
+        "开始行程时间",
+        "取消时间",
+        "到达起点时间",
+        "到达目的地时间",
+        "评分",
+        "接驾时长",
+        "行程时长",
+        "行程里程",
+        "接驾里程",
+        "虚拟单合并数",
+        "取消次数",
+        "订单起点性质",
+        "订单终点性质",
+        "起点所属区",
+        "终点所属区",
+        "average_speed",
+        "起点边ID",
+        "终点边ID",
+        "起点边距离",
+        "终点边距离"
+      ],
+      "unique_orders": 6727,
+      "unique_vehicles": 402,
+      "missing": {
+        "评分": 5824,
+        "接驾时长": 437,
+        "接驾里程": 15
+      },
+      "categories": {
+        "订单状态": {
+          "完成": 6727
+        },
+        "订单来源": {
+          "app": 2841,
+          "小程序": 2759,
+          "百度地图": 1127
+        }
+      },
+      "timing_seconds": {
+        "request_to_arrival_s": {
+          "n": 6727,
+          "missing_or_parse_error": 0,
+          "min": 0.0,
+          "p25": 180.0,
+          "p50": 300.0,
+          "p75": 480.0,
+          "p90": 720.0,
+          "max": 2220.0,
+          "negative": 0,
+          "zero": 178
+        },
+        "request_to_trip_start_s": {
+          "n": 6727,
+          "missing_or_parse_error": 0,
+          "min": 0.0,
+          "p25": 240.0,
+          "p50": 360.0,
+          "p75": 540.0,
+          "p90": 744.0,
+          "max": 8700.0,
+          "negative": 0,
+          "zero": 11
+        },
+        "request_to_accept_s": {
+          "n": 6727,
+          "missing_or_parse_error": 0,
+          "min": 0.0,
+          "p25": 0.0,
+          "p50": 0.0,
+          "p75": 0.0,
+          "p90": 60.0,
+          "max": 1200.0,
+          "negative": 0,
+          "zero": 5908
+        }
+      }
+    },
+    "repository\\7-sample_data_and_code\\carpooling_one_day_sample_code\\carpooling_one_day_results_v12_sumo\\sensitivity_summary.csv": {
+      "rows": 3,
+      "columns": [
+        "scenario",
+        "dw_max_wait_minutes",
+        "dw_max_distance_m",
+        "use_sumo_paths",
+        "total_original_orders",
+        "total_shared_pairs",
+        "overall_sharing_rate",
+        "total_cars",
+        "avg_daily_orders",
+        "avg_daily_cars",
+        "merged_pairs_2p",
+        "merged_pairs_3p",
+        "merged_passengers_total"
+      ],
+      "unique_orders": null,
+      "unique_vehicles": null,
+      "missing": {},
+      "categories": {},
+      "timing_seconds": {}
+    },
+    "repository\\7-sample_data_and_code\\Wuhan-sample\\data\\daily_trajs\\traj_20240708.csv": {
+      "rows": 180102,
+      "columns": [
+        "vehicle_id",
+        "order_id",
+        "start_time",
+        "end_time",
+        "start_lon",
+        "start_lat",
+        "end_lon",
+        "end_lat",
+        "duration",
+        "date",
+        "起点边ID",
+        "终点边ID",
+        "起点边距离",
+        "终点边距离",
+        "路径长度",
+        "路径平均速度",
+        "path"
+      ],
+      "unique_orders": 180102,
+      "unique_vehicles": 11248,
+      "missing": {},
+      "categories": {},
+      "timing_seconds": {}
+    }
+  },
+  "workbooks": {
+    "41893_2026_1944_MOESM10_ESM.xlsx": {
+      "source_data_figure2a_info": {
+        "declared_rows_including_header": 53,
+        "columns": 10,
+        "header": [
+          "Metric",
+          "Period",
+          "Vehicle_Type",
+          "n",
+          "median",
+          "lower_box_edge_q1",
+          "upper_box_edge_q3",
+          "box_height_iqr",
+          "whisker_lower",
+          "whisker_upper"
+        ]
+      },
+      "source_data_figure2a_p": {
+        "declared_rows_including_header": 49,
+        "columns": 7,
+        "header": [
+          "Metric",
+          "Period",
+          "Vehicle_Type_1",
+          "Vehicle_Type_2",
+          "n_1",
+          "n_2",
+          "p_value"
+        ]
+      },
+      "source_data_figure2b": {
+        "declared_rows_including_header": 1000001,
+        "columns": 17,
+        "header": [
+          "gx",
+          "gy",
+          "hour_bin",
+          "Robotaxi_Order_Count",
+          "HV_Order_Count",
+          "gx",
+          "gy",
+          "hour_bin",
+          "Robotaxi_Order_Count",
+          "HV_Order_Count",
+          "gx",
+          "gy",
+          "hour_bin",
+          "Robotaxi_Order_Count",
+          "HV_Order_Count",
+          "Vehicle_Type",
+          "Total_Order_Count"
+        ]
+      },
+      "source_data_figure2c_line": {
+        "declared_rows_including_header": 107,
+        "columns": 3,
+        "header": [
+          "Period",
+          "Top-K%",
+          "Overlap Rate"
+        ]
+      },
+      "source_data_figure2c_radar": {
+        "declared_rows_including_header": 6,
+        "columns": 6,
+        "header": [
+          "CCI Interval",
+          "Peak hour (Morning)",
+          "Day",
+          "Peak hour (Evening)",
+          "Night",
+          "All Periods"
+        ]
+      },
+      "source_data_figure2d": {
+        "declared_rows_including_header": 98,
+        "columns": 5,
+        "header": [
+          "Group",
+          "Transport",
+          "Type",
+          "Time",
+          "Value"
+        ]
+      },
+      "source_data_figure2d_info": {
+        "declared_rows_including_header": 5,
+        "columns": 21,
+        "header": [
+          "Group",
+          "Transport",
+          "Type",
+          "Mean",
+          "Median",
+          "Variance",
+          "Q1",
+          "Q3",
+          "Whisker_Low",
+          "Whisker_High",
+          "Box_Length",
+          "Comparison",
+          "Group1",
+          "Group2",
+          "U-stat",
+          "p-value",
+          "df",
+          "CI_Lower",
+          "CI_Upper",
+          "Effect_Size_r",
+          "Test Name and Instructions"
+        ]
+      },
+      "source_data_figure2e": {
+        "declared_rows_including_header": 12,
+        "columns": 5,
+        "header": [
+          "pct",
+          "fuel_kJ",
+          "elec_kJ",
+          "total_energy_kJ",
+          "total_co2_ton"
+        ]
+      }
+    },
+    "41893_2026_1944_MOESM11_ESM.xlsx": {
+      "figure3a": {
+        "declared_rows_including_header": 24,
+        "columns": 7,
+        "header": [
+          "CCI_percentile_bin",
+          "HV_observed_orders",
+          "HV_POP_predicted_orders",
+          "HV_CTX_predicted_orders",
+          "Robotaxi_observed_orders",
+          "Robotaxi_POP_predicted_orders",
+          "Robotaxi_CTX_predicted_orders"
+        ]
+      },
+      "figure3b": {
+        "declared_rows_including_header": 3565,
+        "columns": 13,
+        "header": [
+          "histogram_CCI_left",
+          "histogram_CCI_right",
+          "histogram_density",
+          null,
+          "KDE_CCI",
+          "KDE_density",
+          "ECDF_CCI",
+          "ECDF_probability",
+          null,
+          "percentile_label",
+          "percentile_probability",
+          "percentile_CCI",
+          "percentile_KDE_density"
+        ]
+      },
+      "figure3c": {
+        "declared_rows_including_header": 25,
+        "columns": 6,
+        "header": [
+          "hour",
+          "time_label",
+          "Passenger_share",
+          "Charging_share",
+          "Dispatch_share",
+          "Idle_share"
+        ]
+      }
+    },
+    "41893_2026_1944_MOESM12_ESM.xlsx": {
+      "figure4a": {
+        "declared_rows_including_header": 61,
+        "columns": 8,
+        "header": [
+          "histogram_bin",
+          "OPCI_left",
+          "OPCI_right",
+          "OPCI_center",
+          "HV_density",
+          "Robotaxi_density",
+          "statistic",
+          "value"
+        ]
+      },
+      "figure4b": {
+        "declared_rows_including_header": 21,
+        "columns": 7,
+        "header": [
+          "CCI_percentile_bin",
+          "Robotaxi_observed_orders",
+          "Robotaxi_CTX_predicted_orders",
+          "Robotaxi_POP_SNE_predicted_orders",
+          null,
+          null,
+          null
+        ]
+      },
+      "figure4c": {
+        "declared_rows_including_header": 10320,
+        "columns": 8,
+        "header": [
+          "timestamp",
+          "date",
+          "weekday",
+          "with_passenger",
+          "driving_to_pick_up",
+          "waiting_to_pick_up",
+          "minimum_fleet_volume",
+          "robotaxi_volume"
+        ]
+      },
+      "figure4d": {
+        "declared_rows_including_header": 7001,
+        "columns": 3,
+        "header": [
+          "weekday",
+          "hour",
+          "density"
+        ]
+      },
+      "figure4e": {
+        "declared_rows_including_header": 25,
+        "columns": 14,
+        "header": [
+          "hour",
+          "time_label",
+          "Original_mean_kWh",
+          "Original_CI_low_kWh",
+          "Original_CI_high_kWh",
+          "Original_n",
+          "Optimized_mean_kWh",
+          "Optimized_CI_low_kWh",
+          "Optimized_CI_high_kWh",
+          "Optimized_n",
+          "Improvement_mean_pct",
+          "Improvement_CI_low_pct",
+          "Improvement_CI_high_pct",
+          "Improvement_n"
+        ]
+      }
+    },
+    "41893_2026_1944_MOESM2_ESM.xlsx": {
+      "SourceData_SupFig1a": {
+        "declared_rows_including_header": 3,
+        "columns": 2,
+        "header": [
+          "Full-time employment status",
+          "value"
+        ]
+      },
+      "SourceData_SupFig1b": {
+        "declared_rows_including_header": 4,
+        "columns": 2,
+        "header": [
+          "Age distribution",
+          "value"
+        ]
+      },
+      "SourceData_SupFig1c": {
+        "declared_rows_including_header": 3,
+        "columns": 2,
+        "header": [
+          "Gender",
+          "value"
+        ]
+      },
+      "SourceData_SupFig1d": {
+        "declared_rows_including_header": 3,
+        "columns": 2,
+        "header": [
+          "License holding status",
+          "value"
+        ]
+      },
+      "SourceData_SupFig1e": {
+        "declared_rows_including_header": 5,
+        "columns": 2,
+        "header": [
+          "Education level",
+          "value"
+        ]
+      },
+      "SourceData_SupFig1f": {
+        "declared_rows_including_header": 6,
+        "columns": 2,
+        "header": [
+          "Preference for Robotaxi",
+          "value"
+        ]
+      },
+      "SourceData_SupFig1g": {
+        "declared_rows_including_header": 8,
+        "columns": 2,
+        "header": [
+          "Usage scenarios of Robotaxi",
+          "value"
+        ]
+      }
+    },
+    "41893_2026_1944_MOESM3_ESM.xlsx": {
+      "Fig S2a": {
+        "declared_rows_including_header": 34,
+        "columns": 7,
+        "header": [
+          "date",
+          "weekday",
+          "weekday_label",
+          "total_orders",
+          "success_orders",
+          "cancelled_orders",
+          "success_rate"
+        ]
+      },
+      "Fig S2a Summary": {
+        "declared_rows_including_header": 8,
+        "columns": 7,
+        "header": [
+          "weekday",
+          "weekday_label",
+          "mean_daily_cancelled_orders",
+          "sd_daily_cancelled_orders",
+          "mean_daily_success_rate",
+          "sd_daily_success_rate",
+          "n_days"
+        ]
+      },
+      "Fig S2b": {
+        "declared_rows_including_header": 43,
+        "columns": 6,
+        "header": [
+          "period",
+          "period_order",
+          "district",
+          "district_order",
+          "cancelled_orders",
+          "sqrt_radial_value"
+        ]
+      },
+      "Fig S2b Box Stats": {
+        "declared_rows_including_header": 5,
+        "columns": 10,
+        "header": [
+          "period",
+          "n",
+          "Q1",
+          "Median",
+          "Q3",
+          "IQR",
+          "Lower_fence",
+          "Upper_fence",
+          "Lower_whisker",
+          "Upper_whisker"
+        ]
+      }
+    },
+    "41893_2026_1944_MOESM4_ESM.xlsx": {
+      "Sensitivity Data": {
+        "declared_rows_including_header": 226,
+        "columns": 4,
+        "header": [
+          "Top-K (%)",
+          "CCI stratum",
+          "Time period",
+          "Top-K overlap (%)"
+        ]
+      },
+      "CCI Thresholds": {
+        "declared_rows_including_header": 5,
+        "columns": 2,
+        "header": [
+          "CCI percentile",
+          "CCI threshold"
+        ]
+      }
+    },
+    "41893_2026_1944_MOESM5_ESM.xlsx": {
+      "FigS5.a": {
+        "declared_rows_including_header": 12,
+        "columns": 7,
+        "header": [
+          "Robotaxi penetration (%)",
+          "Fuel energy (kJ)",
+          "Electric energy (kJ)",
+          "Total energy (kJ)",
+          "Tailpipe CO2 (ton)",
+          "Grid CO2 (ton)",
+          "Total CO2 (ton)"
+        ]
+      },
+      "FigS5.b": {
+        "declared_rows_including_header": 12,
+        "columns": 7,
+        "header": [
+          "Robotaxi penetration (%)",
+          "Fuel energy (kJ)",
+          "Electric energy (kJ)",
+          "Total energy (kJ)",
+          "Tailpipe CO2 (ton)",
+          "Grid CO2 (ton)",
+          "Total CO2 (ton)"
+        ]
+      },
+      "FigS5.c": {
+        "declared_rows_including_header": 12,
+        "columns": 7,
+        "header": [
+          "Robotaxi penetration (%)",
+          "Fuel energy (kJ)",
+          "Electric energy (kJ)",
+          "Total energy (kJ)",
+          "Tailpipe CO2 (ton)",
+          "Grid CO2 (ton)",
+          "Total CO2 (ton)"
+        ]
+      }
+    },
+    "41893_2026_1944_MOESM6_ESM.xlsx": {
+      "Fig.S6": {
+        "declared_rows_including_header": 32,
+        "columns": 3,
+        "header": [
+          "Held-out date",
+          "CTX held-out R²",
+          "POP + SNE held-out R²"
+        ]
+      }
+    },
+    "41893_2026_1944_MOESM7_ESM.xlsx": {
+      "Panel_A_TripCounts": {
+        "declared_rows_including_header": 4,
+        "columns": 2,
+        "header": [
+          "People",
+          "Number_of_Trips"
+        ]
+      },
+      "Panel_B_DailyAvg": {
+        "declared_rows_including_header": 32,
+        "columns": 2,
+        "header": [
+          "Date",
+          "Avg_Passengers_Per_Trip"
+        ]
+      },
+      "Panel_C_HourlyAvg": {
+        "declared_rows_including_header": 25,
+        "columns": 2,
+        "header": [
+          "Hour",
+          "Avg_Passengers_Per_Trip"
+        ]
+      },
+      "Panel_D_DistanceBins": {
+        "declared_rows_including_header": 9,
+        "columns": 3,
+        "header": [
+          "Distance_Bin",
+          "Shared_Ratio_Percent",
+          "Bin_Counts"
+        ]
+      }
+    },
+    "41893_2026_1944_MOESM8_ESM.xlsx": {
+      "SourceData_SupFig8": {
+        "declared_rows_including_header": 4,
+        "columns": 10,
+        "header": [
+          "scenario",
+          "dw_max_wait_minutes",
+          "dw_max_distance_m",
+          "total_original_orders",
+          "total_shared_pairs",
+          "overall_sharing_rate",
+          "total_cars",
+          "merged_pairs_2p",
+          "merged_pairs_3p",
+          "merged_passengers_total"
+        ]
+      }
+    },
+    "41893_2026_1944_MOESM9_ESM.xlsx": {
+      "figure1a": {
+        "declared_rows_including_header": 934,
+        "columns": 6,
+        "header": [
+          "grid_x",
+          "grid_y",
+          "longitude",
+          "latitude",
+          "order_count",
+          null
+        ]
+      },
+      "figure1b": {
+        "declared_rows_including_header": 42,
+        "columns": 7,
+        "header": [
+          "period",
+          "period_order",
+          "district",
+          "district_order",
+          "order_count",
+          null,
+          null
+        ]
+      },
+      "figure1c": {
+        "declared_rows_including_header": 147,
+        "columns": 6,
+        "header": [
+          "period",
+          "period_label",
+          "origin_type",
+          "destination_type",
+          "proportion",
+          null
+        ]
+      },
+      "figure1d_beeswarm": {
+        "declared_rows_including_header": 720001,
+        "columns": 5,
+        "header": [
+          "sample_index",
+          "feature_name",
+          "feature_value",
+          "shap_value",
+          "group"
+        ]
+      },
+      "figure1d_pie": {
+        "declared_rows_including_header": 10,
+        "columns": 4,
+        "header": [
+          "feature_name",
+          "shap_importance",
+          "percentage",
+          "percentage_formatted"
+        ]
+      },
+      "figure1e": {
+        "declared_rows_including_header": 1176,
+        "columns": 5,
+        "header": [
+          "grid_x",
+          "grid_y",
+          "longitude",
+          "latitude",
+          "total_co2_kg"
+        ]
+      },
+      "figure1f": {
+        "declared_rows_including_header": 746,
+        "columns": 3,
+        "header": [
+          "date",
+          "hour",
+          "daily_total_charging_energy_kwh"
+        ]
+      },
+      "figure1f_info": {
+        "declared_rows_including_header": 25,
+        "columns": 7,
+        "header": [
+          "hour",
+          "median",
+          "lower_box_edge_q1",
+          "upper_box_edge_q3",
+          "box_height_iqr",
+          "whisker_lower",
+          "whisker_upper"
+        ]
+      },
+      "figure1g_boxplot_info": {
+        "declared_rows_including_header": 25,
+        "columns": 7,
+        "header": [
+          "hour",
+          "median",
+          "lower_box_edge_q1",
+          "upper_box_edge_q3",
+          "box_height_iqr",
+          "whisker_lower",
+          "whisker_upper"
+        ]
+      },
+      "figure1g_line": {
+        "declared_rows_including_header": 25,
+        "columns": 2,
+        "header": [
+          "hour",
+          "total_co2_ton"
+        ]
+      }
+    }
+  },
+  "figure4a_published_statistics": {
+    "HV_trip_count": 3555128,
+    "Robotaxi_trip_count": 408236,
+    "HV_weighted_mean": 2.65,
+    "Robotaxi_weighted_mean": 2.2,
+    "Delta_weighted_mean": -0.45,
+    "Cohen_d": -1.57,
+    "Welch_p": 0
+  },
+  "lfs_checks": [
+    {
+      "path": "repository\\7-sample_data_and_code\\carpooling_one_day_sample_code\\speed_filled_step1_sample_2024-11-12.csv",
+      "sha256": "86c27cee33212e1d0d7ea5462289f92efbab20093d8c6e9985ab72e4c5164abf",
+      "matches": true
+    },
+    {
+      "path": "repository\\7-sample_data_and_code\\Wuhan-sample\\data\\daily_trajs\\traj_20240708.csv",
+      "sha256": "b693bc342e332285d4d165508f1d880f779c7265d316dc7a581b43f626f17c07",
+      "matches": true
+    },
+    {
+      "path": "repository\\7-sample_data_and_code\\Wuhan-sample\\data\\sumo\\robust.net.xml",
+      "sha256": "a74e9aa94af27655b5753c9f4c84f8a4dab44f3470dceae0f224cc79fd21e58b",
+      "matches": true
+    }
+  ],
+  "downloaded_bytes": 850054616
+}
