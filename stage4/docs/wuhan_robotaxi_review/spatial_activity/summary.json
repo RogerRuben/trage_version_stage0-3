@@ -1,0 +1,953 @@
+{
+  "scope": "published aligned spatial activity; no capability or causal inference",
+  "sources": {
+    "figure2": {
+      "path": "stage4\\output\\external_research\\wuhan_robotaxi_2026\\publisher\\41893_2026_1944_MOESM10_ESM.xlsx",
+      "sha256": "6eeb96601bc932cfad5defbdfc37e8f544243a6c9accfaf0d3cba7dc456c9108"
+    },
+    "figure4": {
+      "path": "stage4\\output\\external_research\\wuhan_robotaxi_2026\\publisher\\41893_2026_1944_MOESM12_ESM.xlsx",
+      "sha256": "3af7a5f8f14b54df55d83401355bf7420ba9e8d10896b184e41981cda1ffc3f9"
+    },
+    "fig2b": {
+      "path": "stage4\\output\\external_research\\wuhan_robotaxi_2026\\repository\\6-figure\\fig2b.py",
+      "sha256": "4d82e4dfe684921c326924e7e1a76cd234f825af826761bccb39b38495286a44"
+    },
+    "fig2c": {
+      "path": "stage4\\output\\external_research\\wuhan_robotaxi_2026\\repository\\6-figure\\fig2c.py",
+      "sha256": "b9820f3419680a86cf47b193aa0af640b092c4480543333d1a7b180eaddfe162"
+    },
+    "fig4a": {
+      "path": "stage4\\output\\external_research\\wuhan_robotaxi_2026\\repository\\6-figure\\fig4a.py",
+      "sha256": "c17a57cbc7acefc30372e54089ecb2a19d3e02df025396431dd83766c587eb6c"
+    },
+    "fig4b": {
+      "path": "stage4\\output\\external_research\\wuhan_robotaxi_2026\\repository\\6-figure\\fig4b.py",
+      "sha256": "f61211c385647f7d1bbecf5256738487b336b4df53523ba886b6fcc9972bb3df"
+    }
+  },
+  "figure2": {
+    "sheet": "source_data_figure2b",
+    "declared_rows_including_header": 1000001,
+    "blocks": [
+      {
+        "records": 1000000,
+        "robotaxi_count": 79936,
+        "hv_count": 1379057
+      },
+      {
+        "records": 1000000,
+        "robotaxi_count": 102143,
+        "hv_count": 1338938
+      },
+      {
+        "records": 651616,
+        "robotaxi_count": 76284,
+        "hv_count": 782490,
+        "blank_padding_rows": 348384
+      }
+    ],
+    "published_total_controls": {
+      "Robotaxi": 258363,
+      "HV": 3500485
+    },
+    "totals_match_published_controls": {
+      "Robotaxi": true,
+      "HV": true
+    },
+    "duplicate_grid_timestamp_keys": 0,
+    "unique_grid_count": 3564,
+    "grid_index_bounds": [
+      0,
+      65,
+      0,
+      53
+    ],
+    "unique_published_timestamps": 744,
+    "first_published_timestamp": "2024-11-12 00:00:00",
+    "last_published_timestamp": "2024-12-12 23:00:00",
+    "date_count": 31,
+    "represented_cell_count": 2651616,
+    "rectangular_grid_timestamp_product": 2651616,
+    "all_grids_have_all_published_timestamps": true,
+    "cell_states": {
+      "both_zero": 2277469,
+      "hv_only_positive": 260921,
+      "both_positive": 38162,
+      "robotaxi_only_positive": 75064
+    },
+    "spatial_totals": {
+      "represented_grids": 3564,
+      "robotaxi_active_grids": 900,
+      "hv_active_grids": 2103,
+      "both_active_grids": 819,
+      "either_active_grids": 2184,
+      "active_grid_jaccard": 0.375,
+      "robotaxi_count": 258363,
+      "hv_count": 3500485,
+      "robotaxi_mass_in_shared_active_grids": 0.9590382523813394,
+      "hv_mass_in_shared_active_grids": 0.35221890680862794,
+      "normalized_spatial_distribution_overlap": 0.16305660170103872
+    },
+    "hourly": [
+      {
+        "hour": 0,
+        "represented_grids": 3564,
+        "robotaxi_active_grids": 202,
+        "hv_active_grids": 1375,
+        "both_active_grids": 183,
+        "either_active_grids": 1394,
+        "active_grid_jaccard": 0.13127690100430417,
+        "robotaxi_count": 1323,
+        "hv_count": 155715,
+        "robotaxi_mass_in_shared_active_grids": 0.9478458049886621,
+        "hv_mass_in_shared_active_grids": 0.19181838615419194,
+        "normalized_spatial_distribution_overlap": 0.11793493302018493,
+        "published_time_slots": 31,
+        "cell_states": {
+          "both_zero": 96308,
+          "hv_only_positive": 13226,
+          "both_positive": 454,
+          "robotaxi_only_positive": 496
+        }
+      },
+      {
+        "hour": 1,
+        "represented_grids": 3564,
+        "robotaxi_active_grids": 178,
+        "hv_active_grids": 1101,
+        "both_active_grids": 145,
+        "either_active_grids": 1134,
+        "active_grid_jaccard": 0.12786596119929453,
+        "robotaxi_count": 841,
+        "hv_count": 85291,
+        "robotaxi_mass_in_shared_active_grids": 0.9215219976218787,
+        "hv_mass_in_shared_active_grids": 0.16158797528461386,
+        "normalized_spatial_distribution_overlap": 0.11259378625022308,
+        "published_time_slots": 31,
+        "cell_states": {
+          "both_zero": 100355,
+          "hv_only_positive": 9445,
+          "both_positive": 275,
+          "robotaxi_only_positive": 409
+        }
+      },
+      {
+        "hour": 2,
+        "represented_grids": 3564,
+        "robotaxi_active_grids": 134,
+        "hv_active_grids": 945,
+        "both_active_grids": 116,
+        "either_active_grids": 963,
+        "active_grid_jaccard": 0.12045690550363447,
+        "robotaxi_count": 550,
+        "hv_count": 62724,
+        "robotaxi_mass_in_shared_active_grids": 0.9127272727272727,
+        "hv_mass_in_shared_active_grids": 0.14117403226835024,
+        "normalized_spatial_distribution_overlap": 0.0986482193273852,
+        "published_time_slots": 31,
+        "cell_states": {
+          "both_zero": 101869,
+          "hv_only_positive": 8164,
+          "both_positive": 153,
+          "robotaxi_only_positive": 298
+        }
+      },
+      {
+        "hour": 3,
+        "represented_grids": 3564,
+        "robotaxi_active_grids": 122,
+        "hv_active_grids": 873,
+        "both_active_grids": 96,
+        "either_active_grids": 899,
+        "active_grid_jaccard": 0.1067853170189099,
+        "robotaxi_count": 583,
+        "hv_count": 44679,
+        "robotaxi_mass_in_shared_active_grids": 0.6620926243567753,
+        "hv_mass_in_shared_active_grids": 0.10877593500302156,
+        "normalized_spatial_distribution_overlap": 0.08028990638270166,
+        "published_time_slots": 31,
+        "cell_states": {
+          "both_zero": 102777,
+          "hv_only_positive": 7288,
+          "both_positive": 114,
+          "robotaxi_only_positive": 305
+        }
+      },
+      {
+        "hour": 4,
+        "represented_grids": 3564,
+        "robotaxi_active_grids": 108,
+        "hv_active_grids": 896,
+        "both_active_grids": 76,
+        "either_active_grids": 928,
+        "active_grid_jaccard": 0.08189655172413793,
+        "robotaxi_count": 482,
+        "hv_count": 32888,
+        "robotaxi_mass_in_shared_active_grids": 0.7717842323651453,
+        "hv_mass_in_shared_active_grids": 0.0831914376064218,
+        "normalized_spatial_distribution_overlap": 0.06511878362979194,
+        "published_time_slots": 31,
+        "cell_states": {
+          "both_zero": 103160,
+          "hv_only_positive": 7001,
+          "both_positive": 81,
+          "robotaxi_only_positive": 242
+        }
+      },
+      {
+        "hour": 5,
+        "represented_grids": 3564,
+        "robotaxi_active_grids": 122,
+        "hv_active_grids": 1045,
+        "both_active_grids": 100,
+        "either_active_grids": 1067,
+        "active_grid_jaccard": 0.09372071227741331,
+        "robotaxi_count": 489,
+        "hv_count": 40450,
+        "robotaxi_mass_in_shared_active_grids": 0.8752556237218814,
+        "hv_mass_in_shared_active_grids": 0.10847960444993819,
+        "normalized_spatial_distribution_overlap": 0.09232034297183274,
+        "published_time_slots": 31,
+        "cell_states": {
+          "both_zero": 101099,
+          "hv_only_positive": 8978,
+          "both_positive": 118,
+          "robotaxi_only_positive": 289
+        }
+      },
+      {
+        "hour": 6,
+        "represented_grids": 3564,
+        "robotaxi_active_grids": 372,
+        "hv_active_grids": 1237,
+        "both_active_grids": 278,
+        "either_active_grids": 1331,
+        "active_grid_jaccard": 0.20886551465063863,
+        "robotaxi_count": 3954,
+        "hv_count": 71569,
+        "robotaxi_mass_in_shared_active_grids": 0.7903388973191705,
+        "hv_mass_in_shared_active_grids": 0.20608084505861476,
+        "normalized_spatial_distribution_overlap": 0.11340622343554009,
+        "published_time_slots": 31,
+        "cell_states": {
+          "both_zero": 96883,
+          "hv_only_positive": 11299,
+          "both_positive": 617,
+          "robotaxi_only_positive": 1685
+        }
+      },
+      {
+        "hour": 7,
+        "represented_grids": 3564,
+        "robotaxi_active_grids": 564,
+        "hv_active_grids": 1319,
+        "both_active_grids": 445,
+        "either_active_grids": 1438,
+        "active_grid_jaccard": 0.3094575799721836,
+        "robotaxi_count": 11215,
+        "hv_count": 141273,
+        "robotaxi_mass_in_shared_active_grids": 0.8667855550601873,
+        "hv_mass_in_shared_active_grids": 0.2953642946635238,
+        "normalized_spatial_distribution_overlap": 0.1235142984730661,
+        "published_time_slots": 31,
+        "cell_states": {
+          "both_zero": 93220,
+          "hv_only_positive": 12393,
+          "both_positive": 1550,
+          "robotaxi_only_positive": 3321
+        }
+      },
+      {
+        "hour": 8,
+        "represented_grids": 3564,
+        "robotaxi_active_grids": 646,
+        "hv_active_grids": 1395,
+        "both_active_grids": 528,
+        "either_active_grids": 1513,
+        "active_grid_jaccard": 0.3489755452742895,
+        "robotaxi_count": 12518,
+        "hv_count": 200636,
+        "robotaxi_mass_in_shared_active_grids": 0.8857644991212654,
+        "hv_mass_in_shared_active_grids": 0.3268107418409458,
+        "normalized_spatial_distribution_overlap": 0.1458454533500229,
+        "published_time_slots": 31,
+        "cell_states": {
+          "both_zero": 91258,
+          "hv_only_positive": 13588,
+          "both_positive": 2028,
+          "robotaxi_only_positive": 3610
+        }
+      },
+      {
+        "hour": 9,
+        "represented_grids": 3564,
+        "robotaxi_active_grids": 708,
+        "hv_active_grids": 1359,
+        "both_active_grids": 557,
+        "either_active_grids": 1510,
+        "active_grid_jaccard": 0.36887417218543045,
+        "robotaxi_count": 12565,
+        "hv_count": 188663,
+        "robotaxi_mass_in_shared_active_grids": 0.8843613211301233,
+        "hv_mass_in_shared_active_grids": 0.34935837975649703,
+        "normalized_spatial_distribution_overlap": 0.1687354401309456,
+        "published_time_slots": 31,
+        "cell_states": {
+          "both_zero": 91829,
+          "hv_only_positive": 12464,
+          "both_positive": 2271,
+          "robotaxi_only_positive": 3920
+        }
+      },
+      {
+        "hour": 10,
+        "represented_grids": 3564,
+        "robotaxi_active_grids": 723,
+        "hv_active_grids": 1350,
+        "both_active_grids": 553,
+        "either_active_grids": 1520,
+        "active_grid_jaccard": 0.3638157894736842,
+        "robotaxi_count": 12807,
+        "hv_count": 185043,
+        "robotaxi_mass_in_shared_active_grids": 0.884438197860545,
+        "hv_mass_in_shared_active_grids": 0.3512534924314889,
+        "normalized_spatial_distribution_overlap": 0.16900934260445338,
+        "published_time_slots": 31,
+        "cell_states": {
+          "both_zero": 92292,
+          "hv_only_positive": 11748,
+          "both_positive": 2288,
+          "robotaxi_only_positive": 4156
+        }
+      },
+      {
+        "hour": 11,
+        "represented_grids": 3564,
+        "robotaxi_active_grids": 735,
+        "hv_active_grids": 1367,
+        "both_active_grids": 569,
+        "either_active_grids": 1533,
+        "active_grid_jaccard": 0.37116764514024786,
+        "robotaxi_count": 14738,
+        "hv_count": 195159,
+        "robotaxi_mass_in_shared_active_grids": 0.8775274799837156,
+        "hv_mass_in_shared_active_grids": 0.34960724332467374,
+        "normalized_spatial_distribution_overlap": 0.1658239641256191,
+        "published_time_slots": 31,
+        "cell_states": {
+          "both_zero": 91542,
+          "hv_only_positive": 12005,
+          "both_positive": 2435,
+          "robotaxi_only_positive": 4502
+        }
+      },
+      {
+        "hour": 12,
+        "represented_grids": 3564,
+        "robotaxi_active_grids": 744,
+        "hv_active_grids": 1392,
+        "both_active_grids": 581,
+        "either_active_grids": 1555,
+        "active_grid_jaccard": 0.37363344051446945,
+        "robotaxi_count": 16939,
+        "hv_count": 194439,
+        "robotaxi_mass_in_shared_active_grids": 0.8805124269437393,
+        "hv_mass_in_shared_active_grids": 0.35308760073853496,
+        "normalized_spatial_distribution_overlap": 0.16825263216872235,
+        "published_time_slots": 31,
+        "cell_states": {
+          "both_zero": 91161,
+          "hv_only_positive": 12028,
+          "both_positive": 2547,
+          "robotaxi_only_positive": 4748
+        }
+      },
+      {
+        "hour": 13,
+        "represented_grids": 3564,
+        "robotaxi_active_grids": 742,
+        "hv_active_grids": 1370,
+        "both_active_grids": 575,
+        "either_active_grids": 1537,
+        "active_grid_jaccard": 0.3741054001301236,
+        "robotaxi_count": 16571,
+        "hv_count": 182145,
+        "robotaxi_mass_in_shared_active_grids": 0.8836521634180194,
+        "hv_mass_in_shared_active_grids": 0.33425018529193773,
+        "normalized_spatial_distribution_overlap": 0.17495527117385656,
+        "published_time_slots": 31,
+        "cell_states": {
+          "both_zero": 91599,
+          "hv_only_positive": 11563,
+          "both_positive": 2588,
+          "robotaxi_only_positive": 4734
+        }
+      },
+      {
+        "hour": 14,
+        "represented_grids": 3564,
+        "robotaxi_active_grids": 754,
+        "hv_active_grids": 1331,
+        "both_active_grids": 569,
+        "either_active_grids": 1516,
+        "active_grid_jaccard": 0.37532981530343007,
+        "robotaxi_count": 16173,
+        "hv_count": 175476,
+        "robotaxi_mass_in_shared_active_grids": 0.8801088233475546,
+        "hv_mass_in_shared_active_grids": 0.3273040187831954,
+        "normalized_spatial_distribution_overlap": 0.16510993111694297,
+        "published_time_slots": 31,
+        "cell_states": {
+          "both_zero": 92149,
+          "hv_only_positive": 11157,
+          "both_positive": 2410,
+          "robotaxi_only_positive": 4768
+        }
+      },
+      {
+        "hour": 15,
+        "represented_grids": 3564,
+        "robotaxi_active_grids": 734,
+        "hv_active_grids": 1353,
+        "both_active_grids": 576,
+        "either_active_grids": 1511,
+        "active_grid_jaccard": 0.3812045003309067,
+        "robotaxi_count": 15514,
+        "hv_count": 169493,
+        "robotaxi_mass_in_shared_active_grids": 0.8802372051050664,
+        "hv_mass_in_shared_active_grids": 0.3289457381720779,
+        "normalized_spatial_distribution_overlap": 0.15810434454505795,
+        "published_time_slots": 31,
+        "cell_states": {
+          "both_zero": 92609,
+          "hv_only_positive": 10960,
+          "both_positive": 2329,
+          "robotaxi_only_positive": 4586
+        }
+      },
+      {
+        "hour": 16,
+        "represented_grids": 3564,
+        "robotaxi_active_grids": 723,
+        "hv_active_grids": 1339,
+        "both_active_grids": 566,
+        "either_active_grids": 1496,
+        "active_grid_jaccard": 0.3783422459893048,
+        "robotaxi_count": 16102,
+        "hv_count": 165811,
+        "robotaxi_mass_in_shared_active_grids": 0.8661035896161967,
+        "hv_mass_in_shared_active_grids": 0.32889253427094706,
+        "normalized_spatial_distribution_overlap": 0.14574227674497064,
+        "published_time_slots": 31,
+        "cell_states": {
+          "both_zero": 92521,
+          "hv_only_positive": 11042,
+          "both_positive": 2188,
+          "robotaxi_only_positive": 4733
+        }
+      },
+      {
+        "hour": 17,
+        "represented_grids": 3564,
+        "robotaxi_active_grids": 731,
+        "hv_active_grids": 1429,
+        "both_active_grids": 588,
+        "either_active_grids": 1572,
+        "active_grid_jaccard": 0.37404580152671757,
+        "robotaxi_count": 19840,
+        "hv_count": 188988,
+        "robotaxi_mass_in_shared_active_grids": 0.8780745967741935,
+        "hv_mass_in_shared_active_grids": 0.3357832243317036,
+        "normalized_spatial_distribution_overlap": 0.14041927883968738,
+        "published_time_slots": 31,
+        "cell_states": {
+          "both_zero": 90801,
+          "hv_only_positive": 11892,
+          "both_positive": 2504,
+          "robotaxi_only_positive": 5287
+        }
+      },
+      {
+        "hour": 18,
+        "represented_grids": 3564,
+        "robotaxi_active_grids": 705,
+        "hv_active_grids": 1428,
+        "both_active_grids": 557,
+        "either_active_grids": 1576,
+        "active_grid_jaccard": 0.3534263959390863,
+        "robotaxi_count": 17614,
+        "hv_count": 180637,
+        "robotaxi_mass_in_shared_active_grids": 0.8587487226070172,
+        "hv_mass_in_shared_active_grids": 0.3049762783925774,
+        "normalized_spatial_distribution_overlap": 0.1406902372282311,
+        "published_time_slots": 31,
+        "cell_states": {
+          "both_zero": 91357,
+          "hv_only_positive": 11972,
+          "both_positive": 2330,
+          "robotaxi_only_positive": 4825
+        }
+      },
+      {
+        "hour": 19,
+        "represented_grids": 3564,
+        "robotaxi_active_grids": 701,
+        "hv_active_grids": 1337,
+        "both_active_grids": 537,
+        "either_active_grids": 1501,
+        "active_grid_jaccard": 0.357761492338441,
+        "robotaxi_count": 17829,
+        "hv_count": 175136,
+        "robotaxi_mass_in_shared_active_grids": 0.817488361657973,
+        "hv_mass_in_shared_active_grids": 0.3216014982642061,
+        "normalized_spatial_distribution_overlap": 0.13732059732716506,
+        "published_time_slots": 31,
+        "cell_states": {
+          "both_zero": 92338,
+          "hv_only_positive": 11107,
+          "both_positive": 2221,
+          "robotaxi_only_positive": 4818
+        }
+      },
+      {
+        "hour": 20,
+        "represented_grids": 3564,
+        "robotaxi_active_grids": 701,
+        "hv_active_grids": 1286,
+        "both_active_grids": 531,
+        "either_active_grids": 1456,
+        "active_grid_jaccard": 0.3646978021978022,
+        "robotaxi_count": 18244,
+        "hv_count": 196217,
+        "robotaxi_mass_in_shared_active_grids": 0.8395636921727692,
+        "hv_mass_in_shared_active_grids": 0.2973340740098972,
+        "normalized_spatial_distribution_overlap": 0.1417321657122995,
+        "published_time_slots": 31,
+        "cell_states": {
+          "both_zero": 92760,
+          "hv_only_positive": 10786,
+          "both_positive": 2272,
+          "robotaxi_only_positive": 4666
+        }
+      },
+      {
+        "hour": 21,
+        "represented_grids": 3564,
+        "robotaxi_active_grids": 695,
+        "hv_active_grids": 1235,
+        "both_active_grids": 506,
+        "either_active_grids": 1424,
+        "active_grid_jaccard": 0.3553370786516854,
+        "robotaxi_count": 18513,
+        "hv_count": 201615,
+        "robotaxi_mass_in_shared_active_grids": 0.8245557176038459,
+        "hv_mass_in_shared_active_grids": 0.30509138704957467,
+        "normalized_spatial_distribution_overlap": 0.14541779473644503,
+        "published_time_slots": 31,
+        "cell_states": {
+          "both_zero": 92979,
+          "hv_only_positive": 10670,
+          "both_positive": 2251,
+          "robotaxi_only_positive": 4584
+        }
+      },
+      {
+        "hour": 22,
+        "represented_grids": 3564,
+        "robotaxi_active_grids": 582,
+        "hv_active_grids": 1149,
+        "both_active_grids": 424,
+        "either_active_grids": 1307,
+        "active_grid_jaccard": 0.324407039020658,
+        "robotaxi_count": 10298,
+        "hv_count": 154924,
+        "robotaxi_mass_in_shared_active_grids": 0.8482229559137696,
+        "hv_mass_in_shared_active_grids": 0.2919818749838631,
+        "normalized_spatial_distribution_overlap": 0.1457461705366392,
+        "published_time_slots": 31,
+        "cell_states": {
+          "both_zero": 95554,
+          "hv_only_positive": 10232,
+          "both_positive": 1575,
+          "robotaxi_only_positive": 3123
+        }
+      },
+      {
+        "hour": 23,
+        "represented_grids": 3564,
+        "robotaxi_active_grids": 250,
+        "hv_active_grids": 1065,
+        "both_active_grids": 196,
+        "either_active_grids": 1119,
+        "active_grid_jaccard": 0.17515638963360142,
+        "robotaxi_count": 2661,
+        "hv_count": 111514,
+        "robotaxi_mass_in_shared_active_grids": 0.8947763998496806,
+        "hv_mass_in_shared_active_grids": 0.19958032175332246,
+        "normalized_spatial_distribution_overlap": 0.11166981917029954,
+        "published_time_slots": 31,
+        "cell_states": {
+          "both_zero": 99049,
+          "hv_only_positive": 9913,
+          "both_positive": 563,
+          "robotaxi_only_positive": 959
+        }
+      }
+    ],
+    "both_modes_positive_total_dates": [
+      "2024-11-12",
+      "2024-11-13",
+      "2024-11-14",
+      "2024-11-15",
+      "2024-11-16",
+      "2024-11-17",
+      "2024-11-18",
+      "2024-11-19",
+      "2024-11-20",
+      "2024-11-21",
+      "2024-11-22",
+      "2024-11-23",
+      "2024-11-24",
+      "2024-11-25",
+      "2024-11-26",
+      "2024-11-27",
+      "2024-11-28",
+      "2024-11-29",
+      "2024-11-30",
+      "2024-12-01",
+      "2024-12-02"
+    ],
+    "both_modes_positive_date_spatial_totals": {
+      "represented_grids": 3564,
+      "robotaxi_active_grids": 865,
+      "hv_active_grids": 2103,
+      "both_active_grids": 792,
+      "either_active_grids": 2176,
+      "active_grid_jaccard": 0.3639705882352941,
+      "robotaxi_count": 167094,
+      "hv_count": 3500485,
+      "robotaxi_mass_in_shared_active_grids": 0.9609381545716782,
+      "hv_mass_in_shared_active_grids": 0.34335584926088814,
+      "normalized_spatial_distribution_overlap": 0.1624332856487886
+    },
+    "both_modes_positive_date_cell_states": {
+      "both_zero": 1461632,
+      "hv_only_positive": 260921,
+      "both_positive": 38162,
+      "robotaxi_only_positive": 35541
+    },
+    "daily": [
+      {
+        "date": "2024-11-12",
+        "cells": 85536,
+        "robotaxi": 6732,
+        "hv": 180294,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-11-13",
+        "cells": 85536,
+        "robotaxi": 7380,
+        "hv": 175249,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-11-14",
+        "cells": 85536,
+        "robotaxi": 7429,
+        "hv": 174417,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-11-15",
+        "cells": 85536,
+        "robotaxi": 8627,
+        "hv": 172956,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-11-16",
+        "cells": 85536,
+        "robotaxi": 9230,
+        "hv": 186226,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-11-17",
+        "cells": 85536,
+        "robotaxi": 9001,
+        "hv": 185981,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-11-18",
+        "cells": 85536,
+        "robotaxi": 7237,
+        "hv": 161838,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-11-19",
+        "cells": 85536,
+        "robotaxi": 7902,
+        "hv": 157589,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-11-20",
+        "cells": 85536,
+        "robotaxi": 8316,
+        "hv": 156478,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-11-21",
+        "cells": 85536,
+        "robotaxi": 8350,
+        "hv": 158481,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-11-22",
+        "cells": 85536,
+        "robotaxi": 9045,
+        "hv": 164164,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-11-23",
+        "cells": 85536,
+        "robotaxi": 10683,
+        "hv": 174291,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-11-24",
+        "cells": 85536,
+        "robotaxi": 9431,
+        "hv": 163710,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-11-25",
+        "cells": 85536,
+        "robotaxi": 8008,
+        "hv": 144420,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-11-26",
+        "cells": 85536,
+        "robotaxi": 3296,
+        "hv": 154011,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-11-27",
+        "cells": 85536,
+        "robotaxi": 8186,
+        "hv": 151261,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-11-28",
+        "cells": 85536,
+        "robotaxi": 6527,
+        "hv": 156825,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-11-29",
+        "cells": 85536,
+        "robotaxi": 9399,
+        "hv": 159209,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-11-30",
+        "cells": 85536,
+        "robotaxi": 10792,
+        "hv": 174832,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-12-01",
+        "cells": 85536,
+        "robotaxi": 8840,
+        "hv": 185612,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-12-02",
+        "cells": 85536,
+        "robotaxi": 2683,
+        "hv": 162641,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-12-03",
+        "cells": 85536,
+        "robotaxi": 9222,
+        "hv": 0,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-12-04",
+        "cells": 85536,
+        "robotaxi": 7969,
+        "hv": 0,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-12-05",
+        "cells": 85536,
+        "robotaxi": 10156,
+        "hv": 0,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-12-06",
+        "cells": 85536,
+        "robotaxi": 9353,
+        "hv": 0,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-12-07",
+        "cells": 85536,
+        "robotaxi": 10992,
+        "hv": 0,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-12-08",
+        "cells": 85536,
+        "robotaxi": 11913,
+        "hv": 0,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-12-09",
+        "cells": 85536,
+        "robotaxi": 9163,
+        "hv": 0,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-12-10",
+        "cells": 85536,
+        "robotaxi": 9934,
+        "hv": 0,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-12-11",
+        "cells": 85536,
+        "robotaxi": 5275,
+        "hv": 0,
+        "published_hours": 24
+      },
+      {
+        "date": "2024-12-12",
+        "cells": 85536,
+        "robotaxi": 7292,
+        "hv": 0,
+        "published_hours": 24
+      }
+    ],
+    "published_figure2c_top30_percent": {
+      "Peak hour (Morning)": 34.5041322314049,
+      "Day": 44.2567567567567,
+      "Peak hour (Evening)": 38.8888888888888,
+      "Night": 40.5405405405405,
+      "All Periods": 45.7186544342507
+    },
+    "published_figure2c_radar": [
+      [
+        "CCI Interval",
+        "Peak hour (Morning)",
+        "Day",
+        "Peak hour (Evening)",
+        "Night",
+        "All Periods"
+      ],
+      [
+        "<20%",
+        15.7894736842105,
+        26.3157894736842,
+        22.2222222222222,
+        37.9310344827586,
+        30
+      ],
+      [
+        "20%~40%",
+        40,
+        35.2112676056338,
+        37.037037037037,
+        42.3728813559322,
+        40.6976744186046
+      ],
+      [
+        "40%~60%",
+        35.4838709677419,
+        46.6666666666666,
+        40.5405405405405,
+        36.8421052631578,
+        49.2647058823529
+      ],
+      [
+        "60%~80%",
+        36.4285714285714,
+        40.3614457831325,
+        37.012987012987,
+        41.025641025641,
+        39.54802259887
+      ],
+      [
+        ">80%",
+        22.2826086956521,
+        26.9430051813471,
+        25.130890052356,
+        28.3505154639175,
+        28.1407035175879
+      ]
+    ],
+    "timing_caveat": "Upstream fig2b maps HV dates by sorted ordinal to AV dates; actual calendar synchrony not established",
+    "zeros_caveat": "Upstream grid x observed-hour expansion fills missing group counts with zero; zero does not establish geofence or capability"
+  },
+  "figure4": {
+    "figure4a_bins": 60,
+    "published_statistics": {
+      "HV_trip_count": 3555128,
+      "Robotaxi_trip_count": 408236,
+      "HV_weighted_mean": 2.65,
+      "Robotaxi_weighted_mean": 2.2,
+      "Delta_weighted_mean": -0.45,
+      "Cohen_d": -1.57,
+      "Welch_p": 0
+    },
+    "rounded_density_integrals": {
+      "HV": 1.0007000000000001,
+      "Robotaxi": 1.0006
+    },
+    "renormalized_bin_center_mean_approximation": {
+      "HV": 2.6452023583491555,
+      "Robotaxi": 2.19578652808315
+    },
+    "renormalized_binned_distance_distribution_overlap_approximation": 0.3945466836017107,
+    "figure4b_cci_bins": 15,
+    "figure4b_totals": {
+      "observed": 408196.0,
+      "CTX_predicted": 428457.25,
+      "POP_SNE_predicted": 392947.73
+    },
+    "figure4b_declared_n": 408196,
+    "figure4b_exclusion_note": "Compared with the original dataset of passenger orders of Robotaxis (n=408236), 40 samples were excluded as they fell outside the study area defined by longitude ranging from 113.942617 to 114.629031 and latitude ranging from 30.255898 to 30.742468.",
+    "join_limit": "No per-trip/grid/time keys linking Figure4a histogram to Figure2b; common-area standardization unavailable",
+    "weighting": "Figure4a upstream code weights trip SNE_mean by dist_km; not order-count shares"
+  },
+  "inputs_unchanged": true,
+  "runtime_s": 55.20443940000041,
+  "peak_working_set_mib": 166.8046875
+}
