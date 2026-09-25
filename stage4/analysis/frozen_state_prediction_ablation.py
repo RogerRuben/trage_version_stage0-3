@@ -159,15 +159,15 @@ def _vehicle_state(fixtures: list[Any], assignments: pd.DataFrame, timestamp: pd
     return vehicles
 
 
-def _waiting_requests(requests: list[Any], assignments: pd.DataFrame, simulation_time_s: int) -> list[tuple[Any, int, bool, bool]]:
+def _waiting_requests(requests: list[Any], assignments: pd.DataFrame, simulation_time_s: int, patience_s: float = 300) -> list[tuple[Any, int, bool, bool]]:
     assigned = set(assignments.loc[pd.to_numeric(assignments["simulation_time_s"]).lt(simulation_time_s), "order_id"].astype(str))
     rows = []
     for request in requests:
-        if request.order_id in assigned or request.sim_time_s > simulation_time_s or simulation_time_s >= request.sim_time_s + 300:
+        if request.order_id in assigned or request.sim_time_s > simulation_time_s or simulation_time_s >= request.sim_time_s + patience_s:
             continue
         first_epoch = int(math.ceil(request.sim_time_s / 30.0) * 30)
         failed_rounds = max(0, (simulation_time_s - first_epoch) // 30)
-        remaining = request.sim_time_s + 300 - simulation_time_s
+        remaining = request.sim_time_s + patience_s - simulation_time_s
         rows.append((request, failed_rounds, failed_rounds > 0, 0 < remaining <= 30))
     return sorted(rows, key=lambda item: (item[0].request_time, item[0].native_id))
 

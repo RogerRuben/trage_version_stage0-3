@@ -48,7 +48,7 @@ class _Captured(Exception):
     pass
 
 
-def production_neutral_arcs(vehicles, fixtures, waiting, timestamp, start, config, adapter, *, neutral=True):
+def production_neutral_arcs(vehicles, fixtures, waiting, timestamp, start, config, adapter, *, neutral=True, integer_deadlines=False):
     """Capture production arcs with inherited availability policy and fixed state."""
     core = production._RollingORFleetControlCore.__new__(production._RollingORFleetControlCore)
     sim_s = int((timestamp - start).total_seconds())
@@ -59,7 +59,10 @@ def production_neutral_arcs(vehicles, fixtures, waiting, timestamp, start, confi
     core.config = config
     core.dispatch_interval_s = 30
     core.rid_to_assigned_vid = {}
-    core.demand = SimpleNamespace(waiting_rq={r.native_id: None for r, *_ in waiting})
+    core.demand = SimpleNamespace(waiting_rq={r.native_id: None for r, *_ in waiting}, rq_db={})
+    core.expired_rids = set()
+    core.cancelled_rids = set()
+    core.rq_dict = {}
     core.runtime_by_vid = {v.native_vehicle_id: SimpleNamespace(
         fixture=replace(fixtures[v.native_vehicle_id], vehicle_type=v.vehicle_type), spatial=v)
         for v in vehicles}
@@ -75,7 +78,8 @@ def production_neutral_arcs(vehicles, fixtures, waiting, timestamp, start, confi
         core.request_by_rid[r.native_id] = request
         core.request_meta[r.native_id] = {
             'first_attempt_time': None, 'attempt_count': 0,
-            'pickup_deadline_s': r.sim_time_s + 300,
+            'pickup_deadline_s': (int(r.sim_time_s + config['max_pickup_wait_s']) if integer_deadlines
+                                  else r.sim_time_s + config['max_pickup_wait_s']),
             'entered_critical': critical, 'failed_round_count': failed,
             'carry_over_flag': carry,
             'passenger_accepts_av': True if neutral else passenger_acceptance(r.order_id, .7, 20260827).passenger_accepts_av,
@@ -149,7 +153,7 @@ GATES = ('G0_SPATIAL', 'G1_PASSENGER', 'G2_STRUCTURAL', 'G3_EVIDENCE',
          'TOPK_COMPRESSION', 'ROUTE_RETURNED', 'G4_PATIENCE', 'G5_SOLVER')
 
 
-def gate_graphs(vehicles, waiting, timestamp, start, config, adapter, k):
+def gate_graphs(vehicles, waiting, timestamp, start, config, adapter, k, patience_s=300):
     """Mirror the production order; report Top-K and routing independently."""
     index = SparseCandidateIndex(vehicles)
     graphs = {g: [] for g in GATES}
@@ -178,7 +182,7 @@ def gate_graphs(vehicles, waiting, timestamp, start, config, adapter, k):
         graphs['TOPK_COMPRESSION'].extend((request.native_id, v.native_vehicle_id) for v in av_vehicles)
         estimates = adapter.estimate_many(av_vehicles, request.pickup_lon_wgs84,
                                           request.pickup_lat_wgs84, timestamp)
-        remaining = request.sim_time_s + 300 - sim_s
+        remaining = request.sim_time_s + patience_s - sim_s
         for v in av_vehicles:
             estimate = estimates.get(v.native_vehicle_id)
             if estimate is None:
