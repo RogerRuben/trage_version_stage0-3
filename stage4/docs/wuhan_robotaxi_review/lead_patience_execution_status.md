@@ -1,5 +1,7 @@
 # Lead × patience execution status
 
+Update: user-authorized retry1 completed 48/48 cells with 16/16 baseline reproduction. See `lead_patience_report.md`, `lead_patience_cells.csv`, and `lead_patience_summary.json`. The first-attempt record below is retained as history, not current completion status.
+
 ## Material Passport
 
 - Origin: academic-research-suite / experiment-agent

@@ -72,14 +72,15 @@ def production_neutral_arcs(vehicles, fixtures, waiting, timestamp, start, confi
     core._fixture_seconds = lambda ts: (pd.Timestamp(ts) - start).total_seconds()
     core.request_by_rid = {}
     core.request_meta = {}
+    patience_s = config.get('max_pickup_wait_s', 300)
     for r, failed, carry, critical in waiting:
         request = SimpleNamespace(**r.__dict__)
         request.av_smoke_eligible = True if neutral else r.av_smoke_eligible
         core.request_by_rid[r.native_id] = request
         core.request_meta[r.native_id] = {
             'first_attempt_time': None, 'attempt_count': 0,
-            'pickup_deadline_s': (int(r.sim_time_s + config['max_pickup_wait_s']) if integer_deadlines
-                                  else r.sim_time_s + config['max_pickup_wait_s']),
+            'pickup_deadline_s': (int(r.sim_time_s + patience_s) if integer_deadlines
+                                  else r.sim_time_s + patience_s),
             'entered_critical': critical, 'failed_round_count': failed,
             'carry_over_flag': carry,
             'passenger_accepts_av': True if neutral else passenger_acceptance(r.order_id, .7, 20260827).passenger_accepts_av,
