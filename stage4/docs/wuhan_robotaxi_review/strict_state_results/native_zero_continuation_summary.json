@@ -1,0 +1,22 @@
+{
+  "status": "BLOCKED_BASELINE_DIVERGENCE",
+  "rows": [
+    {
+      "q_A": 0.5,
+      "status": "BASELINE_DIVERGENCE",
+      "compared_through_s": 41460,
+      "first_mismatch": {
+        "simulation_time_s": 41460,
+        "actual": 6,
+        "reference": 6,
+        "symmetric_difference": 2
+      },
+      "routing_mode": "SINGLE_SOURCE_MATRIX",
+      "routing_failures": 0,
+      "runtime_s": 256.3794361,
+      "peak_rss_mib": 426.69921875,
+      "checkpoint_state_verified": true,
+      "dwell_treatments_started": false
+    }
+  ]
+}
