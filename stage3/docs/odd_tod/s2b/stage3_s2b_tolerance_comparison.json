@@ -1,0 +1,321 @@
+{
+  "artifact_sha256": "0e5c76193da023b714698eb860866ff1ad30d6404001e793048a1d5ea0b77dbd",
+  "candidate_rule_trigger_counts": {
+    "rule_a_physical_branching": 58111,
+    "rule_b_directed_merge_diverge": 58111,
+    "rule_c_signal": 3792,
+    "rule_d_roundabout": 270,
+    "rule_e_restriction_context": 53,
+    "rule_f_merge_diverge": 11369
+  },
+  "junction_candidate_count": 58240,
+  "next_phase_authorized": false,
+  "phase_status": "STAGE3_S2B1_CALIBRATION_PACK_COMPLETE",
+  "recommendation": {
+    "basis": "topological correctness, consolidation gain, grade-separation/roundabout QA flags, stability, smaller-radius tie-break",
+    "forbidden_inputs_used": [],
+    "recommendation_only": true,
+    "recommended_tolerance_m": 5,
+    "tolerance_frozen": false
+  },
+  "s2b2_authorized": false,
+  "schema_version": "stage3_s2b1_tolerance_comparison.1",
+  "selection_uses_av_feasibility": false,
+  "selection_uses_stage4": false,
+  "selection_uses_test31": false,
+  "stability": [
+    {
+      "complex_merge_count": 5107,
+      "complex_split_count": 0,
+      "from_tolerance_m": 5,
+      "grade_separated_complex_stability": 0.2696629213483146,
+      "high_degree_complex_stability": 0.34613766998457873,
+      "node_pair_co_clustering_stability": 0.3644398834745763,
+      "roundabout_complex_stability": 1.0,
+      "signal_complex_stability": 0.42163661581137307,
+      "to_tolerance_m": 10
+    },
+    {
+      "complex_merge_count": 2380,
+      "complex_split_count": 0,
+      "from_tolerance_m": 10,
+      "grade_separated_complex_stability": 0.4173387096774194,
+      "high_degree_complex_stability": 0.8330997430506891,
+      "node_pair_co_clustering_stability": 0.7343803179851218,
+      "roundabout_complex_stability": 1.0,
+      "signal_complex_stability": 0.8294983893235158,
+      "to_tolerance_m": 15
+    },
+    {
+      "complex_merge_count": 1928,
+      "complex_split_count": 0,
+      "from_tolerance_m": 15,
+      "grade_separated_complex_stability": 0.4562615101289134,
+      "high_degree_complex_stability": 0.9470715115314419,
+      "node_pair_co_clustering_stability": 0.7785516901994928,
+      "roundabout_complex_stability": 1.0,
+      "signal_complex_stability": 0.9692239072256913,
+      "to_tolerance_m": 20
+    },
+    {
+      "complex_merge_count": 7170,
+      "complex_split_count": 0,
+      "from_tolerance_m": 5,
+      "grade_separated_complex_stability": 0.08195211786372007,
+      "high_degree_complex_stability": 0.2731043636966982,
+      "node_pair_co_clustering_stability": 0.20836961047810124,
+      "roundabout_complex_stability": 1.0,
+      "signal_complex_stability": 0.3389830508474576,
+      "to_tolerance_m": 20
+    }
+  ],
+  "tolerance_frozen": false,
+  "tolerance_metrics": [
+    {
+      "bridge_surface_conflict_count": 0,
+      "candidate_nodes_unassigned": 0,
+      "complex_count": 51553,
+      "duplicate_node_assignments": 0,
+      "external_physical_connection_count_distribution": {
+        "max": 16.0,
+        "mean": 3.499156208174112,
+        "min": 1.0,
+        "p50": 3.0,
+        "p90": 4.0,
+        "p99": 7.0
+      },
+      "grade_separated_complex_count": 21,
+      "internal_length_distribution_m": {
+        "max": 3068.0,
+        "mean": 1.8529862471631138,
+        "min": 0.0,
+        "p50": 0.0,
+        "p90": 0.0,
+        "p99": 30.0
+      },
+      "member_node_count_distribution": {
+        "max": 16.0,
+        "mean": 1.1310883944678292,
+        "min": 1.0,
+        "p50": 1.0,
+        "p90": 1.0,
+        "p99": 4.0
+      },
+      "mixed_layer_complex_count": 2,
+      "multi_node_complex_share": 0.09227397047698485,
+      "red_flag_counts": {
+        "RED_FLAG_BRIDGE_SURFACE_MIX": 0,
+        "RED_FLAG_DISCONNECTED_MERGE": 0,
+        "RED_FLAG_EXCESSIVE_INTERNAL_LENGTH": 11,
+        "RED_FLAG_EXTREME_MEMBER_COUNT": 0,
+        "RED_FLAG_LAYER_CONFLICT": 2,
+        "RED_FLAG_NO_BOUNDARY_CONNECTION": 0,
+        "RED_FLAG_ROUNDABOUT_MIXED_WITH_UNRELATED_JUNCTION": 0,
+        "RED_FLAG_TUNNEL_SURFACE_MIX": 0
+      },
+      "red_flag_total": 13,
+      "roundabout_complex_count": 37,
+      "signal_complex_count": 2715,
+      "singleton_complex_share": 0.9077260295230152,
+      "tolerance_m": 5,
+      "topological_movement_count_distribution": {
+        "max": 64.0,
+        "mean": 8.300389890016099,
+        "min": 0.0,
+        "p50": 9.0,
+        "p90": 16.0,
+        "p99": 16.0
+      },
+      "tunnel_surface_conflict_count": 0
+    },
+    {
+      "bridge_surface_conflict_count": 4,
+      "candidate_nodes_unassigned": 0,
+      "complex_count": 43685,
+      "duplicate_node_assignments": 0,
+      "external_physical_connection_count_distribution": {
+        "max": 29.0,
+        "mean": 3.6773720956850178,
+        "min": 1.0,
+        "p50": 3.0,
+        "p90": 5.0,
+        "p99": 9.0
+      },
+      "grade_separated_complex_count": 56,
+      "internal_length_distribution_m": {
+        "max": 3068.0,
+        "mean": 6.968913814810576,
+        "min": 0.0,
+        "p50": 0.0,
+        "p90": 22.0,
+        "p99": 87.0
+      },
+      "member_node_count_distribution": {
+        "max": 25.0,
+        "mean": 1.3517683415359962,
+        "min": 1.0,
+        "p50": 1.0,
+        "p90": 2.0,
+        "p99": 6.0
+      },
+      "mixed_layer_complex_count": 22,
+      "multi_node_complex_share": 0.18294609133569875,
+      "red_flag_counts": {
+        "RED_FLAG_BRIDGE_SURFACE_MIX": 4,
+        "RED_FLAG_DISCONNECTED_MERGE": 0,
+        "RED_FLAG_EXCESSIVE_INTERNAL_LENGTH": 28,
+        "RED_FLAG_EXTREME_MEMBER_COUNT": 0,
+        "RED_FLAG_LAYER_CONFLICT": 22,
+        "RED_FLAG_NO_BOUNDARY_CONNECTION": 0,
+        "RED_FLAG_ROUNDABOUT_MIXED_WITH_UNRELATED_JUNCTION": 0,
+        "RED_FLAG_TUNNEL_SURFACE_MIX": 2
+      },
+      "red_flag_total": 56,
+      "roundabout_complex_count": 37,
+      "signal_complex_count": 1629,
+      "singleton_complex_share": 0.8170539086643013,
+      "tolerance_m": 10,
+      "topological_movement_count_distribution": {
+        "max": 841.0,
+        "mean": 9.61215520201442,
+        "min": 0.0,
+        "p50": 9.0,
+        "p90": 16.0,
+        "p99": 25.0
+      },
+      "tunnel_surface_conflict_count": 2
+    },
+    {
+      "bridge_surface_conflict_count": 17,
+      "candidate_nodes_unassigned": 0,
+      "complex_count": 40508,
+      "duplicate_node_assignments": 0,
+      "external_physical_connection_count_distribution": {
+        "max": 29.0,
+        "mean": 3.770094796089661,
+        "min": 1.0,
+        "p50": 3.0,
+        "p90": 5.0,
+        "p99": 10.0
+      },
+      "grade_separated_complex_count": 85,
+      "internal_length_distribution_m": {
+        "max": 3068.0,
+        "mean": 11.726597215364865,
+        "min": 0.0,
+        "p50": 0.0,
+        "p90": 38.0,
+        "p99": 159.9300000000003
+      },
+      "member_node_count_distribution": {
+        "max": 32.0,
+        "mean": 1.4825466574503803,
+        "min": 1.0,
+        "p50": 1.0,
+        "p90": 2.0,
+        "p99": 8.0
+      },
+      "mixed_layer_complex_count": 46,
+      "multi_node_complex_share": 0.21645107139330502,
+      "red_flag_counts": {
+        "RED_FLAG_BRIDGE_SURFACE_MIX": 17,
+        "RED_FLAG_DISCONNECTED_MERGE": 0,
+        "RED_FLAG_EXCESSIVE_INTERNAL_LENGTH": 45,
+        "RED_FLAG_EXTREME_MEMBER_COUNT": 0,
+        "RED_FLAG_LAYER_CONFLICT": 46,
+        "RED_FLAG_NO_BOUNDARY_CONNECTION": 0,
+        "RED_FLAG_ROUNDABOUT_MIXED_WITH_UNRELATED_JUNCTION": 0,
+        "RED_FLAG_TUNNEL_SURFACE_MIX": 4
+      },
+      "red_flag_total": 112,
+      "roundabout_complex_count": 37,
+      "signal_complex_count": 1386,
+      "singleton_complex_share": 0.783548928606695,
+      "tolerance_m": 15,
+      "topological_movement_count_distribution": {
+        "max": 841.0,
+        "mean": 10.31146933938975,
+        "min": 0.0,
+        "p50": 9.0,
+        "p90": 16.0,
+        "p99": 36.0
+      },
+      "tunnel_surface_conflict_count": 4
+    },
+    {
+      "bridge_surface_conflict_count": 30,
+      "candidate_nodes_unassigned": 0,
+      "complex_count": 37864,
+      "duplicate_node_assignments": 0,
+      "external_physical_connection_count_distribution": {
+        "max": 29.0,
+        "mean": 3.8619268962603,
+        "min": 1.0,
+        "p50": 3.0,
+        "p90": 6.0,
+        "p99": 10.0
+      },
+      "grade_separated_complex_count": 125,
+      "internal_length_distribution_m": {
+        "max": 3979.0,
+        "mean": 18.206792731882526,
+        "min": 0.0,
+        "p50": 0.0,
+        "p90": 55.0,
+        "p99": 254.0
+      },
+      "member_node_count_distribution": {
+        "max": 57.0,
+        "mean": 1.611504331290936,
+        "min": 1.0,
+        "p50": 1.0,
+        "p90": 3.0,
+        "p99": 8.0
+      },
+      "mixed_layer_complex_count": 73,
+      "multi_node_complex_share": 0.24978871751531798,
+      "red_flag_counts": {
+        "RED_FLAG_BRIDGE_SURFACE_MIX": 30,
+        "RED_FLAG_DISCONNECTED_MERGE": 0,
+        "RED_FLAG_EXCESSIVE_INTERNAL_LENGTH": 112,
+        "RED_FLAG_EXTREME_MEMBER_COUNT": 1,
+        "RED_FLAG_LAYER_CONFLICT": 73,
+        "RED_FLAG_NO_BOUNDARY_CONNECTION": 0,
+        "RED_FLAG_ROUNDABOUT_MIXED_WITH_UNRELATED_JUNCTION": 0,
+        "RED_FLAG_TUNNEL_SURFACE_MIX": 8
+      },
+      "red_flag_total": 224,
+      "roundabout_complex_count": 37,
+      "signal_complex_count": 1345,
+      "singleton_complex_share": 0.750211282484682,
+      "tolerance_m": 20,
+      "topological_movement_count_distribution": {
+        "max": 841.0,
+        "mean": 10.957479399957743,
+        "min": 0.0,
+        "p50": 9.0,
+        "p90": 16.0,
+        "p99": 36.0
+      },
+      "tunnel_surface_conflict_count": 8
+    }
+  ],
+  "turn_boundary_sensitive_counts": {
+    "r05": {
+      "within_5deg_of_150": 942,
+      "within_5deg_of_30": 3415
+    },
+    "r10": {
+      "within_5deg_of_150": 1005,
+      "within_5deg_of_30": 3170
+    },
+    "r15": {
+      "within_5deg_of_150": 1067,
+      "within_5deg_of_30": 3011
+    },
+    "r20": {
+      "within_5deg_of_150": 1134,
+      "within_5deg_of_30": 2820
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "artifact_sha256": "a0f89c70b60a7c2ccac9603a52cedc767237fc2f20f51124cac4869b4f653e9f",
+  "compileall_status": "PASS",
+  "evidence_verification_status": "PASS",
+  "next_phase_authorized": false,
+  "phase_status": "STAGE3_S2A_NETWORK_FOUNDATION_FROZEN",
+  "s2b_authorized": false,
+  "schema_version": "stage3_s2a_test_evidence.1",
+  "test_commands": [
+    {
+      "command": "D:/anaconda/envs/stage0-valhalla/python.exe -m pytest stage3/tests_odd_tod/test_network_foundation.py -q",
+      "passed": 19,
+      "status": "PASS"
+    },
+    {
+      "command": "python -m pytest stage3/tests_odd_tod/test_static_inventory.py -q",
+      "passed": 10,
+      "status": "PASS",
+      "warnings": 1
+    }
+  ]
+}

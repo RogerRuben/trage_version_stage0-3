@@ -1,0 +1,3 @@
+﻿issue,unique_overlay_identities,test31_tokens,test31_orders_overlapping,source,real_world_legal_certification
+FROZEN_OSM_DIRECTION_SUPPORT,6497,85538,14837,frozen PBF way tags + observed directed endpoints + exported auto graph,False
+UNRESOLVED_WAY_OR_ENDPOINT_ORIENTATION,5,0,0,frozen PBF way tags + observed directed endpoints + exported auto graph,False

@@ -1,0 +1,201 @@
+{
+  "status": "COMPLETE",
+  "completed_states": 10,
+  "registered_states": 10,
+  "runtime_s": 38.130081499999505,
+  "sampled_peak_rss_mb": 260.30078125,
+  "routing_arc_evaluations": 13046,
+  "routing_failures": 0,
+  "numerical_tolerance": 1e-07,
+  "alphas": [
+    0,
+    0.005,
+    0.01,
+    0.02,
+    0.05
+  ],
+  "production_modified": false,
+  "dynamic_simulation": false,
+  "budget_counts": [
+    {
+      "mode": "A1",
+      "alternative": "ANY_ARC_CHANGE",
+      "alpha": 0,
+      "yes": 4,
+      "no": 6,
+      "unresolved": 0,
+      "denominator": 10
+    },
+    {
+      "mode": "A1",
+      "alternative": "ANY_ARC_CHANGE",
+      "alpha": 0.005,
+      "yes": 5,
+      "no": 5,
+      "unresolved": 0,
+      "denominator": 10
+    },
+    {
+      "mode": "A1",
+      "alternative": "ANY_ARC_CHANGE",
+      "alpha": 0.01,
+      "yes": 6,
+      "no": 4,
+      "unresolved": 0,
+      "denominator": 10
+    },
+    {
+      "mode": "A1",
+      "alternative": "ANY_ARC_CHANGE",
+      "alpha": 0.02,
+      "yes": 6,
+      "no": 4,
+      "unresolved": 0,
+      "denominator": 10
+    },
+    {
+      "mode": "A1",
+      "alternative": "ANY_ARC_CHANGE",
+      "alpha": 0.05,
+      "yes": 9,
+      "no": 1,
+      "unresolved": 0,
+      "denominator": 10
+    },
+    {
+      "mode": "A1",
+      "alternative": "AV_SERVICE_INDICATOR_CHANGE",
+      "alpha": 0,
+      "yes": 0,
+      "no": 10,
+      "unresolved": 0,
+      "denominator": 10
+    },
+    {
+      "mode": "A1",
+      "alternative": "AV_SERVICE_INDICATOR_CHANGE",
+      "alpha": 0.005,
+      "yes": 0,
+      "no": 10,
+      "unresolved": 0,
+      "denominator": 10
+    },
+    {
+      "mode": "A1",
+      "alternative": "AV_SERVICE_INDICATOR_CHANGE",
+      "alpha": 0.01,
+      "yes": 0,
+      "no": 10,
+      "unresolved": 0,
+      "denominator": 10
+    },
+    {
+      "mode": "A1",
+      "alternative": "AV_SERVICE_INDICATOR_CHANGE",
+      "alpha": 0.02,
+      "yes": 0,
+      "no": 10,
+      "unresolved": 0,
+      "denominator": 10
+    },
+    {
+      "mode": "A1",
+      "alternative": "AV_SERVICE_INDICATOR_CHANGE",
+      "alpha": 0.05,
+      "yes": 1,
+      "no": 9,
+      "unresolved": 0,
+      "denominator": 10
+    },
+    {
+      "mode": "A2",
+      "alternative": "ANY_ARC_CHANGE",
+      "alpha": 0,
+      "yes": 5,
+      "no": 5,
+      "unresolved": 0,
+      "denominator": 10
+    },
+    {
+      "mode": "A2",
+      "alternative": "ANY_ARC_CHANGE",
+      "alpha": 0.005,
+      "yes": 5,
+      "no": 5,
+      "unresolved": 0,
+      "denominator": 10
+    },
+    {
+      "mode": "A2",
+      "alternative": "ANY_ARC_CHANGE",
+      "alpha": 0.01,
+      "yes": 6,
+      "no": 4,
+      "unresolved": 0,
+      "denominator": 10
+    },
+    {
+      "mode": "A2",
+      "alternative": "ANY_ARC_CHANGE",
+      "alpha": 0.02,
+      "yes": 6,
+      "no": 4,
+      "unresolved": 0,
+      "denominator": 10
+    },
+    {
+      "mode": "A2",
+      "alternative": "ANY_ARC_CHANGE",
+      "alpha": 0.05,
+      "yes": 9,
+      "no": 1,
+      "unresolved": 0,
+      "denominator": 10
+    },
+    {
+      "mode": "A2",
+      "alternative": "AV_SERVICE_INDICATOR_CHANGE",
+      "alpha": 0,
+      "yes": 0,
+      "no": 10,
+      "unresolved": 0,
+      "denominator": 10
+    },
+    {
+      "mode": "A2",
+      "alternative": "AV_SERVICE_INDICATOR_CHANGE",
+      "alpha": 0.005,
+      "yes": 0,
+      "no": 10,
+      "unresolved": 0,
+      "denominator": 10
+    },
+    {
+      "mode": "A2",
+      "alternative": "AV_SERVICE_INDICATOR_CHANGE",
+      "alpha": 0.01,
+      "yes": 0,
+      "no": 10,
+      "unresolved": 0,
+      "denominator": 10
+    },
+    {
+      "mode": "A2",
+      "alternative": "AV_SERVICE_INDICATOR_CHANGE",
+      "alpha": 0.02,
+      "yes": 0,
+      "no": 10,
+      "unresolved": 0,
+      "denominator": 10
+    },
+    {
+      "mode": "A2",
+      "alternative": "AV_SERVICE_INDICATOR_CHANGE",
+      "alpha": 0.05,
+      "yes": 1,
+      "no": 9,
+      "unresolved": 0,
+      "denominator": 10
+    }
+  ]
+}

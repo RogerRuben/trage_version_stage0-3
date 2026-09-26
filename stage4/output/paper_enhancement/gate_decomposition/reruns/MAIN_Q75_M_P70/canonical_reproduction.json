@@ -1,0 +1,32 @@
+{
+  "scenario_id": "MAIN_Q75_M_P70",
+  "checked_summary_fields": [
+    "request_count",
+    "matched",
+    "completed",
+    "patience_expired",
+    "HV_assignments",
+    "AV_assignments",
+    "service_rate",
+    "AV_assignment_share",
+    "request_to_pickup_mean",
+    "request_to_pickup_p50",
+    "request_to_pickup_p90",
+    "request_to_pickup_p95",
+    "first_window_match_rate",
+    "carry_over_entry_rate",
+    "carry_over_recovery_rate",
+    "critical_order_count",
+    "critical_recovery",
+    "expanded_radius_match_share",
+    "pickup_ETA_objective_value"
+  ],
+  "summary_differences": {},
+  "request_outcome_fingerprint_canonical": "a372b1cd4ce8d6d3935a3d89f7481f6afdbd09d083c7e5c4b47a11556aec4326",
+  "request_outcome_fingerprint_rerun": "a372b1cd4ce8d6d3935a3d89f7481f6afdbd09d083c7e5c4b47a11556aec4326",
+  "assignment_fingerprint_canonical": "ca30598e4daaffdc4d08d14709494e490c895fe1fa0d182e3dde8b571a3a7eae",
+  "assignment_fingerprint_rerun": "ca30598e4daaffdc4d08d14709494e490c895fe1fa0d182e3dde8b571a3a7eae",
+  "request_outcomes_exact": true,
+  "assignments_exact": true,
+  "canonical_reproduction_pass": true
+}

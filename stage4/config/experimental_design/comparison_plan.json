@@ -1,0 +1,25 @@
+{
+  "schema_version": "stage4_s5b_comparison_v1",
+  "research_questions": {
+    "RQ1": "mixed_fleet_transition",
+    "RQ2": "joint_odd_exposure_control",
+    "RQ3": "service_cost_tradeoff_under_lexicographic_protection"
+  },
+  "predefined_contrasts": [
+    "q_A effect at fixed profile_id and p_A",
+    "profile_id effect at fixed q_A and p_A",
+    "p_A effect at fixed q_A and profile_id"
+  ],
+  "interaction_patterns": [
+    "q_A x profile_id",
+    "q_A x p_A",
+    "profile_id x p_A"
+  ],
+  "primary_analysis": [
+    "scenario contrasts",
+    "tables",
+    "response surfaces"
+  ],
+  "no_automatic_complex_interaction_model": true,
+  "profile_family_activity_required": true
+}

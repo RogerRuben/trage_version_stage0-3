@@ -1,0 +1,7 @@
+/.gitattributes text eol=lf
+stage2/config/stage2_v5_2.json text eol=lf
+stage2/docs/v5_2/*.json text eol=lf
+stage2/docs/v5_2/*.md text eol=lf
+stage2/docs/v5_2/*.csv text eol=lf
+stage2/v5_2/*.py text eol=lf
+stage2/tests_v5_2/*.py text eol=lf

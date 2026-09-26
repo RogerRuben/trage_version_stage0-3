@@ -1,0 +1,488 @@
+[
+  {
+    "condition": "D0",
+    "mode": "A1",
+    "tolerance": 0.0,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D0",
+    "mode": "A1",
+    "tolerance": 0.005,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D0",
+    "mode": "A1",
+    "tolerance": 0.01,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D0",
+    "mode": "A1",
+    "tolerance": 0.02,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D0",
+    "mode": "A1",
+    "tolerance": 0.05,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D0",
+    "mode": "A2",
+    "tolerance": 0.0,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D0",
+    "mode": "A2",
+    "tolerance": 0.005,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D0",
+    "mode": "A2",
+    "tolerance": 0.01,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D0",
+    "mode": "A2",
+    "tolerance": 0.02,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D0",
+    "mode": "A2",
+    "tolerance": 0.05,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D1",
+    "mode": "A1",
+    "tolerance": 0.0,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D1",
+    "mode": "A1",
+    "tolerance": 0.005,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D1",
+    "mode": "A1",
+    "tolerance": 0.01,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D1",
+    "mode": "A1",
+    "tolerance": 0.02,
+    "gained_states": [
+      "1800"
+    ],
+    "lost_states": [],
+    "gained_with_O_HA_increase": [
+      "1800"
+    ]
+  },
+  {
+    "condition": "D1",
+    "mode": "A1",
+    "tolerance": 0.05,
+    "gained_states": [
+      "0730",
+      "1800",
+      "1830"
+    ],
+    "lost_states": [],
+    "gained_with_O_HA_increase": [
+      "1800",
+      "1830"
+    ]
+  },
+  {
+    "condition": "D1",
+    "mode": "A2",
+    "tolerance": 0.0,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D1",
+    "mode": "A2",
+    "tolerance": 0.005,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D1",
+    "mode": "A2",
+    "tolerance": 0.01,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D1",
+    "mode": "A2",
+    "tolerance": 0.02,
+    "gained_states": [
+      "1800"
+    ],
+    "lost_states": [],
+    "gained_with_O_HA_increase": [
+      "1800"
+    ]
+  },
+  {
+    "condition": "D1",
+    "mode": "A2",
+    "tolerance": 0.05,
+    "gained_states": [
+      "0730",
+      "1800",
+      "1830"
+    ],
+    "lost_states": [],
+    "gained_with_O_HA_increase": [
+      "1800",
+      "1830"
+    ]
+  },
+  {
+    "condition": "D2",
+    "mode": "A1",
+    "tolerance": 0.0,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D2",
+    "mode": "A1",
+    "tolerance": 0.005,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D2",
+    "mode": "A1",
+    "tolerance": 0.01,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D2",
+    "mode": "A1",
+    "tolerance": 0.02,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D2",
+    "mode": "A1",
+    "tolerance": 0.05,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D2",
+    "mode": "A2",
+    "tolerance": 0.0,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D2",
+    "mode": "A2",
+    "tolerance": 0.005,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D2",
+    "mode": "A2",
+    "tolerance": 0.01,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D2",
+    "mode": "A2",
+    "tolerance": 0.02,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D2",
+    "mode": "A2",
+    "tolerance": 0.05,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D3",
+    "mode": "A1",
+    "tolerance": 0.0,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D3",
+    "mode": "A1",
+    "tolerance": 0.005,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D3",
+    "mode": "A1",
+    "tolerance": 0.01,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D3",
+    "mode": "A1",
+    "tolerance": 0.02,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D3",
+    "mode": "A1",
+    "tolerance": 0.05,
+    "gained_states": [
+      "0730",
+      "1800",
+      "1830"
+    ],
+    "lost_states": [],
+    "gained_with_O_HA_increase": [
+      "1800",
+      "1830"
+    ]
+  },
+  {
+    "condition": "D3",
+    "mode": "A2",
+    "tolerance": 0.0,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D3",
+    "mode": "A2",
+    "tolerance": 0.005,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D3",
+    "mode": "A2",
+    "tolerance": 0.01,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D3",
+    "mode": "A2",
+    "tolerance": 0.02,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D3",
+    "mode": "A2",
+    "tolerance": 0.05,
+    "gained_states": [
+      "0730",
+      "1800",
+      "1830"
+    ],
+    "lost_states": [],
+    "gained_with_O_HA_increase": [
+      "1800",
+      "1830"
+    ]
+  },
+  {
+    "condition": "D4",
+    "mode": "A1",
+    "tolerance": 0.0,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D4",
+    "mode": "A1",
+    "tolerance": 0.005,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D4",
+    "mode": "A1",
+    "tolerance": 0.01,
+    "gained_states": [
+      "1800"
+    ],
+    "lost_states": [],
+    "gained_with_O_HA_increase": [
+      "1800"
+    ]
+  },
+  {
+    "condition": "D4",
+    "mode": "A1",
+    "tolerance": 0.02,
+    "gained_states": [
+      "0830",
+      "1800",
+      "2100"
+    ],
+    "lost_states": [],
+    "gained_with_O_HA_increase": [
+      "0830",
+      "1800"
+    ]
+  },
+  {
+    "condition": "D4",
+    "mode": "A1",
+    "tolerance": 0.05,
+    "gained_states": [
+      "0730",
+      "0830",
+      "1300",
+      "1800",
+      "1830"
+    ],
+    "lost_states": [],
+    "gained_with_O_HA_increase": [
+      "0730",
+      "0830",
+      "1300",
+      "1800",
+      "1830"
+    ]
+  },
+  {
+    "condition": "D4",
+    "mode": "A2",
+    "tolerance": 0.0,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D4",
+    "mode": "A2",
+    "tolerance": 0.005,
+    "gained_states": [],
+    "lost_states": [],
+    "gained_with_O_HA_increase": []
+  },
+  {
+    "condition": "D4",
+    "mode": "A2",
+    "tolerance": 0.01,
+    "gained_states": [
+      "1800"
+    ],
+    "lost_states": [],
+    "gained_with_O_HA_increase": [
+      "1800"
+    ]
+  },
+  {
+    "condition": "D4",
+    "mode": "A2",
+    "tolerance": 0.02,
+    "gained_states": [
+      "0830",
+      "1200",
+      "1800",
+      "2100"
+    ],
+    "lost_states": [],
+    "gained_with_O_HA_increase": [
+      "0830",
+      "1200",
+      "1800"
+    ]
+  },
+  {
+    "condition": "D4",
+    "mode": "A2",
+    "tolerance": 0.05,
+    "gained_states": [
+      "0730",
+      "0830",
+      "1200",
+      "1300",
+      "1800",
+      "1830"
+    ],
+    "lost_states": [],
+    "gained_with_O_HA_increase": [
+      "0730",
+      "0830",
+      "1200",
+      "1300",
+      "1800",
+      "1830"
+    ]
+  }
+]

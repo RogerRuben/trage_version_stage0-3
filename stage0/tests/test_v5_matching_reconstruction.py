@@ -104,7 +104,7 @@ def test_full_order_fallback_trigger_can_be_computed_from_ambiguity_share():
 
 
 def test_sparse_ambiguity_does_not_trigger_from_expanded_window_length():
-    flags = pd.Series([False] * 20).to_numpy()
+    flags = pd.Series([False] * 20).to_numpy(copy=True)
     flags[[2, 7, 12]] = True
     assert full_order_decision(flags, {"full_order_ambiguity_share": 0.45, "full_order_min_windows": 4, "full_order_min_window_share": 0.25}) == (False, "")
 
@@ -191,7 +191,7 @@ def test_transition_ambiguity_is_not_masked_by_unreliable_heading():
 
 
 def test_context_expansion_remerges_overlapping_local_windows():
-    flags = pd.Series([False] * 10).to_numpy()
+    flags = pd.Series([False] * 10).to_numpy(copy=True)
     flags[[2, 6]] = True
     assert local_hmm_windows(flags, context_points=2, merge_gap_points=2) == [
         (0, 9)

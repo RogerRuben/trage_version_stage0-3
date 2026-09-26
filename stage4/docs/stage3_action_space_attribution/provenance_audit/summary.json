@@ -1,0 +1,32 @@
+{
+  "status": "PASS",
+  "reverse_order_count": 14837,
+  "reverse_tokens": 85538,
+  "reverse_identities_in_test31": 3322,
+  "all_overlay_identities": 6502,
+  "scoped_orders": 720,
+  "encounters": 13378,
+  "unresolved_encounters": 391,
+  "unresolved_movement_orders": 276,
+  "raw_identity_unresolved_tokens": 23,
+  "raw_identity_unresolved_orders": 23,
+  "runtime_s": 29.089522100002796,
+  "peak_sampled_rss_mib": 662.72265625,
+  "route_calls": 0,
+  "MILPs": 0,
+  "pbf_sha256": "4d918b7ed2201a8f7a75fa7fb2974679343c89a10bf83638e7bcf21ac07c1526",
+  "source_sha256": {
+    "stage3\\output\\odd_tod\\s2a\\stage3_historical_direction_overlay.parquet": "3ff51db9fd424954951ad08a27644f95875354845ad346903c0212f3a6c894c4",
+    "stage3\\output\\odd_tod\\s2a\\stage3_full_network_edges.parquet": "25ed4caf250cacbe251ae258d8e77ff2f0b286884f0376c72b9ef09e33687204",
+    "stage3\\output\\odd_tod\\s4\\test31_route_identity_resolution.parquet": "3148f868b45a2ec5be33c7cb63a3d28598a3cb445626b2f17618c5cbbc7d512c",
+    "stage3\\output\\odd_tod\\s4\\test31_route_complex_encounters.parquet": "79738438b2f6dc1565c8dd8a41b3d68610de4ade9589b2f662e6df725e48324c",
+    "stage3\\output\\odd_tod\\s2b\\final\\stage3_intersection_node_membership.parquet": "55aefa6843aacff111dccb39dd967f4d21e2fab408b6372dfc3b9bbd4304be02",
+    "stage3\\output\\odd_tod\\s2b\\final\\stage3_route_movement_lookup.parquet": "aabe997d06ffc80556ba68551b32805619f548dfe5ad83f2a5a9f043572db811",
+    "stage3\\output\\odd_tod\\s2a\\stage3_observed_full_network_mapping.parquet": "1dda71f6b227e5a148c98d4ce322163ae8fe81a59b7ccb4c08dfb424ddade8c2"
+  },
+  "manual_samples": 55,
+  "manual_review_completed": false,
+  "movement_classification_stage": "ENDPOINT_AWARE_CLOSURE_COMPLETE",
+  "authoritative_movement_table": "movement_classification.json",
+  "closure_code_sha256": "86b96031c2429c6a32e0d31c300806dffb52a24b2a3325f2688d38bccdeceef9"
+}

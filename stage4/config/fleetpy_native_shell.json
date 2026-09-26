@@ -1,0 +1,15 @@
+{
+    "test_date": "20161031",
+    "simulation_start_time": "08:00:00",
+    "simulation_end_time": "09:00:00",
+    "simulation_time_step_s": 60,
+    "profile_id": "M",
+    "engineering_request_count": 200,
+    "engineering_hv_count": 40,
+    "engineering_av_count": 10,
+    "selection_seed": 20260824,
+    "av_availability_policy": "FULL_SIMULATION_HORIZON",
+    "dispatch_policy": "MIN_CORRECTED_PICKUP_ETA_STUB",
+    "fleetpy_repository": "https://github.com/TUM-VT/FleetPy.git",
+    "fleetpy_commit": "0379f9725a147ff33c674de4884cdf89fd787fa9"
+}

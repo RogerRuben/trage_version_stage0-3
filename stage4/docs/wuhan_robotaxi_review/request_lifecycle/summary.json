@@ -1,0 +1,457 @@
+{
+  "source_sha256": "5bb92ba04f400940b19d0dca3cda4246732e662311c13954d29813547d33ed6f",
+  "rows": 6727,
+  "unique_orders": 6727,
+  "unique_vehicles": 402,
+  "method": "Descriptive only; pandas linear quantiles; no cleaning/exclusion/model fitting.",
+  "fields": {
+    "呼单时间": {
+      "blank": 0,
+      "parse_failure_nonblank": 0,
+      "minute_format": 6727,
+      "date_counts": {
+        "2024-11-12": 6727
+      }
+    },
+    "接单时间": {
+      "blank": 0,
+      "parse_failure_nonblank": 0,
+      "minute_format": 6727,
+      "date_counts": {
+        "2024-11-12": 6727
+      }
+    },
+    "出发接驾时间": {
+      "blank": 0,
+      "parse_failure_nonblank": 0,
+      "minute_format": 6727,
+      "date_counts": {
+        "2024-11-12": 6727
+      }
+    },
+    "到达起点时间": {
+      "blank": 0,
+      "parse_failure_nonblank": 0,
+      "minute_format": 6727,
+      "date_counts": {
+        "2024-11-12": 6727
+      }
+    },
+    "开始行程时间": {
+      "blank": 0,
+      "parse_failure_nonblank": 0,
+      "minute_format": 6727,
+      "date_counts": {
+        "2024-11-12": 6726,
+        "2024-11-13": 1
+      }
+    },
+    "到达目的地时间": {
+      "blank": 0,
+      "parse_failure_nonblank": 0,
+      "minute_format": 6727,
+      "date_counts": {
+        "2024-11-12": 6712,
+        "2024-11-13": 15
+      }
+    },
+    "取消时间": {
+      "blank": 0,
+      "parse_failure_nonblank": 0,
+      "minute_format": 6727,
+      "date_counts": {
+        "2024-11-12": 6712,
+        "2024-11-13": 15
+      }
+    }
+  },
+  "intervals": {
+    "request_to_accept": {
+      "n": 6727,
+      "missing": 0,
+      "min": 0.0,
+      "p25": 0.0,
+      "p50": 0.0,
+      "p75": 0.0,
+      "p90": 60.0,
+      "p99": 420.0,
+      "max": 1200.0,
+      "negative": 0,
+      "zero": 5908,
+      "gt_300s": 109,
+      "gt_1800s": 0
+    },
+    "accept_to_depart": {
+      "n": 6727,
+      "missing": 0,
+      "min": 0.0,
+      "p25": 0.0,
+      "p50": 0.0,
+      "p75": 0.0,
+      "p90": 0.0,
+      "p99": 60.0,
+      "max": 240.0,
+      "negative": 0,
+      "zero": 6093,
+      "gt_300s": 0,
+      "gt_1800s": 0
+    },
+    "depart_to_arrival": {
+      "n": 6727,
+      "missing": 0,
+      "min": 0.0,
+      "p25": 180.0,
+      "p50": 300.0,
+      "p75": 420.0,
+      "p90": 660.0,
+      "p99": 1080.0,
+      "max": 2160.0,
+      "negative": 0,
+      "zero": 233,
+      "gt_300s": 2787,
+      "gt_1800s": 1
+    },
+    "arrival_to_boarding_proxy": {
+      "n": 6727,
+      "missing": 0,
+      "min": 0.0,
+      "p25": 0.0,
+      "p50": 60.0,
+      "p75": 60.0,
+      "p90": 120.0,
+      "p99": 240.0,
+      "max": 8460.0,
+      "negative": 0,
+      "zero": 1876,
+      "gt_300s": 17,
+      "gt_1800s": 6
+    },
+    "boarding_proxy_to_destination": {
+      "n": 6727,
+      "missing": 0,
+      "min": 0.0,
+      "p25": 480.0,
+      "p50": 780.0,
+      "p75": 1140.0,
+      "p90": 1620.0,
+      "p99": 3300.0,
+      "max": 6300.0,
+      "negative": 0,
+      "zero": 157,
+      "gt_300s": 5737,
+      "gt_1800s": 439
+    },
+    "request_to_arrival": {
+      "n": 6727,
+      "missing": 0,
+      "min": 0.0,
+      "p25": 180.0,
+      "p50": 300.0,
+      "p75": 480.0,
+      "p90": 720.0,
+      "p99": 1200.0,
+      "max": 2220.0,
+      "negative": 0,
+      "zero": 178,
+      "gt_300s": 3045,
+      "gt_1800s": 5
+    },
+    "request_to_boarding_proxy": {
+      "n": 6727,
+      "missing": 0,
+      "min": 0.0,
+      "p25": 240.0,
+      "p50": 360.0,
+      "p75": 540.0,
+      "p90": 744.0000000000327,
+      "p99": 1260.0,
+      "max": 8700.0,
+      "negative": 0,
+      "zero": 11,
+      "gt_300s": 3872,
+      "gt_1800s": 12
+    },
+    "request_to_destination": {
+      "n": 6727,
+      "missing": 0,
+      "min": 0.0,
+      "p25": 840.0,
+      "p50": 1140.0,
+      "p75": 1620.0,
+      "p90": 2160.0,
+      "p99": 4080.0,
+      "max": 9240.0,
+      "negative": 0,
+      "zero": 1,
+      "gt_300s": 6586,
+      "gt_1800s": 1171
+    },
+    "accept_to_arrival": {
+      "n": 6727,
+      "missing": 0,
+      "min": 0.0,
+      "p25": 180.0,
+      "p50": 300.0,
+      "p75": 480.0,
+      "p90": 660.0,
+      "p99": 1080.0,
+      "max": 2160.0,
+      "negative": 0,
+      "zero": 216,
+      "gt_300s": 2872,
+      "gt_1800s": 1
+    },
+    "accept_to_destination": {
+      "n": 6727,
+      "missing": 0,
+      "min": 0.0,
+      "p25": 840.0,
+      "p50": 1140.0,
+      "p75": 1560.0,
+      "p90": 2100.0,
+      "p99": 4020.0,
+      "max": 9240.0,
+      "negative": 0,
+      "zero": 2,
+      "gt_300s": 6579,
+      "gt_1800s": 1125
+    }
+  },
+  "status_counts": {
+    "完成": 6727
+  },
+  "processing_markers": {
+    "取消次数": {
+      "0.0": 6727
+    },
+    "虚拟单合并数": {
+      "1.0": 6241,
+      "2.0": 260,
+      "3.0": 49,
+      "4.0": 41,
+      "5.0": 33,
+      "7.0": 17,
+      "6.0": 17,
+      "8.0": 10,
+      "10.0": 9,
+      "11.0": 8,
+      "9.0": 8,
+      "18.0": 5,
+      "31.0": 4,
+      "20.0": 3,
+      "15.0": 3,
+      "14.0": 3,
+      "25.0": 3,
+      "22.0": 2,
+      "13.0": 2,
+      "19.0": 2,
+      "27.0": 1,
+      "21.0": 1,
+      "39.0": 1,
+      "24.0": 1,
+      "17.0": 1,
+      "26.0": 1,
+      "12.0": 1
+    }
+  },
+  "cancel_field": {
+    "nonblank_completed": 6727,
+    "equals_destination": 4159,
+    "earlier_than_request": 0
+  },
+  "chronology": {
+    "any_adjacent_negative": 0,
+    "complete_chain": 6727
+  },
+  "duration_comparisons": {
+    "接驾时长": {
+      "reported_numeric": {
+        "n": 6290,
+        "missing": 437,
+        "min": 0.0,
+        "p25": 172.0,
+        "p50": 287.0,
+        "p75": 450.0,
+        "p90": 646.1000000000004,
+        "p99": 1075.4399999999987,
+        "max": 2164.0,
+        "negative": 0,
+        "zero": 167,
+        "gt_300s": 2974,
+        "gt_1800s": 1
+      },
+      "comparisons": {
+        "request_to_accept": {
+          "available_pairs": 6290,
+          "abs_error_le_60s": 440,
+          "median_abs_error_s": 278.0,
+          "p90_abs_error_s": 630.1000000000004
+        },
+        "accept_to_depart": {
+          "available_pairs": 6290,
+          "abs_error_le_60s": 415,
+          "median_abs_error_s": 282.0,
+          "p90_abs_error_s": 639.0
+        },
+        "depart_to_arrival": {
+          "available_pairs": 6290,
+          "abs_error_le_60s": 6289,
+          "median_abs_error_s": 17.0,
+          "p90_abs_error_s": 40.0
+        },
+        "arrival_to_boarding_proxy": {
+          "available_pairs": 6290,
+          "abs_error_le_60s": 762,
+          "median_abs_error_s": 236.0,
+          "p90_abs_error_s": 601.1000000000004
+        },
+        "boarding_proxy_to_destination": {
+          "available_pairs": 6290,
+          "abs_error_le_60s": 484,
+          "median_abs_error_s": 460.5,
+          "p90_abs_error_s": 1269.0
+        },
+        "request_to_arrival": {
+          "available_pairs": 6290,
+          "abs_error_le_60s": 5792,
+          "median_abs_error_s": 20.0,
+          "p90_abs_error_s": 55.0
+        },
+        "request_to_boarding_proxy": {
+          "available_pairs": 6290,
+          "abs_error_le_60s": 3023,
+          "median_abs_error_s": 63.0,
+          "p90_abs_error_s": 180.0
+        },
+        "request_to_destination": {
+          "available_pairs": 6290,
+          "abs_error_le_60s": 88,
+          "median_abs_error_s": 846.0,
+          "p90_abs_error_s": 1720.0
+        },
+        "accept_to_arrival": {
+          "available_pairs": 6290,
+          "abs_error_le_60s": 6200,
+          "median_abs_error_s": 18.0,
+          "p90_abs_error_s": 42.0
+        },
+        "accept_to_destination": {
+          "available_pairs": 6290,
+          "abs_error_le_60s": 93,
+          "median_abs_error_s": 827.0,
+          "p90_abs_error_s": 1691.0
+        }
+      },
+      "integer_share": 1.0
+    },
+    "行程时长": {
+      "reported_numeric": {
+        "n": 6727,
+        "missing": 0,
+        "min": 0.0,
+        "p25": 765.0,
+        "p50": 1122.0,
+        "p75": 1571.0,
+        "p90": 2120.2000000000016,
+        "p99": 4124.699999999999,
+        "max": 10231.0,
+        "negative": 0,
+        "zero": 329,
+        "gt_300s": 6293,
+        "gt_1800s": 1172
+      },
+      "comparisons": {
+        "request_to_accept": {
+          "available_pairs": 6727,
+          "abs_error_le_60s": 342,
+          "median_abs_error_s": 1109.0,
+          "p90_abs_error_s": 2106.0
+        },
+        "accept_to_depart": {
+          "available_pairs": 6727,
+          "abs_error_le_60s": 346,
+          "median_abs_error_s": 1116.0,
+          "p90_abs_error_s": 2114.0
+        },
+        "depart_to_arrival": {
+          "available_pairs": 6727,
+          "abs_error_le_60s": 118,
+          "median_abs_error_s": 801.0,
+          "p90_abs_error_s": 1698.800000000001
+        },
+        "arrival_to_boarding_proxy": {
+          "available_pairs": 6727,
+          "abs_error_le_60s": 292,
+          "median_abs_error_s": 1061.0,
+          "p90_abs_error_s": 2057.4000000000005
+        },
+        "boarding_proxy_to_destination": {
+          "available_pairs": 6727,
+          "abs_error_le_60s": 78,
+          "median_abs_error_s": 366.0,
+          "p90_abs_error_s": 776.0
+        },
+        "request_to_arrival": {
+          "available_pairs": 6727,
+          "abs_error_le_60s": 159,
+          "median_abs_error_s": 780.0,
+          "p90_abs_error_s": 1666.0
+        },
+        "request_to_boarding_proxy": {
+          "available_pairs": 6727,
+          "abs_error_le_60s": 196,
+          "median_abs_error_s": 720.0,
+          "p90_abs_error_s": 1587.800000000001
+        },
+        "request_to_destination": {
+          "available_pairs": 6727,
+          "abs_error_le_60s": 5905,
+          "median_abs_error_s": 21.0,
+          "p90_abs_error_s": 143.20000000000164
+        },
+        "accept_to_arrival": {
+          "available_pairs": 6727,
+          "abs_error_le_60s": 135,
+          "median_abs_error_s": 796.0,
+          "p90_abs_error_s": 1684.0
+        },
+        "accept_to_destination": {
+          "available_pairs": 6727,
+          "abs_error_le_60s": 6274,
+          "median_abs_error_s": 19.0,
+          "p90_abs_error_s": 48.400000000000546
+        }
+      },
+      "integer_share": 1.0
+    }
+  },
+  "vehicle_order_count_distribution": {
+    "n": 402,
+    "missing": 0,
+    "min": 1.0,
+    "p25": 12.0,
+    "p50": 17.0,
+    "p75": 22.0,
+    "p90": 26.0,
+    "p99": 31.99000000000001,
+    "max": 34.0,
+    "negative": 0,
+    "zero": 0
+  },
+  "tail_screen": {
+    "arrival_to_boarding_gt_30min": 6,
+    "boarding_before_arrival": 0,
+    "pickup_wait_gt_30min": 5
+  },
+  "zero_duration_crosscheck": {
+    "reported_trip_duration_zero_but_boarding_to_destination_positive": 328,
+    "reported_pickup_duration_missing_but_depart_to_arrival_present": 437
+  },
+  "calculation_checks": {
+    "rows_match_prior_inventory": true,
+    "unique_orders": true,
+    "interval_decomposition_exact": true,
+    "arrival_quantiles_match_previous": true,
+    "boarding_median_matches_previous": true
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "rows": [
+    {
+      "cross_order_scenario_coherent": true,
+      "date": "20161025",
+      "fixed_seed": 20261009,
+      "protocol": "development",
+      "selected_family": "hierarchical_quantile_copula.network_region_highway_route_residual.1",
+      "status": "PASS"
+    },
+    {
+      "cross_order_scenario_coherent": true,
+      "date": "20161026",
+      "fixed_seed": 20261009,
+      "protocol": "development",
+      "selected_family": "hierarchical_quantile_copula.network_region_highway_route_residual.1",
+      "status": "PASS"
+    },
+    {
+      "cross_order_scenario_coherent": true,
+      "date": "20161027",
+      "fixed_seed": 20261009,
+      "protocol": "development",
+      "selected_family": "hierarchical_quantile_copula.network_region_highway_route_residual.1",
+      "status": "PASS"
+    },
+    {
+      "cross_order_scenario_coherent": true,
+      "date": "20161022",
+      "fixed_seed": 20261009,
+      "protocol": "fold_1",
+      "selected_family": "hierarchical_quantile_copula.network_region_highway_route_residual.1",
+      "status": "PASS"
+    },
+    {
+      "cross_order_scenario_coherent": true,
+      "date": "20161023",
+      "fixed_seed": 20261009,
+      "protocol": "fold_1",
+      "selected_family": "hierarchical_quantile_copula.network_region_highway_route_residual.1",
+      "status": "PASS"
+    },
+    {
+      "cross_order_scenario_coherent": true,
+      "date": "20161024",
+      "fixed_seed": 20261009,
+      "protocol": "fold_2",
+      "selected_family": "hierarchical_quantile_copula.network_region_highway_route_residual.1",
+      "status": "PASS"
+    },
+    {
+      "cross_order_scenario_coherent": true,
+      "date": "20161025",
+      "fixed_seed": 20261009,
+      "protocol": "fold_2",
+      "selected_family": "hierarchical_quantile_copula.network_region_highway_route_residual.1",
+      "status": "PASS"
+    },
+    {
+      "cross_order_scenario_coherent": true,
+      "date": "20161026",
+      "fixed_seed": 20261009,
+      "protocol": "fold_3",
+      "selected_family": "hierarchical_quantile_copula.network_region_highway_route_residual.1",
+      "status": "PASS"
+    },
+    {
+      "cross_order_scenario_coherent": true,
+      "date": "20161027",
+      "fixed_seed": 20261009,
+      "protocol": "fold_3",
+      "selected_family": "hierarchical_quantile_copula.network_region_highway_route_residual.1",
+      "status": "PASS"
+    },
+    {
+      "cross_order_scenario_coherent": true,
+      "date": "20161031",
+      "fixed_seed": 20261009,
+      "protocol": "legacy",
+      "selected_family": "hierarchical_quantile_copula.network_region_highway_route_residual.1",
+      "status": "PASS"
+    }
+  ],
+  "same_scenario_index_semantics": "one system traffic state shared across the complete day batch",
+  "schema_version": "stage2_v5_1_cross_order_scenario_audit.1",
+  "status": "PASS"
+}

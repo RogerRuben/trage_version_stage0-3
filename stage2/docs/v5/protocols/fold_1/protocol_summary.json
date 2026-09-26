@@ -1,0 +1,119 @@
+{
+  "baseline_fit_dates": [
+    "20161009",
+    "20161010",
+    "20161011",
+    "20161012",
+    "20161013",
+    "20161014",
+    "20161015",
+    "20161016",
+    "20161017",
+    "20161018"
+  ],
+  "calibration_dates": [
+    "20161021"
+  ],
+  "development_ablation": null,
+  "evaluation_dates": [
+    "20161022",
+    "20161023"
+  ],
+  "feature_artifact_sha256": "6842c388e870ec8b378251de41722bcac028cdb127e7278057dbdb2f91a2a0a7",
+  "feature_fit_dates": [
+    "20161009",
+    "20161010",
+    "20161011",
+    "20161012",
+    "20161013",
+    "20161014",
+    "20161015",
+    "20161016",
+    "20161017",
+    "20161018"
+  ],
+  "legacy_benchmark_dates": [],
+  "model_evaluation": {
+    "evaluation_deep_mae": 0.028696982539492356,
+    "evaluation_paired_ci_all_below_zero": true,
+    "evaluation_strong_baseline_mae": 0.029810064165380432,
+    "legacy_evaluated_in_this_step": false,
+    "relative_mae_change": -0.03733912210698087,
+    "schema_version": "stage2_v5_model_evaluation.1",
+    "scientific_evaluation_dates": [
+      "20161022",
+      "20161023"
+    ],
+    "scientific_evaluation_role": "evaluation",
+    "status": "PREDICTIVE_BASELINE_VALIDATED"
+  },
+  "model_fit_dates": [
+    "20161009",
+    "20161010",
+    "20161011",
+    "20161012",
+    "20161013",
+    "20161014",
+    "20161015",
+    "20161016",
+    "20161017",
+    "20161018"
+  ],
+  "model_id": "2ac3af674a8135cb93708b11f3440ab0a2f0e0259f3f5d3531e7c737d61e459c",
+  "prediction_day_count": 5,
+  "protocol": "fold_1",
+  "protocol_config": {
+    "path": "D:/pycodes/didi_xian_raw/.worktrees/stage0-v6-valhalla/stage2/output_v5/protocols/fold_1/config.json",
+    "protocol_name": "fold_1",
+    "sha256": "e25591cface47bfe27b2aca6844ae51c26c8f85955310050e09fd07b6e96dfb1"
+  },
+  "scenario_selection": {
+    "calibration_dates": [
+      "20161021"
+    ],
+    "calibration_status": "FIT_ON_CALIBRATION_DATE_NOT_AN_UNBIASED_EVALUATION",
+    "evaluation_dates": [
+      "20161022",
+      "20161023"
+    ],
+    "generator_id": "stage2_v5_route_scenarios.1",
+    "legacy_benchmark_dates": [],
+    "route_dispersion_multiplier": 2.5999999999999996,
+    "route_offset_s": 14.219084764408251,
+    "route_time_scale": 1.3347980556181929,
+    "scenario_count": 1000,
+    "scenario_seed": 20261009,
+    "schema_version": "stage2_v5_scenario_selection.1",
+    "scores": {
+      "independent": 2.383144652777666,
+      "residual_block": 2.3328940705018626,
+      "shared_route_latent": 2.02445
+    },
+    "selected_model": "shared_route_latent",
+    "selection_dates": [
+      "20161019",
+      "20161020"
+    ]
+  },
+  "schema_version": "stage2_v5_protocol_run.1",
+  "selected_history_mode": "ordinary_concatenation",
+  "shard_day_count": 15,
+  "status": "PASS",
+  "train_dates": [
+    "20161009",
+    "20161010",
+    "20161011",
+    "20161012",
+    "20161013",
+    "20161014",
+    "20161015",
+    "20161016",
+    "20161017",
+    "20161018"
+  ],
+  "upstream_rebuild_performed": false,
+  "validation_model_dates": [
+    "20161019",
+    "20161020"
+  ]
+}

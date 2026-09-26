@@ -1,0 +1,133 @@
+{
+  "cpu_only_kernels": [
+    "max_consecutive_high_exposure",
+    "micro_route_aggregation",
+    "static_structure_preprocessing",
+    "weighted_quantile"
+  ],
+  "devices": [
+    "cpu"
+  ],
+  "scaling_checks": [
+    {
+      "device": "cpu",
+      "high_rows": 50000,
+      "hotspot": "support_aware_edge_representation",
+      "low_rows": 10000,
+      "scaling_ratio": 6.11542343597367,
+      "status": "PASS"
+    },
+    {
+      "device": "cpu",
+      "high_rows": 500000,
+      "hotspot": "support_aware_edge_representation",
+      "low_rows": 100000,
+      "scaling_ratio": 7.708070876296926,
+      "status": "PASS"
+    },
+    {
+      "device": "cpu",
+      "high_rows": 50000,
+      "hotspot": "static_structure_preprocessing",
+      "low_rows": 10000,
+      "scaling_ratio": 2.7202097775469873,
+      "status": "PASS"
+    },
+    {
+      "device": "cpu",
+      "high_rows": 500000,
+      "hotspot": "static_structure_preprocessing",
+      "low_rows": 100000,
+      "scaling_ratio": 4.887245553828961,
+      "status": "PASS"
+    },
+    {
+      "device": "cpu",
+      "high_rows": 50000,
+      "hotspot": "micro_route_aggregation",
+      "low_rows": 10000,
+      "scaling_ratio": 2.2600937373857484,
+      "status": "PASS"
+    },
+    {
+      "device": "cpu",
+      "high_rows": 500000,
+      "hotspot": "micro_route_aggregation",
+      "low_rows": 100000,
+      "scaling_ratio": 4.77953784230909,
+      "status": "PASS"
+    },
+    {
+      "device": "cpu",
+      "high_rows": 50000,
+      "hotspot": "weighted_quantile",
+      "low_rows": 10000,
+      "scaling_ratio": 4.439149560842749,
+      "status": "PASS"
+    },
+    {
+      "device": "cpu",
+      "high_rows": 500000,
+      "hotspot": "weighted_quantile",
+      "low_rows": 100000,
+      "scaling_ratio": 5.245401525388185,
+      "status": "PASS"
+    },
+    {
+      "device": "cpu",
+      "high_rows": 50000,
+      "hotspot": "max_consecutive_high_exposure",
+      "low_rows": 10000,
+      "scaling_ratio": 1.8251514644570555,
+      "status": "PASS"
+    },
+    {
+      "device": "cpu",
+      "high_rows": 500000,
+      "hotspot": "max_consecutive_high_exposure",
+      "low_rows": 100000,
+      "scaling_ratio": 5.680376899216648,
+      "status": "PASS"
+    },
+    {
+      "device": "cpu",
+      "high_rows": 50000,
+      "hotspot": "temporal_adapter",
+      "low_rows": 10000,
+      "scaling_ratio": 6.234030895573873,
+      "status": "PASS"
+    },
+    {
+      "device": "cpu",
+      "high_rows": 500000,
+      "hotspot": "temporal_adapter",
+      "low_rows": 100000,
+      "scaling_ratio": 5.173677758850181,
+      "status": "PASS"
+    },
+    {
+      "device": "cpu",
+      "high_rows": 50000,
+      "hotspot": "full_transfer_model_forward",
+      "low_rows": 10000,
+      "scaling_ratio": 4.1758755590233,
+      "status": "PASS"
+    },
+    {
+      "device": "cpu",
+      "high_rows": 500000,
+      "hotspot": "full_transfer_model_forward",
+      "low_rows": 100000,
+      "scaling_ratio": 4.74342334953427,
+      "status": "PASS"
+    }
+  ],
+  "schema_version": "stage2_v5_2_performance.2",
+  "status": "PASS",
+  "timing_policy": {
+    "inference_mode": true,
+    "repeat_runs": 3,
+    "summary": "median",
+    "warmup_runs": 2
+  }
+}

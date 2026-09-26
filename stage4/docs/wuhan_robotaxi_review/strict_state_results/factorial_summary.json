@@ -1,0 +1,132 @@
+{
+  "status": "COMPLETE",
+  "cells": 48,
+  "baseline_300_passes": 16,
+  "runtime_s": 222.10014450000017,
+  "peak_rss_mib": 837.890625,
+  "routing_arcs": 87519,
+  "routing_failures": 0,
+  "sources": {
+    "stage4\\output\\paper_enhancement\\mechanism_validity\\strict_pre_epoch\\request_time_sensitivity.csv": "a107803352164f5b7e4dcbf40781469348f68527c8c58bf581f3c4c64993c47d",
+    "stage4\\docs\\paper_redesign\\recovered_rt_environment_parameters.json": "bbaf84dbc7caf09c3557c0ba93db39a7b5454645174e64494494738cc3c87018",
+    "stage4\\output\\final_experiments\\ODD_Q50_M_P70_REFERENCE\\scenario_config.json": "3fdf2cf53c04ee3262d6060c318e468426d77321b4ef9e8e4a3483b639f3bbe4",
+    "stage4\\output\\final_experiments\\ODD_Q50_M_P70_REFERENCE\\assignment_log.parquet": "77bc76ba02a42988c5546af6d95e577f90f7ce2b8a2b76c8009fd637ffcca69c",
+    "stage4\\output\\final_experiments\\MAIN_Q75_M_P70\\scenario_config.json": "9f68bccc06e1ec0ccd32fea88d4b4408a1351a43bcdd65dfe002bc18e495f1cf",
+    "stage4\\output\\final_experiments\\MAIN_Q75_M_P70\\assignment_log.parquet": "b1adc849cc3c20779eabd558b41247a26ca063f4551934bfb9c8222058093beb"
+  },
+  "no_full_day_simulation": true,
+  "no_prediction_reinference": true,
+  "capacity_scope": "solver-input graph maximum matching, before cumulative Gamma and lexicographic selection",
+  "clock_scope": "legacy AV gate metrics retain microseconds; production_av and mixed metrics use production integer deadlines; discrepancies explicitly counted",
+  "conditioning": "canonical prior assignments and positions; release-specific waiting cohorts; frozen descriptors",
+  "aggregate": [
+    {
+      "rt_variant": "CANONICAL_ZERO_LEAD",
+      "patience_s": 180,
+      "waiting_orders": 251,
+      "G5_SOLVER_M": 9,
+      "mixed_M": 22,
+      "retained_av_M": 9,
+      "retained_mixed_M": 22
+    },
+    {
+      "rt_variant": "CANONICAL_ZERO_LEAD",
+      "patience_s": 300,
+      "waiting_orders": 369,
+      "G5_SOLVER_M": 11,
+      "mixed_M": 52,
+      "retained_av_M": 11,
+      "retained_mixed_M": 52
+    },
+    {
+      "rt_variant": "CANONICAL_ZERO_LEAD",
+      "patience_s": 600,
+      "waiting_orders": 722,
+      "G5_SOLVER_M": 27,
+      "mixed_M": 144,
+      "retained_av_M": 23,
+      "retained_mixed_M": 129
+    },
+    {
+      "rt_variant": "RT-Base",
+      "patience_s": 180,
+      "waiting_orders": 320,
+      "G5_SOLVER_M": 7,
+      "mixed_M": 19,
+      "retained_av_M": 7,
+      "retained_mixed_M": 19
+    },
+    {
+      "rt_variant": "RT-Base",
+      "patience_s": 300,
+      "waiting_orders": 538,
+      "G5_SOLVER_M": 26,
+      "mixed_M": 68,
+      "retained_av_M": 23,
+      "retained_mixed_M": 58
+    },
+    {
+      "rt_variant": "RT-Base",
+      "patience_s": 600,
+      "waiting_orders": 1055,
+      "G5_SOLVER_M": 127,
+      "mixed_M": 284,
+      "retained_av_M": 66,
+      "retained_mixed_M": 184
+    },
+    {
+      "rt_variant": "RT-High",
+      "patience_s": 180,
+      "waiting_orders": 406,
+      "G5_SOLVER_M": 13,
+      "mixed_M": 35,
+      "retained_av_M": 13,
+      "retained_mixed_M": 35
+    },
+    {
+      "rt_variant": "RT-High",
+      "patience_s": 300,
+      "waiting_orders": 634,
+      "G5_SOLVER_M": 40,
+      "mixed_M": 102,
+      "retained_av_M": 35,
+      "retained_mixed_M": 91
+    },
+    {
+      "rt_variant": "RT-High",
+      "patience_s": 600,
+      "waiting_orders": 1228,
+      "G5_SOLVER_M": 157,
+      "mixed_M": 326,
+      "retained_av_M": 84,
+      "retained_mixed_M": 237
+    },
+    {
+      "rt_variant": "RT-Low",
+      "patience_s": 180,
+      "waiting_orders": 364,
+      "G5_SOLVER_M": 13,
+      "mixed_M": 34,
+      "retained_av_M": 13,
+      "retained_mixed_M": 34
+    },
+    {
+      "rt_variant": "RT-Low",
+      "patience_s": 300,
+      "waiting_orders": 561,
+      "G5_SOLVER_M": 29,
+      "mixed_M": 89,
+      "retained_av_M": 23,
+      "retained_mixed_M": 79
+    },
+    {
+      "rt_variant": "RT-Low",
+      "patience_s": 600,
+      "waiting_orders": 930,
+      "G5_SOLVER_M": 103,
+      "mixed_M": 251,
+      "retained_av_M": 75,
+      "retained_mixed_M": 212
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "schema_version": "stage3_s2b2_test_evidence.1",
+  "phase_status": "STAGE3_S2B_INTERSECTION_COMPLEX_FROZEN",
+  "authorized_base": "800c9e9d0747b6fe875c00e5c1d8932626b29fc0",
+  "results": [
+    {
+      "command": "python -m pytest stage3/tests_odd_tod/test_s2b2_final_freeze.py -q",
+      "status": "PASS",
+      "passed": 11
+    },
+    {
+      "command": "python -m pytest stage3/tests_odd_tod -q",
+      "status": "PASS",
+      "passed": 74,
+      "warnings": 1
+    },
+    {
+      "command": "python -m compileall -q stage3/odd_tod stage3/tests_odd_tod",
+      "status": "PASS"
+    },
+    {
+      "command": "python -m stage3.odd_tod.s2b2_final_freeze --root . --verify stage3/docs/odd_tod/s2b/stage3_s2b2_evidence_bundle.json",
+      "status": "PASS"
+    },
+    {
+      "command": "git diff --check",
+      "status": "PASS"
+    }
+  ],
+  "scope_note": "Interface correctness only; no Test31 assessment, tolerance recalibration, Stage2 inference, AV profile calibration, dynamic E/Q/C calibration, fallback routing, or Stage4 execution.",
+  "s3_authorized": false,
+  "next_phase_authorized": false
+}

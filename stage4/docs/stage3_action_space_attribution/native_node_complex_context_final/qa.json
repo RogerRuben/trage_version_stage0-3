@@ -1,0 +1,15 @@
+{
+  "audit_status": "PASS_READ_ONLY_CONTEXT_COMPLETE",
+  "node_scope": 55,
+  "native_transition_groups": 51,
+  "new_membership_assignments": 0,
+  "tests_passed": 8,
+  "compileall": "PASS",
+  "diff_check": "PASS",
+  "shortcut_records_excluded_from_primary_adjacency": 30,
+  "clustering_changed": false,
+  "production_interface_changed": false,
+  "routing_calls": 0,
+  "gpu_used": false,
+  "dense_distance_matrix_created": false
+}

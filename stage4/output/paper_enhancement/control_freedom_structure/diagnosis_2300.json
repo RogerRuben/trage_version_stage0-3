@@ -1,0 +1,98 @@
+{
+  "epoch_id": "2300",
+  "timestamp": "2016-10-31 23:00:00+08:00",
+  "state_sha256": "07fb8cfe8a88774e6d5f550f3465491c7228cb7dd82599dedf2645ab7ea78d46",
+  "arc_count": 1,
+  "av_arc_count": 1,
+  "routed_arcs": 807,
+  "runtime_s": 5.0415241999999125,
+  "counts": [
+    0,
+    0,
+    0
+  ],
+  "pstar_s": 0.0,
+  "reference": "HISTORICAL_P_SELECTED_SET_VERIFIED_OPTIMAL",
+  "results": [
+    {
+      "mode": "A1",
+      "alternative": "ANY_ARC_CHANGE",
+      "status": "INFEASIBLE",
+      "solver_message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+      "pstar_s": 0.0,
+      "alternative_pickup_s": null,
+      "gap_upper_s": null,
+      "gap_lower_s": null,
+      "runtime_s": 0.0009975000002668821,
+      "gap_relative": null,
+      "budget_exists": {
+        "0": "NO",
+        "0.005": "NO",
+        "0.01": "NO",
+        "0.02": "NO",
+        "0.05": "NO"
+      },
+      "witness": []
+    },
+    {
+      "mode": "A1",
+      "alternative": "AV_SERVICE_INDICATOR_CHANGE",
+      "status": "INFEASIBLE",
+      "solver_message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+      "pstar_s": 0.0,
+      "alternative_pickup_s": null,
+      "gap_upper_s": null,
+      "gap_lower_s": null,
+      "runtime_s": 0.0021219999998720596,
+      "gap_relative": null,
+      "budget_exists": {
+        "0": "NO",
+        "0.005": "NO",
+        "0.01": "NO",
+        "0.02": "NO",
+        "0.05": "NO"
+      },
+      "witness": []
+    },
+    {
+      "mode": "A2",
+      "alternative": "ANY_ARC_CHANGE",
+      "status": "INFEASIBLE",
+      "solver_message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+      "pstar_s": 0.0,
+      "alternative_pickup_s": null,
+      "gap_upper_s": null,
+      "gap_lower_s": null,
+      "runtime_s": 0.0020946000004187226,
+      "gap_relative": null,
+      "budget_exists": {
+        "0": "NO",
+        "0.005": "NO",
+        "0.01": "NO",
+        "0.02": "NO",
+        "0.05": "NO"
+      },
+      "witness": []
+    },
+    {
+      "mode": "A2",
+      "alternative": "AV_SERVICE_INDICATOR_CHANGE",
+      "status": "INFEASIBLE",
+      "solver_message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+      "pstar_s": 0.0,
+      "alternative_pickup_s": null,
+      "gap_upper_s": null,
+      "gap_lower_s": null,
+      "runtime_s": 0.0018965999997817562,
+      "gap_relative": null,
+      "budget_exists": {
+        "0": "NO",
+        "0.005": "NO",
+        "0.01": "NO",
+        "0.02": "NO",
+        "0.05": "NO"
+      },
+      "witness": []
+    }
+  ]
+}

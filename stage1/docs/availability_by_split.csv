@@ -1,0 +1,13 @@
+split,dimension,status,count
+test,lcs,available,318221
+test,lcs,unavailable,459196
+test,rts,available,717805
+test,rts,unavailable,59612
+train,lcs,available,1720264
+train,lcs,unavailable,2497609
+train,rts,available,3877832
+train,rts,unavailable,340041
+validation,lcs,available,320248
+validation,lcs,unavailable,459992
+validation,rts,available,713460
+validation,rts,unavailable,66780

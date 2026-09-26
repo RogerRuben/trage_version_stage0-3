@@ -1,0 +1,12 @@
+{
+  "schema_version": "stage2_v5_2_support_distribution.1",
+  "status": "NOT_RUN",
+  "reason": "Phase A code-only delivery; Train support must be fitted during Phase B.",
+  "support_source": "train_only",
+  "evaluation_support_used": false,
+  "seen_edge_count": null,
+  "unseen_edge_count": null,
+  "support_quantiles": {"p25": null, "p50": null, "p75": null, "p90": null},
+  "selected_tau": null,
+  "support_groups": {"unseen": null, "low": null, "medium": null, "high": null}
+}

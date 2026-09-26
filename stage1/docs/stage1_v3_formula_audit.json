@@ -1,0 +1,30 @@
+{
+  "schema_version": "stage1_v3_formula_audit.1",
+  "formula_revision": {
+    "crawl_stop_mutually_exclusive": true,
+    "acceleration_rms_weighted_by_midpoint_delta": true,
+    "distance_exceed_invalidates_lcs": true,
+    "distance_exceed_invalidates_rts": true,
+    "support_highway_key": "canonical_highway",
+    "tail_event_present_nullable": true
+  },
+  "thresholds": {
+    "stop_speed_mps": 1.0,
+    "low_speed_mps": 5.0,
+    "maximum_adjacent_gap_s": 6.0,
+    "maximum_direct_speed_mps": 75.0,
+    "maximum_absolute_acceleration_mps2": 8.0,
+    "distance_identity_tolerance_m": 1e-06,
+    "tail_percentile_threshold": 0.9
+  },
+  "tests": {
+    "collected_count": 54,
+    "passed_count": 54,
+    "failed_count": 0,
+    "new_test_function_count": 7,
+    "new_collected_case_count": 9,
+    "modified_test_file_count": 1
+  },
+  "config_sha": "f693bb01ee0c5e61cfcbc5a381c6b6ad41e541c38106d4f56e4b3d11161ad754",
+  "code_sha": "stage1-v3-content.c14bff2bb463c2ecdb6d4a6300e4d51a5fc3f6ae4dbe34013727ee16dd3f29df"
+}

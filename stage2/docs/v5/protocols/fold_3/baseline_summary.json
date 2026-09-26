@@ -1,0 +1,11 @@
+{
+  "best_validation_mae": 0.02909189691200051,
+  "best_validation_model": "hist_gradient_boosting",
+  "development_evaluation_dates": [
+    "20161026",
+    "20161027"
+  ],
+  "evaluation_rule": "all models use identical direct-pace rows per date",
+  "legacy_is_untouched_test": false,
+  "schema_version": "stage2_v5_baseline_evaluation.1"
+}

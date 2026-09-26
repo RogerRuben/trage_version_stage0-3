@@ -1,0 +1,472 @@
+{
+  "audit_status": "PASS",
+  "authorizations": {
+    "model_inference": false,
+    "model_training": false,
+    "phase_d": false,
+    "sparsity_stress_test": false,
+    "stage0_production": false,
+    "stage1_production": false,
+    "stage3": false,
+    "tau_selection": false,
+    "transfer_v2": false
+  },
+  "counts": {
+    "accepted_orders": 220000,
+    "direct_observed_traversals": 5775530,
+    "link_traversals": 15649455,
+    "missing_raw_origin_grid": 0,
+    "missing_raw_time": 0,
+    "prefilter_pass": 354323,
+    "processed_candidates": 361965,
+    "raw_candidates": 1999515,
+    "rejected_orders": 141965,
+    "target_valid_traversals": {
+      "acceleration_rms": 2663880,
+      "crawl": 5775530,
+      "speed_cv": 3903457,
+      "stop": 5775530
+    },
+    "unprocessed_quota": 1637550,
+    "valhalla_processed_or_matched": 354323
+  },
+  "distribution_distance": [
+    {
+      "comparison": "raw_vs_accepted",
+      "dimension": "time_bin",
+      "jensen_shannon_divergence": 9.524248678179187e-05,
+      "target": "orders",
+      "total_variation_distance": 0.008340064124641128
+    },
+    {
+      "comparison": "raw_vs_accepted",
+      "dimension": "origin_grid",
+      "jensen_shannon_divergence": 0.004703785807844462,
+      "target": "orders",
+      "total_variation_distance": 0.058559796500651407
+    },
+    {
+      "comparison": "accepted_orders_vs_target_valid_traversals",
+      "dimension": "time_bin",
+      "jensen_shannon_divergence": 0.0004190781157889336,
+      "target": "crawl",
+      "total_variation_distance": 0.015419733899273787
+    },
+    {
+      "comparison": "accepted_orders_vs_target_valid_traversals",
+      "dimension": "origin_grid",
+      "jensen_shannon_divergence": 0.001996118350808735,
+      "target": "crawl",
+      "total_variation_distance": 0.04185109996988863
+    },
+    {
+      "comparison": "accepted_orders_vs_target_valid_traversals",
+      "dimension": "time_bin",
+      "jensen_shannon_divergence": 0.0004190781157889336,
+      "target": "stop",
+      "total_variation_distance": 0.015419733899273787
+    },
+    {
+      "comparison": "accepted_orders_vs_target_valid_traversals",
+      "dimension": "origin_grid",
+      "jensen_shannon_divergence": 0.001996118350808735,
+      "target": "stop",
+      "total_variation_distance": 0.04185109996988863
+    },
+    {
+      "comparison": "accepted_orders_vs_target_valid_traversals",
+      "dimension": "time_bin",
+      "jensen_shannon_divergence": 0.0006153452986142414,
+      "target": "speed_cv",
+      "total_variation_distance": 0.017709134395020063
+    },
+    {
+      "comparison": "accepted_orders_vs_target_valid_traversals",
+      "dimension": "origin_grid",
+      "jensen_shannon_divergence": 0.001907812706683795,
+      "target": "speed_cv",
+      "total_variation_distance": 0.04068122981989833
+    },
+    {
+      "comparison": "accepted_orders_vs_target_valid_traversals",
+      "dimension": "time_bin",
+      "jensen_shannon_divergence": 0.000875782309293397,
+      "target": "acceleration_rms",
+      "total_variation_distance": 0.0214009444869889
+    },
+    {
+      "comparison": "accepted_orders_vs_target_valid_traversals",
+      "dimension": "origin_grid",
+      "jensen_shannon_divergence": 0.0016448180696449792,
+      "target": "acceleration_rms",
+      "total_variation_distance": 0.03577293162263656
+    }
+  ],
+  "execution_head": "035c265596dc86754edc1c683a0f18223ce5ee8d",
+  "final_classification": {
+    "accepted_rare_order_count": 4308,
+    "accepted_rare_order_share": 0.019581818181818183,
+    "classification": "UP-D",
+    "conclusion": "MULTI_STAGE_SELECTION_COMPOUNDS_SPARSE_CONTEXT_ATTRITION",
+    "demand_concentrated": true,
+    "material_supervision_target_count": 2,
+    "maximum_broad_selection_rank_mean_gap": 0.010743816666597406,
+    "raw_rare_order_count": 44001,
+    "raw_rare_order_share": 0.02200583641533072,
+    "sampling_hash_representativeness": "PASS",
+    "stage0_quality_effect": {
+      "common_count": 128898,
+      "common_denominator": 209035,
+      "common_rate": 0.6166335781089292,
+      "comparison": "core_acceptance_given_processed",
+      "difference_ci_high": -0.05984927169884409,
+      "difference_ci_low": -0.08041865427140837,
+      "percentage_point_difference": -0.0700024399284952,
+      "rare_count": 4308,
+      "rare_denominator": 7881,
+      "rare_rate": 0.546631138180434,
+      "rate_ratio": 0.8864764384982468,
+      "ratio_ci_high": 0.903044699039527,
+      "ratio_ci_low": 0.8696510198715619
+    },
+    "stage0_quality_selection_material": true,
+    "stage1_label_effect_rows": [
+      {
+        "common_count": 3453044,
+        "common_denominator": 3453044,
+        "common_rate": 1.0,
+        "difference_ci_high": 0.0,
+        "difference_ci_low": 0.0,
+        "material_attrition": false,
+        "percentage_point_difference": 0.0,
+        "rare_count": 104437,
+        "rare_denominator": 104437,
+        "rare_rate": 1.0,
+        "rate_ratio": 1.0,
+        "ratio_ci_high": 1.0,
+        "ratio_ci_low": 1.0,
+        "target": "crawl"
+      },
+      {
+        "common_count": 3453044,
+        "common_denominator": 3453044,
+        "common_rate": 1.0,
+        "difference_ci_high": 0.0,
+        "difference_ci_low": 0.0,
+        "material_attrition": false,
+        "percentage_point_difference": 0.0,
+        "rare_count": 104437,
+        "rare_denominator": 104437,
+        "rare_rate": 1.0,
+        "rate_ratio": 1.0,
+        "ratio_ci_high": 1.0,
+        "ratio_ci_low": 1.0,
+        "target": "stop"
+      },
+      {
+        "common_count": 2346078,
+        "common_denominator": 3453044,
+        "common_rate": 0.6794231408577476,
+        "difference_ci_high": -0.04696439045229567,
+        "difference_ci_low": -0.05343690057599523,
+        "material_attrition": true,
+        "percentage_point_difference": -0.05011551999540953,
+        "rare_count": 65723,
+        "rare_denominator": 104437,
+        "rare_rate": 0.629307620862338,
+        "rate_ratio": 0.9262381320539944,
+        "ratio_ci_high": 0.930883618642364,
+        "ratio_ci_low": 0.9213794184195107,
+        "target": "speed_cv"
+      },
+      {
+        "common_count": 1602836,
+        "common_denominator": 3453044,
+        "common_rate": 0.4641805896478585,
+        "difference_ci_high": -0.05944546092721718,
+        "difference_ci_low": -0.06815660973292606,
+        "material_attrition": true,
+        "percentage_point_difference": -0.06367119163757479,
+        "rare_count": 41828,
+        "rare_denominator": 104437,
+        "rare_rate": 0.40050939801028373,
+        "rate_ratio": 0.8628309906584468,
+        "ratio_ci_high": 0.8719266941373214,
+        "ratio_ci_low": 0.8534107649195993,
+        "target": "acceleration_rms"
+      }
+    ],
+    "stage1_label_effects": {
+      "acceleration_rms": {
+        "difference_ci_high": -0.05944546092721718,
+        "difference_ci_low": -0.06815660973292606,
+        "high_availability_rate": 0.4641805896478585,
+        "high_direct_observed_traversals": 3453044,
+        "high_target_valid_traversals": 1602836,
+        "material_attrition": true,
+        "percentage_point_difference": -0.06367119163757479,
+        "rare_availability_rate": 0.40050939801028373,
+        "rare_direct_observed_traversals": 104437,
+        "rare_target_valid_traversals": 41828,
+        "rate_ratio": 0.8628309906584468,
+        "ratio_ci_high": 0.8719266941373214,
+        "ratio_ci_low": 0.8534107649195993
+      },
+      "crawl": {
+        "difference_ci_high": 0.0,
+        "difference_ci_low": 0.0,
+        "high_availability_rate": 1.0,
+        "high_direct_observed_traversals": 3453044,
+        "high_target_valid_traversals": 3453044,
+        "material_attrition": false,
+        "percentage_point_difference": 0.0,
+        "rare_availability_rate": 1.0,
+        "rare_direct_observed_traversals": 104437,
+        "rare_target_valid_traversals": 104437,
+        "rate_ratio": 1.0,
+        "ratio_ci_high": 1.0,
+        "ratio_ci_low": 1.0
+      },
+      "speed_cv": {
+        "difference_ci_high": -0.04696439045229567,
+        "difference_ci_low": -0.05343690057599523,
+        "high_availability_rate": 0.6794231408577476,
+        "high_direct_observed_traversals": 3453044,
+        "high_target_valid_traversals": 2346078,
+        "material_attrition": true,
+        "percentage_point_difference": -0.05011551999540953,
+        "rare_availability_rate": 0.629307620862338,
+        "rare_direct_observed_traversals": 104437,
+        "rare_target_valid_traversals": 65723,
+        "rate_ratio": 0.9262381320539944,
+        "ratio_ci_high": 0.930883618642364,
+        "ratio_ci_low": 0.9213794184195107
+      },
+      "stop": {
+        "difference_ci_high": 0.0,
+        "difference_ci_low": 0.0,
+        "high_availability_rate": 1.0,
+        "high_direct_observed_traversals": 3453044,
+        "high_target_valid_traversals": 3453044,
+        "material_attrition": false,
+        "percentage_point_difference": 0.0,
+        "rare_availability_rate": 1.0,
+        "rare_direct_observed_traversals": 104437,
+        "rare_target_valid_traversals": 104437,
+        "rate_ratio": 1.0,
+        "ratio_ci_high": 1.0,
+        "ratio_ci_low": 1.0
+      }
+    },
+    "stage1_supervision_attrition_material": true,
+    "target_valid_rare_traversal_share": {
+      "acceleration_rms": 0.015701908494376624,
+      "crawl": 0.01808266946929546,
+      "speed_cv": 0.016837126680273408,
+      "stop": 0.01808266946929546
+    }
+  },
+  "identity_audit": {
+    "accepted_identity_count": 220000,
+    "accepted_rejected_overlap_count": 0,
+    "bucket_count": 196,
+    "manifest_accepted_count": 220000,
+    "manifest_candidate_count": 392000,
+    "manifest_matched_count": 354322,
+    "manifest_prefilter_eligible_count": 354323,
+    "manifest_processing_exception_count": 0,
+    "manifest_rejected_count": 141965,
+    "rejection_identity_count": 141965
+  },
+  "interpretation": "Raw demand concentration, Stage 0 quality selection, and Stage 1 label availability jointly shape sparse-context representation; no single stage explains the observed sparsity.",
+  "optional_context_reweighting": {
+    "reason": "Raw order-grid contexts and Stage 2 edge-time traversal contexts have different units; a defensible direct mapping is not available without expanding engineering scope.",
+    "status": "SKIP"
+  },
+  "protocol": {
+    "primary_raw_context": "origin_grid_x_time_bin",
+    "spatial_grid": {
+      "cell_size_m": 1000,
+      "crs": "EPSG:32649",
+      "minimum_raw_count_for_cell_rate": 30,
+      "origin_m": [
+        0,
+        0
+      ]
+    },
+    "test_dates": [
+      "20161031"
+    ],
+    "time_bin": {
+      "count": 48,
+      "definition": "local_hour * 2 + (local_minute >= 30)",
+      "minutes": 30,
+      "timezone": "Asia/Shanghai"
+    },
+    "train_dates": [
+      "20161009",
+      "20161010",
+      "20161011",
+      "20161012",
+      "20161013",
+      "20161014",
+      "20161015",
+      "20161016",
+      "20161017",
+      "20161018",
+      "20161019",
+      "20161020",
+      "20161021",
+      "20161022",
+      "20161023",
+      "20161024"
+    ],
+    "train_only_raw_support_row_count": 1571670,
+    "validation_dates": [
+      "20161025",
+      "20161026",
+      "20161027"
+    ]
+  },
+  "raw_candidate_coverage": "FULL",
+  "raw_support_quantiles": {
+    "od_grid_pair": {
+      "p25": 35,
+      "p50": 100,
+      "p75": 232,
+      "p90": 493
+    },
+    "od_grid_pair_x_time_bin": {
+      "p25": 1,
+      "p50": 3,
+      "p75": 8,
+      "p90": 16
+    },
+    "origin_grid": {
+      "p25": 11063,
+      "p50": 15789,
+      "p75": 22403,
+      "p90": 33125
+    },
+    "origin_grid_x_time_bin": {
+      "p25": 82,
+      "p50": 307,
+      "p75": 546,
+      "p90": 839
+    },
+    "temporal": {
+      "p25": 11405,
+      "p50": 42919,
+      "p75": 48801,
+      "p90": 50095
+    }
+  },
+  "rejection_audit": {
+    "attribution_policy": "multi-label; one rejection may contribute to multiple mechanisms",
+    "mapped_rejection_count": 141965,
+    "multi_mechanism_rejection_count": 75973,
+    "rejection_count": 141965,
+    "unmapped_rejection_count": 0
+  },
+  "runtime_s": 204.40172259999963,
+  "schema_version": "stage0_stage1_upstream_representativeness_report.1",
+  "selection_opportunity": {
+    "effects": [
+      {
+        "common_count": 209035,
+        "common_denominator": 1154455,
+        "common_rate": 0.18106812305373532,
+        "comparison": "processing_opportunity",
+        "difference_ci_high": 0.0003904980255436042,
+        "difference_ci_low": -0.004374258274670965,
+        "percentage_point_difference": -0.0019585573620465035,
+        "rare_count": 7881,
+        "rare_denominator": 44001,
+        "rare_rate": 0.17910956569168882,
+        "rate_ratio": 0.9891833121754663,
+        "ratio_ci_high": 1.0021150345548002,
+        "ratio_ci_low": 0.9759720898280775
+      },
+      {
+        "common_count": 204599,
+        "common_denominator": 209035,
+        "common_rate": 0.9787786734278948,
+        "comparison": "prefilter_pass_given_processed",
+        "difference_ci_high": -0.008907613398411946,
+        "difference_ci_low": -0.01688579863487026,
+        "percentage_point_difference": -0.012911397701464211,
+        "rare_count": 7612,
+        "rare_denominator": 7881,
+        "rare_rate": 0.9658672757264306,
+        "rate_ratio": 0.9868086646634364,
+        "ratio_ci_high": 0.990901038924434,
+        "ratio_ci_low": 0.982748725816826
+      },
+      {
+        "common_count": 128898,
+        "common_denominator": 1154455,
+        "common_rate": 0.11165268460009269,
+        "comparison": "core_acceptance_given_raw",
+        "difference_ci_high": -0.011065179860504277,
+        "difference_ci_low": -0.016821134744892056,
+        "percentage_point_difference": -0.013745818847041624,
+        "rare_count": 4308,
+        "rare_denominator": 44001,
+        "rare_rate": 0.09790686575305106,
+        "rate_ratio": 0.8768876995992069,
+        "ratio_ci_high": 0.897620466101029,
+        "ratio_ci_low": 0.8562129176990716
+      },
+      {
+        "common_count": 128898,
+        "common_denominator": 209035,
+        "common_rate": 0.6166335781089292,
+        "comparison": "core_acceptance_given_processed",
+        "difference_ci_high": -0.05984927169884409,
+        "difference_ci_low": -0.08041865427140837,
+        "percentage_point_difference": -0.0700024399284952,
+        "rare_count": 4308,
+        "rare_denominator": 7881,
+        "rare_rate": 0.546631138180434,
+        "rate_ratio": 0.8864764384982468,
+        "ratio_ci_high": 0.903044699039527,
+        "ratio_ci_low": 0.8696510198715619
+      }
+    ],
+    "maximum_broad_selection_rank_mean_gap": 0.010743816666597406,
+    "quota_unprocessed_is_rejected": false,
+    "sampling_hash_representativeness": "PASS",
+    "selection_hash_inputs": [
+      "date",
+      "order_id",
+      "seed"
+    ],
+    "selection_hash_recomputed_for_all_candidates": true
+  },
+  "stage1_edge_support_quantiles": {
+    "edge_spatial_support": {
+      "p25": 2,
+      "p50": 19,
+      "p75": 243,
+      "p90": 1057
+    },
+    "edge_time_support": {
+      "p25": 2,
+      "p50": 5,
+      "p75": 18,
+      "p90": 45
+    }
+  },
+  "stage1_supervision": {
+    "direct_observed_traversals": 5775530,
+    "frozen_mask_source": "stage2.v4.stage1_adapter._add_component_masks equivalent component rules",
+    "missing_accepted_order_context_count": 0,
+    "target_valid_totals": {
+      "acceleration_rms": 2663880,
+      "crawl": 5775530,
+      "speed_cv": 3903457,
+      "stop": 5775530
+    },
+    "train_direct_observed_traversals": 4217873
+  }
+}

@@ -1,0 +1,38 @@
+         64799 function calls (64502 primitive calls) in 0.269 seconds
+
+   Ordered by: cumulative time
+   List reduced from 687 to 30 due to restriction <30>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.002    0.002    0.078    0.078 benchmark_hotspots.py:96(<lambda>)
+        1    0.043    0.043    0.075    0.075 history.py:11(causal_window_mean)
+        1    0.001    0.001    0.061    0.061 benchmark_hotspots.py:77(<lambda>)
+        1    0.005    0.005    0.060    0.060 aggregation.py:34(aggregate_route_dimensions)
+       55    0.058    0.001    0.058    0.001 {method 'astype' of 'numpy.ndarray' objects}
+        1    0.003    0.003    0.035    0.035 benchmark_hotspots.py:60(_aggregation_case)
+        1    0.007    0.007    0.033    0.033 benchmark_hotspots.py:87(_history_case)
+        1    0.001    0.001    0.030    0.030 benchmark_hotspots.py:57(<lambda>)
+        1    0.010    0.010    0.030    0.030 cdf.py:25(map_empirical_cdf)
+        3    0.000    0.000    0.026    0.009 groupby.py:1698(_agg_general)
+        3    0.000    0.000    0.026    0.009 groupby.py:1764(_cython_agg_general)
+        5    0.000    0.000    0.025    0.005 groupby.py:1781(array_func)
+        5    0.000    0.000    0.025    0.005 ops.py:946(_cython_operation)
+        1    0.000    0.000    0.024    0.024 groupby.py:3389(first)
+        1    0.000    0.000    0.024    0.024 managers.py:1645(grouped_reduce)
+        3    0.000    0.000    0.024    0.008 blocks.py:341(apply)
+        5    0.000    0.000    0.023    0.005 ops.py:535(cython_operation)
+        3    0.003    0.001    0.022    0.007 array.py:2672(_groupby_op)
+    13/12    0.001    0.000    0.020    0.002 algorithms.py:652(factorize)
+        3    0.000    0.000    0.020    0.007 base.py:2750(_groupby_op)
+        2    0.000    0.000    0.019    0.009 frame.py:702(__init__)
+        2    0.000    0.000    0.019    0.009 construction.py:375(dict_to_mgr)
+        2    0.000    0.000    0.018    0.009 construction.py:96(arrays_to_mgr)
+       47    0.001    0.000    0.018    0.000 construction.py:531(sanitize_array)
+     7011    0.002    0.000    0.017    0.000 fromnumeric.py:48(_wrapfunc)
+        2    0.000    0.000    0.017    0.008 construction.py:553(_homogenize)
+        1    0.003    0.003    0.016    0.016 benchmark_hotspots.py:49(_cdf_case)
+     5001    0.002    0.000    0.014    0.000 fromnumeric.py:1459(searchsorted)
+       20    0.013    0.001    0.013    0.001 string_arrow.py:195(_from_sequence)
+        1    0.001    0.001    0.012    0.012 _arraysetops_impl.py:145(unique)
+
+

@@ -1,0 +1,9 @@
+figure_id,section,scientific_question,data_source,panels,caption_draft,main_or_appendix
+F1,4,How does information move from trajectories to decisions?,Tier 1 architecture,"offline historical|online decision-time|counterfactual evaluation",Integrated leakage-safe data-to-decision workflow,MAIN
+F2,2,How is the empirical system grounded?,Stage0/1 network and Test31 products,"Xi'an network|30k OD|matched route|directed movement",Empirical road-network grounding and route representation,MAIN
+F3,3,How does prediction become an optimization input?,Stage3 interface,"predicted route state|hard readiness|three rho families|excess",Decision-time prediction to operational-suitability interface,MAIN
+F4,6,Why does nominal AV supply differ from effective capacity?,factorial_effects.csv; gate decomposition,"service vs q_A|same-unit conversion|peak timing",Fleet transition and effective-capacity conversion,MAIN
+F5,6,How do capability and ODD policy alter family activity?,family_activity_summary.csv; odd_policy_tradeoff.csv,"family activity|STRICT REFERENCE UNCONSTRAINED",Capability-dependent family activity and tested ODD policies,MAIN
+FA1,Appendix E,Is replay spatially representative?,spatial_metrics.csv,"all-day|morning|evening",Spatial representativeness diagnostics,APPENDIX
+FA2,Appendix H,Does prediction alter frozen decisions?,frozen_state_prediction_ablation,"eligible arcs|assignment overlap",Frozen-state prediction-to-decision diagnostics,APPENDIX
+FA3,Appendix I,What is the within-eta cost response?,cost_pairwise_robustness.csv,"four eta pairs",Cost robustness under local epsilon relaxation,APPENDIX

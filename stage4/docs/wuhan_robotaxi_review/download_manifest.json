@@ -1,0 +1,486 @@
+{
+  "revision": "d8de2c56e6c127542c98c9d224021cd131cd4f77",
+  "files": [
+    {
+      "path": "repository\\1-Robotaxi_data_process\\avg_speed.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/1-Robotaxi_data_process/avg_speed.py",
+      "bytes": 12591,
+      "sha256": "da90a6b71bb2224470ee366bc292fc7e4ed10deae49e4ffe411d79defdc95790"
+    },
+    {
+      "path": "repository\\1-Robotaxi_data_process\\dist.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/1-Robotaxi_data_process/dist.py",
+      "bytes": 11191,
+      "sha256": "cf7b392bd31c5a4ed27ef04313f6cbb758b4ad84ea488a6ebffb5823dd1de138"
+    },
+    {
+      "path": "repository\\1-Robotaxi_data_process\\od_classifier.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/1-Robotaxi_data_process/od_classifier.py",
+      "bytes": 12878,
+      "sha256": "ccfac595befa813fb2a05f0d1c98a51b8f7f82aea20fb66b1a4f8f0bf42468fd"
+    },
+    {
+      "path": "repository\\1-Robotaxi_data_process\\pre_av_process.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/1-Robotaxi_data_process/pre_av_process.py",
+      "bytes": 29995,
+      "sha256": "7edd1fb9da250674af9b2f7be3258d1328a7c3a96de3d1f784a1f22b41ef643b"
+    },
+    {
+      "path": "repository\\1-Robotaxi_data_process\\pre_process.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/1-Robotaxi_data_process/pre_process.py",
+      "bytes": 5216,
+      "sha256": "f508695631058c9841fc9365a6eb7c0dbfa187fa731c5348d5757edabd81ed41"
+    },
+    {
+      "path": "repository\\1-Robotaxi_data_process\\soc.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/1-Robotaxi_data_process/soc.py",
+      "bytes": 7726,
+      "sha256": "40824d6e9533fdc85c0246f930d17f13170f84ea41bb5506d460a138d1cf5ef4"
+    },
+    {
+      "path": "repository\\1-Robotaxi_data_process\\traj.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/1-Robotaxi_data_process/traj.py",
+      "bytes": 6688,
+      "sha256": "8154d83365062cb9c234767bc4efee528cb0cbb379442918981b237ffe45b552"
+    },
+    {
+      "path": "repository\\1-Robotaxi_data_process\\zone_recog.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/1-Robotaxi_data_process/zone_recog.py",
+      "bytes": 5019,
+      "sha256": "57798a3c9353c700127a50f7c4402545dcdcccf1468d324f333c9b71b3f20cec"
+    },
+    {
+      "path": "repository\\2-HV_data_process\\V1_ticket.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/2-HV_data_process/V1_ticket.py",
+      "bytes": 10652,
+      "sha256": "f5878dce016e2cf99bed8c6b42603f4fac685d5ec3b1734a101d1fdc0be86185"
+    },
+    {
+      "path": "repository\\2-HV_data_process\\analy.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/2-HV_data_process/analy.py",
+      "bytes": 5399,
+      "sha256": "dc3abd7256298a2a8ae20c752577f683d1ee8ca36bb05ba2ab96c1811dd6435c"
+    },
+    {
+      "path": "repository\\2-HV_data_process\\cont.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/2-HV_data_process/cont.py",
+      "bytes": 8709,
+      "sha256": "9c0da6d49daa7ea7905432d12d9f55ac338d27a8e83d55f394a44b3abfdc5f84"
+    },
+    {
+      "path": "repository\\2-HV_data_process\\grid.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/2-HV_data_process/grid.py",
+      "bytes": 21156,
+      "sha256": "113dd798a02a8f52e3cf2f23720fe5ef05fa433480bf6908b9561d21ee72053b"
+    },
+    {
+      "path": "repository\\2-HV_data_process\\merged_order.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/2-HV_data_process/merged_order.py",
+      "bytes": 931,
+      "sha256": "12a05cd01535dc0add441164f670addd8fb9f1494949797abe43432a99f14d47"
+    },
+    {
+      "path": "repository\\2-HV_data_process\\pre_hdv_process.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/2-HV_data_process/pre_hdv_process.py",
+      "bytes": 2097,
+      "sha256": "45e9367789a0bf4256383d9aaf24b3d9af4246b6bc857859fa2e3b602aade232"
+    },
+    {
+      "path": "repository\\2-HV_data_process\\speed_gen.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/2-HV_data_process/speed_gen.py",
+      "bytes": 23832,
+      "sha256": "a2813159bc321fce296926ad4db0830ffdda8885f7f19ed27a45873b483d2625"
+    },
+    {
+      "path": "repository\\2-HV_data_process\\speed_rec.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/2-HV_data_process/speed_rec.py",
+      "bytes": 11818,
+      "sha256": "678f84e282bc152b631625e186cf383d43c9fc9d9447254bef6909df7c9339d8"
+    },
+    {
+      "path": "repository\\2-HV_data_process\\speed_tag.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/2-HV_data_process/speed_tag.py",
+      "bytes": 2175,
+      "sha256": "494d694eeeceba8a05cd764b9623dd982c9f15d2ff7c6ecccb3722ae4b523ee7"
+    },
+    {
+      "path": "repository\\2-HV_data_process\\travel_len.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/2-HV_data_process/travel_len.py",
+      "bytes": 12239,
+      "sha256": "5220d2adb6759f5d0d51344d5292607c6890d3abc3bc63631fa680f757360531"
+    },
+    {
+      "path": "repository\\3-fleet_optim\\dynamic_waiting_ride_sharing.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/3-fleet_optim/dynamic_waiting_ride_sharing.py",
+      "bytes": 10889,
+      "sha256": "a58bcb370b6678f19a4a3fa647a13c5b5166bae49ff2a9e13ec56049aa8a264d"
+    },
+    {
+      "path": "repository\\3-fleet_optim\\improved_ride_sharing_sumo.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/3-fleet_optim/improved_ride_sharing_sumo.py",
+      "bytes": 40694,
+      "sha256": "cc65e84f5dc687ddb0d01a5867315ff80ef2e1224cf65e66e410a772b082ea3d"
+    },
+    {
+      "path": "repository\\4-simulation\\basic.vtype.xml",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/4-simulation/basic.vtype.xml",
+      "bytes": 13194,
+      "sha256": "cf179de7dadec8c7bff7a3680d6e8d5e733b78dbfafbf08c2f1a67b25de85b24"
+    },
+    {
+      "path": "repository\\4-simulation\\eqaco2.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/4-simulation/eqaco2.py",
+      "bytes": 7315,
+      "sha256": "6d160bdf97ef717ac9f7cbe2a14bff321bf415f38bb2d17174d64d6324183c4d"
+    },
+    {
+      "path": "repository\\4-simulation\\rou_gen.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/4-simulation/rou_gen.py",
+      "bytes": 9242,
+      "sha256": "9fc6f4a7d338769c5bfac555bce4c5801504bb6699be2c5d7319e0bc42202151"
+    },
+    {
+      "path": "repository\\4-simulation\\sim.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/4-simulation/sim.py",
+      "bytes": 3973,
+      "sha256": "df081014db8f97925425852ed3e923bfe892b8af78f4b08a9eb78a41bfbe9e6b"
+    },
+    {
+      "path": "repository\\5-cci_and_sne\\cci_distribution.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/5-cci_and_sne/cci_distribution.py",
+      "bytes": 2850,
+      "sha256": "f424eed7a0a4cbdeea62318e43fe770e378187c754fb34d69a2ef3486efd6ffd"
+    },
+    {
+      "path": "repository\\5-cci_and_sne\\cci_percentile.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/5-cci_and_sne/cci_percentile.py",
+      "bytes": 3643,
+      "sha256": "6c108d7c5ce0d59119ddf16ae64a7cf37b3d48a19d83b61e8832156cad69ed37"
+    },
+    {
+      "path": "repository\\5-cci_and_sne\\compute_grid_sne_wuhan.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/5-cci_and_sne/compute_grid_sne_wuhan.py",
+      "bytes": 7454,
+      "sha256": "4ec97acb260d43f3209cd379467b56852b1eddf6b33f22dcbb00b528e1118037"
+    },
+    {
+      "path": "repository\\5-cci_and_sne\\ntl.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/5-cci_and_sne/ntl.py",
+      "bytes": 23775,
+      "sha256": "f728d5261e53674da790775c1e2fdb117f530f5daec7f43612886c00389af858"
+    },
+    {
+      "path": "repository\\6-figure\\fig1a.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/6-figure/fig1a.py",
+      "bytes": 36175,
+      "sha256": "e1ea41c3f2a37fec236d27111809f58e79fa641c25c45c569a6fb72c064d0e81"
+    },
+    {
+      "path": "repository\\6-figure\\fig1b.R",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/6-figure/fig1b.R",
+      "bytes": 13413,
+      "sha256": "d80c9ea9fd177e1e80b1fcbfcce9876e9f39e336475227e9650c728d5a97fae6"
+    },
+    {
+      "path": "repository\\6-figure\\fig1c.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/6-figure/fig1c.py",
+      "bytes": 6612,
+      "sha256": "1cff126ff82151fe0407e711da3904235e98ecf26fcae37e073c6fe070c2538b"
+    },
+    {
+      "path": "repository\\6-figure\\fig1d_pie.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/6-figure/fig1d_pie.py",
+      "bytes": 3231,
+      "sha256": "344f223a6d56c16dbc5f32cfcc37cb75e7bac9d4b0e77f60ee20cc8450887969"
+    },
+    {
+      "path": "repository\\6-figure\\fig1d_shap.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/6-figure/fig1d_shap.py",
+      "bytes": 5256,
+      "sha256": "6b8036b1b7f7c4b14fdd9e04292aff2eec84adf482af16ea24cef2582b70bf40"
+    },
+    {
+      "path": "repository\\6-figure\\fig1e.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/6-figure/fig1e.py",
+      "bytes": 22643,
+      "sha256": "fe52217de3ddd31b1f34271acc425a38a233dc1ea8bc8e5e4e36d6c7cb22ca13"
+    },
+    {
+      "path": "repository\\6-figure\\fig1f.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/6-figure/fig1f.py",
+      "bytes": 2852,
+      "sha256": "c3ead78b94cb6433a9dbda82de76c99a2ebce5d4e51fae54a880f3725065c85a"
+    },
+    {
+      "path": "repository\\6-figure\\fig1g.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/6-figure/fig1g.py",
+      "bytes": 3373,
+      "sha256": "91166fb0d1249a51a0c2b74da917f68f86675e99d2128dee9adba4a429b05c75"
+    },
+    {
+      "path": "repository\\6-figure\\fig2a.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/6-figure/fig2a.py",
+      "bytes": 30704,
+      "sha256": "2195d71ef713789cfecf639694138db0f031f19d92c5272b716aef6012334eb0"
+    },
+    {
+      "path": "repository\\6-figure\\fig2b.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/6-figure/fig2b.py",
+      "bytes": 23062,
+      "sha256": "4d82e4dfe684921c326924e7e1a76cd234f825af826761bccb39b38495286a44"
+    },
+    {
+      "path": "repository\\6-figure\\fig2c.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/6-figure/fig2c.py",
+      "bytes": 25105,
+      "sha256": "b9820f3419680a86cf47b193aa0af640b092c4480543333d1a7b180eaddfe162"
+    },
+    {
+      "path": "repository\\6-figure\\fig2c_SA.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/6-figure/fig2c_SA.py",
+      "bytes": 21744,
+      "sha256": "0da6a1ecb9019c97b6a9556784d15d4a624ad0b10f4b1b92d9456f61a13c4d1c"
+    },
+    {
+      "path": "repository\\6-figure\\fig2d.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/6-figure/fig2d.py",
+      "bytes": 11215,
+      "sha256": "722c396c5eb0167efafa9417a122ef4c0e132611958691a444c5031de524b957"
+    },
+    {
+      "path": "repository\\6-figure\\fig3a.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/6-figure/fig3a.py",
+      "bytes": 22502,
+      "sha256": "41ea6310e30483462fa56f53e405cb12a9627e43c78fc67603ed5dcb202babbb"
+    },
+    {
+      "path": "repository\\6-figure\\fig3b.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/6-figure/fig3b.py",
+      "bytes": 10450,
+      "sha256": "a537db1ae7438be66c41092065356dd74ead8238bfb0b457299ab343ccb0a553"
+    },
+    {
+      "path": "repository\\6-figure\\fig3c.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/6-figure/fig3c.py",
+      "bytes": 9910,
+      "sha256": "f3d79a69dca5910191df26851adb4bbf557d48521b72c728d2c8b18c75e5fd45"
+    },
+    {
+      "path": "repository\\6-figure\\fig4a.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/6-figure/fig4a.py",
+      "bytes": 7659,
+      "sha256": "c17a57cbc7acefc30372e54089ecb2a19d3e02df025396431dd83766c587eb6c"
+    },
+    {
+      "path": "repository\\6-figure\\fig4b.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/6-figure/fig4b.py",
+      "bytes": 20558,
+      "sha256": "f61211c385647f7d1bbecf5256738487b336b4df53523ba886b6fcc9972bb3df"
+    },
+    {
+      "path": "repository\\6-figure\\fig4c.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/6-figure/fig4c.py",
+      "bytes": 24614,
+      "sha256": "2252e9e18259512ff0a47586e278b9e0da9217197fc319ddc546e5239861b8bf"
+    },
+    {
+      "path": "repository\\6-figure\\fig4d.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/6-figure/fig4d.py",
+      "bytes": 24261,
+      "sha256": "ddf88c6f16bfebc9926416a05db3ae1ea7b2158d0da653bb43390398a2e10b7a"
+    },
+    {
+      "path": "repository\\6-figure\\fig4e.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/6-figure/fig4e.py",
+      "bytes": 6565,
+      "sha256": "3a2c2bd1df3ca992d1edac19d8bb16458643ce2b4bfe5802f20526cbe9b2aec7"
+    },
+    {
+      "path": "repository\\7-sample_data_and_code\\Wuhan-sample\\README.md",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/7-sample_data_and_code/Wuhan-sample/README.md",
+      "bytes": 1597,
+      "sha256": "b80e1bc65e8c853e52fcad35370435a5c8cd65f8d7d7778fbfff472b775a24df"
+    },
+    {
+      "path": "repository\\7-sample_data_and_code\\Wuhan-sample\\code\\add_relocation_sample.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/7-sample_data_and_code/Wuhan-sample/code/add_relocation_sample.py",
+      "bytes": 4358,
+      "sha256": "7f55e559ada1dc84122a4be5b6a2e90c38c70c1851470924009e25c0d97e56cd"
+    },
+    {
+      "path": "repository\\7-sample_data_and_code\\Wuhan-sample\\code\\generate_routes_sample.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/7-sample_data_and_code/Wuhan-sample/code/generate_routes_sample.py",
+      "bytes": 9602,
+      "sha256": "a62bb359afcce9fb7fa04844d61d4a6203f800907dcc5a9932e6f51e0aaef35d"
+    },
+    {
+      "path": "repository\\7-sample_data_and_code\\Wuhan-sample\\code\\generate_sumocfg_sample.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/7-sample_data_and_code/Wuhan-sample/code/generate_sumocfg_sample.py",
+      "bytes": 2616,
+      "sha256": "36312bbf11d781df929ec697f93683b05362314c1cd60606d441e5fd258daba7"
+    },
+    {
+      "path": "repository\\7-sample_data_and_code\\Wuhan-sample\\code\\run_simulation_sample.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/7-sample_data_and_code/Wuhan-sample/code/run_simulation_sample.py",
+      "bytes": 6261,
+      "sha256": "3c4afa3508c2ec5b2b05f50609182ca683d6d525cf0ef852e6cd9d182873aa81"
+    },
+    {
+      "path": "repository\\7-sample_data_and_code\\Wuhan-sample\\code\\sample_settings.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/7-sample_data_and_code/Wuhan-sample/code/sample_settings.py",
+      "bytes": 1581,
+      "sha256": "881ea06cc968bdfbc0b1c16470398f3b6e378de0cdbd2e6665848a70bb67b5a8"
+    },
+    {
+      "path": "repository\\7-sample_data_and_code\\Wuhan-sample\\code\\split_by_vehicle_sample.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/7-sample_data_and_code/Wuhan-sample/code/split_by_vehicle_sample.py",
+      "bytes": 2745,
+      "sha256": "18bdaaf2b12b0da8694bb52f1f330e8c8c558ccf689f597276b8e24fc9d09cf8"
+    },
+    {
+      "path": "repository\\7-sample_data_and_code\\Wuhan-sample\\data\\daily_trajs\\traj_20240708.csv",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/7-sample_data_and_code/Wuhan-sample/data/daily_trajs/traj_20240708.csv",
+      "bytes": 127425265,
+      "sha256": "b693bc342e332285d4d165508f1d880f779c7265d316dc7a581b43f626f17c07"
+    },
+    {
+      "path": "repository\\7-sample_data_and_code\\Wuhan-sample\\data\\sumo\\basic.vtype.xml",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/7-sample_data_and_code/Wuhan-sample/data/sumo/basic.vtype.xml",
+      "bytes": 13194,
+      "sha256": "cf179de7dadec8c7bff7a3680d6e8d5e733b78dbfafbf08c2f1a67b25de85b24"
+    },
+    {
+      "path": "repository\\7-sample_data_and_code\\Wuhan-sample\\data\\sumo\\robust.net.xml",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/7-sample_data_and_code/Wuhan-sample/data/sumo/robust.net.xml",
+      "bytes": 288169964,
+      "sha256": "a74e9aa94af27655b5753c9f4c84f8a4dab44f3470dceae0f224cc79fd21e58b"
+    },
+    {
+      "path": "repository\\7-sample_data_and_code\\Wuhan-sample\\run.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/7-sample_data_and_code/Wuhan-sample/run.py",
+      "bytes": 3010,
+      "sha256": "8294e5ad3a5deb1e984a98ed34850612d90d7a5bf0cf65e9e06baa35938112d2"
+    },
+    {
+      "path": "repository\\7-sample_data_and_code\\carpooling_one_day_sample_code\\carpooling_one_day_results_v12_sumo\\sensitivity_summary.csv",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/7-sample_data_and_code/carpooling_one_day_sample_code/carpooling_one_day_results_v12_sumo/sensitivity_summary.csv",
+      "bytes": 467,
+      "sha256": "ced9bb8f017ae6dc99b11bfe6f2f45965df4fd8b4aabda79302bd7120ca7d307"
+    },
+    {
+      "path": "repository\\7-sample_data_and_code\\carpooling_one_day_sample_code\\carpooling_one_day_results_v12_sumo\\sensitivity_summary.json",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/7-sample_data_and_code/carpooling_one_day_sample_code/carpooling_one_day_results_v12_sumo/sensitivity_summary.json",
+      "bytes": 1257,
+      "sha256": "b6fc3fe19a71bbe37828386a83c7cba86f7b3d3fced48df98219b99eb062d1cc"
+    },
+    {
+      "path": "repository\\7-sample_data_and_code\\carpooling_one_day_sample_code\\dynamic_waiting_ride_sharing.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/7-sample_data_and_code/carpooling_one_day_sample_code/dynamic_waiting_ride_sharing.py",
+      "bytes": 12720,
+      "sha256": "cb8cc98605b8f8bd04fb34ba22f73fa6aeff9e2bcdd304598b31606f47c1cfd9"
+    },
+    {
+      "path": "repository\\7-sample_data_and_code\\carpooling_one_day_sample_code\\filter_v12_traj_one_day.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/7-sample_data_and_code/carpooling_one_day_sample_code/filter_v12_traj_one_day.py",
+      "bytes": 3615,
+      "sha256": "0613e467be6b584111241b805cfec979cba907f81f6c286792a13a49c870d9f7"
+    },
+    {
+      "path": "repository\\7-sample_data_and_code\\carpooling_one_day_sample_code\\run_carpooling_one_day.py",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/7-sample_data_and_code/carpooling_one_day_sample_code/run_carpooling_one_day.py",
+      "bytes": 43311,
+      "sha256": "e89b6e4919ef94e674df5c7a3356360f194b1e8aa1127701b6ca8411e649f786"
+    },
+    {
+      "path": "repository\\7-sample_data_and_code\\carpooling_one_day_sample_code\\speed_filled_step1_sample_2024-11-12.csv",
+      "url": "https://media.githubusercontent.com/media/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/7-sample_data_and_code/carpooling_one_day_sample_code/speed_filled_step1_sample_2024-11-12.csv",
+      "bytes": 333861765,
+      "sha256": "86c27cee33212e1d0d7ea5462289f92efbab20093d8c6e9985ab72e4c5164abf",
+      "lfs_verified": true
+    },
+    {
+      "path": "repository\\7-sample_data_and_code\\carpooling_one_day_sample_code\\v12-traj_sample_2024-11-12.csv",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/7-sample_data_and_code/carpooling_one_day_sample_code/v12-traj_sample_2024-11-12.csv",
+      "bytes": 3009090,
+      "sha256": "5bb92ba04f400940b19d0dca3cda4246732e662311c13954d29813547d33ed6f"
+    },
+    {
+      "path": "repository\\README.md",
+      "url": "https://raw.githubusercontent.com/Tlab-seu-code/Urban_Robotaxi_Analysis-/d8de2c56e6c127542c98c9d224021cd131cd4f77/README.md",
+      "bytes": 10088,
+      "sha256": "746ca4a0c57169865f04739f8c42c212dc2751fb81b74571ea0792e5d324527c"
+    },
+    {
+      "path": "publisher\\41893_2026_1944_MOESM1_ESM.pdf",
+      "url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41893-026-01944-2/MediaObjects/41893_2026_1944_MOESM1_ESM.pdf",
+      "bytes": 1716295,
+      "sha256": "0867d778a47698e76eb3f894b5f312ebbb368400b69a8d95bf19467c27bb098e"
+    },
+    {
+      "path": "publisher\\41893_2026_1944_MOESM2_ESM.xlsx",
+      "url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41893-026-01944-2/MediaObjects/41893_2026_1944_MOESM2_ESM.xlsx",
+      "bytes": 14095,
+      "sha256": "4c147a94644bc299d42c322e81d017c8e0990a1b10fb9d5b21f7c27063622800"
+    },
+    {
+      "path": "publisher\\41893_2026_1944_MOESM3_ESM.xlsx",
+      "url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41893-026-01944-2/MediaObjects/41893_2026_1944_MOESM3_ESM.xlsx",
+      "bytes": 20444,
+      "sha256": "2f6995a41d73a200e62dac202f08c64e2b8bd46ba045f460240840c7abca3e14"
+    },
+    {
+      "path": "publisher\\41893_2026_1944_MOESM4_ESM.xlsx",
+      "url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41893-026-01944-2/MediaObjects/41893_2026_1944_MOESM4_ESM.xlsx",
+      "bytes": 16423,
+      "sha256": "e6c29e9952e120dae3d418900fca1747d9ccd13e86c4e2538a1b072ead0df6f2"
+    },
+    {
+      "path": "publisher\\41893_2026_1944_MOESM5_ESM.xlsx",
+      "url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41893-026-01944-2/MediaObjects/41893_2026_1944_MOESM5_ESM.xlsx",
+      "bytes": 16776,
+      "sha256": "b9f0f90b4745266ca8675861fd2716ba4504e57cee21eaf443a0ffb03f63885c"
+    },
+    {
+      "path": "publisher\\41893_2026_1944_MOESM6_ESM.xlsx",
+      "url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41893-026-01944-2/MediaObjects/41893_2026_1944_MOESM6_ESM.xlsx",
+      "bytes": 10363,
+      "sha256": "28bf0847535ca1342e2598504bab9ef7007805b45fce7d658f58c31594a04fe8"
+    },
+    {
+      "path": "publisher\\41893_2026_1944_MOESM7_ESM.xlsx",
+      "url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41893-026-01944-2/MediaObjects/41893_2026_1944_MOESM7_ESM.xlsx",
+      "bytes": 13752,
+      "sha256": "f8a044483038badb6dbffeac9fd4d9f9821599a3cd29d94f9c543bdec0260aee"
+    },
+    {
+      "path": "publisher\\41893_2026_1944_MOESM8_ESM.xlsx",
+      "url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41893-026-01944-2/MediaObjects/41893_2026_1944_MOESM8_ESM.xlsx",
+      "bytes": 10495,
+      "sha256": "b1d99f7709f071b8d034adaffcf28d2da09cdb6be05f23e3a4ec532133b9e390"
+    },
+    {
+      "path": "publisher\\41893_2026_1944_MOESM9_ESM.xlsx",
+      "url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41893-026-01944-2/MediaObjects/41893_2026_1944_MOESM9_ESM.xlsx",
+      "bytes": 28532089,
+      "sha256": "33be6bfc78b7f4034dc9c20390ff0404963b0f95221d365948d516ac66f60ff3"
+    },
+    {
+      "path": "publisher\\41893_2026_1944_MOESM10_ESM.xlsx",
+      "url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41893-026-01944-2/MediaObjects/41893_2026_1944_MOESM10_ESM.xlsx",
+      "bytes": 65668311,
+      "sha256": "6eeb96601bc932cfad5defbdfc37e8f544243a6c9accfaf0d3cba7dc456c9108"
+    },
+    {
+      "path": "publisher\\41893_2026_1944_MOESM11_ESM.xlsx",
+      "url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41893-026-01944-2/MediaObjects/41893_2026_1944_MOESM11_ESM.xlsx",
+      "bytes": 56717,
+      "sha256": "8e3f60ee85d39e474624ae317a53c367790c5a3efbf8405aef318a88eb1e49d6"
+    },
+    {
+      "path": "publisher\\41893_2026_1944_MOESM12_ESM.xlsx",
+      "url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs41893-026-01944-2/MediaObjects/41893_2026_1944_MOESM12_ESM.xlsx",
+      "bytes": 651997,
+      "sha256": "3af7a5f8f14b54df55d83401355bf7420ba9e8d10896b184e41981cda1ffc3f9"
+    }
+  ]
+}

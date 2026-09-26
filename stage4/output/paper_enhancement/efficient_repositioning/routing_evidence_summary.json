@@ -1,0 +1,12 @@
+{
+  "sample_size": 20,
+  "known_repeats_per_mode": 10,
+  "ordinary_repeats_per_mode": 3,
+  "max_within_mode_range_s": 0.0,
+  "failure_count": 0,
+  "selected_mode": "SCALAR_ROUTE",
+  "selection_reason": "both modes exact with zero failures; scalar had higher frozen throughput",
+  "scalar_arcs_per_second": 924.7980490751014,
+  "m1_arcs_per_second": 820.2485507318886,
+  "performance_arc_count": 5000
+}

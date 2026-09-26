@@ -1,0 +1,57 @@
+{
+  "status": "PASS",
+  "production_D0_graph_parity": [
+    {
+      "epoch_id": "0730",
+      "arcs": 26,
+      "status": "PASS"
+    },
+    {
+      "epoch_id": "0830",
+      "arcs": 6,
+      "status": "PASS"
+    },
+    {
+      "epoch_id": "1200",
+      "arcs": 18,
+      "status": "PASS"
+    },
+    {
+      "epoch_id": "1300",
+      "arcs": 14,
+      "status": "PASS"
+    },
+    {
+      "epoch_id": "1700",
+      "arcs": 3,
+      "status": "PASS"
+    },
+    {
+      "epoch_id": "1730",
+      "arcs": 22,
+      "status": "PASS"
+    },
+    {
+      "epoch_id": "1800",
+      "arcs": 18,
+      "status": "PASS"
+    },
+    {
+      "epoch_id": "1830",
+      "arcs": 5,
+      "status": "PASS"
+    },
+    {
+      "epoch_id": "2100",
+      "arcs": 17,
+      "status": "PASS"
+    },
+    {
+      "epoch_id": "2300",
+      "arcs": 1,
+      "status": "PASS"
+    }
+  ],
+  "mathematical_fixture_count": 3,
+  "additional_routing_calls": 0
+}

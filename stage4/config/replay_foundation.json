@@ -1,0 +1,7 @@
+{
+  "test_date": "20161031",
+  "session_gap_split_min": 90,
+  "time_bin_min": 15,
+  "fleet_sampling_seed": 20260824,
+  "pickup_eta_min_bin_sample": 30
+}

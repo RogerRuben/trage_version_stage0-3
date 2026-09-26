@@ -1,0 +1,56 @@
+{
+  "status": "READ_ONLY_TOPOLOGY_CONTEXT_COMPLETE",
+  "node_count": 55,
+  "affected_edges": 88,
+  "unique_transition_components": 51,
+  "unique_component_context_counts": {
+    "WITHIN_FROZEN_CANDIDATE_BUFFER_REVIEW": 15,
+    "OUTSIDE_BUFFERS_SINGLE_COMPLEX_ADJACENCY": 16,
+    "WITHIN_CANDIDATE_PAIR_DISTANCE_REVIEW": 12,
+    "OUTSIDE_BUFFERS_NO_DIRECT_COMPLEX_ANCHOR": 1,
+    "OUTSIDE_BUFFERS_MULTICOMPLEX_ADJACENCY": 7
+  },
+  "unique_components_branching_or_control": 45,
+  "unique_components_signal": 4,
+  "shortcut_adjacency_records": 30,
+  "nonshortcut_neighbor_degree_counts": {
+    "3": 30,
+    "2": 6,
+    "4": 18,
+    "5": 1
+  },
+  "nodes_near_multiple_complexes_within10m": 1,
+  "nodes_near_multiple_complexes_within20m": 4,
+  "context_counts": {
+    "WITHIN_FROZEN_CANDIDATE_BUFFER_REVIEW": 17,
+    "OUTSIDE_BUFFERS_SINGLE_COMPLEX_ADJACENCY": 16,
+    "WITHIN_CANDIDATE_PAIR_DISTANCE_REVIEW": 14,
+    "OUTSIDE_BUFFERS_NO_DIRECT_COMPLEX_ANCHOR": 1,
+    "OUTSIDE_BUFFERS_MULTICOMPLEX_ADJACENCY": 7
+  },
+  "nearest_candidate_distance_min_m": 4.866232122963802,
+  "nearest_candidate_distance_median_m": 18.406168101185262,
+  "nearest_candidate_distance_max_m": 258.5031454040478,
+  "branching_or_control_nodes": 49,
+  "signal_nodes": 5,
+  "roundabout_nodes": 0,
+  "direct_adjacency_records": 210,
+  "nodes_with_no_membership_assignment": 55,
+  "input_hashes": {
+    "stage3\\output\\odd_tod\\s2a\\stage3_full_network_nodes.parquet": "158bbb8b5b2578de73e6fcc6fe4431169e8729cf8f66d553780bb4b052cd2625",
+    "stage3\\output\\odd_tod\\s2b\\final\\stage3_intersection_node_membership.parquet": "55aefa6843aacff111dccb39dd967f4d21e2fab408b6372dfc3b9bbd4304be02",
+    "stage3\\output\\odd_tod\\s2b\\final\\stage3_intersection_complexes.parquet": "4c23c7a8a5f49007ce367e21d24405549a979c82bf367d086b4fcf1d281bdeed",
+    "stage3\\output\\odd_tod\\s2b\\final\\stage3_route_movement_lookup.parquet": "aabe997d06ffc80556ba68551b32805619f548dfe5ad83f2a5a9f043572db811",
+    "stage3\\output\\odd_tod\\s2a\\stage3_full_network_edges.parquet": "25ed4caf250cacbe251ae258d8e77ff2f0b286884f0376c72b9ef09e33687204",
+    "stage3\\output\\odd_tod\\s2b\\final\\stage3_edge_complex_boundary_index.parquet": "fb46c8d53763c3bca014be26b5a74cbcf546d8ee65859d46569c99702844a532",
+    "stage4\\output\\paper_enhancement\\native_endpoint_candidates_v2\\endpoint_candidates.parquet": "6ee234255f8fe08bd1e9e30501e909d1097796f441e980c5b900f54df2665420"
+  },
+  "sources_unchanged": true,
+  "native_tiles_unchanged": true,
+  "clustering_changed": false,
+  "production_changed": false,
+  "routing_calls": 0,
+  "matrix_calls": 0,
+  "runtime_s": 1.5529968999981065,
+  "peak_working_set_mib": 250.66015625
+}

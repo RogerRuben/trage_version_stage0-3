@@ -1,0 +1,5002 @@
+[
+  {
+    "epoch_id": "0730",
+    "condition": "D0",
+    "layer": "SPATIAL",
+    "E_AV": 6816,
+    "U_AV": 55,
+    "M_AV": 55,
+    "O_HA": 55,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D0",
+    "layer": "PASSENGER",
+    "E_AV": 4675,
+    "U_AV": 36,
+    "M_AV": 36,
+    "O_HA": 36,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D0",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 4675,
+    "U_AV": 36,
+    "M_AV": 36,
+    "O_HA": 36,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D0",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 4675,
+    "U_AV": 36,
+    "M_AV": 36,
+    "O_HA": 36,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D0",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 2241,
+    "U_AV": 18,
+    "M_AV": 18,
+    "O_HA": 18,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D0",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 1126,
+    "U_AV": 9,
+    "M_AV": 9,
+    "O_HA": 9,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D0",
+    "layer": "TOPK",
+    "E_AV": 136,
+    "U_AV": 9,
+    "M_AV": 9,
+    "O_HA": 9,
+    "E_HV": 827
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D0",
+    "layer": "VALID_ETA",
+    "E_AV": 136,
+    "U_AV": 9,
+    "M_AV": 9,
+    "O_HA": 9,
+    "E_HV": 827
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D0",
+    "layer": "PATIENCE",
+    "E_AV": 16,
+    "U_AV": 2,
+    "M_AV": 2,
+    "O_HA": 2,
+    "E_HV": 11
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D0",
+    "layer": "SESSION",
+    "E_AV": 16,
+    "U_AV": 2,
+    "M_AV": 2,
+    "O_HA": 2,
+    "E_HV": 10
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D1",
+    "layer": "SPATIAL",
+    "E_AV": 6816,
+    "U_AV": 55,
+    "M_AV": 55,
+    "O_HA": 55,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D1",
+    "layer": "PASSENGER",
+    "E_AV": 4675,
+    "U_AV": 36,
+    "M_AV": 36,
+    "O_HA": 36,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D1",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 4675,
+    "U_AV": 36,
+    "M_AV": 36,
+    "O_HA": 36,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D1",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 4309,
+    "U_AV": 34,
+    "M_AV": 34,
+    "O_HA": 34,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D1",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 2754,
+    "U_AV": 18,
+    "M_AV": 18,
+    "O_HA": 18,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D1",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 2754,
+    "U_AV": 18,
+    "M_AV": 18,
+    "O_HA": 18,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D1",
+    "layer": "TOPK",
+    "E_AV": 258,
+    "U_AV": 18,
+    "M_AV": 18,
+    "O_HA": 18,
+    "E_HV": 713
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D1",
+    "layer": "VALID_ETA",
+    "E_AV": 258,
+    "U_AV": 18,
+    "M_AV": 18,
+    "O_HA": 18,
+    "E_HV": 713
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D1",
+    "layer": "PATIENCE",
+    "E_AV": 23,
+    "U_AV": 6,
+    "M_AV": 6,
+    "O_HA": 3,
+    "E_HV": 11
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D1",
+    "layer": "SESSION",
+    "E_AV": 23,
+    "U_AV": 6,
+    "M_AV": 6,
+    "O_HA": 2,
+    "E_HV": 10
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D2",
+    "layer": "SPATIAL",
+    "E_AV": 6816,
+    "U_AV": 55,
+    "M_AV": 55,
+    "O_HA": 55,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D2",
+    "layer": "PASSENGER",
+    "E_AV": 4675,
+    "U_AV": 36,
+    "M_AV": 36,
+    "O_HA": 36,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D2",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 3848,
+    "U_AV": 32,
+    "M_AV": 32,
+    "O_HA": 32,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D2",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 3848,
+    "U_AV": 32,
+    "M_AV": 32,
+    "O_HA": 32,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D2",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 2373,
+    "U_AV": 19,
+    "M_AV": 19,
+    "O_HA": 19,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D2",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 1126,
+    "U_AV": 9,
+    "M_AV": 9,
+    "O_HA": 9,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D2",
+    "layer": "TOPK",
+    "E_AV": 136,
+    "U_AV": 9,
+    "M_AV": 9,
+    "O_HA": 9,
+    "E_HV": 827
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D2",
+    "layer": "VALID_ETA",
+    "E_AV": 136,
+    "U_AV": 9,
+    "M_AV": 9,
+    "O_HA": 9,
+    "E_HV": 827
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D2",
+    "layer": "PATIENCE",
+    "E_AV": 16,
+    "U_AV": 2,
+    "M_AV": 2,
+    "O_HA": 2,
+    "E_HV": 11
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D2",
+    "layer": "SESSION",
+    "E_AV": 16,
+    "U_AV": 2,
+    "M_AV": 2,
+    "O_HA": 2,
+    "E_HV": 10
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D3",
+    "layer": "SPATIAL",
+    "E_AV": 6816,
+    "U_AV": 55,
+    "M_AV": 55,
+    "O_HA": 55,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D3",
+    "layer": "PASSENGER",
+    "E_AV": 4675,
+    "U_AV": 36,
+    "M_AV": 36,
+    "O_HA": 36,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D3",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 4675,
+    "U_AV": 36,
+    "M_AV": 36,
+    "O_HA": 36,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D3",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 4675,
+    "U_AV": 36,
+    "M_AV": 36,
+    "O_HA": 36,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D3",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 2241,
+    "U_AV": 18,
+    "M_AV": 18,
+    "O_HA": 18,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D3",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 2241,
+    "U_AV": 18,
+    "M_AV": 18,
+    "O_HA": 18,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D3",
+    "layer": "TOPK",
+    "E_AV": 258,
+    "U_AV": 18,
+    "M_AV": 18,
+    "O_HA": 18,
+    "E_HV": 731
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D3",
+    "layer": "VALID_ETA",
+    "E_AV": 258,
+    "U_AV": 18,
+    "M_AV": 18,
+    "O_HA": 18,
+    "E_HV": 731
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D3",
+    "layer": "PATIENCE",
+    "E_AV": 27,
+    "U_AV": 9,
+    "M_AV": 9,
+    "O_HA": 3,
+    "E_HV": 11
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D3",
+    "layer": "SESSION",
+    "E_AV": 27,
+    "U_AV": 9,
+    "M_AV": 9,
+    "O_HA": 2,
+    "E_HV": 10
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D4",
+    "layer": "SPATIAL",
+    "E_AV": 6816,
+    "U_AV": 55,
+    "M_AV": 55,
+    "O_HA": 55,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D4",
+    "layer": "PASSENGER",
+    "E_AV": 4675,
+    "U_AV": 36,
+    "M_AV": 36,
+    "O_HA": 36,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D4",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 4675,
+    "U_AV": 36,
+    "M_AV": 36,
+    "O_HA": 36,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D4",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 4675,
+    "U_AV": 36,
+    "M_AV": 36,
+    "O_HA": 36,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D4",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 4675,
+    "U_AV": 36,
+    "M_AV": 36,
+    "O_HA": 36,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D4",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 4675,
+    "U_AV": 36,
+    "M_AV": 36,
+    "O_HA": 36,
+    "E_HV": 2334
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D4",
+    "layer": "TOPK",
+    "E_AV": 523,
+    "U_AV": 36,
+    "M_AV": 36,
+    "O_HA": 36,
+    "E_HV": 534
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D4",
+    "layer": "VALID_ETA",
+    "E_AV": 523,
+    "U_AV": 36,
+    "M_AV": 36,
+    "O_HA": 36,
+    "E_HV": 534
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D4",
+    "layer": "PATIENCE",
+    "E_AV": 51,
+    "U_AV": 14,
+    "M_AV": 14,
+    "O_HA": 5,
+    "E_HV": 11
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D4",
+    "layer": "SESSION",
+    "E_AV": 51,
+    "U_AV": 14,
+    "M_AV": 14,
+    "O_HA": 4,
+    "E_HV": 10
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D0",
+    "layer": "SPATIAL",
+    "E_AV": 8422,
+    "U_AV": 67,
+    "M_AV": 67,
+    "O_HA": 67,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D0",
+    "layer": "PASSENGER",
+    "E_AV": 5734,
+    "U_AV": 44,
+    "M_AV": 44,
+    "O_HA": 44,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D0",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 5734,
+    "U_AV": 44,
+    "M_AV": 44,
+    "O_HA": 44,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D0",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 5734,
+    "U_AV": 44,
+    "M_AV": 44,
+    "O_HA": 44,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D0",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 2365,
+    "U_AV": 20,
+    "M_AV": 20,
+    "O_HA": 20,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D0",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 1397,
+    "U_AV": 12,
+    "M_AV": 12,
+    "O_HA": 12,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D0",
+    "layer": "TOPK",
+    "E_AV": 176,
+    "U_AV": 12,
+    "M_AV": 12,
+    "O_HA": 12,
+    "E_HV": 1040
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D0",
+    "layer": "VALID_ETA",
+    "E_AV": 176,
+    "U_AV": 12,
+    "M_AV": 12,
+    "O_HA": 12,
+    "E_HV": 1040
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D0",
+    "layer": "PATIENCE",
+    "E_AV": 3,
+    "U_AV": 1,
+    "M_AV": 1,
+    "O_HA": 0,
+    "E_HV": 7
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D0",
+    "layer": "SESSION",
+    "E_AV": 3,
+    "U_AV": 1,
+    "M_AV": 1,
+    "O_HA": 0,
+    "E_HV": 3
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D1",
+    "layer": "SPATIAL",
+    "E_AV": 8422,
+    "U_AV": 67,
+    "M_AV": 67,
+    "O_HA": 67,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D1",
+    "layer": "PASSENGER",
+    "E_AV": 5734,
+    "U_AV": 44,
+    "M_AV": 44,
+    "O_HA": 44,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D1",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 5734,
+    "U_AV": 44,
+    "M_AV": 44,
+    "O_HA": 44,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D1",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 5684,
+    "U_AV": 43,
+    "M_AV": 43,
+    "O_HA": 43,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D1",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 3049,
+    "U_AV": 22,
+    "M_AV": 22,
+    "O_HA": 22,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D1",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 3049,
+    "U_AV": 22,
+    "M_AV": 22,
+    "O_HA": 22,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D1",
+    "layer": "TOPK",
+    "E_AV": 310,
+    "U_AV": 22,
+    "M_AV": 22,
+    "O_HA": 22,
+    "E_HV": 914
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D1",
+    "layer": "VALID_ETA",
+    "E_AV": 310,
+    "U_AV": 22,
+    "M_AV": 22,
+    "O_HA": 22,
+    "E_HV": 914
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D1",
+    "layer": "PATIENCE",
+    "E_AV": 10,
+    "U_AV": 3,
+    "M_AV": 3,
+    "O_HA": 1,
+    "E_HV": 7
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D1",
+    "layer": "SESSION",
+    "E_AV": 10,
+    "U_AV": 3,
+    "M_AV": 3,
+    "O_HA": 1,
+    "E_HV": 3
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D2",
+    "layer": "SPATIAL",
+    "E_AV": 8422,
+    "U_AV": 67,
+    "M_AV": 67,
+    "O_HA": 67,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D2",
+    "layer": "PASSENGER",
+    "E_AV": 5734,
+    "U_AV": 44,
+    "M_AV": 44,
+    "O_HA": 44,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D2",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 5156,
+    "U_AV": 41,
+    "M_AV": 41,
+    "O_HA": 41,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D2",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 5156,
+    "U_AV": 41,
+    "M_AV": 41,
+    "O_HA": 41,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D2",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 2810,
+    "U_AV": 22,
+    "M_AV": 22,
+    "O_HA": 22,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D2",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 1397,
+    "U_AV": 12,
+    "M_AV": 12,
+    "O_HA": 12,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D2",
+    "layer": "TOPK",
+    "E_AV": 176,
+    "U_AV": 12,
+    "M_AV": 12,
+    "O_HA": 12,
+    "E_HV": 1040
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D2",
+    "layer": "VALID_ETA",
+    "E_AV": 176,
+    "U_AV": 12,
+    "M_AV": 12,
+    "O_HA": 12,
+    "E_HV": 1040
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D2",
+    "layer": "PATIENCE",
+    "E_AV": 3,
+    "U_AV": 1,
+    "M_AV": 1,
+    "O_HA": 0,
+    "E_HV": 7
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D2",
+    "layer": "SESSION",
+    "E_AV": 3,
+    "U_AV": 1,
+    "M_AV": 1,
+    "O_HA": 0,
+    "E_HV": 3
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D3",
+    "layer": "SPATIAL",
+    "E_AV": 8422,
+    "U_AV": 67,
+    "M_AV": 67,
+    "O_HA": 67,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D3",
+    "layer": "PASSENGER",
+    "E_AV": 5734,
+    "U_AV": 44,
+    "M_AV": 44,
+    "O_HA": 44,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D3",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 5734,
+    "U_AV": 44,
+    "M_AV": 44,
+    "O_HA": 44,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D3",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 5734,
+    "U_AV": 44,
+    "M_AV": 44,
+    "O_HA": 44,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D3",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 2365,
+    "U_AV": 20,
+    "M_AV": 20,
+    "O_HA": 20,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D3",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 2365,
+    "U_AV": 20,
+    "M_AV": 20,
+    "O_HA": 20,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D3",
+    "layer": "TOPK",
+    "E_AV": 289,
+    "U_AV": 20,
+    "M_AV": 20,
+    "O_HA": 20,
+    "E_HV": 948
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D3",
+    "layer": "VALID_ETA",
+    "E_AV": 289,
+    "U_AV": 20,
+    "M_AV": 20,
+    "O_HA": 20,
+    "E_HV": 948
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D3",
+    "layer": "PATIENCE",
+    "E_AV": 8,
+    "U_AV": 4,
+    "M_AV": 4,
+    "O_HA": 0,
+    "E_HV": 7
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D3",
+    "layer": "SESSION",
+    "E_AV": 8,
+    "U_AV": 4,
+    "M_AV": 4,
+    "O_HA": 0,
+    "E_HV": 3
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D4",
+    "layer": "SPATIAL",
+    "E_AV": 8422,
+    "U_AV": 67,
+    "M_AV": 67,
+    "O_HA": 67,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D4",
+    "layer": "PASSENGER",
+    "E_AV": 5734,
+    "U_AV": 44,
+    "M_AV": 44,
+    "O_HA": 44,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D4",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 5734,
+    "U_AV": 44,
+    "M_AV": 44,
+    "O_HA": 44,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D4",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 5734,
+    "U_AV": 44,
+    "M_AV": 44,
+    "O_HA": 44,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D4",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 5734,
+    "U_AV": 44,
+    "M_AV": 44,
+    "O_HA": 44,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D4",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 5734,
+    "U_AV": 44,
+    "M_AV": 44,
+    "O_HA": 44,
+    "E_HV": 3300
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D4",
+    "layer": "TOPK",
+    "E_AV": 641,
+    "U_AV": 44,
+    "M_AV": 44,
+    "O_HA": 42,
+    "E_HV": 631
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D4",
+    "layer": "VALID_ETA",
+    "E_AV": 641,
+    "U_AV": 44,
+    "M_AV": 44,
+    "O_HA": 42,
+    "E_HV": 631
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D4",
+    "layer": "PATIENCE",
+    "E_AV": 54,
+    "U_AV": 13,
+    "M_AV": 13,
+    "O_HA": 2,
+    "E_HV": 7
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D4",
+    "layer": "SESSION",
+    "E_AV": 54,
+    "U_AV": 13,
+    "M_AV": 13,
+    "O_HA": 2,
+    "E_HV": 3
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D0",
+    "layer": "SPATIAL",
+    "E_AV": 9088,
+    "U_AV": 76,
+    "M_AV": 76,
+    "O_HA": 76,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D0",
+    "layer": "PASSENGER",
+    "E_AV": 5480,
+    "U_AV": 50,
+    "M_AV": 50,
+    "O_HA": 50,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D0",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 5480,
+    "U_AV": 50,
+    "M_AV": 50,
+    "O_HA": 50,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D0",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 5480,
+    "U_AV": 50,
+    "M_AV": 50,
+    "O_HA": 50,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D0",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 2815,
+    "U_AV": 26,
+    "M_AV": 26,
+    "O_HA": 26,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D0",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 1434,
+    "U_AV": 14,
+    "M_AV": 14,
+    "O_HA": 14,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D0",
+    "layer": "TOPK",
+    "E_AV": 178,
+    "U_AV": 14,
+    "M_AV": 14,
+    "O_HA": 14,
+    "E_HV": 1098
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D0",
+    "layer": "VALID_ETA",
+    "E_AV": 178,
+    "U_AV": 14,
+    "M_AV": 14,
+    "O_HA": 14,
+    "E_HV": 1098
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D0",
+    "layer": "PATIENCE",
+    "E_AV": 9,
+    "U_AV": 4,
+    "M_AV": 4,
+    "O_HA": 2,
+    "E_HV": 16
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D0",
+    "layer": "SESSION",
+    "E_AV": 9,
+    "U_AV": 4,
+    "M_AV": 4,
+    "O_HA": 0,
+    "E_HV": 9
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D1",
+    "layer": "SPATIAL",
+    "E_AV": 9088,
+    "U_AV": 76,
+    "M_AV": 76,
+    "O_HA": 76,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D1",
+    "layer": "PASSENGER",
+    "E_AV": 5480,
+    "U_AV": 50,
+    "M_AV": 50,
+    "O_HA": 50,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D1",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 5480,
+    "U_AV": 50,
+    "M_AV": 50,
+    "O_HA": 50,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D1",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 5458,
+    "U_AV": 49,
+    "M_AV": 49,
+    "O_HA": 49,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D1",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 3783,
+    "U_AV": 30,
+    "M_AV": 30,
+    "O_HA": 30,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D1",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 3783,
+    "U_AV": 30,
+    "M_AV": 30,
+    "O_HA": 30,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D1",
+    "layer": "TOPK",
+    "E_AV": 414,
+    "U_AV": 30,
+    "M_AV": 30,
+    "O_HA": 29,
+    "E_HV": 896
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D1",
+    "layer": "VALID_ETA",
+    "E_AV": 414,
+    "U_AV": 30,
+    "M_AV": 30,
+    "O_HA": 29,
+    "E_HV": 896
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D1",
+    "layer": "PATIENCE",
+    "E_AV": 16,
+    "U_AV": 8,
+    "M_AV": 7,
+    "O_HA": 4,
+    "E_HV": 16
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D1",
+    "layer": "SESSION",
+    "E_AV": 16,
+    "U_AV": 8,
+    "M_AV": 7,
+    "O_HA": 1,
+    "E_HV": 9
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D2",
+    "layer": "SPATIAL",
+    "E_AV": 9088,
+    "U_AV": 76,
+    "M_AV": 76,
+    "O_HA": 76,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D2",
+    "layer": "PASSENGER",
+    "E_AV": 5480,
+    "U_AV": 50,
+    "M_AV": 50,
+    "O_HA": 50,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D2",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 4893,
+    "U_AV": 45,
+    "M_AV": 45,
+    "O_HA": 45,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D2",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 4893,
+    "U_AV": 45,
+    "M_AV": 45,
+    "O_HA": 45,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D2",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 3324,
+    "U_AV": 29,
+    "M_AV": 29,
+    "O_HA": 29,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D2",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 1434,
+    "U_AV": 14,
+    "M_AV": 14,
+    "O_HA": 14,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D2",
+    "layer": "TOPK",
+    "E_AV": 178,
+    "U_AV": 14,
+    "M_AV": 14,
+    "O_HA": 14,
+    "E_HV": 1098
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D2",
+    "layer": "VALID_ETA",
+    "E_AV": 178,
+    "U_AV": 14,
+    "M_AV": 14,
+    "O_HA": 14,
+    "E_HV": 1098
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D2",
+    "layer": "PATIENCE",
+    "E_AV": 9,
+    "U_AV": 4,
+    "M_AV": 4,
+    "O_HA": 2,
+    "E_HV": 16
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D2",
+    "layer": "SESSION",
+    "E_AV": 9,
+    "U_AV": 4,
+    "M_AV": 4,
+    "O_HA": 0,
+    "E_HV": 9
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D3",
+    "layer": "SPATIAL",
+    "E_AV": 9088,
+    "U_AV": 76,
+    "M_AV": 76,
+    "O_HA": 76,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D3",
+    "layer": "PASSENGER",
+    "E_AV": 5480,
+    "U_AV": 50,
+    "M_AV": 50,
+    "O_HA": 50,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D3",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 5480,
+    "U_AV": 50,
+    "M_AV": 50,
+    "O_HA": 50,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D3",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 5480,
+    "U_AV": 50,
+    "M_AV": 50,
+    "O_HA": 50,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D3",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 2815,
+    "U_AV": 26,
+    "M_AV": 26,
+    "O_HA": 26,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D3",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 2815,
+    "U_AV": 26,
+    "M_AV": 26,
+    "O_HA": 26,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D3",
+    "layer": "TOPK",
+    "E_AV": 366,
+    "U_AV": 26,
+    "M_AV": 26,
+    "O_HA": 25,
+    "E_HV": 966
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D3",
+    "layer": "VALID_ETA",
+    "E_AV": 366,
+    "U_AV": 26,
+    "M_AV": 26,
+    "O_HA": 25,
+    "E_HV": 966
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D3",
+    "layer": "PATIENCE",
+    "E_AV": 28,
+    "U_AV": 9,
+    "M_AV": 9,
+    "O_HA": 3,
+    "E_HV": 16
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D3",
+    "layer": "SESSION",
+    "E_AV": 28,
+    "U_AV": 9,
+    "M_AV": 9,
+    "O_HA": 0,
+    "E_HV": 9
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D4",
+    "layer": "SPATIAL",
+    "E_AV": 9088,
+    "U_AV": 76,
+    "M_AV": 76,
+    "O_HA": 76,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D4",
+    "layer": "PASSENGER",
+    "E_AV": 5480,
+    "U_AV": 50,
+    "M_AV": 50,
+    "O_HA": 50,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D4",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 5480,
+    "U_AV": 50,
+    "M_AV": 50,
+    "O_HA": 50,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D4",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 5480,
+    "U_AV": 50,
+    "M_AV": 50,
+    "O_HA": 50,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D4",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 5480,
+    "U_AV": 50,
+    "M_AV": 50,
+    "O_HA": 50,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D4",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 5480,
+    "U_AV": 50,
+    "M_AV": 50,
+    "O_HA": 50,
+    "E_HV": 3815
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D4",
+    "layer": "TOPK",
+    "E_AV": 731,
+    "U_AV": 50,
+    "M_AV": 50,
+    "O_HA": 48,
+    "E_HV": 712
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D4",
+    "layer": "VALID_ETA",
+    "E_AV": 731,
+    "U_AV": 50,
+    "M_AV": 50,
+    "O_HA": 48,
+    "E_HV": 712
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D4",
+    "layer": "PATIENCE",
+    "E_AV": 59,
+    "U_AV": 21,
+    "M_AV": 18,
+    "O_HA": 4,
+    "E_HV": 16
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D4",
+    "layer": "SESSION",
+    "E_AV": 59,
+    "U_AV": 21,
+    "M_AV": 18,
+    "O_HA": 1,
+    "E_HV": 9
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D0",
+    "layer": "SPATIAL",
+    "E_AV": 6104,
+    "U_AV": 50,
+    "M_AV": 50,
+    "O_HA": 49,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D0",
+    "layer": "PASSENGER",
+    "E_AV": 4371,
+    "U_AV": 34,
+    "M_AV": 34,
+    "O_HA": 34,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D0",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 4371,
+    "U_AV": 34,
+    "M_AV": 34,
+    "O_HA": 34,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D0",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 4371,
+    "U_AV": 34,
+    "M_AV": 34,
+    "O_HA": 34,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D0",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 1473,
+    "U_AV": 12,
+    "M_AV": 12,
+    "O_HA": 12,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D0",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 229,
+    "U_AV": 3,
+    "M_AV": 3,
+    "O_HA": 3,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D0",
+    "layer": "TOPK",
+    "E_AV": 37,
+    "U_AV": 3,
+    "M_AV": 3,
+    "O_HA": 3,
+    "E_HV": 833
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D0",
+    "layer": "VALID_ETA",
+    "E_AV": 37,
+    "U_AV": 3,
+    "M_AV": 3,
+    "O_HA": 3,
+    "E_HV": 833
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D0",
+    "layer": "PATIENCE",
+    "E_AV": 6,
+    "U_AV": 1,
+    "M_AV": 1,
+    "O_HA": 0,
+    "E_HV": 19
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D0",
+    "layer": "SESSION",
+    "E_AV": 6,
+    "U_AV": 1,
+    "M_AV": 1,
+    "O_HA": 0,
+    "E_HV": 8
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D1",
+    "layer": "SPATIAL",
+    "E_AV": 6104,
+    "U_AV": 50,
+    "M_AV": 50,
+    "O_HA": 49,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D1",
+    "layer": "PASSENGER",
+    "E_AV": 4371,
+    "U_AV": 34,
+    "M_AV": 34,
+    "O_HA": 34,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D1",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 4371,
+    "U_AV": 34,
+    "M_AV": 34,
+    "O_HA": 34,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D1",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 4371,
+    "U_AV": 34,
+    "M_AV": 34,
+    "O_HA": 34,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D1",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 2502,
+    "U_AV": 20,
+    "M_AV": 20,
+    "O_HA": 20,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D1",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 2473,
+    "U_AV": 19,
+    "M_AV": 19,
+    "O_HA": 19,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D1",
+    "layer": "TOPK",
+    "E_AV": 241,
+    "U_AV": 19,
+    "M_AV": 19,
+    "O_HA": 19,
+    "E_HV": 652
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D1",
+    "layer": "VALID_ETA",
+    "E_AV": 241,
+    "U_AV": 19,
+    "M_AV": 19,
+    "O_HA": 19,
+    "E_HV": 652
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D1",
+    "layer": "PATIENCE",
+    "E_AV": 12,
+    "U_AV": 4,
+    "M_AV": 4,
+    "O_HA": 2,
+    "E_HV": 19
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D1",
+    "layer": "SESSION",
+    "E_AV": 12,
+    "U_AV": 4,
+    "M_AV": 4,
+    "O_HA": 1,
+    "E_HV": 8
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D2",
+    "layer": "SPATIAL",
+    "E_AV": 6104,
+    "U_AV": 50,
+    "M_AV": 50,
+    "O_HA": 49,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D2",
+    "layer": "PASSENGER",
+    "E_AV": 4371,
+    "U_AV": 34,
+    "M_AV": 34,
+    "O_HA": 34,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D2",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 3849,
+    "U_AV": 31,
+    "M_AV": 31,
+    "O_HA": 31,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D2",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 3849,
+    "U_AV": 31,
+    "M_AV": 31,
+    "O_HA": 31,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D2",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 2023,
+    "U_AV": 16,
+    "M_AV": 16,
+    "O_HA": 16,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D2",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 352,
+    "U_AV": 5,
+    "M_AV": 5,
+    "O_HA": 5,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D2",
+    "layer": "TOPK",
+    "E_AV": 60,
+    "U_AV": 5,
+    "M_AV": 5,
+    "O_HA": 5,
+    "E_HV": 810
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D2",
+    "layer": "VALID_ETA",
+    "E_AV": 60,
+    "U_AV": 5,
+    "M_AV": 5,
+    "O_HA": 5,
+    "E_HV": 810
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D2",
+    "layer": "PATIENCE",
+    "E_AV": 9,
+    "U_AV": 2,
+    "M_AV": 2,
+    "O_HA": 0,
+    "E_HV": 19
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D2",
+    "layer": "SESSION",
+    "E_AV": 9,
+    "U_AV": 2,
+    "M_AV": 2,
+    "O_HA": 0,
+    "E_HV": 8
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D3",
+    "layer": "SPATIAL",
+    "E_AV": 6104,
+    "U_AV": 50,
+    "M_AV": 50,
+    "O_HA": 49,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D3",
+    "layer": "PASSENGER",
+    "E_AV": 4371,
+    "U_AV": 34,
+    "M_AV": 34,
+    "O_HA": 34,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D3",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 4371,
+    "U_AV": 34,
+    "M_AV": 34,
+    "O_HA": 34,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D3",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 4371,
+    "U_AV": 34,
+    "M_AV": 34,
+    "O_HA": 34,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D3",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 1473,
+    "U_AV": 12,
+    "M_AV": 12,
+    "O_HA": 12,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D3",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 1473,
+    "U_AV": 12,
+    "M_AV": 12,
+    "O_HA": 12,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D3",
+    "layer": "TOPK",
+    "E_AV": 153,
+    "U_AV": 12,
+    "M_AV": 12,
+    "O_HA": 12,
+    "E_HV": 725
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D3",
+    "layer": "VALID_ETA",
+    "E_AV": 153,
+    "U_AV": 12,
+    "M_AV": 12,
+    "O_HA": 12,
+    "E_HV": 725
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D3",
+    "layer": "PATIENCE",
+    "E_AV": 16,
+    "U_AV": 5,
+    "M_AV": 5,
+    "O_HA": 1,
+    "E_HV": 19
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D3",
+    "layer": "SESSION",
+    "E_AV": 16,
+    "U_AV": 5,
+    "M_AV": 5,
+    "O_HA": 1,
+    "E_HV": 8
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D4",
+    "layer": "SPATIAL",
+    "E_AV": 6104,
+    "U_AV": 50,
+    "M_AV": 50,
+    "O_HA": 49,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D4",
+    "layer": "PASSENGER",
+    "E_AV": 4371,
+    "U_AV": 34,
+    "M_AV": 34,
+    "O_HA": 34,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D4",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 4371,
+    "U_AV": 34,
+    "M_AV": 34,
+    "O_HA": 34,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D4",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 4371,
+    "U_AV": 34,
+    "M_AV": 34,
+    "O_HA": 34,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D4",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 4371,
+    "U_AV": 34,
+    "M_AV": 34,
+    "O_HA": 34,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D4",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 4371,
+    "U_AV": 34,
+    "M_AV": 34,
+    "O_HA": 34,
+    "E_HV": 3490
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D4",
+    "layer": "TOPK",
+    "E_AV": 431,
+    "U_AV": 34,
+    "M_AV": 34,
+    "O_HA": 34,
+    "E_HV": 495
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D4",
+    "layer": "VALID_ETA",
+    "E_AV": 431,
+    "U_AV": 34,
+    "M_AV": 34,
+    "O_HA": 34,
+    "E_HV": 495
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D4",
+    "layer": "PATIENCE",
+    "E_AV": 33,
+    "U_AV": 13,
+    "M_AV": 13,
+    "O_HA": 4,
+    "E_HV": 19
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D4",
+    "layer": "SESSION",
+    "E_AV": 33,
+    "U_AV": 13,
+    "M_AV": 13,
+    "O_HA": 2,
+    "E_HV": 8
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D0",
+    "layer": "SPATIAL",
+    "E_AV": 11035,
+    "U_AV": 80,
+    "M_AV": 80,
+    "O_HA": 80,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D0",
+    "layer": "PASSENGER",
+    "E_AV": 8917,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D0",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 8917,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D0",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 8917,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D0",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 4091,
+    "U_AV": 30,
+    "M_AV": 30,
+    "O_HA": 30,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D0",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 2152,
+    "U_AV": 16,
+    "M_AV": 16,
+    "O_HA": 16,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D0",
+    "layer": "TOPK",
+    "E_AV": 153,
+    "U_AV": 16,
+    "M_AV": 16,
+    "O_HA": 16,
+    "E_HV": 1357
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D0",
+    "layer": "VALID_ETA",
+    "E_AV": 153,
+    "U_AV": 16,
+    "M_AV": 16,
+    "O_HA": 16,
+    "E_HV": 1357
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D0",
+    "layer": "PATIENCE",
+    "E_AV": 0,
+    "U_AV": 0,
+    "M_AV": 0,
+    "O_HA": 0,
+    "E_HV": 6
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D0",
+    "layer": "SESSION",
+    "E_AV": 0,
+    "U_AV": 0,
+    "M_AV": 0,
+    "O_HA": 0,
+    "E_HV": 3
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D1",
+    "layer": "SPATIAL",
+    "E_AV": 11035,
+    "U_AV": 80,
+    "M_AV": 80,
+    "O_HA": 80,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D1",
+    "layer": "PASSENGER",
+    "E_AV": 8917,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D1",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 8917,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D1",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 8685,
+    "U_AV": 62,
+    "M_AV": 62,
+    "O_HA": 62,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D1",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 4643,
+    "U_AV": 35,
+    "M_AV": 35,
+    "O_HA": 35,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D1",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 4458,
+    "U_AV": 34,
+    "M_AV": 34,
+    "O_HA": 34,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D1",
+    "layer": "TOPK",
+    "E_AV": 322,
+    "U_AV": 34,
+    "M_AV": 34,
+    "O_HA": 34,
+    "E_HV": 1196
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D1",
+    "layer": "VALID_ETA",
+    "E_AV": 322,
+    "U_AV": 34,
+    "M_AV": 34,
+    "O_HA": 34,
+    "E_HV": 1196
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D1",
+    "layer": "PATIENCE",
+    "E_AV": 6,
+    "U_AV": 2,
+    "M_AV": 2,
+    "O_HA": 0,
+    "E_HV": 6
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D1",
+    "layer": "SESSION",
+    "E_AV": 6,
+    "U_AV": 2,
+    "M_AV": 2,
+    "O_HA": 0,
+    "E_HV": 3
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D2",
+    "layer": "SPATIAL",
+    "E_AV": 11035,
+    "U_AV": 80,
+    "M_AV": 80,
+    "O_HA": 80,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D2",
+    "layer": "PASSENGER",
+    "E_AV": 8917,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D2",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 8199,
+    "U_AV": 59,
+    "M_AV": 59,
+    "O_HA": 59,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D2",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 8199,
+    "U_AV": 59,
+    "M_AV": 59,
+    "O_HA": 59,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D2",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 4323,
+    "U_AV": 31,
+    "M_AV": 31,
+    "O_HA": 31,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D2",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 2152,
+    "U_AV": 16,
+    "M_AV": 16,
+    "O_HA": 16,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D2",
+    "layer": "TOPK",
+    "E_AV": 153,
+    "U_AV": 16,
+    "M_AV": 16,
+    "O_HA": 16,
+    "E_HV": 1357
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D2",
+    "layer": "VALID_ETA",
+    "E_AV": 153,
+    "U_AV": 16,
+    "M_AV": 16,
+    "O_HA": 16,
+    "E_HV": 1357
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D2",
+    "layer": "PATIENCE",
+    "E_AV": 0,
+    "U_AV": 0,
+    "M_AV": 0,
+    "O_HA": 0,
+    "E_HV": 6
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D2",
+    "layer": "SESSION",
+    "E_AV": 0,
+    "U_AV": 0,
+    "M_AV": 0,
+    "O_HA": 0,
+    "E_HV": 3
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D3",
+    "layer": "SPATIAL",
+    "E_AV": 11035,
+    "U_AV": 80,
+    "M_AV": 80,
+    "O_HA": 80,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D3",
+    "layer": "PASSENGER",
+    "E_AV": 8917,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D3",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 8917,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D3",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 8917,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D3",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 4091,
+    "U_AV": 30,
+    "M_AV": 30,
+    "O_HA": 30,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D3",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 4091,
+    "U_AV": 30,
+    "M_AV": 30,
+    "O_HA": 30,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D3",
+    "layer": "TOPK",
+    "E_AV": 287,
+    "U_AV": 30,
+    "M_AV": 30,
+    "O_HA": 30,
+    "E_HV": 1231
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D3",
+    "layer": "VALID_ETA",
+    "E_AV": 287,
+    "U_AV": 30,
+    "M_AV": 30,
+    "O_HA": 30,
+    "E_HV": 1231
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D3",
+    "layer": "PATIENCE",
+    "E_AV": 4,
+    "U_AV": 1,
+    "M_AV": 1,
+    "O_HA": 0,
+    "E_HV": 6
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D3",
+    "layer": "SESSION",
+    "E_AV": 4,
+    "U_AV": 1,
+    "M_AV": 1,
+    "O_HA": 0,
+    "E_HV": 3
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D4",
+    "layer": "SPATIAL",
+    "E_AV": 11035,
+    "U_AV": 80,
+    "M_AV": 80,
+    "O_HA": 80,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D4",
+    "layer": "PASSENGER",
+    "E_AV": 8917,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D4",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 8917,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D4",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 8917,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D4",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 8917,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D4",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 8917,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 9130
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D4",
+    "layer": "TOPK",
+    "E_AV": 659,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 878
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D4",
+    "layer": "VALID_ETA",
+    "E_AV": 659,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 878
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D4",
+    "layer": "PATIENCE",
+    "E_AV": 67,
+    "U_AV": 9,
+    "M_AV": 9,
+    "O_HA": 0,
+    "E_HV": 6
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D4",
+    "layer": "SESSION",
+    "E_AV": 67,
+    "U_AV": 9,
+    "M_AV": 9,
+    "O_HA": 0,
+    "E_HV": 3
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D0",
+    "layer": "SPATIAL",
+    "E_AV": 11813,
+    "U_AV": 85,
+    "M_AV": 85,
+    "O_HA": 85,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D0",
+    "layer": "PASSENGER",
+    "E_AV": 7129,
+    "U_AV": 52,
+    "M_AV": 52,
+    "O_HA": 52,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D0",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 7129,
+    "U_AV": 52,
+    "M_AV": 52,
+    "O_HA": 52,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D0",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 7129,
+    "U_AV": 52,
+    "M_AV": 52,
+    "O_HA": 52,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D0",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 3027,
+    "U_AV": 19,
+    "M_AV": 19,
+    "O_HA": 19,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D0",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 1550,
+    "U_AV": 10,
+    "M_AV": 10,
+    "O_HA": 10,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D0",
+    "layer": "TOPK",
+    "E_AV": 96,
+    "U_AV": 10,
+    "M_AV": 10,
+    "O_HA": 10,
+    "E_HV": 1498
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D0",
+    "layer": "VALID_ETA",
+    "E_AV": 96,
+    "U_AV": 10,
+    "M_AV": 10,
+    "O_HA": 10,
+    "E_HV": 1498
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D0",
+    "layer": "PATIENCE",
+    "E_AV": 3,
+    "U_AV": 1,
+    "M_AV": 1,
+    "O_HA": 0,
+    "E_HV": 31
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D0",
+    "layer": "SESSION",
+    "E_AV": 3,
+    "U_AV": 1,
+    "M_AV": 1,
+    "O_HA": 0,
+    "E_HV": 19
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D1",
+    "layer": "SPATIAL",
+    "E_AV": 11813,
+    "U_AV": 85,
+    "M_AV": 85,
+    "O_HA": 85,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D1",
+    "layer": "PASSENGER",
+    "E_AV": 7129,
+    "U_AV": 52,
+    "M_AV": 52,
+    "O_HA": 52,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D1",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 7129,
+    "U_AV": 52,
+    "M_AV": 52,
+    "O_HA": 52,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D1",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 6889,
+    "U_AV": 50,
+    "M_AV": 50,
+    "O_HA": 50,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D1",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 3820,
+    "U_AV": 24,
+    "M_AV": 24,
+    "O_HA": 24,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D1",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 3549,
+    "U_AV": 22,
+    "M_AV": 22,
+    "O_HA": 22,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D1",
+    "layer": "TOPK",
+    "E_AV": 247,
+    "U_AV": 22,
+    "M_AV": 22,
+    "O_HA": 22,
+    "E_HV": 1347
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D1",
+    "layer": "VALID_ETA",
+    "E_AV": 247,
+    "U_AV": 22,
+    "M_AV": 22,
+    "O_HA": 22,
+    "E_HV": 1347
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D1",
+    "layer": "PATIENCE",
+    "E_AV": 7,
+    "U_AV": 4,
+    "M_AV": 3,
+    "O_HA": 1,
+    "E_HV": 31
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D1",
+    "layer": "SESSION",
+    "E_AV": 7,
+    "U_AV": 4,
+    "M_AV": 3,
+    "O_HA": 0,
+    "E_HV": 19
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D2",
+    "layer": "SPATIAL",
+    "E_AV": 11813,
+    "U_AV": 85,
+    "M_AV": 85,
+    "O_HA": 85,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D2",
+    "layer": "PASSENGER",
+    "E_AV": 7129,
+    "U_AV": 52,
+    "M_AV": 52,
+    "O_HA": 52,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D2",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 6248,
+    "U_AV": 44,
+    "M_AV": 44,
+    "O_HA": 44,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D2",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 6248,
+    "U_AV": 44,
+    "M_AV": 44,
+    "O_HA": 44,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D2",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 3712,
+    "U_AV": 22,
+    "M_AV": 22,
+    "O_HA": 22,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D2",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 1815,
+    "U_AV": 12,
+    "M_AV": 12,
+    "O_HA": 12,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D2",
+    "layer": "TOPK",
+    "E_AV": 125,
+    "U_AV": 12,
+    "M_AV": 12,
+    "O_HA": 11,
+    "E_HV": 1469
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D2",
+    "layer": "VALID_ETA",
+    "E_AV": 125,
+    "U_AV": 12,
+    "M_AV": 12,
+    "O_HA": 11,
+    "E_HV": 1469
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D2",
+    "layer": "PATIENCE",
+    "E_AV": 3,
+    "U_AV": 1,
+    "M_AV": 1,
+    "O_HA": 0,
+    "E_HV": 31
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D2",
+    "layer": "SESSION",
+    "E_AV": 3,
+    "U_AV": 1,
+    "M_AV": 1,
+    "O_HA": 0,
+    "E_HV": 19
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D3",
+    "layer": "SPATIAL",
+    "E_AV": 11813,
+    "U_AV": 85,
+    "M_AV": 85,
+    "O_HA": 85,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D3",
+    "layer": "PASSENGER",
+    "E_AV": 7129,
+    "U_AV": 52,
+    "M_AV": 52,
+    "O_HA": 52,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D3",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 7129,
+    "U_AV": 52,
+    "M_AV": 52,
+    "O_HA": 52,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D3",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 7129,
+    "U_AV": 52,
+    "M_AV": 52,
+    "O_HA": 52,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D3",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 3027,
+    "U_AV": 19,
+    "M_AV": 19,
+    "O_HA": 19,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D3",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 3027,
+    "U_AV": 19,
+    "M_AV": 19,
+    "O_HA": 19,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D3",
+    "layer": "TOPK",
+    "E_AV": 208,
+    "U_AV": 19,
+    "M_AV": 19,
+    "O_HA": 18,
+    "E_HV": 1386
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D3",
+    "layer": "VALID_ETA",
+    "E_AV": 208,
+    "U_AV": 19,
+    "M_AV": 19,
+    "O_HA": 18,
+    "E_HV": 1386
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D3",
+    "layer": "PATIENCE",
+    "E_AV": 13,
+    "U_AV": 4,
+    "M_AV": 3,
+    "O_HA": 0,
+    "E_HV": 31
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D3",
+    "layer": "SESSION",
+    "E_AV": 13,
+    "U_AV": 4,
+    "M_AV": 3,
+    "O_HA": 0,
+    "E_HV": 19
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D4",
+    "layer": "SPATIAL",
+    "E_AV": 11813,
+    "U_AV": 85,
+    "M_AV": 85,
+    "O_HA": 85,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D4",
+    "layer": "PASSENGER",
+    "E_AV": 7129,
+    "U_AV": 52,
+    "M_AV": 52,
+    "O_HA": 52,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D4",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 7129,
+    "U_AV": 52,
+    "M_AV": 52,
+    "O_HA": 52,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D4",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 7129,
+    "U_AV": 52,
+    "M_AV": 52,
+    "O_HA": 52,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D4",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 7129,
+    "U_AV": 52,
+    "M_AV": 52,
+    "O_HA": 52,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D4",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 7129,
+    "U_AV": 52,
+    "M_AV": 52,
+    "O_HA": 52,
+    "E_HV": 8804
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D4",
+    "layer": "TOPK",
+    "E_AV": 645,
+    "U_AV": 52,
+    "M_AV": 52,
+    "O_HA": 47,
+    "E_HV": 995
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D4",
+    "layer": "VALID_ETA",
+    "E_AV": 645,
+    "U_AV": 52,
+    "M_AV": 52,
+    "O_HA": 47,
+    "E_HV": 995
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D4",
+    "layer": "PATIENCE",
+    "E_AV": 89,
+    "U_AV": 13,
+    "M_AV": 12,
+    "O_HA": 3,
+    "E_HV": 17
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D4",
+    "layer": "SESSION",
+    "E_AV": 89,
+    "U_AV": 13,
+    "M_AV": 12,
+    "O_HA": 1,
+    "E_HV": 6
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D0",
+    "layer": "SPATIAL",
+    "E_AV": 13462,
+    "U_AV": 94,
+    "M_AV": 94,
+    "O_HA": 94,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D0",
+    "layer": "PASSENGER",
+    "E_AV": 9582,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D0",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 9582,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D0",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 9582,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D0",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 4081,
+    "U_AV": 26,
+    "M_AV": 26,
+    "O_HA": 26,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D0",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 1815,
+    "U_AV": 12,
+    "M_AV": 12,
+    "O_HA": 12,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D0",
+    "layer": "TOPK",
+    "E_AV": 109,
+    "U_AV": 12,
+    "M_AV": 12,
+    "O_HA": 12,
+    "E_HV": 1653
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D0",
+    "layer": "VALID_ETA",
+    "E_AV": 109,
+    "U_AV": 12,
+    "M_AV": 12,
+    "O_HA": 12,
+    "E_HV": 1653
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D0",
+    "layer": "PATIENCE",
+    "E_AV": 0,
+    "U_AV": 0,
+    "M_AV": 0,
+    "O_HA": 0,
+    "E_HV": 24
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D0",
+    "layer": "SESSION",
+    "E_AV": 0,
+    "U_AV": 0,
+    "M_AV": 0,
+    "O_HA": 0,
+    "E_HV": 18
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D1",
+    "layer": "SPATIAL",
+    "E_AV": 13462,
+    "U_AV": 94,
+    "M_AV": 94,
+    "O_HA": 94,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D1",
+    "layer": "PASSENGER",
+    "E_AV": 9582,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D1",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 9582,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D1",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 8901,
+    "U_AV": 59,
+    "M_AV": 59,
+    "O_HA": 59,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D1",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 5490,
+    "U_AV": 36,
+    "M_AV": 36,
+    "O_HA": 36,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D1",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 5490,
+    "U_AV": 36,
+    "M_AV": 36,
+    "O_HA": 36,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D1",
+    "layer": "TOPK",
+    "E_AV": 375,
+    "U_AV": 36,
+    "M_AV": 36,
+    "O_HA": 36,
+    "E_HV": 1391
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D1",
+    "layer": "VALID_ETA",
+    "E_AV": 375,
+    "U_AV": 36,
+    "M_AV": 36,
+    "O_HA": 36,
+    "E_HV": 1391
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D1",
+    "layer": "PATIENCE",
+    "E_AV": 15,
+    "U_AV": 4,
+    "M_AV": 4,
+    "O_HA": 1,
+    "E_HV": 24
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D1",
+    "layer": "SESSION",
+    "E_AV": 15,
+    "U_AV": 4,
+    "M_AV": 4,
+    "O_HA": 1,
+    "E_HV": 18
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D2",
+    "layer": "SPATIAL",
+    "E_AV": 13462,
+    "U_AV": 94,
+    "M_AV": 94,
+    "O_HA": 94,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D2",
+    "layer": "PASSENGER",
+    "E_AV": 9582,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D2",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 8888,
+    "U_AV": 59,
+    "M_AV": 59,
+    "O_HA": 59,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D2",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 8888,
+    "U_AV": 59,
+    "M_AV": 59,
+    "O_HA": 59,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D2",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 4192,
+    "U_AV": 28,
+    "M_AV": 28,
+    "O_HA": 28,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D2",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 1821,
+    "U_AV": 13,
+    "M_AV": 13,
+    "O_HA": 13,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D2",
+    "layer": "TOPK",
+    "E_AV": 115,
+    "U_AV": 13,
+    "M_AV": 13,
+    "O_HA": 13,
+    "E_HV": 1653
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D2",
+    "layer": "VALID_ETA",
+    "E_AV": 115,
+    "U_AV": 13,
+    "M_AV": 13,
+    "O_HA": 13,
+    "E_HV": 1653
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D2",
+    "layer": "PATIENCE",
+    "E_AV": 0,
+    "U_AV": 0,
+    "M_AV": 0,
+    "O_HA": 0,
+    "E_HV": 24
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D2",
+    "layer": "SESSION",
+    "E_AV": 0,
+    "U_AV": 0,
+    "M_AV": 0,
+    "O_HA": 0,
+    "E_HV": 18
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D3",
+    "layer": "SPATIAL",
+    "E_AV": 13462,
+    "U_AV": 94,
+    "M_AV": 94,
+    "O_HA": 94,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D3",
+    "layer": "PASSENGER",
+    "E_AV": 9582,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D3",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 9582,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D3",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 9582,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D3",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 4081,
+    "U_AV": 26,
+    "M_AV": 26,
+    "O_HA": 26,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D3",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 4081,
+    "U_AV": 26,
+    "M_AV": 26,
+    "O_HA": 26,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D3",
+    "layer": "TOPK",
+    "E_AV": 266,
+    "U_AV": 26,
+    "M_AV": 26,
+    "O_HA": 26,
+    "E_HV": 1500
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D3",
+    "layer": "VALID_ETA",
+    "E_AV": 266,
+    "U_AV": 26,
+    "M_AV": 26,
+    "O_HA": 26,
+    "E_HV": 1500
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D3",
+    "layer": "PATIENCE",
+    "E_AV": 10,
+    "U_AV": 1,
+    "M_AV": 1,
+    "O_HA": 1,
+    "E_HV": 24
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D3",
+    "layer": "SESSION",
+    "E_AV": 10,
+    "U_AV": 1,
+    "M_AV": 1,
+    "O_HA": 1,
+    "E_HV": 18
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D4",
+    "layer": "SPATIAL",
+    "E_AV": 13462,
+    "U_AV": 94,
+    "M_AV": 94,
+    "O_HA": 94,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D4",
+    "layer": "PASSENGER",
+    "E_AV": 9582,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D4",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 9582,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D4",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 9582,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D4",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 9582,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D4",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 9582,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 11329
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D4",
+    "layer": "TOPK",
+    "E_AV": 664,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 1126
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D4",
+    "layer": "VALID_ETA",
+    "E_AV": 664,
+    "U_AV": 63,
+    "M_AV": 63,
+    "O_HA": 63,
+    "E_HV": 1126
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D4",
+    "layer": "PATIENCE",
+    "E_AV": 30,
+    "U_AV": 10,
+    "M_AV": 10,
+    "O_HA": 3,
+    "E_HV": 24
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D4",
+    "layer": "SESSION",
+    "E_AV": 30,
+    "U_AV": 10,
+    "M_AV": 10,
+    "O_HA": 2,
+    "E_HV": 18
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D0",
+    "layer": "SPATIAL",
+    "E_AV": 11162,
+    "U_AV": 80,
+    "M_AV": 80,
+    "O_HA": 80,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D0",
+    "layer": "PASSENGER",
+    "E_AV": 7638,
+    "U_AV": 57,
+    "M_AV": 57,
+    "O_HA": 57,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D0",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 7638,
+    "U_AV": 57,
+    "M_AV": 57,
+    "O_HA": 57,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D0",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 7638,
+    "U_AV": 57,
+    "M_AV": 57,
+    "O_HA": 57,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D0",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 4698,
+    "U_AV": 34,
+    "M_AV": 34,
+    "O_HA": 34,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D0",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 1959,
+    "U_AV": 13,
+    "M_AV": 13,
+    "O_HA": 13,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D0",
+    "layer": "TOPK",
+    "E_AV": 123,
+    "U_AV": 13,
+    "M_AV": 13,
+    "O_HA": 13,
+    "E_HV": 1423
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D0",
+    "layer": "VALID_ETA",
+    "E_AV": 123,
+    "U_AV": 13,
+    "M_AV": 13,
+    "O_HA": 13,
+    "E_HV": 1423
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D0",
+    "layer": "PATIENCE",
+    "E_AV": 0,
+    "U_AV": 0,
+    "M_AV": 0,
+    "O_HA": 0,
+    "E_HV": 8
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D0",
+    "layer": "SESSION",
+    "E_AV": 0,
+    "U_AV": 0,
+    "M_AV": 0,
+    "O_HA": 0,
+    "E_HV": 5
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D1",
+    "layer": "SPATIAL",
+    "E_AV": 11162,
+    "U_AV": 80,
+    "M_AV": 80,
+    "O_HA": 80,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D1",
+    "layer": "PASSENGER",
+    "E_AV": 7638,
+    "U_AV": 57,
+    "M_AV": 57,
+    "O_HA": 57,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D1",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 7638,
+    "U_AV": 57,
+    "M_AV": 57,
+    "O_HA": 57,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D1",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 6871,
+    "U_AV": 52,
+    "M_AV": 52,
+    "O_HA": 52,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D1",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 4829,
+    "U_AV": 36,
+    "M_AV": 36,
+    "O_HA": 36,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D1",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 4388,
+    "U_AV": 33,
+    "M_AV": 33,
+    "O_HA": 33,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D1",
+    "layer": "TOPK",
+    "E_AV": 275,
+    "U_AV": 32,
+    "M_AV": 32,
+    "O_HA": 32,
+    "E_HV": 1290
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D1",
+    "layer": "VALID_ETA",
+    "E_AV": 275,
+    "U_AV": 32,
+    "M_AV": 32,
+    "O_HA": 32,
+    "E_HV": 1290
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D1",
+    "layer": "PATIENCE",
+    "E_AV": 6,
+    "U_AV": 4,
+    "M_AV": 4,
+    "O_HA": 2,
+    "E_HV": 8
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D1",
+    "layer": "SESSION",
+    "E_AV": 6,
+    "U_AV": 4,
+    "M_AV": 4,
+    "O_HA": 2,
+    "E_HV": 5
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D2",
+    "layer": "SPATIAL",
+    "E_AV": 11162,
+    "U_AV": 80,
+    "M_AV": 80,
+    "O_HA": 80,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D2",
+    "layer": "PASSENGER",
+    "E_AV": 7638,
+    "U_AV": 57,
+    "M_AV": 57,
+    "O_HA": 57,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D2",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 7108,
+    "U_AV": 54,
+    "M_AV": 54,
+    "O_HA": 54,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D2",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 7108,
+    "U_AV": 54,
+    "M_AV": 54,
+    "O_HA": 54,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D2",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 5238,
+    "U_AV": 38,
+    "M_AV": 38,
+    "O_HA": 38,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D2",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 2009,
+    "U_AV": 14,
+    "M_AV": 14,
+    "O_HA": 14,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D2",
+    "layer": "TOPK",
+    "E_AV": 126,
+    "U_AV": 14,
+    "M_AV": 14,
+    "O_HA": 14,
+    "E_HV": 1420
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D2",
+    "layer": "VALID_ETA",
+    "E_AV": 126,
+    "U_AV": 14,
+    "M_AV": 14,
+    "O_HA": 14,
+    "E_HV": 1420
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D2",
+    "layer": "PATIENCE",
+    "E_AV": 0,
+    "U_AV": 0,
+    "M_AV": 0,
+    "O_HA": 0,
+    "E_HV": 8
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D2",
+    "layer": "SESSION",
+    "E_AV": 0,
+    "U_AV": 0,
+    "M_AV": 0,
+    "O_HA": 0,
+    "E_HV": 5
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D3",
+    "layer": "SPATIAL",
+    "E_AV": 11162,
+    "U_AV": 80,
+    "M_AV": 80,
+    "O_HA": 80,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D3",
+    "layer": "PASSENGER",
+    "E_AV": 7638,
+    "U_AV": 57,
+    "M_AV": 57,
+    "O_HA": 57,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D3",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 7638,
+    "U_AV": 57,
+    "M_AV": 57,
+    "O_HA": 57,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D3",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 7638,
+    "U_AV": 57,
+    "M_AV": 57,
+    "O_HA": 57,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D3",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 4698,
+    "U_AV": 34,
+    "M_AV": 34,
+    "O_HA": 34,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D3",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 4698,
+    "U_AV": 34,
+    "M_AV": 34,
+    "O_HA": 34,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D3",
+    "layer": "TOPK",
+    "E_AV": 311,
+    "U_AV": 34,
+    "M_AV": 34,
+    "O_HA": 32,
+    "E_HV": 1247
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D3",
+    "layer": "VALID_ETA",
+    "E_AV": 311,
+    "U_AV": 34,
+    "M_AV": 34,
+    "O_HA": 32,
+    "E_HV": 1247
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D3",
+    "layer": "PATIENCE",
+    "E_AV": 5,
+    "U_AV": 4,
+    "M_AV": 4,
+    "O_HA": 2,
+    "E_HV": 8
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D3",
+    "layer": "SESSION",
+    "E_AV": 5,
+    "U_AV": 4,
+    "M_AV": 4,
+    "O_HA": 2,
+    "E_HV": 5
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D4",
+    "layer": "SPATIAL",
+    "E_AV": 11162,
+    "U_AV": 80,
+    "M_AV": 80,
+    "O_HA": 80,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D4",
+    "layer": "PASSENGER",
+    "E_AV": 7638,
+    "U_AV": 57,
+    "M_AV": 57,
+    "O_HA": 57,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D4",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 7638,
+    "U_AV": 57,
+    "M_AV": 57,
+    "O_HA": 57,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D4",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 7638,
+    "U_AV": 57,
+    "M_AV": 57,
+    "O_HA": 57,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D4",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 7638,
+    "U_AV": 57,
+    "M_AV": 57,
+    "O_HA": 57,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D4",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 7638,
+    "U_AV": 57,
+    "M_AV": 57,
+    "O_HA": 57,
+    "E_HV": 9840
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D4",
+    "layer": "TOPK",
+    "E_AV": 521,
+    "U_AV": 56,
+    "M_AV": 56,
+    "O_HA": 53,
+    "E_HV": 1048
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D4",
+    "layer": "VALID_ETA",
+    "E_AV": 521,
+    "U_AV": 56,
+    "M_AV": 56,
+    "O_HA": 53,
+    "E_HV": 1048
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D4",
+    "layer": "PATIENCE",
+    "E_AV": 38,
+    "U_AV": 8,
+    "M_AV": 8,
+    "O_HA": 2,
+    "E_HV": 8
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D4",
+    "layer": "SESSION",
+    "E_AV": 38,
+    "U_AV": 8,
+    "M_AV": 8,
+    "O_HA": 2,
+    "E_HV": 5
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D0",
+    "layer": "SPATIAL",
+    "E_AV": 11008,
+    "U_AV": 86,
+    "M_AV": 84,
+    "O_HA": 86,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D0",
+    "layer": "PASSENGER",
+    "E_AV": 7922,
+    "U_AV": 59,
+    "M_AV": 59,
+    "O_HA": 59,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D0",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 7922,
+    "U_AV": 59,
+    "M_AV": 59,
+    "O_HA": 59,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D0",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 7922,
+    "U_AV": 59,
+    "M_AV": 59,
+    "O_HA": 59,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D0",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 3963,
+    "U_AV": 33,
+    "M_AV": 33,
+    "O_HA": 33,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D0",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 2603,
+    "U_AV": 22,
+    "M_AV": 22,
+    "O_HA": 22,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D0",
+    "layer": "TOPK",
+    "E_AV": 252,
+    "U_AV": 22,
+    "M_AV": 22,
+    "O_HA": 22,
+    "E_HV": 1303
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D0",
+    "layer": "VALID_ETA",
+    "E_AV": 252,
+    "U_AV": 22,
+    "M_AV": 22,
+    "O_HA": 22,
+    "E_HV": 1303
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D0",
+    "layer": "PATIENCE",
+    "E_AV": 10,
+    "U_AV": 2,
+    "M_AV": 2,
+    "O_HA": 1,
+    "E_HV": 23
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D0",
+    "layer": "SESSION",
+    "E_AV": 10,
+    "U_AV": 2,
+    "M_AV": 2,
+    "O_HA": 1,
+    "E_HV": 7
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D1",
+    "layer": "SPATIAL",
+    "E_AV": 11008,
+    "U_AV": 86,
+    "M_AV": 84,
+    "O_HA": 86,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D1",
+    "layer": "PASSENGER",
+    "E_AV": 7922,
+    "U_AV": 59,
+    "M_AV": 59,
+    "O_HA": 59,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D1",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 7922,
+    "U_AV": 59,
+    "M_AV": 59,
+    "O_HA": 59,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D1",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 7219,
+    "U_AV": 55,
+    "M_AV": 55,
+    "O_HA": 55,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D1",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 4862,
+    "U_AV": 38,
+    "M_AV": 38,
+    "O_HA": 38,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D1",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 4854,
+    "U_AV": 37,
+    "M_AV": 37,
+    "O_HA": 37,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D1",
+    "layer": "TOPK",
+    "E_AV": 417,
+    "U_AV": 37,
+    "M_AV": 37,
+    "O_HA": 37,
+    "E_HV": 1142
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D1",
+    "layer": "VALID_ETA",
+    "E_AV": 417,
+    "U_AV": 37,
+    "M_AV": 37,
+    "O_HA": 37,
+    "E_HV": 1142
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D1",
+    "layer": "PATIENCE",
+    "E_AV": 19,
+    "U_AV": 5,
+    "M_AV": 5,
+    "O_HA": 1,
+    "E_HV": 23
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D1",
+    "layer": "SESSION",
+    "E_AV": 19,
+    "U_AV": 5,
+    "M_AV": 5,
+    "O_HA": 1,
+    "E_HV": 7
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D2",
+    "layer": "SPATIAL",
+    "E_AV": 11008,
+    "U_AV": 86,
+    "M_AV": 84,
+    "O_HA": 86,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D2",
+    "layer": "PASSENGER",
+    "E_AV": 7922,
+    "U_AV": 59,
+    "M_AV": 59,
+    "O_HA": 59,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D2",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 7322,
+    "U_AV": 54,
+    "M_AV": 54,
+    "O_HA": 54,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D2",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 7322,
+    "U_AV": 54,
+    "M_AV": 54,
+    "O_HA": 54,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D2",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 4777,
+    "U_AV": 37,
+    "M_AV": 37,
+    "O_HA": 37,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D2",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 2603,
+    "U_AV": 22,
+    "M_AV": 22,
+    "O_HA": 22,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D2",
+    "layer": "TOPK",
+    "E_AV": 252,
+    "U_AV": 22,
+    "M_AV": 22,
+    "O_HA": 22,
+    "E_HV": 1303
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D2",
+    "layer": "VALID_ETA",
+    "E_AV": 252,
+    "U_AV": 22,
+    "M_AV": 22,
+    "O_HA": 22,
+    "E_HV": 1303
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D2",
+    "layer": "PATIENCE",
+    "E_AV": 10,
+    "U_AV": 2,
+    "M_AV": 2,
+    "O_HA": 1,
+    "E_HV": 23
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D2",
+    "layer": "SESSION",
+    "E_AV": 10,
+    "U_AV": 2,
+    "M_AV": 2,
+    "O_HA": 1,
+    "E_HV": 7
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D3",
+    "layer": "SPATIAL",
+    "E_AV": 11008,
+    "U_AV": 86,
+    "M_AV": 84,
+    "O_HA": 86,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D3",
+    "layer": "PASSENGER",
+    "E_AV": 7922,
+    "U_AV": 59,
+    "M_AV": 59,
+    "O_HA": 59,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D3",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 7922,
+    "U_AV": 59,
+    "M_AV": 59,
+    "O_HA": 59,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D3",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 7922,
+    "U_AV": 59,
+    "M_AV": 59,
+    "O_HA": 59,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D3",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 3963,
+    "U_AV": 33,
+    "M_AV": 33,
+    "O_HA": 33,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D3",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 3963,
+    "U_AV": 33,
+    "M_AV": 33,
+    "O_HA": 33,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D3",
+    "layer": "TOPK",
+    "E_AV": 373,
+    "U_AV": 33,
+    "M_AV": 33,
+    "O_HA": 33,
+    "E_HV": 1201
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D3",
+    "layer": "VALID_ETA",
+    "E_AV": 373,
+    "U_AV": 33,
+    "M_AV": 33,
+    "O_HA": 33,
+    "E_HV": 1201
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D3",
+    "layer": "PATIENCE",
+    "E_AV": 27,
+    "U_AV": 7,
+    "M_AV": 7,
+    "O_HA": 2,
+    "E_HV": 23
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D3",
+    "layer": "SESSION",
+    "E_AV": 27,
+    "U_AV": 7,
+    "M_AV": 7,
+    "O_HA": 1,
+    "E_HV": 7
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D4",
+    "layer": "SPATIAL",
+    "E_AV": 11008,
+    "U_AV": 86,
+    "M_AV": 84,
+    "O_HA": 86,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D4",
+    "layer": "PASSENGER",
+    "E_AV": 7922,
+    "U_AV": 59,
+    "M_AV": 59,
+    "O_HA": 59,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D4",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 7922,
+    "U_AV": 59,
+    "M_AV": 59,
+    "O_HA": 59,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D4",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 7922,
+    "U_AV": 59,
+    "M_AV": 59,
+    "O_HA": 59,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D4",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 7922,
+    "U_AV": 59,
+    "M_AV": 59,
+    "O_HA": 59,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D4",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 7922,
+    "U_AV": 59,
+    "M_AV": 59,
+    "O_HA": 59,
+    "E_HV": 6418
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D4",
+    "layer": "TOPK",
+    "E_AV": 711,
+    "U_AV": 59,
+    "M_AV": 59,
+    "O_HA": 59,
+    "E_HV": 879
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D4",
+    "layer": "VALID_ETA",
+    "E_AV": 711,
+    "U_AV": 59,
+    "M_AV": 59,
+    "O_HA": 59,
+    "E_HV": 879
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D4",
+    "layer": "PATIENCE",
+    "E_AV": 71,
+    "U_AV": 12,
+    "M_AV": 11,
+    "O_HA": 4,
+    "E_HV": 23
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D4",
+    "layer": "SESSION",
+    "E_AV": 71,
+    "U_AV": 12,
+    "M_AV": 11,
+    "O_HA": 1,
+    "E_HV": 7
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D0",
+    "layer": "SPATIAL",
+    "E_AV": 6270,
+    "U_AV": 47,
+    "M_AV": 47,
+    "O_HA": 47,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D0",
+    "layer": "PASSENGER",
+    "E_AV": 3996,
+    "U_AV": 35,
+    "M_AV": 35,
+    "O_HA": 35,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D0",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 3996,
+    "U_AV": 35,
+    "M_AV": 35,
+    "O_HA": 35,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D0",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 3996,
+    "U_AV": 35,
+    "M_AV": 35,
+    "O_HA": 35,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D0",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 2399,
+    "U_AV": 20,
+    "M_AV": 20,
+    "O_HA": 20,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D0",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 1510,
+    "U_AV": 13,
+    "M_AV": 13,
+    "O_HA": 13,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D0",
+    "layer": "TOPK",
+    "E_AV": 111,
+    "U_AV": 13,
+    "M_AV": 13,
+    "O_HA": 13,
+    "E_HV": 696
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D0",
+    "layer": "VALID_ETA",
+    "E_AV": 111,
+    "U_AV": 13,
+    "M_AV": 13,
+    "O_HA": 13,
+    "E_HV": 696
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D0",
+    "layer": "PATIENCE",
+    "E_AV": 1,
+    "U_AV": 1,
+    "M_AV": 1,
+    "O_HA": 0,
+    "E_HV": 11
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D0",
+    "layer": "SESSION",
+    "E_AV": 1,
+    "U_AV": 1,
+    "M_AV": 1,
+    "O_HA": 0,
+    "E_HV": 0
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D1",
+    "layer": "SPATIAL",
+    "E_AV": 6270,
+    "U_AV": 47,
+    "M_AV": 47,
+    "O_HA": 47,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D1",
+    "layer": "PASSENGER",
+    "E_AV": 3996,
+    "U_AV": 35,
+    "M_AV": 35,
+    "O_HA": 35,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D1",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 3996,
+    "U_AV": 35,
+    "M_AV": 35,
+    "O_HA": 35,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D1",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 3991,
+    "U_AV": 34,
+    "M_AV": 34,
+    "O_HA": 34,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D1",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 3074,
+    "U_AV": 24,
+    "M_AV": 24,
+    "O_HA": 24,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D1",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 3074,
+    "U_AV": 24,
+    "M_AV": 24,
+    "O_HA": 24,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D1",
+    "layer": "TOPK",
+    "E_AV": 247,
+    "U_AV": 24,
+    "M_AV": 24,
+    "O_HA": 24,
+    "E_HV": 596
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D1",
+    "layer": "VALID_ETA",
+    "E_AV": 247,
+    "U_AV": 24,
+    "M_AV": 24,
+    "O_HA": 24,
+    "E_HV": 596
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D1",
+    "layer": "PATIENCE",
+    "E_AV": 1,
+    "U_AV": 1,
+    "M_AV": 1,
+    "O_HA": 0,
+    "E_HV": 11
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D1",
+    "layer": "SESSION",
+    "E_AV": 1,
+    "U_AV": 1,
+    "M_AV": 1,
+    "O_HA": 0,
+    "E_HV": 0
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D2",
+    "layer": "SPATIAL",
+    "E_AV": 6270,
+    "U_AV": 47,
+    "M_AV": 47,
+    "O_HA": 47,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D2",
+    "layer": "PASSENGER",
+    "E_AV": 3996,
+    "U_AV": 35,
+    "M_AV": 35,
+    "O_HA": 35,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D2",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 3996,
+    "U_AV": 35,
+    "M_AV": 35,
+    "O_HA": 35,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D2",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 3996,
+    "U_AV": 35,
+    "M_AV": 35,
+    "O_HA": 35,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D2",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 2653,
+    "U_AV": 23,
+    "M_AV": 23,
+    "O_HA": 23,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D2",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 1515,
+    "U_AV": 14,
+    "M_AV": 14,
+    "O_HA": 14,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D2",
+    "layer": "TOPK",
+    "E_AV": 116,
+    "U_AV": 14,
+    "M_AV": 14,
+    "O_HA": 14,
+    "E_HV": 696
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D2",
+    "layer": "VALID_ETA",
+    "E_AV": 116,
+    "U_AV": 14,
+    "M_AV": 14,
+    "O_HA": 14,
+    "E_HV": 696
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D2",
+    "layer": "PATIENCE",
+    "E_AV": 2,
+    "U_AV": 2,
+    "M_AV": 1,
+    "O_HA": 0,
+    "E_HV": 11
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D2",
+    "layer": "SESSION",
+    "E_AV": 2,
+    "U_AV": 2,
+    "M_AV": 1,
+    "O_HA": 0,
+    "E_HV": 0
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D3",
+    "layer": "SPATIAL",
+    "E_AV": 6270,
+    "U_AV": 47,
+    "M_AV": 47,
+    "O_HA": 47,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D3",
+    "layer": "PASSENGER",
+    "E_AV": 3996,
+    "U_AV": 35,
+    "M_AV": 35,
+    "O_HA": 35,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D3",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 3996,
+    "U_AV": 35,
+    "M_AV": 35,
+    "O_HA": 35,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D3",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 3996,
+    "U_AV": 35,
+    "M_AV": 35,
+    "O_HA": 35,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D3",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 2399,
+    "U_AV": 20,
+    "M_AV": 20,
+    "O_HA": 20,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D3",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 2399,
+    "U_AV": 20,
+    "M_AV": 20,
+    "O_HA": 20,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D3",
+    "layer": "TOPK",
+    "E_AV": 206,
+    "U_AV": 20,
+    "M_AV": 20,
+    "O_HA": 20,
+    "E_HV": 620
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D3",
+    "layer": "VALID_ETA",
+    "E_AV": 206,
+    "U_AV": 20,
+    "M_AV": 20,
+    "O_HA": 20,
+    "E_HV": 620
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D3",
+    "layer": "PATIENCE",
+    "E_AV": 1,
+    "U_AV": 1,
+    "M_AV": 1,
+    "O_HA": 0,
+    "E_HV": 11
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D3",
+    "layer": "SESSION",
+    "E_AV": 1,
+    "U_AV": 1,
+    "M_AV": 1,
+    "O_HA": 0,
+    "E_HV": 0
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D4",
+    "layer": "SPATIAL",
+    "E_AV": 6270,
+    "U_AV": 47,
+    "M_AV": 47,
+    "O_HA": 47,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D4",
+    "layer": "PASSENGER",
+    "E_AV": 3996,
+    "U_AV": 35,
+    "M_AV": 35,
+    "O_HA": 35,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D4",
+    "layer": "PHYSICAL_DIRECTION_HARD",
+    "E_AV": 3996,
+    "U_AV": 35,
+    "M_AV": 35,
+    "O_HA": 35,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D4",
+    "layer": "CAPABILITY_HARD",
+    "E_AV": 3996,
+    "U_AV": 35,
+    "M_AV": 35,
+    "O_HA": 35,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D4",
+    "layer": "STRUCTURAL_ROUTE",
+    "E_AV": 3996,
+    "U_AV": 35,
+    "M_AV": 35,
+    "O_HA": 35,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D4",
+    "layer": "PRE_TOPK_EVIDENCE",
+    "E_AV": 3996,
+    "U_AV": 35,
+    "M_AV": 35,
+    "O_HA": 35,
+    "E_HV": 2822
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D4",
+    "layer": "TOPK",
+    "E_AV": 367,
+    "U_AV": 35,
+    "M_AV": 35,
+    "O_HA": 35,
+    "E_HV": 505
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D4",
+    "layer": "VALID_ETA",
+    "E_AV": 367,
+    "U_AV": 35,
+    "M_AV": 35,
+    "O_HA": 35,
+    "E_HV": 505
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D4",
+    "layer": "PATIENCE",
+    "E_AV": 17,
+    "U_AV": 6,
+    "M_AV": 5,
+    "O_HA": 1,
+    "E_HV": 11
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D4",
+    "layer": "SESSION",
+    "E_AV": 17,
+    "U_AV": 6,
+    "M_AV": 5,
+    "O_HA": 0,
+    "E_HV": 0
+  }
+]

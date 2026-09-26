@@ -1,0 +1,73 @@
+{
+  "status": "COMPLETE",
+  "original_config_sha256": "53a0eae43d6c8abae1017ae54874d8224a6123d5fded574785dbfaeaa9bbd57f",
+  "code_sha": "d1603d47939dbafacf8208c9eff85ee1ecd299b3",
+  "amended_execution_budget_s": 3600,
+  "scientific_parameters_changed": false,
+  "retry_condition": {
+    "q_A": 0.75,
+    "additional_pickup_overhead_s": 120
+  },
+  "preserved_files": {
+    "stage4\\output\\paper_enhancement\\dwell_deterministic_window\\summary.json": "eaae4ea66b8710a577daad1dfb7eb9ff16db42b7ad155c4262b84b8b81e8a91f",
+    "stage4\\output\\paper_enhancement\\dwell_deterministic_window\\q50_dwell0\\assignments.parquet": "dd4cbdca7e285e5b6408e24ead50968e77702e9d3510824966d8f639e885b84f",
+    "stage4\\output\\paper_enhancement\\dwell_deterministic_window\\q50_dwell0\\cohort_outcomes.parquet": "d570810a6d227d22e3876a311a41e0d648a5396e4f19a0afc0aca6919cfecab4",
+    "stage4\\output\\paper_enhancement\\dwell_deterministic_window\\q50_dwell0\\epochs.parquet": "8c378195b50af020d852c40523b38743fd1e5bad1db34624e40c2b9c0f97b96c",
+    "stage4\\output\\paper_enhancement\\dwell_deterministic_window\\q50_dwell0\\exposure.parquet": "6141c14f699427a71d60efa6972de96477167eed6c29dd085bb79144021c79e8",
+    "stage4\\output\\paper_enhancement\\dwell_deterministic_window\\q50_dwell0\\summary.json": "d01f94d62b8c23d732ade24339c183b3afd9d629a554b61266418a78bffc16a8",
+    "stage4\\output\\paper_enhancement\\dwell_deterministic_window\\q50_dwell120\\assignments.parquet": "d46b58c29ae4cdca09c7b9424a56d5d51f78d90cfbded429bcdca27a99ea6547",
+    "stage4\\output\\paper_enhancement\\dwell_deterministic_window\\q50_dwell120\\cohort_outcomes.parquet": "d6c5dbe697d3da2f600cd8bf43d0767e9ccc6824ee9c4b98519e6143b64c5083",
+    "stage4\\output\\paper_enhancement\\dwell_deterministic_window\\q50_dwell120\\epochs.parquet": "ca31034a68f143ef4a74663e087d58587b6149c629548f391a96860beabc3a90",
+    "stage4\\output\\paper_enhancement\\dwell_deterministic_window\\q50_dwell120\\exposure.parquet": "1695b70dc257d99ee5d320793fb9470e914285bd40b6656f65233138b877721f",
+    "stage4\\output\\paper_enhancement\\dwell_deterministic_window\\q50_dwell120\\summary.json": "6039373d29f4958283d11f62d76d9196ad20a4e6ba2d0bcbaac988bb190096a5",
+    "stage4\\output\\paper_enhancement\\dwell_deterministic_window\\q50_dwell60\\assignments.parquet": "4f745beecf3cded09044b199612cfbebd12d467340c061aea3998120c47b35d5",
+    "stage4\\output\\paper_enhancement\\dwell_deterministic_window\\q50_dwell60\\cohort_outcomes.parquet": "4ba9c2f17c67fc4b4658a9ea57cb28ca01a49a5ac15f46282dda59dd561b5ab6",
+    "stage4\\output\\paper_enhancement\\dwell_deterministic_window\\q50_dwell60\\epochs.parquet": "663f8b74fdedc6ca568bcb8843f3aaa5296e77040be16dfd9fdf40cb88f5802e",
+    "stage4\\output\\paper_enhancement\\dwell_deterministic_window\\q50_dwell60\\exposure.parquet": "1f6528c957b7a2963efc3f18246b10acfbd92b99ea5cb7e72914925eab36a672",
+    "stage4\\output\\paper_enhancement\\dwell_deterministic_window\\q50_dwell60\\summary.json": "dc8c24131d511b79fcfab18c7fb7a091ea3a3fbc4afc2d7500740e4e32c158cb",
+    "stage4\\output\\paper_enhancement\\dwell_deterministic_window\\q75_dwell0\\assignments.parquet": "bb5244d50be6f3539b754716cb967d8cc4e0a472576146bdd5fdd90bf57909f3",
+    "stage4\\output\\paper_enhancement\\dwell_deterministic_window\\q75_dwell0\\cohort_outcomes.parquet": "cdc681fc3913c8a8e0694eed2a522728ff7be42b9282f6409f5df26d78e69869",
+    "stage4\\output\\paper_enhancement\\dwell_deterministic_window\\q75_dwell0\\epochs.parquet": "0e278a3434dbcac5e8f98d8d6775a8eb699d8831da3451c0f24e011985ae4578",
+    "stage4\\output\\paper_enhancement\\dwell_deterministic_window\\q75_dwell0\\exposure.parquet": "a4b4a87019c6c1b775d0960eb5900a8129115dbad0029caaeb6b5d0518efdbd8",
+    "stage4\\output\\paper_enhancement\\dwell_deterministic_window\\q75_dwell0\\summary.json": "069d5eaf06078abf1d071692fdffee0dcd66f369e1f7ec4f7630897cbb6b2907",
+    "stage4\\output\\paper_enhancement\\dwell_deterministic_window\\q75_dwell60\\assignments.parquet": "441f42560f1764701f7bf07052e59d60ba188de33ea8eeda9a27fd1fd894382d",
+    "stage4\\output\\paper_enhancement\\dwell_deterministic_window\\q75_dwell60\\cohort_outcomes.parquet": "5b1279a63ceaa123b391d97416a319644288b0b23bd58e83cd919c94de5c356b",
+    "stage4\\output\\paper_enhancement\\dwell_deterministic_window\\q75_dwell60\\epochs.parquet": "99e3552c7a18ed2b53fd14fd18af9041cfe004abfbebb18681900c75a34dbc32",
+    "stage4\\output\\paper_enhancement\\dwell_deterministic_window\\q75_dwell60\\exposure.parquet": "8c09f04fd90a9cc8a17d40fe81b095652bab901837a9202dcdfda1936fd55aae",
+    "stage4\\output\\paper_enhancement\\dwell_deterministic_window\\q75_dwell60\\summary.json": "8743dfd689fc57cc46297aeac32fc40f98753a4e41820445f7ad39f05861cb17"
+  },
+  "result": {
+    "q_A": 0.75,
+    "additional_pickup_overhead_s": 120,
+    "status": "COMPLETE",
+    "cohort_orders": 1667,
+    "matched": 655,
+    "expired": 1012,
+    "matched_AV": 189,
+    "matched_HV": 466,
+    "mean_request_to_arrival_s": 186.64953964427482,
+    "mean_request_to_service_start_s": 306.6495396442748,
+    "assignments_after_checkpoint": 950,
+    "hours": {
+      "HV": {
+        "online_s": 566556.0,
+        "busy_s": 427685.52224900003,
+        "available_vehicle_hours": 38.5751327086111
+      },
+      "AV": {
+        "online_s": 1382400.0,
+        "busy_s": 143456.71040699998,
+        "available_vehicle_hours": 344.1509137758333
+      }
+    },
+    "pickup_time_max_error_s": 9.971472536562942e-10,
+    "service_time_max_error_s": 0.0,
+    "hv_realized_overrun_count": 29,
+    "routing_arcs": 293223,
+    "routing_failures": 0,
+    "runtime_s": 1373.1869477999971,
+    "peak_rss_mib": 396.8203125,
+    "drain_end_s": 45630,
+    "checkpoint_sha256": "942ef4043470cc992ee8d32a605e8bb77c68c953fafa87f0b844182d29ccda96"
+  }
+}

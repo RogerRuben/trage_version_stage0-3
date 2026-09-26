@@ -1,0 +1,997 @@
+[
+  {
+    "case_id": "reverse_0001",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "1022454662:0:F",
+      "category": "FROZEN_OSM_DIRECTION_SUPPORT",
+      "osm_way_id": 1022454662,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": true,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": true,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1213899045889,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "reverse_0002",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "1022454662:10:F",
+      "category": "FROZEN_OSM_DIRECTION_SUPPORT",
+      "osm_way_id": 1022454662,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": true,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": true,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1212389096449,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "reverse_0003",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "1022454662:11:F",
+      "category": "FROZEN_OSM_DIRECTION_SUPPORT",
+      "osm_way_id": 1022454662,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": true,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": true,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1213764828161,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "reverse_0004",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "1022454662:12:F",
+      "category": "FROZEN_OSM_DIRECTION_SUPPORT",
+      "osm_way_id": 1022454662,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": true,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": true,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1165010238465,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "reverse_0005",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "1022454662:13:F",
+      "category": "FROZEN_OSM_DIRECTION_SUPPORT",
+      "osm_way_id": 1022454662,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": true,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": true,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1165010238465,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "reverse_0006",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "1022454662:14:F",
+      "category": "FROZEN_OSM_DIRECTION_SUPPORT",
+      "osm_way_id": 1022454662,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": true,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": false,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1164876020737,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "reverse_0007",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "1022454662:15:F",
+      "category": "FROZEN_OSM_DIRECTION_SUPPORT",
+      "osm_way_id": 1022454662,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": true,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": true,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1164808911873,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "reverse_0008",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "1022454662:16:F",
+      "category": "FROZEN_OSM_DIRECTION_SUPPORT",
+      "osm_way_id": 1022454662,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": true,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": true,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1164808911873,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "reverse_0009",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "1022454662:17:F",
+      "category": "FROZEN_OSM_DIRECTION_SUPPORT",
+      "osm_way_id": 1022454662,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": true,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": true,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1161084369921,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "reverse_0010",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "1022454662:18:F",
+      "category": "FROZEN_OSM_DIRECTION_SUPPORT",
+      "osm_way_id": 1022454662,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": true,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": true,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1161084369921,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "reverse_0011",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "1022454662:19:F",
+      "category": "FROZEN_OSM_DIRECTION_SUPPORT",
+      "osm_way_id": 1022454662,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": true,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": true,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1161084369921,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "reverse_0012",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "1022454662:1:F",
+      "category": "FROZEN_OSM_DIRECTION_SUPPORT",
+      "osm_way_id": 1022454662,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": true,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": true,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1213899045889,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "reverse_0013",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "1022454662:20:F",
+      "category": "FROZEN_OSM_DIRECTION_SUPPORT",
+      "osm_way_id": 1022454662,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": true,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": true,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1161084369921,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "reverse_0014",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "1022454662:21:F",
+      "category": "FROZEN_OSM_DIRECTION_SUPPORT",
+      "osm_way_id": 1022454662,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": true,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": true,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1161084369921,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "reverse_0015",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "1022454662:22:F",
+      "category": "FROZEN_OSM_DIRECTION_SUPPORT",
+      "osm_way_id": 1022454662,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": true,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": true,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1161084369921,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "reverse_0016",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "1022454662:2:F",
+      "category": "FROZEN_OSM_DIRECTION_SUPPORT",
+      "osm_way_id": 1022454662,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": true,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": true,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1213899045889,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "reverse_0017",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "1022454662:3:F",
+      "category": "FROZEN_OSM_DIRECTION_SUPPORT",
+      "osm_way_id": 1022454662,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": true,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": true,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1213899045889,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "reverse_0018",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "1022454662:4:F",
+      "category": "FROZEN_OSM_DIRECTION_SUPPORT",
+      "osm_way_id": 1022454662,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": true,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": true,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1213899045889,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "reverse_0019",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "1022454662:5:F",
+      "category": "FROZEN_OSM_DIRECTION_SUPPORT",
+      "osm_way_id": 1022454662,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": true,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": true,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1212993076225,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "reverse_0020",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "1022454662:6:F",
+      "category": "FROZEN_OSM_DIRECTION_SUPPORT",
+      "osm_way_id": 1022454662,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": true,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": true,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1213194402817,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "reverse_0021",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "1022454662:7:F",
+      "category": "FROZEN_OSM_DIRECTION_SUPPORT",
+      "osm_way_id": 1022454662,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": true,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": true,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1213194402817,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "reverse_0022",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "1022454662:9:F",
+      "category": "FROZEN_OSM_DIRECTION_SUPPORT",
+      "osm_way_id": 1022454662,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": true,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": true,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1212389096449,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "reverse_0023",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "1037359298:1:F",
+      "category": "FROZEN_OSM_DIRECTION_SUPPORT",
+      "osm_way_id": 1037359298,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": true,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": true,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1095955217409,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "reverse_0024",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "1037359298:2:F",
+      "category": "FROZEN_OSM_DIRECTION_SUPPORT",
+      "osm_way_id": 1037359298,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": true,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": true,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1096961850369,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "reverse_0025",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "1037359298:3:F",
+      "category": "FROZEN_OSM_DIRECTION_SUPPORT",
+      "osm_way_id": 1037359298,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": true,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": true,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1096961850369,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "reverse_0026",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "162532761:0:F",
+      "category": "UNRESOLVED_WAY_OR_ENDPOINT_ORIENTATION",
+      "osm_way_id": 162532761,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": false,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": true,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1616389821466,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "reverse_0027",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "162532761:14:F",
+      "category": "UNRESOLVED_WAY_OR_ENDPOINT_ORIENTATION",
+      "osm_way_id": 162532761,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": false,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": true,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1616826029082,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "reverse_0028",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "162532761:15:F",
+      "category": "UNRESOLVED_WAY_OR_ENDPOINT_ORIENTATION",
+      "osm_way_id": 162532761,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": false,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": true,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1616826029082,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "reverse_0029",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "162532761:16:F",
+      "category": "UNRESOLVED_WAY_OR_ENDPOINT_ORIENTATION",
+      "osm_way_id": 162532761,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": false,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": true,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1616826029082,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "reverse_0030",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "canonical_edge_uid": "162532761:1:F",
+      "category": "UNRESOLVED_WAY_OR_ENDPOINT_ORIENTATION",
+      "osm_way_id": 162532761,
+      "one_way": "yes",
+      "vehicle_oneway": "yes",
+      "osm_orientation_resolved": false,
+      "implied_oneway": false,
+      "conditional_tags_present": false,
+      "access_tags": {},
+      "forward_reference_present": true,
+      "exported_same_endpoint_direction_count": 0,
+      "observed_valhalla_edge_id": 1616389821466,
+      "physical_restriction_confirmed": false
+    }
+  },
+  {
+    "case_id": "movement_0031",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "complex_id": "s3ic_70ad9a559fc5cfd9fa31d560",
+      "incoming": "s3e_0f8561a1f0b65b93f767e6dd",
+      "outgoing": "s3e_7d6c3fc4b2d382a3d6e51505",
+      "reason": "ENDPOINT_SCOPE_MISMATCH_BETWEEN_MOVEMENT_AND_BOUNDARY_PRODUCTS",
+      "internal_count": 0,
+      "directed_path_exists": true,
+      "recorded_chain_continuous": true,
+      "incoming_role_valid": true,
+      "outgoing_role_valid": true,
+      "classification": "ENDPOINT_SCOPE_MISMATCH",
+      "entire_movement_certified": false
+    }
+  },
+  {
+    "case_id": "movement_0032",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "complex_id": "s3ic_80aaeee1a6b65c900d879410",
+      "incoming": "s3e_e809d885a186e4781312b1ed",
+      "outgoing": "s3e_33a071aebd4d76ce7790b777",
+      "reason": "ENDPOINT_SCOPE_MISMATCH_BETWEEN_MOVEMENT_AND_BOUNDARY_PRODUCTS",
+      "internal_count": 3,
+      "directed_path_exists": true,
+      "recorded_chain_continuous": true,
+      "incoming_role_valid": true,
+      "outgoing_role_valid": true,
+      "classification": "ENDPOINT_SCOPE_MISMATCH",
+      "entire_movement_certified": false
+    }
+  },
+  {
+    "case_id": "movement_0033",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "complex_id": "s3ic_fae3156f351334ddfcd2c339",
+      "incoming": "s3e_6a4404d6eefc7ef51cacafb8",
+      "outgoing": "s3e_b4ee3adc33af1d73171bbfad",
+      "reason": "ENDPOINT_SCOPE_MISMATCH_BETWEEN_MOVEMENT_AND_BOUNDARY_PRODUCTS",
+      "internal_count": 1,
+      "directed_path_exists": true,
+      "recorded_chain_continuous": true,
+      "incoming_role_valid": true,
+      "outgoing_role_valid": true,
+      "classification": "ENDPOINT_SCOPE_MISMATCH",
+      "entire_movement_certified": false
+    }
+  },
+  {
+    "case_id": "movement_0034",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "complex_id": "s3ic_6b8e2dc5bfd6a0132c43986d",
+      "incoming": "s3e_574fdff45b47a38ac4d0fbb7",
+      "outgoing": "s3e_649eb2deaada614bbc093297",
+      "reason": "ENDPOINT_SCOPE_MISMATCH_BETWEEN_MOVEMENT_AND_BOUNDARY_PRODUCTS",
+      "internal_count": 0,
+      "directed_path_exists": true,
+      "recorded_chain_continuous": true,
+      "incoming_role_valid": true,
+      "outgoing_role_valid": true,
+      "classification": "ENDPOINT_SCOPE_MISMATCH",
+      "entire_movement_certified": false
+    }
+  },
+  {
+    "case_id": "movement_0035",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "complex_id": "s3ic_d338d69065910d268439db33",
+      "incoming": "s3e_db7185dc697e2c0ff89d1fff",
+      "outgoing": "s3e_57494b7ae35f32bdeeeb1c8e",
+      "reason": "ENDPOINT_SCOPE_MISMATCH_BETWEEN_MOVEMENT_AND_BOUNDARY_PRODUCTS",
+      "internal_count": 1,
+      "directed_path_exists": true,
+      "recorded_chain_continuous": true,
+      "incoming_role_valid": true,
+      "outgoing_role_valid": true,
+      "classification": "ENDPOINT_SCOPE_MISMATCH",
+      "entire_movement_certified": false
+    }
+  },
+  {
+    "case_id": "movement_0036",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "complex_id": "s3ic_bebbe3ff5e576814c4cf38a6",
+      "incoming": "s3e_2cda32ef6089d5bf7c3e948a",
+      "outgoing": "s3e_56ca1657aa2889e5a7b243dc",
+      "reason": "ENDPOINT_SCOPE_MISMATCH_BETWEEN_MOVEMENT_AND_BOUNDARY_PRODUCTS",
+      "internal_count": 5,
+      "directed_path_exists": true,
+      "recorded_chain_continuous": false,
+      "incoming_role_valid": true,
+      "outgoing_role_valid": true,
+      "classification": "ENDPOINT_SCOPE_MISMATCH",
+      "entire_movement_certified": false
+    }
+  },
+  {
+    "case_id": "movement_0037",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "complex_id": "s3ic_11e736025a08da6a64322dbc",
+      "incoming": "s3e_55bd67d05e17c1aabff88895",
+      "outgoing": "s3e_9a94ff033c7327b43b8f0400",
+      "reason": "ENDPOINT_SCOPE_MISMATCH_BETWEEN_MOVEMENT_AND_BOUNDARY_PRODUCTS",
+      "internal_count": 3,
+      "directed_path_exists": true,
+      "recorded_chain_continuous": true,
+      "incoming_role_valid": true,
+      "outgoing_role_valid": true,
+      "classification": "ENDPOINT_SCOPE_MISMATCH",
+      "entire_movement_certified": false
+    }
+  },
+  {
+    "case_id": "movement_0038",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "complex_id": "s3ic_b8c4a017d0bee731fb87af6e",
+      "incoming": "s3e_9d6030f0fd01908e82bd2795",
+      "outgoing": "s3e_27279baf10916ca2811c3f8f",
+      "reason": "ENDPOINT_SCOPE_MISMATCH_BETWEEN_MOVEMENT_AND_BOUNDARY_PRODUCTS",
+      "internal_count": 1,
+      "directed_path_exists": true,
+      "recorded_chain_continuous": true,
+      "incoming_role_valid": true,
+      "outgoing_role_valid": true,
+      "classification": "ENDPOINT_SCOPE_MISMATCH",
+      "entire_movement_certified": false
+    }
+  },
+  {
+    "case_id": "movement_0039",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "complex_id": "s3ic_b8c4a017d0bee731fb87af6e",
+      "incoming": "s3e_9d6030f0fd01908e82bd2795",
+      "outgoing": "s3e_27279baf10916ca2811c3f8f",
+      "reason": "ENDPOINT_SCOPE_MISMATCH_BETWEEN_MOVEMENT_AND_BOUNDARY_PRODUCTS",
+      "internal_count": 1,
+      "directed_path_exists": true,
+      "recorded_chain_continuous": true,
+      "incoming_role_valid": true,
+      "outgoing_role_valid": true,
+      "classification": "ENDPOINT_SCOPE_MISMATCH",
+      "entire_movement_certified": false
+    }
+  },
+  {
+    "case_id": "movement_0040",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "complex_id": "s3ic_d338d69065910d268439db33",
+      "incoming": "s3e_db7185dc697e2c0ff89d1fff",
+      "outgoing": "s3e_57494b7ae35f32bdeeeb1c8e",
+      "reason": "ENDPOINT_SCOPE_MISMATCH_BETWEEN_MOVEMENT_AND_BOUNDARY_PRODUCTS",
+      "internal_count": 1,
+      "directed_path_exists": true,
+      "recorded_chain_continuous": true,
+      "incoming_role_valid": true,
+      "outgoing_role_valid": true,
+      "classification": "ENDPOINT_SCOPE_MISMATCH",
+      "entire_movement_certified": false
+    }
+  },
+  {
+    "case_id": "movement_0041",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "complex_id": "s3ic_7ebdb43b46acb1520152edfb",
+      "incoming": "s3e_ef2a29f6a2c8e6ed54bf42b1",
+      "outgoing": "s3e_c6e66ccf2c332d931cbcdfbd",
+      "reason": "ENDPOINT_SCOPE_MISMATCH_BETWEEN_MOVEMENT_AND_BOUNDARY_PRODUCTS",
+      "internal_count": 0,
+      "directed_path_exists": true,
+      "recorded_chain_continuous": true,
+      "incoming_role_valid": true,
+      "outgoing_role_valid": true,
+      "classification": "ENDPOINT_SCOPE_MISMATCH",
+      "entire_movement_certified": false
+    }
+  },
+  {
+    "case_id": "movement_0042",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "complex_id": "s3ic_5e47714a580c9b21584c6541",
+      "incoming": "s3e_f429e859206305dc26917c7a",
+      "outgoing": "s3e_fba390473c38067a1507c04c",
+      "reason": "ENDPOINT_SCOPE_MISMATCH_BETWEEN_MOVEMENT_AND_BOUNDARY_PRODUCTS",
+      "internal_count": 0,
+      "directed_path_exists": true,
+      "recorded_chain_continuous": true,
+      "incoming_role_valid": true,
+      "outgoing_role_valid": true,
+      "classification": "ENDPOINT_SCOPE_MISMATCH",
+      "entire_movement_certified": false
+    }
+  },
+  {
+    "case_id": "movement_0043",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "complex_id": "s3ic_70ad9a559fc5cfd9fa31d560",
+      "incoming": "s3e_0f8561a1f0b65b93f767e6dd",
+      "outgoing": "s3e_7d6c3fc4b2d382a3d6e51505",
+      "reason": "ENDPOINT_SCOPE_MISMATCH_BETWEEN_MOVEMENT_AND_BOUNDARY_PRODUCTS",
+      "internal_count": 0,
+      "directed_path_exists": true,
+      "recorded_chain_continuous": true,
+      "incoming_role_valid": true,
+      "outgoing_role_valid": true,
+      "classification": "ENDPOINT_SCOPE_MISMATCH",
+      "entire_movement_certified": false
+    }
+  },
+  {
+    "case_id": "movement_0044",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "complex_id": "s3ic_0f842794f3ae7e49297655e8",
+      "incoming": "s3e_a1fb56d1ed9317ec194c7354",
+      "outgoing": "s3e_18c23b42a32a45ad4ca48e1c",
+      "reason": "ENDPOINT_SCOPE_MISMATCH_BETWEEN_MOVEMENT_AND_BOUNDARY_PRODUCTS",
+      "internal_count": 1,
+      "directed_path_exists": true,
+      "recorded_chain_continuous": true,
+      "incoming_role_valid": true,
+      "outgoing_role_valid": true,
+      "classification": "ENDPOINT_SCOPE_MISMATCH",
+      "entire_movement_certified": false
+    }
+  },
+  {
+    "case_id": "movement_0045",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "complex_id": "s3ic_0975220dd23f771f3c3b9b01",
+      "incoming": "s3e_154870b11e836f57058aa409",
+      "outgoing": "s3e_c2293a148a30444c896595ce",
+      "reason": "ENDPOINT_SCOPE_MISMATCH_BETWEEN_MOVEMENT_AND_BOUNDARY_PRODUCTS",
+      "internal_count": 1,
+      "directed_path_exists": true,
+      "recorded_chain_continuous": true,
+      "incoming_role_valid": true,
+      "outgoing_role_valid": true,
+      "classification": "ENDPOINT_SCOPE_MISMATCH",
+      "entire_movement_certified": false
+    }
+  },
+  {
+    "case_id": "movement_0046",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "complex_id": "s3ic_70ad9a559fc5cfd9fa31d560",
+      "incoming": "s3e_0f8561a1f0b65b93f767e6dd",
+      "outgoing": "s3e_7d6c3fc4b2d382a3d6e51505",
+      "reason": "ENDPOINT_SCOPE_MISMATCH_BETWEEN_MOVEMENT_AND_BOUNDARY_PRODUCTS",
+      "internal_count": 0,
+      "directed_path_exists": true,
+      "recorded_chain_continuous": true,
+      "incoming_role_valid": true,
+      "outgoing_role_valid": true,
+      "classification": "ENDPOINT_SCOPE_MISMATCH",
+      "entire_movement_certified": false
+    }
+  },
+  {
+    "case_id": "movement_0047",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "complex_id": "s3ic_cd2076757fc435894ae0377a",
+      "incoming": "s3e_3f582bf99e3efeccf562b844",
+      "outgoing": "s3e_a52488ad5450c4688898b34e",
+      "reason": "ENDPOINT_SCOPE_MISMATCH_BETWEEN_MOVEMENT_AND_BOUNDARY_PRODUCTS",
+      "internal_count": 5,
+      "directed_path_exists": true,
+      "recorded_chain_continuous": true,
+      "incoming_role_valid": true,
+      "outgoing_role_valid": true,
+      "classification": "ENDPOINT_SCOPE_MISMATCH",
+      "entire_movement_certified": false
+    }
+  },
+  {
+    "case_id": "movement_0048",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "complex_id": "s3ic_ecab32890869e6f318d1dd21",
+      "incoming": "s3e_7007d681d88068d79a00c04d",
+      "outgoing": "s3e_8ae6a8224b7be4e0226839d5",
+      "reason": "ENDPOINT_SCOPE_MISMATCH_BETWEEN_MOVEMENT_AND_BOUNDARY_PRODUCTS",
+      "internal_count": 1,
+      "directed_path_exists": true,
+      "recorded_chain_continuous": true,
+      "incoming_role_valid": true,
+      "outgoing_role_valid": true,
+      "classification": "ENDPOINT_SCOPE_MISMATCH",
+      "entire_movement_certified": false
+    }
+  },
+  {
+    "case_id": "movement_0049",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "complex_id": "s3ic_6b8e2dc5bfd6a0132c43986d",
+      "incoming": "s3e_574fdff45b47a38ac4d0fbb7",
+      "outgoing": "s3e_649eb2deaada614bbc093297",
+      "reason": "ENDPOINT_SCOPE_MISMATCH_BETWEEN_MOVEMENT_AND_BOUNDARY_PRODUCTS",
+      "internal_count": 0,
+      "directed_path_exists": true,
+      "recorded_chain_continuous": true,
+      "incoming_role_valid": true,
+      "outgoing_role_valid": true,
+      "classification": "ENDPOINT_SCOPE_MISMATCH",
+      "entire_movement_certified": false
+    }
+  },
+  {
+    "case_id": "movement_0050",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "complex_id": "s3ic_d3357a0fcb8129aa0e184cd1",
+      "incoming": "s3e_4b83a97ab5281824a2f0fb39",
+      "outgoing": "s3e_b8db9eb37a4e8787db4662a9",
+      "reason": "ENDPOINT_SCOPE_MISMATCH_BETWEEN_MOVEMENT_AND_BOUNDARY_PRODUCTS",
+      "internal_count": 0,
+      "directed_path_exists": true,
+      "recorded_chain_continuous": true,
+      "incoming_role_valid": true,
+      "outgoing_role_valid": true,
+      "classification": "ENDPOINT_SCOPE_MISMATCH",
+      "entire_movement_certified": false
+    }
+  },
+  {
+    "case_id": "movement_0051",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "complex_id": "s3ic_17b955ded0cb317c57481d64",
+      "incoming": "s3e_193246ee7bdb002f62c9cef3",
+      "outgoing": "s3e_fea8574870b1859a04102f11",
+      "reason": "ENDPOINT_SCOPE_MISMATCH_BETWEEN_MOVEMENT_AND_BOUNDARY_PRODUCTS",
+      "internal_count": 0,
+      "directed_path_exists": true,
+      "recorded_chain_continuous": true,
+      "incoming_role_valid": true,
+      "outgoing_role_valid": true,
+      "classification": "ENDPOINT_SCOPE_MISMATCH",
+      "entire_movement_certified": false
+    }
+  },
+  {
+    "case_id": "movement_0052",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "complex_id": "s3ic_7ebdb43b46acb1520152edfb",
+      "incoming": "s3e_ef2a29f6a2c8e6ed54bf42b1",
+      "outgoing": "s3e_c6e66ccf2c332d931cbcdfbd",
+      "reason": "ENDPOINT_SCOPE_MISMATCH_BETWEEN_MOVEMENT_AND_BOUNDARY_PRODUCTS",
+      "internal_count": 0,
+      "directed_path_exists": true,
+      "recorded_chain_continuous": true,
+      "incoming_role_valid": true,
+      "outgoing_role_valid": true,
+      "classification": "ENDPOINT_SCOPE_MISMATCH",
+      "entire_movement_certified": false
+    }
+  },
+  {
+    "case_id": "movement_0053",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "complex_id": "s3ic_e7751f64246bc2b3fe7b03cb",
+      "incoming": "s3e_ad9052ef3d29597fbe7fb572",
+      "outgoing": "s3e_a53c894212dd2e4e4ca2ec0a",
+      "reason": "ENDPOINT_SCOPE_MISMATCH_BETWEEN_MOVEMENT_AND_BOUNDARY_PRODUCTS",
+      "internal_count": 2,
+      "directed_path_exists": true,
+      "recorded_chain_continuous": true,
+      "incoming_role_valid": true,
+      "outgoing_role_valid": true,
+      "classification": "ENDPOINT_SCOPE_MISMATCH",
+      "entire_movement_certified": false
+    }
+  },
+  {
+    "case_id": "movement_0054",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "complex_id": "s3ic_8434783dcfdf44af368cfdea",
+      "incoming": "s3e_b9bc115528c54061e5b8ac49",
+      "outgoing": "s3e_8104e3dfa3eee96fbe623efa",
+      "reason": "ENDPOINT_SCOPE_MISMATCH_BETWEEN_MOVEMENT_AND_BOUNDARY_PRODUCTS",
+      "internal_count": 0,
+      "directed_path_exists": true,
+      "recorded_chain_continuous": true,
+      "incoming_role_valid": true,
+      "outgoing_role_valid": true,
+      "classification": "ENDPOINT_SCOPE_MISMATCH",
+      "entire_movement_certified": false
+    }
+  },
+  {
+    "case_id": "movement_0055",
+    "status": "PROGRAMMATIC_EVIDENCE_ONLY_HUMAN_REVIEW_PENDING",
+    "detail": {
+      "complex_id": "s3ic_0398bee9de0a439b99b87630",
+      "incoming": "s3e_7dc486abec8084896744abad",
+      "outgoing": "s3e_a702e6c6458bf1f03f2bc0cf",
+      "reason": "ENDPOINT_SCOPE_MISMATCH_BETWEEN_MOVEMENT_AND_BOUNDARY_PRODUCTS",
+      "internal_count": 2,
+      "directed_path_exists": true,
+      "recorded_chain_continuous": true,
+      "incoming_role_valid": true,
+      "outgoing_role_valid": true,
+      "classification": "ENDPOINT_SCOPE_MISMATCH",
+      "entire_movement_certified": false
+    }
+  }
+]

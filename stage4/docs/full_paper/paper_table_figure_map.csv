@@ -1,0 +1,14 @@
+item_type,item_id,proposed_title,frozen_source,placement,purpose
+Table,1,Main factorial service-rate results,factorial_effects.csv,Main text,Answer RQ1 across q_A and summarize served-passenger waiting range
+Table,2,Marginal effects and descriptive interaction contrasts,"factorial_effects.csv; interaction_contrasts.csv",Main text,Answer RQ2 for acceptance and capability moderation
+Table,3,Benchmark and temporal-anchor comparison,"benchmark_comparison.csv; temporal_mechanism_15min.csv",Main text,Compare effective capacity and support the temporal mechanism boundary
+Table,4,Family-specific positive exposure activity by capability,family_activity_summary.csv,Main text,Show capability-dependent operational-envelope dimensions
+Table,5,Operational-envelope policy trade-off,odd_policy_tradeoff.csv,Main text,Answer RQ3 for STRICT REFERENCE and UNCONSTRAINED
+Table,6,Within-eta cost robustness,cost_pairwise_robustness.csv,Main text or appendix,Report secondary cost sensitivity without cross-eta ranking
+Figure,1,Service rate versus AV active vehicle-hour share,fig01_service_rate_factorial.png,Main text,Visualize RQ1 factorial response
+Figure,2,Acceptance gain versus AV penetration,fig03_acceptance_gain.png,Main text,Visualize RQ2 acceptance moderation
+Figure,3,Peak-period effective service and queue mechanism,fig04_temporal_mechanism.png,Main text,Contrast service queue pressure and total available stock
+Figure,4,Operational-envelope family activity by capability,fig05_family_activity.png,Main text,Visualize adaptive family bottlenecks
+Figure,5,Service-exposure trade-off under ODD policies,fig06_odd_tradeoff.png,Main text,Visualize RQ3 policy comparison
+Figure,A1,AV assignment share across the factorial,fig02_av_share_factorial.png,Appendix,Complement service results with assignment composition
+Figure,A2,Within-eta cost robustness,fig07_cost_robustness.png,Appendix,Show secondary cost sensitivity

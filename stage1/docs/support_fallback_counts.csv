@@ -1,0 +1,16 @@
+split,record_type,fallback_level,count,share,mean,std,min,max
+test,fallback_level,edge_hour,758389,0.9755240752389001,,,,
+test,fallback_level,global_hour,4,5.145243800945953e-06,,,,
+test,fallback_level,highway_hour,19022,0.02446820689539848,,,,
+test,fallback_level,spatial_neighbor,2,2.5726219004729764e-06,,,,
+train,fallback_level,edge_hour,4141509,0.9818951400385929,,,,
+train,fallback_level,global_hour,21,4.97881278075466e-06,,,,
+train,fallback_level,highway_hour,76337,0.018098458630688975,,,,
+train,fallback_level,spatial_neighbor,6,1.4225179373584742e-06,,,,
+validation,fallback_level,edge_hour,760017,0.974081051984005,,,,
+validation,fallback_level,global_hour,3,3.844970778222085e-06,,,,
+validation,fallback_level,highway_hour,20217,0.025911258074438635,,,,
+validation,fallback_level,spatial_neighbor,3,3.844970778222085e-06,,,,
+test,edge_time_bin_30m_distribution,,777417,,182.5779742403369,238.48722649668014,0.0,2796.0
+train,edge_time_bin_30m_distribution,,4217873,,185.18360415308854,239.91597361318273,1.0,2796.0
+validation,edge_time_bin_30m_distribution,,780240,,176.252773505588,233.07420940521797,0.0,2796.0

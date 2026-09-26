@@ -1,0 +1,50 @@
+{
+  "status": "STOP_VERIFICATION_FAILED",
+  "endpoints": 88,
+  "verified": 69,
+  "conflicts_or_unresolved": 19,
+  "native_identities_read_and_cross_checked": 88,
+  "existing_endpoint_conflicts": 19,
+  "conflicts_with_explicit_hierarchy_transition": 18,
+  "native_missing_side_unique_nodes": 55,
+  "mvt_marker_disagreement_not_a_direction_failure": 33,
+  "candidates_already_in_frozen_node_table": 0,
+  "input_hashes": {
+    "stage3\\output\\odd_tod\\s2a\\stage3_full_network_edges.parquet": "25ed4caf250cacbe251ae258d8e77ff2f0b286884f0376c72b9ef09e33687204",
+    "stage3\\output\\odd_tod\\s2a\\stage3_full_network_nodes.parquet": "158bbb8b5b2578de73e6fcc6fe4431169e8729cf8f66d553780bb4b052cd2625",
+    "D:\\pycodes\\didi_xian_raw\\valhalla_data\\valhalla.json": "f2eb80488a2ec832208b8ee1a7433aa4905e58243fe1c0d5b81d48a3368ec696",
+    "stage4\\output\\paper_enhancement\\stage3_semantic_provenance\\endpoint_evidence_private.json": "d2634615e04c15c188e63a882bda68e7ec754525c17df8c8a88582237981e234"
+  },
+  "native_tiles": [
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\valhalla_data\\tiles\\0\\002\\862.gph",
+      "sha256": "766dd05c851f43f1f1308d1735c5da99d5f750703b75a051ac5ec0cb2c5fd4e5",
+      "nodes": 16652,
+      "edges": 41456
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\valhalla_data\\tiles\\2\\000\\716\\835.gph",
+      "sha256": "f95ef1f17ed88adbef5edbde2d1a610b7cc4ece80323483829a33ee1a0a92434",
+      "nodes": 14952,
+      "edges": 32673
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\valhalla_data\\tiles\\1\\044\\928.gph",
+      "sha256": "88c89c913129b99b49dcd6fe2b1ef240b0c9219fde627ae4a98584833a4c7b49",
+      "nodes": 28625,
+      "edges": 81459
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\valhalla_data\\tiles\\2\\000\\715\\395.gph",
+      "sha256": "4f6946d72ddc8e81cc3f1d2d52bcfcd60c8cdc7a67cf09d4f4398fe341f6c72c",
+      "nodes": 21687,
+      "edges": 52323
+    }
+  ],
+  "sources_unchanged": true,
+  "production_modified": false,
+  "routing_calls": 0,
+  "matrix_calls": 0,
+  "runtime_s": 0.5152583999988565,
+  "peak_working_set_mib": 478.67578125
+}

@@ -1,0 +1,176 @@
+{
+  "artifact_sha256": "6d485a43691fe24923c1b7a6bc0af34acc68d14f34ef0ded0dc976675a3e8732",
+  "authorizations": {
+    "s2a": true,
+    "s2b": false,
+    "s3": false,
+    "s4": false,
+    "s5": false,
+    "s6": false,
+    "s7": false,
+    "s8": false,
+    "stage4": false
+  },
+  "base_commit": "573413e87d4fd6698bc13100425bb5aed6b6a621",
+  "config": {
+    "path": "stage3/config/stage3_s2a_network_foundation.json",
+    "sha256": "736f80dae1f7e77ce4784bcde6b7b19993b877a3cbf9509657e3d69b1e1e4a44",
+    "size_bytes": 3025
+  },
+  "next_phase_authorized": false,
+  "phase_status": "STAGE3_S2A_NETWORK_FOUNDATION_FROZEN",
+  "products": {
+    "control_evidence": {
+      "path": "stage3/output/odd_tod/s2a/stage3_control_evidence.parquet",
+      "row_count": 4081,
+      "schema": "control_evidence_type: large_string\nevidence_id: large_string\nlat: double\nlon: double\nosm_entity_type: large_string\nosm_node_id: double\nosm_way_id: double\npositive_evidence_only: bool\nraw_highway: large_string\nraw_junction: large_string\nsource: large_string\nmapped_full_network_edge_count: int64\nmapped_stage3_edge_uids: large_string\nmissing_tag_means_negative_control: bool\npoi_used: bool\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1991",
+      "schema_sha256": "730617d46d904a940e0c1b7e994b5901516e5ee1d0d8526398d6705e7107cb9b",
+      "sha256": "97c38791c0d14dd3e491de6021517917384c6f94ba6853228b8e8f71910d63b9",
+      "size_bytes": 315468
+    },
+    "full_network_edges": {
+      "path": "stage3/output/odd_tod/s2a/stage3_full_network_edges.parquet",
+      "row_count": 209454,
+      "schema": "stage3_edge_uid: large_string\nvalhalla_directed_edge_id: int64\nosm_way_id: int64\ndirection: large_string\ngeometry: large_string\ngeometry_point_count: int64\nstart_lon: double\nstart_lat: double\nend_lon: double\nend_lat: double\nlength_m: double\nauto_routable: bool\nvalhalla_access_mask: int64\nvalhalla_road_class: large_string\nvalhalla_road_class_code: int64\nvalhalla_use_code: int64\nvalhalla_speed_limit_kmh: double\nbridge_valhalla: bool\ntunnel_valhalla: bool\nroundabout_valhalla: bool\nvalhalla_layer: uint64\nmotor_vehicle_routability_source: large_string\nfrom_osm_node_id: double\nto_osm_node_id: double\nosm_highway: large_string\nosm_maxspeed_raw: large_string\nosm_layer: int64\nbridge_osm: bool\nbridge_effective: bool\nbridge_conflict: bool\ntunnel_osm: bool\ntunnel_effective: bool\ntunnel_conflict: bool\njunction_roundabout_way: bool\nmini_roundabout_node_exposure: bool\nroundabout_evidence_source: large_string\ngrade_separation_evidence: bool\nroad_class_provenance: large_string\nfrom_valhalla_node_id: double\nto_valhalla_node_id: double\nfrom_stage3_node_uid: large_string\nto_stage3_node_uid: large_string\nobserved_network_member: bool\ncanonical_edge_uid: string\ncanonical_traversal_direction: string\nmapping_status: large_string\nmapping_method: large_string\nmapping_confidence: large_string\nstage0_road_class: string\nbridge_stage0: bool\ntunnel_stage0: bool\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 6745",
+      "schema_sha256": "17c5129fa8dc0bdd3a4eeef356b6f212d746b3b30f47e82cf78f5f705ab4e099",
+      "sha256": "25ed4caf250cacbe251ae258d8e77ff2f0b286884f0376c72b9ef09e33687204",
+      "size_bytes": 19170318
+    },
+    "full_network_nodes": {
+      "path": "stage3/output/odd_tod/s2a/stage3_full_network_nodes.parquet",
+      "row_count": 89607,
+      "schema": "valhalla_node_id: int64\nstage3_node_uid: large_string\nlon: double\nlat: double\nvalhalla_node_type: int64\nvalhalla_traffic_signal: bool\nosm_node_id: double\nosm_node_mapping_status: large_string\nincident_auto_edge_count: int64\ngraph_degree_undirected_proxy: int64\nsource_provenance: large_string\nintersection_complex_id: null\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1675",
+      "schema_sha256": "9f3a60343676ca63e4f7b5531e47b5071806d717d7d288c370556251ffea6438",
+      "sha256": "158bbb8b5b2578de73e6fcc6fe4431169e8729cf8f66d553780bb4b052cd2625",
+      "size_bytes": 2730726
+    },
+    "observed_mapping": {
+      "path": "stage3/output/odd_tod/s2a/stage3_observed_full_network_mapping.parquet",
+      "row_count": 25382,
+      "schema": "canonical_edge_uid: large_string\ncanonical_traversal_direction: large_string\nobserved_valhalla_edge_id: int64\nobserved_osm_way_id: int64\nobserved_begin_osm_node_id: int64\nobserved_end_osm_node_id: int64\nmapping_status: large_string\nmapping_method: large_string\nmapping_confidence: large_string\ncandidate_count: int64\nstage3_edge_uid: large_string\nvalhalla_directed_edge_id: double\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1739",
+      "schema_sha256": "047ecf7e0bf2b116f6c99a4cff08ff9edf46247351282f1ba820cb27f68fc7dc",
+      "sha256": "1dda71f6b227e5a148c98d4ce322163ae8fe81a59b7ccb4c08dfb424ddade8c2",
+      "size_bytes": 523299
+    },
+    "speed_domain": {
+      "path": "stage3/output/odd_tod/s2a/stage3_speed_domain.parquet",
+      "row_count": 209454,
+      "schema": "stage3_edge_uid: large_string\nvalhalla_directed_edge_id: int64\nobserved_network_member: bool\nspeed_domain_value_kmh: double\nspeed_domain_provenance: large_string\nspeed_domain_confidence: large_string\nposted_speed_observed: bool\nhistorical_freeflow_speed_kmh: double\nhistorical_speed_support_n: int64\nroad_class_prior_kmh: double\nroad_class_context: large_string\nspeed_inference_method: large_string\nselected_freeflow_quantile: double\nspeed_compatible_C: bool\nspeed_compatible_M: bool\nspeed_compatible_A: bool\nis_verified_posted_speed_limit: bool\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 2495",
+      "schema_sha256": "546b4fb74ef1b4110aa0756f30dc53aaa6c2717f384fd442a65e2f49c81d14cd",
+      "sha256": "ae1c8e70e4dff905cb04dac5bb55e3b24a94a40e1ce6b74855ef7b9f4de3c25e",
+      "size_bytes": 3626070
+    },
+    "turn_restrictions": {
+      "path": "stage3/output/odd_tod/s2a/stage3_turn_restrictions.parquet",
+      "row_count": 20,
+      "schema": "restriction_id: int64\nrelation_type: large_string\nrestriction_type: large_string\nmembers: large_string\nfrom_member: large_string\nvia_members: large_string\nto_member: large_string\nfrom_stage3_edge_uids: large_string\nto_stage3_edge_uids: large_string\nmapping_status: large_string\ndirected_enforcement_certified: bool\ngeometry_guessing_used: bool\nreader: large_string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1726",
+      "schema_sha256": "94bb902a99efc066458b308e5fb902afbec753713f2f86466ad96b57804d23b3",
+      "sha256": "719e0bc3907da297df3e2f63373bedb9b4d814249c7772fd27ee47fd1733e274",
+      "size_bytes": 12129
+    }
+  },
+  "reports": {
+    "stage3_full_network_export_report.json": {
+      "path": "stage3/docs/odd_tod/s2a/stage3_full_network_export_report.json",
+      "sha256": "44f5b5a87156404165aa3dff9862031dbcf579232eb171eb6c55222e296d79c1",
+      "size_bytes": 3439
+    },
+    "stage3_s2a_field_provenance.md": {
+      "path": "stage3/docs/odd_tod/s2a/stage3_s2a_field_provenance.md",
+      "sha256": "a9f6e1c8b7d5d4e7d31dfb9046439fc7350f0f8e7aceee3de58b5911b172a76d",
+      "size_bytes": 1434
+    },
+    "stage3_s2a_network_foundation_report.md": {
+      "path": "stage3/docs/odd_tod/s2a/stage3_s2a_network_foundation_report.md",
+      "sha256": "6a7944a9fe52db228b475723d639f26821643585c4eb92b779481ca9a0193090",
+      "size_bytes": 2724
+    },
+    "stage3_s2a_speed_domain_report.md": {
+      "path": "stage3/docs/odd_tod/s2a/stage3_s2a_speed_domain_report.md",
+      "sha256": "08236f64fa143965e20031768cb946f4695cb34d283d76aae11fca2c6b2ec7d4",
+      "size_bytes": 3875
+    },
+    "stage3_s2a_speed_validation.json": {
+      "path": "stage3/docs/odd_tod/s2a/stage3_s2a_speed_validation.json",
+      "sha256": "f2cf2fa5b989e232adbc52437657fa954322076c4b6ff7d0bf5dca8b36a4179a",
+      "size_bytes": 27445
+    },
+    "stage3_s2a_test_evidence.json": {
+      "path": "stage3/docs/odd_tod/s2a/stage3_s2a_test_evidence.json",
+      "sha256": "a332ab684591ef13d9149cc11f7a91be4558dd435b85b6304d4cf96c8bce5529",
+      "size_bytes": 725
+    }
+  },
+  "runtime_s": 137.1861609000007,
+  "schema_version": "stage3_s2a_evidence_bundle.1",
+  "source_bindings": {
+    "pbf": {
+      "path": "D:/pycodes/didi_xian_raw/map_data/xian_roadmap_update.osm.pbf",
+      "sha256": "4d918b7ed2201a8f7a75fa7fb2974679343c89a10bf83638e7bcf21ac07c1526",
+      "size_bytes": 21753051
+    },
+    "s1_inventory": {
+      "path": "stage3/docs/odd_tod/stage3_static_data_inventory.json",
+      "sha256": "88679e8700be776fa3ea15cfa7852b95c3d520cabb043f0ba623daba3b801074",
+      "size_bytes": 33978
+    },
+    "s1_provenance": {
+      "path": "stage3/docs/odd_tod/stage3_static_field_provenance.md",
+      "sha256": "70ad301a8cb04bd202bb91bcc9fd8d0edabd7cf5f903980383cf24d934662ec9",
+      "size_bytes": 4855
+    },
+    "stage0_freeze_manifest": {
+      "path": "stage0/docs/stage0_v6_freeze_manifest.json",
+      "sha256": "35a0e8c83c508fa344c74b9ecc2df11f59725d393a9a71f04ee461148762d7d1",
+      "size_bytes": 24194
+    },
+    "stage1_release_manifest": {
+      "path": "stage1/docs/stage1_v3_release_manifest.json",
+      "sha256": "29942f040b7fbd1ce5ccf9ee4586f381cb8f900c27f7aad48482936e7278f26c",
+      "size_bytes": 2661
+    },
+    "stage2_final_release_manifest": {
+      "path": "stage2/docs/v5_2/stage2_v5_2_final_release_manifest.json",
+      "sha256": "11782738a0441f63547de90f9e205f452b68465a548771403e31903d3f9a3812",
+      "size_bytes": 9214
+    },
+    "valhalla_build_manifest": {
+      "path": "D:/pycodes/didi_xian_raw/valhalla_data/build_manifest.json",
+      "sha256": "b1e376bd94ccb67a450a6af120afff7dc3cae97c96ceb6a1dc937830499cfd3c",
+      "size_bytes": 969
+    },
+    "valhalla_config": {
+      "path": "D:/pycodes/didi_xian_raw/valhalla_data/valhalla.json",
+      "sha256": "f2eb80488a2ec832208b8ee1a7433aa4905e58243fe1c0d5b81d48a3368ec696",
+      "size_bytes": 9756
+    }
+  },
+  "upstream_frozen_commit": "e489343abb36a878cffe48e3a5eae34e6c4670c5",
+  "verification": {
+    "counts": {
+      "control_rows": 4081,
+      "directed_edges": 209454,
+      "mapping_rows": 25382,
+      "nodes": 89607,
+      "restriction_rows": 20,
+      "speed_rows": 209454
+    },
+    "failures": [],
+    "next_phase_authorized": false,
+    "phase_status": "STAGE3_S2A_NETWORK_FOUNDATION_FROZEN",
+    "s2a_complete": true,
+    "s2b_authorized": false,
+    "schema_version": "stage3_s2a_verification.1",
+    "scope_guards": {
+      "fallback_routing_performed": false,
+      "intersection_clustering_performed": false,
+      "intersection_tolerance_selected": false,
+      "profile_calibration_performed": false,
+      "stage2_candidate_inference_performed": false,
+      "stage2_training_performed": false,
+      "stage4_performed": false,
+      "test31_parameter_fitting": false
+    },
+    "status": "PASS"
+  }
+}
