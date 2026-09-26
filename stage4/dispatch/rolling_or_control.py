@@ -292,7 +292,9 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                 if gate_counts is not None and is_av:
                     gate_counts["gate_av_n4_pickup_within_patience"] += 1
                 runtime = by_vid[vehicle.native_vehicle_id]
-                predicted = float(request.predicted_service_time_s)
+                # Arrival patience is unchanged; stationary pickup time belongs
+                # in planned completion/session admission and operating time.
+                predicted = float(request.predicted_service_time_s) + self._pickup_overhead_s()
                 if runtime.fixture.availability_policy == "EMPIRICAL_SESSION":
                     if not isfinite(predicted):
                         invalid_hv_window += 1

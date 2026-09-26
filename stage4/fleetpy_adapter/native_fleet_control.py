@@ -63,6 +63,13 @@ class _NativeFleetControlCore:
     def _timestamp(self, sim_time: float) -> pd.Timestamp:
         return self.start + pd.Timedelta(seconds=float(sim_time))
 
+    def _pickup_overhead_s(self) -> float:
+        """Opt-in extra stationary time; historical configurations remain zero."""
+        value = float(getattr(self, 'config', {}).get('additional_pickup_overhead_s', 0.0))
+        if not isfinite(value) or value < 0:
+            raise ValueError('additional_pickup_overhead_s must be finite and nonnegative')
+        return value
+
     def _fixture_seconds(self, timestamp: pd.Timestamp) -> float:
         return float((timestamp - self.start).total_seconds())
 
@@ -140,7 +147,7 @@ class _NativeFleetControlCore:
             return None
         if runtime.fixture.vehicle_type == "HV":
             predicted_end = simulation_time + (
-                estimate.corrected_pickup_eta_s + request.predicted_service_time_s
+                estimate.corrected_pickup_eta_s + request.predicted_service_time_s + self._pickup_overhead_s()
             )
             window_end = self._fixture_seconds(runtime.fixture.availability_end_time)
             if predicted_end > window_end:
@@ -189,7 +196,7 @@ class _NativeFleetControlCore:
                 states.BOARDING,
                 request.pickup_position,
                 {1: [request.native_request]},
-                duration=0.0,
+                duration=self._pickup_overhead_s(),
                 locked=True,
             ),
             leg(states.ROUTE, request.dropoff_position, {}),
