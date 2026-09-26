@@ -1,0 +1,13 @@
+{
+  "state_boundary": "assignment_time < decision_time",
+  "full_day_simulation": false,
+  "completed": [
+    "prediction",
+    "mechanism",
+    "timing",
+    "factorial"
+  ],
+  "status": "COMPLETE",
+  "active": null,
+  "runtime_s": 357.3786117999989
+}

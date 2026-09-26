@@ -203,10 +203,22 @@ def _weighted_order_values(frame: pd.DataFrame, columns: dict[str, str], weight_
     return result.reset_index()
 
 
-def run(root: str | Path) -> dict[str, Any]:
+def state_output(path: Path, strict_pre_epoch: bool) -> Path:
+    """Keep corrected analyses separate from historical inclusive-state artifacts."""
+    return path / 'strict_pre_epoch' if strict_pre_epoch else path
+
+
+def restore_state(fixtures, assignments, timestamp, strict_pre_epoch=False):
+    restore = pre_decision_vehicle_state if strict_pre_epoch else _vehicle_state
+    return restore(fixtures, assignments, timestamp)
+
+
+def run(root: str | Path, *, strict_pre_epoch=False) -> dict[str, Any]:
     started = time.perf_counter()
     root = Path(root).resolve()
-    output = root / OUTPUT_REL
+    output = root / state_output(OUTPUT_REL, strict_pre_epoch)
+    if strict_pre_epoch and output.exists():
+        raise RuntimeError('Preserve existing strict output; do not silently rerun')
     scenario = root / SCENARIO_REL
     config = json.loads((scenario / "scenario_config.json").read_text(encoding="utf-8"))["runtime_configuration"]
     start = pd.Timestamp("2016-10-31T00:00:00+08:00")
@@ -233,7 +245,7 @@ def run(root: str | Path) -> dict[str, Any]:
     for clock in EPOCH_CLOCKS:
         timestamp = pd.Timestamp(f"2016-10-31T{clock}:00+08:00")
         sim_s = int((timestamp - start).total_seconds())
-        vehicles = _vehicle_state(fleet.native_fixtures, assignments, timestamp)
+        vehicles = restore_state(fleet.native_fixtures, assignments, timestamp, strict_pre_epoch)
         waiting = _waiting_requests(requests, assignments, sim_s)
         state = _exposure_before(exposure_log, sim_s)
         index = SparseCandidateIndex(vehicles)

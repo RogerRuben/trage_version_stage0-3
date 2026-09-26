@@ -17,9 +17,9 @@ from stage4.analysis.recover_rt_parameters import sha256
 OUT = Path('stage4/output/paper_enhancement/lead_patience_factorial')
 
 
-def run(root, attempt=None):
+def run(root, attempt=None, *, strict_pre_epoch=False):
     started = time.perf_counter()
-    out = root / OUT
+    out = root / f.state_output(OUT, strict_pre_epoch)
     if attempt is not None:
         if not attempt.isalnum():
             raise ValueError('attempt must be alphanumeric')
@@ -32,7 +32,7 @@ def run(root, attempt=None):
     assert recovered['status'] == 'RECOVERED_FINGERPRINT_VERIFIED'
     generator = 'stage4/scripts/build_decoupled_abm_environment.py'
     assert sha256(root / generator) == recovered['code_sources'][generator]
-    old_path = root / m.OUT / 'request_time_sensitivity.csv'
+    old_path = root / f.state_output(m.OUT, strict_pre_epoch) / 'request_time_sensitivity.csv'
     old = pd.read_csv(old_path)
     start = pd.Timestamp('2016-10-31T00:00:00+08:00')
     requests = f.load_all_test31_requests(root, start=start,
@@ -63,7 +63,7 @@ def run(root, attempt=None):
             for clock in ('12:00', '17:30'):
                 ts = pd.Timestamp(f'2016-10-31T{clock}:00+08:00')
                 sim_s = int((ts-start).total_seconds())
-                vehicles = f._vehicle_state(fleet.native_fixtures, assignments, ts)
+                vehicles = f.restore_state(fleet.native_fixtures, assignments, ts, strict_pre_epoch)
                 physical_hash = f._sha([v.__dict__ for v in vehicles])
                 for name, timed in variants.items():
                     common = {r.native_id for r,*_ in f._waiting_requests(timed, assignments, sim_s, 180)}

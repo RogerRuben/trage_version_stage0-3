@@ -1,6 +1,8 @@
 from types import SimpleNamespace
 import pandas as pd
-from stage4.analysis.frozen_state_prediction_ablation import _vehicle_state, pre_decision_vehicle_state
+from pathlib import Path
+from stage4.analysis.frozen_state_prediction_ablation import (
+    _vehicle_state, pre_decision_vehicle_state, restore_state, state_output)
 
 
 def test_current_action_not_in_predecision_vehicle_state():
@@ -17,3 +19,10 @@ def test_current_action_not_in_predecision_vehicle_state():
     assert set(state) == {'0','2'}
     assert state['0'].lon_wgs84 == 108.9
     assert state['2'].lon_wgs84 == 109.
+    assert restore_state(fixtures,a,t,True) == list(state.values())
+
+
+def test_strict_output_is_separate():
+    original = Path('stage4/output/example')
+    assert state_output(original,False) == original
+    assert state_output(original,True) == original/'strict_pre_epoch'

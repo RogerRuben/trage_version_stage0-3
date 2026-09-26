@@ -120,7 +120,7 @@ def _arc_summary(arcs):
             'pickup_objective_s': solved.pickup_eta_optimum_s}
 
 
-def load_states(root):
+def load_states(root, strict_pre_epoch=False):
     """Use exactly the prior frozen-state reconstruction and verify its hashes."""
     scenario = root / frozen.SCENARIO_REL
     config = json.loads((scenario / 'scenario_config.json').read_text())['runtime_configuration']
@@ -134,11 +134,11 @@ def load_states(root):
     fleet = frozen.build_fleet_scenario(root, benchmark_start=start,
         simulation_end=start + pd.Timedelta(days=1, seconds=max(r.realized_service_time_s for r in requests) + 60),
         requested_q_a=.5, seed=20260824, max_hv_hour_error_pct=2.)
-    registry = pd.read_csv(root / frozen.OUTPUT_REL / 'frozen_epoch_registry.csv', dtype={'epoch_id': str})
+    registry = pd.read_csv(root / frozen.state_output(frozen.OUTPUT_REL, strict_pre_epoch) / 'frozen_epoch_registry.csv', dtype={'epoch_id': str})
     for row in registry.itertuples(index=False):
         ts = pd.Timestamp(row.timestamp)
         sim_s = int((ts - start).total_seconds())
-        vehicles = frozen._vehicle_state(fleet.native_fixtures, assignments, ts)
+        vehicles = frozen.restore_state(fleet.native_fixtures, assignments, ts, strict_pre_epoch)
         waiting = frozen._waiting_requests(requests, assignments, sim_s)
         state = frozen._exposure_before(exposure, sim_s)
         payload = {'timestamp': ts.isoformat(), 'waiting': [r.order_id for r, *_ in waiting],
@@ -197,14 +197,16 @@ def gate_graphs(vehicles, waiting, timestamp, start, config, adapter, k, patienc
     return graphs
 
 
-def run(root):
+def run(root, *, strict_pre_epoch=False):
     root = Path(root).resolve()
-    output = root / OUT
+    output = root / frozen.state_output(OUT, strict_pre_epoch)
+    if strict_pre_epoch and output.exists():
+        raise RuntimeError('Preserve existing strict output; do not silently rerun')
     output.mkdir(parents=True, exist_ok=True)
     adapter = ArcDeterministicValhallaAdapter(root, routing_mode=SINGLE_SOURCE_MATRIX)
     neutral_rows, gate_rows, topk_rows = [], [], []
     started = time.perf_counter()
-    for registry, vehicles, waiting, fixtures, config, start in load_states(root):
+    for registry, vehicles, waiting, fixtures, config, start in load_states(root, strict_pre_epoch):
         ts = pd.Timestamp(registry.timestamp)
         originals = production_neutral_arcs(vehicles, fixtures, waiting, ts, start, config, adapter)
         relabeled = [replace(v, vehicle_type='AV') for v in vehicles]
@@ -235,7 +237,7 @@ def run(root):
             return summary
         adapter.cache.clear()  # bounded per-state routing memory
     # B first, then C and K. Reuse the exact ten frozen states, without progression.
-    for registry, vehicles, waiting, fixtures, config, start in load_states(root):
+    for registry, vehicles, waiting, fixtures, config, start in load_states(root, strict_pre_epoch):
         ts = pd.Timestamp(registry.timestamp)
         for k in (10, 20, 40, 80):
             graphs = gate_graphs(vehicles, waiting, ts, start, config, adapter, k)
@@ -262,7 +264,7 @@ def run(root):
     gate_df = pd.DataFrame(gate_rows)
     capacity = gate_df.groupby('gate', sort=False)[['E','U','M','delta_E','delta_U','delta_M']].sum().reset_index()
     frozen._atomic_csv(capacity, output / 'matching_capacity_summary.csv')
-    export_funnel(root)
+    export_funnel(root, strict_pre_epoch)
     summary = {'classification': 'B_C_COMPLETE_RT_PENDING', 'neutral_classification': 'PASS_IDENTITY',
                'snapshots_tested': len(neutral_rows)//2, 'runtime_s': time.perf_counter() - started,
                'routing_arcs': adapter.routing_arc_evaluations, 'routing_failures': adapter.routing_failures,
@@ -271,16 +273,16 @@ def run(root):
     return summary
 
 
-def export_funnel(root):
+def export_funnel(root, strict_pre_epoch=False):
     """Section-11 filenames expose the same results, without new computation."""
     root = Path(root)
-    target = root / 'stage4/output/paper_enhancement/matching_capacity_funnel'
+    target = root / frozen.state_output(Path('stage4/output/paper_enhancement/matching_capacity_funnel'), strict_pre_epoch)
     for source, destination in (
         ('snapshot_gate_matching.csv', 'snapshot_gate_metrics.csv'),
         ('topk_sensitivity.csv', 'topk_matching_sensitivity.csv'),
         ('matching_capacity_summary.csv', 'matching_capacity_summary.csv'),
     ):
-        frame = pd.read_csv(root / OUT / source, dtype={'epoch_id': str})
+        frame = pd.read_csv(root / frozen.state_output(OUT, strict_pre_epoch) / source, dtype={'epoch_id': str})
         frozen._atomic_csv(frame, target / destination)
 
 

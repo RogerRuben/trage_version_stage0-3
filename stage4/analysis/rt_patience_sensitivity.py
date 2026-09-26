@@ -31,7 +31,7 @@ def request_variants(requests, stats, parameters, start):
     return variants, fingerprint(tables)
 
 
-def run(root: Path):
+def run(root: Path, *, strict_pre_epoch=False):
     started = time.perf_counter()
     recovered_path = root / 'stage4/docs/paper_redesign/recovered_rt_environment_parameters.json'
     recovered = json.loads(recovered_path.read_text())
@@ -46,7 +46,9 @@ def run(root: Path):
     assert len(requests) == 30000
     variants, lead_summary = request_variants(requests, recovered['request_time_chain_stats'],
                                              recovered['parameters'], start)
-    output = root / mvc.OUT
+    output = root / frozen.state_output(mvc.OUT, strict_pre_epoch)
+    if strict_pre_epoch and (output / 'request_time_sensitivity.csv').exists():
+        raise RuntimeError('Preserve existing strict RT output')
     frozen._atomic_csv(lead_summary, output / 'test31_rt_lead_summary.csv')
     adapter = mvc.ArcDeterministicValhallaAdapter(root, routing_mode=mvc.SINGLE_SOURCE_MATRIX)
     rows, sources = [], []
@@ -72,7 +74,7 @@ def run(root: Path):
         for clock, period in (('12:00', 'NORMAL'), ('17:30', 'EVENING')):
             ts = pd.Timestamp(f'2016-10-31T{clock}:00+08:00')
             sim_s = int((ts-start).total_seconds())
-            vehicles = frozen._vehicle_state(fleet.native_fixtures, assignments, ts)
+            vehicles = frozen.restore_state(fleet.native_fixtures, assignments, ts, strict_pre_epoch)
             physical_hash = frozen._sha([v.__dict__ for v in vehicles])
             for name, timed_requests in variants.items():
                 waiting = frozen._waiting_requests(timed_requests, assignments, sim_s)
