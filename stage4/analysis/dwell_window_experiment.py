@@ -55,7 +55,7 @@ def run_condition(root, cfg, q, overhead, directory):
         max(r.realized_service_time_s for r in c.request_by_rid.values()))/step)*step+step
     for tick in range(cfg['checkpoint_s'],drain+step,step):
         if time.perf_counter()-started > cfg['scenario_timeout_s']:
-            raise TimeoutError('Per-condition 30-minute budget exhausted')
+            raise TimeoutError(f"Per-condition {cfg['scenario_timeout_s']}-second budget exhausted")
         if tick == cfg['checkpoint_s']:
             c.time_trigger(tick)
         else:
