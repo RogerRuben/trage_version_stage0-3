@@ -1,5 +1,7 @@
 # Lead × patience 固定状态实验
 
+> 2026-09-26状态更正：本报告的48格数值仍可复现旧分析，但旧恢复函数把当前epoch已选车辆剔除，同时保留派单前等待订单，存在混合时点问题。不得将以下结果继续作为完整派单前反事实或稳健性证据；需要使用严格pre-decision状态重算。正式41场景不受该分析函数影响。见 `dwell_checkpoint_preflight_report.md`。原数字保留为审计历史。
+
 ## Material Passport
 
 - 日期：2026-09-25；Origin Skill：academic-research-suite / experiment-agent。

@@ -140,6 +140,11 @@ def _historical_values(reference: pd.DataFrame, distributions: dict[str, np.ndar
 
 
 def _vehicle_state(fixtures: list[Any], assignments: pd.DataFrame, timestamp: pd.Timestamp) -> list[SpatialVehicle]:
+    """Legacy inclusive/post-assignment vehicle view; not a pre-decision state.
+
+    Retained for old artifact reproduction. New decision experiments must use
+    pre_decision_vehicle_state to exclude the current epoch's assignments.
+    """
     prior = assignments.loc[pd.to_datetime(assignments["assignment_time"]).le(timestamp)].copy()
     active_ids = set(prior.loc[pd.to_datetime(prior["service_end_time"]).gt(timestamp), "vehicle_id"].astype(str))
     completed = prior.loc[pd.to_datetime(prior["service_end_time"]).le(timestamp)].sort_values(["service_end_time", "assignment_time"])
@@ -157,6 +162,12 @@ def _vehicle_state(fixtures: list[Any], assignments: pd.DataFrame, timestamp: pd
             lon, lat = float(fixture.initial_lon_wgs84), float(fixture.initial_lat_wgs84)
         vehicles.append(SpatialVehicle(str(fixture.vehicle_id), int(fixture.native_id), str(fixture.vehicle_type), lon, lat))
     return vehicles
+
+
+def pre_decision_vehicle_state(fixtures: list[Any], assignments: pd.DataFrame, timestamp: pd.Timestamp) -> list[SpatialVehicle]:
+    """Restore vehicles just before this epoch, never condition on its actions."""
+    prior = assignments.loc[pd.to_datetime(assignments['assignment_time']).lt(timestamp)]
+    return _vehicle_state(fixtures, prior, timestamp)
 
 
 def _waiting_requests(requests: list[Any], assignments: pd.DataFrame, simulation_time_s: int, patience_s: float = 300) -> list[tuple[Any, int, bool, bool]]:
