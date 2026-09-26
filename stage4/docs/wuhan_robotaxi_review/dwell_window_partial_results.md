@@ -1,5 +1,8 @@
 # Deterministic dwell window — 5/6 complete
 
+> Superseded by [six-condition final results](dwell_window_final_results.md).
+> The authorized q75/120 retry completed; this partial report is preserved as history.
+
 ## Material Passport
 
 2026-09-26; academic-research-suite / experiment-agent. Execution commit
