@@ -1,0 +1,15 @@
+{
+  "schema_version": "traffic_state_batch2.1",
+  "status": "DESCRIPTIVE_OVERLAP_AND_PROFILE_DRAFT_ONLY",
+  "batch1_config": "stage3/config/traffic_state_batch1.json",
+  "measurement_dates": ["20161009", "20161010", "20161011", "20161012", "20161013", "20161014", "20161015", "20161016", "20161017", "20161018", "20161019", "20161020", "20161021", "20161022", "20161023", "20161024", "20161025", "20161026", "20161027"],
+  "overlap_dates": ["20161025", "20161026", "20161027"],
+  "output_root": "stage3/output/traffic_state_batch2",
+  "report_root": "stage3/docs/traffic_state_batch2",
+  "diagnostic_distance_coverage_cutpoints": [0.5, 0.8],
+  "hard_timeout_s": 1800,
+  "profile_changes": false,
+  "training": false,
+  "dispatch": false,
+  "test31_read": false
+}

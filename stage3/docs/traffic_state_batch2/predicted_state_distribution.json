@@ -1,0 +1,94 @@
+{
+  "rows": [
+    {
+      "state": "CONGESTED_PROXY",
+      "tokens": 9313,
+      "predicted_time_s": 150387.546875,
+      "date": "20161025"
+    },
+    {
+      "state": "MIXED_EVIDENCE",
+      "tokens": 79751,
+      "predicted_time_s": 807512.4375,
+      "date": "20161025"
+    },
+    {
+      "state": "NON_CONGESTED_PROXY",
+      "tokens": 261094,
+      "predicted_time_s": 3179414.75,
+      "date": "20161025"
+    },
+    {
+      "state": "SEVERE_CONGESTION_PROXY",
+      "tokens": 4930,
+      "predicted_time_s": 27150.58203125,
+      "date": "20161025"
+    },
+    {
+      "state": "UNKNOWN",
+      "tokens": 342875,
+      "predicted_time_s": 1169163.5,
+      "date": "20161025"
+    },
+    {
+      "state": "CONGESTED_PROXY",
+      "tokens": 8710,
+      "predicted_time_s": 135661.03125,
+      "date": "20161026"
+    },
+    {
+      "state": "MIXED_EVIDENCE",
+      "tokens": 77315,
+      "predicted_time_s": 763532.6875,
+      "date": "20161026"
+    },
+    {
+      "state": "NON_CONGESTED_PROXY",
+      "tokens": 265484,
+      "predicted_time_s": 3214155.75,
+      "date": "20161026"
+    },
+    {
+      "state": "SEVERE_CONGESTION_PROXY",
+      "tokens": 4817,
+      "predicted_time_s": 24177.40625,
+      "date": "20161026"
+    },
+    {
+      "state": "UNKNOWN",
+      "tokens": 343856,
+      "predicted_time_s": 1178934.25,
+      "date": "20161026"
+    },
+    {
+      "state": "CONGESTED_PROXY",
+      "tokens": 8787,
+      "predicted_time_s": 139549.453125,
+      "date": "20161027"
+    },
+    {
+      "state": "MIXED_EVIDENCE",
+      "tokens": 77104,
+      "predicted_time_s": 770022.125,
+      "date": "20161027"
+    },
+    {
+      "state": "NON_CONGESTED_PROXY",
+      "tokens": 262374,
+      "predicted_time_s": 3193023.75,
+      "date": "20161027"
+    },
+    {
+      "state": "SEVERE_CONGESTION_PROXY",
+      "tokens": 4752,
+      "predicted_time_s": 24712.4453125,
+      "date": "20161027"
+    },
+    {
+      "state": "UNKNOWN",
+      "tokens": 336722,
+      "predicted_time_s": 1156326.5,
+      "date": "20161027"
+    }
+  ]
+}
