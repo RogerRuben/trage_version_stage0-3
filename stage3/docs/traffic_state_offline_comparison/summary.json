@@ -1,0 +1,116 @@
+{
+  "status": "COMPLETED_OFFLINE_DESCRIPTIVE_ONLY",
+  "prereg_commit": "e13af72",
+  "dates": [
+    {
+      "date": "20161025",
+      "routes": 9954
+    },
+    {
+      "date": "20161026",
+      "routes": 9946
+    },
+    {
+      "date": "20161027",
+      "routes": 9951
+    }
+  ],
+  "routes": 29851,
+  "sources": [
+    {
+      "date": "20161025",
+      "source_sha256": "0d209a7f768f2ea72acdb8d54a38982a75e24d846f649101250e0f8017801b15",
+      "sidecar_sha256": "9f4d682e3d74620e4b664a33f5e8674b1e1bf0cfc1f30f119ba56962cbbf9261",
+      "output_sha256": "967483ccb09787e059ca71e3fe2f26b298b3f989573070e3d613dad3212d5a42"
+    },
+    {
+      "date": "20161026",
+      "source_sha256": "cb579ab6525b52a2e05f0edeb9e75fdd039d300e4e56cbfbd5eadd7930966a6b",
+      "sidecar_sha256": "f97b1896c94f84ab9778cea1516c99f2ec7d15410341e5b9261554954fcd7e0f",
+      "output_sha256": "7e22256fdfe3c1484f0c98a2032903e80a7093b984a4da82e02a88c27c554225"
+    },
+    {
+      "date": "20161027",
+      "source_sha256": "e5dafac7706e9a8af1ec431f0f66e0c361e84cff0c87357bc87483848286a44e",
+      "sidecar_sha256": "260e299d334e3ed0f4e95425f88cee2067b6280a0ea2a85fb6fe91a802266e3e",
+      "output_sha256": "caf9aa68367d34cd009b8112d7953a705b591c90287918743f74915b156e8059"
+    }
+  ],
+  "protected_sha256": {
+    "stage3\\config\\stage3_av_capability_profiles.json": "bea54c12a0c013995c3644a0bab84b35413d5df8a6785dfdd6a03fd49f32978e",
+    "stage3\\config\\traffic_state_offline_comparison.json": "f3b56a16521b7fb41ff1e1a91b4c7cd59a52b9cc6053e60aa10ba9e859159076",
+    "stage3\\config\\traffic_state_batch1.json": "5064c16767aa6017bb3bd519f675e7e1e2c9d48616b07ac25a215a76bb4238fa",
+    "stage2\\output_v5_2\\development\\M3\\epoch_004.pt": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde"
+  },
+  "budget_count": 101,
+  "zero_budget": [
+    {
+      "profile": "A",
+      "budget": 0.0,
+      "routes": 29851,
+      "baseline_dynamic_pass": 23978,
+      "traffic_only_known_exceeds": 0,
+      "traffic_only_within_bound": 9,
+      "baseline_fail__RETAINED_VARIABILITY_EXCEEDS": 2394,
+      "baseline_fail__KNOWN_EXPOSURE_EXCEEDS": 0,
+      "baseline_fail__WITHIN_BOUND": 0,
+      "baseline_fail__UNRESOLVED_BOUND": 3479,
+      "baseline_pass__RETAINED_VARIABILITY_EXCEEDS": 0,
+      "baseline_pass__KNOWN_EXPOSURE_EXCEEDS": 0,
+      "baseline_pass__WITHIN_BOUND": 6,
+      "baseline_pass__UNRESOLVED_BOUND": 23972,
+      "dynamic_within_lower_count": 6,
+      "dynamic_within_upper_count": 27457,
+      "date": "ALL_VALIDATION"
+    },
+    {
+      "profile": "C",
+      "budget": 0.0,
+      "routes": 29851,
+      "baseline_dynamic_pass": 4761,
+      "traffic_only_known_exceeds": 17921,
+      "traffic_only_within_bound": 6,
+      "baseline_fail__RETAINED_VARIABILITY_EXCEEDS": 16635,
+      "baseline_fail__KNOWN_EXPOSURE_EXCEEDS": 5931,
+      "baseline_fail__WITHIN_BOUND": 0,
+      "baseline_fail__UNRESOLVED_BOUND": 2524,
+      "baseline_pass__RETAINED_VARIABILITY_EXCEEDS": 0,
+      "baseline_pass__KNOWN_EXPOSURE_EXCEEDS": 2325,
+      "baseline_pass__WITHIN_BOUND": 0,
+      "baseline_pass__UNRESOLVED_BOUND": 2436,
+      "dynamic_within_lower_count": 0,
+      "dynamic_within_upper_count": 4960,
+      "date": "ALL_VALIDATION"
+    },
+    {
+      "profile": "M",
+      "budget": 0.0,
+      "routes": 29851,
+      "baseline_dynamic_pass": 13973,
+      "traffic_only_known_exceeds": 10815,
+      "traffic_only_within_bound": 8,
+      "baseline_fail__RETAINED_VARIABILITY_EXCEEDS": 7973,
+      "baseline_fail__KNOWN_EXPOSURE_EXCEEDS": 3103,
+      "baseline_fail__WITHIN_BOUND": 0,
+      "baseline_fail__UNRESOLVED_BOUND": 4802,
+      "baseline_pass__RETAINED_VARIABILITY_EXCEEDS": 0,
+      "baseline_pass__KNOWN_EXPOSURE_EXCEEDS": 4540,
+      "baseline_pass__WITHIN_BOUND": 2,
+      "baseline_pass__UNRESOLVED_BOUND": 9431,
+      "dynamic_within_lower_count": 2,
+      "dynamic_within_upper_count": 14235,
+      "date": "ALL_VALIDATION"
+    }
+  ],
+  "baseline_recomputed_exact": true,
+  "nestedness_valid": true,
+  "budget_monotonicity_valid": true,
+  "production_budget_selected": false,
+  "unknown_policy_selected": false,
+  "dispatch": false,
+  "training": false,
+  "test31_read": false,
+  "gpu_used": false,
+  "runtime_s": 2.7030000000013388,
+  "peak_rss_mb": 130.5
+}
