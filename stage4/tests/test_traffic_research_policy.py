@@ -43,3 +43,13 @@ def test_mixed_mapping_and_nestedness():
     assert outside_share("M",.02,.01,.03) == .01
     assert outside_share("A",.02,.01,.03) == 0
     with pytest.raises(ValueError): outside_share("X",0,0,0)
+
+
+def test_preflight_ignores_unconsumed_cross_midnight_future():
+    from stage4.analysis.traffic_research_window import preflight_requests
+    r,t=fixture()
+    r.sim_time_s=37800; r.predicted_service_time_s=100.
+    t["predicted_time_s"]=100.; t["rho_dynamic_frozen"]=r.rho_dynamic
+    future=SimpleNamespace(sim_time_s=86410, av_smoke_eligible=True)
+    c=SimpleNamespace(request_by_rid={1:r,2:future})
+    assert preflight_requests(c,TrafficResearchPolicy(t),{"measurement_end_s":38700})==1

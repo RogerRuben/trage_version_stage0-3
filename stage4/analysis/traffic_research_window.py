@@ -20,6 +20,21 @@ OUT = Path("stage4/output/traffic_research/window")
 DOC = Path("stage4/docs/traffic_research")
 
 
+def preflight_requests(c, policy, cfg):
+    """Do not validate unconsumed post-cutoff demand from an all-day checkpoint."""
+    ready = 0
+    for r in c.request_by_rid.values():
+        if r.sim_time_s >= cfg["measurement_end_s"] or not r.av_smoke_eligible:
+            continue
+        result = policy.evaluate(r)
+        key = (r.request_time.strftime("%Y%m%d"), str(r.order_id), str(r.profile_id), "ORIGINAL:"+r.order_id)
+        assert np.isclose(policy.rows[key]["rho_dynamic_frozen"], r.rho_dynamic, atol=1e-6, rtol=1e-6)
+        assert np.isclose(policy.rows[key]["predicted_time_s"], r.predicted_service_time_s, atol=1e-3, rtol=1e-5)
+        assert result["exposure"].dynamic <= max(0, r.rho_dynamic-1)+1e-6
+        ready += 1
+    return ready
+
+
 def condition(root, cfg, mode, dest):
     start = time.monotonic()
     checkpoint = root/cfg["checkpoint"]
@@ -32,17 +47,7 @@ def condition(root, cfg, mode, dest):
     table_path = root/"stage4/output/traffic_research/policy_date=20161031.parquet"
     table = pd.read_parquet(table_path)
     policy = TrafficResearchPolicy(table, cfg["main_budget"])
-    # Every originally eligible request must have exact selected-original identity.
-    ready = 0
-    for r in c.request_by_rid.values():
-        if not r.av_smoke_eligible:
-            continue
-        result = policy.evaluate(r)
-        key = (r.request_time.strftime("%Y%m%d"), str(r.order_id), str(r.profile_id), "ORIGINAL:"+r.order_id)
-        assert np.isclose(policy.rows[key]["rho_dynamic_frozen"], r.rho_dynamic, atol=1e-6, rtol=1e-6)
-        assert np.isclose(policy.rows[key]["predicted_time_s"], r.predicted_service_time_s, atol=1e-3, rtol=1e-5)
-        assert result["exposure"].dynamic <= max(0, r.rho_dynamic-1)+1e-6
-        ready += 1
+    ready = preflight_requests(c, policy, cfg)
     c.config = {**c.config, "traffic_research_policy":mode, "traffic_research_budget": cfg["main_budget"],
                 "traffic_research_table":str(table_path), "additional_pickup_overhead_s":0}
     c.traffic_policy = policy if mode == MODE else None
@@ -138,11 +143,14 @@ def condition(root, cfg, mode, dest):
     return result
 
 
-def run(root, fleetpy_root):
+def run(root, fleetpy_root, attempt=None):
     cfg = json.loads((root/CONFIG).read_text())
     load_fleetpy_bindings(fleetpy_root)
     assert json.loads((root/DOC/"offline_summary.json").read_text())["status"] == "PASS"
-    output = root/OUT; output.mkdir(parents=True,exist_ok=False)
+    if attempt is not None and (not attempt.isalnum() or len(attempt)>30):
+        raise ValueError("attempt must be a short alphanumeric directory name")
+    output = root/OUT if attempt is None else root/OUT/attempt
+    output.mkdir(parents=True,exist_ok=False)
     protected = [root/CONFIG,root/"stage3/config/stage3_av_capability_profiles.json",root/"stage2/output_v5_2/development/M3/epoch_004.pt"]
     before = {str(p):sha(p) for p in protected}
     summary = dict(status="RUNNING",protocol_commit="e13325d",protected_sha256=before,rows=[])
@@ -168,4 +176,6 @@ def run(root, fleetpy_root):
 
 if __name__ == "__main__":
     p=argparse.ArgumentParser(); p.add_argument("--fleetpy-root",type=Path,required=True)
-    run(Path.cwd(),p.parse_args().fleetpy_root)
+    p.add_argument("--attempt", help="new directory for an explicitly authorized retry; never overwrite")
+    args=p.parse_args()
+    run(Path.cwd(),args.fleetpy_root,args.attempt)
