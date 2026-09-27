@@ -1,0 +1,403 @@
+{
+  "rows": [
+    {
+      "date": "20161009",
+      "minimum_orders": 1,
+      "cells": 108207,
+      "non_unknown_cells": 33953,
+      "count_only_eligible_cells": 103529
+    },
+    {
+      "date": "20161009",
+      "minimum_orders": 3,
+      "cells": 108207,
+      "non_unknown_cells": 24395,
+      "count_only_eligible_cells": 30781
+    },
+    {
+      "date": "20161009",
+      "minimum_orders": 5,
+      "cells": 108207,
+      "non_unknown_cells": 11060,
+      "count_only_eligible_cells": 12156
+    },
+    {
+      "date": "20161010",
+      "minimum_orders": 1,
+      "cells": 107589,
+      "non_unknown_cells": 33716,
+      "count_only_eligible_cells": 102860
+    },
+    {
+      "date": "20161010",
+      "minimum_orders": 3,
+      "cells": 107589,
+      "non_unknown_cells": 24268,
+      "count_only_eligible_cells": 30963
+    },
+    {
+      "date": "20161010",
+      "minimum_orders": 5,
+      "cells": 107589,
+      "non_unknown_cells": 10933,
+      "count_only_eligible_cells": 12045
+    },
+    {
+      "date": "20161011",
+      "minimum_orders": 1,
+      "cells": 108259,
+      "non_unknown_cells": 33543,
+      "count_only_eligible_cells": 103561
+    },
+    {
+      "date": "20161011",
+      "minimum_orders": 3,
+      "cells": 108259,
+      "non_unknown_cells": 24510,
+      "count_only_eligible_cells": 31349
+    },
+    {
+      "date": "20161011",
+      "minimum_orders": 5,
+      "cells": 108259,
+      "non_unknown_cells": 11068,
+      "count_only_eligible_cells": 12188
+    },
+    {
+      "date": "20161012",
+      "minimum_orders": 1,
+      "cells": 108546,
+      "non_unknown_cells": 33915,
+      "count_only_eligible_cells": 103820
+    },
+    {
+      "date": "20161012",
+      "minimum_orders": 3,
+      "cells": 108546,
+      "non_unknown_cells": 24323,
+      "count_only_eligible_cells": 30553
+    },
+    {
+      "date": "20161012",
+      "minimum_orders": 5,
+      "cells": 108546,
+      "non_unknown_cells": 10958,
+      "count_only_eligible_cells": 11976
+    },
+    {
+      "date": "20161013",
+      "minimum_orders": 1,
+      "cells": 108428,
+      "non_unknown_cells": 34071,
+      "count_only_eligible_cells": 103911
+    },
+    {
+      "date": "20161013",
+      "minimum_orders": 3,
+      "cells": 108428,
+      "non_unknown_cells": 24635,
+      "count_only_eligible_cells": 31239
+    },
+    {
+      "date": "20161013",
+      "minimum_orders": 5,
+      "cells": 108428,
+      "non_unknown_cells": 10980,
+      "count_only_eligible_cells": 12054
+    },
+    {
+      "date": "20161014",
+      "minimum_orders": 1,
+      "cells": 109191,
+      "non_unknown_cells": 34039,
+      "count_only_eligible_cells": 103969
+    },
+    {
+      "date": "20161014",
+      "minimum_orders": 3,
+      "cells": 109191,
+      "non_unknown_cells": 24490,
+      "count_only_eligible_cells": 31022
+    },
+    {
+      "date": "20161014",
+      "minimum_orders": 5,
+      "cells": 109191,
+      "non_unknown_cells": 10763,
+      "count_only_eligible_cells": 11747
+    },
+    {
+      "date": "20161015",
+      "minimum_orders": 1,
+      "cells": 107735,
+      "non_unknown_cells": 33345,
+      "count_only_eligible_cells": 102763
+    },
+    {
+      "date": "20161015",
+      "minimum_orders": 3,
+      "cells": 107735,
+      "non_unknown_cells": 24206,
+      "count_only_eligible_cells": 30550
+    },
+    {
+      "date": "20161015",
+      "minimum_orders": 5,
+      "cells": 107735,
+      "non_unknown_cells": 11006,
+      "count_only_eligible_cells": 11994
+    },
+    {
+      "date": "20161016",
+      "minimum_orders": 1,
+      "cells": 107568,
+      "non_unknown_cells": 33818,
+      "count_only_eligible_cells": 103219
+    },
+    {
+      "date": "20161016",
+      "minimum_orders": 3,
+      "cells": 107568,
+      "non_unknown_cells": 24738,
+      "count_only_eligible_cells": 31464
+    },
+    {
+      "date": "20161016",
+      "minimum_orders": 5,
+      "cells": 107568,
+      "non_unknown_cells": 11534,
+      "count_only_eligible_cells": 12669
+    },
+    {
+      "date": "20161017",
+      "minimum_orders": 1,
+      "cells": 106529,
+      "non_unknown_cells": 33942,
+      "count_only_eligible_cells": 101839
+    },
+    {
+      "date": "20161017",
+      "minimum_orders": 3,
+      "cells": 106529,
+      "non_unknown_cells": 24747,
+      "count_only_eligible_cells": 30881
+    },
+    {
+      "date": "20161017",
+      "minimum_orders": 5,
+      "cells": 106529,
+      "non_unknown_cells": 11331,
+      "count_only_eligible_cells": 12416
+    },
+    {
+      "date": "20161018",
+      "minimum_orders": 1,
+      "cells": 108486,
+      "non_unknown_cells": 34193,
+      "count_only_eligible_cells": 103876
+    },
+    {
+      "date": "20161018",
+      "minimum_orders": 3,
+      "cells": 108486,
+      "non_unknown_cells": 24756,
+      "count_only_eligible_cells": 31395
+    },
+    {
+      "date": "20161018",
+      "minimum_orders": 5,
+      "cells": 108486,
+      "non_unknown_cells": 11133,
+      "count_only_eligible_cells": 12282
+    },
+    {
+      "date": "20161019",
+      "minimum_orders": 1,
+      "cells": 107465,
+      "non_unknown_cells": 34234,
+      "count_only_eligible_cells": 102985
+    },
+    {
+      "date": "20161019",
+      "minimum_orders": 3,
+      "cells": 107465,
+      "non_unknown_cells": 24934,
+      "count_only_eligible_cells": 31298
+    },
+    {
+      "date": "20161019",
+      "minimum_orders": 5,
+      "cells": 107465,
+      "non_unknown_cells": 11682,
+      "count_only_eligible_cells": 12883
+    },
+    {
+      "date": "20161020",
+      "minimum_orders": 1,
+      "cells": 108594,
+      "non_unknown_cells": 34270,
+      "count_only_eligible_cells": 103978
+    },
+    {
+      "date": "20161020",
+      "minimum_orders": 3,
+      "cells": 108594,
+      "non_unknown_cells": 24910,
+      "count_only_eligible_cells": 31486
+    },
+    {
+      "date": "20161020",
+      "minimum_orders": 5,
+      "cells": 108594,
+      "non_unknown_cells": 11133,
+      "count_only_eligible_cells": 12210
+    },
+    {
+      "date": "20161021",
+      "minimum_orders": 1,
+      "cells": 110598,
+      "non_unknown_cells": 34695,
+      "count_only_eligible_cells": 105500
+    },
+    {
+      "date": "20161021",
+      "minimum_orders": 3,
+      "cells": 110598,
+      "non_unknown_cells": 25041,
+      "count_only_eligible_cells": 31446
+    },
+    {
+      "date": "20161021",
+      "minimum_orders": 5,
+      "cells": 110598,
+      "non_unknown_cells": 11318,
+      "count_only_eligible_cells": 12283
+    },
+    {
+      "date": "20161022",
+      "minimum_orders": 1,
+      "cells": 111292,
+      "non_unknown_cells": 34078,
+      "count_only_eligible_cells": 106096
+    },
+    {
+      "date": "20161022",
+      "minimum_orders": 3,
+      "cells": 111292,
+      "non_unknown_cells": 24433,
+      "count_only_eligible_cells": 30945
+    },
+    {
+      "date": "20161022",
+      "minimum_orders": 5,
+      "cells": 111292,
+      "non_unknown_cells": 10656,
+      "count_only_eligible_cells": 11680
+    },
+    {
+      "date": "20161023",
+      "minimum_orders": 1,
+      "cells": 108204,
+      "non_unknown_cells": 33795,
+      "count_only_eligible_cells": 103681
+    },
+    {
+      "date": "20161023",
+      "minimum_orders": 3,
+      "cells": 108204,
+      "non_unknown_cells": 24562,
+      "count_only_eligible_cells": 30756
+    },
+    {
+      "date": "20161023",
+      "minimum_orders": 5,
+      "cells": 108204,
+      "non_unknown_cells": 11109,
+      "count_only_eligible_cells": 12023
+    },
+    {
+      "date": "20161024",
+      "minimum_orders": 1,
+      "cells": 109847,
+      "non_unknown_cells": 33352,
+      "count_only_eligible_cells": 104692
+    },
+    {
+      "date": "20161024",
+      "minimum_orders": 3,
+      "cells": 109847,
+      "non_unknown_cells": 23964,
+      "count_only_eligible_cells": 30469
+    },
+    {
+      "date": "20161024",
+      "minimum_orders": 5,
+      "cells": 109847,
+      "non_unknown_cells": 10341,
+      "count_only_eligible_cells": 11331
+    },
+    {
+      "date": "20161025",
+      "minimum_orders": 1,
+      "cells": 109730,
+      "non_unknown_cells": 33353,
+      "count_only_eligible_cells": 104481
+    },
+    {
+      "date": "20161025",
+      "minimum_orders": 3,
+      "cells": 109730,
+      "non_unknown_cells": 23871,
+      "count_only_eligible_cells": 30326
+    },
+    {
+      "date": "20161025",
+      "minimum_orders": 5,
+      "cells": 109730,
+      "non_unknown_cells": 10329,
+      "count_only_eligible_cells": 11442
+    },
+    {
+      "date": "20161026",
+      "minimum_orders": 1,
+      "cells": 109805,
+      "non_unknown_cells": 33849,
+      "count_only_eligible_cells": 104678
+    },
+    {
+      "date": "20161026",
+      "minimum_orders": 3,
+      "cells": 109805,
+      "non_unknown_cells": 24229,
+      "count_only_eligible_cells": 30719
+    },
+    {
+      "date": "20161026",
+      "minimum_orders": 5,
+      "cells": 109805,
+      "non_unknown_cells": 10614,
+      "count_only_eligible_cells": 11606
+    },
+    {
+      "date": "20161027",
+      "minimum_orders": 1,
+      "cells": 109979,
+      "non_unknown_cells": 33556,
+      "count_only_eligible_cells": 104818
+    },
+    {
+      "date": "20161027",
+      "minimum_orders": 3,
+      "cells": 109979,
+      "non_unknown_cells": 23994,
+      "count_only_eligible_cells": 30268
+    },
+    {
+      "date": "20161027",
+      "minimum_orders": 5,
+      "cells": 109979,
+      "non_unknown_cells": 10351,
+      "count_only_eligible_cells": 11245
+    }
+  ]
+}

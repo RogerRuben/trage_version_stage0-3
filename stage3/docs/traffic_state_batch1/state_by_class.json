@@ -1,0 +1,876 @@
+{
+  "rows": [
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "living_street",
+      "state": "UNKNOWN",
+      "cells": 163,
+      "order_cell_exposures": 166,
+      "events": 167
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "pedestrian",
+      "state": "UNKNOWN",
+      "cells": 23,
+      "order_cell_exposures": 23,
+      "events": 23
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "primary",
+      "state": "CONGESTED_PROXY",
+      "cells": 7915,
+      "order_cell_exposures": 39057,
+      "events": 39126
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "primary",
+      "state": "MIXED_EVIDENCE",
+      "cells": 27483,
+      "order_cell_exposures": 153250,
+      "events": 153834
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "primary",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 107596,
+      "order_cell_exposures": 578567,
+      "events": 580551
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "primary",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 922,
+      "order_cell_exposures": 4188,
+      "events": 4195
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "primary",
+      "state": "UNKNOWN",
+      "cells": 313443,
+      "order_cell_exposures": 568633,
+      "events": 570383
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "primary_link",
+      "state": "CONGESTED_PROXY",
+      "cells": 544,
+      "order_cell_exposures": 2187,
+      "events": 2189
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "primary_link",
+      "state": "MIXED_EVIDENCE",
+      "cells": 2102,
+      "order_cell_exposures": 9122,
+      "events": 9136
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "primary_link",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 6622,
+      "order_cell_exposures": 26774,
+      "events": 26795
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "primary_link",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 68,
+      "order_cell_exposures": 252,
+      "events": 252
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "primary_link",
+      "state": "UNKNOWN",
+      "cells": 49343,
+      "order_cell_exposures": 73258,
+      "events": 73321
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "residential",
+      "state": "CONGESTED_PROXY",
+      "cells": 1,
+      "order_cell_exposures": 4,
+      "events": 4
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "residential",
+      "state": "MIXED_EVIDENCE",
+      "cells": 14,
+      "order_cell_exposures": 42,
+      "events": 42
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "residential",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 22,
+      "order_cell_exposures": 73,
+      "events": 74
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "residential",
+      "state": "UNKNOWN",
+      "cells": 11101,
+      "order_cell_exposures": 12197,
+      "events": 12241
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "secondary",
+      "state": "CONGESTED_PROXY",
+      "cells": 5387,
+      "order_cell_exposures": 22639,
+      "events": 22679
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "secondary",
+      "state": "MIXED_EVIDENCE",
+      "cells": 18156,
+      "order_cell_exposures": 82496,
+      "events": 82867
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "secondary",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 92863,
+      "order_cell_exposures": 418398,
+      "events": 419909
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "secondary",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 463,
+      "order_cell_exposures": 1816,
+      "events": 1818
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "secondary",
+      "state": "UNKNOWN",
+      "cells": 421616,
+      "order_cell_exposures": 695343,
+      "events": 697576
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "secondary_link",
+      "state": "CONGESTED_PROXY",
+      "cells": 311,
+      "order_cell_exposures": 1419,
+      "events": 1422
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "secondary_link",
+      "state": "MIXED_EVIDENCE",
+      "cells": 988,
+      "order_cell_exposures": 4558,
+      "events": 4615
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "secondary_link",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 3509,
+      "order_cell_exposures": 16699,
+      "events": 16965
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "secondary_link",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 23,
+      "order_cell_exposures": 112,
+      "events": 112
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "secondary_link",
+      "state": "UNKNOWN",
+      "cells": 22765,
+      "order_cell_exposures": 34668,
+      "events": 34779
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "service",
+      "state": "CONGESTED_PROXY",
+      "cells": 1,
+      "order_cell_exposures": 3,
+      "events": 3
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "service",
+      "state": "MIXED_EVIDENCE",
+      "cells": 4,
+      "order_cell_exposures": 14,
+      "events": 14
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "service",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 2,
+      "order_cell_exposures": 6,
+      "events": 6
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "service",
+      "state": "UNKNOWN",
+      "cells": 2476,
+      "order_cell_exposures": 2606,
+      "events": 2610
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "tertiary",
+      "state": "CONGESTED_PROXY",
+      "cells": 834,
+      "order_cell_exposures": 2990,
+      "events": 2995
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "tertiary",
+      "state": "MIXED_EVIDENCE",
+      "cells": 2321,
+      "order_cell_exposures": 8872,
+      "events": 8898
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "tertiary",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 12628,
+      "order_cell_exposures": 48575,
+      "events": 48748
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "tertiary",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 38,
+      "order_cell_exposures": 136,
+      "events": 136
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "tertiary",
+      "state": "UNKNOWN",
+      "cells": 272555,
+      "order_cell_exposures": 351233,
+      "events": 352724
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "tertiary_link",
+      "state": "CONGESTED_PROXY",
+      "cells": 346,
+      "order_cell_exposures": 1372,
+      "events": 1376
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "tertiary_link",
+      "state": "MIXED_EVIDENCE",
+      "cells": 1144,
+      "order_cell_exposures": 4757,
+      "events": 4777
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "tertiary_link",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 6355,
+      "order_cell_exposures": 26539,
+      "events": 26629
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "tertiary_link",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 27,
+      "order_cell_exposures": 103,
+      "events": 103
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "tertiary_link",
+      "state": "UNKNOWN",
+      "cells": 43717,
+      "order_cell_exposures": 68901,
+      "events": 69144
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "track",
+      "state": "UNKNOWN",
+      "cells": 17,
+      "order_cell_exposures": 17,
+      "events": 17
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "trunk",
+      "state": "CONGESTED_PROXY",
+      "cells": 2391,
+      "order_cell_exposures": 15735,
+      "events": 15773
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "trunk",
+      "state": "MIXED_EVIDENCE",
+      "cells": 15275,
+      "order_cell_exposures": 110207,
+      "events": 110723
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "trunk",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 42825,
+      "order_cell_exposures": 296862,
+      "events": 298372
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "trunk",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 369,
+      "order_cell_exposures": 2027,
+      "events": 2027
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "trunk",
+      "state": "UNKNOWN",
+      "cells": 60270,
+      "order_cell_exposures": 119618,
+      "events": 120051
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "trunk_link",
+      "state": "CONGESTED_PROXY",
+      "cells": 455,
+      "order_cell_exposures": 2619,
+      "events": 2621
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "trunk_link",
+      "state": "MIXED_EVIDENCE",
+      "cells": 2241,
+      "order_cell_exposures": 15416,
+      "events": 15475
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "trunk_link",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 9228,
+      "order_cell_exposures": 54009,
+      "events": 54333
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "trunk_link",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 58,
+      "order_cell_exposures": 280,
+      "events": 280
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "trunk_link",
+      "state": "UNKNOWN",
+      "cells": 37390,
+      "order_cell_exposures": 55985,
+      "events": 56087
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "unclassified",
+      "state": "CONGESTED_PROXY",
+      "cells": 1208,
+      "order_cell_exposures": 5603,
+      "events": 5616
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "unclassified",
+      "state": "MIXED_EVIDENCE",
+      "cells": 4232,
+      "order_cell_exposures": 22743,
+      "events": 22818
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "unclassified",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 15836,
+      "order_cell_exposures": 79029,
+      "events": 79244
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "unclassified",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 105,
+      "order_cell_exposures": 437,
+      "events": 437
+    },
+    {
+      "role": "train_descriptive_in_sample",
+      "canonical_highway": "unclassified",
+      "state": "UNKNOWN",
+      "cells": 108747,
+      "order_cell_exposures": 159991,
+      "events": 160459
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "living_street",
+      "state": "UNKNOWN",
+      "cells": 16,
+      "order_cell_exposures": 17,
+      "events": 17
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "pedestrian",
+      "state": "UNKNOWN",
+      "cells": 5,
+      "order_cell_exposures": 5,
+      "events": 5
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "primary",
+      "state": "CONGESTED_PROXY",
+      "cells": 1765,
+      "order_cell_exposures": 8630,
+      "events": 8652
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "primary",
+      "state": "MIXED_EVIDENCE",
+      "cells": 5683,
+      "order_cell_exposures": 31435,
+      "events": 31550
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "primary",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 18877,
+      "order_cell_exposures": 99491,
+      "events": 99824
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "primary",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 233,
+      "order_cell_exposures": 1018,
+      "events": 1018
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "primary",
+      "state": "UNKNOWN",
+      "cells": 59221,
+      "order_cell_exposures": 107321,
+      "events": 107652
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "primary_link",
+      "state": "CONGESTED_PROXY",
+      "cells": 144,
+      "order_cell_exposures": 586,
+      "events": 588
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "primary_link",
+      "state": "MIXED_EVIDENCE",
+      "cells": 466,
+      "order_cell_exposures": 2000,
+      "events": 2007
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "primary_link",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 1221,
+      "order_cell_exposures": 4864,
+      "events": 4864
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "primary_link",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 29,
+      "order_cell_exposures": 108,
+      "events": 109
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "primary_link",
+      "state": "UNKNOWN",
+      "cells": 9544,
+      "order_cell_exposures": 14325,
+      "events": 14339
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "residential",
+      "state": "CONGESTED_PROXY",
+      "cells": 1,
+      "order_cell_exposures": 3,
+      "events": 3
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "residential",
+      "state": "MIXED_EVIDENCE",
+      "cells": 1,
+      "order_cell_exposures": 3,
+      "events": 3
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "residential",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 5,
+      "order_cell_exposures": 15,
+      "events": 16
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "residential",
+      "state": "UNKNOWN",
+      "cells": 2291,
+      "order_cell_exposures": 2497,
+      "events": 2504
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "secondary",
+      "state": "CONGESTED_PROXY",
+      "cells": 1166,
+      "order_cell_exposures": 4832,
+      "events": 4835
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "secondary",
+      "state": "MIXED_EVIDENCE",
+      "cells": 3802,
+      "order_cell_exposures": 17071,
+      "events": 17127
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "secondary",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 16247,
+      "order_cell_exposures": 72020,
+      "events": 72285
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "secondary",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 115,
+      "order_cell_exposures": 435,
+      "events": 435
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "secondary",
+      "state": "UNKNOWN",
+      "cells": 80190,
+      "order_cell_exposures": 131531,
+      "events": 131923
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "secondary_link",
+      "state": "CONGESTED_PROXY",
+      "cells": 53,
+      "order_cell_exposures": 255,
+      "events": 255
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "secondary_link",
+      "state": "MIXED_EVIDENCE",
+      "cells": 195,
+      "order_cell_exposures": 881,
+      "events": 896
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "secondary_link",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 606,
+      "order_cell_exposures": 2741,
+      "events": 2782
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "secondary_link",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 10,
+      "order_cell_exposures": 47,
+      "events": 47
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "secondary_link",
+      "state": "UNKNOWN",
+      "cells": 4409,
+      "order_cell_exposures": 6695,
+      "events": 6717
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "service",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 1,
+      "order_cell_exposures": 3,
+      "events": 3
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "service",
+      "state": "UNKNOWN",
+      "cells": 468,
+      "order_cell_exposures": 492,
+      "events": 493
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "tertiary",
+      "state": "CONGESTED_PROXY",
+      "cells": 204,
+      "order_cell_exposures": 737,
+      "events": 738
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "tertiary",
+      "state": "MIXED_EVIDENCE",
+      "cells": 522,
+      "order_cell_exposures": 1982,
+      "events": 1991
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "tertiary",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 2346,
+      "order_cell_exposures": 9015,
+      "events": 9051
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "tertiary",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 9,
+      "order_cell_exposures": 33,
+      "events": 33
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "tertiary",
+      "state": "UNKNOWN",
+      "cells": 52460,
+      "order_cell_exposures": 68156,
+      "events": 68446
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "tertiary_link",
+      "state": "CONGESTED_PROXY",
+      "cells": 103,
+      "order_cell_exposures": 412,
+      "events": 412
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "tertiary_link",
+      "state": "MIXED_EVIDENCE",
+      "cells": 285,
+      "order_cell_exposures": 1150,
+      "events": 1154
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "tertiary_link",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 1235,
+      "order_cell_exposures": 5003,
+      "events": 5023
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "tertiary_link",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 6,
+      "order_cell_exposures": 20,
+      "events": 21
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "tertiary_link",
+      "state": "UNKNOWN",
+      "cells": 8661,
+      "order_cell_exposures": 13618,
+      "events": 13682
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "trunk",
+      "state": "CONGESTED_PROXY",
+      "cells": 550,
+      "order_cell_exposures": 3468,
+      "events": 3475
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "trunk",
+      "state": "MIXED_EVIDENCE",
+      "cells": 3140,
+      "order_cell_exposures": 21208,
+      "events": 21297
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "trunk",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 7075,
+      "order_cell_exposures": 46927,
+      "events": 47132
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "trunk",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 107,
+      "order_cell_exposures": 607,
+      "events": 608
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "trunk",
+      "state": "UNKNOWN",
+      "cells": 11912,
+      "order_cell_exposures": 23513,
+      "events": 23594
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "trunk_link",
+      "state": "CONGESTED_PROXY",
+      "cells": 111,
+      "order_cell_exposures": 635,
+      "events": 635
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "trunk_link",
+      "state": "MIXED_EVIDENCE",
+      "cells": 452,
+      "order_cell_exposures": 2940,
+      "events": 2948
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "trunk_link",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 1559,
+      "order_cell_exposures": 8853,
+      "events": 8906
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "trunk_link",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 13,
+      "order_cell_exposures": 68,
+      "events": 68
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "trunk_link",
+      "state": "UNKNOWN",
+      "cells": 7136,
+      "order_cell_exposures": 10605,
+      "events": 10620
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "unclassified",
+      "state": "CONGESTED_PROXY",
+      "cells": 238,
+      "order_cell_exposures": 1109,
+      "events": 1112
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "unclassified",
+      "state": "MIXED_EVIDENCE",
+      "cells": 868,
+      "order_cell_exposures": 4466,
+      "events": 4475
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "unclassified",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 2614,
+      "order_cell_exposures": 12438,
+      "events": 12468
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "unclassified",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 37,
+      "order_cell_exposures": 146,
+      "events": 146
+    },
+    {
+      "role": "validation_descriptive",
+      "canonical_highway": "unclassified",
+      "state": "UNKNOWN",
+      "cells": 21107,
+      "order_cell_exposures": 31124,
+      "events": 31207
+    }
+  ]
+}
