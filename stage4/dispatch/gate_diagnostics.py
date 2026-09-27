@@ -97,7 +97,7 @@ def validate_gate_counts(row: dict[str, Any]) -> None:
         ),
         "topk": (
             row["gate_av_n3_evidence_complete"] - row["gate_av_n3a_shared_topk"],
-            row["gate_av_loss_shared_topk"],
+            row["gate_av_loss_shared_topk"] + row.get("gate_av_loss_traffic_policy", 0),
         ),
         "routing": (
             row["gate_av_n3a_shared_topk"] - row["gate_av_n3b_route_returned"],
@@ -132,7 +132,8 @@ def aggregate_gate_epochs(epoch: pd.DataFrame, bin_minutes: int = 15) -> pd.Data
     missing = required.difference(epoch.columns)
     if missing:
         raise ValueError(f"gate epoch log missing columns: {sorted(missing)}")
-    frame = epoch[["timestamp", *GATE_COLUMNS, *LOSS_COLUMNS]].copy()
+    extras = ["gate_av_loss_traffic_policy"] if "gate_av_loss_traffic_policy" in epoch else []
+    frame = epoch[["timestamp", *GATE_COLUMNS, *LOSS_COLUMNS, *extras]].copy()
     frame["timestamp"] = pd.to_datetime(frame["timestamp"])
     if frame["timestamp"].dt.tz is None:
         frame["timestamp"] = frame["timestamp"].dt.tz_localize("Asia/Shanghai")
@@ -141,7 +142,7 @@ def aggregate_gate_epochs(epoch: pd.DataFrame, bin_minutes: int = 15) -> pd.Data
     frame["time_bin_start"] = frame["timestamp"].dt.floor(f"{int(bin_minutes)}min")
     result = (
         frame.groupby("time_bin_start", as_index=False, sort=True)[
-            [*GATE_COLUMNS, *LOSS_COLUMNS]
+            [*GATE_COLUMNS, *LOSS_COLUMNS, *extras]
         ]
         .sum()
         .reset_index(drop=True)

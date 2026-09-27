@@ -91,6 +91,8 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
             config.get("prospective_gate_logging", False)
         )
         self.repositioning_manager = repositioning_manager
+        from .traffic_research_policy import TrafficResearchPolicy
+        self.traffic_policy = TrafficResearchPolicy.from_config(config)
 
     def record_tick(self, simulation_time: int) -> None:
         """Avoid retaining an O(ticks x fleet) trace; epoch aggregates are enough."""
@@ -137,6 +139,11 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
             "acceptance_source": acceptance.acceptance_source,
             "exposure": exposure,
         }
+        policy = getattr(self, "traffic_policy", None)
+        if policy is not None:
+            update = policy.evaluate(request)
+            if update is not None:
+                self.request_meta[rid].update(update)
 
     def _expire(self, rid: int, simulation_time: int) -> None:
         self.expired_rids.add(rid)
@@ -201,6 +208,7 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
         pruned_acceptance_epoch = 0
         pruned_exposure_epoch = 0
         gate_counts = empty_gate_counts() if self.prospective_gate_logging else None
+        traffic_pruned = 0
         routing_before = self.eta_adapter.routing_time_s
         for rid in waiting_ids:
             request = self.request_by_rid[rid]
@@ -248,6 +256,10 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                                 "gate_av_loss_evidence_incomplete"
                             ] += nearby_av
             av_eligible = av_ready and accepts and exposure is not None
+            if av_eligible and not meta.get("traffic_allowed", True):
+                removed = index.count_vehicle_type_within(request.pickup_lon_wgs84, request.pickup_lat_wgs84, radius, "AV")
+                traffic_pruned += removed
+                av_eligible = False
             if av_ready and not accepts:
                 pruned_acceptance_epoch += index.count_vehicle_type_within(
                     request.pickup_lon_wgs84,
@@ -377,6 +389,8 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                 }
             )
             if arc.vehicle_type == "AV":
+                if "traffic_policy" in self.request_meta[arc.request_id]:
+                    self.assignment_rows[-1].update({k: v for k, v in self.request_meta[arc.request_id].items() if k.startswith("traffic_")})
                 selected_av_exposures.append(
                     ExposureExcess(
                         arc.exposure_static, arc.exposure_dynamic, arc.exposure_speed
@@ -392,7 +406,10 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
             gate_counts["gate_av_loss_shared_topk"] = (
                 gate_counts["gate_av_n3_evidence_complete"]
                 - gate_counts["gate_av_n3a_shared_topk"]
+                - traffic_pruned
             )
+            if getattr(self, "traffic_policy", None) is not None:
+                gate_counts["gate_av_loss_traffic_policy"] = traffic_pruned
             gate_counts["gate_av_loss_routing_failure"] = (
                 gate_counts["gate_av_n3a_shared_topk"]
                 - gate_counts["gate_av_n3b_route_returned"]
@@ -443,6 +460,8 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
             }
         if gate_counts is not None:
             epoch_row.update(gate_counts)
+        if getattr(self, "traffic_policy", None) is not None:
+            epoch_row["traffic_policy_pruned_av_opportunities"] = traffic_pruned
         self.epoch_rows.append(epoch_row)
         n_av = self.exposure_state.av_assignments
         self.exposure_rows.append(
