@@ -1,0 +1,17 @@
+{
+  "version": "traffic_common_state_v1",
+  "source_profile": "M",
+  "source_scenario": "ODD_Q50_M_P70_REFERENCE",
+  "profiles": ["C", "M", "A"],
+  "cuts_s": [37800, 63000],
+  "variants": ["OFF", "ON"],
+  "budget": 0.05,
+  "window_duration_s": 900,
+  "patience_s": 300,
+  "routing_mode": "SINGLE_SOURCE_MATRIX",
+  "scenario_timeout_s": 1800,
+  "rss_warning_mib": 2048,
+  "gamma_static": null,
+  "gamma_dynamic": null,
+  "gamma_speed": null
+}

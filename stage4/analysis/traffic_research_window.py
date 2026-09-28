@@ -35,12 +35,14 @@ def preflight_requests(c, policy, cfg):
     return ready
 
 
-def condition(root, cfg, mode, dest, on_ready=None):
+def condition(root, cfg, mode, dest, on_ready=None, on_loaded=None):
     start = time.monotonic()
     checkpoint = root/cfg["checkpoint"]
     checkpoint_sha = sha(checkpoint)
     with checkpoint.open("rb") as f:
         sim = cloudpickle.load(f)
+    if on_loaded is not None:
+        on_loaded(sim)
     c = sim.operators[0]
     assert c.dispatch_interval_s == 30 and c.max_pickup_wait_s == 300
     assert c.acceptance_rate == .7 and c.config["profile_id"] == cfg["profile_id"]
@@ -55,10 +57,15 @@ def condition(root, cfg, mode, dest, on_ready=None):
     c.traffic_policy = policy if mode != "FROZEN" else None
     old_dynamic = c.exposure_state.dynamic
     if mode != "FROZEN":
-        past_av = [r for r in c.assignment_rows if r["vehicle_type"] == "AV"]
-        assert len(past_av) == c.exposure_state.av_assignments
-        c.exposure_state.dynamic = sum(policy.evaluate(c.request_by_rid[int(a["native_request_id"])])["exposure"].dynamic for a in past_av)
-        assert c.exposure_state.dynamic <= old_dynamic+1e-6
+        if cfg.get("preserve_inherited_exposure", False):
+            # Common-state diagnostic: inherited M history is not a C/A ledger.
+            # It is never used for admission or interpreted as target-profile exposure.
+            assert all(value is None for value in c.gammas.values())
+        else:
+            past_av = [r for r in c.assignment_rows if r["vehicle_type"] == "AV"]
+            assert len(past_av) == c.exposure_state.av_assignments
+            c.exposure_state.dynamic = sum(policy.evaluate(c.request_by_rid[int(a["native_request_id"])])["exposure"].dynamic for a in past_av)
+            assert c.exposure_state.dynamic <= old_dynamic+1e-6
         for rid, meta in c.request_meta.items():
             result = policy.evaluate(c.request_by_rid[rid])
             if result is not None:
