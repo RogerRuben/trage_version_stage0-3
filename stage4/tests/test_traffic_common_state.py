@@ -42,3 +42,26 @@ def test_local_shared_checkpoint_retarget_preflight():
             assert preflight_requests(c,policy,{'measurement_end_s':cp['cut']+900})>0
             assert c.config['profile_id']==profile
             del c,sim,requests; gc.collect()
+
+
+def test_completed_local_common_state_outputs():
+    path=Path('stage4/docs/traffic_research/common_state_summary.json')
+    if not path.exists():
+        pytest.skip('Generated after all prespecified conditions complete')
+    summary=json.loads(path.read_text())
+    assert summary['status']=='COMPLETE' and len(summary['rows'])==12
+    for cut in [37800,63000]:
+        rows=[r for r in summary['rows'] if r['cut']==cut]
+        assert len({r['checkpoint_sha256'] for r in rows})==1
+        assert len({r['common_start']['physical_sha256'] for r in rows})==1
+        assert len({r['common_start']['control_sha256'] for r in rows})==1
+        assert len({(r['common_start']['acceptance_seed'],r['common_start']['acceptance_rate']) for r in rows})==1
+        for row in rows:
+            assert row['routing_failures']==0 and row['gate_conservation']
+            assert all(v is None for v in row['gammas'].values())
+            assert row['cohort_orders']==(379 if cut==37800 else 419)
+    comparison=json.loads(Path('stage4/docs/traffic_research/common_state_comparison.json').read_text())
+    for row in comparison['pairs']:
+        assert row['gained']+row['both_matched']+row['lost']+row['both_unserved']==row['cohort']
+        if row['profile']=='A':
+            assert row['physical_assignments_identical'] and row['gained']==row['lost']==0

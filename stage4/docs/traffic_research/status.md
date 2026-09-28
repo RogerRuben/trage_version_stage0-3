@@ -6,6 +6,9 @@
 相对减速型MIXED的离线语义/预算归因/已有服务转移分析也已完成：
 [mixed_attribution_report.md](mixed_attribution_report.md)。无新动态实验、无策略调整。
 
+随后授权的C/M/A共同M物理起点、Gamma全关闭、交通OFF/ON两窗口12条件已完成：
+[common_state_report.md](common_state_report.md)。这是独立短期诊断，默认FROZEN及原41场景不变。
+
 ## Material Passport
 
 academic-research-suite / experiment-agent，2026-09-27。
