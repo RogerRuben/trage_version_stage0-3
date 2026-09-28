@@ -1,9 +1,12 @@
-# 独立交通研究策略：实现与离线对账完成，动态运行待重试授权
+# 独立交通研究策略：实现、离线对账与小窗口动态对照完成
 
 ## Material Passport
 
 academic-research-suite / experiment-agent，2026-09-27。
-实现/离线：PASS；动态：STOPPED_BEFORE_FIRST_SIMULATION_STEP，非实验完成。
+实现/离线：PASS；动态 retry1：COMPLETE（2026-09-28，退出码0）。
+两个条件均为254/379单匹配，全部266条新增物理分配一致；冻结默认值不变。
+完整结果和解释见 [window_report.md](window_report.md)，机器摘要见 [window_summary.json](window_summary.json)。
+下文首次失败记录保留为历史，不代表当前仍在等待授权。
 协议提交 `e13325d`，首次执行代码提交 `f341e83`。
 
 ## 已实现
@@ -58,8 +61,8 @@ Test31 M3 manifest 的 decision-time/predicted-progression 标志和源 SHA 已�
 测试最初遇到系统 pytest 临时目录 ACL 和未设置 FLEETPY_ROOT，已改用新的工作区临时目录和既有固定 FleetPy checkout。
 仅设置子进程 Git safe.directory，未改全局 Git 或环境依赖。
 
-依据技能的失败不自动重试规则，暂停动态执行，等待用户授权。新增 `--attempt retry1` 将结果写到新目录，
-不会覆盖第一次失败记录；未运行该命令：
+首次失败后依据技能的失败不自动重试规则暂停。用户于2026-09-28授权后，已执行以下命令，
+结果写入新目录 `retry1`，没有覆盖第一次失败记录：
 
 ```powershell
 $env:OMP_NUM_THREADS='1'
@@ -72,4 +75,4 @@ D:/anaconda/envs/stage0-valhalla/python.exe -u -m stage4.analysis.traffic_resear
 ```
 
 运行目录为本 worktree 根目录。每条件1800秒、单进程CPU、2GiB RSS告警、无GPU。
-在两个条件完成且原生对账通过之前，不声称新策略提高/降低服务，也不进入全天试验。
+两个条件完成且原生对账通过。本窗口没有观察到服务差异；未进入全天试验或其他profile。

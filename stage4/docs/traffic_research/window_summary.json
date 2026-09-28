@@ -1,0 +1,63 @@
+{
+  "status": "COMPLETE",
+  "protocol_commit": "e13325d",
+  "protected_sha256": {
+    "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\config\\traffic_research_window.json": "9a30fe93373a3db71e5bf4059cfccce12d0b919fe9f34a4d888ab20e64519ecf",
+    "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage3\\config\\stage3_av_capability_profiles.json": "bea54c12a0c013995c3644a0bab84b35413d5df8a6785dfdd6a03fd49f32978e",
+    "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage2\\output_v5_2\\development\\M3\\epoch_004.pt": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde"
+  },
+  "rows": [
+    {
+      "mode": "FROZEN",
+      "status": "COMPLETE",
+      "cohort_orders": 379,
+      "matched": 254,
+      "expired": 125,
+      "matched_AV": 22,
+      "matched_HV": 232,
+      "mean_wait_s": 187.98325728740156,
+      "post_checkpoint_assignments": 266,
+      "eligible_requests_checked": 2026,
+      "inherited_dynamic_before": 95.64505263388362,
+      "inherited_dynamic_after": 95.64505263388362,
+      "baseline_exact_until_demand_cutoff": true,
+      "pickup_error_s": 9.874145945332202e-10,
+      "service_error_s": 0.0,
+      "routing_failures": 0,
+      "routing_arcs": 37857,
+      "runtime_s": 79.04700000000003,
+      "peak_rss_mib": 532.59375,
+      "checkpoint_sha256": "e8e18b904d720a1926e92a0cce6d7123e240c4b9d34916318ae8f5bfc5c554a3",
+      "policy_table_sha256": "be63ba8cec28c5116790eef3a91ad9c25c28e8fd1ac80e03f125e95d4d2549ed",
+      "drain_end_s": 40740,
+      "cohort_eligible_unknown_share_mean": 0.08487171013971273
+    },
+    {
+      "mode": "TRAFFIC_REPLACEMENT_V1",
+      "status": "COMPLETE",
+      "cohort_orders": 379,
+      "matched": 254,
+      "expired": 125,
+      "matched_AV": 22,
+      "matched_HV": 232,
+      "mean_wait_s": 187.98325728740156,
+      "post_checkpoint_assignments": 266,
+      "eligible_requests_checked": 2026,
+      "inherited_dynamic_before": 95.64505263388362,
+      "inherited_dynamic_after": 61.65063306689326,
+      "baseline_exact_until_demand_cutoff": null,
+      "pickup_error_s": 9.874145945332202e-10,
+      "service_error_s": 0.0,
+      "routing_failures": 0,
+      "routing_arcs": 37857,
+      "runtime_s": 81.48399999999992,
+      "peak_rss_mib": 542.26953125,
+      "checkpoint_sha256": "e8e18b904d720a1926e92a0cce6d7123e240c4b9d34916318ae8f5bfc5c554a3",
+      "policy_table_sha256": "be63ba8cec28c5116790eef3a91ad9c25c28e8fd1ac80e03f125e95d4d2549ed",
+      "drain_end_s": 40740,
+      "cohort_eligible_unknown_share_mean": 0.08487171013971273
+    }
+  ],
+  "active": null,
+  "matched_difference": 0
+}
