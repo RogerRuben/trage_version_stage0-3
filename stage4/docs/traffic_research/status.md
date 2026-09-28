@@ -1,5 +1,8 @@
 # 独立交通研究策略：实现、离线对账与小窗口动态对照完成
 
+后续授权的“离线独立作用 → F/V/VT固定状态 → 预定动态窗口”三阶段也已于2026-09-28完成，
+见 [mechanism_report.md](mechanism_report.md)。下文保留首轮M窗口的历史结果。
+
 ## Material Passport
 
 academic-research-suite / experiment-agent，2026-09-27。

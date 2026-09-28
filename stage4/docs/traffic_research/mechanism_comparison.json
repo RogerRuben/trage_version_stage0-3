@@ -1,0 +1,1620 @@
+{
+  "status": "COMPLETE",
+  "pairs": [
+    {
+      "profile": "C",
+      "cut": 37800,
+      "contrast": "F->V",
+      "physical_assignments_identical": true,
+      "cohort": 379,
+      "both_matched": 245,
+      "gained": 0,
+      "lost": 0,
+      "both_unserved": 134,
+      "common_matched_wait_difference_s": 0.0,
+      "transitions": [
+        {
+          "before": "AV",
+          "after": "AV",
+          "count": 17
+        },
+        {
+          "before": "AV",
+          "after": "HV",
+          "count": 0
+        },
+        {
+          "before": "AV",
+          "after": "UNSERVED",
+          "count": 0
+        },
+        {
+          "before": "HV",
+          "after": "AV",
+          "count": 0
+        },
+        {
+          "before": "HV",
+          "after": "HV",
+          "count": 228
+        },
+        {
+          "before": "HV",
+          "after": "UNSERVED",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "AV",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "HV",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "UNSERVED",
+          "count": 134
+        }
+      ]
+    },
+    {
+      "profile": "C",
+      "cut": 37800,
+      "contrast": "V->VT",
+      "physical_assignments_identical": false,
+      "cohort": 379,
+      "both_matched": 235,
+      "gained": 4,
+      "lost": 10,
+      "both_unserved": 130,
+      "common_matched_wait_difference_s": -0.7209849574468083,
+      "transitions": [
+        {
+          "before": "AV",
+          "after": "AV",
+          "count": 10
+        },
+        {
+          "before": "AV",
+          "after": "HV",
+          "count": 3
+        },
+        {
+          "before": "AV",
+          "after": "UNSERVED",
+          "count": 4
+        },
+        {
+          "before": "HV",
+          "after": "AV",
+          "count": 2
+        },
+        {
+          "before": "HV",
+          "after": "HV",
+          "count": 220
+        },
+        {
+          "before": "HV",
+          "after": "UNSERVED",
+          "count": 6
+        },
+        {
+          "before": "UNSERVED",
+          "after": "AV",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "HV",
+          "count": 4
+        },
+        {
+          "before": "UNSERVED",
+          "after": "UNSERVED",
+          "count": 130
+        }
+      ]
+    },
+    {
+      "profile": "C",
+      "cut": 37800,
+      "contrast": "F->VT",
+      "physical_assignments_identical": false,
+      "cohort": 379,
+      "both_matched": 235,
+      "gained": 4,
+      "lost": 10,
+      "both_unserved": 130,
+      "common_matched_wait_difference_s": -0.7209849574468083,
+      "transitions": [
+        {
+          "before": "AV",
+          "after": "AV",
+          "count": 10
+        },
+        {
+          "before": "AV",
+          "after": "HV",
+          "count": 3
+        },
+        {
+          "before": "AV",
+          "after": "UNSERVED",
+          "count": 4
+        },
+        {
+          "before": "HV",
+          "after": "AV",
+          "count": 2
+        },
+        {
+          "before": "HV",
+          "after": "HV",
+          "count": 220
+        },
+        {
+          "before": "HV",
+          "after": "UNSERVED",
+          "count": 6
+        },
+        {
+          "before": "UNSERVED",
+          "after": "AV",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "HV",
+          "count": 4
+        },
+        {
+          "before": "UNSERVED",
+          "after": "UNSERVED",
+          "count": 130
+        }
+      ]
+    },
+    {
+      "profile": "C",
+      "cut": 63000,
+      "contrast": "F->V",
+      "physical_assignments_identical": true,
+      "cohort": 419,
+      "both_matched": 217,
+      "gained": 0,
+      "lost": 0,
+      "both_unserved": 202,
+      "common_matched_wait_difference_s": 0.0,
+      "transitions": [
+        {
+          "before": "AV",
+          "after": "AV",
+          "count": 22
+        },
+        {
+          "before": "AV",
+          "after": "HV",
+          "count": 0
+        },
+        {
+          "before": "AV",
+          "after": "UNSERVED",
+          "count": 0
+        },
+        {
+          "before": "HV",
+          "after": "AV",
+          "count": 0
+        },
+        {
+          "before": "HV",
+          "after": "HV",
+          "count": 195
+        },
+        {
+          "before": "HV",
+          "after": "UNSERVED",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "AV",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "HV",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "UNSERVED",
+          "count": 202
+        }
+      ]
+    },
+    {
+      "profile": "C",
+      "cut": 63000,
+      "contrast": "V->VT",
+      "physical_assignments_identical": false,
+      "cohort": 419,
+      "both_matched": 200,
+      "gained": 2,
+      "lost": 17,
+      "both_unserved": 200,
+      "common_matched_wait_difference_s": 5.757207545000001,
+      "transitions": [
+        {
+          "before": "AV",
+          "after": "AV",
+          "count": 1
+        },
+        {
+          "before": "AV",
+          "after": "HV",
+          "count": 8
+        },
+        {
+          "before": "AV",
+          "after": "UNSERVED",
+          "count": 13
+        },
+        {
+          "before": "HV",
+          "after": "AV",
+          "count": 0
+        },
+        {
+          "before": "HV",
+          "after": "HV",
+          "count": 191
+        },
+        {
+          "before": "HV",
+          "after": "UNSERVED",
+          "count": 4
+        },
+        {
+          "before": "UNSERVED",
+          "after": "AV",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "HV",
+          "count": 2
+        },
+        {
+          "before": "UNSERVED",
+          "after": "UNSERVED",
+          "count": 200
+        }
+      ]
+    },
+    {
+      "profile": "C",
+      "cut": 63000,
+      "contrast": "F->VT",
+      "physical_assignments_identical": false,
+      "cohort": 419,
+      "both_matched": 200,
+      "gained": 2,
+      "lost": 17,
+      "both_unserved": 200,
+      "common_matched_wait_difference_s": 5.757207545000001,
+      "transitions": [
+        {
+          "before": "AV",
+          "after": "AV",
+          "count": 1
+        },
+        {
+          "before": "AV",
+          "after": "HV",
+          "count": 8
+        },
+        {
+          "before": "AV",
+          "after": "UNSERVED",
+          "count": 13
+        },
+        {
+          "before": "HV",
+          "after": "AV",
+          "count": 0
+        },
+        {
+          "before": "HV",
+          "after": "HV",
+          "count": 191
+        },
+        {
+          "before": "HV",
+          "after": "UNSERVED",
+          "count": 4
+        },
+        {
+          "before": "UNSERVED",
+          "after": "AV",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "HV",
+          "count": 2
+        },
+        {
+          "before": "UNSERVED",
+          "after": "UNSERVED",
+          "count": 200
+        }
+      ]
+    },
+    {
+      "profile": "M",
+      "cut": 37800,
+      "contrast": "F->V",
+      "physical_assignments_identical": true,
+      "cohort": 379,
+      "both_matched": 254,
+      "gained": 0,
+      "lost": 0,
+      "both_unserved": 125,
+      "common_matched_wait_difference_s": 0.0,
+      "transitions": [
+        {
+          "before": "AV",
+          "after": "AV",
+          "count": 22
+        },
+        {
+          "before": "AV",
+          "after": "HV",
+          "count": 0
+        },
+        {
+          "before": "AV",
+          "after": "UNSERVED",
+          "count": 0
+        },
+        {
+          "before": "HV",
+          "after": "AV",
+          "count": 0
+        },
+        {
+          "before": "HV",
+          "after": "HV",
+          "count": 232
+        },
+        {
+          "before": "HV",
+          "after": "UNSERVED",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "AV",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "HV",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "UNSERVED",
+          "count": 125
+        }
+      ]
+    },
+    {
+      "profile": "M",
+      "cut": 37800,
+      "contrast": "V->VT",
+      "physical_assignments_identical": true,
+      "cohort": 379,
+      "both_matched": 254,
+      "gained": 0,
+      "lost": 0,
+      "both_unserved": 125,
+      "common_matched_wait_difference_s": 0.0,
+      "transitions": [
+        {
+          "before": "AV",
+          "after": "AV",
+          "count": 22
+        },
+        {
+          "before": "AV",
+          "after": "HV",
+          "count": 0
+        },
+        {
+          "before": "AV",
+          "after": "UNSERVED",
+          "count": 0
+        },
+        {
+          "before": "HV",
+          "after": "AV",
+          "count": 0
+        },
+        {
+          "before": "HV",
+          "after": "HV",
+          "count": 232
+        },
+        {
+          "before": "HV",
+          "after": "UNSERVED",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "AV",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "HV",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "UNSERVED",
+          "count": 125
+        }
+      ]
+    },
+    {
+      "profile": "M",
+      "cut": 37800,
+      "contrast": "F->VT",
+      "physical_assignments_identical": true,
+      "cohort": 379,
+      "both_matched": 254,
+      "gained": 0,
+      "lost": 0,
+      "both_unserved": 125,
+      "common_matched_wait_difference_s": 0.0,
+      "transitions": [
+        {
+          "before": "AV",
+          "after": "AV",
+          "count": 22
+        },
+        {
+          "before": "AV",
+          "after": "HV",
+          "count": 0
+        },
+        {
+          "before": "AV",
+          "after": "UNSERVED",
+          "count": 0
+        },
+        {
+          "before": "HV",
+          "after": "AV",
+          "count": 0
+        },
+        {
+          "before": "HV",
+          "after": "HV",
+          "count": 232
+        },
+        {
+          "before": "HV",
+          "after": "UNSERVED",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "AV",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "HV",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "UNSERVED",
+          "count": 125
+        }
+      ]
+    },
+    {
+      "profile": "M",
+      "cut": 63000,
+      "contrast": "F->V",
+      "physical_assignments_identical": true,
+      "cohort": 419,
+      "both_matched": 218,
+      "gained": 0,
+      "lost": 0,
+      "both_unserved": 201,
+      "common_matched_wait_difference_s": 0.0,
+      "transitions": [
+        {
+          "before": "AV",
+          "after": "AV",
+          "count": 27
+        },
+        {
+          "before": "AV",
+          "after": "HV",
+          "count": 0
+        },
+        {
+          "before": "AV",
+          "after": "UNSERVED",
+          "count": 0
+        },
+        {
+          "before": "HV",
+          "after": "AV",
+          "count": 0
+        },
+        {
+          "before": "HV",
+          "after": "HV",
+          "count": 191
+        },
+        {
+          "before": "HV",
+          "after": "UNSERVED",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "AV",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "HV",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "UNSERVED",
+          "count": 201
+        }
+      ]
+    },
+    {
+      "profile": "M",
+      "cut": 63000,
+      "contrast": "V->VT",
+      "physical_assignments_identical": false,
+      "cohort": 419,
+      "both_matched": 216,
+      "gained": 0,
+      "lost": 2,
+      "both_unserved": 201,
+      "common_matched_wait_difference_s": -0.12318688888888882,
+      "transitions": [
+        {
+          "before": "AV",
+          "after": "AV",
+          "count": 25
+        },
+        {
+          "before": "AV",
+          "after": "HV",
+          "count": 2
+        },
+        {
+          "before": "AV",
+          "after": "UNSERVED",
+          "count": 0
+        },
+        {
+          "before": "HV",
+          "after": "AV",
+          "count": 1
+        },
+        {
+          "before": "HV",
+          "after": "HV",
+          "count": 188
+        },
+        {
+          "before": "HV",
+          "after": "UNSERVED",
+          "count": 2
+        },
+        {
+          "before": "UNSERVED",
+          "after": "AV",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "HV",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "UNSERVED",
+          "count": 201
+        }
+      ]
+    },
+    {
+      "profile": "M",
+      "cut": 63000,
+      "contrast": "F->VT",
+      "physical_assignments_identical": false,
+      "cohort": 419,
+      "both_matched": 216,
+      "gained": 0,
+      "lost": 2,
+      "both_unserved": 201,
+      "common_matched_wait_difference_s": -0.12318688888888882,
+      "transitions": [
+        {
+          "before": "AV",
+          "after": "AV",
+          "count": 25
+        },
+        {
+          "before": "AV",
+          "after": "HV",
+          "count": 2
+        },
+        {
+          "before": "AV",
+          "after": "UNSERVED",
+          "count": 0
+        },
+        {
+          "before": "HV",
+          "after": "AV",
+          "count": 1
+        },
+        {
+          "before": "HV",
+          "after": "HV",
+          "count": 188
+        },
+        {
+          "before": "HV",
+          "after": "UNSERVED",
+          "count": 2
+        },
+        {
+          "before": "UNSERVED",
+          "after": "AV",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "HV",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "UNSERVED",
+          "count": 201
+        }
+      ]
+    }
+  ],
+  "details": [
+    {
+      "profile": "C",
+      "cut": 37800,
+      "variant": "F",
+      "new_assignments": 261,
+      "new_av_assignments": 17,
+      "epochs": 41,
+      "gate_counts": {
+        "gate_av_n0_spatial": 292584,
+        "gate_av_n1_passenger_compatible": 197378,
+        "gate_av_n2_structurally_ready": 53321,
+        "gate_av_n3_evidence_complete": 27972,
+        "gate_av_n3a_shared_topk": 2907,
+        "gate_av_n3b_route_returned": 2907,
+        "gate_av_n4_pickup_within_patience": 76,
+        "gate_av_n5_solver_eligible": 76,
+        "gate_av_n6_selected": 17,
+        "gate_av_loss_acceptance": 95206,
+        "gate_av_loss_no_selected_route": 99349,
+        "gate_av_loss_hard_infeasible": 0,
+        "gate_av_loss_hard_unknown": 44708,
+        "gate_av_loss_evidence_incomplete": 25349,
+        "gate_av_loss_shared_topk": 25065,
+        "gate_av_loss_routing_failure": 0,
+        "gate_av_loss_patience": 2831,
+        "gate_av_loss_other_arc_condition": 0,
+        "gate_av_loss_dispatch_competition": 59
+      },
+      "selected_av_traffic": {
+        "outside_share": {
+          "mean": 0.053808429271979166,
+          "maximum": 0.2083961856962936,
+          "predicted_time_weighted_mean": 0.06933364403256395
+        },
+        "unknown_share": {
+          "mean": 0.08919652985405395,
+          "maximum": 0.254644017469117,
+          "predicted_time_weighted_mean": 0.08010748112540104
+        },
+        "low_support_share": {
+          "mean": 0.12619492081946826,
+          "maximum": 0.41005220588847374,
+          "predicted_time_weighted_mean": 0.12616427900814858
+        }
+      },
+      "cohort_av_count": 17,
+      "cohort_av_traffic": {
+        "research_outside_share": {
+          "mean": 0.053808429271979166,
+          "maximum": 0.2083961856962936
+        },
+        "research_unknown_share": {
+          "mean": 0.08919652985405396,
+          "maximum": 0.254644017469117
+        }
+      },
+      "final_exposure": {
+        "simulation_time_s": 39000,
+        "av_assignments_this_epoch": 0,
+        "cumulative_av_assignments": 473,
+        "static_excess_this_epoch": 0.0,
+        "dynamic_excess_this_epoch": 0.0,
+        "speed_excess_this_epoch": 0.0,
+        "cumulative_static_excess": 3363.3777777777773,
+        "cumulative_dynamic_excess": 214.83273864858853,
+        "cumulative_speed_excess": 55.4166666666666,
+        "cumulative_mean_static_excess": 7.1107352595724675,
+        "cumulative_mean_dynamic_excess": 0.4541918364663605,
+        "cumulative_mean_speed_excess": 0.11715997181113447,
+        "gamma_static": null,
+        "gamma_dynamic": null,
+        "gamma_speed": null
+      }
+    },
+    {
+      "profile": "C",
+      "cut": 37800,
+      "variant": "V",
+      "new_assignments": 261,
+      "new_av_assignments": 17,
+      "epochs": 41,
+      "gate_counts": {
+        "gate_av_n0_spatial": 292584,
+        "gate_av_n1_passenger_compatible": 197378,
+        "gate_av_n2_structurally_ready": 53321,
+        "gate_av_n3_evidence_complete": 27972,
+        "gate_av_n3a_shared_topk": 2907,
+        "gate_av_n3b_route_returned": 2907,
+        "gate_av_n4_pickup_within_patience": 76,
+        "gate_av_n5_solver_eligible": 76,
+        "gate_av_n6_selected": 17,
+        "gate_av_loss_acceptance": 95206,
+        "gate_av_loss_no_selected_route": 99349,
+        "gate_av_loss_hard_infeasible": 0,
+        "gate_av_loss_hard_unknown": 44708,
+        "gate_av_loss_evidence_incomplete": 25349,
+        "gate_av_loss_shared_topk": 25065,
+        "gate_av_loss_routing_failure": 0,
+        "gate_av_loss_patience": 2831,
+        "gate_av_loss_other_arc_condition": 0,
+        "gate_av_loss_dispatch_competition": 59,
+        "gate_av_loss_traffic_policy": 0,
+        "traffic_policy_pruned_av_opportunities": 0
+      },
+      "selected_av_traffic": {
+        "outside_share": {
+          "mean": 0.053808429271979166,
+          "maximum": 0.2083961856962936,
+          "predicted_time_weighted_mean": 0.06933364403256395
+        },
+        "unknown_share": {
+          "mean": 0.08919652985405395,
+          "maximum": 0.254644017469117,
+          "predicted_time_weighted_mean": 0.08010748112540104
+        },
+        "low_support_share": {
+          "mean": 0.12619492081946826,
+          "maximum": 0.41005220588847374,
+          "predicted_time_weighted_mean": 0.12616427900814858
+        }
+      },
+      "cohort_av_count": 17,
+      "cohort_av_traffic": {
+        "research_outside_share": {
+          "mean": 0.053808429271979166,
+          "maximum": 0.2083961856962936
+        },
+        "research_unknown_share": {
+          "mean": 0.08919652985405396,
+          "maximum": 0.254644017469117
+        }
+      },
+      "final_exposure": {
+        "simulation_time_s": 39000,
+        "av_assignments_this_epoch": 0,
+        "cumulative_av_assignments": 473,
+        "static_excess_this_epoch": 0.0,
+        "dynamic_excess_this_epoch": 0.0,
+        "speed_excess_this_epoch": 0.0,
+        "cumulative_static_excess": 3363.3777777777773,
+        "cumulative_dynamic_excess": 172.67575218774368,
+        "cumulative_speed_excess": 55.4166666666666,
+        "cumulative_mean_static_excess": 7.1107352595724675,
+        "cumulative_mean_dynamic_excess": 0.3650650151960754,
+        "cumulative_mean_speed_excess": 0.11715997181113447,
+        "gamma_static": null,
+        "gamma_dynamic": null,
+        "gamma_speed": null
+      }
+    },
+    {
+      "profile": "C",
+      "cut": 37800,
+      "variant": "VT",
+      "new_assignments": 255,
+      "new_av_assignments": 12,
+      "epochs": 41,
+      "gate_counts": {
+        "gate_av_n0_spatial": 303581,
+        "gate_av_n1_passenger_compatible": 204649,
+        "gate_av_n2_structurally_ready": 57453,
+        "gate_av_n3_evidence_complete": 32140,
+        "gate_av_n3a_shared_topk": 1287,
+        "gate_av_n3b_route_returned": 1287,
+        "gate_av_n4_pickup_within_patience": 40,
+        "gate_av_n5_solver_eligible": 40,
+        "gate_av_n6_selected": 12,
+        "gate_av_loss_acceptance": 98932,
+        "gate_av_loss_no_selected_route": 100649,
+        "gate_av_loss_hard_infeasible": 0,
+        "gate_av_loss_hard_unknown": 46547,
+        "gate_av_loss_evidence_incomplete": 25313,
+        "gate_av_loss_shared_topk": 12803,
+        "gate_av_loss_routing_failure": 0,
+        "gate_av_loss_patience": 1247,
+        "gate_av_loss_other_arc_condition": 0,
+        "gate_av_loss_dispatch_competition": 28,
+        "gate_av_loss_traffic_policy": 18050,
+        "traffic_policy_pruned_av_opportunities": 18050
+      },
+      "selected_av_traffic": {
+        "outside_share": {
+          "mean": 0.00675575122610449,
+          "maximum": 0.033701022398801704,
+          "predicted_time_weighted_mean": 0.00732706162464172
+        },
+        "unknown_share": {
+          "mean": 0.10170537117017298,
+          "maximum": 0.254644017469117,
+          "predicted_time_weighted_mean": 0.09737296321147905
+        },
+        "low_support_share": {
+          "mean": 0.14332542489921574,
+          "maximum": 0.41005220588847374,
+          "predicted_time_weighted_mean": 0.14940462392405113
+        }
+      },
+      "cohort_av_count": 12,
+      "cohort_av_traffic": {
+        "research_outside_share": {
+          "mean": 0.00675575122610449,
+          "maximum": 0.033701022398801704
+        },
+        "research_unknown_share": {
+          "mean": 0.10170537117017298,
+          "maximum": 0.254644017469117
+        }
+      },
+      "final_exposure": {
+        "simulation_time_s": 39000,
+        "av_assignments_this_epoch": 0,
+        "cumulative_av_assignments": 468,
+        "static_excess_this_epoch": 0.0,
+        "dynamic_excess_this_epoch": 0.0,
+        "speed_excess_this_epoch": 0.0,
+        "cumulative_static_excess": 3319.977777777777,
+        "cumulative_dynamic_excess": 171.79973275294438,
+        "cumulative_speed_excess": 55.08333333333327,
+        "cumulative_mean_static_excess": 7.093969610636276,
+        "cumulative_mean_dynamic_excess": 0.36709344605329997,
+        "cumulative_mean_speed_excess": 0.11769943019943006,
+        "gamma_static": null,
+        "gamma_dynamic": null,
+        "gamma_speed": null
+      }
+    },
+    {
+      "profile": "C",
+      "cut": 63000,
+      "variant": "F",
+      "new_assignments": 231,
+      "new_av_assignments": 22,
+      "epochs": 41,
+      "gate_counts": {
+        "gate_av_n0_spatial": 436265,
+        "gate_av_n1_passenger_compatible": 299852,
+        "gate_av_n2_structurally_ready": 66652,
+        "gate_av_n3_evidence_complete": 37509,
+        "gate_av_n3a_shared_topk": 2728,
+        "gate_av_n3b_route_returned": 2728,
+        "gate_av_n4_pickup_within_patience": 131,
+        "gate_av_n5_solver_eligible": 131,
+        "gate_av_n6_selected": 22,
+        "gate_av_loss_acceptance": 136413,
+        "gate_av_loss_no_selected_route": 165547,
+        "gate_av_loss_hard_infeasible": 0,
+        "gate_av_loss_hard_unknown": 67653,
+        "gate_av_loss_evidence_incomplete": 29143,
+        "gate_av_loss_shared_topk": 34781,
+        "gate_av_loss_routing_failure": 0,
+        "gate_av_loss_patience": 2597,
+        "gate_av_loss_other_arc_condition": 0,
+        "gate_av_loss_dispatch_competition": 109
+      },
+      "selected_av_traffic": {
+        "outside_share": {
+          "mean": 0.22965894141624307,
+          "maximum": 0.5469501275831212,
+          "predicted_time_weighted_mean": 0.2665406474607002
+        },
+        "unknown_share": {
+          "mean": 0.06942067089310254,
+          "maximum": 0.26413610849433533,
+          "predicted_time_weighted_mean": 0.06400920772328732
+        },
+        "low_support_share": {
+          "mean": 0.13876331567464464,
+          "maximum": 0.6079242702957125,
+          "predicted_time_weighted_mean": 0.11382347279629397
+        }
+      },
+      "cohort_av_count": 22,
+      "cohort_av_traffic": {
+        "research_outside_share": {
+          "mean": 0.22965894141624307,
+          "maximum": 0.5469501275831212
+        },
+        "research_unknown_share": {
+          "mean": 0.06942067089310254,
+          "maximum": 0.26413610849433533
+        }
+      },
+      "final_exposure": {
+        "simulation_time_s": 64200,
+        "av_assignments_this_epoch": 0,
+        "cumulative_av_assignments": 1108,
+        "static_excess_this_epoch": 0.0,
+        "dynamic_excess_this_epoch": 0.0,
+        "speed_excess_this_epoch": 0.0,
+        "cumulative_static_excess": 7863.211111111116,
+        "cumulative_dynamic_excess": 438.94211763637946,
+        "cumulative_speed_excess": 130.9166666666673,
+        "cumulative_mean_static_excess": 7.096760930605701,
+        "cumulative_mean_dynamic_excess": 0.3961571458812089,
+        "cumulative_mean_speed_excess": 0.1181558363417575,
+        "gamma_static": null,
+        "gamma_dynamic": null,
+        "gamma_speed": null
+      }
+    },
+    {
+      "profile": "C",
+      "cut": 63000,
+      "variant": "V",
+      "new_assignments": 231,
+      "new_av_assignments": 22,
+      "epochs": 41,
+      "gate_counts": {
+        "gate_av_n0_spatial": 436265,
+        "gate_av_n1_passenger_compatible": 299852,
+        "gate_av_n2_structurally_ready": 66652,
+        "gate_av_n3_evidence_complete": 37509,
+        "gate_av_n3a_shared_topk": 2728,
+        "gate_av_n3b_route_returned": 2728,
+        "gate_av_n4_pickup_within_patience": 131,
+        "gate_av_n5_solver_eligible": 131,
+        "gate_av_n6_selected": 22,
+        "gate_av_loss_acceptance": 136413,
+        "gate_av_loss_no_selected_route": 165547,
+        "gate_av_loss_hard_infeasible": 0,
+        "gate_av_loss_hard_unknown": 67653,
+        "gate_av_loss_evidence_incomplete": 29143,
+        "gate_av_loss_shared_topk": 34781,
+        "gate_av_loss_routing_failure": 0,
+        "gate_av_loss_patience": 2597,
+        "gate_av_loss_other_arc_condition": 0,
+        "gate_av_loss_dispatch_competition": 109,
+        "gate_av_loss_traffic_policy": 0,
+        "traffic_policy_pruned_av_opportunities": 0
+      },
+      "selected_av_traffic": {
+        "outside_share": {
+          "mean": 0.22965894141624307,
+          "maximum": 0.5469501275831212,
+          "predicted_time_weighted_mean": 0.2665406474607002
+        },
+        "unknown_share": {
+          "mean": 0.06942067089310254,
+          "maximum": 0.26413610849433533,
+          "predicted_time_weighted_mean": 0.06400920772328732
+        },
+        "low_support_share": {
+          "mean": 0.13876331567464464,
+          "maximum": 0.6079242702957125,
+          "predicted_time_weighted_mean": 0.11382347279629397
+        }
+      },
+      "cohort_av_count": 22,
+      "cohort_av_traffic": {
+        "research_outside_share": {
+          "mean": 0.22965894141624307,
+          "maximum": 0.5469501275831212
+        },
+        "research_unknown_share": {
+          "mean": 0.06942067089310254,
+          "maximum": 0.26413610849433533
+        }
+      },
+      "final_exposure": {
+        "simulation_time_s": 64200,
+        "av_assignments_this_epoch": 0,
+        "cumulative_av_assignments": 1108,
+        "static_excess_this_epoch": 0.0,
+        "dynamic_excess_this_epoch": 0.0,
+        "speed_excess_this_epoch": 0.0,
+        "cumulative_static_excess": 7863.211111111116,
+        "cumulative_dynamic_excess": 308.5017977844109,
+        "cumulative_speed_excess": 130.9166666666673,
+        "cumulative_mean_static_excess": 7.096760930605701,
+        "cumulative_mean_dynamic_excess": 0.27843122543719395,
+        "cumulative_mean_speed_excess": 0.1181558363417575,
+        "gamma_static": null,
+        "gamma_dynamic": null,
+        "gamma_speed": null
+      }
+    },
+    {
+      "profile": "C",
+      "cut": 63000,
+      "variant": "VT",
+      "new_assignments": 216,
+      "new_av_assignments": 1,
+      "epochs": 41,
+      "gate_counts": {
+        "gate_av_n0_spatial": 476749,
+        "gate_av_n1_passenger_compatible": 333859,
+        "gate_av_n2_structurally_ready": 91675,
+        "gate_av_n3_evidence_complete": 61299,
+        "gate_av_n3a_shared_topk": 302,
+        "gate_av_n3b_route_returned": 302,
+        "gate_av_n4_pickup_within_patience": 11,
+        "gate_av_n5_solver_eligible": 11,
+        "gate_av_n6_selected": 1,
+        "gate_av_loss_acceptance": 142890,
+        "gate_av_loss_no_selected_route": 170948,
+        "gate_av_loss_hard_infeasible": 0,
+        "gate_av_loss_hard_unknown": 71236,
+        "gate_av_loss_evidence_incomplete": 30376,
+        "gate_av_loss_shared_topk": 3315,
+        "gate_av_loss_routing_failure": 0,
+        "gate_av_loss_patience": 291,
+        "gate_av_loss_other_arc_condition": 0,
+        "gate_av_loss_dispatch_competition": 10,
+        "gate_av_loss_traffic_policy": 57682,
+        "traffic_policy_pruned_av_opportunities": 57682
+      },
+      "selected_av_traffic": {
+        "outside_share": {
+          "mean": 0.04601335423699097,
+          "maximum": 0.04601335423699097,
+          "predicted_time_weighted_mean": 0.04601335423699097
+        },
+        "unknown_share": {
+          "mean": 0.04600527447903563,
+          "maximum": 0.04600527447903563,
+          "predicted_time_weighted_mean": 0.04600527447903563
+        },
+        "low_support_share": {
+          "mean": 0.06491668812889055,
+          "maximum": 0.06491668812889055,
+          "predicted_time_weighted_mean": 0.06491668812889055
+        }
+      },
+      "cohort_av_count": 1,
+      "cohort_av_traffic": {
+        "research_outside_share": {
+          "mean": 0.04601335423699097,
+          "maximum": 0.04601335423699097
+        },
+        "research_unknown_share": {
+          "mean": 0.04600527447903563,
+          "maximum": 0.04600527447903563
+        }
+      },
+      "final_exposure": {
+        "simulation_time_s": 64200,
+        "av_assignments_this_epoch": 0,
+        "cumulative_av_assignments": 1087,
+        "static_excess_this_epoch": 0.0,
+        "dynamic_excess_this_epoch": 0.0,
+        "speed_excess_this_epoch": 0.0,
+        "cumulative_static_excess": 7754.5111111111155,
+        "cumulative_dynamic_excess": 305.09649237226904,
+        "cumulative_speed_excess": 128.2500000000007,
+        "cumulative_mean_static_excess": 7.133864867627521,
+        "cumulative_mean_dynamic_excess": 0.2806775458806523,
+        "cumulative_mean_speed_excess": 0.11798528058877711,
+        "gamma_static": null,
+        "gamma_dynamic": null,
+        "gamma_speed": null
+      }
+    },
+    {
+      "profile": "M",
+      "cut": 37800,
+      "variant": "F",
+      "new_assignments": 266,
+      "new_av_assignments": 24,
+      "epochs": 41,
+      "gate_counts": {
+        "gate_av_n0_spatial": 262959,
+        "gate_av_n1_passenger_compatible": 184717,
+        "gate_av_n2_structurally_ready": 89762,
+        "gate_av_n3_evidence_complete": 44583,
+        "gate_av_n3a_shared_topk": 4849,
+        "gate_av_n3b_route_returned": 4849,
+        "gate_av_n4_pickup_within_patience": 105,
+        "gate_av_n5_solver_eligible": 105,
+        "gate_av_n6_selected": 24,
+        "gate_av_loss_acceptance": 78242,
+        "gate_av_loss_no_selected_route": 59747,
+        "gate_av_loss_hard_infeasible": 0,
+        "gate_av_loss_hard_unknown": 35208,
+        "gate_av_loss_evidence_incomplete": 45179,
+        "gate_av_loss_shared_topk": 39734,
+        "gate_av_loss_routing_failure": 0,
+        "gate_av_loss_patience": 4744,
+        "gate_av_loss_other_arc_condition": 0,
+        "gate_av_loss_dispatch_competition": 81
+      },
+      "selected_av_traffic": {
+        "outside_share": {
+          "mean": 0.0025766181364523994,
+          "maximum": 0.019980835415076597,
+          "predicted_time_weighted_mean": 0.0024981342693986244
+        },
+        "unknown_share": {
+          "mean": 0.09677702035380348,
+          "maximum": 0.25706901258518183,
+          "predicted_time_weighted_mean": 0.0883152670325254
+        },
+        "low_support_share": {
+          "mean": 0.12730368749656748,
+          "maximum": 0.5643233413510684,
+          "predicted_time_weighted_mean": 0.11520327555435203
+        }
+      },
+      "cohort_av_count": 22,
+      "cohort_av_traffic": {
+        "research_outside_share": {
+          "mean": 0.0019026363572627726,
+          "maximum": 0.01466139291026076
+        },
+        "research_unknown_share": {
+          "mean": 0.09341620755525391,
+          "maximum": 0.25706901258518183
+        }
+      },
+      "final_exposure": {
+        "simulation_time_s": 39000,
+        "av_assignments_this_epoch": 0,
+        "cumulative_av_assignments": 695,
+        "static_excess_this_epoch": 0.0,
+        "dynamic_excess_this_epoch": 0.0,
+        "speed_excess_this_epoch": 0.0,
+        "cumulative_static_excess": 1472.6512254901963,
+        "cumulative_dynamic_excess": 99.61628109390045,
+        "cumulative_speed_excess": 0.0,
+        "cumulative_mean_static_excess": 2.118922626604599,
+        "cumulative_mean_dynamic_excess": 0.14333277855237475,
+        "cumulative_mean_speed_excess": 0.0,
+        "gamma_static": 2.145067625590382,
+        "gamma_dynamic": 0.14934256810554178,
+        "gamma_speed": 0.0
+      }
+    },
+    {
+      "profile": "M",
+      "cut": 37800,
+      "variant": "V",
+      "new_assignments": 266,
+      "new_av_assignments": 24,
+      "epochs": 41,
+      "gate_counts": {
+        "gate_av_n0_spatial": 262959,
+        "gate_av_n1_passenger_compatible": 184717,
+        "gate_av_n2_structurally_ready": 89762,
+        "gate_av_n3_evidence_complete": 44583,
+        "gate_av_n3a_shared_topk": 4849,
+        "gate_av_n3b_route_returned": 4849,
+        "gate_av_n4_pickup_within_patience": 105,
+        "gate_av_n5_solver_eligible": 105,
+        "gate_av_n6_selected": 24,
+        "gate_av_loss_acceptance": 78242,
+        "gate_av_loss_no_selected_route": 59747,
+        "gate_av_loss_hard_infeasible": 0,
+        "gate_av_loss_hard_unknown": 35208,
+        "gate_av_loss_evidence_incomplete": 45179,
+        "gate_av_loss_shared_topk": 39734,
+        "gate_av_loss_routing_failure": 0,
+        "gate_av_loss_patience": 4744,
+        "gate_av_loss_other_arc_condition": 0,
+        "gate_av_loss_dispatch_competition": 81,
+        "gate_av_loss_traffic_policy": 0,
+        "traffic_policy_pruned_av_opportunities": 0
+      },
+      "selected_av_traffic": {
+        "outside_share": {
+          "mean": 0.0025766181364523994,
+          "maximum": 0.019980835415076597,
+          "predicted_time_weighted_mean": 0.0024981342693986244
+        },
+        "unknown_share": {
+          "mean": 0.09677702035380348,
+          "maximum": 0.25706901258518183,
+          "predicted_time_weighted_mean": 0.0883152670325254
+        },
+        "low_support_share": {
+          "mean": 0.12730368749656748,
+          "maximum": 0.5643233413510684,
+          "predicted_time_weighted_mean": 0.11520327555435203
+        }
+      },
+      "cohort_av_count": 22,
+      "cohort_av_traffic": {
+        "research_outside_share": {
+          "mean": 0.0019026363572627726,
+          "maximum": 0.01466139291026076
+        },
+        "research_unknown_share": {
+          "mean": 0.09341620755525391,
+          "maximum": 0.25706901258518183
+        }
+      },
+      "final_exposure": {
+        "simulation_time_s": 39000,
+        "av_assignments_this_epoch": 0,
+        "cumulative_av_assignments": 695,
+        "static_excess_this_epoch": 0.0,
+        "dynamic_excess_this_epoch": 0.0,
+        "speed_excess_this_epoch": 0.0,
+        "cumulative_static_excess": 1472.6512254901963,
+        "cumulative_dynamic_excess": 64.28831731177944,
+        "cumulative_speed_excess": 0.0,
+        "cumulative_mean_static_excess": 2.118922626604599,
+        "cumulative_mean_dynamic_excess": 0.09250117598817185,
+        "cumulative_mean_speed_excess": 0.0,
+        "gamma_static": 2.145067625590382,
+        "gamma_dynamic": 0.14934256810554178,
+        "gamma_speed": 0.0
+      }
+    },
+    {
+      "profile": "M",
+      "cut": 37800,
+      "variant": "VT",
+      "new_assignments": 266,
+      "new_av_assignments": 24,
+      "epochs": 41,
+      "gate_counts": {
+        "gate_av_n0_spatial": 262959,
+        "gate_av_n1_passenger_compatible": 184717,
+        "gate_av_n2_structurally_ready": 89762,
+        "gate_av_n3_evidence_complete": 44583,
+        "gate_av_n3a_shared_topk": 4849,
+        "gate_av_n3b_route_returned": 4849,
+        "gate_av_n4_pickup_within_patience": 105,
+        "gate_av_n5_solver_eligible": 105,
+        "gate_av_n6_selected": 24,
+        "gate_av_loss_acceptance": 78242,
+        "gate_av_loss_no_selected_route": 59747,
+        "gate_av_loss_hard_infeasible": 0,
+        "gate_av_loss_hard_unknown": 35208,
+        "gate_av_loss_evidence_incomplete": 45179,
+        "gate_av_loss_shared_topk": 39734,
+        "gate_av_loss_routing_failure": 0,
+        "gate_av_loss_patience": 4744,
+        "gate_av_loss_other_arc_condition": 0,
+        "gate_av_loss_dispatch_competition": 81,
+        "gate_av_loss_traffic_policy": 0,
+        "traffic_policy_pruned_av_opportunities": 0
+      },
+      "selected_av_traffic": {
+        "outside_share": {
+          "mean": 0.0025766181364523994,
+          "maximum": 0.019980835415076597,
+          "predicted_time_weighted_mean": 0.0024981342693986244
+        },
+        "unknown_share": {
+          "mean": 0.09677702035380348,
+          "maximum": 0.25706901258518183,
+          "predicted_time_weighted_mean": 0.0883152670325254
+        },
+        "low_support_share": {
+          "mean": 0.12730368749656748,
+          "maximum": 0.5643233413510684,
+          "predicted_time_weighted_mean": 0.11520327555435203
+        }
+      },
+      "cohort_av_count": 22,
+      "cohort_av_traffic": {
+        "research_outside_share": {
+          "mean": 0.0019026363572627726,
+          "maximum": 0.01466139291026076
+        },
+        "research_unknown_share": {
+          "mean": 0.09341620755525391,
+          "maximum": 0.25706901258518183
+        }
+      },
+      "final_exposure": {
+        "simulation_time_s": 39000,
+        "av_assignments_this_epoch": 0,
+        "cumulative_av_assignments": 695,
+        "static_excess_this_epoch": 0.0,
+        "dynamic_excess_this_epoch": 0.0,
+        "speed_excess_this_epoch": 0.0,
+        "cumulative_static_excess": 1472.6512254901963,
+        "cumulative_dynamic_excess": 64.28831731177944,
+        "cumulative_speed_excess": 0.0,
+        "cumulative_mean_static_excess": 2.118922626604599,
+        "cumulative_mean_dynamic_excess": 0.09250117598817185,
+        "cumulative_mean_speed_excess": 0.0,
+        "gamma_static": 2.145067625590382,
+        "gamma_dynamic": 0.14934256810554178,
+        "gamma_speed": 0.0
+      }
+    },
+    {
+      "profile": "M",
+      "cut": 63000,
+      "variant": "F",
+      "new_assignments": 233,
+      "new_av_assignments": 28,
+      "epochs": 41,
+      "gate_counts": {
+        "gate_av_n0_spatial": 409947,
+        "gate_av_n1_passenger_compatible": 280002,
+        "gate_av_n2_structurally_ready": 120097,
+        "gate_av_n3_evidence_complete": 59404,
+        "gate_av_n3a_shared_topk": 4064,
+        "gate_av_n3b_route_returned": 4064,
+        "gate_av_n4_pickup_within_patience": 124,
+        "gate_av_n5_solver_eligible": 124,
+        "gate_av_n6_selected": 28,
+        "gate_av_loss_acceptance": 129945,
+        "gate_av_loss_no_selected_route": 106038,
+        "gate_av_loss_hard_infeasible": 0,
+        "gate_av_loss_hard_unknown": 53867,
+        "gate_av_loss_evidence_incomplete": 60693,
+        "gate_av_loss_shared_topk": 55340,
+        "gate_av_loss_routing_failure": 0,
+        "gate_av_loss_patience": 3940,
+        "gate_av_loss_other_arc_condition": 0,
+        "gate_av_loss_dispatch_competition": 96
+      },
+      "selected_av_traffic": {
+        "outside_share": {
+          "mean": 0.013175943098999663,
+          "maximum": 0.13412890886337,
+          "predicted_time_weighted_mean": 0.011197196690783203
+        },
+        "unknown_share": {
+          "mean": 0.06635396945841975,
+          "maximum": 0.12026781883828262,
+          "predicted_time_weighted_mean": 0.06989436649070063
+        },
+        "low_support_share": {
+          "mean": 0.13579076686109048,
+          "maximum": 0.3965756844256078,
+          "predicted_time_weighted_mean": 0.12886291816200293
+        }
+      },
+      "cohort_av_count": 27,
+      "cohort_av_traffic": {
+        "research_outside_share": {
+          "mean": 0.013554742963456103,
+          "maximum": 0.13412890886337
+        },
+        "research_unknown_share": {
+          "mean": 0.06691088286742757,
+          "maximum": 0.12026781883828262
+        }
+      },
+      "final_exposure": {
+        "simulation_time_s": 64200,
+        "av_assignments_this_epoch": 0,
+        "cumulative_av_assignments": 1577,
+        "static_excess_this_epoch": 0.0,
+        "dynamic_excess_this_epoch": 0.0,
+        "speed_excess_this_epoch": 0.0,
+        "cumulative_static_excess": 3343.7404411764696,
+        "cumulative_dynamic_excess": 229.40370448070203,
+        "cumulative_speed_excess": 0.0,
+        "cumulative_mean_static_excess": 2.1203173374613,
+        "cumulative_mean_dynamic_excess": 0.1454684238939138,
+        "cumulative_mean_speed_excess": 0.0,
+        "gamma_static": 2.145067625590382,
+        "gamma_dynamic": 0.14934256810554178,
+        "gamma_speed": 0.0
+      }
+    },
+    {
+      "profile": "M",
+      "cut": 63000,
+      "variant": "V",
+      "new_assignments": 233,
+      "new_av_assignments": 28,
+      "epochs": 41,
+      "gate_counts": {
+        "gate_av_n0_spatial": 409947,
+        "gate_av_n1_passenger_compatible": 280002,
+        "gate_av_n2_structurally_ready": 120097,
+        "gate_av_n3_evidence_complete": 59404,
+        "gate_av_n3a_shared_topk": 4064,
+        "gate_av_n3b_route_returned": 4064,
+        "gate_av_n4_pickup_within_patience": 124,
+        "gate_av_n5_solver_eligible": 124,
+        "gate_av_n6_selected": 28,
+        "gate_av_loss_acceptance": 129945,
+        "gate_av_loss_no_selected_route": 106038,
+        "gate_av_loss_hard_infeasible": 0,
+        "gate_av_loss_hard_unknown": 53867,
+        "gate_av_loss_evidence_incomplete": 60693,
+        "gate_av_loss_shared_topk": 55340,
+        "gate_av_loss_routing_failure": 0,
+        "gate_av_loss_patience": 3940,
+        "gate_av_loss_other_arc_condition": 0,
+        "gate_av_loss_dispatch_competition": 96,
+        "gate_av_loss_traffic_policy": 0,
+        "traffic_policy_pruned_av_opportunities": 0
+      },
+      "selected_av_traffic": {
+        "outside_share": {
+          "mean": 0.013175943098999663,
+          "maximum": 0.13412890886337,
+          "predicted_time_weighted_mean": 0.011197196690783203
+        },
+        "unknown_share": {
+          "mean": 0.06635396945841975,
+          "maximum": 0.12026781883828262,
+          "predicted_time_weighted_mean": 0.06989436649070063
+        },
+        "low_support_share": {
+          "mean": 0.13579076686109048,
+          "maximum": 0.3965756844256078,
+          "predicted_time_weighted_mean": 0.12886291816200293
+        }
+      },
+      "cohort_av_count": 27,
+      "cohort_av_traffic": {
+        "research_outside_share": {
+          "mean": 0.013554742963456103,
+          "maximum": 0.13412890886337
+        },
+        "research_unknown_share": {
+          "mean": 0.06691088286742757,
+          "maximum": 0.12026781883828262
+        }
+      },
+      "final_exposure": {
+        "simulation_time_s": 64200,
+        "av_assignments_this_epoch": 0,
+        "cumulative_av_assignments": 1577,
+        "static_excess_this_epoch": 0.0,
+        "dynamic_excess_this_epoch": 0.0,
+        "speed_excess_this_epoch": 0.0,
+        "cumulative_static_excess": 3343.7404411764696,
+        "cumulative_dynamic_excess": 106.2789423991755,
+        "cumulative_speed_excess": 0.0,
+        "cumulative_mean_static_excess": 2.1203173374613,
+        "cumulative_mean_dynamic_excess": 0.06739311502801237,
+        "cumulative_mean_speed_excess": 0.0,
+        "gamma_static": 2.145067625590382,
+        "gamma_dynamic": 0.14934256810554178,
+        "gamma_speed": 0.0
+      }
+    },
+    {
+      "profile": "M",
+      "cut": 63000,
+      "variant": "VT",
+      "new_assignments": 231,
+      "new_av_assignments": 27,
+      "epochs": 41,
+      "gate_counts": {
+        "gate_av_n0_spatial": 415807,
+        "gate_av_n1_passenger_compatible": 283353,
+        "gate_av_n2_structurally_ready": 122566,
+        "gate_av_n3_evidence_complete": 61564,
+        "gate_av_n3a_shared_topk": 4148,
+        "gate_av_n3b_route_returned": 4148,
+        "gate_av_n4_pickup_within_patience": 121,
+        "gate_av_n5_solver_eligible": 121,
+        "gate_av_n6_selected": 27,
+        "gate_av_loss_acceptance": 132454,
+        "gate_av_loss_no_selected_route": 106502,
+        "gate_av_loss_hard_infeasible": 0,
+        "gate_av_loss_hard_unknown": 54285,
+        "gate_av_loss_evidence_incomplete": 61002,
+        "gate_av_loss_shared_topk": 56939,
+        "gate_av_loss_routing_failure": 0,
+        "gate_av_loss_patience": 4027,
+        "gate_av_loss_other_arc_condition": 0,
+        "gate_av_loss_dispatch_competition": 94,
+        "gate_av_loss_traffic_policy": 477,
+        "traffic_policy_pruned_av_opportunities": 477
+      },
+      "selected_av_traffic": {
+        "outside_share": {
+          "mean": 0.005507961349841655,
+          "maximum": 0.045314772229415344,
+          "predicted_time_weighted_mean": 0.004256052673516978
+        },
+        "unknown_share": {
+          "mean": 0.06672718493256978,
+          "maximum": 0.12026781883828262,
+          "predicted_time_weighted_mean": 0.07009158128389373
+        },
+        "low_support_share": {
+          "mean": 0.13460964302944906,
+          "maximum": 0.3965756844256078,
+          "predicted_time_weighted_mean": 0.1276191570160316
+        }
+      },
+      "cohort_av_count": 26,
+      "cohort_av_traffic": {
+        "research_outside_share": {
+          "mean": 0.005606408064886497,
+          "maximum": 0.045314772229415344
+        },
+        "research_unknown_share": {
+          "mean": 0.06731987252939133,
+          "maximum": 0.12026781883828262
+        }
+      },
+      "final_exposure": {
+        "simulation_time_s": 64200,
+        "av_assignments_this_epoch": 0,
+        "cumulative_av_assignments": 1576,
+        "static_excess_this_epoch": 0.0,
+        "dynamic_excess_this_epoch": 0.0,
+        "speed_excess_this_epoch": 0.0,
+        "cumulative_static_excess": 3342.644362745097,
+        "cumulative_dynamic_excess": 106.2789423991755,
+        "cumulative_speed_excess": 0.0,
+        "cumulative_mean_static_excess": 2.120967235244351,
+        "cumulative_mean_dynamic_excess": 0.06743587715683726,
+        "cumulative_mean_speed_excess": 0.0,
+        "gamma_static": 2.145067625590382,
+        "gamma_dynamic": 0.14934256810554178,
+        "gamma_speed": 0.0
+      }
+    }
+  ],
+  "interpretation": "Paired descriptive conditional continuations, not independent replications or full-day effects"
+}

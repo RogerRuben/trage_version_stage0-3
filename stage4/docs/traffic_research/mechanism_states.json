@@ -1,0 +1,1609 @@
+{
+  "status": "COMPLETE",
+  "stage": "states",
+  "protocol_commit": "6fcc31a",
+  "protected_sha256": {
+    "stage4\\config\\traffic_mechanism_v1.json": "6b834c613a1edc20ab618398ae7447433add44d4482cda3fef15e530c55196cc",
+    "stage3\\config\\stage3_av_capability_profiles.json": "bea54c12a0c013995c3644a0bab84b35413d5df8a6785dfdd6a03fd49f32978e",
+    "stage2\\output_v5_2\\development\\M3\\epoch_004.pt": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde"
+  },
+  "rows": [
+    {
+      "profile": "C",
+      "cut": 37800,
+      "variant": "F",
+      "source_scenario": "MAIN_Q50_C_P70",
+      "gammas": {
+        "static": null,
+        "dynamic": null,
+        "speed": null
+      },
+      "history_exposure": {
+        "av_assignments": 456,
+        "static": 3258.3777777777773,
+        "dynamic": 209.90757329176205,
+        "speed": 53.74999999999995
+      },
+      "mixed": {
+        "E": 22,
+        "U": 10,
+        "M": 9
+      },
+      "av": {
+        "E": 0,
+        "U": 0,
+        "M": 0
+      },
+      "constrained_maximum": 9,
+      "selected": 9,
+      "selected_av": 0,
+      "selected_pairs": [
+        [
+          6274,
+          1023
+        ],
+        [
+          6300,
+          958
+        ],
+        [
+          6352,
+          882
+        ],
+        [
+          6355,
+          878
+        ],
+        [
+          6356,
+          699
+        ],
+        [
+          6358,
+          1163
+        ],
+        [
+          6359,
+          1054
+        ],
+        [
+          6360,
+          1040
+        ],
+        [
+          6361,
+          1184
+        ]
+      ],
+      "selected_pickup_sum_s": 1123.3821181590433
+    },
+    {
+      "profile": "C",
+      "cut": 37800,
+      "variant": "V",
+      "source_scenario": "MAIN_Q50_C_P70",
+      "gammas": {
+        "static": null,
+        "dynamic": null,
+        "speed": null
+      },
+      "history_exposure": {
+        "av_assignments": 456,
+        "static": 3258.3777777777773,
+        "dynamic": 169.62796327389725,
+        "speed": 53.74999999999995
+      },
+      "mixed": {
+        "E": 22,
+        "U": 10,
+        "M": 9
+      },
+      "av": {
+        "E": 0,
+        "U": 0,
+        "M": 0
+      },
+      "constrained_maximum": 9,
+      "selected": 9,
+      "selected_av": 0,
+      "selected_pairs": [
+        [
+          6274,
+          1023
+        ],
+        [
+          6300,
+          958
+        ],
+        [
+          6352,
+          882
+        ],
+        [
+          6355,
+          878
+        ],
+        [
+          6356,
+          699
+        ],
+        [
+          6358,
+          1163
+        ],
+        [
+          6359,
+          1054
+        ],
+        [
+          6360,
+          1040
+        ],
+        [
+          6361,
+          1184
+        ]
+      ],
+      "selected_pickup_sum_s": 1123.3821181590433
+    },
+    {
+      "profile": "C",
+      "cut": 37800,
+      "variant": "VT",
+      "source_scenario": "MAIN_Q50_C_P70",
+      "gammas": {
+        "static": null,
+        "dynamic": null,
+        "speed": null
+      },
+      "history_exposure": {
+        "av_assignments": 456,
+        "static": 3258.3777777777773,
+        "dynamic": 169.62796327389725,
+        "speed": 53.74999999999995
+      },
+      "mixed": {
+        "E": 22,
+        "U": 10,
+        "M": 9
+      },
+      "av": {
+        "E": 0,
+        "U": 0,
+        "M": 0
+      },
+      "constrained_maximum": 9,
+      "selected": 9,
+      "selected_av": 0,
+      "selected_pairs": [
+        [
+          6274,
+          1023
+        ],
+        [
+          6300,
+          958
+        ],
+        [
+          6352,
+          882
+        ],
+        [
+          6355,
+          878
+        ],
+        [
+          6356,
+          699
+        ],
+        [
+          6358,
+          1163
+        ],
+        [
+          6359,
+          1054
+        ],
+        [
+          6360,
+          1040
+        ],
+        [
+          6361,
+          1184
+        ]
+      ],
+      "selected_pickup_sum_s": 1123.3821181590433,
+      "topk_refill_added_pairs": 0,
+      "removed_pairs": 0,
+      "fixed_V_arc_deletion": {
+        "mixed": {
+          "E": 22,
+          "U": 10,
+          "M": 9
+        },
+        "av": {
+          "E": 0,
+          "U": 0,
+          "M": 0
+        },
+        "constrained_maximum": 9,
+        "selected": 9,
+        "selected_av": 0,
+        "selected_pairs": [
+          [
+            6274,
+            1023
+          ],
+          [
+            6300,
+            958
+          ],
+          [
+            6352,
+            882
+          ],
+          [
+            6355,
+            878
+          ],
+          [
+            6356,
+            699
+          ],
+          [
+            6358,
+            1163
+          ],
+          [
+            6359,
+            1054
+          ],
+          [
+            6360,
+            1040
+          ],
+          [
+            6361,
+            1184
+          ]
+        ],
+        "selected_pickup_sum_s": 1123.3821181590433
+      }
+    },
+    {
+      "profile": "C",
+      "cut": 63000,
+      "variant": "F",
+      "source_scenario": "MAIN_Q50_C_P70",
+      "gammas": {
+        "static": null,
+        "dynamic": null,
+        "speed": null
+      },
+      "history_exposure": {
+        "av_assignments": 1086,
+        "static": 7742.911111111115,
+        "dynamic": 432.06650110878263,
+        "speed": 128.2500000000007
+      },
+      "mixed": {
+        "E": 34,
+        "U": 12,
+        "M": 11
+      },
+      "av": {
+        "E": 0,
+        "U": 0,
+        "M": 0
+      },
+      "constrained_maximum": 11,
+      "selected": 11,
+      "selected_av": 0,
+      "selected_pairs": [
+        [
+          18969,
+          2411
+        ],
+        [
+          18988,
+          2764
+        ],
+        [
+          19000,
+          1523
+        ],
+        [
+          19005,
+          2813
+        ],
+        [
+          19006,
+          2799
+        ],
+        [
+          19008,
+          2774
+        ],
+        [
+          19010,
+          2692
+        ],
+        [
+          19011,
+          2705
+        ],
+        [
+          19013,
+          2709
+        ],
+        [
+          19014,
+          1737
+        ],
+        [
+          19017,
+          2487
+        ]
+      ],
+      "selected_pickup_sum_s": 1720.0957525165727
+    },
+    {
+      "profile": "C",
+      "cut": 63000,
+      "variant": "V",
+      "source_scenario": "MAIN_Q50_C_P70",
+      "gammas": {
+        "static": null,
+        "dynamic": null,
+        "speed": null
+      },
+      "history_exposure": {
+        "av_assignments": 1086,
+        "static": 7742.911111111115,
+        "dynamic": 305.09649237226904,
+        "speed": 128.2500000000007
+      },
+      "mixed": {
+        "E": 34,
+        "U": 12,
+        "M": 11
+      },
+      "av": {
+        "E": 0,
+        "U": 0,
+        "M": 0
+      },
+      "constrained_maximum": 11,
+      "selected": 11,
+      "selected_av": 0,
+      "selected_pairs": [
+        [
+          18969,
+          2411
+        ],
+        [
+          18988,
+          2764
+        ],
+        [
+          19000,
+          1523
+        ],
+        [
+          19005,
+          2813
+        ],
+        [
+          19006,
+          2799
+        ],
+        [
+          19008,
+          2774
+        ],
+        [
+          19010,
+          2692
+        ],
+        [
+          19011,
+          2705
+        ],
+        [
+          19013,
+          2709
+        ],
+        [
+          19014,
+          1737
+        ],
+        [
+          19017,
+          2487
+        ]
+      ],
+      "selected_pickup_sum_s": 1720.0957525165727
+    },
+    {
+      "profile": "C",
+      "cut": 63000,
+      "variant": "VT",
+      "source_scenario": "MAIN_Q50_C_P70",
+      "gammas": {
+        "static": null,
+        "dynamic": null,
+        "speed": null
+      },
+      "history_exposure": {
+        "av_assignments": 1086,
+        "static": 7742.911111111115,
+        "dynamic": 305.09649237226904,
+        "speed": 128.2500000000007
+      },
+      "mixed": {
+        "E": 34,
+        "U": 12,
+        "M": 11
+      },
+      "av": {
+        "E": 0,
+        "U": 0,
+        "M": 0
+      },
+      "constrained_maximum": 11,
+      "selected": 11,
+      "selected_av": 0,
+      "selected_pairs": [
+        [
+          18969,
+          2411
+        ],
+        [
+          18988,
+          2764
+        ],
+        [
+          19000,
+          1523
+        ],
+        [
+          19005,
+          2813
+        ],
+        [
+          19006,
+          2799
+        ],
+        [
+          19008,
+          2774
+        ],
+        [
+          19010,
+          2692
+        ],
+        [
+          19011,
+          2705
+        ],
+        [
+          19013,
+          2709
+        ],
+        [
+          19014,
+          1737
+        ],
+        [
+          19017,
+          2487
+        ]
+      ],
+      "selected_pickup_sum_s": 1720.0957525165727,
+      "topk_refill_added_pairs": 0,
+      "removed_pairs": 0,
+      "fixed_V_arc_deletion": {
+        "mixed": {
+          "E": 34,
+          "U": 12,
+          "M": 11
+        },
+        "av": {
+          "E": 0,
+          "U": 0,
+          "M": 0
+        },
+        "constrained_maximum": 11,
+        "selected": 11,
+        "selected_av": 0,
+        "selected_pairs": [
+          [
+            18969,
+            2411
+          ],
+          [
+            18988,
+            2764
+          ],
+          [
+            19000,
+            1523
+          ],
+          [
+            19005,
+            2813
+          ],
+          [
+            19006,
+            2799
+          ],
+          [
+            19008,
+            2774
+          ],
+          [
+            19010,
+            2692
+          ],
+          [
+            19011,
+            2705
+          ],
+          [
+            19013,
+            2709
+          ],
+          [
+            19014,
+            1737
+          ],
+          [
+            19017,
+            2487
+          ]
+        ],
+        "selected_pickup_sum_s": 1720.0957525165727
+      }
+    },
+    {
+      "profile": "M",
+      "cut": 37800,
+      "variant": "F",
+      "source_scenario": "ODD_Q50_M_P70_REFERENCE",
+      "gammas": {
+        "static": 2.145067625590382,
+        "dynamic": 0.14934256810554178,
+        "speed": 0.0
+      },
+      "history_exposure": {
+        "av_assignments": 671,
+        "static": 1419.3982843137255,
+        "dynamic": 95.64505263388362,
+        "speed": 0.0
+      },
+      "mixed": {
+        "E": 19,
+        "U": 9,
+        "M": 8
+      },
+      "av": {
+        "E": 3,
+        "U": 2,
+        "M": 2
+      },
+      "constrained_maximum": 8,
+      "selected": 8,
+      "selected_av": 2,
+      "selected_pairs": [
+        [
+          6274,
+          974
+        ],
+        [
+          6355,
+          4377
+        ],
+        [
+          6356,
+          1101
+        ],
+        [
+          6357,
+          4264
+        ],
+        [
+          6358,
+          1163
+        ],
+        [
+          6359,
+          510
+        ],
+        [
+          6360,
+          1040
+        ],
+        [
+          6361,
+          1184
+        ]
+      ],
+      "selected_pickup_sum_s": 1278.5862265889114
+    },
+    {
+      "profile": "M",
+      "cut": 37800,
+      "variant": "V",
+      "source_scenario": "ODD_Q50_M_P70_REFERENCE",
+      "gammas": {
+        "static": 2.145067625590382,
+        "dynamic": 0.14934256810554178,
+        "speed": 0.0
+      },
+      "history_exposure": {
+        "av_assignments": 671,
+        "static": 1419.3982843137255,
+        "dynamic": 61.65063306689326,
+        "speed": 0.0
+      },
+      "mixed": {
+        "E": 19,
+        "U": 9,
+        "M": 8
+      },
+      "av": {
+        "E": 3,
+        "U": 2,
+        "M": 2
+      },
+      "constrained_maximum": 8,
+      "selected": 8,
+      "selected_av": 2,
+      "selected_pairs": [
+        [
+          6274,
+          974
+        ],
+        [
+          6355,
+          4377
+        ],
+        [
+          6356,
+          1101
+        ],
+        [
+          6357,
+          4264
+        ],
+        [
+          6358,
+          1163
+        ],
+        [
+          6359,
+          510
+        ],
+        [
+          6360,
+          1040
+        ],
+        [
+          6361,
+          1184
+        ]
+      ],
+      "selected_pickup_sum_s": 1278.5862265889114
+    },
+    {
+      "profile": "M",
+      "cut": 37800,
+      "variant": "VT",
+      "source_scenario": "ODD_Q50_M_P70_REFERENCE",
+      "gammas": {
+        "static": 2.145067625590382,
+        "dynamic": 0.14934256810554178,
+        "speed": 0.0
+      },
+      "history_exposure": {
+        "av_assignments": 671,
+        "static": 1419.3982843137255,
+        "dynamic": 61.65063306689326,
+        "speed": 0.0
+      },
+      "mixed": {
+        "E": 19,
+        "U": 9,
+        "M": 8
+      },
+      "av": {
+        "E": 3,
+        "U": 2,
+        "M": 2
+      },
+      "constrained_maximum": 8,
+      "selected": 8,
+      "selected_av": 2,
+      "selected_pairs": [
+        [
+          6274,
+          974
+        ],
+        [
+          6355,
+          4377
+        ],
+        [
+          6356,
+          1101
+        ],
+        [
+          6357,
+          4264
+        ],
+        [
+          6358,
+          1163
+        ],
+        [
+          6359,
+          510
+        ],
+        [
+          6360,
+          1040
+        ],
+        [
+          6361,
+          1184
+        ]
+      ],
+      "selected_pickup_sum_s": 1278.5862265889114,
+      "topk_refill_added_pairs": 0,
+      "removed_pairs": 0,
+      "fixed_V_arc_deletion": {
+        "mixed": {
+          "E": 19,
+          "U": 9,
+          "M": 8
+        },
+        "av": {
+          "E": 3,
+          "U": 2,
+          "M": 2
+        },
+        "constrained_maximum": 8,
+        "selected": 8,
+        "selected_av": 2,
+        "selected_pairs": [
+          [
+            6274,
+            974
+          ],
+          [
+            6355,
+            4377
+          ],
+          [
+            6356,
+            1101
+          ],
+          [
+            6357,
+            4264
+          ],
+          [
+            6358,
+            1163
+          ],
+          [
+            6359,
+            510
+          ],
+          [
+            6360,
+            1040
+          ],
+          [
+            6361,
+            1184
+          ]
+        ],
+        "selected_pickup_sum_s": 1278.5862265889114
+      }
+    },
+    {
+      "profile": "M",
+      "cut": 63000,
+      "variant": "F",
+      "source_scenario": "ODD_Q50_M_P70_REFERENCE",
+      "gammas": {
+        "static": 2.145067625590382,
+        "dynamic": 0.14934256810554178,
+        "speed": 0.0
+      },
+      "history_exposure": {
+        "av_assignments": 1549,
+        "static": 3304.9330882352933,
+        "dynamic": 225.11654251680275,
+        "speed": 0.0
+      },
+      "mixed": {
+        "E": 37,
+        "U": 12,
+        "M": 12
+      },
+      "av": {
+        "E": 4,
+        "U": 1,
+        "M": 1
+      },
+      "constrained_maximum": 12,
+      "selected": 12,
+      "selected_av": 1,
+      "selected_pairs": [
+        [
+          18988,
+          2764
+        ],
+        [
+          18991,
+          1969
+        ],
+        [
+          19000,
+          2290
+        ],
+        [
+          19005,
+          2813
+        ],
+        [
+          19006,
+          2709
+        ],
+        [
+          19008,
+          2774
+        ],
+        [
+          19009,
+          4406
+        ],
+        [
+          19010,
+          2677
+        ],
+        [
+          19011,
+          2705
+        ],
+        [
+          19013,
+          2799
+        ],
+        [
+          19014,
+          2712
+        ],
+        [
+          19019,
+          2595
+        ]
+      ],
+      "selected_pickup_sum_s": 2069.8379572796466
+    },
+    {
+      "profile": "M",
+      "cut": 63000,
+      "variant": "V",
+      "source_scenario": "ODD_Q50_M_P70_REFERENCE",
+      "gammas": {
+        "static": 2.145067625590382,
+        "dynamic": 0.14934256810554178,
+        "speed": 0.0
+      },
+      "history_exposure": {
+        "av_assignments": 1549,
+        "static": 3304.9330882352933,
+        "dynamic": 105.23735180215944,
+        "speed": 0.0
+      },
+      "mixed": {
+        "E": 37,
+        "U": 12,
+        "M": 12
+      },
+      "av": {
+        "E": 4,
+        "U": 1,
+        "M": 1
+      },
+      "constrained_maximum": 12,
+      "selected": 12,
+      "selected_av": 1,
+      "selected_pairs": [
+        [
+          18988,
+          2764
+        ],
+        [
+          18991,
+          1969
+        ],
+        [
+          19000,
+          2290
+        ],
+        [
+          19005,
+          2813
+        ],
+        [
+          19006,
+          2709
+        ],
+        [
+          19008,
+          2774
+        ],
+        [
+          19009,
+          4406
+        ],
+        [
+          19010,
+          2677
+        ],
+        [
+          19011,
+          2705
+        ],
+        [
+          19013,
+          2799
+        ],
+        [
+          19014,
+          2712
+        ],
+        [
+          19019,
+          2595
+        ]
+      ],
+      "selected_pickup_sum_s": 2069.8379572796466
+    },
+    {
+      "profile": "M",
+      "cut": 63000,
+      "variant": "VT",
+      "source_scenario": "ODD_Q50_M_P70_REFERENCE",
+      "gammas": {
+        "static": 2.145067625590382,
+        "dynamic": 0.14934256810554178,
+        "speed": 0.0
+      },
+      "history_exposure": {
+        "av_assignments": 1549,
+        "static": 3304.9330882352933,
+        "dynamic": 105.23735180215944,
+        "speed": 0.0
+      },
+      "mixed": {
+        "E": 37,
+        "U": 12,
+        "M": 12
+      },
+      "av": {
+        "E": 4,
+        "U": 1,
+        "M": 1
+      },
+      "constrained_maximum": 12,
+      "selected": 12,
+      "selected_av": 1,
+      "selected_pairs": [
+        [
+          18988,
+          2764
+        ],
+        [
+          18991,
+          1969
+        ],
+        [
+          19000,
+          2290
+        ],
+        [
+          19005,
+          2813
+        ],
+        [
+          19006,
+          2709
+        ],
+        [
+          19008,
+          2774
+        ],
+        [
+          19009,
+          4406
+        ],
+        [
+          19010,
+          2677
+        ],
+        [
+          19011,
+          2705
+        ],
+        [
+          19013,
+          2799
+        ],
+        [
+          19014,
+          2712
+        ],
+        [
+          19019,
+          2595
+        ]
+      ],
+      "selected_pickup_sum_s": 2069.8379572796466,
+      "topk_refill_added_pairs": 0,
+      "removed_pairs": 0,
+      "fixed_V_arc_deletion": {
+        "mixed": {
+          "E": 37,
+          "U": 12,
+          "M": 12
+        },
+        "av": {
+          "E": 4,
+          "U": 1,
+          "M": 1
+        },
+        "constrained_maximum": 12,
+        "selected": 12,
+        "selected_av": 1,
+        "selected_pairs": [
+          [
+            18988,
+            2764
+          ],
+          [
+            18991,
+            1969
+          ],
+          [
+            19000,
+            2290
+          ],
+          [
+            19005,
+            2813
+          ],
+          [
+            19006,
+            2709
+          ],
+          [
+            19008,
+            2774
+          ],
+          [
+            19009,
+            4406
+          ],
+          [
+            19010,
+            2677
+          ],
+          [
+            19011,
+            2705
+          ],
+          [
+            19013,
+            2799
+          ],
+          [
+            19014,
+            2712
+          ],
+          [
+            19019,
+            2595
+          ]
+        ],
+        "selected_pickup_sum_s": 2069.8379572796466
+      }
+    },
+    {
+      "profile": "A",
+      "cut": 37800,
+      "variant": "F",
+      "source_scenario": "MAIN_Q50_A_P70",
+      "gammas": {
+        "static": null,
+        "dynamic": null,
+        "speed": null
+      },
+      "history_exposure": {
+        "av_assignments": 745,
+        "static": 650.8118721461185,
+        "dynamic": 32.98590201320649,
+        "speed": 0.0
+      },
+      "mixed": {
+        "E": 16,
+        "U": 6,
+        "M": 5
+      },
+      "av": {
+        "E": 2,
+        "U": 1,
+        "M": 1
+      },
+      "constrained_maximum": 5,
+      "selected": 5,
+      "selected_av": 0,
+      "selected_pairs": [
+        [
+          6355,
+          878
+        ],
+        [
+          6356,
+          699
+        ],
+        [
+          6358,
+          1163
+        ],
+        [
+          6359,
+          1040
+        ],
+        [
+          6361,
+          1184
+        ]
+      ],
+      "selected_pickup_sum_s": 655.3062355927754
+    },
+    {
+      "profile": "A",
+      "cut": 37800,
+      "variant": "V",
+      "source_scenario": "MAIN_Q50_A_P70",
+      "gammas": {
+        "static": null,
+        "dynamic": null,
+        "speed": null
+      },
+      "history_exposure": {
+        "av_assignments": 745,
+        "static": 650.8118721461185,
+        "dynamic": 22.79190009581564,
+        "speed": 0.0
+      },
+      "mixed": {
+        "E": 16,
+        "U": 6,
+        "M": 5
+      },
+      "av": {
+        "E": 2,
+        "U": 1,
+        "M": 1
+      },
+      "constrained_maximum": 5,
+      "selected": 5,
+      "selected_av": 0,
+      "selected_pairs": [
+        [
+          6355,
+          878
+        ],
+        [
+          6356,
+          699
+        ],
+        [
+          6358,
+          1163
+        ],
+        [
+          6359,
+          1040
+        ],
+        [
+          6361,
+          1184
+        ]
+      ],
+      "selected_pickup_sum_s": 655.3062355927754
+    },
+    {
+      "profile": "A",
+      "cut": 37800,
+      "variant": "VT",
+      "source_scenario": "MAIN_Q50_A_P70",
+      "gammas": {
+        "static": null,
+        "dynamic": null,
+        "speed": null
+      },
+      "history_exposure": {
+        "av_assignments": 745,
+        "static": 650.8118721461185,
+        "dynamic": 22.79190009581564,
+        "speed": 0.0
+      },
+      "mixed": {
+        "E": 16,
+        "U": 6,
+        "M": 5
+      },
+      "av": {
+        "E": 2,
+        "U": 1,
+        "M": 1
+      },
+      "constrained_maximum": 5,
+      "selected": 5,
+      "selected_av": 0,
+      "selected_pairs": [
+        [
+          6355,
+          878
+        ],
+        [
+          6356,
+          699
+        ],
+        [
+          6358,
+          1163
+        ],
+        [
+          6359,
+          1040
+        ],
+        [
+          6361,
+          1184
+        ]
+      ],
+      "selected_pickup_sum_s": 655.3062355927754,
+      "topk_refill_added_pairs": 0,
+      "removed_pairs": 0,
+      "fixed_V_arc_deletion": {
+        "mixed": {
+          "E": 16,
+          "U": 6,
+          "M": 5
+        },
+        "av": {
+          "E": 2,
+          "U": 1,
+          "M": 1
+        },
+        "constrained_maximum": 5,
+        "selected": 5,
+        "selected_av": 0,
+        "selected_pairs": [
+          [
+            6355,
+            878
+          ],
+          [
+            6356,
+            699
+          ],
+          [
+            6358,
+            1163
+          ],
+          [
+            6359,
+            1040
+          ],
+          [
+            6361,
+            1184
+          ]
+        ],
+        "selected_pickup_sum_s": 655.3062355927754
+      }
+    },
+    {
+      "profile": "A",
+      "cut": 63000,
+      "variant": "F",
+      "source_scenario": "MAIN_Q50_A_P70",
+      "gammas": {
+        "static": null,
+        "dynamic": null,
+        "speed": null
+      },
+      "history_exposure": {
+        "av_assignments": 1671,
+        "static": 1489.189284627094,
+        "dynamic": 63.78440148871991,
+        "speed": 0.0
+      },
+      "mixed": {
+        "E": 30,
+        "U": 11,
+        "M": 10
+      },
+      "av": {
+        "E": 1,
+        "U": 1,
+        "M": 1
+      },
+      "constrained_maximum": 10,
+      "selected": 10,
+      "selected_av": 1,
+      "selected_pairs": [
+        [
+          18988,
+          2764
+        ],
+        [
+          18989,
+          2195
+        ],
+        [
+          19005,
+          2813
+        ],
+        [
+          19006,
+          2709
+        ],
+        [
+          19008,
+          2774
+        ],
+        [
+          19009,
+          4419
+        ],
+        [
+          19011,
+          2705
+        ],
+        [
+          19013,
+          2799
+        ],
+        [
+          19014,
+          2712
+        ],
+        [
+          19019,
+          1628
+        ]
+      ],
+      "selected_pickup_sum_s": 1666.044684507734
+    },
+    {
+      "profile": "A",
+      "cut": 63000,
+      "variant": "V",
+      "source_scenario": "MAIN_Q50_A_P70",
+      "gammas": {
+        "static": null,
+        "dynamic": null,
+        "speed": null
+      },
+      "history_exposure": {
+        "av_assignments": 1671,
+        "static": 1489.189284627094,
+        "dynamic": 29.41487864559496,
+        "speed": 0.0
+      },
+      "mixed": {
+        "E": 30,
+        "U": 11,
+        "M": 10
+      },
+      "av": {
+        "E": 1,
+        "U": 1,
+        "M": 1
+      },
+      "constrained_maximum": 10,
+      "selected": 10,
+      "selected_av": 1,
+      "selected_pairs": [
+        [
+          18988,
+          2764
+        ],
+        [
+          18989,
+          2195
+        ],
+        [
+          19005,
+          2813
+        ],
+        [
+          19006,
+          2709
+        ],
+        [
+          19008,
+          2774
+        ],
+        [
+          19009,
+          4419
+        ],
+        [
+          19011,
+          2705
+        ],
+        [
+          19013,
+          2799
+        ],
+        [
+          19014,
+          2712
+        ],
+        [
+          19019,
+          1628
+        ]
+      ],
+      "selected_pickup_sum_s": 1666.044684507734
+    },
+    {
+      "profile": "A",
+      "cut": 63000,
+      "variant": "VT",
+      "source_scenario": "MAIN_Q50_A_P70",
+      "gammas": {
+        "static": null,
+        "dynamic": null,
+        "speed": null
+      },
+      "history_exposure": {
+        "av_assignments": 1671,
+        "static": 1489.189284627094,
+        "dynamic": 29.41487864559496,
+        "speed": 0.0
+      },
+      "mixed": {
+        "E": 30,
+        "U": 11,
+        "M": 10
+      },
+      "av": {
+        "E": 1,
+        "U": 1,
+        "M": 1
+      },
+      "constrained_maximum": 10,
+      "selected": 10,
+      "selected_av": 1,
+      "selected_pairs": [
+        [
+          18988,
+          2764
+        ],
+        [
+          18989,
+          2195
+        ],
+        [
+          19005,
+          2813
+        ],
+        [
+          19006,
+          2709
+        ],
+        [
+          19008,
+          2774
+        ],
+        [
+          19009,
+          4419
+        ],
+        [
+          19011,
+          2705
+        ],
+        [
+          19013,
+          2799
+        ],
+        [
+          19014,
+          2712
+        ],
+        [
+          19019,
+          1628
+        ]
+      ],
+      "selected_pickup_sum_s": 1666.044684507734,
+      "topk_refill_added_pairs": 0,
+      "removed_pairs": 0,
+      "fixed_V_arc_deletion": {
+        "mixed": {
+          "E": 30,
+          "U": 11,
+          "M": 10
+        },
+        "av": {
+          "E": 1,
+          "U": 1,
+          "M": 1
+        },
+        "constrained_maximum": 10,
+        "selected": 10,
+        "selected_av": 1,
+        "selected_pairs": [
+          [
+            18988,
+            2764
+          ],
+          [
+            18989,
+            2195
+          ],
+          [
+            19005,
+            2813
+          ],
+          [
+            19006,
+            2709
+          ],
+          [
+            19008,
+            2774
+          ],
+          [
+            19009,
+            4419
+          ],
+          [
+            19011,
+            2705
+          ],
+          [
+            19013,
+            2799
+          ],
+          [
+            19014,
+            2712
+          ],
+          [
+            19019,
+            1628
+          ]
+        ],
+        "selected_pickup_sum_s": 1666.044684507734
+      }
+    }
+  ],
+  "active": null,
+  "runtime_s": 400.3189086999996,
+  "peak_rss_mib": 798.9609375
+}
