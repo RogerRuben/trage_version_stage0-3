@@ -11,7 +11,7 @@ import psutil
 from joblib.externals import cloudpickle
 
 from stage3.scripts.traffic_state_batch1 import sha, write_json
-from stage4.dispatch.traffic_research_policy import MODE, TrafficResearchPolicy
+from stage4.dispatch.traffic_research_policy import MODE, VARIABILITY_MODE, TrafficResearchPolicy
 from stage4.dispatch.deterministic_routing import ArcDeterministicValhallaAdapter
 from stage4.fleetpy_adapter.upstream import load_fleetpy_bindings
 
@@ -35,7 +35,7 @@ def preflight_requests(c, policy, cfg):
     return ready
 
 
-def condition(root, cfg, mode, dest):
+def condition(root, cfg, mode, dest, on_ready=None):
     start = time.monotonic()
     checkpoint = root/cfg["checkpoint"]
     checkpoint_sha = sha(checkpoint)
@@ -46,13 +46,15 @@ def condition(root, cfg, mode, dest):
     assert c.acceptance_rate == .7 and c.config["profile_id"] == cfg["profile_id"]
     table_path = root/"stage4/output/traffic_research/policy_date=20161031.parquet"
     table = pd.read_parquet(table_path)
-    policy = TrafficResearchPolicy(table, cfg["main_budget"])
+    if mode not in ("FROZEN", MODE, VARIABILITY_MODE):
+        raise ValueError("invalid window policy")
+    policy = TrafficResearchPolicy(table, cfg["main_budget"], mode=VARIABILITY_MODE if mode == VARIABILITY_MODE else MODE)
     ready = preflight_requests(c, policy, cfg)
     c.config = {**c.config, "traffic_research_policy":mode, "traffic_research_budget": cfg["main_budget"],
                 "traffic_research_table":str(table_path), "additional_pickup_overhead_s":0}
-    c.traffic_policy = policy if mode == MODE else None
+    c.traffic_policy = policy if mode != "FROZEN" else None
     old_dynamic = c.exposure_state.dynamic
-    if mode == MODE:
+    if mode != "FROZEN":
         past_av = [r for r in c.assignment_rows if r["vehicle_type"] == "AV"]
         assert len(past_av) == c.exposure_state.av_assignments
         c.exposure_state.dynamic = sum(policy.evaluate(c.request_by_rid[int(a["native_request_id"])])["exposure"].dynamic for a in past_av)
@@ -67,10 +69,14 @@ def condition(root, cfg, mode, dest):
     c.run_started_perf = time.perf_counter()
     c.runtime_guard_s = cfg["scenario_timeout_s"]
     c.matching_end_s = cfg["last_dispatch_s"]
+    if cfg.get("prospective_gate_logging", False):
+        c.prospective_gate_logging = True
     sim.demand.future_requests = {t:v for t,v in sim.demand.future_requests.items() if t<cfg["measurement_end_s"]}
     cohort = {rid:r for rid,r in c.request_by_rid.items() if cfg["measurement_start_s"] <= r.sim_time_s < cfg["measurement_end_s"]}
     drain = math.ceil((cfg["last_dispatch_s"]+300+max(r.realized_service_time_s for r in c.request_by_rid.values()))/30)*30+30
     initial_rows, initial_epochs, initial_exposure = len(c.assignment_rows), len(c.epoch_rows), len(c.exposure_rows)
+    if on_ready is not None:
+        on_ready(c)
     for tick in range(cfg["checkpoint_s"], drain+30, 30):
         if time.monotonic()-start > cfg["scenario_timeout_s"]:
             raise TimeoutError("traffic scenario exceeded prespecified 1800 seconds")
@@ -117,8 +123,9 @@ def condition(root, cfg, mode, dest):
         g = g.sort_values("assignment_time")
         assert (pd.to_datetime(g.assignment_time).iloc[1:].to_numpy() >= pd.to_datetime(g.service_end_time).iloc[:-1].to_numpy()).all()
     baseline_exact = None
-    if mode == "FROZEN":
-        prior = pd.read_parquet(root/"stage4/output/paper_enhancement/dwell_deterministic_window/q50_dwell0/assignments.parquet")
+    reference = cfg.get("baseline_reference", "stage4/output/paper_enhancement/dwell_deterministic_window/q50_dwell0/assignments.parquet")
+    if mode == "FROZEN" and reference is not None:
+        prior = pd.read_parquet(root/reference)
         keys = ["simulation_time_s","native_request_id","native_vehicle_id","pickup_eta_s"]
         a = assignments.loc[assignments.simulation_time_s.lt(cfg["measurement_end_s"]),keys].sort_values(keys[:3]).reset_index(drop=True)
         b = prior.loc[prior.simulation_time_s.lt(cfg["measurement_end_s"]),keys].sort_values(keys[:3]).reset_index(drop=True)
@@ -128,6 +135,10 @@ def condition(root, cfg, mode, dest):
     outcome.to_parquet(dest/"cohort_outcomes.parquet",index=False)
     pd.DataFrame(c.epoch_rows[initial_epochs:]).to_parquet(dest/"epochs.parquet",index=False)
     pd.DataFrame(c.exposure_rows[initial_exposure:]).to_parquet(dest/"exposure.parquet",index=False)
+    if cfg.get("prospective_gate_logging", False):
+        from stage4.dispatch.gate_diagnostics import validate_gate_counts
+        for row in c.epoch_rows[initial_epochs:]:
+            validate_gate_counts(row)
     assert sha(checkpoint) == checkpoint_sha
     mem = psutil.Process().memory_info()
     result = dict(mode=mode,status="COMPLETE",cohort_orders=len(outcome),matched=int(outcome.matched.sum()),
@@ -139,6 +150,9 @@ def condition(root, cfg, mode, dest):
         runtime_s=time.monotonic()-start,peak_rss_mib=getattr(mem,"peak_wset",mem.rss)/2**20,
         checkpoint_sha256=checkpoint_sha,policy_table_sha256=sha(table_path),drain_end_s=tick,
         cohort_eligible_unknown_share_mean=float(outcome.research_unknown_share.mean()))
+    if cfg.get("prospective_gate_logging", False):
+        result.update(gate_conservation=True, gammas=c.gammas,
+            traffic_pruned=sum(r.get("traffic_policy_pruned_av_opportunities",0) for r in c.epoch_rows[initial_epochs:]))
     write_json(dest/"summary.json",result)
     return result
 
