@@ -3,6 +3,9 @@
 后续授权的“离线独立作用 → F/V/VT固定状态 → 预定动态窗口”三阶段也已于2026-09-28完成，
 见 [mechanism_report.md](mechanism_report.md)。下文保留首轮M窗口的历史结果。
 
+相对减速型MIXED的离线语义/预算归因/已有服务转移分析也已完成：
+[mixed_attribution_report.md](mixed_attribution_report.md)。无新动态实验、无策略调整。
+
 ## Material Passport
 
 academic-research-suite / experiment-agent，2026-09-27。
