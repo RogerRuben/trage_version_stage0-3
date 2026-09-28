@@ -45,6 +45,16 @@ def test_mixed_mapping_and_nestedness():
     with pytest.raises(ValueError): outside_share("X",0,0,0)
 
 
+def test_variability_only_is_same_exposure_without_traffic_gate():
+    from stage4.dispatch.traffic_research_policy import VARIABILITY_MODE
+    r,t=fixture(); t.loc[0,"outside_share"] = .5
+    v=TrafficResearchPolicy(t,mode=VARIABILITY_MODE).evaluate(r)
+    vt=TrafficResearchPolicy(t).evaluate(r)
+    assert v["exposure"] == vt["exposure"]
+    assert v["traffic_allowed"] and not vt["traffic_allowed"]
+    assert v["traffic_policy"] == VARIABILITY_MODE
+
+
 def test_preflight_ignores_unconsumed_cross_midnight_future():
     from stage4.analysis.traffic_research_window import preflight_requests
     r,t=fixture()

@@ -4,6 +4,7 @@ import pandas as pd
 from .exposure import exposure_excess
 
 MODE = "TRAFFIC_REPLACEMENT_V1"
+VARIABILITY_MODE = "VARIABILITY_ONLY_V1"
 KEYS = ["date", "order_id", "profile_id", "selected_route_reference"]
 
 
@@ -14,7 +15,10 @@ def outside_share(profile, congested, severe, relative_mixed):
 
 
 class TrafficResearchPolicy:
-    def __init__(self, frame, budget=.05):
+    def __init__(self, frame, budget=.05, *, mode=MODE):
+        if mode not in (MODE, VARIABILITY_MODE):
+            raise ValueError("unrecognized research mode")
+        self.mode = mode
         if not isfinite(budget) or not 0 <= budget <= 1:
             raise ValueError("invalid traffic budget")
         if frame.duplicated(KEYS).any():
@@ -35,9 +39,9 @@ class TrafficResearchPolicy:
         mode = config.get("traffic_research_policy", "FROZEN")
         if mode == "FROZEN":
             return None
-        if mode != MODE:
+        if mode not in (MODE, VARIABILITY_MODE):
             raise ValueError("unrecognized traffic policy")
-        return cls(pd.read_parquet(config["traffic_research_table"]), float(config["traffic_research_budget"]))
+        return cls(pd.read_parquet(config["traffic_research_table"]), float(config["traffic_research_budget"]), mode=mode)
 
     def evaluate(self, request):
         if not request.av_smoke_eligible:
@@ -51,6 +55,6 @@ class TrafficResearchPolicy:
         exposure = exposure_excess(request.rho_static, row["rho_variability"], request.rho_speed)
         if exposure is None:
             raise ValueError("missing retained-family evidence")
-        return {"exposure": exposure, "traffic_allowed": row["outside_share"] <= self.budget+1e-6,
+        return {"exposure": exposure, "traffic_allowed": self.mode == VARIABILITY_MODE or row["outside_share"] <= self.budget+1e-6,
                 "traffic_outside_share": row["outside_share"], "traffic_unknown_share": row["unknown_share"],
-                "traffic_low_support_share": row["low_support_share"], "traffic_policy": MODE}
+                "traffic_low_support_share": row["low_support_share"], "traffic_policy": self.mode}
