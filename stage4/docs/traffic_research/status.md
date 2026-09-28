@@ -1,5 +1,9 @@
 # 独立交通研究策略：实现、离线对账与小窗口动态对照完成
 
+2026-09-28 方法整理：新增 [Stage3–Stage4 统一方法与数学表述 v1](stage3_stage4_integrated_method_v1.md)。
+保留静态/速度域与 CV/acceleration 六项，以交通状态替换 crawl/stop 六项，区分订单级5%预算与累计Gamma。
+这是待作者确认的方法稿，本轮只写文档，未启动新实验、未改变默认FROZEN或已有运行配置。
+
 后续授权的“离线独立作用 → F/V/VT固定状态 → 预定动态窗口”三阶段也已于2026-09-28完成，
 见 [mechanism_report.md](mechanism_report.md)。下文保留首轮M窗口的历史结果。
 
