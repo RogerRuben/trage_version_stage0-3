@@ -29,3 +29,14 @@ def test_window_is_bounded_and_profile_specific(tmp_path):
     c=window_config(tmp_path,cfg,'C',63000,tmp_path/'cp.pkl')
     assert c['measurement_end_s']==63900 and c['last_dispatch_s']==64200
     assert c['baseline_reference'] is None and c['profile_id']=='C'
+
+
+def test_paired_report_keeps_gained_and_lost_orders():
+    from stage4.analysis.traffic_mechanism_compare import compare
+    a=pd.DataFrame(dict(order_id=['a','b','c'],matched=[True,True,False],
+                        vehicle_type=['HV','AV',None],wait_s=[10.,20.,None]))
+    b=pd.DataFrame(dict(order_id=['a','b','c'],matched=[True,False,True],
+                        vehicle_type=['AV',None,'HV'],wait_s=[15.,None,30.]))
+    r=compare(a,b)
+    assert r['gained']==1 and r['lost']==1 and r['both_matched']==1
+    assert r['common_matched_wait_difference_s']==5

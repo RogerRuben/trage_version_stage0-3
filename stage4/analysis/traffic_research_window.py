@@ -112,7 +112,7 @@ def condition(root, cfg, mode, dest, on_ready=None):
         outcomes.append(row)
     outcome = pd.DataFrame(outcomes)
     av = assignments.loc[assignments.vehicle_type.eq("AV")]
-    if mode == MODE:
+    if mode == MODE and not av.empty:
         assert av.traffic_allowed.all() and av.traffic_outside_share.le(cfg["main_budget"]+1e-6).all()
         assert av.exposure_dynamic.notna().all()
     pickup_error = (pd.to_datetime(assignments.pickup_time)-pd.to_datetime(assignments.assignment_time)).dt.total_seconds()-assignments.pickup_eta_s
