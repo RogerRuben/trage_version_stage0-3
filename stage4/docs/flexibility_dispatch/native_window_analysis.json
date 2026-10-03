@@ -1,0 +1,532 @@
+{
+  "status": "COMPLETE",
+  "classification": "BOUNDED_EXPLORATORY_NATIVE_COMPARISON",
+  "groups": [
+    {
+      "cut": 37800,
+      "profile": "C",
+      "cohort": 379,
+      "matched": {
+        "MYOPIC": 254,
+        "AV_FIRST": 255,
+        "LOOKAHEAD": 251
+      },
+      "service_rate": {
+        "MYOPIC": 0.6701846965699209,
+        "AV_FIRST": 0.6728232189973615,
+        "LOOKAHEAD": 0.662269129287599
+      },
+      "av_served": {
+        "MYOPIC": 19,
+        "AV_FIRST": 23,
+        "LOOKAHEAD": 21
+      },
+      "mean_wait_among_served_s": {
+        "MYOPIC": 188.71985592913387,
+        "AV_FIRST": 190.4157240784314,
+        "LOOKAHEAD": 193.72687599601596
+      },
+      "paired_vs_myopic": {
+        "AV_FIRST": {
+          "cut": 37800,
+          "profile": "C",
+          "policy": "AV_FIRST",
+          "cohort": 379,
+          "net_matched_change": 1,
+          "gained": 3,
+          "lost": 2
+        },
+        "LOOKAHEAD": {
+          "cut": 37800,
+          "profile": "C",
+          "policy": "LOOKAHEAD",
+          "cohort": 379,
+          "net_matched_change": -3,
+          "gained": 26,
+          "lost": 29
+        }
+      }
+    },
+    {
+      "cut": 37800,
+      "profile": "M",
+      "cohort": 379,
+      "matched": {
+        "MYOPIC": 267,
+        "AV_FIRST": 267,
+        "LOOKAHEAD": 264
+      },
+      "service_rate": {
+        "MYOPIC": 0.7044854881266491,
+        "AV_FIRST": 0.7044854881266491,
+        "LOOKAHEAD": 0.6965699208443272
+      },
+      "av_served": {
+        "MYOPIC": 46,
+        "AV_FIRST": 57,
+        "LOOKAHEAD": 47
+      },
+      "mean_wait_among_served_s": {
+        "MYOPIC": 178.23584310861423,
+        "AV_FIRST": 179.6412585093633,
+        "LOOKAHEAD": 185.37829979166665
+      },
+      "paired_vs_myopic": {
+        "AV_FIRST": {
+          "cut": 37800,
+          "profile": "M",
+          "policy": "AV_FIRST",
+          "cohort": 379,
+          "net_matched_change": 0,
+          "gained": 5,
+          "lost": 5
+        },
+        "LOOKAHEAD": {
+          "cut": 37800,
+          "profile": "M",
+          "policy": "LOOKAHEAD",
+          "cohort": 379,
+          "net_matched_change": -3,
+          "gained": 23,
+          "lost": 26
+        }
+      }
+    },
+    {
+      "cut": 37800,
+      "profile": "A",
+      "cohort": 379,
+      "matched": {
+        "MYOPIC": 268,
+        "AV_FIRST": 268,
+        "LOOKAHEAD": 267
+      },
+      "service_rate": {
+        "MYOPIC": 0.7071240105540897,
+        "AV_FIRST": 0.7071240105540897,
+        "LOOKAHEAD": 0.7044854881266491
+      },
+      "av_served": {
+        "MYOPIC": 48,
+        "AV_FIRST": 59,
+        "LOOKAHEAD": 49
+      },
+      "mean_wait_among_served_s": {
+        "MYOPIC": 177.7964115074627,
+        "AV_FIRST": 179.19658282089554,
+        "LOOKAHEAD": 184.0988353220974
+      },
+      "paired_vs_myopic": {
+        "AV_FIRST": {
+          "cut": 37800,
+          "profile": "A",
+          "policy": "AV_FIRST",
+          "cohort": 379,
+          "net_matched_change": 0,
+          "gained": 5,
+          "lost": 5
+        },
+        "LOOKAHEAD": {
+          "cut": 37800,
+          "profile": "A",
+          "policy": "LOOKAHEAD",
+          "cohort": 379,
+          "net_matched_change": -1,
+          "gained": 26,
+          "lost": 27
+        }
+      }
+    },
+    {
+      "cut": 63000,
+      "profile": "C",
+      "cohort": 419,
+      "matched": {
+        "MYOPIC": 200,
+        "AV_FIRST": 201,
+        "LOOKAHEAD": 191
+      },
+      "service_rate": {
+        "MYOPIC": 0.477326968973747,
+        "AV_FIRST": 0.4797136038186158,
+        "LOOKAHEAD": 0.45584725536992843
+      },
+      "av_served": {
+        "MYOPIC": 4,
+        "AV_FIRST": 5,
+        "LOOKAHEAD": 4
+      },
+      "mean_wait_among_served_s": {
+        "MYOPIC": 187.837294935,
+        "AV_FIRST": 188.08443108955223,
+        "LOOKAHEAD": 191.21310511518323
+      },
+      "paired_vs_myopic": {
+        "AV_FIRST": {
+          "cut": 63000,
+          "profile": "C",
+          "policy": "AV_FIRST",
+          "cohort": 419,
+          "net_matched_change": 1,
+          "gained": 1,
+          "lost": 0
+        },
+        "LOOKAHEAD": {
+          "cut": 63000,
+          "profile": "C",
+          "policy": "LOOKAHEAD",
+          "cohort": 419,
+          "net_matched_change": -9,
+          "gained": 25,
+          "lost": 34
+        }
+      }
+    },
+    {
+      "cut": 63000,
+      "profile": "M",
+      "cohort": 419,
+      "matched": {
+        "MYOPIC": 225,
+        "AV_FIRST": 226,
+        "LOOKAHEAD": 212
+      },
+      "service_rate": {
+        "MYOPIC": 0.5369928400954654,
+        "AV_FIRST": 0.5393794749403341,
+        "LOOKAHEAD": 0.5059665871121718
+      },
+      "av_served": {
+        "MYOPIC": 40,
+        "AV_FIRST": 46,
+        "LOOKAHEAD": 35
+      },
+      "mean_wait_among_served_s": {
+        "MYOPIC": 182.00346101333335,
+        "AV_FIRST": 183.76012502654868,
+        "LOOKAHEAD": 180.48990270754717
+      },
+      "paired_vs_myopic": {
+        "AV_FIRST": {
+          "cut": 63000,
+          "profile": "M",
+          "policy": "AV_FIRST",
+          "cohort": 419,
+          "net_matched_change": 1,
+          "gained": 3,
+          "lost": 2
+        },
+        "LOOKAHEAD": {
+          "cut": 63000,
+          "profile": "M",
+          "policy": "LOOKAHEAD",
+          "cohort": 419,
+          "net_matched_change": -13,
+          "gained": 16,
+          "lost": 29
+        }
+      }
+    },
+    {
+      "cut": 63000,
+      "profile": "A",
+      "cohort": 419,
+      "matched": {
+        "MYOPIC": 228,
+        "AV_FIRST": 228,
+        "LOOKAHEAD": 217
+      },
+      "service_rate": {
+        "MYOPIC": 0.5441527446300716,
+        "AV_FIRST": 0.5441527446300716,
+        "LOOKAHEAD": 0.5178997613365155
+      },
+      "av_served": {
+        "MYOPIC": 42,
+        "AV_FIRST": 47,
+        "LOOKAHEAD": 39
+      },
+      "mean_wait_among_served_s": {
+        "MYOPIC": 182.7153641622807,
+        "AV_FIRST": 184.21316182017546,
+        "LOOKAHEAD": 183.21291275576036
+      },
+      "paired_vs_myopic": {
+        "AV_FIRST": {
+          "cut": 63000,
+          "profile": "A",
+          "policy": "AV_FIRST",
+          "cohort": 419,
+          "net_matched_change": 0,
+          "gained": 2,
+          "lost": 2
+        },
+        "LOOKAHEAD": {
+          "cut": 63000,
+          "profile": "A",
+          "policy": "LOOKAHEAD",
+          "cohort": 419,
+          "net_matched_change": -11,
+          "gained": 19,
+          "lost": 30
+        }
+      }
+    }
+  ],
+  "aggregates_by_profile": [
+    {
+      "profile": "C",
+      "cohort": 798,
+      "matched": {
+        "MYOPIC": 454,
+        "AV_FIRST": 456,
+        "LOOKAHEAD": 442
+      },
+      "service_rate": {
+        "MYOPIC": 0.568922305764411,
+        "AV_FIRST": 0.5714285714285714,
+        "LOOKAHEAD": 0.5538847117794486
+      },
+      "net_vs_myopic": {
+        "AV_FIRST": 2,
+        "LOOKAHEAD": -12
+      },
+      "percentage_points_vs_myopic": {
+        "AV_FIRST": 0.2506265664160401,
+        "LOOKAHEAD": -1.5037593984962405
+      }
+    },
+    {
+      "profile": "M",
+      "cohort": 798,
+      "matched": {
+        "MYOPIC": 492,
+        "AV_FIRST": 493,
+        "LOOKAHEAD": 476
+      },
+      "service_rate": {
+        "MYOPIC": 0.6165413533834586,
+        "AV_FIRST": 0.6177944862155389,
+        "LOOKAHEAD": 0.5964912280701754
+      },
+      "net_vs_myopic": {
+        "AV_FIRST": 1,
+        "LOOKAHEAD": -16
+      },
+      "percentage_points_vs_myopic": {
+        "AV_FIRST": 0.12531328320802004,
+        "LOOKAHEAD": -2.0050125313283207
+      }
+    },
+    {
+      "profile": "A",
+      "cohort": 798,
+      "matched": {
+        "MYOPIC": 496,
+        "AV_FIRST": 496,
+        "LOOKAHEAD": 484
+      },
+      "service_rate": {
+        "MYOPIC": 0.6215538847117794,
+        "AV_FIRST": 0.6215538847117794,
+        "LOOKAHEAD": 0.606516290726817
+      },
+      "net_vs_myopic": {
+        "AV_FIRST": 0,
+        "LOOKAHEAD": -12
+      },
+      "percentage_points_vs_myopic": {
+        "AV_FIRST": 0.0,
+        "LOOKAHEAD": -1.5037593984962405
+      }
+    }
+  ],
+  "resources": {
+    "runtime_s": 1972.3600000000006,
+    "peak_rss_mib": 668.1875,
+    "routing_failures": 0,
+    "routing_arc_evaluations": 821025,
+    "resource_fallback_epochs": 0,
+    "maximum_successful_model_variables": 6413,
+    "maximum_successful_model_nonzeros": 29410,
+    "adapter_time_s": 425.55674159998307,
+    "current_epoch_timing_s": {
+      "candidate_generation_time_s": 115.91216040222207,
+      "routing_time_s": 1340.3497888977436,
+      "solver_time_s": 425.7270392998471
+    },
+    "maximum_current_topk_pairs": 1986,
+    "maximum_current_valid_arcs": 72,
+    "gpu_used": false,
+    "dense_request_vehicle_matrix": false
+  },
+  "descriptive_epoch_diagnostics": [
+    {
+      "cut": 37800,
+      "profile": "C",
+      "policy": "MYOPIC",
+      "decision_epochs": 41,
+      "zero_selected_with_current_arcs": 0,
+      "interpretation": "Observation only; not a same-state maximum-matching counterfactual."
+    },
+    {
+      "cut": 37800,
+      "profile": "C",
+      "policy": "AV_FIRST",
+      "decision_epochs": 41,
+      "zero_selected_with_current_arcs": 0,
+      "interpretation": "Observation only; not a same-state maximum-matching counterfactual."
+    },
+    {
+      "cut": 37800,
+      "profile": "C",
+      "policy": "LOOKAHEAD",
+      "decision_epochs": 41,
+      "zero_selected_with_current_arcs": 1,
+      "interpretation": "Observation only; not a same-state maximum-matching counterfactual."
+    },
+    {
+      "cut": 37800,
+      "profile": "M",
+      "policy": "MYOPIC",
+      "decision_epochs": 41,
+      "zero_selected_with_current_arcs": 0,
+      "interpretation": "Observation only; not a same-state maximum-matching counterfactual."
+    },
+    {
+      "cut": 37800,
+      "profile": "M",
+      "policy": "AV_FIRST",
+      "decision_epochs": 41,
+      "zero_selected_with_current_arcs": 0,
+      "interpretation": "Observation only; not a same-state maximum-matching counterfactual."
+    },
+    {
+      "cut": 37800,
+      "profile": "M",
+      "policy": "LOOKAHEAD",
+      "decision_epochs": 41,
+      "zero_selected_with_current_arcs": 0,
+      "interpretation": "Observation only; not a same-state maximum-matching counterfactual."
+    },
+    {
+      "cut": 37800,
+      "profile": "A",
+      "policy": "MYOPIC",
+      "decision_epochs": 41,
+      "zero_selected_with_current_arcs": 0,
+      "interpretation": "Observation only; not a same-state maximum-matching counterfactual."
+    },
+    {
+      "cut": 37800,
+      "profile": "A",
+      "policy": "AV_FIRST",
+      "decision_epochs": 41,
+      "zero_selected_with_current_arcs": 0,
+      "interpretation": "Observation only; not a same-state maximum-matching counterfactual."
+    },
+    {
+      "cut": 37800,
+      "profile": "A",
+      "policy": "LOOKAHEAD",
+      "decision_epochs": 41,
+      "zero_selected_with_current_arcs": 0,
+      "interpretation": "Observation only; not a same-state maximum-matching counterfactual."
+    },
+    {
+      "cut": 63000,
+      "profile": "C",
+      "policy": "MYOPIC",
+      "decision_epochs": 41,
+      "zero_selected_with_current_arcs": 0,
+      "interpretation": "Observation only; not a same-state maximum-matching counterfactual."
+    },
+    {
+      "cut": 63000,
+      "profile": "C",
+      "policy": "AV_FIRST",
+      "decision_epochs": 41,
+      "zero_selected_with_current_arcs": 0,
+      "interpretation": "Observation only; not a same-state maximum-matching counterfactual."
+    },
+    {
+      "cut": 63000,
+      "profile": "C",
+      "policy": "LOOKAHEAD",
+      "decision_epochs": 41,
+      "zero_selected_with_current_arcs": 1,
+      "interpretation": "Observation only; not a same-state maximum-matching counterfactual."
+    },
+    {
+      "cut": 63000,
+      "profile": "M",
+      "policy": "MYOPIC",
+      "decision_epochs": 41,
+      "zero_selected_with_current_arcs": 0,
+      "interpretation": "Observation only; not a same-state maximum-matching counterfactual."
+    },
+    {
+      "cut": 63000,
+      "profile": "M",
+      "policy": "AV_FIRST",
+      "decision_epochs": 41,
+      "zero_selected_with_current_arcs": 0,
+      "interpretation": "Observation only; not a same-state maximum-matching counterfactual."
+    },
+    {
+      "cut": 63000,
+      "profile": "M",
+      "policy": "LOOKAHEAD",
+      "decision_epochs": 41,
+      "zero_selected_with_current_arcs": 1,
+      "interpretation": "Observation only; not a same-state maximum-matching counterfactual."
+    },
+    {
+      "cut": 63000,
+      "profile": "A",
+      "policy": "MYOPIC",
+      "decision_epochs": 41,
+      "zero_selected_with_current_arcs": 0,
+      "interpretation": "Observation only; not a same-state maximum-matching counterfactual."
+    },
+    {
+      "cut": 63000,
+      "profile": "A",
+      "policy": "AV_FIRST",
+      "decision_epochs": 41,
+      "zero_selected_with_current_arcs": 0,
+      "interpretation": "Observation only; not a same-state maximum-matching counterfactual."
+    },
+    {
+      "cut": 63000,
+      "profile": "A",
+      "policy": "LOOKAHEAD",
+      "decision_epochs": 41,
+      "zero_selected_with_current_arcs": 1,
+      "interpretation": "Observation only; not a same-state maximum-matching counterfactual."
+    }
+  ],
+  "necessary_qa": {
+    "completed_conditions": 18,
+    "expected_conditions": 18,
+    "physical_reconciliation": true,
+    "route_compatibility_nested": true,
+    "forecast_dates": [
+      "20161010",
+      "20161017",
+      "20161024"
+    ],
+    "forecast_fit_on_test31": false,
+    "frozen_profile_checkpoint_config_unchanged": true
+  },
+  "interpretation": {
+    "independent_window_count": 2,
+    "profiles_are_not_independent_replications": true,
+    "paired_gains_not_significance_tests": true,
+    "future_eta_is_train_prediction_heuristic": true,
+    "recourse_counts_not_realized_service": true,
+    "full_day_superiority_not_established": true,
+    "no_additional_experiment": true,
+    "gamma_operating_cost_repositioning_disabled": true
+  }
+}

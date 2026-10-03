@@ -48,6 +48,7 @@ ML 不追加拥堵 veto，U 只描述，不冒充非拥堵。A/M/D/L、speed、C
 后续候选使用 Train M3 P50 / OD 直线距离的 30min 中位 pace 近似接驾 ETA，搜索半径 2km，每个请求取 5 个不同车辆及其可行状态。
 它不是精确路由，也不是实现未来拥堵；明确标记 `TRAIN_M3_MEDIAN_OD_CHORD_PACE_BY_30MIN`。
 所有策略共享同一当前候选条件与预测服务时间；只有 LOOKAHEAD 使用情景 recourse。
+兼容集约束的是乘客服务的 original route；接驾只估计时间，没有逐段 C/M/A 路线认证。因此本版不是空驶加载客全程的 AV 路径可通行保证。
 
 ## 4. 时间链与基线区别
 

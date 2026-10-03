@@ -5,6 +5,8 @@
 2026-10-04；academic-research-suite / experiment-agent；状态 COMPLETE（小实例范围）。
 这轮检验 OR 实现与反例，不检验真实全日服务提升，没有 p-value、显著性或车型安全结论。
 
+本报告是 `3f3ff48` 的历史小实例报告；后续数据连接与 native 运行见 [native_window_protocol.md](native_window_protocol.md)。下面“未运行”的描述仅对应原型阶段，不覆盖后续执行。
+
 ## 本轮实际完成
 
 Stage3 明确 C/M/A 兼容集；Stage4 实现三个独立、可切换的策略和一次后续服务模型。
