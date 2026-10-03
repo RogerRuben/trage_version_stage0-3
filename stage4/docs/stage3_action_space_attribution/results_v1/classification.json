@@ -1,0 +1,14 @@
+{
+  "labels": [
+    "STAGE3_CAPACITY_ONLY",
+    "STAGE3_INTERACTION"
+  ],
+  "investigate_factors": [],
+  "capacity_only_factors": [
+    "D2"
+  ],
+  "downstream_spatial_patience_bottleneck": "REVIEW_REQUIRED: report pre/post capacity; no frozen dominance threshold",
+  "scope": "Ten registered M physical states; D4 is not an assignment upper bound",
+  "Stage3_modification_authorized": false,
+  "Stage5_authorized": false
+}

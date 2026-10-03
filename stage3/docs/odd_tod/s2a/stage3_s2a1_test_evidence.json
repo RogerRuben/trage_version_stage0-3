@@ -1,0 +1,23 @@
+{
+  "artifact_sha256": "6a28b17392926c0fc2a588dac666d34ad094a9cba0a4baa538f2f053fe2995a8",
+  "compileall_status": "PASS",
+  "evidence_verification_status": "PASS",
+  "next_phase_authorized": false,
+  "phase_status": "STAGE3_S2A1_SCIENTIFIC_CLOSURE_COMPLETE",
+  "s2b_authorized": false,
+  "schema_version": "stage3_s2a1_test_evidence.1",
+  "status": "PASS",
+  "tests": [
+    {
+      "failed": 0,
+      "passed": 25,
+      "suite": "S2A.1 + S2A"
+    },
+    {
+      "failed": 0,
+      "passed": 10,
+      "suite": "S1 regression",
+      "warnings": 1
+    }
+  ]
+}

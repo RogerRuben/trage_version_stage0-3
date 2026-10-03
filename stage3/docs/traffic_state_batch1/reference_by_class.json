@@ -1,0 +1,74 @@
+{
+  "rows": [
+    {
+      "canonical_highway": "living_street",
+      "observed_edge_days": 148,
+      "reference_supported_edge_days": 0
+    },
+    {
+      "canonical_highway": "pedestrian",
+      "observed_edge_days": 19,
+      "reference_supported_edge_days": 0
+    },
+    {
+      "canonical_highway": "primary",
+      "observed_edge_days": 28964,
+      "reference_supported_edge_days": 19243
+    },
+    {
+      "canonical_highway": "primary_link",
+      "observed_edge_days": 5162,
+      "reference_supported_edge_days": 3097
+    },
+    {
+      "canonical_highway": "residential",
+      "observed_edge_days": 5033,
+      "reference_supported_edge_days": 417
+    },
+    {
+      "canonical_highway": "secondary",
+      "observed_edge_days": 38821,
+      "reference_supported_edge_days": 25973
+    },
+    {
+      "canonical_highway": "secondary_link",
+      "observed_edge_days": 3002,
+      "reference_supported_edge_days": 1519
+    },
+    {
+      "canonical_highway": "service",
+      "observed_edge_days": 1681,
+      "reference_supported_edge_days": 57
+    },
+    {
+      "canonical_highway": "tertiary",
+      "observed_edge_days": 36612,
+      "reference_supported_edge_days": 20858
+    },
+    {
+      "canonical_highway": "tertiary_link",
+      "observed_edge_days": 4302,
+      "reference_supported_edge_days": 2698
+    },
+    {
+      "canonical_highway": "track",
+      "observed_edge_days": 15,
+      "reference_supported_edge_days": 0
+    },
+    {
+      "canonical_highway": "trunk",
+      "observed_edge_days": 6072,
+      "reference_supported_edge_days": 4749
+    },
+    {
+      "canonical_highway": "trunk_link",
+      "observed_edge_days": 4091,
+      "reference_supported_edge_days": 2678
+    },
+    {
+      "canonical_highway": "unclassified",
+      "observed_edge_days": 17531,
+      "reference_supported_edge_days": 6934
+    }
+  ]
+}

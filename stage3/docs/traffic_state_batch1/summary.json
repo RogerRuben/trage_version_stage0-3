@@ -1,0 +1,165 @@
+{
+  "status": "COMPLETED_DESCRIPTIVE_ONLY",
+  "schema_version": "traffic_state_batch1.1",
+  "config_sha256": "5064c16767aa6017bb3bd519f675e7e1e2c9d48616b07ac25a215a76bb4238fa",
+  "sources": [
+    {
+      "date": "20161009",
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161009.parquet",
+      "sha256": "f551af3d4765701ea9417f5198e20965c05c622638a1a83520feb0572c31fa60",
+      "rows": 263605
+    },
+    {
+      "date": "20161010",
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161010.parquet",
+      "sha256": "e99ad7287e8c3390891cdbf43c874db1c66715b2d6e3e215a91e00b3e59b54aa",
+      "rows": 261653
+    },
+    {
+      "date": "20161011",
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161011.parquet",
+      "sha256": "2485583be97aef52abf38012a0c71a4f7416c22f1a17c8bc419002697bbb5370",
+      "rows": 263657
+    },
+    {
+      "date": "20161012",
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161012.parquet",
+      "sha256": "684a812dcf94ed26960f111fa431eb4855ebb6a0287a9f033615cbb5ba8aaeed",
+      "rows": 262149
+    },
+    {
+      "date": "20161013",
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161013.parquet",
+      "sha256": "6165d5db6a5512069bf5a3bb4400e2c943659bb9f236aa99c8d5636e7493bda8",
+      "rows": 263320
+    },
+    {
+      "date": "20161014",
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161014.parquet",
+      "sha256": "bd8de8a5550608dc71d2d6c85493272a601b6754f514b341e0f603af91ad4e0c",
+      "rows": 263414
+    },
+    {
+      "date": "20161015",
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161015.parquet",
+      "sha256": "a8714fa5ca1c749e18f843449894c197dec6ed02d7235be2cd20288b323c99c5",
+      "rows": 263693
+    },
+    {
+      "date": "20161016",
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161016.parquet",
+      "sha256": "cd661db636688b2dafd80e859b4f4f6725c86acee8c8d900cfee0f50bf4807ec",
+      "rows": 265262
+    },
+    {
+      "date": "20161017",
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161017.parquet",
+      "sha256": "bd4c7f59ab05a1bf8f4866064a200bc9868d3442eb2f96e16ba5674bef836130",
+      "rows": 261587
+    },
+    {
+      "date": "20161018",
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161018.parquet",
+      "sha256": "e7b42776ae0d8482c9c607e39ae1ca7377aeb3797fea873fbb9b8f000dc7bf4a",
+      "rows": 264526
+    },
+    {
+      "date": "20161019",
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161019.parquet",
+      "sha256": "e5b9b2ff9fb4545e405d340408ff2cf985a68365eb70cfbf919048bf18e0b7dc",
+      "rows": 264801
+    },
+    {
+      "date": "20161020",
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161020.parquet",
+      "sha256": "37a60f563ba291ce4d02827e55571933e7ce0c0aebb25e13951b570b858f38e1",
+      "rows": 265755
+    },
+    {
+      "date": "20161021",
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161021.parquet",
+      "sha256": "173c988286ec29e93a97e49dfa4ed2ce6572b95113b14e645112b680b5ce6164",
+      "rows": 268206
+    },
+    {
+      "date": "20161022",
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161022.parquet",
+      "sha256": "4b14e3f178058ee89df5530e3e0eb0a9eccee6f1e877b46ff6de454a2ecdbc65",
+      "rows": 264854
+    },
+    {
+      "date": "20161023",
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161023.parquet",
+      "sha256": "5cd32608506b11c1d682a5e8a16c6c6a9cfaddefbfc02f70890295fe50afce46",
+      "rows": 261879
+    },
+    {
+      "date": "20161024",
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161024.parquet",
+      "sha256": "afbdc9bf79fbeca5f93de37fb0e49c72e0797bb10421c8f38c002f7f394961a0",
+      "rows": 259512
+    },
+    {
+      "date": "20161025",
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161025.parquet",
+      "sha256": "1187857bf5a5309dc72a7300c84bbf6fcaa2c27128f8df3b39cfcde399e438a8",
+      "rows": 260356
+    },
+    {
+      "date": "20161026",
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161026.parquet",
+      "sha256": "37f65ab07a1ac13b37256981f56c49e353f60ea5709de64bbe64ef2640d1119a",
+      "rows": 260552
+    },
+    {
+      "date": "20161027",
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161027.parquet",
+      "sha256": "0b11e4ab77535d67a2684b499092a72f1ced9f59cb0a460699e7678bd42ef5e3",
+      "rows": 259332
+    }
+  ],
+  "protected_inputs_unchanged": {
+    "stage3\\config\\stage3_av_capability_profiles.json": "bea54c12a0c013995c3644a0bab84b35413d5df8a6785dfdd6a03fd49f32978e",
+    "stage2\\output_v5_2\\development\\M3\\epoch_004.pt": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde"
+  },
+  "dates": [
+    "20161009",
+    "20161010",
+    "20161011",
+    "20161012",
+    "20161013",
+    "20161014",
+    "20161015",
+    "20161016",
+    "20161017",
+    "20161018",
+    "20161019",
+    "20161020",
+    "20161021",
+    "20161022",
+    "20161023",
+    "20161024",
+    "20161025",
+    "20161026",
+    "20161027"
+  ],
+  "events": 4998113,
+  "reference_edges": 11724,
+  "reference_supported_edges": 4644,
+  "study_observed_edges": 13941,
+  "observed_cells": 2066052,
+  "no_event_cells_within_study_edge_union": 10648140,
+  "no_event_denominator_scope": "19 days x 48 bins x union of observed directed edges; not full network",
+  "test31_read": false,
+  "training": false,
+  "gpu_used": false,
+  "runtime_s": 70.21899999999914,
+  "peak_rss_mb": 546.69140625,
+  "limitations": [
+    "Stage1 bucket access denied; hash-verified existing history store reused",
+    "No direct interval count, duration, distance coverage or original window start in history events",
+    "Train states use full-Train retrospective reference, not online backtest",
+    "Unknown no-event cells not materialized; denominator is observed cells only",
+    "Candidate thresholds are unvalidated descriptive choices, not AV policies"
+  ]
+}

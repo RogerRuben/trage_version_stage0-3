@@ -1,0 +1,2 @@
+﻿issue,encounters,unique_orders,unique_movement_keys,internal_path_present,entire_movement_certified,exact_endpoint_recovery_encounters,scientific_consequence
+ENDPOINT_SCOPE_MISMATCH_BETWEEN_MOVEMENT_AND_BOUNDARY_PRODUCTS,391,276,117,391,False,0,Technical interface unknown; preserve UNKNOWN until endpoint and movement evidence is repaired and verified

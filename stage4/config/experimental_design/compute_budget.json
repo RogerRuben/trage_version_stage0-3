@@ -1,0 +1,26 @@
+{
+  "schema_version": "stage4_s5b_compute_budget_v1",
+  "registry_rows": 42,
+  "unique_dispatch_scenarios": 41,
+  "reuse_rows": 1,
+  "one_hour_runtime_per_scenario_s": {
+    "low": 110.0,
+    "high": 125.0
+  },
+  "one_hour_matrix_sequential_hours": {
+    "low": 1.2527777777777778,
+    "high": 1.4236111111111112
+  },
+  "full_day_linear_extrapolation_sequential_hours": {
+    "low": 30.066666666666666,
+    "high": 34.166666666666664
+  },
+  "recommended_parallel_scenario_slots": 4,
+  "full_day_ideal_four_slot_wall_clock_hours": {
+    "low": 7.516666666666667,
+    "high": 8.541666666666666
+  },
+  "planning_caveat": "linear estimate only; routing cache reuse and Valhalla contention may change runtime",
+  "execution_architecture": "scenario-level parallelism only; cKDTree, Top-K 20, Valhalla cache/fallback, CSR sparse MILP, CPU-only, no dense order-by-fleet matrix",
+  "matrix_execution_authorized": false
+}

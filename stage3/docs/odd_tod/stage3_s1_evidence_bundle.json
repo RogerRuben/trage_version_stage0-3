@@ -1,0 +1,91 @@
+{
+  "artifact_sha256": "5d87573c15858e9b65e22f1969b62eb566304cef903479e09b69a313a695b1d1",
+  "artifacts": {
+    "config": {
+      "path": "stage3/config/stage3_s1_static_inventory.json",
+      "sha256": "68abf902f91b22fca9e3bdfe751e3aec09f39126d0d5024433b4b32eb1eaab24",
+      "size_bytes": 1681
+    },
+    "field_provenance": {
+      "path": "stage3/docs/odd_tod/stage3_static_field_provenance.md",
+      "sha256": "70ad301a8cb04bd202bb91bcc9fd8d0edabd7cf5f903980383cf24d934662ec9",
+      "size_bytes": 4855
+    },
+    "implementation": {
+      "path": "stage3/odd_tod/static_inventory.py",
+      "sha256": "5dffaed1323a25a6ef56209b2df6beee53952ea4add33d05275eea862a75986e",
+      "size_bytes": 64646
+    },
+    "inventory": {
+      "path": "stage3/docs/odd_tod/stage3_static_data_inventory.json",
+      "sha256": "88679e8700be776fa3ea15cfa7852b95c3d520cabb043f0ba623daba3b801074",
+      "size_bytes": 33978
+    },
+    "test_evidence": {
+      "path": "stage3/docs/odd_tod/stage3_s1_test_evidence.json",
+      "sha256": "7bb6c0354e012f7b020d0fac5c81dffba634668a320697cd6cd71e6544aae85a",
+      "size_bytes": 1171
+    },
+    "tests": {
+      "path": "stage3/tests_odd_tod/test_static_inventory.py",
+      "sha256": "ba709fbf108dcb8b5f26b4eda1452bde1681e00858af8e8117f486c283ea17eb",
+      "size_bytes": 4391
+    }
+  },
+  "authorizations": {
+    "s1": true,
+    "s2": false,
+    "s3": false,
+    "s4": false,
+    "s5": false,
+    "s6": false,
+    "s7": false,
+    "s8": false,
+    "stage4": false
+  },
+  "execution_head": "e489343abb36a878cffe48e3a5eae34e6c4670c5",
+  "frozen_upstream": {
+    "frozen_osm_pbf": {
+      "path": "D:/pycodes/didi_xian_raw/map_data/xian_roadmap_update.osm.pbf",
+      "sha256": "4d918b7ed2201a8f7a75fa7fb2974679343c89a10bf83638e7bcf21ac07c1526",
+      "size_bytes": 21753051
+    },
+    "poi_csv": {
+      "path": "D:/pycodes/didi_xian_raw/map_data/西安市POI数据.csv",
+      "sha256": "524e4546a5b507271abcb8290ccfa47bef68c157d81bffe5512a28c8dc8ac3f2",
+      "size_bytes": 39273661
+    },
+    "stage0_freeze_manifest": {
+      "path": "stage0/docs/stage0_v6_freeze_manifest.json",
+      "sha256": "35a0e8c83c508fa344c74b9ecc2df11f59725d393a9a71f04ee461148762d7d1",
+      "size_bytes": 24194
+    },
+    "stage1_release_manifest": {
+      "path": "stage1/docs/stage1_v3_release_manifest.json",
+      "sha256": "29942f040b7fbd1ce5ccf9ee4586f381cb8f900c27f7aad48482936e7278f26c",
+      "size_bytes": 2661
+    },
+    "stage2_final_release_manifest": {
+      "path": "stage2/docs/v5_2/stage2_v5_2_final_release_manifest.json",
+      "sha256": "11782738a0441f63547de90f9e205f452b68465a548771403e31903d3f9a3812",
+      "size_bytes": 9214
+    },
+    "valhalla_build_manifest": {
+      "path": "D:/pycodes/didi_xian_raw/valhalla_data/build_manifest.json",
+      "sha256": "b1e376bd94ccb67a450a6af120afff7dc3cae97c96ceb6a1dc937830499cfd3c",
+      "size_bytes": 969
+    }
+  },
+  "next_phase_authorized": false,
+  "phase_status": "STAGE3_S1_STATIC_INVENTORY_COMPLETE",
+  "s2_authorized": false,
+  "schema_version": "stage3_s1_static_inventory_evidence.1",
+  "scope_guards": {
+    "intersection_clustering_performed": false,
+    "model_inference_performed": false,
+    "question": "What data do we actually have?",
+    "route_assessment_performed": false,
+    "threshold_calibration_performed": false
+  },
+  "status": "PASS"
+}

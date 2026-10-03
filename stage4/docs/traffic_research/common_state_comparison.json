@@ -1,0 +1,715 @@
+{
+  "status": "COMPLETE",
+  "rows": [
+    {
+      "profile": "C",
+      "cut": 37800,
+      "variant": "OFF",
+      "cohort": 379,
+      "matched": 253,
+      "av": 21,
+      "hv": 232,
+      "mean_wait_s": 190.17193429644269,
+      "traffic": {
+        "outside_share": {
+          "mean": 0.08611412761961612,
+          "p50": 0.07048120706197578,
+          "maximum": 0.30646277147787254,
+          "time_weighted_mean": 0.10416228801574487
+        },
+        "unknown_share": {
+          "mean": 0.0819282362931988,
+          "p50": 0.07425259171421875,
+          "maximum": 0.254644017469117,
+          "time_weighted_mean": 0.07258099832222585
+        },
+        "low_support_share": {
+          "mean": 0.1112982826028848,
+          "p50": 0.08202968228281796,
+          "maximum": 0.41005220588847374,
+          "time_weighted_mean": 0.10603341445859701
+        }
+      }
+    },
+    {
+      "profile": "C",
+      "cut": 37800,
+      "variant": "ON",
+      "cohort": 379,
+      "matched": 248,
+      "av": 13,
+      "hv": 235,
+      "mean_wait_s": 190.70574243951614,
+      "traffic": {
+        "outside_share": {
+          "mean": 0.008969715225393797,
+          "p50": 0.002289425918663645,
+          "maximum": 0.033701022398801704,
+          "time_weighted_mean": 0.010279446824656577
+        },
+        "unknown_share": {
+          "mean": 0.09215297485636284,
+          "p50": 0.08270009692750607,
+          "maximum": 0.254644017469117,
+          "time_weighted_mean": 0.08916652596812306
+        },
+        "low_support_share": {
+          "mean": 0.13371311929623075,
+          "p50": 0.10386160081809692,
+          "maximum": 0.41005220588847374,
+          "time_weighted_mean": 0.1330592806857978
+        }
+      }
+    },
+    {
+      "profile": "M",
+      "cut": 37800,
+      "variant": "OFF",
+      "cohort": 379,
+      "matched": 254,
+      "av": 23,
+      "hv": 231,
+      "mean_wait_s": 187.98325728740156,
+      "traffic": {
+        "outside_share": {
+          "mean": 0.0018199130373817824,
+          "p50": 0.0,
+          "maximum": 0.01466139291026076,
+          "time_weighted_mean": 0.0018352362587351018
+        },
+        "unknown_share": {
+          "mean": 0.10042611233411754,
+          "p50": 0.08270009692750607,
+          "maximum": 0.25706901258518183,
+          "time_weighted_mean": 0.08463787258357422
+        },
+        "low_support_share": {
+          "mean": 0.12450508181458389,
+          "p50": 0.10144510127381842,
+          "maximum": 0.5643233413510684,
+          "time_weighted_mean": 0.10943078386834802
+        }
+      }
+    },
+    {
+      "profile": "M",
+      "cut": 37800,
+      "variant": "ON",
+      "cohort": 379,
+      "matched": 254,
+      "av": 23,
+      "hv": 231,
+      "mean_wait_s": 187.98325728740156,
+      "traffic": {
+        "outside_share": {
+          "mean": 0.0018199130373817824,
+          "p50": 0.0,
+          "maximum": 0.01466139291026076,
+          "time_weighted_mean": 0.0018352362587351018
+        },
+        "unknown_share": {
+          "mean": 0.10042611233411754,
+          "p50": 0.08270009692750607,
+          "maximum": 0.25706901258518183,
+          "time_weighted_mean": 0.08463787258357422
+        },
+        "low_support_share": {
+          "mean": 0.12450508181458389,
+          "p50": 0.10144510127381842,
+          "maximum": 0.5643233413510684,
+          "time_weighted_mean": 0.10943078386834802
+        }
+      }
+    },
+    {
+      "profile": "A",
+      "cut": 37800,
+      "variant": "OFF",
+      "cohort": 379,
+      "matched": 258,
+      "av": 26,
+      "hv": 232,
+      "mean_wait_s": 187.1261255387597,
+      "traffic": {
+        "outside_share": {
+          "mean": 0.0,
+          "p50": 0.0,
+          "maximum": 0.0,
+          "time_weighted_mean": 0.0
+        },
+        "unknown_share": {
+          "mean": 0.10276498644187824,
+          "p50": 0.0908099933038639,
+          "maximum": 0.25706901258518183,
+          "time_weighted_mean": 0.08928410358273002
+        },
+        "low_support_share": {
+          "mean": 0.14398732016226215,
+          "p50": 0.10306864697082718,
+          "maximum": 0.5643233413510684,
+          "time_weighted_mean": 0.13267585339137675
+        }
+      }
+    },
+    {
+      "profile": "A",
+      "cut": 37800,
+      "variant": "ON",
+      "cohort": 379,
+      "matched": 258,
+      "av": 26,
+      "hv": 232,
+      "mean_wait_s": 187.1261255387597,
+      "traffic": {
+        "outside_share": {
+          "mean": 0.0,
+          "p50": 0.0,
+          "maximum": 0.0,
+          "time_weighted_mean": 0.0
+        },
+        "unknown_share": {
+          "mean": 0.10276498644187824,
+          "p50": 0.0908099933038639,
+          "maximum": 0.25706901258518183,
+          "time_weighted_mean": 0.08928410358273002
+        },
+        "low_support_share": {
+          "mean": 0.14398732016226215,
+          "p50": 0.10306864697082718,
+          "maximum": 0.5643233413510684,
+          "time_weighted_mean": 0.13267585339137675
+        }
+      }
+    },
+    {
+      "profile": "C",
+      "cut": 63000,
+      "variant": "OFF",
+      "cohort": 419,
+      "matched": 212,
+      "av": 19,
+      "hv": 193,
+      "mean_wait_s": 189.13905118867925,
+      "traffic": {
+        "outside_share": {
+          "mean": 0.22208237736806283,
+          "p50": 0.18267439814759923,
+          "maximum": 0.5469501275831212,
+          "time_weighted_mean": 0.25977445337764643
+        },
+        "unknown_share": {
+          "mean": 0.052957108376204855,
+          "p50": 0.05230066694790698,
+          "maximum": 0.10070637895576633,
+          "time_weighted_mean": 0.05894916535346852
+        },
+        "low_support_share": {
+          "mean": 0.11980429645713263,
+          "p50": 0.09513838037684075,
+          "maximum": 0.3516091392716553,
+          "time_weighted_mean": 0.11151797345532195
+        }
+      }
+    },
+    {
+      "profile": "C",
+      "cut": 63000,
+      "variant": "ON",
+      "cohort": 419,
+      "matched": 199,
+      "av": 2,
+      "hv": 197,
+      "mean_wait_s": 190.51756752261306,
+      "traffic": {
+        "outside_share": {
+          "mean": 0.034788413256219286,
+          "p50": 0.034788413256219286,
+          "maximum": 0.03809827374698195,
+          "time_weighted_mean": 0.03497104382199929
+        },
+        "unknown_share": {
+          "mean": 0.07594740019105778,
+          "p50": 0.07594740019105778,
+          "maximum": 0.10070637895576633,
+          "time_weighted_mean": 0.0773135442664813
+        },
+        "low_support_share": {
+          "mean": 0.1045467212696502,
+          "p50": 0.1045467212696502,
+          "maximum": 0.1254691495684208,
+          "time_weighted_mean": 0.10570117322566469
+        }
+      }
+    },
+    {
+      "profile": "M",
+      "cut": 63000,
+      "variant": "OFF",
+      "cohort": 419,
+      "matched": 218,
+      "av": 27,
+      "hv": 191,
+      "mean_wait_s": 188.5998610504587,
+      "traffic": {
+        "outside_share": {
+          "mean": 0.013554742963456103,
+          "p50": 0.0,
+          "maximum": 0.13412890886337,
+          "time_weighted_mean": 0.011713076218526025
+        },
+        "unknown_share": {
+          "mean": 0.06691088286742757,
+          "p50": 0.07313266241648103,
+          "maximum": 0.12026781883828262,
+          "time_weighted_mean": 0.07105616777713362
+        },
+        "low_support_share": {
+          "mean": 0.13032903585900327,
+          "p50": 0.09989404558287132,
+          "maximum": 0.3965756844256078,
+          "time_weighted_mean": 0.11920714715863624
+        }
+      }
+    },
+    {
+      "profile": "M",
+      "cut": 63000,
+      "variant": "ON",
+      "cohort": 419,
+      "matched": 216,
+      "av": 26,
+      "hv": 190,
+      "mean_wait_s": 187.85296367592593,
+      "traffic": {
+        "outside_share": {
+          "mean": 0.005606408064886497,
+          "p50": 0.0,
+          "maximum": 0.045314772229415344,
+          "time_weighted_mean": 0.004341582532483671
+        },
+        "unknown_share": {
+          "mean": 0.06731987252939133,
+          "p50": 0.06969654875395662,
+          "maximum": 0.12026781883828262,
+          "time_weighted_mean": 0.07131950338623101
+        },
+        "low_support_share": {
+          "mean": 0.12889241761068,
+          "p50": 0.09940521442052155,
+          "maximum": 0.3965756844256078,
+          "time_weighted_mean": 0.1174397078683203
+        }
+      }
+    },
+    {
+      "profile": "A",
+      "cut": 63000,
+      "variant": "OFF",
+      "cohort": 419,
+      "matched": 218,
+      "av": 27,
+      "hv": 191,
+      "mean_wait_s": 189.01529092201835,
+      "traffic": {
+        "outside_share": {
+          "mean": 0.0,
+          "p50": 0.0,
+          "maximum": 0.0,
+          "time_weighted_mean": 0.0
+        },
+        "unknown_share": {
+          "mean": 0.07195453613295139,
+          "p50": 0.07313266241648103,
+          "maximum": 0.2130810816631632,
+          "time_weighted_mean": 0.07877199207622776
+        },
+        "low_support_share": {
+          "mean": 0.13359005564347567,
+          "p50": 0.10089246229139248,
+          "maximum": 0.3965756844256078,
+          "time_weighted_mean": 0.12341596989130624
+        }
+      }
+    },
+    {
+      "profile": "A",
+      "cut": 63000,
+      "variant": "ON",
+      "cohort": 419,
+      "matched": 218,
+      "av": 27,
+      "hv": 191,
+      "mean_wait_s": 189.01529092201835,
+      "traffic": {
+        "outside_share": {
+          "mean": 0.0,
+          "p50": 0.0,
+          "maximum": 0.0,
+          "time_weighted_mean": 0.0
+        },
+        "unknown_share": {
+          "mean": 0.07195453613295139,
+          "p50": 0.07313266241648103,
+          "maximum": 0.2130810816631632,
+          "time_weighted_mean": 0.07877199207622776
+        },
+        "low_support_share": {
+          "mean": 0.13359005564347567,
+          "p50": 0.10089246229139248,
+          "maximum": 0.3965756844256078,
+          "time_weighted_mean": 0.12341596989130624
+        }
+      }
+    }
+  ],
+  "pairs": [
+    {
+      "profile": "C",
+      "cut": 37800,
+      "cohort": 379,
+      "both_matched": 243,
+      "gained": 5,
+      "lost": 10,
+      "both_unserved": 121,
+      "common_matched_wait_difference_s": -0.18314546502057646,
+      "transitions": [
+        {
+          "before": "AV",
+          "after": "AV",
+          "count": 9
+        },
+        {
+          "before": "AV",
+          "after": "HV",
+          "count": 5
+        },
+        {
+          "before": "AV",
+          "after": "UNSERVED",
+          "count": 7
+        },
+        {
+          "before": "HV",
+          "after": "AV",
+          "count": 1
+        },
+        {
+          "before": "HV",
+          "after": "HV",
+          "count": 228
+        },
+        {
+          "before": "HV",
+          "after": "UNSERVED",
+          "count": 3
+        },
+        {
+          "before": "UNSERVED",
+          "after": "AV",
+          "count": 3
+        },
+        {
+          "before": "UNSERVED",
+          "after": "HV",
+          "count": 2
+        },
+        {
+          "before": "UNSERVED",
+          "after": "UNSERVED",
+          "count": 121
+        }
+      ],
+      "physical_assignments_identical": false
+    },
+    {
+      "profile": "M",
+      "cut": 37800,
+      "cohort": 379,
+      "both_matched": 254,
+      "gained": 0,
+      "lost": 0,
+      "both_unserved": 125,
+      "common_matched_wait_difference_s": 0.0,
+      "transitions": [
+        {
+          "before": "AV",
+          "after": "AV",
+          "count": 23
+        },
+        {
+          "before": "AV",
+          "after": "HV",
+          "count": 0
+        },
+        {
+          "before": "AV",
+          "after": "UNSERVED",
+          "count": 0
+        },
+        {
+          "before": "HV",
+          "after": "AV",
+          "count": 0
+        },
+        {
+          "before": "HV",
+          "after": "HV",
+          "count": 231
+        },
+        {
+          "before": "HV",
+          "after": "UNSERVED",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "AV",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "HV",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "UNSERVED",
+          "count": 125
+        }
+      ],
+      "physical_assignments_identical": true
+    },
+    {
+      "profile": "A",
+      "cut": 37800,
+      "cohort": 379,
+      "both_matched": 258,
+      "gained": 0,
+      "lost": 0,
+      "both_unserved": 121,
+      "common_matched_wait_difference_s": 0.0,
+      "transitions": [
+        {
+          "before": "AV",
+          "after": "AV",
+          "count": 26
+        },
+        {
+          "before": "AV",
+          "after": "HV",
+          "count": 0
+        },
+        {
+          "before": "AV",
+          "after": "UNSERVED",
+          "count": 0
+        },
+        {
+          "before": "HV",
+          "after": "AV",
+          "count": 0
+        },
+        {
+          "before": "HV",
+          "after": "HV",
+          "count": 232
+        },
+        {
+          "before": "HV",
+          "after": "UNSERVED",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "AV",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "HV",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "UNSERVED",
+          "count": 121
+        }
+      ],
+      "physical_assignments_identical": true
+    },
+    {
+      "profile": "C",
+      "cut": 63000,
+      "cohort": 419,
+      "both_matched": 197,
+      "gained": 2,
+      "lost": 15,
+      "both_unserved": 205,
+      "common_matched_wait_difference_s": 3.386628878172589,
+      "transitions": [
+        {
+          "before": "AV",
+          "after": "AV",
+          "count": 2
+        },
+        {
+          "before": "AV",
+          "after": "HV",
+          "count": 9
+        },
+        {
+          "before": "AV",
+          "after": "UNSERVED",
+          "count": 8
+        },
+        {
+          "before": "HV",
+          "after": "AV",
+          "count": 0
+        },
+        {
+          "before": "HV",
+          "after": "HV",
+          "count": 186
+        },
+        {
+          "before": "HV",
+          "after": "UNSERVED",
+          "count": 7
+        },
+        {
+          "before": "UNSERVED",
+          "after": "AV",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "HV",
+          "count": 2
+        },
+        {
+          "before": "UNSERVED",
+          "after": "UNSERVED",
+          "count": 205
+        }
+      ],
+      "physical_assignments_identical": false
+    },
+    {
+      "profile": "M",
+      "cut": 63000,
+      "cohort": 419,
+      "both_matched": 216,
+      "gained": 0,
+      "lost": 2,
+      "both_unserved": 201,
+      "common_matched_wait_difference_s": -0.12318688888888882,
+      "transitions": [
+        {
+          "before": "AV",
+          "after": "AV",
+          "count": 25
+        },
+        {
+          "before": "AV",
+          "after": "HV",
+          "count": 2
+        },
+        {
+          "before": "AV",
+          "after": "UNSERVED",
+          "count": 0
+        },
+        {
+          "before": "HV",
+          "after": "AV",
+          "count": 1
+        },
+        {
+          "before": "HV",
+          "after": "HV",
+          "count": 188
+        },
+        {
+          "before": "HV",
+          "after": "UNSERVED",
+          "count": 2
+        },
+        {
+          "before": "UNSERVED",
+          "after": "AV",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "HV",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "UNSERVED",
+          "count": 201
+        }
+      ],
+      "physical_assignments_identical": false
+    },
+    {
+      "profile": "A",
+      "cut": 63000,
+      "cohort": 419,
+      "both_matched": 218,
+      "gained": 0,
+      "lost": 0,
+      "both_unserved": 201,
+      "common_matched_wait_difference_s": 0.0,
+      "transitions": [
+        {
+          "before": "AV",
+          "after": "AV",
+          "count": 27
+        },
+        {
+          "before": "AV",
+          "after": "HV",
+          "count": 0
+        },
+        {
+          "before": "AV",
+          "after": "UNSERVED",
+          "count": 0
+        },
+        {
+          "before": "HV",
+          "after": "AV",
+          "count": 0
+        },
+        {
+          "before": "HV",
+          "after": "HV",
+          "count": 191
+        },
+        {
+          "before": "HV",
+          "after": "UNSERVED",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "AV",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "HV",
+          "count": 0
+        },
+        {
+          "before": "UNSERVED",
+          "after": "UNSERVED",
+          "count": 201
+        }
+      ],
+      "physical_assignments_identical": true
+    }
+  ]
+}

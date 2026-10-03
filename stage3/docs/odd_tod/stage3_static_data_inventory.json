@@ -1,0 +1,1116 @@
+{
+  "artifact_sha256": "ae08f65c9dc9052d22809028661dc0c688bd03eb49af73d3c7e420f9df02cbac",
+  "authorizations": {
+    "s1": true,
+    "s2": false,
+    "s3": false,
+    "s4": false,
+    "s5": false,
+    "s6": false,
+    "s7": false,
+    "s8": false,
+    "stage4": false
+  },
+  "execution_head": "e489343abb36a878cffe48e3a5eae34e6c4670c5",
+  "frozen_osm_pbf": {
+    "graph_identity": {
+      "identity_scope_note": "OSM node IDs inside Stage0 are available, but GDAL points includes tagged nodes rather than the full raw node table",
+      "observed_graph_osm_way_count": 2720,
+      "observed_graph_ways_found_as_raw_highway_ways": {
+        "count": 2720,
+        "denominator": 2720,
+        "share": 1.0
+      },
+      "raw_highway_way_count": 53181,
+      "raw_tagged_node_count_exposed_by_gdal": 50302,
+      "raw_untagged_way_node_ids_exposed_by_gdal": false
+    },
+    "maxspeed": {
+      "any_base_directional_or_conditional_coverage": {
+        "count": 512,
+        "denominator": 53181,
+        "share": 0.009627498542712623
+      },
+      "base_tag_coverage": {
+        "count": 512,
+        "denominator": 53181,
+        "share": 0.009627498542712623
+      },
+      "base_tag_parseability": {
+        "count": 512,
+        "denominator": 512,
+        "share": 1.0
+      },
+      "by_osm_highway": {
+        "bus_guideway": {
+          "base_parseable_share_of_tagged": null,
+          "base_tag_coverage_share": 0.0,
+          "ways": 2
+        },
+        "busway": {
+          "base_parseable_share_of_tagged": null,
+          "base_tag_coverage_share": 0.0,
+          "ways": 8
+        },
+        "construction": {
+          "any_speed_tag": 1,
+          "base_parseable": 1,
+          "base_parseable_share_of_tagged": 1.0,
+          "base_tag_coverage_share": 0.002890173410404624,
+          "base_tagged": 1,
+          "ways": 346
+        },
+        "corridor": {
+          "base_parseable_share_of_tagged": null,
+          "base_tag_coverage_share": 0.0,
+          "ways": 25
+        },
+        "cycleway": {
+          "base_parseable_share_of_tagged": null,
+          "base_tag_coverage_share": 0.0,
+          "ways": 613
+        },
+        "elevator": {
+          "base_parseable_share_of_tagged": null,
+          "base_tag_coverage_share": 0.0,
+          "ways": 2
+        },
+        "footway": {
+          "base_parseable_share_of_tagged": null,
+          "base_tag_coverage_share": 0.0,
+          "ways": 6289
+        },
+        "living_street": {
+          "any_speed_tag": 3,
+          "base_parseable": 3,
+          "base_parseable_share_of_tagged": 1.0,
+          "base_tag_coverage_share": 0.005813953488372093,
+          "base_tagged": 3,
+          "ways": 516
+        },
+        "motorway": {
+          "any_speed_tag": 68,
+          "base_parseable": 68,
+          "base_parseable_share_of_tagged": 1.0,
+          "base_tag_coverage_share": 0.044184535412605586,
+          "base_tagged": 68,
+          "ways": 1539
+        },
+        "motorway_link": {
+          "any_speed_tag": 4,
+          "base_parseable": 4,
+          "base_parseable_share_of_tagged": 1.0,
+          "base_tag_coverage_share": 0.003228410008071025,
+          "base_tagged": 4,
+          "ways": 1239
+        },
+        "path": {
+          "base_parseable_share_of_tagged": null,
+          "base_tag_coverage_share": 0.0,
+          "ways": 726
+        },
+        "pedestrian": {
+          "any_speed_tag": 1,
+          "base_parseable": 1,
+          "base_parseable_share_of_tagged": 1.0,
+          "base_tag_coverage_share": 0.0037593984962406013,
+          "base_tagged": 1,
+          "ways": 266
+        },
+        "primary": {
+          "any_speed_tag": 88,
+          "base_parseable": 88,
+          "base_parseable_share_of_tagged": 1.0,
+          "base_tag_coverage_share": 0.042328042328042326,
+          "base_tagged": 88,
+          "ways": 2079
+        },
+        "primary_link": {
+          "any_speed_tag": 6,
+          "base_parseable": 6,
+          "base_parseable_share_of_tagged": 1.0,
+          "base_tag_coverage_share": 0.006557377049180328,
+          "base_tagged": 6,
+          "ways": 915
+        },
+        "proposed": {
+          "base_parseable_share_of_tagged": null,
+          "base_tag_coverage_share": 0.0,
+          "ways": 3
+        },
+        "residential": {
+          "any_speed_tag": 5,
+          "base_parseable": 5,
+          "base_parseable_share_of_tagged": 1.0,
+          "base_tag_coverage_share": 0.00037650602409638556,
+          "base_tagged": 5,
+          "ways": 13280
+        },
+        "road": {
+          "base_parseable_share_of_tagged": null,
+          "base_tag_coverage_share": 0.0,
+          "ways": 1
+        },
+        "secondary": {
+          "any_speed_tag": 57,
+          "base_parseable": 57,
+          "base_parseable_share_of_tagged": 1.0,
+          "base_tag_coverage_share": 0.021072088724584104,
+          "base_tagged": 57,
+          "ways": 2705
+        },
+        "secondary_link": {
+          "any_speed_tag": 1,
+          "base_parseable": 1,
+          "base_parseable_share_of_tagged": 1.0,
+          "base_tag_coverage_share": 0.001184834123222749,
+          "base_tagged": 1,
+          "ways": 844
+        },
+        "service": {
+          "any_speed_tag": 7,
+          "base_parseable": 7,
+          "base_parseable_share_of_tagged": 1.0,
+          "base_tag_coverage_share": 0.0011776581426648722,
+          "base_tagged": 7,
+          "ways": 5944
+        },
+        "services": {
+          "base_parseable_share_of_tagged": null,
+          "base_tag_coverage_share": 0.0,
+          "ways": 37
+        },
+        "steps": {
+          "base_parseable_share_of_tagged": null,
+          "base_tag_coverage_share": 0.0,
+          "ways": 720
+        },
+        "tertiary": {
+          "any_speed_tag": 59,
+          "base_parseable": 59,
+          "base_parseable_share_of_tagged": 1.0,
+          "base_tag_coverage_share": 0.009929316728374285,
+          "base_tagged": 59,
+          "ways": 5942
+        },
+        "tertiary_link": {
+          "any_speed_tag": 6,
+          "base_parseable": 6,
+          "base_parseable_share_of_tagged": 1.0,
+          "base_tag_coverage_share": 0.008415147265077139,
+          "base_tagged": 6,
+          "ways": 713
+        },
+        "track": {
+          "base_parseable_share_of_tagged": null,
+          "base_tag_coverage_share": 0.0,
+          "ways": 527
+        },
+        "trunk": {
+          "any_speed_tag": 180,
+          "base_parseable": 180,
+          "base_parseable_share_of_tagged": 1.0,
+          "base_tag_coverage_share": 0.158311345646438,
+          "base_tagged": 180,
+          "ways": 1137
+        },
+        "trunk_link": {
+          "any_speed_tag": 14,
+          "base_parseable": 14,
+          "base_parseable_share_of_tagged": 1.0,
+          "base_tag_coverage_share": 0.016203703703703703,
+          "base_tagged": 14,
+          "ways": 864
+        },
+        "unclassified": {
+          "any_speed_tag": 12,
+          "base_parseable": 12,
+          "base_parseable_share_of_tagged": 1.0,
+          "base_tag_coverage_share": 0.0020342430920494998,
+          "base_tagged": 12,
+          "ways": 5899
+        }
+      },
+      "conditional_way_count": 0,
+      "directional_only_way_count": 0,
+      "format_counts": {
+        "numeric": 512
+      },
+      "highway_way_population": 53181,
+      "observed_edge_comparison": {
+        "both_numeric": 502,
+        "edges": 18992,
+        "numeric_difference": {
+          "count": 502,
+          "maximum_abs_difference_kmh": 0.0,
+          "p50_abs_difference_kmh": 0.0,
+          "p90_abs_difference_kmh": 0.0
+        },
+        "numeric_difference_over_10_kmh": 0,
+        "numeric_exact_within_0_5_kmh": 502,
+        "osm_base_parseable": 502,
+        "osm_base_tagged": 502,
+        "osm_conditional_tagged": 0,
+        "osm_directional_tagged": 0,
+        "osm_parseable_but_stage0_missing": 0,
+        "osm_parseable_but_stage0_missing_share": 0.0,
+        "scope": "observed accepted-order canonical edges only",
+        "stage0_positive": 502
+      },
+      "tagged_highway_ways_not_in_observed_graph": 444,
+      "top_raw_values": {
+        "10": 1,
+        "100": 102,
+        "120": 44,
+        "15": 1,
+        "20": 5,
+        "25": 2,
+        "30": 15,
+        "35": 3,
+        "40": 10,
+        "5": 2,
+        "50": 51,
+        "60": 122,
+        "70": 116,
+        "80": 38
+      }
+    },
+    "reader": {
+      "interface": "Fiona/GDAL OSM vector layers",
+      "layers": [
+        "points",
+        "lines",
+        "multilinestrings",
+        "multipolygons",
+        "other_relations"
+      ],
+      "limitation": "GDAL exposes restriction geometries but not raw relation member roles/refs; full exact directed-turn mapping is not certified in S1"
+    },
+    "roundabout": {
+      "highway_mini_roundabout_node_count": 7,
+      "junction_roundabout_node_count": 0,
+      "junction_roundabout_way_count": 69,
+      "observed_canonical_segments_on_roundabout_way": {
+        "count": 134,
+        "denominator": 18992,
+        "share": 0.007055602358887953
+      },
+      "representation": "primarily OSM ways; mini_roundabout is a separate node tag",
+      "roundabout_ways_represented_in_observed_graph": {
+        "count": 25,
+        "denominator": 69,
+        "share": 0.36231884057971014
+      }
+    },
+    "schemas": {
+      "lines": {
+        "aerialway": "str",
+        "barrier": "str",
+        "highway": "str",
+        "man_made": "str",
+        "name": "str",
+        "osm_id": "str",
+        "other_tags": "str",
+        "railway": "str",
+        "waterway": "str",
+        "z_order": "int"
+      },
+      "other_relations": {
+        "name": "str",
+        "osm_id": "str",
+        "other_tags": "str",
+        "type": "str"
+      },
+      "points": {
+        "address": "str",
+        "barrier": "str",
+        "highway": "str",
+        "is_in": "str",
+        "man_made": "str",
+        "name": "str",
+        "osm_id": "str",
+        "other_tags": "str",
+        "place": "str",
+        "ref": "str"
+      }
+    },
+    "topology_and_layers": {
+      "any_grade_separation_tag": {
+        "count": 5771,
+        "denominator": 53181,
+        "share": 0.1085161993945206
+      },
+      "bridge_tag_true": {
+        "count": 4376,
+        "denominator": 53181,
+        "share": 0.08228502660724694
+      },
+      "highway_way_count": 53181,
+      "layer_tag_coverage": {
+        "count": 5394,
+        "denominator": 53181,
+        "share": 0.10142720144412479
+      },
+      "nonzero_layer": {
+        "count": 5387,
+        "denominator": 53181,
+        "share": 0.10129557548748613
+      },
+      "observed_edge_osm_vs_stage0": {
+        "edges": 18992,
+        "raw_bridge_true": 687,
+        "raw_bridge_true_stage0_false": 269,
+        "raw_nonzero_layer": 1031,
+        "raw_tunnel_true": 86,
+        "raw_tunnel_true_stage0_false": 0,
+        "stage0_bridge_true": 418,
+        "stage0_bridge_true_raw_false": 0,
+        "stage0_tunnel_true": 86,
+        "stage0_tunnel_true_raw_false": 0
+      },
+      "tag_value_counts": {
+        "bridge": {
+          "aqueduct": 16,
+          "boardwalk": 4,
+          "viaduct": 308,
+          "yes": 4048
+        },
+        "junction": {
+          "circular": 1,
+          "crossing": 1,
+          "roundabout": 69
+        },
+        "layer": {
+          "-1": 1019,
+          "-2": 31,
+          "-3": 2,
+          "0": 7,
+          "1": 3922,
+          "2": 360,
+          "3": 46,
+          "4": 4,
+          "5": 3
+        },
+        "tunnel": {
+          "building_passage": 77,
+          "building_passage-": 7,
+          "yes": 1030,
+          "规划路": 1
+        }
+      },
+      "tunnel_tag_true": {
+        "count": 1115,
+        "denominator": 53181,
+        "share": 0.020966134521727686
+      },
+      "unparseable_layer_count": 0
+    },
+    "traffic_signals": {
+      "identity_method": "exact OSM node ID intersection",
+      "mapped_to_observed_graph_endpoint_by_osm_node_id": {
+        "count": 405,
+        "denominator": 4005,
+        "share": 0.10112359550561797
+      },
+      "mapping_scope": "accepted-order observed subnetwork; full frozen graph unavailable",
+      "observed_canonical_segments_incident_to_signal_node": {
+        "count": 2419,
+        "denominator": 18992,
+        "share": 0.12736941870261162
+      },
+      "observed_directed_identities_incident_to_signal_node": {
+        "count": 3891,
+        "denominator": 25382,
+        "share": 0.15329761248128596
+      },
+      "observed_graph_endpoint_nodes_that_are_signals": {
+        "count": 405,
+        "denominator": 5983,
+        "share": 0.0676917934146749
+      },
+      "raw_highway_traffic_signals_nodes": 4005,
+      "raw_tagged_point_features": 50302
+    },
+    "turn_restrictions": {
+      "all_line_member_geometries_resolved_to_unique_osm_way": {
+        "count": 18,
+        "denominator": 20,
+        "share": 0.9
+      },
+      "all_member_ways_present_in_observed_graph": {
+        "count": 7,
+        "denominator": 20,
+        "share": 0.35
+      },
+      "exact_current_directed_network_mapping_certified": false,
+      "exact_mapping_blocker": "raw relation roles/member refs are not exposed by the available GDAL reader; a role-preserving PBF reader is required before S2 enforcement",
+      "member_geometry_shape_counts": {
+        "line_members=0;point_members=1": 2,
+        "line_members=1;point_members=1": 2,
+        "line_members=2;point_members=0": 1,
+        "line_members=2;point_members=1": 12,
+        "line_members=2;point_members=2": 1,
+        "line_members=3;point_members=0": 1,
+        "line_members=4;point_members=1": 1
+      },
+      "node_via_single_shared_observed_endpoint_candidate_count": 3,
+      "relations_with_ambiguous_line_geometry_match": 0,
+      "restriction_relation_count": 20,
+      "restriction_value_counts": {
+        "no_left_turn": 2,
+        "no_right_turn": 4,
+        "no_u_turn": 2,
+        "only_right_turn": 2,
+        "only_straight_on": 9,
+        "only_u_turn": 1
+      },
+      "via_type_counts_inferred_from_geometry": {
+        "ambiguous_geometry": 5,
+        "node_via": 14,
+        "way_via": 1
+      },
+      "way_via_all_member_ways_observed_count": 0
+    }
+  },
+  "graph_identity": {
+    "begin_end_osm_node_id_present": true,
+    "canonical_edge_uid_present": true,
+    "canonical_from_to_node_present": true,
+    "canonical_traversal_direction_present": true,
+    "complete_frozen_network_edge_table_available": false,
+    "directed_identity": [
+      "canonical_edge_uid",
+      "canonical_traversal_direction"
+    ],
+    "identity_scope_note": "OSM node IDs inside Stage0 are available, but GDAL points includes tagged nodes rather than the full raw node table",
+    "legacy_full_canonical_edges_path": "D:/pycodes/didi_xian_raw/.worktrees/stage0-v5/stage0/output_v5/network/canonical_edges.parquet",
+    "legacy_full_canonical_edges_present": false,
+    "missing_values_by_field": {
+      "begin_osm_node_id": {
+        "count": 0,
+        "denominator": 18992,
+        "share": 0.0
+      },
+      "canonical_from_node": {
+        "count": 0,
+        "denominator": 18992,
+        "share": 0.0
+      },
+      "canonical_to_node": {
+        "count": 0,
+        "denominator": 18992,
+        "share": 0.0
+      },
+      "canonical_traversal_direction": {
+        "count": 0,
+        "denominator": 18992,
+        "share": 0.0
+      },
+      "end_osm_node_id": {
+        "count": 0,
+        "denominator": 18992,
+        "share": 0.0
+      },
+      "forward": {
+        "count": 0,
+        "denominator": 18992,
+        "share": 0.0
+      },
+      "osm_way_id": {
+        "count": 0,
+        "denominator": 18992,
+        "share": 0.0
+      }
+    },
+    "multiple_observed_source_values_by_field": {
+      "begin_osm_node_id": {
+        "count": 6390,
+        "denominator": 18992,
+        "share": 0.3364574557708509
+      },
+      "canonical_from_node": {
+        "count": 6390,
+        "denominator": 18992,
+        "share": 0.3364574557708509
+      },
+      "canonical_to_node": {
+        "count": 6390,
+        "denominator": 18992,
+        "share": 0.3364574557708509
+      },
+      "canonical_traversal_direction": {
+        "count": 6390,
+        "denominator": 18992,
+        "share": 0.3364574557708509
+      },
+      "end_osm_node_id": {
+        "count": 6390,
+        "denominator": 18992,
+        "share": 0.3364574557708509
+      },
+      "forward": {
+        "count": 6390,
+        "denominator": 18992,
+        "share": 0.3364574557708509
+      },
+      "osm_way_id": {
+        "count": 0,
+        "denominator": 18992,
+        "share": 0.0
+      }
+    },
+    "observed_graph_osm_way_count": 2720,
+    "observed_graph_ways_found_as_raw_highway_ways": {
+      "count": 2720,
+      "denominator": 2720,
+      "share": 1.0
+    },
+    "osm_way_id_present": true,
+    "raw_highway_way_count": 53181,
+    "raw_tagged_node_count_exposed_by_gdal": 50302,
+    "raw_untagged_way_node_ids_exposed_by_gdal": false,
+    "source_multiplicity_interpretation": "canonical_edge_uid is the base segment identity and direction is separate; opposite direction/endpoints on one base ID are expected, not conflicts",
+    "unique_observed_endpoint_osm_node_count": 5983,
+    "unique_observed_osm_way_count": 2720,
+    "valhalla_tiles_present": true
+  },
+  "limitations": [
+    "legacy full canonical_edges.parquet is absent",
+    "GDAL points exposes tagged nodes, not the complete raw OSM node table",
+    "POI has no OSM identity fields and is corroboration-only"
+  ],
+  "next_phase_authorized": false,
+  "phase": "S1_STATIC_DATA_INVENTORY",
+  "poi": {
+    "columns": [
+      "名称",
+      "大类",
+      "中类",
+      "经度",
+      "纬度",
+      "省份",
+      "城市",
+      "区域"
+    ],
+    "interpretation": "name/category text can only corroborate nearby OSM evidence; no direct OSM node, way, signal-control, or junction identity is present",
+    "osm_identity_fields_present": false,
+    "row_count": 399566,
+    "search_results": {
+      "junction": {
+        "example_names": [
+          "旅游路口",
+          "二庙路口",
+          "翠一路口",
+          "六号路三号路口",
+          "九峰路口",
+          "尚九路口",
+          "雁引路汇通路口",
+          "雁引路汇通二路口",
+          "环山路雁引路口",
+          "香村路口",
+          "香村窑厂路口",
+          "甫十路环山路口",
+          "南桑村路口",
+          "何寨路口",
+          "季胡路口",
+          "上塬路口",
+          "财源路口",
+          "终台路口",
+          "豆村路口",
+          "界尚路口商行"
+        ],
+        "matched_rows": 1220,
+        "matched_share": 0.003053312844436213,
+        "search_terms": [
+          "junction",
+          "intersection",
+          "crossroad",
+          "crossing",
+          "路口",
+          "交叉口",
+          "十字路口",
+          "丁字路口",
+          "环岛"
+        ],
+        "top_major_categories": {
+          "交通设施": 1176,
+          "医疗保健": 10,
+          "旅游景点": 4,
+          "汽车相关": 3,
+          "生活服务": 5,
+          "购物消费": 11,
+          "运动健身": 1,
+          "酒店住宿": 2,
+          "金融机构": 1,
+          "餐饮美食": 7
+        },
+        "top_middle_categories": {
+          "专科医院": 9,
+          "中国菜": 1,
+          "便利店": 6,
+          "停车场": 2,
+          "公交站": 1168,
+          "公园": 2,
+          "其他": 17,
+          "地铁": 5,
+          "小吃快餐": 1,
+          "市场": 1
+        }
+      },
+      "signal": {
+        "example_names": [],
+        "matched_rows": 0,
+        "matched_share": 0.0,
+        "search_terms": [
+          "traffic signal",
+          "traffic light",
+          "signalized",
+          "红绿灯",
+          "交通信号",
+          "信号灯"
+        ],
+        "top_major_categories": {},
+        "top_middle_categories": {}
+      }
+    },
+    "signal_or_junction_role": "corroboration_only",
+    "top_major_categories": {
+      "交通设施": 24178,
+      "休闲娱乐": 5135,
+      "公司企业": 34219,
+      "医疗保健": 16990,
+      "商务住宅": 12847,
+      "旅游景点": 3760,
+      "汽车相关": 16261,
+      "生活服务": 54932,
+      "科教文化": 21433,
+      "购物消费": 111666,
+      "运动健身": 4223,
+      "酒店住宿": 16235,
+      "金融机构": 5314,
+      "餐饮美食": 72373
+    },
+    "top_middle_categories": {
+      "中介": 3337,
+      "中国菜": 41668,
+      "住宅区": 7402,
+      "便利店": 15947,
+      "停车场": 16832,
+      "公交站": 5928,
+      "公厕": 3835,
+      "公司": 28399,
+      "其他": 116780,
+      "医药销售": 7151,
+      "培训单位": 8877,
+      "家居建材": 23422,
+      "家电数码": 6233,
+      "小吃快餐": 9312,
+      "市场": 9714,
+      "汽车维修": 3900,
+      "洗浴推拿": 4284,
+      "物流": 5470,
+      "美容理发": 14268,
+      "蛋糕甜品店": 3804
+    },
+    "valid_coordinate_rows": {
+      "count": 399566,
+      "denominator": 399566,
+      "share": 1.0
+    }
+  },
+  "priority_findings": {
+    "signalization": "OSM traffic-signal nodes support exact node-ID joins to observed graph endpoints; missing tags cannot be interpreted as unsignalized",
+    "speed_limit": "Stage0 numeric coverage is measurable but per-edge source provenance is absent; raw OSM directional/conditional tags remain separate evidence",
+    "turn_restriction": "restriction relations exist, but exact directed mapping is not certified without member roles/refs"
+  },
+  "runtime_s": 113.25351369999953,
+  "s1_authorized": true,
+  "s1_blockers": [],
+  "s2_authorized": false,
+  "s2_prerequisites_for_review": [
+    "role-preserving PBF relation reader for exact from/via/to restriction mapping",
+    "complete frozen-network edge export or an explicitly observed-subnetwork-only S2 scope",
+    "speed provenance adapter that does not treat road class/design speed as posted speed"
+  ],
+  "schema_version": "stage3_static_data_inventory.1",
+  "scope": {
+    "intersection_clustering_performed": false,
+    "model_inference_performed": false,
+    "question": "What data do we actually have?",
+    "route_assessment_performed": false,
+    "threshold_calibration_performed": false
+  },
+  "sources": {
+    "config": {
+      "path": "stage3/config/stage3_s1_static_inventory.json",
+      "sha256": "68abf902f91b22fca9e3bdfe751e3aec09f39126d0d5024433b4b32eb1eaab24",
+      "size_bytes": 1681
+    },
+    "frozen_osm_pbf": {
+      "path": "D:/pycodes/didi_xian_raw/map_data/xian_roadmap_update.osm.pbf",
+      "sha256": "4d918b7ed2201a8f7a75fa7fb2974679343c89a10bf83638e7bcf21ac07c1526",
+      "size_bytes": 21753051
+    },
+    "poi_csv": {
+      "path": "D:/pycodes/didi_xian_raw/map_data/西安市POI数据.csv",
+      "sha256": "524e4546a5b507271abcb8290ccfa47bef68c157d81bffe5512a28c8dc8ac3f2",
+      "size_bytes": 39273661
+    },
+    "route_parts_set": {
+      "file_count": 196,
+      "relative_paths_sha256": "ac9e669549640d30daf62d67795345f5d2c6a1bb1d120c15a693d781fc0da4a8",
+      "total_size_bytes": 528649284
+    },
+    "stage0_freeze_manifest": {
+      "path": "stage0/docs/stage0_v6_freeze_manifest.json",
+      "sha256": "35a0e8c83c508fa344c74b9ecc2df11f59725d393a9a71f04ee461148762d7d1",
+      "size_bytes": 24194
+    },
+    "stage0_frozen_tiles_sha256": "2e29e7849d2ab4523039088f34986494f4438c196ea131e7da416a26cb5ef698",
+    "stage1_release_manifest": {
+      "path": "stage1/docs/stage1_v3_release_manifest.json",
+      "sha256": "29942f040b7fbd1ce5ccf9ee4586f381cb8f900c27f7aad48482936e7278f26c",
+      "size_bytes": 2661
+    },
+    "stage2_final_release_manifest": {
+      "path": "stage2/docs/v5_2/stage2_v5_2_final_release_manifest.json",
+      "sha256": "11782738a0441f63547de90f9e205f452b68465a548771403e31903d3f9a3812",
+      "size_bytes": 9214
+    },
+    "valhalla_build_manifest": {
+      "path": "D:/pycodes/didi_xian_raw/valhalla_data/build_manifest.json",
+      "sha256": "b1e376bd94ccb67a450a6af120afff7dc3cae97c96ceb6a1dc937830499cfd3c",
+      "size_bytes": 969
+    },
+    "valhalla_build_manifest_payload": {
+      "adopted_existing_build": false,
+      "build_elapsed_s": 5.7102205,
+      "build_ended_at": "2026-07-24T04:06:19.5955407+00:00",
+      "build_started_at": "2026-07-24T04:06:13.8853202+00:00",
+      "build_status": "PASS",
+      "config_path": "D:\\pycodes\\didi_xian_raw\\valhalla_data\\valhalla.json",
+      "environment_name": "stage0-valhalla",
+      "error": null,
+      "installation_method": "conda Python 3.12 environment + PyPI wheel",
+      "operating_system": "Windows-11-10.0.26200-SP0",
+      "pbf_path": "D:\\pycodes\\didi_xian_raw\\map_data\\xian_roadmap_update.osm.pbf",
+      "pbf_sha256": "4d918b7ed2201a8f7a75fa7fb2974679343c89a10bf83638e7bcf21ac07c1526",
+      "pbf_size_bytes": 21753051,
+      "python_implementation": "CPython",
+      "python_version": "3.12.13",
+      "pyvalhalla_version": "3.8.2",
+      "schema_version": "stage0_v6_valhalla_tile_build.1",
+      "tile_path": "D:\\pycodes\\didi_xian_raw\\valhalla_data\\tiles",
+      "tile_size_bytes": 30246200,
+      "valhalla_version": "3.8.2"
+    }
+  },
+  "stage0_route_parts": {
+    "graph_identity": {
+      "begin_end_osm_node_id_present": true,
+      "canonical_edge_uid_present": true,
+      "canonical_from_to_node_present": true,
+      "canonical_traversal_direction_present": true,
+      "directed_identity": [
+        "canonical_edge_uid",
+        "canonical_traversal_direction"
+      ],
+      "missing_values_by_field": {
+        "begin_osm_node_id": {
+          "count": 0,
+          "denominator": 18992,
+          "share": 0.0
+        },
+        "canonical_from_node": {
+          "count": 0,
+          "denominator": 18992,
+          "share": 0.0
+        },
+        "canonical_to_node": {
+          "count": 0,
+          "denominator": 18992,
+          "share": 0.0
+        },
+        "canonical_traversal_direction": {
+          "count": 0,
+          "denominator": 18992,
+          "share": 0.0
+        },
+        "end_osm_node_id": {
+          "count": 0,
+          "denominator": 18992,
+          "share": 0.0
+        },
+        "forward": {
+          "count": 0,
+          "denominator": 18992,
+          "share": 0.0
+        },
+        "osm_way_id": {
+          "count": 0,
+          "denominator": 18992,
+          "share": 0.0
+        }
+      },
+      "multiple_observed_source_values_by_field": {
+        "begin_osm_node_id": {
+          "count": 6390,
+          "denominator": 18992,
+          "share": 0.3364574557708509
+        },
+        "canonical_from_node": {
+          "count": 6390,
+          "denominator": 18992,
+          "share": 0.3364574557708509
+        },
+        "canonical_to_node": {
+          "count": 6390,
+          "denominator": 18992,
+          "share": 0.3364574557708509
+        },
+        "canonical_traversal_direction": {
+          "count": 6390,
+          "denominator": 18992,
+          "share": 0.3364574557708509
+        },
+        "end_osm_node_id": {
+          "count": 6390,
+          "denominator": 18992,
+          "share": 0.3364574557708509
+        },
+        "forward": {
+          "count": 6390,
+          "denominator": 18992,
+          "share": 0.3364574557708509
+        },
+        "osm_way_id": {
+          "count": 0,
+          "denominator": 18992,
+          "share": 0.0
+        }
+      },
+      "osm_way_id_present": true,
+      "source_multiplicity_interpretation": "canonical_edge_uid is the base segment identity and direction is separate; opposite direction/endpoints on one base ID are expected, not conflicts",
+      "unique_observed_endpoint_osm_node_count": 5983,
+      "unique_observed_osm_way_count": 2720
+    },
+    "population": {
+      "canonical_segment_ids_observed_in_both_directions": 6390,
+      "edge_count_denominator_note": "route_parts includes every traversed canonical edge; the Stage0 freeze count is limited to canonical edges with direct observations",
+      "observed_unique_canonical_segment_ids": 18992,
+      "observed_unique_directed_canonical_identities": 25382,
+      "route_part_file_count": 196,
+      "route_part_rows": 15649455,
+      "scope_note": "accepted-order observed subnetwork; not the complete frozen routable graph",
+      "stage0_freeze_unique_direct_observed_edge_count": 11754
+    },
+    "speed_limit": {
+      "by_road_class_route_part_row": {
+        "primary": {
+          "abnormal": 0,
+          "null": 5520697,
+          "positive": 344907,
+          "positive_coverage_share": 0.058801617020173884,
+          "rows": 5865604,
+          "zero": 0
+        },
+        "residential": {
+          "abnormal": 0,
+          "null": 59918,
+          "positive": 62,
+          "positive_coverage_share": 0.001033677892630877,
+          "rows": 59980,
+          "zero": 0
+        },
+        "secondary": {
+          "abnormal": 0,
+          "null": 4851722,
+          "positive": 56743,
+          "positive_coverage_share": 0.011560233188990856,
+          "rows": 4908465,
+          "zero": 0
+        },
+        "service_other": {
+          "abnormal": 0,
+          "null": 37612,
+          "positive": 69,
+          "positive_coverage_share": 0.001831161593375972,
+          "rows": 37681,
+          "zero": 0
+        },
+        "tertiary": {
+          "abnormal": 0,
+          "null": 2170678,
+          "positive": 724,
+          "positive_coverage_share": 0.00033342513270228177,
+          "rows": 2171402,
+          "zero": 0
+        },
+        "trunk": {
+          "abnormal": 0,
+          "null": 837504,
+          "positive": 776701,
+          "positive_coverage_share": 0.4811662707029157,
+          "rows": 1614205,
+          "zero": 0
+        },
+        "unclassified": {
+          "abnormal": 0,
+          "null": 992035,
+          "positive": 83,
+          "positive_coverage_share": 8.365940341773862e-05,
+          "rows": 992118,
+          "zero": 0
+        }
+      },
+      "by_road_class_unique_edge": {
+        "primary": {
+          "abnormal": 0,
+          "edges": 2508,
+          "null": 2402,
+          "positive": 106,
+          "positive_coverage_share": 0.04226475279106858,
+          "zero": 0
+        },
+        "residential": {
+          "abnormal": 0,
+          "edges": 2265,
+          "null": 2246,
+          "positive": 19,
+          "positive_coverage_share": 0.008388520971302429,
+          "zero": 0
+        },
+        "secondary": {
+          "abnormal": 0,
+          "edges": 3522,
+          "null": 3468,
+          "positive": 54,
+          "positive_coverage_share": 0.015332197614991482,
+          "zero": 0
+        },
+        "service_other": {
+          "abnormal": 0,
+          "edges": 2979,
+          "null": 2967,
+          "positive": 12,
+          "positive_coverage_share": 0.004028197381671702,
+          "zero": 0
+        },
+        "tertiary": {
+          "abnormal": 0,
+          "edges": 4222,
+          "null": 4216,
+          "positive": 6,
+          "positive_coverage_share": 0.0014211274277593558,
+          "zero": 0
+        },
+        "trunk": {
+          "abnormal": 0,
+          "edges": 563,
+          "null": 293,
+          "positive": 270,
+          "positive_coverage_share": 0.47957371225577267,
+          "zero": 0
+        },
+        "unclassified": {
+          "abnormal": 0,
+          "edges": 2933,
+          "null": 2898,
+          "positive": 35,
+          "positive_coverage_share": 0.011933174224343675,
+          "zero": 0
+        }
+      },
+      "diagnostic_abnormal_definition": {
+        "high_above_kmh": 160.0,
+        "low_positive_below_kmh": 5.0
+      },
+      "field_present": true,
+      "provenance_field_present": false,
+      "row_weighted": {
+        "coverage_positive": {
+          "count": 1179289,
+          "denominator": 15649455,
+          "share": 0.07535655395028133
+        },
+        "high": {
+          "count": 0,
+          "denominator": 15649455,
+          "share": 0.0
+        },
+        "length_weighted_positive_coverage_share": 0.10182932077079866,
+        "low_positive": {
+          "count": 0,
+          "denominator": 15649455,
+          "share": 0.0
+        },
+        "negative": {
+          "count": 0,
+          "denominator": 15649455,
+          "share": 0.0
+        },
+        "null": {
+          "count": 14470166,
+          "denominator": 15649455,
+          "share": 0.9246434460497187
+        },
+        "zero": {
+          "count": 0,
+          "denominator": 15649455,
+          "share": 0.0
+        }
+      },
+      "unique_edge_weighted": {
+        "coverage_positive": {
+          "count": 502,
+          "denominator": 18992,
+          "share": 0.02643218197135636
+        },
+        "high": {
+          "count": 0,
+          "denominator": 18992,
+          "share": 0.0
+        },
+        "identity_unit": "canonical_edge_uid base segment; direction stored separately",
+        "low_positive": {
+          "count": 0,
+          "denominator": 18992,
+          "share": 0.0
+        },
+        "multiple_values_for_same_canonical_edge": {
+          "count": 0,
+          "denominator": 18992,
+          "share": 0.0
+        },
+        "negative": {
+          "count": 0,
+          "denominator": 18992,
+          "share": 0.0
+        },
+        "null": {
+          "count": 18490,
+          "denominator": 18992,
+          "share": 0.9735678180286437
+        },
+        "zero": {
+          "count": 0,
+          "denominator": 18992,
+          "share": 0.0
+        }
+      },
+      "unit_assumed_from_valhalla_contract": "km/h"
+    },
+    "static_flags": {
+      "bridge_null_edges": 0,
+      "bridge_true_edges": 418,
+      "junction_field_present": false,
+      "layer_field_present": false,
+      "roundabout_field_present": false,
+      "signal_field_present": false,
+      "tunnel_null_edges": 0,
+      "tunnel_true_edges": 86,
+      "turn_restriction_field_present": false
+    }
+  },
+  "status": "STAGE3_S1_STATIC_INVENTORY_COMPLETE"
+}

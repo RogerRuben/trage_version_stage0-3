@@ -1,0 +1,362 @@
+[
+  {
+    "epoch_id": "0730",
+    "condition": "D13",
+    "pstar_s": 1251.585014993522,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 59.74903337908768,
+    "gap_relative": 0.04773869346733664,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D13",
+    "pstar_s": 1251.585014993522,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 59.74903337908768,
+    "gap_relative": 0.04773869346733664,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D13",
+    "pstar_s": 509.98336332277586,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 101.99667266455526,
+    "gap_relative": 0.20000000000000018,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D13",
+    "pstar_s": 509.98336332277586,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 101.99667266455526,
+    "gap_relative": 0.20000000000000018,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D13",
+    "pstar_s": 930.6329293179617,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 223.53438008127523,
+    "gap_relative": 0.24019607843137267,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D13",
+    "pstar_s": 930.6329293179617,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 223.53438008127523,
+    "gap_relative": 0.24019607843137267,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D13",
+    "pstar_s": 1120.8248015063066,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 110.82782552207891,
+    "gap_relative": 0.09888059701492545,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D13",
+    "pstar_s": 1120.8248015063066,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 110.82782552207891,
+    "gap_relative": 0.09888059701492545,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D13",
+    "pstar_s": 383.5131596576524,
+    "mode": "A1",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D13",
+    "pstar_s": 383.5131596576524,
+    "mode": "A2",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D13",
+    "pstar_s": 1042.8676651117112,
+    "mode": "A1",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D13",
+    "pstar_s": 1042.8676651117112,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 136.71740731647446,
+    "gap_relative": 0.13109756097560987,
+    "same_order_swap_count": 0,
+    "served_set_changed": true,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D13",
+    "pstar_s": 956.7041086885783,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 11.081514772454511,
+    "gap_relative": 0.011583011583011516,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": true,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D13",
+    "pstar_s": 956.7041086885783,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 11.081514772454511,
+    "gap_relative": 0.011583011583011516,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": true,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D13",
+    "pstar_s": 737.3300096025938,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 26.10017733106531,
+    "gap_relative": 0.03539823008849564,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D13",
+    "pstar_s": 737.3300096025938,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 26.10017733106531,
+    "gap_relative": 0.03539823008849564,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D13",
+    "pstar_s": 1154.8397617662592,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 29.61127594272466,
+    "gap_relative": 0.025641025641025696,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D13",
+    "pstar_s": 1154.8397617662592,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 29.61127594272466,
+    "gap_relative": 0.025641025641025696,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D13",
+    "pstar_s": 260.50910094171064,
+    "mode": "A1",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D13",
+    "pstar_s": 260.50910094171064,
+    "mode": "A2",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  }
+]

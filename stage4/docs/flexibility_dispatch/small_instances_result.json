@@ -1,0 +1,435 @@
+{
+  "status": "COMPLETE",
+  "scope": "SYNTHETIC_OR_CORRECTNESS_AND_COUNTEREXAMPLES_ONLY",
+  "native_fleetpy_dynamic_window_run": false,
+  "signal_input": {
+    "release": "D:\\pycodes\\didi_xian_raw\\map_data\\signal_gapfill_20261004",
+    "manifest_sha256": "f7d7e4aabfdb5304997497421868466e29e402d67c581b5ea679a4e7c467d454",
+    "full_positive_union_count": 699,
+    "map_or_amap_supported_count": 693,
+    "legacy_only_count": 6,
+    "http_closed": true,
+    "unlisted_locations_are_not_proven_unsignalized": true,
+    "evidence_period_is_not_2016_field_truth": true,
+    "canonical_complex_mapping_completed": false,
+    "tables": {
+      "xian_signalized_intersections_final.csv": {
+        "path": "D:\\pycodes\\didi_xian_raw\\map_data\\signal_gapfill_20261004\\results\\xian_signalized_intersections_final.csv",
+        "row_count": 699,
+        "sha256": "12c6b35866916f9f518487e398b918921ba056f296732d5296f5e22ec65091f7"
+      },
+      "map_or_amap_positive_final.csv": {
+        "path": "D:\\pycodes\\didi_xian_raw\\map_data\\signal_gapfill_20261004\\results\\map_or_amap_positive_final.csv",
+        "row_count": 693,
+        "sha256": "c93d432f253946fa9db708dc932d75465a805a578e675948d674d017e5e2c87c"
+      }
+    }
+  },
+  "rows": [
+    {
+      "case": "flexibility_reservation",
+      "policy": "MYOPIC",
+      "decision": {
+        "policy": "MYOPIC",
+        "selected_pairs": [
+          [
+            1,
+            10
+          ]
+        ],
+        "immediate_service_count": 1,
+        "expected_next_service_count": 0.0,
+        "expected_total_service_count": 1.0,
+        "solve_time_s": 0.0032701000018278137,
+        "variable_count": 2,
+        "constraint_nonzeros": 4,
+        "sparse_matrix_bytes": 0,
+        "recourse_pairs": []
+      },
+      "realized_next_service_score": 1.0,
+      "realized_continuation": {
+        "policy": "FIXED_ACTION_EVALUATION",
+        "selected_pairs": [
+          [
+            1,
+            10
+          ]
+        ],
+        "immediate_service_count": 1,
+        "expected_next_service_count": 0.0,
+        "expected_total_service_count": 1.0,
+        "solve_time_s": 0.0011911000037798658,
+        "variable_count": 5,
+        "constraint_nonzeros": 13,
+        "sparse_matrix_bytes": 196,
+        "recourse_pairs": []
+      }
+    },
+    {
+      "case": "flexibility_reservation",
+      "policy": "AV_FIRST",
+      "decision": {
+        "policy": "AV_FIRST",
+        "selected_pairs": [
+          [
+            2,
+            10
+          ]
+        ],
+        "immediate_service_count": 1,
+        "expected_next_service_count": 0.0,
+        "expected_total_service_count": 1.0,
+        "solve_time_s": 0.004094500000064727,
+        "variable_count": 4,
+        "constraint_nonzeros": 10,
+        "sparse_matrix_bytes": 148,
+        "recourse_pairs": []
+      },
+      "realized_next_service_score": 2.0,
+      "realized_continuation": {
+        "policy": "FIXED_ACTION_EVALUATION",
+        "selected_pairs": [
+          [
+            2,
+            10
+          ]
+        ],
+        "immediate_service_count": 1,
+        "expected_next_service_count": 1.0,
+        "expected_total_service_count": 2.0,
+        "solve_time_s": 0.0014057000007596798,
+        "variable_count": 5,
+        "constraint_nonzeros": 13,
+        "sparse_matrix_bytes": 196,
+        "recourse_pairs": [
+          [
+            "FORECAST_HV_DEPENDENT",
+            1,
+            20
+          ]
+        ]
+      }
+    },
+    {
+      "case": "flexibility_reservation",
+      "policy": "LOOKAHEAD",
+      "decision": {
+        "policy": "LOOKAHEAD",
+        "selected_pairs": [
+          [
+            2,
+            10
+          ]
+        ],
+        "immediate_service_count": 1,
+        "expected_next_service_count": 1.0,
+        "expected_total_service_count": 2.0,
+        "solve_time_s": 0.003258699995058123,
+        "variable_count": 5,
+        "constraint_nonzeros": 16,
+        "sparse_matrix_bytes": 232,
+        "recourse_pairs": [
+          [
+            "FORECAST_HV_DEPENDENT",
+            1,
+            20
+          ]
+        ]
+      },
+      "realized_next_service_score": 2.0,
+      "realized_continuation": {
+        "policy": "FIXED_ACTION_EVALUATION",
+        "selected_pairs": [
+          [
+            2,
+            10
+          ]
+        ],
+        "immediate_service_count": 1,
+        "expected_next_service_count": 1.0,
+        "expected_total_service_count": 2.0,
+        "solve_time_s": 0.0010118999998667277,
+        "variable_count": 5,
+        "constraint_nonzeros": 13,
+        "sparse_matrix_bytes": 196,
+        "recourse_pairs": [
+          [
+            "FORECAST_HV_DEPENDENT",
+            1,
+            20
+          ]
+        ]
+      }
+    },
+    {
+      "case": "location_counterexample",
+      "policy": "MYOPIC",
+      "decision": {
+        "policy": "MYOPIC",
+        "selected_pairs": [
+          [
+            1,
+            10
+          ]
+        ],
+        "immediate_service_count": 1,
+        "expected_next_service_count": 0.0,
+        "expected_total_service_count": 1.0,
+        "solve_time_s": 0.0017435000045225024,
+        "variable_count": 2,
+        "constraint_nonzeros": 4,
+        "sparse_matrix_bytes": 0,
+        "recourse_pairs": []
+      },
+      "realized_next_service_score": 2.0,
+      "realized_continuation": {
+        "policy": "FIXED_ACTION_EVALUATION",
+        "selected_pairs": [
+          [
+            1,
+            10
+          ]
+        ],
+        "immediate_service_count": 1,
+        "expected_next_service_count": 1.0,
+        "expected_total_service_count": 2.0,
+        "solve_time_s": 0.0010407000008854084,
+        "variable_count": 5,
+        "constraint_nonzeros": 13,
+        "sparse_matrix_bytes": 196,
+        "recourse_pairs": [
+          [
+            "FORECAST_AV_NEARBY",
+            2,
+            20
+          ]
+        ]
+      }
+    },
+    {
+      "case": "location_counterexample",
+      "policy": "AV_FIRST",
+      "decision": {
+        "policy": "AV_FIRST",
+        "selected_pairs": [
+          [
+            2,
+            10
+          ]
+        ],
+        "immediate_service_count": 1,
+        "expected_next_service_count": 0.0,
+        "expected_total_service_count": 1.0,
+        "solve_time_s": 0.003391999998711981,
+        "variable_count": 4,
+        "constraint_nonzeros": 10,
+        "sparse_matrix_bytes": 148,
+        "recourse_pairs": []
+      },
+      "realized_next_service_score": 1.0,
+      "realized_continuation": {
+        "policy": "FIXED_ACTION_EVALUATION",
+        "selected_pairs": [
+          [
+            2,
+            10
+          ]
+        ],
+        "immediate_service_count": 1,
+        "expected_next_service_count": 0.0,
+        "expected_total_service_count": 1.0,
+        "solve_time_s": 0.0009437999979127198,
+        "variable_count": 5,
+        "constraint_nonzeros": 13,
+        "sparse_matrix_bytes": 196,
+        "recourse_pairs": []
+      }
+    },
+    {
+      "case": "location_counterexample",
+      "policy": "LOOKAHEAD",
+      "decision": {
+        "policy": "LOOKAHEAD",
+        "selected_pairs": [
+          [
+            1,
+            10
+          ]
+        ],
+        "immediate_service_count": 1,
+        "expected_next_service_count": 1.0,
+        "expected_total_service_count": 2.0,
+        "solve_time_s": 0.0029364000001805834,
+        "variable_count": 5,
+        "constraint_nonzeros": 16,
+        "sparse_matrix_bytes": 232,
+        "recourse_pairs": [
+          [
+            "FORECAST_AV_NEARBY",
+            2,
+            20
+          ]
+        ]
+      },
+      "realized_next_service_score": 2.0,
+      "realized_continuation": {
+        "policy": "FIXED_ACTION_EVALUATION",
+        "selected_pairs": [
+          [
+            1,
+            10
+          ]
+        ],
+        "immediate_service_count": 1,
+        "expected_next_service_count": 1.0,
+        "expected_total_service_count": 2.0,
+        "solve_time_s": 0.0009328000014647841,
+        "variable_count": 5,
+        "constraint_nonzeros": 13,
+        "sparse_matrix_bytes": 196,
+        "recourse_pairs": [
+          [
+            "FORECAST_AV_NEARBY",
+            2,
+            20
+          ]
+        ]
+      }
+    },
+    {
+      "case": "forecast_error_counterexample",
+      "policy": "MYOPIC",
+      "decision": {
+        "policy": "MYOPIC",
+        "selected_pairs": [
+          [
+            1,
+            10
+          ]
+        ],
+        "immediate_service_count": 1,
+        "expected_next_service_count": 0.0,
+        "expected_total_service_count": 1.0,
+        "solve_time_s": 0.0016489999979967251,
+        "variable_count": 2,
+        "constraint_nonzeros": 4,
+        "sparse_matrix_bytes": 0,
+        "recourse_pairs": []
+      },
+      "realized_next_service_score": 2.0,
+      "realized_continuation": {
+        "policy": "FIXED_ACTION_EVALUATION",
+        "selected_pairs": [
+          [
+            1,
+            10
+          ]
+        ],
+        "immediate_service_count": 1,
+        "expected_next_service_count": 1.0,
+        "expected_total_service_count": 2.0,
+        "solve_time_s": 0.0009941000025719404,
+        "variable_count": 5,
+        "constraint_nonzeros": 13,
+        "sparse_matrix_bytes": 196,
+        "recourse_pairs": [
+          [
+            "REALIZED_AV_NEARBY",
+            2,
+            20
+          ]
+        ]
+      }
+    },
+    {
+      "case": "forecast_error_counterexample",
+      "policy": "AV_FIRST",
+      "decision": {
+        "policy": "AV_FIRST",
+        "selected_pairs": [
+          [
+            2,
+            10
+          ]
+        ],
+        "immediate_service_count": 1,
+        "expected_next_service_count": 0.0,
+        "expected_total_service_count": 1.0,
+        "solve_time_s": 0.0029034999970463105,
+        "variable_count": 4,
+        "constraint_nonzeros": 10,
+        "sparse_matrix_bytes": 148,
+        "recourse_pairs": []
+      },
+      "realized_next_service_score": 1.0,
+      "realized_continuation": {
+        "policy": "FIXED_ACTION_EVALUATION",
+        "selected_pairs": [
+          [
+            2,
+            10
+          ]
+        ],
+        "immediate_service_count": 1,
+        "expected_next_service_count": 0.0,
+        "expected_total_service_count": 1.0,
+        "solve_time_s": 0.0009655999965616502,
+        "variable_count": 5,
+        "constraint_nonzeros": 13,
+        "sparse_matrix_bytes": 196,
+        "recourse_pairs": []
+      }
+    },
+    {
+      "case": "forecast_error_counterexample",
+      "policy": "LOOKAHEAD",
+      "decision": {
+        "policy": "LOOKAHEAD",
+        "selected_pairs": [
+          [
+            2,
+            10
+          ]
+        ],
+        "immediate_service_count": 1,
+        "expected_next_service_count": 1.0,
+        "expected_total_service_count": 2.0,
+        "solve_time_s": 0.0033859000031952746,
+        "variable_count": 5,
+        "constraint_nonzeros": 16,
+        "sparse_matrix_bytes": 232,
+        "recourse_pairs": [
+          [
+            "FORECAST_HV_DEPENDENT",
+            1,
+            20
+          ]
+        ]
+      },
+      "realized_next_service_score": 1.0,
+      "realized_continuation": {
+        "policy": "FIXED_ACTION_EVALUATION",
+        "selected_pairs": [
+          [
+            2,
+            10
+          ]
+        ],
+        "immediate_service_count": 1,
+        "expected_next_service_count": 0.0,
+        "expected_total_service_count": 1.0,
+        "solve_time_s": 0.0010435999938636087,
+        "variable_count": 5,
+        "constraint_nonzeros": 13,
+        "sparse_matrix_bytes": 196,
+        "recourse_pairs": []
+      }
+    }
+  ],
+  "runtime_s": 0.06998290000046836,
+  "peak_rss_mb": 77.84765625,
+  "gpu_used": false,
+  "dense_request_vehicle_matrix_used": false,
+  "continuation_rule": "SAME_OPTIMAL_ONE_NEXT_SERVICE_CONTINUATION_FOR_ALL_POLICIES",
+  "scientific_claim": "EXISTENCE_OF_BENEFIT_AND_FAILURE_CASES_NOT_EMPIRICAL_SUPERIORITY"
+}

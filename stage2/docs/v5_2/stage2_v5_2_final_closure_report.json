@@ -1,0 +1,35 @@
+{
+  "artifact_sha256": "d488313428346004fbbe73bd269231f54da4c27eb41527f718d03234e8b33fde",
+  "base_commit": "69c995290c2b91d86a42f80236a7565fd7113ece",
+  "blockers": [],
+  "contract": {
+    "path": "stage2/docs/v5_2/stage2_v5_2_to_stage3_contract.md",
+    "schema_version": "stage2_v5_2_to_stage3_contract.2",
+    "sha256": "8e0b62426b4c29658c45cfff33f7e5802387fb570c83616fb47d8f3bcd9da553",
+    "size_bytes": 2822
+  },
+  "final_predictor": "M3",
+  "limitations": [
+    "The M3 checkpoint is hash-bound local production state and is ignored by Git.",
+    "No Stage 3 static inventory, calibration, inference, or experiment was run in S0."
+  ],
+  "manifest": {
+    "path": "stage2/docs/v5_2/stage2_v5_2_final_release_manifest.json",
+    "sha256": "11782738a0441f63547de90f9e205f452b68465a548771403e31903d3f9a3812",
+    "size_bytes": 9214
+  },
+  "next_phase_authorized": false,
+  "phase_status": "STAGE2_FINAL_FROZEN",
+  "schema_version": "stage2_v5_2_final_closure_report.1",
+  "status": "PASS",
+  "verification": {
+    "final_model": "M3",
+    "next_phase_authorized": false,
+    "resolved_descriptor_count": 20,
+    "schema_version": "stage2_v5_2_final_release_verification.1",
+    "scientific_evidence_count": 4,
+    "stage2_status": "STAGE2_FINAL_FROZEN",
+    "stage3_authorized": false,
+    "status": "PASS"
+  }
+}

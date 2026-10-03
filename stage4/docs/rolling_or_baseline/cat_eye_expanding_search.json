@@ -1,0 +1,22 @@
+{
+  "case": "A_EXPANDING_SEARCH",
+  "vehicle_distance_m": 2500,
+  "epochs": [
+    {
+      "failed_round_count": 0,
+      "search_radius_m": 2000,
+      "candidate_found": false,
+      "matched": false,
+      "carry_over": true
+    },
+    {
+      "failed_round_count": 1,
+      "search_radius_m": 3000,
+      "candidate_found": true,
+      "pickup_eta_s": 60,
+      "remaining_patience_s": 240,
+      "matched": true
+    }
+  ],
+  "result": "PASS_MATCHED_BEFORE_PATIENCE_EXPIRY"
+}

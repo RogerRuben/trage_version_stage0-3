@@ -1,0 +1,71 @@
+{
+  "status": "READ_ONLY_AUDIT_COMPLETE",
+  "route_source": "stage2/output_v4/route_conditioned_dataset/revealed_route_proxy/day=20161031.parquet",
+  "order_count": 30000,
+  "feature_age_reconstruction_mismatches": 0,
+  "release_comparisons": {
+    "CANONICAL_ZERO_LEAD": {
+      "tokens": 2116712,
+      "missing_availability": 0,
+      "history_at_or_after_release": 0,
+      "decision_after_release": 0,
+      "orders_with_history_at_or_after_release": 0
+    },
+    "RT-Low": {
+      "tokens": 2116712,
+      "missing_availability": 0,
+      "history_at_or_after_release": 2116689,
+      "decision_after_release": 2116712,
+      "orders_with_history_at_or_after_release": 29999
+    },
+    "RT-Base": {
+      "tokens": 2116712,
+      "missing_availability": 0,
+      "history_at_or_after_release": 2116689,
+      "decision_after_release": 2116712,
+      "orders_with_history_at_or_after_release": 29999
+    },
+    "RT-High": {
+      "tokens": 2116712,
+      "missing_availability": 0,
+      "history_at_or_after_release": 2116689,
+      "decision_after_release": 2116712,
+      "orders_with_history_at_or_after_release": 29999
+    }
+  },
+  "assignment_accounting": [
+    {
+      "scenario": "ODD_Q50_M_P70_REFERENCE",
+      "rows": 18113,
+      "completed": 18113,
+      "missing_time_rows": 0,
+      "pickup_error_abs_max_s": 1.0006147022068035e-09,
+      "service_error_abs_max_s": 9.999894245993346e-10,
+      "service_error_abs_above_1s": 0,
+      "service_error_quantiles_s": {
+        "0.0": -9.999894245993346e-10,
+        "0.5": 0.0,
+        "0.9": 0.0,
+        "1.0": 9.999894245993346e-10
+      }
+    },
+    {
+      "scenario": "MAIN_Q75_M_P70",
+      "rows": 12039,
+      "completed": 12039,
+      "missing_time_rows": 0,
+      "pickup_error_abs_max_s": 1.0006147022068035e-09,
+      "service_error_abs_max_s": 9.999894245993346e-10,
+      "service_error_abs_above_1s": 0,
+      "service_error_quantiles_s": {
+        "0.0": -9.999894245993346e-10,
+        "0.5": 0.0,
+        "0.9": 0.0,
+        "1.0": 9.999894245993346e-10
+      }
+    }
+  ],
+  "interpretation": "timestamp compatibility, not proof of all feature provenance; missing history is unknown",
+  "runtime_s": 11.395679799999925,
+  "peak_working_set_mib": 376.1484375
+}

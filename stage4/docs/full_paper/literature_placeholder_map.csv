@@ -1,0 +1,11 @@
+placeholder_id,section,claim_needing_support,preferred_source_type,notes
+CITE-L1,1 and 2.1,Dynamic ride-hailing requires repeated assignment under uncertain spatial-temporal demand,"Recent transportation operations review and foundational dynamic assignment papers",Verify scope and avoid claiming complete coverage
+CITE-L2,2.1,Passenger patience and carry-over alter rolling matching decisions,"Ride-hailing queueing; matching; and abandonment studies",Distinguish modeled patience expiration from observed behavioral cancellation
+CITE-L3,2.2,Mixed HV/AV fleets create heterogeneous availability and service constraints,"Peer-reviewed mixed-fleet mobility or ride-hailing operations studies",Prefer operational studies rather than broad AV forecasts
+CITE-L4,2.3,Passenger willingness to use autonomous mobility is heterogeneous,"Empirical stated/revealed preference studies and systematic reviews",Do not treat the paper's p_A as empirically calibrated
+CITE-L5,2.4,An operational design domain defines conditions under which an automated driving system is intended to operate,"ISO 34503 or another verified primary standards source",Use exact verified terminology at citation stage
+CITE-L6,2.4,Route-level operational compatibility can depend on road; intersection; traffic; and speed attributes,"Primary AV operational-domain and route-suitability research",Do not translate reference-envelope exposure into safety probability
+CITE-L7,2.5 and 4.6,Lexicographic optimization preserves priority among noncommensurate objectives,"Operations research textbooks or peer-reviewed lexicographic optimization methods",Cite sequential exact optimization rather than weighted-sum approximation
+CITE-L8,2.5 and 4.5,Cumulative resource or exposure constraints can provide transparent operational controls,"Constrained assignment; resource-budget; or cumulative exposure optimization studies",Seek conceptually close transportation applications
+CITE-L9,4.6 and 5.4,Sparse candidate construction supports scalable rolling assignment,"Large-scale matching and sparse assignment research",Do not claim real-time deployment without timing evidence
+CITE-L10,9,Charging; maintenance; and congestion feedback may alter AV fleet operations,"Electric/AV fleet operations and dynamic traffic assignment literature",Use to motivate future extensions only

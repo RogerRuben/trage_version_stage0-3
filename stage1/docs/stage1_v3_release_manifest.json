@@ -1,0 +1,78 @@
+{
+  "schema_version": "stage1_v3_release_manifest.1",
+  "release_tag": "stage1-v3-final",
+  "engineering_status": "PASS",
+  "scientific_status": "REVIEW_COMPLETED_BASELINE_NOT_CAUSALLY_VALIDATED",
+  "stage0_release": {
+    "tag": "stage0-v6-final",
+    "commit": "729275d81ec5dc224ac0967a6e600457764607b8",
+    "source_content_hash": "a5e482f4a0d2b607",
+    "freeze_manifest_sha256": "35a0e8c83c508fa344c74b9ecc2df11f59725d393a9a71f04ee461148762d7d1"
+  },
+  "stage1_identity": {
+    "config_sha256": "f693bb01ee0c5e61cfcbc5a381c6b6ad41e541c38106d4f56e4b3d11161ad754",
+    "code_sha": "stage1-v3-content.c14bff2bb463c2ecdb6d4a6300e4d51a5fc3f6ae4dbe34013727ee16dd3f29df",
+    "model_id": "fa9cf5f2e8e79687a5fe93aa446cd9b0bd70698a60374569c1bdcdd761b240b8",
+    "model_schema_version": "stage1_v3_models.4",
+    "output_summary_schema_version": "stage1_v3_output_summary.2"
+  },
+  "frozen_inputs": {
+    "accepted_order_count": 220000,
+    "direct_interval_count": 18604112,
+    "bucket_count": 196,
+    "train_order_count": 160000,
+    "validation_order_count": 30000,
+    "test_order_count": 30000,
+    "train_dates": [
+      "20161009",
+      "20161010",
+      "20161011",
+      "20161012",
+      "20161013",
+      "20161014",
+      "20161015",
+      "20161016",
+      "20161017",
+      "20161018",
+      "20161019",
+      "20161020",
+      "20161021",
+      "20161022",
+      "20161023",
+      "20161024"
+    ],
+    "validation_dates": [
+      "20161025",
+      "20161026",
+      "20161027"
+    ],
+    "test_date": "20161031"
+  },
+  "production": {
+    "model_bundle_sha256": "94b1be6ac9755c195d9f28aee3dc50c7513a523fce453f1307c4b256cad9240c",
+    "output_manifest_aggregate_sha256": "51ab7e24b8e0944b8fdefd803cd285fe8af2c0456b5cfcd26ac3e6b30986c1ea",
+    "completed_bucket_count": 196,
+    "interval_label_count": 18604112,
+    "traversal_label_count": 5775530,
+    "order_label_count": 220000
+  },
+  "quality": {
+    "lcs_available_count": 2358733,
+    "lcs_available_share": 0.408401133748764,
+    "rts_available_count": 5309097,
+    "rts_available_share": 0.919239792711665,
+    "distance_exceed_invalid_count": 0,
+    "distance_exceed_invalid_share": 0.0,
+    "verification_failure_count": 0
+  },
+  "reports": {
+    "preflight_sha256": "449c652ebca9d79c56b637d1fe0701efdc00a60cb5be6a93eec7117ae6f8ff9d",
+    "verification_sha256": "e563b9eb9e82eae05a7bc1fd4b924a2feaf724f962ba1f016dc0a27a865c76ed",
+    "scientific_review_sha256": "f7bed87839fb4b29d321f3e9dcb0e632a320381b69b68bef2707bd225e361b26"
+  },
+  "large_artifact_policy": {
+    "model_binary_committed": false,
+    "output_parquet_committed": false,
+    "local_artifacts_bound_by_hash": true
+  }
+}

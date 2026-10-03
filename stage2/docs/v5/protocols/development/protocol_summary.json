@@ -1,0 +1,157 @@
+{
+  "baseline_fit_dates": [
+    "20161009",
+    "20161010",
+    "20161011",
+    "20161012",
+    "20161013",
+    "20161014",
+    "20161015",
+    "20161016",
+    "20161017",
+    "20161018",
+    "20161019",
+    "20161020",
+    "20161021"
+  ],
+  "calibration_dates": [
+    "20161024"
+  ],
+  "development_ablation": {
+    "development_evaluation_dates": [
+      "20161025",
+      "20161026",
+      "20161027"
+    ],
+    "horizon_gate_selected": false,
+    "horizon_gate_validation_mae": 0.028694231437763815,
+    "schema_version": "stage2_v5_horizon_ablation.1",
+    "selected_history_mode": "ordinary_concatenation",
+    "selected_validation_mae": 0.02858136294300031,
+    "selection_dates": [
+      "20161022",
+      "20161023"
+    ],
+    "selection_metric": "same-row direct-observed pace_sec_per_m MAE",
+    "status": "PASS",
+    "validation_mae_by_model": {
+      "horizon_gate": 0.028694231437763815,
+      "ordinary_concatenation": 0.02858136294300031,
+      "without_profile": 0.028764104374482933,
+      "without_recent": 0.028671755603752392
+    }
+  },
+  "evaluation_dates": [
+    "20161025",
+    "20161026",
+    "20161027"
+  ],
+  "feature_artifact_sha256": "64f9e55f897862c778a6680e60cc7438da0c3c9c226bf04d9b7ac8fd5568e84e",
+  "feature_fit_dates": [
+    "20161009",
+    "20161010",
+    "20161011",
+    "20161012",
+    "20161013",
+    "20161014",
+    "20161015",
+    "20161016",
+    "20161017",
+    "20161018",
+    "20161019",
+    "20161020",
+    "20161021"
+  ],
+  "legacy_benchmark_dates": [],
+  "model_evaluation": {
+    "evaluation_deep_mae": 0.028746301143654937,
+    "evaluation_paired_ci_all_below_zero": true,
+    "evaluation_strong_baseline_mae": 0.02987126427234343,
+    "legacy_evaluated_in_this_step": false,
+    "relative_mae_change": -0.037660378832041985,
+    "schema_version": "stage2_v5_model_evaluation.1",
+    "scientific_evaluation_dates": [
+      "20161025",
+      "20161026",
+      "20161027"
+    ],
+    "scientific_evaluation_role": "evaluation",
+    "status": "PREDICTIVE_BASELINE_VALIDATED"
+  },
+  "model_fit_dates": [
+    "20161009",
+    "20161010",
+    "20161011",
+    "20161012",
+    "20161013",
+    "20161014",
+    "20161015",
+    "20161016",
+    "20161017",
+    "20161018",
+    "20161019",
+    "20161020",
+    "20161021"
+  ],
+  "model_id": "c98d73b58b7f6cd70d2abd95a1075f17996e4189b39b353f398f97e419402319",
+  "prediction_day_count": 6,
+  "protocol": "development",
+  "protocol_config": {
+    "path": "D:/pycodes/didi_xian_raw/.worktrees/stage0-v6-valhalla/stage2/output_v5/protocols/development/config.json",
+    "protocol_name": "development_temporal_evaluation",
+    "sha256": "302cdaacc713b2a3b10d7d17590f7382fff5df4b366bf15499c0536fa1ff1faf"
+  },
+  "scenario_selection": {
+    "calibration_dates": [
+      "20161024"
+    ],
+    "calibration_status": "FIT_ON_CALIBRATION_DATE_NOT_AN_UNBIASED_EVALUATION",
+    "evaluation_dates": [
+      "20161025",
+      "20161026",
+      "20161027"
+    ],
+    "generator_id": "stage2_v5_route_scenarios.1",
+    "legacy_benchmark_dates": [],
+    "route_dispersion_multiplier": 2.8999999999999995,
+    "route_offset_s": 16.877099573979166,
+    "route_time_scale": 1.3496731736362297,
+    "scenario_count": 1000,
+    "scenario_seed": 20261009,
+    "schema_version": "stage2_v5_scenario_selection.1",
+    "scores": {
+      "independent": 2.4601812814333397,
+      "residual_block": 2.415756189994879,
+      "shared_route_latent": 2.136051869468826
+    },
+    "selected_model": "shared_route_latent",
+    "selection_dates": [
+      "20161022",
+      "20161023"
+    ]
+  },
+  "schema_version": "stage2_v5_protocol_run.1",
+  "selected_history_mode": "ordinary_concatenation",
+  "shard_day_count": 19,
+  "status": "PASS",
+  "train_dates": [
+    "20161009",
+    "20161010",
+    "20161011",
+    "20161012",
+    "20161013",
+    "20161014",
+    "20161015",
+    "20161016",
+    "20161017",
+    "20161018",
+    "20161019",
+    "20161020",
+    "20161021"
+  ],
+  "upstream_rebuild_performed": false,
+  "validation_model_dates": [
+    "20161022",
+    "20161023"
+  ]
+}

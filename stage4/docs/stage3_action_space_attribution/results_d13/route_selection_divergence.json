@@ -1,0 +1,18 @@
+[
+  {
+    "route_type": "ORIGINAL",
+    "hard_state": "UNKNOWN",
+    "remaining_unknown": [
+      "MOVEMENT_LOOKUP_UNRESOLVED"
+    ],
+    "unique_order_count": 23
+  },
+  {
+    "route_type": "ORIGINAL",
+    "hard_state": "UNKNOWN",
+    "remaining_unknown": [
+      "UNRESOLVED_ROUTE_IDENTITY"
+    ],
+    "unique_order_count": 3
+  }
+]

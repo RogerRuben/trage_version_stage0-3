@@ -1,0 +1,5 @@
+scope,date,unique_edge_time_cells,evaluation_traversals,evaluation_share,crawl_valid_count,stop_valid_count,speed_cv_valid_count,acceleration_rms_valid_count
+daily,20161025,4495,4952,0.007058142733547985,1467,1467,970,618
+daily,20161026,3961,4404,0.006247907433364166,1309,1309,855,511
+daily,20161027,4782,5200,0.0074956899782624995,1557,1557,975,625
+aggregate,all,11182,14556,0.00693073879790059,4333,4333,2800,1754

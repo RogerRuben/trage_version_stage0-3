@@ -1,0 +1,352 @@
+{
+  "by_date": {
+    "20161009": {
+      "direct_time": 263605,
+      "labels": 263605,
+      "pace": 242693,
+      "rows": 714536
+    },
+    "20161010": {
+      "direct_time": 261653,
+      "labels": 261653,
+      "pace": 240551,
+      "rows": 706886
+    },
+    "20161011": {
+      "direct_time": 263657,
+      "labels": 263657,
+      "pace": 242664,
+      "rows": 718689
+    },
+    "20161012": {
+      "direct_time": 262149,
+      "labels": 262149,
+      "pace": 240730,
+      "rows": 712116
+    },
+    "20161013": {
+      "direct_time": 263320,
+      "labels": 263320,
+      "pace": 242533,
+      "rows": 716983
+    },
+    "20161014": {
+      "direct_time": 263414,
+      "labels": 263414,
+      "pace": 240378,
+      "rows": 707124
+    },
+    "20161015": {
+      "direct_time": 263693,
+      "labels": 263693,
+      "pace": 241294,
+      "rows": 717050
+    },
+    "20161016": {
+      "direct_time": 265262,
+      "labels": 265262,
+      "pace": 245021,
+      "rows": 726756
+    },
+    "20161017": {
+      "direct_time": 261587,
+      "labels": 261587,
+      "pace": 241081,
+      "rows": 715275
+    },
+    "20161018": {
+      "direct_time": 264526,
+      "labels": 264526,
+      "pace": 243608,
+      "rows": 719000
+    },
+    "20161019": {
+      "direct_time": 264801,
+      "labels": 264801,
+      "pace": 244609,
+      "rows": 718860
+    },
+    "20161020": {
+      "direct_time": 265755,
+      "labels": 265755,
+      "pace": 245215,
+      "rows": 720877
+    },
+    "20161021": {
+      "direct_time": 268206,
+      "labels": 268206,
+      "pace": 245859,
+      "rows": 719805
+    },
+    "20161022": {
+      "direct_time": 264854,
+      "labels": 264854,
+      "pace": 242193,
+      "rows": 713631
+    },
+    "20161023": {
+      "direct_time": 261879,
+      "labels": 261879,
+      "pace": 241839,
+      "rows": 707742
+    },
+    "20161024": {
+      "direct_time": 259512,
+      "labels": 259512,
+      "pace": 237564,
+      "rows": 697204
+    },
+    "20161025": {
+      "direct_time": 260356,
+      "labels": 260356,
+      "pace": 237553,
+      "rows": 701601
+    },
+    "20161026": {
+      "direct_time": 260552,
+      "labels": 260552,
+      "pace": 238711,
+      "rows": 704876
+    },
+    "20161027": {
+      "direct_time": 259332,
+      "labels": 259332,
+      "pace": 237196,
+      "rows": 693732
+    },
+    "20161031": {
+      "direct_time": 777417,
+      "labels": 777417,
+      "pace": 717805,
+      "rows": 2116712
+    }
+  },
+  "by_split": {
+    "test": {
+      "direct_time": 777417,
+      "labels": 777417,
+      "pace": 717805,
+      "rows": 2116712
+    },
+    "train": {
+      "direct_time": 4217873,
+      "labels": 4217873,
+      "pace": 3877832,
+      "rows": 11432534
+    },
+    "validation": {
+      "direct_time": 780240,
+      "labels": 780240,
+      "pace": 713460,
+      "rows": 2100209
+    }
+  },
+  "counters": {
+    "allocated_distance_mismatch_count": 0,
+    "direct_coverage_ge_0_5_count": 4425585,
+    "direct_coverage_ge_0_8_count": 1578387,
+    "direct_coverage_ge_0_95_count": 158383,
+    "direct_coverage_ge_0_99_count": 20246,
+    "direct_coverage_ge_0_9_count": 524373,
+    "direct_enter_exit_valid_count": 5775530,
+    "direct_source_count": 5775530,
+    "engine_time_nonnull_count": 0,
+    "enter_exit_valid_count": 5775530,
+    "full_distance_time_derivation_count": 5775530,
+    "label_and_traversal_direct_time_pair_count": 5775530,
+    "label_duplicate_key_count": 0,
+    "label_pace_formula_mismatch_count": 0,
+    "label_row_count": 5775530,
+    "label_traversal_direct_time_mismatch_count": 0,
+    "measurement_source_mismatch_count": 0,
+    "non_direct_time_observation_flag_defect_count": 9873925,
+    "observed_time_nonnull_count": 5775530,
+    "pace_target_valid_count": 5309097,
+    "partition_count": 196,
+    "raw_direct_pace_derivable_count": 5762834,
+    "raw_pace_derivable_but_quality_unavailable_count": 453737,
+    "rts_measurement_available_count": 5309097,
+    "time_observation_valid_false_direct_count": 0,
+    "time_observation_valid_true_count": 15649455,
+    "time_observation_valid_true_non_direct_count": 9873925,
+    "travel_and_observed_both_nonnull_count": 5775530,
+    "travel_observed_alias_mismatch_count": 0,
+    "travel_time_direct_valid_count": 5775530,
+    "travel_time_interpolated_valid_count": 0,
+    "travel_time_nonnull_count": 5775530,
+    "travel_time_target_valid_count": 5775530,
+    "traversal_duplicate_key_count": 0,
+    "traversal_row_count": 15649455,
+    "traversal_with_label_count": 5775530,
+    "traversal_without_label_count": 9873925
+  },
+  "coverage": {
+    "direct_pace_share_of_route_tokens": 0.3392512391006588,
+    "direct_travel_time_share_of_route_tokens": 0.3690563025996752,
+    "pace_share_of_supervised_traversals": 0.9192397927116646,
+    "rts_measurement_share_of_route_tokens": 0.3392512391006588,
+    "traversal_label_share_of_route_tokens": 0.3690563025996752
+  },
+  "distributions": {
+    "allocated_distance_m": {
+      "count": 15648350,
+      "max": 924.0,
+      "mean": 54.43429307243256,
+      "min": 0.00020457248132723898,
+      "p01": 2.5343165284544886,
+      "p10": 7.0,
+      "p50": 23.0,
+      "p90": 146.0,
+      "p95": 203.9339387203173,
+      "p99": 301.03659746655086,
+      "quantile_sample_count": 1833162,
+      "std": 69.59808161542487
+    },
+    "direct_distance_coverage_share": {
+      "count": 5775530,
+      "max": 1.0,
+      "mean": 0.6525719904749175,
+      "min": 0.0,
+      "p01": 0.1612024683496602,
+      "p10": 0.37674603405950163,
+      "p50": 0.6779810000000001,
+      "p90": 0.894253446381913,
+      "p95": 0.9292835834625252,
+      "p99": 0.974061829889093,
+      "quantile_sample_count": 1538144,
+      "std": 0.19783227374408396
+    },
+    "direct_observed_distance_m": {
+      "count": 5762834,
+      "max": 922.314624,
+      "mean": 83.14155259818176,
+      "min": 6.896551724189237e-05,
+      "p01": 10.81412075135428,
+      "p10": 18.400005835725942,
+      "p50": 59.77790102389078,
+      "p90": 183.39582139999993,
+      "p95": 229.91073101585854,
+      "p99": 340.76147964000006,
+      "quantile_sample_count": 1534774,
+      "std": 73.34066979353577
+    },
+    "direct_observed_sec_per_m": {
+      "count": 5309097,
+      "max": 17.328074775237923,
+      "mean": 0.13470161014335166,
+      "min": 0.027343787876479213,
+      "p01": 0.05789344063843961,
+      "p10": 0.07797265280743142,
+      "p50": 0.12102617610615705,
+      "p90": 0.20988730982465154,
+      "p95": 0.24472641096400413,
+      "p99": 0.2966971671354472,
+      "quantile_sample_count": 1745496,
+      "std": 0.0661184363989125
+    },
+    "direct_observed_time_s": {
+      "count": 5775530,
+      "max": 732.0,
+      "mean": 10.097657011564307,
+      "min": 1.0,
+      "p01": 3.0,
+      "p10": 3.0,
+      "p50": 6.0,
+      "p90": 21.0,
+      "p95": 27.0,
+      "p99": 39.0,
+      "quantile_sample_count": 1538144,
+      "std": 8.660038714721995
+    },
+    "enter_exit_span_minus_direct_time_s": {
+      "count": 5775530,
+      "max": 3538.0,
+      "mean": 3.3161706371536464,
+      "min": 0.0,
+      "p01": 0.0,
+      "p10": 0.0,
+      "p50": 0.0,
+      "p90": 4.0,
+      "p95": 18.0,
+      "p99": 78.0,
+      "quantile_sample_count": 1538144,
+      "std": 17.262975927305916
+    },
+    "raw_derivable_direct_sec_per_m": {
+      "count": 5762834,
+      "max": 250000.00000005166,
+      "mean": 0.21042748819711724,
+      "min": 0.022700271785814033,
+      "p01": 0.057818372912182316,
+      "p10": 0.07888258061123331,
+      "p50": 0.12472949766645897,
+      "p90": 0.21661881184646967,
+      "p95": 0.24687719184533516,
+      "p99": 0.3028207828676686,
+      "quantile_sample_count": 1534774,
+      "std": 106.16902875177001
+    }
+  },
+  "engineering_status": "PASS",
+  "input": {
+    "partition_count": 196,
+    "stage1_input_root": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage1\\input_v1",
+    "stage1_label_root": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage1\\output_v3"
+  },
+  "measurement_source_counts": {
+    "direct_observed": 5775530,
+    "engine_interpolated": 1523211,
+    "interval_supported": 8066830,
+    "unresolved": 283884
+  },
+  "recommended_masks": {
+    "full_traversal_time_sensitivity_valid": "pace_target_valid AND direct_distance_coverage_share >= frozen sensitivity threshold",
+    "pace_target_valid": "travel_time_direct_valid AND rts_measurement_available AND observed_sec_per_m is finite and positive; the Stage 1 flag here is a frozen physical-window quality gate (time >= 3 s, distance >= 10 m, continuous, plausible speed), not RTS model output",
+    "travel_time_direct_valid": "same as travel_time_target_valid",
+    "travel_time_interpolated_valid": "false for the frozen release because engine allocation is disabled",
+    "travel_time_source_class": [
+      "direct_raw_gps_interval",
+      "interval_supported_no_link_time",
+      "engine_interpolated_no_link_time",
+      "engine_allocated_time",
+      "unresolved_no_link_time",
+      "unknown_no_link_time"
+    ],
+    "travel_time_target_valid": "measurement_source == direct_observed AND direct_observed_time_s > 0"
+  },
+  "runtime_s": 52.05622690000018,
+  "schema_version": "stage2_v5_service_time_target_audit.1",
+  "semantic_findings": {
+    "direct_observation_fields": [
+      "link_traversals.observed_travel_time_s",
+      "link_traversals.observed_distance_m",
+      "traversal_labels.direct_observed_time_s",
+      "traversal_labels.direct_observed_distance_m",
+      "traversal_labels.observed_sec_per_m"
+    ],
+    "duplicate_time_source_conclusion": "travel_time_s aliases observed_travel_time_s on direct rows, while traversal_labels.direct_observed_time_s re-aggregates the same direct intervals. They are consistency copies, not independent observations, and must not be counted twice.",
+    "interpolated_or_engine_fields": "engine_allocated_travel_time_s is disabled and null in the frozen release; interval_supported and engine_interpolated route tokens have no individual-link time label.",
+    "physical_traversal_realized_time_field": "No frozen field is a complete full-edge realized time for every traversal. direct_observed_time_s and link_traversals.observed_travel_time_s are the same sum of directly timed GPS intervals and may cover only part of allocated_distance_m.",
+    "recommended_direct_travel_time_sensitivity_target": "Use direct_observed_time_s only for high direct_distance_coverage_share thresholds as a sensitivity target, not as an unconditional full-traversal target.",
+    "recommended_primary_distribution_target": "observed_sec_per_m (directly observed pace) because direct timing commonly covers only a fraction of the physical traversal. Full traversal time is derived as predicted pace multiplied by allocated_distance_m.",
+    "source_indicator_required": true,
+    "time_observation_valid_conclusion": "The frozen link_traversals.time_observation_valid flag is true for non-direct rows and is not sufficient by itself. v5 validity must require measurement_source == direct_observed plus finite positive time and distance."
+  },
+  "target_contract": {
+    "derived_full_traversal_time": "predicted_pace * allocated_distance_m",
+    "direct_time_role": "high-coverage sensitivity and auxiliary supervision",
+    "interpolated_time_role": "not supervised in v5 frozen upstream",
+    "primary_distribution_target": "direct_observed_sec_per_m",
+    "unavailable_value_policy": "NaN plus explicit validity mask; never fill with zero"
+  },
+  "time_source_counts": {
+    "missing": 9873925,
+    "raw_gps_interval": 5775530
+  },
+  "travel_time_source_class_counts": {
+    "direct_raw_gps_interval": 5775530,
+    "engine_interpolated_no_link_time": 1523211,
+    "interval_supported_no_link_time": 8066830,
+    "unresolved_no_link_time": 283884
+  }
+}

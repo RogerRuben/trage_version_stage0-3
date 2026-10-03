@@ -1,0 +1,106 @@
+{
+  "status": "PASS",
+  "scientific_condition": false,
+  "states": [
+    {
+      "epoch_id": "0730",
+      "status": "PASS",
+      "pstar_s": 874.2226989150731,
+      "counts": [
+        0,
+        5,
+        0
+      ]
+    },
+    {
+      "epoch_id": "0830",
+      "status": "PASS",
+      "pstar_s": 609.2959130224743,
+      "counts": [
+        0,
+        3,
+        0
+      ]
+    },
+    {
+      "epoch_id": "1200",
+      "status": "PASS",
+      "pstar_s": 839.3944068358087,
+      "counts": [
+        0,
+        6,
+        0
+      ]
+    },
+    {
+      "epoch_id": "1300",
+      "status": "PASS",
+      "pstar_s": 564.5945828483261,
+      "counts": [
+        0,
+        4,
+        0
+      ]
+    },
+    {
+      "epoch_id": "1700",
+      "status": "PASS",
+      "pstar_s": 72.78351935108732,
+      "counts": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "epoch_id": "1730",
+      "status": "PASS",
+      "pstar_s": 963.3808003928309,
+      "counts": [
+        0,
+        4,
+        0
+      ]
+    },
+    {
+      "epoch_id": "1800",
+      "status": "PASS",
+      "pstar_s": 384.1591787784252,
+      "counts": [
+        0,
+        3,
+        0
+      ]
+    },
+    {
+      "epoch_id": "1830",
+      "status": "PASS",
+      "pstar_s": 450.22805896087596,
+      "counts": [
+        0,
+        3,
+        0
+      ]
+    },
+    {
+      "epoch_id": "2100",
+      "status": "PASS",
+      "pstar_s": 623.9518859359825,
+      "counts": [
+        0,
+        3,
+        0
+      ]
+    },
+    {
+      "epoch_id": "2300",
+      "status": "PASS",
+      "pstar_s": 0.0,
+      "counts": [
+        0,
+        0,
+        0
+      ]
+    }
+  ]
+}

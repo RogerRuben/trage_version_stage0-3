@@ -1,0 +1,16 @@
+{
+  "version": "traffic_mechanism_v1",
+  "budget": 0.05,
+  "cuts_s": [37800, 63000],
+  "window_duration_s": 900,
+  "patience_s": 300,
+  "variants": ["F", "V", "VT"],
+  "state_profiles": ["C", "M", "A"],
+  "dynamic_profiles": ["C", "M"],
+  "scenarios": {"C": "MAIN_Q50_C_P70", "M": "ODD_Q50_M_P70_REFERENCE", "A": "MAIN_Q50_A_P70"},
+  "routing_mode": "SINGLE_SOURCE_MATRIX",
+  "scenario_timeout_s": 1800,
+  "rss_warning_mib": 2048,
+  "gpu": false,
+  "single_process": true
+}

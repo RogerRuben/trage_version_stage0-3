@@ -1,0 +1,1802 @@
+[
+  {
+    "epoch_id": "0730",
+    "condition": "D0",
+    "pstar_s": 874.2226989150731,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 59.749033379087905,
+    "gap_relative": 0.0683453237410074,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D0",
+    "pstar_s": 874.2226989150731,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 59.749033379087905,
+    "gap_relative": 0.0683453237410074,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D1",
+    "pstar_s": 1251.585014993522,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 59.74903337908768,
+    "gap_relative": 0.04773869346733664,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D1",
+    "pstar_s": 1251.585014993522,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 59.74903337908768,
+    "gap_relative": 0.04773869346733664,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D2",
+    "pstar_s": 874.2226989150731,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 59.749033379087905,
+    "gap_relative": 0.0683453237410074,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D2",
+    "pstar_s": 874.2226989150731,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 59.749033379087905,
+    "gap_relative": 0.0683453237410074,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D3",
+    "pstar_s": 1754.734769764787,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 59.74903337908813,
+    "gap_relative": 0.034050179211469765,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D3",
+    "pstar_s": 1754.734769764787,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 59.74903337908813,
+    "gap_relative": 0.034050179211469765,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D4",
+    "pstar_s": 1965.4287295752545,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 59.749033379087905,
+    "gap_relative": 0.030400000000000087,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D4",
+    "pstar_s": 1965.4287295752545,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 59.749033379087905,
+    "gap_relative": 0.030400000000000087,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D0",
+    "pstar_s": 609.2959130224743,
+    "mode": "A1",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D0",
+    "pstar_s": 609.2959130224743,
+    "mode": "A2",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D1",
+    "pstar_s": 509.98336332277586,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 101.99667266455526,
+    "gap_relative": 0.20000000000000018,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D1",
+    "pstar_s": 509.98336332277586,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 101.99667266455526,
+    "gap_relative": 0.20000000000000018,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D2",
+    "pstar_s": 609.2959130224743,
+    "mode": "A1",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D2",
+    "pstar_s": 609.2959130224743,
+    "mode": "A2",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D3",
+    "pstar_s": 917.9700539809966,
+    "mode": "A1",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D3",
+    "pstar_s": 917.9700539809966,
+    "mode": "A2",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D4",
+    "pstar_s": 1562.1595655466085,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 29.52535261342382,
+    "gap_relative": 0.01890034364261165,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": true,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D4",
+    "pstar_s": 1562.1595655466085,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 29.52535261342382,
+    "gap_relative": 0.01890034364261165,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": true,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D0",
+    "pstar_s": 839.3944068358087,
+    "mode": "A1",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D0",
+    "pstar_s": 839.3944068358087,
+    "mode": "A2",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D1",
+    "pstar_s": 930.6329293179617,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 223.53438008127523,
+    "gap_relative": 0.24019607843137267,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D1",
+    "pstar_s": 930.6329293179617,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 223.53438008127523,
+    "gap_relative": 0.24019607843137267,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D2",
+    "pstar_s": 839.3944068358087,
+    "mode": "A1",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D2",
+    "pstar_s": 839.3944068358087,
+    "mode": "A2",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D3",
+    "pstar_s": 1633.1695524305408,
+    "mode": "A1",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D3",
+    "pstar_s": 1633.1695524305408,
+    "mode": "A2",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D4",
+    "pstar_s": 2696.0983393476245,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 223.53438008127478,
+    "gap_relative": 0.08291032148900156,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D4",
+    "pstar_s": 2696.0983393476245,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 31.933482868753345,
+    "gap_relative": 0.011844331641285866,
+    "same_order_swap_count": 0,
+    "served_set_changed": true,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": true,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D0",
+    "pstar_s": 564.5945828483261,
+    "mode": "A1",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D0",
+    "pstar_s": 564.5945828483261,
+    "mode": "A2",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D1",
+    "pstar_s": 955.6286087469816,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 110.82782552207891,
+    "gap_relative": 0.1159737417943108,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D1",
+    "pstar_s": 955.6286087469816,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 110.82782552207891,
+    "gap_relative": 0.1159737417943108,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D2",
+    "pstar_s": 729.7907756076512,
+    "mode": "A1",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D2",
+    "pstar_s": 729.7907756076512,
+    "mode": "A2",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D3",
+    "pstar_s": 970.2662460800865,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 110.8278255220788,
+    "gap_relative": 0.11422413793103443,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D3",
+    "pstar_s": 970.2662460800865,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 110.8278255220788,
+    "gap_relative": 0.11422413793103443,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D4",
+    "pstar_s": 1760.6986620677428,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 46.004003046900834,
+    "gap_relative": 0.026128266033254265,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D4",
+    "pstar_s": 1760.6986620677428,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 46.004003046900834,
+    "gap_relative": 0.026128266033254265,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D0",
+    "pstar_s": 72.78351935108732,
+    "mode": "A1",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D0",
+    "pstar_s": 72.78351935108732,
+    "mode": "A2",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D1",
+    "pstar_s": 383.5131596576524,
+    "mode": "A1",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D1",
+    "pstar_s": 383.5131596576524,
+    "mode": "A2",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D2",
+    "pstar_s": 72.78351935108732,
+    "mode": "A1",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D2",
+    "pstar_s": 72.78351935108732,
+    "mode": "A2",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D3",
+    "pstar_s": 232.34738869770183,
+    "mode": "A1",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D3",
+    "pstar_s": 232.34738869770183,
+    "mode": "A2",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D4",
+    "pstar_s": 1164.536309617397,
+    "mode": "A1",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D4",
+    "pstar_s": 1164.536309617397,
+    "mode": "A2",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D0",
+    "pstar_s": 963.3808003928309,
+    "mode": "A1",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D0",
+    "pstar_s": 963.3808003928309,
+    "mode": "A2",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D1",
+    "pstar_s": 1042.8676651117112,
+    "mode": "A1",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D1",
+    "pstar_s": 1042.8676651117112,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 136.71740731647446,
+    "gap_relative": 0.13109756097560987,
+    "same_order_swap_count": 0,
+    "served_set_changed": true,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D2",
+    "pstar_s": 963.3808003928309,
+    "mode": "A1",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D2",
+    "pstar_s": 963.3808003928309,
+    "mode": "A2",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D3",
+    "pstar_s": 1042.8676651117112,
+    "mode": "A1",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D3",
+    "pstar_s": 1042.8676651117112,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 136.71740731647446,
+    "gap_relative": 0.13109756097560987,
+    "same_order_swap_count": 0,
+    "served_set_changed": true,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D4",
+    "pstar_s": 1767.7878713479008,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 104.92266142892208,
+    "gap_relative": 0.05935251798561146,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D4",
+    "pstar_s": 1767.7878713479008,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 104.92266142892208,
+    "gap_relative": 0.05935251798561146,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D0",
+    "pstar_s": 384.15917877842526,
+    "mode": "A1",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D0",
+    "pstar_s": 384.15917877842526,
+    "mode": "A2",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D1",
+    "pstar_s": 956.7041086885783,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 11.081514772454511,
+    "gap_relative": 0.011583011583011516,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": true,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D1",
+    "pstar_s": 956.7041086885783,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 11.081514772454511,
+    "gap_relative": 0.011583011583011516,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": true,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D2",
+    "pstar_s": 384.15917877842526,
+    "mode": "A1",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D2",
+    "pstar_s": 384.15917877842526,
+    "mode": "A2",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D3",
+    "pstar_s": 373.07766400597063,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 11.081514772454568,
+    "gap_relative": 0.029702970297029688,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D3",
+    "pstar_s": 373.07766400597063,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 11.081514772454568,
+    "gap_relative": 0.029702970297029688,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D4",
+    "pstar_s": 1492.3106560238825,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 11.081514772454511,
+    "gap_relative": 0.007425742574257385,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": true,
+      "0.02": true,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D4",
+    "pstar_s": 1492.3106560238825,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 11.081514772454511,
+    "gap_relative": 0.007425742574257385,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": true,
+      "0.02": true,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D0",
+    "pstar_s": 450.22805896087596,
+    "mode": "A1",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D0",
+    "pstar_s": 450.22805896087596,
+    "mode": "A2",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D1",
+    "pstar_s": 737.3300096025938,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 26.10017733106531,
+    "gap_relative": 0.03539823008849564,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D1",
+    "pstar_s": 737.3300096025938,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 26.10017733106531,
+    "gap_relative": 0.03539823008849564,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D2",
+    "pstar_s": 450.22805896087596,
+    "mode": "A1",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D2",
+    "pstar_s": 450.22805896087596,
+    "mode": "A2",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D3",
+    "pstar_s": 590.5165121153518,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 26.100177331065197,
+    "gap_relative": 0.04419889502762418,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D3",
+    "pstar_s": 590.5165121153518,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 26.100177331065197,
+    "gap_relative": 0.04419889502762418,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D4",
+    "pstar_s": 1099.4699700711246,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 26.100177331065197,
+    "gap_relative": 0.023738872403560762,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D4",
+    "pstar_s": 1099.4699700711246,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 26.100177331065197,
+    "gap_relative": 0.023738872403560762,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D0",
+    "pstar_s": 750.8573542619451,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 29.61127594272466,
+    "gap_relative": 0.039436619718309945,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D0",
+    "pstar_s": 750.8573542619451,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 29.61127594272466,
+    "gap_relative": 0.039436619718309945,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D1",
+    "pstar_s": 934.8702833345908,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 29.61127594272466,
+    "gap_relative": 0.03167420814479645,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D1",
+    "pstar_s": 934.8702833345908,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 29.61127594272466,
+    "gap_relative": 0.03167420814479645,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D2",
+    "pstar_s": 750.8573542619451,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 29.61127594272466,
+    "gap_relative": 0.039436619718309945,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D2",
+    "pstar_s": 750.8573542619451,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 29.61127594272466,
+    "gap_relative": 0.039436619718309945,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D3",
+    "pstar_s": 1324.0470528675428,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 29.61127594272466,
+    "gap_relative": 0.022364217252396214,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D3",
+    "pstar_s": 1324.0470528675428,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 29.61127594272466,
+    "gap_relative": 0.022364217252396214,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D4",
+    "pstar_s": 1656.1163616538115,
+    "mode": "A1",
+    "status": "OPTIMAL",
+    "gap_s": 29.61127594272466,
+    "gap_relative": 0.01787994891443171,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": true,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D4",
+    "pstar_s": 1656.1163616538115,
+    "mode": "A2",
+    "status": "OPTIMAL",
+    "gap_s": 29.61127594272466,
+    "gap_relative": 0.01787994891443171,
+    "same_order_swap_count": 1,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": true,
+      "0.05": true
+    }
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D0",
+    "pstar_s": 260.50910094171064,
+    "mode": "A1",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D0",
+    "pstar_s": 260.50910094171064,
+    "mode": "A2",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D1",
+    "pstar_s": 260.50910094171064,
+    "mode": "A1",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D1",
+    "pstar_s": 260.50910094171064,
+    "mode": "A2",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D2",
+    "pstar_s": 240.60910017532996,
+    "mode": "A1",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D2",
+    "pstar_s": 240.60910017532996,
+    "mode": "A2",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D3",
+    "pstar_s": 260.50910094171064,
+    "mode": "A1",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D3",
+    "pstar_s": 260.50910094171064,
+    "mode": "A2",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D4",
+    "pstar_s": 701.9272997596092,
+    "mode": "A1",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D4",
+    "pstar_s": 701.9272997596092,
+    "mode": "A2",
+    "status": "INFEASIBLE",
+    "gap_s": null,
+    "gap_relative": null,
+    "same_order_swap_count": 0,
+    "served_set_changed": false,
+    "budget_exists": {
+      "0": false,
+      "0.005": false,
+      "0.01": false,
+      "0.02": false,
+      "0.05": false
+    }
+  }
+]

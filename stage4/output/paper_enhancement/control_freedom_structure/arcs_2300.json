@@ -1,0 +1,34 @@
+{
+  "epoch_id": "2300",
+  "timestamp": "2016-10-31 23:00:00+08:00",
+  "state_sha256": "07fb8cfe8a88774e6d5f550f3465491c7228cb7dd82599dedf2645ab7ea78d46",
+  "exposure_state": {
+    "av_assignments": 2151,
+    "static": 4609.904166666657,
+    "dynamic": 304.9271545165116,
+    "speed": 0.0
+  },
+  "gammas": {
+    "static": 2.145067625590382,
+    "dynamic": 0.14934256810554178,
+    "speed": 0.0
+  },
+  "arcs": [
+    {
+      "vehicle_id": 4402,
+      "request_id": 29085,
+      "pickup_eta_s": 260.50910094171064,
+      "critical": false,
+      "carry_over": false,
+      "payload": [
+        "96344c7666a85442ed7ee8d5065c3b16",
+        "AV_S3_0214"
+      ],
+      "vehicle_type": "AV",
+      "exposure_static": 9.441176470588236,
+      "exposure_dynamic": 1.0377599950694512,
+      "exposure_speed": 0.0,
+      "operating_cost": 673.9109955111076
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "base_scenario": "MAIN_Q50_M_P70",
+  "repositioning_enabled": false,
+  "summary_difference_count": 18,
+  "summary_differences": {
+    "matched": {
+      "canonical": 18133,
+      "rerun": 18141
+    },
+    "completed": {
+      "canonical": 18133,
+      "rerun": 18141
+    },
+    "patience_expired": {
+      "canonical": 11867,
+      "rerun": 11859
+    },
+    "HV_assignments": {
+      "canonical": 15926,
+      "rerun": 15923
+    },
+    "AV_assignments": {
+      "canonical": 2207,
+      "rerun": 2218
+    },
+    "service_rate": {
+      "canonical": 0.6044333333333334,
+      "rerun": 0.6047
+    },
+    "AV_assignment_share": {
+      "canonical": 0.12171179617272376,
+      "rerun": 0.1222644837660548
+    },
+    "request_to_pickup_mean": {
+      "canonical": 176.48532348541337,
+      "rerun": 176.3932731127281
+    },
+    "request_to_pickup_p50": {
+      "canonical": 193.5785,
+      "rerun": 193.417359
+    },
+    "request_to_pickup_p90": {
+      "canonical": 282.7665222,
+      "rerun": 282.698501
+    },
+    "request_to_pickup_p95": {
+      "canonical": 291.83945719999997,
+      "rerun": 291.839501
+    },
+    "first_window_match_rate": {
+      "canonical": 0.46546666666666664,
+      "rerun": 0.46696666666666664
+    },
+    "carry_over_entry_rate": {
+      "canonical": 0.5345333333333333,
+      "rerun": 0.5330333333333334
+    },
+    "carry_over_recovery_rate": {
+      "canonical": 0.25997755051134946,
+      "rerun": 0.2583953473829029
+    },
+    "critical_order_count": {
+      "canonical": 11964,
+      "rerun": 11954
+    },
+    "critical_recovery": {
+      "canonical": 0.008107656302240054,
+      "rerun": 0.007947130667558975
+    },
+    "expanded_radius_match_share": {
+      "canonical": 0.22991231456460598,
+      "rerun": 0.22777134667328153
+    },
+    "pickup_ETA_objective_value": {
+      "canonical": 2552085.379011887,
+      "rerun": 2557764.375776422
+    }
+  },
+  "request_fingerprint_canonical": "a6df78189b1521b87473631e70bb6d18baefd6ce497ababa44dc73c5427781cc",
+  "request_fingerprint_rerun": "6d5275130ddddf37a88e5ab91a08c6c5b0d2376076fea0c4e76b41d6556fb2a3",
+  "assignment_fingerprint_canonical": "47d7ed44f8f1bcfeb2a35adf0eac2a68be7f25e56778e861c6e0b258ea788072",
+  "assignment_fingerprint_rerun": "a090560a186fa43eb1515a0508e3328c867a95a697a0b97690567d1815a57d8e",
+  "request_outcomes_exact": false,
+  "assignments_exact": false,
+  "exact_reproduction": false
+}

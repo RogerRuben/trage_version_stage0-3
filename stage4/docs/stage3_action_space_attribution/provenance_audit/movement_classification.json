@@ -1,0 +1,12 @@
+[
+  {
+    "issue": "ENDPOINT_SCOPE_MISMATCH_BETWEEN_MOVEMENT_AND_BOUNDARY_PRODUCTS",
+    "encounters": 391,
+    "unique_orders": 276,
+    "unique_movement_keys": 117,
+    "internal_path_present": 391,
+    "entire_movement_certified": false,
+    "exact_endpoint_recovery_encounters": 0,
+    "scientific_consequence": "Technical interface unknown; preserve UNKNOWN until endpoint and movement evidence is repaired and verified"
+  }
+]

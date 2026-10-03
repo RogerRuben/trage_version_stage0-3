@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "formulation_fixtures": 3,
+  "states_verified": 10,
+  "alternative_dispositions": 40,
+  "feasible_witnesses_verified": 22,
+  "infeasible_dispositions_from_solver": 18,
+  "infeasibility_independently_reproved": false,
+  "routing_calls": 0,
+  "checks": [
+    "counts",
+    "pickup",
+    "one_vehicle_one_order",
+    "Gamma",
+    "A1_order_set",
+    "AV_indicator_change",
+    "source_hashes"
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "schema_version": "stage3_s1_static_inventory_test_evidence.1",
+  "status": "PASS",
+  "phase": "S1_STATIC_DATA_INVENTORY",
+  "checks": {
+    "inventory_execution": {
+      "command": "python -m stage3.odd_tod.static_inventory --repo-root . --config stage3/config/stage3_s1_static_inventory.json",
+      "status": "PASS"
+    },
+    "targeted_s1_tests": {
+      "command": "python -m pytest stage3/tests_odd_tod/test_static_inventory.py -q",
+      "passed": 10,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "full_stage3_regression": {
+      "command": "python -m pytest stage3/tests_v5_1 stage3/tests_odd_tod -q",
+      "passed": 16,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "compileall": {
+      "command": "python -m compileall -q stage3",
+      "status": "PASS"
+    }
+  },
+  "scope_guards": {
+    "intersection_clustering_performed": false,
+    "threshold_calibration_performed": false,
+    "stage2_inference_performed": false,
+    "route_assessment_performed": false
+  },
+  "known_environment_warnings": [
+    "Pandas reports bottleneck 1.3.5 below its preferred 1.3.6 version."
+  ],
+  "s2_authorized": false,
+  "next_phase_authorized": false
+}

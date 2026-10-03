@@ -1,0 +1,679 @@
+{
+  "rows": [
+    {
+      "date": "20161025",
+      "kind": "unknown_reason",
+      "unknown_reason": "LOW_COUNT_AND_DAYS",
+      "tokens": 36184,
+      "time_s": 136680.0276448687,
+      "total_time_s": 5333628.713782499,
+      "time_share": 0.025626085912519036
+    },
+    {
+      "date": "20161025",
+      "kind": "unknown_reason",
+      "unknown_reason": "LOW_COUNT_ONLY",
+      "tokens": 101242,
+      "time_s": 492812.11988575757,
+      "total_time_s": 5333628.713782499,
+      "time_share": 0.09239715516985536
+    },
+    {
+      "date": "20161025",
+      "kind": "unknown_reason",
+      "unknown_reason": "NOT_UNKNOWN",
+      "tokens": 355088,
+      "time_s": 4164465.2354922974,
+      "total_time_s": 5333628.713782499,
+      "time_share": 0.7807939882899996
+    },
+    {
+      "date": "20161025",
+      "kind": "unknown_reason",
+      "unknown_reason": "NO_REFERENCE",
+      "tokens": 205449,
+      "time_s": 539671.3307595754,
+      "total_time_s": 5333628.713782499,
+      "time_share": 0.10118277062762618
+    },
+    {
+      "date": "20161025",
+      "kind": "state_support",
+      "research_state": "CONGESTED_PROXY",
+      "reference_support": "LOW_REFERENCE_SUPPORT",
+      "tokens": 1065,
+      "time_s": 5652.9101560898125,
+      "total_time_s": 5333628.713782499,
+      "time_share": 0.001059861955048027
+    },
+    {
+      "date": "20161025",
+      "kind": "state_support",
+      "research_state": "CONGESTED_PROXY",
+      "reference_support": "MEETS_ORIGINAL_SUPPORT",
+      "tokens": 9313,
+      "time_s": 150387.5424013771,
+      "total_time_s": 5333628.713782499,
+      "time_share": 0.028196102591986648
+    },
+    {
+      "date": "20161025",
+      "kind": "state_support",
+      "research_state": "MIXED_EVIDENCE",
+      "reference_support": "LOW_REFERENCE_SUPPORT",
+      "tokens": 118248,
+      "time_s": 482949.0314257217,
+      "total_time_s": 5333628.713782499,
+      "time_share": 0.09054792850086191
+    },
+    {
+      "date": "20161025",
+      "kind": "state_support",
+      "research_state": "MIXED_EVIDENCE",
+      "reference_support": "MEETS_ORIGINAL_SUPPORT",
+      "tokens": 79751,
+      "time_s": 807512.4312281609,
+      "total_time_s": 5333628.713782499,
+      "time_share": 0.1514001957319391
+    },
+    {
+      "date": "20161025",
+      "kind": "state_support",
+      "research_state": "NON_CONGESTED_PROXY",
+      "reference_support": "LOW_REFERENCE_SUPPORT",
+      "tokens": 17451,
+      "time_s": 139187.47567486763,
+      "total_time_s": 5333628.713782499,
+      "time_share": 0.02609620638106974
+    },
+    {
+      "date": "20161025",
+      "kind": "state_support",
+      "research_state": "NON_CONGESTED_PROXY",
+      "reference_support": "MEETS_ORIGINAL_SUPPORT",
+      "tokens": 261094,
+      "time_s": 3179414.6794183254,
+      "total_time_s": 5333628.713782499,
+      "time_share": 0.5961072376865075
+    },
+    {
+      "date": "20161025",
+      "kind": "state_support",
+      "research_state": "SEVERE_CONGESTION_PROXY",
+      "reference_support": "LOW_REFERENCE_SUPPORT",
+      "tokens": 662,
+      "time_s": 1702.7302739471197,
+      "total_time_s": 5333628.713782499,
+      "time_share": 0.0003192442453947228
+    },
+    {
+      "date": "20161025",
+      "kind": "state_support",
+      "research_state": "SEVERE_CONGESTION_PROXY",
+      "reference_support": "MEETS_ORIGINAL_SUPPORT",
+      "tokens": 4930,
+      "time_s": 27150.582444434054,
+      "total_time_s": 5333628.713782499,
+      "time_share": 0.005090452279566236
+    },
+    {
+      "date": "20161025",
+      "kind": "state_support",
+      "research_state": "UNKNOWN",
+      "reference_support": "NO_REFERENCE",
+      "tokens": 205449,
+      "time_s": 539671.3307595754,
+      "total_time_s": 5333628.713782499,
+      "time_share": 0.10118277062762618
+    },
+    {
+      "date": "20161025",
+      "kind": "mixed",
+      "strict_state": "CONGESTED_PROXY",
+      "mixed_subtype": "NOT_MIXED",
+      "reference_support": "MEETS_ORIGINAL_SUPPORT",
+      "tokens": 9313,
+      "time_s": 150387.5424013771,
+      "total_time_s": 5333628.713782499,
+      "time_share": 0.028196102591986648
+    },
+    {
+      "date": "20161025",
+      "kind": "mixed",
+      "strict_state": "MIXED_EVIDENCE",
+      "mixed_subtype": "HIGH_LOW_SPEED_SHARE_WITHOUT_RELATIVE_SLOWDOWN",
+      "reference_support": "MEETS_ORIGINAL_SUPPORT",
+      "tokens": 44371,
+      "time_s": 259014.53199779987,
+      "total_time_s": 5333628.713782499,
+      "time_share": 0.04856253517019038
+    },
+    {
+      "date": "20161025",
+      "kind": "mixed",
+      "strict_state": "MIXED_EVIDENCE",
+      "mixed_subtype": "RELATIVE_SLOWDOWN_WITHOUT_HIGH_LOW_SPEED_SHARE",
+      "reference_support": "MEETS_ORIGINAL_SUPPORT",
+      "tokens": 35380,
+      "time_s": 548497.899230361,
+      "total_time_s": 5333628.713782499,
+      "time_share": 0.10283766056174871
+    },
+    {
+      "date": "20161025",
+      "kind": "mixed",
+      "strict_state": "NON_CONGESTED_PROXY",
+      "mixed_subtype": "NOT_MIXED",
+      "reference_support": "MEETS_ORIGINAL_SUPPORT",
+      "tokens": 261094,
+      "time_s": 3179414.6794183254,
+      "total_time_s": 5333628.713782499,
+      "time_share": 0.5961072376865075
+    },
+    {
+      "date": "20161025",
+      "kind": "mixed",
+      "strict_state": "SEVERE_CONGESTION_PROXY",
+      "mixed_subtype": "NOT_MIXED",
+      "reference_support": "MEETS_ORIGINAL_SUPPORT",
+      "tokens": 4930,
+      "time_s": 27150.582444434054,
+      "total_time_s": 5333628.713782499,
+      "time_share": 0.005090452279566236
+    },
+    {
+      "date": "20161025",
+      "kind": "mixed",
+      "strict_state": "UNKNOWN",
+      "mixed_subtype": "HIGH_LOW_SPEED_SHARE_WITHOUT_RELATIVE_SLOWDOWN",
+      "reference_support": "LOW_REFERENCE_SUPPORT",
+      "tokens": 117552,
+      "time_s": 476692.8581016136,
+      "total_time_s": 5333628.713782499,
+      "time_share": 0.08937496096603112
+    },
+    {
+      "date": "20161025",
+      "kind": "mixed",
+      "strict_state": "UNKNOWN",
+      "mixed_subtype": "NOT_MIXED",
+      "reference_support": "LOW_REFERENCE_SUPPORT",
+      "tokens": 19178,
+      "time_s": 146543.11610490456,
+      "total_time_s": 5333628.713782499,
+      "time_share": 0.02747531258151249
+    },
+    {
+      "date": "20161025",
+      "kind": "mixed",
+      "strict_state": "UNKNOWN",
+      "mixed_subtype": "NOT_MIXED",
+      "reference_support": "NO_REFERENCE",
+      "tokens": 205449,
+      "time_s": 539671.3307595754,
+      "total_time_s": 5333628.713782499,
+      "time_share": 0.10118277062762618
+    },
+    {
+      "date": "20161025",
+      "kind": "mixed",
+      "strict_state": "UNKNOWN",
+      "mixed_subtype": "RELATIVE_SLOWDOWN_WITHOUT_HIGH_LOW_SPEED_SHARE",
+      "reference_support": "LOW_REFERENCE_SUPPORT",
+      "tokens": 696,
+      "time_s": 6256.173324108124,
+      "total_time_s": 5333628.713782499,
+      "time_share": 0.0011729675348307804
+    },
+    {
+      "date": "20161026",
+      "kind": "unknown_reason",
+      "unknown_reason": "LOW_COUNT_AND_DAYS",
+      "tokens": 36922,
+      "time_s": 140288.889250268,
+      "total_time_s": 5316461.188965492,
+      "time_share": 0.026387644762919115
+    },
+    {
+      "date": "20161026",
+      "kind": "unknown_reason",
+      "unknown_reason": "LOW_COUNT_ONLY",
+      "tokens": 102616,
+      "time_s": 501123.2621232667,
+      "total_time_s": 5316461.188965492,
+      "time_share": 0.09425880191947347
+    },
+    {
+      "date": "20161026",
+      "kind": "unknown_reason",
+      "unknown_reason": "NOT_UNKNOWN",
+      "tokens": 356326,
+      "time_s": 4137526.894384937,
+      "total_time_s": 5316461.188965492,
+      "time_share": 0.77824830226778
+    },
+    {
+      "date": "20161026",
+      "kind": "unknown_reason",
+      "unknown_reason": "NO_REFERENCE",
+      "tokens": 204318,
+      "time_s": 537522.1432070199,
+      "total_time_s": 5316461.188965492,
+      "time_share": 0.1011052510498274
+    },
+    {
+      "date": "20161026",
+      "kind": "state_support",
+      "research_state": "CONGESTED_PROXY",
+      "reference_support": "LOW_REFERENCE_SUPPORT",
+      "tokens": 1089,
+      "time_s": 5728.682727089152,
+      "total_time_s": 5316461.188965492,
+      "time_share": 0.0010775368282532074
+    },
+    {
+      "date": "20161026",
+      "kind": "state_support",
+      "research_state": "CONGESTED_PROXY",
+      "reference_support": "MEETS_ORIGINAL_SUPPORT",
+      "tokens": 8710,
+      "time_s": 135661.03482034057,
+      "total_time_s": 5316461.188965492,
+      "time_share": 0.02551716828139552
+    },
+    {
+      "date": "20161026",
+      "kind": "state_support",
+      "research_state": "MIXED_EVIDENCE",
+      "reference_support": "LOW_REFERENCE_SUPPORT",
+      "tokens": 119593,
+      "time_s": 490876.69663075055,
+      "total_time_s": 5316461.188965492,
+      "time_share": 0.0923314737347435
+    },
+    {
+      "date": "20161026",
+      "kind": "state_support",
+      "research_state": "MIXED_EVIDENCE",
+      "reference_support": "MEETS_ORIGINAL_SUPPORT",
+      "tokens": 77315,
+      "time_s": 763532.6815134287,
+      "total_time_s": 5316461.188965492,
+      "time_share": 0.14361671314335342
+    },
+    {
+      "date": "20161026",
+      "kind": "state_support",
+      "research_state": "NON_CONGESTED_PROXY",
+      "reference_support": "LOW_REFERENCE_SUPPORT",
+      "tokens": 18206,
+      "time_s": 143065.34131622314,
+      "total_time_s": 5316461.188965492,
+      "time_share": 0.02690988163576938
+    },
+    {
+      "date": "20161026",
+      "kind": "state_support",
+      "research_state": "NON_CONGESTED_PROXY",
+      "reference_support": "MEETS_ORIGINAL_SUPPORT",
+      "tokens": 265484,
+      "time_s": 3214155.770885229,
+      "total_time_s": 5316461.188965492,
+      "time_share": 0.6045667703840905
+    },
+    {
+      "date": "20161026",
+      "kind": "state_support",
+      "research_state": "SEVERE_CONGESTION_PROXY",
+      "reference_support": "LOW_REFERENCE_SUPPORT",
+      "tokens": 650,
+      "time_s": 1741.43069947185,
+      "total_time_s": 5316461.188965492,
+      "time_share": 0.0003275544836264868
+    },
+    {
+      "date": "20161026",
+      "kind": "state_support",
+      "research_state": "SEVERE_CONGESTION_PROXY",
+      "reference_support": "MEETS_ORIGINAL_SUPPORT",
+      "tokens": 4817,
+      "time_s": 24177.40716593864,
+      "total_time_s": 5316461.188965492,
+      "time_share": 0.004547650458940568
+    },
+    {
+      "date": "20161026",
+      "kind": "state_support",
+      "research_state": "UNKNOWN",
+      "reference_support": "NO_REFERENCE",
+      "tokens": 204318,
+      "time_s": 537522.1432070199,
+      "total_time_s": 5316461.188965492,
+      "time_share": 0.1011052510498274
+    },
+    {
+      "date": "20161026",
+      "kind": "mixed",
+      "strict_state": "CONGESTED_PROXY",
+      "mixed_subtype": "NOT_MIXED",
+      "reference_support": "MEETS_ORIGINAL_SUPPORT",
+      "tokens": 8710,
+      "time_s": 135661.03482034057,
+      "total_time_s": 5316461.188965492,
+      "time_share": 0.02551716828139552
+    },
+    {
+      "date": "20161026",
+      "kind": "mixed",
+      "strict_state": "MIXED_EVIDENCE",
+      "mixed_subtype": "HIGH_LOW_SPEED_SHARE_WITHOUT_RELATIVE_SLOWDOWN",
+      "reference_support": "MEETS_ORIGINAL_SUPPORT",
+      "tokens": 44003,
+      "time_s": 255813.95312321186,
+      "total_time_s": 5316461.188965492,
+      "time_share": 0.04811733670776399
+    },
+    {
+      "date": "20161026",
+      "kind": "mixed",
+      "strict_state": "MIXED_EVIDENCE",
+      "mixed_subtype": "RELATIVE_SLOWDOWN_WITHOUT_HIGH_LOW_SPEED_SHARE",
+      "reference_support": "MEETS_ORIGINAL_SUPPORT",
+      "tokens": 33312,
+      "time_s": 507718.7283902168,
+      "total_time_s": 5316461.188965492,
+      "time_share": 0.09549937643558942
+    },
+    {
+      "date": "20161026",
+      "kind": "mixed",
+      "strict_state": "NON_CONGESTED_PROXY",
+      "mixed_subtype": "NOT_MIXED",
+      "reference_support": "MEETS_ORIGINAL_SUPPORT",
+      "tokens": 265484,
+      "time_s": 3214155.770885229,
+      "total_time_s": 5316461.188965492,
+      "time_share": 0.6045667703840905
+    },
+    {
+      "date": "20161026",
+      "kind": "mixed",
+      "strict_state": "SEVERE_CONGESTION_PROXY",
+      "mixed_subtype": "NOT_MIXED",
+      "reference_support": "MEETS_ORIGINAL_SUPPORT",
+      "tokens": 4817,
+      "time_s": 24177.40716593864,
+      "total_time_s": 5316461.188965492,
+      "time_share": 0.004547650458940568
+    },
+    {
+      "date": "20161026",
+      "kind": "mixed",
+      "strict_state": "UNKNOWN",
+      "mixed_subtype": "HIGH_LOW_SPEED_SHARE_WITHOUT_RELATIVE_SLOWDOWN",
+      "reference_support": "LOW_REFERENCE_SUPPORT",
+      "tokens": 118786,
+      "time_s": 483179.2181322917,
+      "total_time_s": 5316461.188965492,
+      "time_share": 0.09088361617971512
+    },
+    {
+      "date": "20161026",
+      "kind": "mixed",
+      "strict_state": "UNKNOWN",
+      "mixed_subtype": "NOT_MIXED",
+      "reference_support": "LOW_REFERENCE_SUPPORT",
+      "tokens": 19945,
+      "time_s": 150535.45474278415,
+      "total_time_s": 5316461.188965492,
+      "time_share": 0.028314972947649075
+    },
+    {
+      "date": "20161026",
+      "kind": "mixed",
+      "strict_state": "UNKNOWN",
+      "mixed_subtype": "NOT_MIXED",
+      "reference_support": "NO_REFERENCE",
+      "tokens": 204318,
+      "time_s": 537522.1432070199,
+      "total_time_s": 5316461.188965492,
+      "time_share": 0.1011052510498274
+    },
+    {
+      "date": "20161026",
+      "kind": "mixed",
+      "strict_state": "UNKNOWN",
+      "mixed_subtype": "RELATIVE_SLOWDOWN_WITHOUT_HIGH_LOW_SPEED_SHARE",
+      "reference_support": "LOW_REFERENCE_SUPPORT",
+      "tokens": 807,
+      "time_s": 7697.478498458862,
+      "total_time_s": 5316461.188965492,
+      "time_share": 0.001447857555028382
+    },
+    {
+      "date": "20161027",
+      "kind": "unknown_reason",
+      "unknown_reason": "LOW_COUNT_AND_DAYS",
+      "tokens": 36300,
+      "time_s": 137250.56808283646,
+      "total_time_s": 5283634.389450466,
+      "time_share": 0.02597654530314908
+    },
+    {
+      "date": "20161027",
+      "kind": "unknown_reason",
+      "unknown_reason": "LOW_COUNT_ONLY",
+      "tokens": 100700,
+      "time_s": 495419.20400162553,
+      "total_time_s": 5283634.389450466,
+      "time_share": 0.09376485341052383
+    },
+    {
+      "date": "20161027",
+      "kind": "unknown_reason",
+      "unknown_reason": "NOT_UNKNOWN",
+      "tokens": 353017,
+      "time_s": 4127307.870048429,
+      "total_time_s": 5283634.389450466,
+      "time_share": 0.7811494069856898
+    },
+    {
+      "date": "20161027",
+      "kind": "unknown_reason",
+      "unknown_reason": "NO_REFERENCE",
+      "tokens": 199722,
+      "time_s": 523656.74731757515,
+      "total_time_s": 5283634.389450466,
+      "time_share": 0.09910919430063725
+    },
+    {
+      "date": "20161027",
+      "kind": "state_support",
+      "research_state": "CONGESTED_PROXY",
+      "reference_support": "LOW_REFERENCE_SUPPORT",
+      "tokens": 1105,
+      "time_s": 5899.8586869998835,
+      "total_time_s": 5283634.389450466,
+      "time_share": 0.001116628867958729
+    },
+    {
+      "date": "20161027",
+      "kind": "state_support",
+      "research_state": "CONGESTED_PROXY",
+      "reference_support": "MEETS_ORIGINAL_SUPPORT",
+      "tokens": 8787,
+      "time_s": 139549.45405989885,
+      "total_time_s": 5283634.389450466,
+      "time_share": 0.026411640884639813
+    },
+    {
+      "date": "20161027",
+      "kind": "state_support",
+      "research_state": "MIXED_EVIDENCE",
+      "reference_support": "LOW_REFERENCE_SUPPORT",
+      "tokens": 117295,
+      "time_s": 481723.85573512036,
+      "total_time_s": 5283634.389450466,
+      "time_share": 0.09117282162765673
+    },
+    {
+      "date": "20161027",
+      "kind": "state_support",
+      "research_state": "MIXED_EVIDENCE",
+      "reference_support": "MEETS_ORIGINAL_SUPPORT",
+      "tokens": 77104,
+      "time_s": 770022.1094181538,
+      "total_time_s": 5283634.389450466,
+      "time_share": 0.1457372052380485
+    },
+    {
+      "date": "20161027",
+      "kind": "state_support",
+      "research_state": "NON_CONGESTED_PROXY",
+      "reference_support": "LOW_REFERENCE_SUPPORT",
+      "tokens": 17977,
+      "time_s": 143315.96368932724,
+      "total_time_s": 5283634.389450466,
+      "time_share": 0.02712450429489938
+    },
+    {
+      "date": "20161027",
+      "kind": "state_support",
+      "research_state": "NON_CONGESTED_PROXY",
+      "reference_support": "MEETS_ORIGINAL_SUPPORT",
+      "tokens": 262374,
+      "time_s": 3193023.861315489,
+      "total_time_s": 5283634.389450466,
+      "time_share": 0.6043233929453595
+    },
+    {
+      "date": "20161027",
+      "kind": "state_support",
+      "research_state": "SEVERE_CONGESTION_PROXY",
+      "reference_support": "LOW_REFERENCE_SUPPORT",
+      "tokens": 623,
+      "time_s": 1730.0939730145037,
+      "total_time_s": 5283634.389450466,
+      "time_share": 0.0003274439231580604
+    },
+    {
+      "date": "20161027",
+      "kind": "state_support",
+      "research_state": "SEVERE_CONGESTION_PROXY",
+      "reference_support": "MEETS_ORIGINAL_SUPPORT",
+      "tokens": 4752,
+      "time_s": 24712.445254887454,
+      "total_time_s": 5283634.389450466,
+      "time_share": 0.004677167917641954
+    },
+    {
+      "date": "20161027",
+      "kind": "state_support",
+      "research_state": "UNKNOWN",
+      "reference_support": "NO_REFERENCE",
+      "tokens": 199722,
+      "time_s": 523656.74731757515,
+      "total_time_s": 5283634.389450466,
+      "time_share": 0.09910919430063725
+    },
+    {
+      "date": "20161027",
+      "kind": "mixed",
+      "strict_state": "CONGESTED_PROXY",
+      "mixed_subtype": "NOT_MIXED",
+      "reference_support": "MEETS_ORIGINAL_SUPPORT",
+      "tokens": 8787,
+      "time_s": 139549.45405989885,
+      "total_time_s": 5283634.389450466,
+      "time_share": 0.026411640884639813
+    },
+    {
+      "date": "20161027",
+      "kind": "mixed",
+      "strict_state": "MIXED_EVIDENCE",
+      "mixed_subtype": "HIGH_LOW_SPEED_SHARE_WITHOUT_RELATIVE_SLOWDOWN",
+      "reference_support": "MEETS_ORIGINAL_SUPPORT",
+      "tokens": 43942,
+      "time_s": 256933.9031099081,
+      "total_time_s": 5283634.389450466,
+      "time_share": 0.04862825172440271
+    },
+    {
+      "date": "20161027",
+      "kind": "mixed",
+      "strict_state": "MIXED_EVIDENCE",
+      "mixed_subtype": "RELATIVE_SLOWDOWN_WITHOUT_HIGH_LOW_SPEED_SHARE",
+      "reference_support": "MEETS_ORIGINAL_SUPPORT",
+      "tokens": 33162,
+      "time_s": 513088.20630824566,
+      "total_time_s": 5283634.389450466,
+      "time_share": 0.0971089535136458
+    },
+    {
+      "date": "20161027",
+      "kind": "mixed",
+      "strict_state": "NON_CONGESTED_PROXY",
+      "mixed_subtype": "NOT_MIXED",
+      "reference_support": "MEETS_ORIGINAL_SUPPORT",
+      "tokens": 262374,
+      "time_s": 3193023.861315489,
+      "total_time_s": 5283634.389450466,
+      "time_share": 0.6043233929453595
+    },
+    {
+      "date": "20161027",
+      "kind": "mixed",
+      "strict_state": "SEVERE_CONGESTION_PROXY",
+      "mixed_subtype": "NOT_MIXED",
+      "reference_support": "MEETS_ORIGINAL_SUPPORT",
+      "tokens": 4752,
+      "time_s": 24712.445254887454,
+      "total_time_s": 5283634.389450466,
+      "time_share": 0.004677167917641954
+    },
+    {
+      "date": "20161027",
+      "kind": "mixed",
+      "strict_state": "UNKNOWN",
+      "mixed_subtype": "HIGH_LOW_SPEED_SHARE_WITHOUT_RELATIVE_SLOWDOWN",
+      "reference_support": "LOW_REFERENCE_SUPPORT",
+      "tokens": 116580,
+      "time_s": 474736.69361549336,
+      "total_time_s": 5283634.389450466,
+      "time_share": 0.08985040572893788
+    },
+    {
+      "date": "20161027",
+      "kind": "mixed",
+      "strict_state": "UNKNOWN",
+      "mixed_subtype": "NOT_MIXED",
+      "reference_support": "LOW_REFERENCE_SUPPORT",
+      "tokens": 19705,
+      "time_s": 150945.91634934163,
+      "total_time_s": 5283634.389450466,
+      "time_share": 0.02856857708601617
+    },
+    {
+      "date": "20161027",
+      "kind": "mixed",
+      "strict_state": "UNKNOWN",
+      "mixed_subtype": "NOT_MIXED",
+      "reference_support": "NO_REFERENCE",
+      "tokens": 199722,
+      "time_s": 523656.74731757515,
+      "total_time_s": 5283634.389450466,
+      "time_share": 0.09910919430063725
+    },
+    {
+      "date": "20161027",
+      "kind": "mixed",
+      "strict_state": "UNKNOWN",
+      "mixed_subtype": "RELATIVE_SLOWDOWN_WITHOUT_HIGH_LOW_SPEED_SHARE",
+      "reference_support": "LOW_REFERENCE_SUPPORT",
+      "tokens": 715,
+      "time_s": 6987.162119626999,
+      "total_time_s": 5283634.389450466,
+      "time_share": 0.0013224158987188573
+    }
+  ]
+}

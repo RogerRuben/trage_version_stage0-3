@@ -1,0 +1,10 @@
+{
+  "legacy_evaluated_in_this_step": false,
+  "new_final_test_consumed": false,
+  "relative_mae_change": -0.039436792764906525,
+  "schema_version": "stage2_v5_model_evaluation.1",
+  "status": "PREDICTIVE_BASELINE_VALIDATED",
+  "validation_deep_mae": 0.02895125247965458,
+  "validation_paired_ci_all_below_zero": true,
+  "validation_strong_baseline_mae": 0.030139872380692687
+}

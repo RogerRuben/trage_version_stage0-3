@@ -1,0 +1,38 @@
+{
+  "status": "NATIVE_CHECKPOINT_VERIFIED",
+  "rows": [
+    {
+      "q_A": 0.5,
+      "available": 367,
+      "busy": 247,
+      "prior_assignments": 3856,
+      "roundtrip_equal": true,
+      "busy_drain_equal": true,
+      "timestamp_max_error_s": {
+        "pickup_time": 0.0,
+        "service_end_time": 0.0
+      },
+      "checkpoint": "stage4\\output\\paper_enhancement\\native_checkpoint_closure\\retry1\\q50\\native_checkpoint.pkl",
+      "checkpoint_bytes": 32682211
+    },
+    {
+      "q_A": 0.75,
+      "available": 396,
+      "busy": 157,
+      "prior_assignments": 2663,
+      "roundtrip_equal": true,
+      "busy_drain_equal": true,
+      "timestamp_max_error_s": {
+        "pickup_time": 0.0,
+        "service_end_time": 0.0
+      },
+      "checkpoint": "stage4\\output\\paper_enhancement\\native_checkpoint_closure\\retry1\\q75\\native_checkpoint.pkl",
+      "checkpoint_bytes": 29419768
+    }
+  ],
+  "runtime_s": 92.29581859999962,
+  "peak_rss_mib": 602.98828125,
+  "full_day_rerun": false,
+  "construction": "forced recorded actions through 10:30; native motion; no prehistory routing/solver",
+  "continuation_boundary": "call control.time_trigger(37800) once, then sim.step from 37830"
+}

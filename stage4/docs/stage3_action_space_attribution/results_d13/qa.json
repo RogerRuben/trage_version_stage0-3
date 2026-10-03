@@ -1,0 +1,61 @@
+{
+  "status": "PASS",
+  "condition_states": 10,
+  "witness_checks": [
+    {
+      "epoch_id": "0730",
+      "status": "PASS",
+      "arcs": 33
+    },
+    {
+      "epoch_id": "0830",
+      "status": "PASS",
+      "arcs": 13
+    },
+    {
+      "epoch_id": "1200",
+      "status": "PASS",
+      "arcs": 25
+    },
+    {
+      "epoch_id": "1300",
+      "status": "PASS",
+      "arcs": 23
+    },
+    {
+      "epoch_id": "1700",
+      "status": "PASS",
+      "arcs": 9
+    },
+    {
+      "epoch_id": "1730",
+      "status": "PASS",
+      "arcs": 26
+    },
+    {
+      "epoch_id": "1800",
+      "status": "PASS",
+      "arcs": 33
+    },
+    {
+      "epoch_id": "1830",
+      "status": "PASS",
+      "arcs": 11
+    },
+    {
+      "epoch_id": "2100",
+      "status": "PASS",
+      "arcs": 31
+    },
+    {
+      "epoch_id": "2300",
+      "status": "PASS",
+      "arcs": 1
+    }
+  ],
+  "additional_MILPs": 0,
+  "additional_routing_calls": 0,
+  "maximum_final_arcs": 33,
+  "D3_eligible_not_D13_unique_orders": 26,
+  "old_outputs_unchanged_scope": "New output directory only; old files opened read-only"
+}

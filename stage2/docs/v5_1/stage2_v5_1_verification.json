@@ -1,0 +1,358 @@
+{
+  "availability_model_role": "availability_aware_diagnostic_and_ipw_sensitivity_only",
+  "checks": {
+    "configuration_and_science": [
+      {
+        "detail": true,
+        "name": "all_formal_fields_finite",
+        "status": "PASS"
+      },
+      {
+        "detail": true,
+        "name": "all_quantiles_monotonic",
+        "status": "PASS"
+      },
+      {
+        "detail": "PASS",
+        "name": "static_complexity_gate",
+        "status": "PASS"
+      },
+      {
+        "detail": "PASS",
+        "name": "performance_scaling_gate",
+        "status": "PASS"
+      },
+      {
+        "detail": 33267.05859375,
+        "name": "maximum_pace_mean",
+        "status": "FAIL"
+      },
+      {
+        "detail": 14245.244632286332,
+        "name": "maximum_mean_to_p50_ratio",
+        "status": "FAIL"
+      },
+      {
+        "detail": 0.47603510648012154,
+        "name": "maximum_p99_9_pace_mean",
+        "status": "PASS"
+      },
+      {
+        "detail": 0.8316584533450883,
+        "name": "maximum_single_row_mae_contribution",
+        "status": "FAIL"
+      },
+      {
+        "detail": 0.9999993780599599,
+        "name": "maximum_single_row_rmse_contribution",
+        "status": "FAIL"
+      },
+      {
+        "detail": 0.0249545489373854,
+        "name": "maximum_pace_quantile_coverage_error",
+        "status": "PASS"
+      },
+      {
+        "detail": 5,
+        "name": "minimum_final_daily_mae_wins_vs_strong_baseline",
+        "status": "PASS"
+      },
+      {
+        "detail": 0.14968466113805468,
+        "name": "require_aggregate_mae_better_than_strong_baseline",
+        "status": "FAIL"
+      },
+      {
+        "detail": false,
+        "name": "require_paired_bootstrap_ci_below_zero",
+        "status": "FAIL"
+      },
+      {
+        "detail": 0.8802333333333333,
+        "name": "route_p90_coverage",
+        "status": "PASS"
+      },
+      {
+        "detail": 0.9234333333333333,
+        "name": "route_p95_coverage",
+        "status": "PASS"
+      },
+      {
+        "detail": 11992.546449701538,
+        "name": "route_mean_rmse_stability",
+        "status": "FAIL"
+      },
+      {
+        "detail": 1199338.309927871,
+        "name": "route_mean_stability",
+        "status": "FAIL"
+      },
+      {
+        "detail": 1199338.309927871,
+        "name": "route_cvar95_stability",
+        "status": "FAIL"
+      },
+      {
+        "detail": 426.6456450141698,
+        "name": "route_p90_interval_width_stability",
+        "status": "PASS"
+      },
+      {
+        "detail": 563.2561516136559,
+        "name": "route_p95_interval_width_stability",
+        "status": "PASS"
+      },
+      {
+        "detail": 0.0004,
+        "name": "route_extreme_interval_share",
+        "status": "PASS"
+      },
+      {
+        "detail": [
+          "calibration",
+          "evaluation",
+          "legacy",
+          "validation_model"
+        ],
+        "name": "formal_evaluation_and_legacy_present",
+        "status": "PASS"
+      },
+      {
+        "detail": {
+          "development": 1,
+          "legacy": 1
+        },
+        "name": "calibration_parameters_frozen_across_post_calibration_dates",
+        "status": "PASS"
+      }
+    ],
+    "formal_products": [
+      {
+        "detail": {
+          "files_valid": true,
+          "stability_status": "PASS"
+        },
+        "name": "formal_product:development:calibration:20161024",
+        "status": "PASS"
+      },
+      {
+        "detail": {
+          "files_valid": true,
+          "stability_status": "PASS"
+        },
+        "name": "formal_product:development:evaluation:20161025",
+        "status": "PASS"
+      },
+      {
+        "detail": {
+          "files_valid": true,
+          "stability_status": "PASS"
+        },
+        "name": "formal_product:development:evaluation:20161026",
+        "status": "PASS"
+      },
+      {
+        "detail": {
+          "files_valid": true,
+          "stability_status": "PASS"
+        },
+        "name": "formal_product:development:evaluation:20161027",
+        "status": "PASS"
+      },
+      {
+        "detail": {
+          "files_valid": true,
+          "stability_status": "PASS"
+        },
+        "name": "formal_product:development:validation_model:20161022",
+        "status": "PASS"
+      },
+      {
+        "detail": {
+          "files_valid": true,
+          "stability_status": "PASS"
+        },
+        "name": "formal_product:development:validation_model:20161023",
+        "status": "PASS"
+      },
+      {
+        "detail": {
+          "files_valid": true,
+          "stability_status": "PASS"
+        },
+        "name": "formal_product:legacy:calibration:20161027",
+        "status": "PASS"
+      },
+      {
+        "detail": {
+          "files_valid": true,
+          "stability_status": "PASS"
+        },
+        "name": "formal_product:legacy:legacy:20161031",
+        "status": "PASS"
+      },
+      {
+        "detail": {
+          "files_valid": true,
+          "stability_status": "PASS"
+        },
+        "name": "formal_product:legacy:validation_model:20161025",
+        "status": "PASS"
+      },
+      {
+        "detail": {
+          "files_valid": true,
+          "stability_status": "PASS"
+        },
+        "name": "formal_product:legacy:validation_model:20161026",
+        "status": "PASS"
+      }
+    ],
+    "frozen_evidence": [
+      {
+        "detail": "f6e335381cbd2cdd262ee325a92b32f916c0c09f105b640c0d306f53f17aae66",
+        "name": "frozen_evidence:stage2/docs/v5/stage2_v5_rolling_origin_summary.json",
+        "status": "PASS"
+      },
+      {
+        "detail": "17de387dcf1ac996d9cbb31a7b77acdbd52d9bc4e4566ef74aa4787b6d650237",
+        "name": "frozen_evidence:stage2/docs/v5/stage2_v5_fold3_tail_diagnostic.md",
+        "status": "PASS"
+      },
+      {
+        "detail": "67914a52b31d1256869e7ab7099bf1062e38cdd157576cbfff81a80b2e1581a1",
+        "name": "frozen_evidence:stage2/docs/v5/stage2_v5_fold3_tail_diagnostic.json",
+        "status": "PASS"
+      },
+      {
+        "detail": "1754da9603fc8752699a82eec3bc2b94b45868676573501a03507e4382cf6300",
+        "name": "frozen_evidence:stage2/docs/v5/protocols/fold_3/service_time_metrics.csv",
+        "status": "PASS"
+      },
+      {
+        "detail": "6941d5672cc08d19a4355eef3d650854c00349fc1107209beaeed39e725f6756",
+        "name": "frozen_evidence:stage2/docs/v5/protocols/fold_3/scenario_coverage.csv",
+        "status": "PASS"
+      },
+      {
+        "detail": "24c3611a9e6c05cd12387599b83703072f08e94c037fc27d18b350558e7d1810",
+        "name": "frozen_evidence:stage2/docs/v5/stage2_v5_final_verification.json",
+        "status": "PASS"
+      }
+    ],
+    "v5_1_retraining": [
+      {
+        "detail": 3,
+        "name": "v5_1_three_rolling_folds",
+        "status": "PASS"
+      },
+      {
+        "detail": -0.023943318591684748,
+        "name": "v5_1_aggregate_p50_better_than_tree",
+        "status": "PASS"
+      },
+      {
+        "detail": true,
+        "name": "v5_1_paired_ci_below_zero",
+        "status": "PASS"
+      },
+      {
+        "detail": 6,
+        "name": "v5_1_daily_wins",
+        "status": "PASS"
+      },
+      {
+        "detail": null,
+        "name": "v5_1_quantile_coverage_error",
+        "status": "PASS"
+      },
+      {
+        "detail": [
+          0.8553,
+          0.9216,
+          0.8434,
+          0.8215,
+          0.9087,
+          0.9155
+        ],
+        "name": "v5_1_route_p90_coverage",
+        "status": "FAIL"
+      },
+      {
+        "detail": [
+          0.8946,
+          0.9502,
+          0.8847,
+          0.868,
+          0.9372,
+          0.9455
+        ],
+        "name": "v5_1_route_p95_coverage",
+        "status": "FAIL"
+      },
+      {
+        "detail": 389.24277275736927,
+        "name": "v5_1_route_mean_rmse_stability",
+        "status": "PASS"
+      },
+      {
+        "detail": 4045.8846383361815,
+        "name": "v5_1_route_mean_stability",
+        "status": "PASS"
+      },
+      {
+        "detail": 7334.441728515625,
+        "name": "v5_1_route_cvar95_stability",
+        "status": "PASS"
+      },
+      {
+        "detail": 9982.968815252434,
+        "name": "v5_1_extreme_scenario_stability",
+        "status": "PASS"
+      },
+      {
+        "detail": "PASS",
+        "name": "v5_1_cross_order_scenario",
+        "status": "PASS"
+      },
+      {
+        "detail": 5,
+        "name": "v5_1_stable_checkpoint_manifests",
+        "status": "PASS"
+      },
+      {
+        "detail": {
+          "development": false,
+          "fold_1": false,
+          "fold_2": false,
+          "fold_3": true,
+          "legacy": false
+        },
+        "name": "v5_1_selected_checkpoint_single_row_stability",
+        "status": "FAIL"
+      },
+      {
+        "detail": 25,
+        "name": "v5_1_formal_product_hashes_and_stability",
+        "status": "PASS"
+      },
+      {
+        "detail": {
+          "development": 1,
+          "fold_1": 1,
+          "fold_2": 1,
+          "fold_3": 1,
+          "legacy": 1
+        },
+        "name": "v5_1_calibration_frozen_by_protocol",
+        "status": "PASS"
+      }
+    ]
+  },
+  "full_distribution_stability_status": "FAIL",
+  "horizon_gate_role": "negative_ablation_not_selected",
+  "p0_status": "PASS",
+  "retraining_required": true,
+  "schema_version": "stage2_v5_1_verification.1",
+  "status": "READY_FOR_ROUTE_SCENARIO_PROTOTYPE"
+}

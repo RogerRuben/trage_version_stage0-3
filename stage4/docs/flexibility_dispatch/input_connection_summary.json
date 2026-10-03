@@ -1,0 +1,78 @@
+{
+  "status": "COMPLETE",
+  "config_sha256": "3327374c65f3e62c01fff8e2a32cd45587ed8d1a0f75bba50bbd19aee1ce3d09",
+  "signal_overlay": {
+    "release": "D:\\pycodes\\didi_xian_raw\\map_data\\signal_gapfill_20261004",
+    "manifest_sha256": "f7d7e4aabfdb5304997497421868466e29e402d67c581b5ea679a4e7c467d454",
+    "full_positive_union_count": 699,
+    "map_or_amap_supported_count": 693,
+    "legacy_only_count": 6,
+    "http_closed": true,
+    "unlisted_locations_are_not_proven_unsignalized": true,
+    "evidence_period_is_not_2016_field_truth": true,
+    "canonical_complex_mapping_completed": true,
+    "tables": {
+      "xian_signalized_intersections_final.csv": {
+        "path": "D:\\pycodes\\didi_xian_raw\\map_data\\signal_gapfill_20261004\\results\\xian_signalized_intersections_final.csv",
+        "row_count": 699,
+        "sha256": "12c6b35866916f9f518487e398b918921ba056f296732d5296f5e22ec65091f7"
+      },
+      "map_or_amap_positive_final.csv": {
+        "path": "D:\\pycodes\\didi_xian_raw\\map_data\\signal_gapfill_20261004\\results\\map_or_amap_positive_final.csv",
+        "row_count": 693,
+        "sha256": "c93d432f253946fa9db708dc932d75465a805a578e675948d674d017e5e2c87c"
+      }
+    },
+    "position_mapping_basis_counts": {
+      "UNIQUE_NEAREST_SURFACE_COMPLEX": 571,
+      "AMBIGUOUS_OR_NO_SURFACE_COMPLEX_ASSOCIATION": 72,
+      "EXACT_MEMBER_NODE_ID": 56
+    },
+    "mapped_new_positive_complex_count": 596,
+    "frozen_positive_complex_count": 1629,
+    "union_positive_complex_count": 2020,
+    "unlisted_control_policy": "RESEARCH_ASSUMED_NON_SIGNAL_WITH_PROVENANCE",
+    "grade_separated_proximity_transfer_allowed": false
+  },
+  "test31_routes": {
+    "orders": 30000,
+    "data_ready": 29864,
+    "compatible": {
+      "C": 5299,
+      "M": 13847,
+      "A": 14613
+    },
+    "bearing_fallback_encounters": 13896,
+    "unresolved_maneuver_encounters": 0
+  },
+  "train_templates": [
+    {
+      "date": "20161010",
+      "source_band_orders": 1071,
+      "template_orders": 1062,
+      "m3_prediction_path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage3\\output\\odd_tod\\s3\\cache\\m3\\date=20161010.parquet",
+      "m3_prediction_sha256": "546f261d2b008905ce8711604066a5e90ea790b9529666a7e249725ccb440e44",
+      "source_midnight_is_before_test": true
+    },
+    {
+      "date": "20161017",
+      "source_band_orders": 1116,
+      "template_orders": 1113,
+      "m3_prediction_path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage3\\output\\odd_tod\\s3\\cache\\m3\\date=20161017.parquet",
+      "m3_prediction_sha256": "144bc5e042ef19fc78e25dc8d78f908c976903ca334cb42b5b7f655d86198c37",
+      "source_midnight_is_before_test": true
+    },
+    {
+      "date": "20161024",
+      "source_band_orders": 1231,
+      "template_orders": 1225,
+      "m3_prediction_path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage3\\output\\odd_tod\\s3\\cache\\m3\\date=20161024.parquet",
+      "m3_prediction_sha256": "84ad370d5dc74ce2db80842d8125870b299e815932b7d92219a0e297916d69d6",
+      "source_midnight_is_before_test": true
+    }
+  ],
+  "new_clustering": false,
+  "new_m3_inference": false,
+  "http_calls": 0,
+  "test31_used_to_fit_forecast": false
+}

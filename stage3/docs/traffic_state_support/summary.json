@@ -1,0 +1,146 @@
+{
+  "status": "COMPLETED_RESEARCH_SUPPORT_SEPARATION",
+  "protocol_commit": "f1af90e",
+  "seed": "traffic-support-split-v1",
+  "days": [
+    {
+      "date": "20161025",
+      "routes": 9954,
+      "tokens": 697963,
+      "predicted_time_s": 5333628.713782499,
+      "strict_unknown_time_s": 1169163.4782902016,
+      "research_unknown_time_s": 539671.3307595754
+    },
+    {
+      "date": "20161026",
+      "routes": 9946,
+      "tokens": 700182,
+      "predicted_time_s": 5316461.188965492,
+      "strict_unknown_time_s": 1178934.2945805546,
+      "research_unknown_time_s": 537522.1432070199
+    },
+    {
+      "date": "20161027",
+      "routes": 9951,
+      "tokens": 689739,
+      "predicted_time_s": 5283634.389450466,
+      "strict_unknown_time_s": 1156326.5194020371,
+      "research_unknown_time_s": 523656.74731757515
+    }
+  ],
+  "sources": [
+    {
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161009.parquet",
+      "sha256": "f551af3d4765701ea9417f5198e20965c05c622638a1a83520feb0572c31fa60"
+    },
+    {
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161010.parquet",
+      "sha256": "e99ad7287e8c3390891cdbf43c874db1c66715b2d6e3e215a91e00b3e59b54aa"
+    },
+    {
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161011.parquet",
+      "sha256": "2485583be97aef52abf38012a0c71a4f7416c22f1a17c8bc419002697bbb5370"
+    },
+    {
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161012.parquet",
+      "sha256": "684a812dcf94ed26960f111fa431eb4855ebb6a0287a9f033615cbb5ba8aaeed"
+    },
+    {
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161013.parquet",
+      "sha256": "6165d5db6a5512069bf5a3bb4400e2c943659bb9f236aa99c8d5636e7493bda8"
+    },
+    {
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161014.parquet",
+      "sha256": "bd8de8a5550608dc71d2d6c85493272a601b6754f514b341e0f603af91ad4e0c"
+    },
+    {
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161015.parquet",
+      "sha256": "a8714fa5ca1c749e18f843449894c197dec6ed02d7235be2cd20288b323c99c5"
+    },
+    {
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161016.parquet",
+      "sha256": "cd661db636688b2dafd80e859b4f4f6725c86acee8c8d900cfee0f50bf4807ec"
+    },
+    {
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161017.parquet",
+      "sha256": "bd4c7f59ab05a1bf8f4866064a200bc9868d3442eb2f96e16ba5674bef836130"
+    },
+    {
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161018.parquet",
+      "sha256": "e7b42776ae0d8482c9c607e39ae1ca7377aeb3797fea873fbb9b8f000dc7bf4a"
+    },
+    {
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161019.parquet",
+      "sha256": "e5b9b2ff9fb4545e405d340408ff2cf985a68365eb70cfbf919048bf18e0b7dc"
+    },
+    {
+      "path": "stage2\\output_v4\\causal_history_store\\events\\day=20161020.parquet",
+      "sha256": "37a60f563ba291ce4d02827e55571933e7ce0c0aebb25e13951b570b858f38e1"
+    },
+    {
+      "path": "stage3\\output\\traffic_state_batch1\\cells\\date=20161021.parquet",
+      "sha256": "7a4e458264b2a433ed7d14ac83b540d92b1d13195045729cae60a660f31e5e44"
+    },
+    {
+      "path": "stage3\\output\\traffic_state_batch1\\cells\\date=20161022.parquet",
+      "sha256": "6f90d33f74baa76aa0f9b5b901063acf94fa03d3801f58383034a072a74f1bd0"
+    },
+    {
+      "path": "stage3\\output\\traffic_state_batch1\\cells\\date=20161023.parquet",
+      "sha256": "ae08e721b3988d7bf69ce87abffc91fd9c84cc0b15b522e6219754096668ed28"
+    },
+    {
+      "path": "stage3\\output\\traffic_state_batch1\\cells\\date=20161024.parquet",
+      "sha256": "e6e25ace89f191553482e494596c01ddc150389d992613b6c77e6439d1e5dccf"
+    },
+    {
+      "path": "stage3\\output\\odd_tod\\s3\\cache\\m3_validation\\date=20161025.parquet",
+      "sha256": "ec5efc157709c0e33149899841a87118ab9abdf4ea934b136009eb67ce3912e7"
+    },
+    {
+      "path": "stage2\\output_v4\\route_conditioned_dataset\\revealed_route_proxy\\day=20161025.parquet",
+      "sha256": "34e080f36c5c33a4c6cd12b63026facacd96f1b2413791d3ea8e64107f5090fa"
+    },
+    {
+      "path": "stage3\\output\\traffic_state_batch2\\route_overlap_date=20161025.parquet",
+      "sha256": "0d209a7f768f2ea72acdb8d54a38982a75e24d846f649101250e0f8017801b15"
+    },
+    {
+      "path": "stage3\\output\\odd_tod\\s3\\cache\\m3_validation\\date=20161026.parquet",
+      "sha256": "43bb50c9695b75e97461f901978b1ac493d19e9cee086302ce508c499f8d91c7"
+    },
+    {
+      "path": "stage2\\output_v4\\route_conditioned_dataset\\revealed_route_proxy\\day=20161026.parquet",
+      "sha256": "73d9baf493c2df6e7a891ae7638d5591d852d44710ae164e0cad0356de5b0904"
+    },
+    {
+      "path": "stage3\\output\\traffic_state_batch2\\route_overlap_date=20161026.parquet",
+      "sha256": "cb579ab6525b52a2e05f0edeb9e75fdd039d300e4e56cbfbd5eadd7930966a6b"
+    },
+    {
+      "path": "stage3\\output\\odd_tod\\s3\\cache\\m3_validation\\date=20161027.parquet",
+      "sha256": "153bd47c9e84542fa68cdcd0fd11152a68b549016c440cde569215a6b61aa72a"
+    },
+    {
+      "path": "stage2\\output_v4\\route_conditioned_dataset\\revealed_route_proxy\\day=20161027.parquet",
+      "sha256": "7ea15f894be5ba035eaef05b781d0c05fcda5b76945c90091a2d33a213a7736b"
+    },
+    {
+      "path": "stage3\\output\\traffic_state_batch2\\route_overlap_date=20161027.parquet",
+      "sha256": "e5dafac7706e9a8af1ec431f0f66e0c361e84cff0c87357bc87483848286a44e"
+    }
+  ],
+  "protected_sha256": {
+    "stage3\\config\\traffic_state_batch1.json": "5064c16767aa6017bb3bd519f675e7e1e2c9d48616b07ac25a215a76bb4238fa",
+    "stage3\\output\\traffic_state_batch1\\train_reference.parquet": "a82186c02cb4d9fb515d629c982b131bf3220ee946fa8427b2a6c1bdbb17f6c3",
+    "stage3\\config\\stage3_av_capability_profiles.json": "bea54c12a0c013995c3644a0bab84b35413d5df8a6785dfdd6a03fd49f32978e",
+    "stage2\\output_v5_2\\development\\M3\\epoch_004.pt": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde"
+  },
+  "runtime_s": 37.17200000000594,
+  "peak_rss_mb": 694.640625,
+  "gpu_used": false,
+  "training": false,
+  "dispatch": false,
+  "test31_read": false,
+  "production_threshold_selected": false
+}

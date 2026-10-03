@@ -1,0 +1,38 @@
+{
+  "base_config": "stage2/config/stage2_v5.json",
+  "schema_version": "stage2_v5_1_training.1",
+  "deep": {
+    "maximum_epochs": 4,
+    "early_stopping_patience": 2
+  },
+  "distribution": {
+    "family": "monotonic_quantiles",
+    "maximum_log_p50": 1.6094379124341003,
+    "maximum_log_p90_p50_ratio": 2.302585092994046,
+    "maximum_log_p95_p90_ratio": 1.0986122886681098
+  },
+  "checkpoint_selection": {
+    "mode": "stable_unique_traversal",
+    "requires_unique_traversal_merge": true,
+    "primary": "validation_p50_mae",
+    "secondary": [
+      "validation_distribution_loss",
+      "validation_mean_mae",
+      "validation_quantile_coverage_error"
+    ]
+  },
+  "stability_thresholds": {
+    "maximum_pace_mean_s_per_m": 5.0,
+    "maximum_mean_to_p50_ratio": 20.0,
+    "maximum_p99_9_pace_mean_s_per_m": 1.0,
+    "maximum_single_row_mae_contribution_share": 0.05,
+    "maximum_single_row_rmse_contribution_share": 0.10,
+    "maximum_route_mean_s": 7200.0,
+    "maximum_route_mean_rmse_s": 600.0,
+    "maximum_average_p90_p50_width_s": 900.0,
+    "maximum_average_p95_p50_width_s": 1200.0,
+    "extreme_route_interval_width_s": 3600.0,
+    "maximum_extreme_route_interval_share": 0.001,
+    "maximum_route_cvar95_s": 14400.0
+  }
+}

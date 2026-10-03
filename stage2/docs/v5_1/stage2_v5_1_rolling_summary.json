@@ -1,0 +1,12 @@
+{
+  "aggregate_p50_mae": 0.029108152719059015,
+  "aggregate_tree_mae": 0.0298221950359071,
+  "all_paired_ci_below_zero": true,
+  "daily_p50_wins": 6,
+  "evaluation_day_count": 6,
+  "fold_count": 3,
+  "relative_difference": -0.023943318591684748,
+  "schema_version": "stage2_v5_1_rolling_diagnostic.1",
+  "scientific_role": "rolling_temporal_backtesting_evidence_not_new_holdout_confirmation",
+  "status": "PASS"
+}

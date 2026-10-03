@@ -1,0 +1,138 @@
+{
+  "epoch_id": "1800",
+  "timestamp": "2016-10-31 18:00:00+08:00",
+  "state_sha256": "b9ff74fb53c2605b56a7cbc861b242e18d8ee7ece82e7a130ffc4b3cd050e80d",
+  "arc_count": 18,
+  "av_arc_count": 0,
+  "routed_arcs": 1762,
+  "runtime_s": 4.1694987000000765,
+  "counts": [
+    0,
+    3,
+    0
+  ],
+  "pstar_s": 384.1591787784252,
+  "reference": "HISTORICAL_P_SELECTED_SET_VERIFIED_OPTIMAL",
+  "results": [
+    {
+      "mode": "A1",
+      "alternative": "ANY_ARC_CHANGE",
+      "status": "OPTIMAL",
+      "solver_message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+      "pstar_s": 384.1591787784252,
+      "alternative_pickup_s": 384.1591787784252,
+      "gap_upper_s": 0.0,
+      "gap_lower_s": 0.0,
+      "runtime_s": 0.0010920999993686564,
+      "gap_relative": 0.0,
+      "budget_exists": {
+        "0": "YES_WITHIN_NUMERICAL_TOLERANCE",
+        "0.005": "YES_WITHIN_NUMERICAL_TOLERANCE",
+        "0.01": "YES_WITHIN_NUMERICAL_TOLERANCE",
+        "0.02": "YES_WITHIN_NUMERICAL_TOLERANCE",
+        "0.05": "YES_WITHIN_NUMERICAL_TOLERANCE"
+      },
+      "witness": [
+        {
+          "order_id": "e20648cb31023d596243e4d9a0f71cb9",
+          "vehicle_id": "HV_S3_02112",
+          "vehicle_type": "HV",
+          "pickup_eta_s": 173.61039810178832,
+          "selected_before": false,
+          "selected_after": true
+        },
+        {
+          "order_id": "e20648cb31023d596243e4d9a0f71cb9",
+          "vehicle_id": "HV_S3_02532",
+          "vehicle_type": "HV",
+          "pickup_eta_s": 173.61039810178832,
+          "selected_before": true,
+          "selected_after": false
+        }
+      ],
+      "served_order_set_changed": false,
+      "vehicle_identity_set_changed": true,
+      "same_order_hv_av_swap_count": 0
+    },
+    {
+      "mode": "A1",
+      "alternative": "AV_SERVICE_INDICATOR_CHANGE",
+      "status": "INFEASIBLE",
+      "solver_message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+      "pstar_s": 384.1591787784252,
+      "alternative_pickup_s": null,
+      "gap_upper_s": null,
+      "gap_lower_s": null,
+      "runtime_s": 0.0010588000004645437,
+      "gap_relative": null,
+      "budget_exists": {
+        "0": "NO",
+        "0.005": "NO",
+        "0.01": "NO",
+        "0.02": "NO",
+        "0.05": "NO"
+      },
+      "witness": []
+    },
+    {
+      "mode": "A2",
+      "alternative": "ANY_ARC_CHANGE",
+      "status": "OPTIMAL",
+      "solver_message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+      "pstar_s": 384.1591787784252,
+      "alternative_pickup_s": 384.1591787784252,
+      "gap_upper_s": 0.0,
+      "gap_lower_s": 0.0,
+      "runtime_s": 0.0011291000000710483,
+      "gap_relative": 0.0,
+      "budget_exists": {
+        "0": "YES_WITHIN_NUMERICAL_TOLERANCE",
+        "0.005": "YES_WITHIN_NUMERICAL_TOLERANCE",
+        "0.01": "YES_WITHIN_NUMERICAL_TOLERANCE",
+        "0.02": "YES_WITHIN_NUMERICAL_TOLERANCE",
+        "0.05": "YES_WITHIN_NUMERICAL_TOLERANCE"
+      },
+      "witness": [
+        {
+          "order_id": "e20648cb31023d596243e4d9a0f71cb9",
+          "vehicle_id": "HV_S3_02112",
+          "vehicle_type": "HV",
+          "pickup_eta_s": 173.61039810178832,
+          "selected_before": false,
+          "selected_after": true
+        },
+        {
+          "order_id": "e20648cb31023d596243e4d9a0f71cb9",
+          "vehicle_id": "HV_S3_02532",
+          "vehicle_type": "HV",
+          "pickup_eta_s": 173.61039810178832,
+          "selected_before": true,
+          "selected_after": false
+        }
+      ],
+      "served_order_set_changed": false,
+      "vehicle_identity_set_changed": true,
+      "same_order_hv_av_swap_count": 0
+    },
+    {
+      "mode": "A2",
+      "alternative": "AV_SERVICE_INDICATOR_CHANGE",
+      "status": "INFEASIBLE",
+      "solver_message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)",
+      "pstar_s": 384.1591787784252,
+      "alternative_pickup_s": null,
+      "gap_upper_s": null,
+      "gap_lower_s": null,
+      "runtime_s": 0.0009648000004744972,
+      "gap_relative": null,
+      "budget_exists": {
+        "0": "NO",
+        "0.005": "NO",
+        "0.01": "NO",
+        "0.02": "NO",
+        "0.05": "NO"
+      },
+      "witness": []
+    }
+  ]
+}

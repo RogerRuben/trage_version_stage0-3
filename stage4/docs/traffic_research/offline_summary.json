@@ -1,0 +1,447 @@
+{
+  "status": "PASS",
+  "rows": [
+    {
+      "date": "20161025",
+      "profile": "C",
+      "budget": 0.0,
+      "routes": 9954,
+      "traffic_budget_allowed": 1109,
+      "traffic_budget_exceeded": 8845,
+      "allowed_with_unknown": 1091,
+      "mean_unknown_share": 0.09796327959112608,
+      "mean_low_support_share": 0.12031428786456003
+    },
+    {
+      "date": "20161025",
+      "profile": "C",
+      "budget": 0.05,
+      "routes": 9954,
+      "traffic_budget_allowed": 4519,
+      "traffic_budget_exceeded": 5435,
+      "allowed_with_unknown": 4481,
+      "mean_unknown_share": 0.09796327959112608,
+      "mean_low_support_share": 0.12031428786456003
+    },
+    {
+      "date": "20161025",
+      "profile": "C",
+      "budget": 0.1,
+      "routes": 9954,
+      "traffic_budget_allowed": 6018,
+      "traffic_budget_exceeded": 3936,
+      "allowed_with_unknown": 5965,
+      "mean_unknown_share": 0.09796327959112608,
+      "mean_low_support_share": 0.12031428786456003
+    },
+    {
+      "date": "20161025",
+      "profile": "M",
+      "budget": 0.0,
+      "routes": 9954,
+      "traffic_budget_allowed": 5903,
+      "traffic_budget_exceeded": 4051,
+      "allowed_with_unknown": 5832,
+      "mean_unknown_share": 0.09796327959112608,
+      "mean_low_support_share": 0.12031428786456003
+    },
+    {
+      "date": "20161025",
+      "profile": "M",
+      "budget": 0.05,
+      "routes": 9954,
+      "traffic_budget_allowed": 9767,
+      "traffic_budget_exceeded": 187,
+      "allowed_with_unknown": 9669,
+      "mean_unknown_share": 0.09796327959112608,
+      "mean_low_support_share": 0.12031428786456003
+    },
+    {
+      "date": "20161025",
+      "profile": "M",
+      "budget": 0.1,
+      "routes": 9954,
+      "traffic_budget_allowed": 9899,
+      "traffic_budget_exceeded": 55,
+      "allowed_with_unknown": 9795,
+      "mean_unknown_share": 0.09796327959112608,
+      "mean_low_support_share": 0.12031428786456003
+    },
+    {
+      "date": "20161025",
+      "profile": "A",
+      "budget": 0.0,
+      "routes": 9954,
+      "traffic_budget_allowed": 9954,
+      "traffic_budget_exceeded": 0,
+      "allowed_with_unknown": 9846,
+      "mean_unknown_share": 0.09796327959112608,
+      "mean_low_support_share": 0.12031428786456003
+    },
+    {
+      "date": "20161025",
+      "profile": "A",
+      "budget": 0.05,
+      "routes": 9954,
+      "traffic_budget_allowed": 9954,
+      "traffic_budget_exceeded": 0,
+      "allowed_with_unknown": 9846,
+      "mean_unknown_share": 0.09796327959112608,
+      "mean_low_support_share": 0.12031428786456003
+    },
+    {
+      "date": "20161025",
+      "profile": "A",
+      "budget": 0.1,
+      "routes": 9954,
+      "traffic_budget_allowed": 9954,
+      "traffic_budget_exceeded": 0,
+      "allowed_with_unknown": 9846,
+      "mean_unknown_share": 0.09796327959112608,
+      "mean_low_support_share": 0.12031428786456003
+    },
+    {
+      "date": "20161026",
+      "profile": "C",
+      "budget": 0.0,
+      "routes": 9946,
+      "traffic_budget_allowed": 1124,
+      "traffic_budget_exceeded": 8822,
+      "allowed_with_unknown": 1105,
+      "mean_unknown_share": 0.09805473493660313,
+      "mean_low_support_share": 0.1221991044792068
+    },
+    {
+      "date": "20161026",
+      "profile": "C",
+      "budget": 0.05,
+      "routes": 9946,
+      "traffic_budget_allowed": 4711,
+      "traffic_budget_exceeded": 5235,
+      "allowed_with_unknown": 4675,
+      "mean_unknown_share": 0.09805473493660313,
+      "mean_low_support_share": 0.1221991044792068
+    },
+    {
+      "date": "20161026",
+      "profile": "C",
+      "budget": 0.1,
+      "routes": 9946,
+      "traffic_budget_allowed": 6325,
+      "traffic_budget_exceeded": 3621,
+      "allowed_with_unknown": 6274,
+      "mean_unknown_share": 0.09805473493660313,
+      "mean_low_support_share": 0.1221991044792068
+    },
+    {
+      "date": "20161026",
+      "profile": "M",
+      "budget": 0.0,
+      "routes": 9946,
+      "traffic_budget_allowed": 5945,
+      "traffic_budget_exceeded": 4001,
+      "allowed_with_unknown": 5868,
+      "mean_unknown_share": 0.09805473493660313,
+      "mean_low_support_share": 0.1221991044792068
+    },
+    {
+      "date": "20161026",
+      "profile": "M",
+      "budget": 0.05,
+      "routes": 9946,
+      "traffic_budget_allowed": 9799,
+      "traffic_budget_exceeded": 147,
+      "allowed_with_unknown": 9699,
+      "mean_unknown_share": 0.09805473493660313,
+      "mean_low_support_share": 0.1221991044792068
+    },
+    {
+      "date": "20161026",
+      "profile": "M",
+      "budget": 0.1,
+      "routes": 9946,
+      "traffic_budget_allowed": 9895,
+      "traffic_budget_exceeded": 51,
+      "allowed_with_unknown": 9791,
+      "mean_unknown_share": 0.09805473493660313,
+      "mean_low_support_share": 0.1221991044792068
+    },
+    {
+      "date": "20161026",
+      "profile": "A",
+      "budget": 0.0,
+      "routes": 9946,
+      "traffic_budget_allowed": 9946,
+      "traffic_budget_exceeded": 0,
+      "allowed_with_unknown": 9842,
+      "mean_unknown_share": 0.09805473493660313,
+      "mean_low_support_share": 0.1221991044792068
+    },
+    {
+      "date": "20161026",
+      "profile": "A",
+      "budget": 0.05,
+      "routes": 9946,
+      "traffic_budget_allowed": 9946,
+      "traffic_budget_exceeded": 0,
+      "allowed_with_unknown": 9842,
+      "mean_unknown_share": 0.09805473493660313,
+      "mean_low_support_share": 0.1221991044792068
+    },
+    {
+      "date": "20161026",
+      "profile": "A",
+      "budget": 0.1,
+      "routes": 9946,
+      "traffic_budget_allowed": 9946,
+      "traffic_budget_exceeded": 0,
+      "allowed_with_unknown": 9842,
+      "mean_unknown_share": 0.09805473493660313,
+      "mean_low_support_share": 0.1221991044792068
+    },
+    {
+      "date": "20161027",
+      "profile": "C",
+      "budget": 0.0,
+      "routes": 9951,
+      "traffic_budget_allowed": 1105,
+      "traffic_budget_exceeded": 8846,
+      "allowed_with_unknown": 1087,
+      "mean_unknown_share": 0.09662892014048415,
+      "mean_low_support_share": 0.1215723377065174
+    },
+    {
+      "date": "20161027",
+      "profile": "C",
+      "budget": 0.05,
+      "routes": 9951,
+      "traffic_budget_allowed": 4449,
+      "traffic_budget_exceeded": 5502,
+      "allowed_with_unknown": 4412,
+      "mean_unknown_share": 0.09662892014048415,
+      "mean_low_support_share": 0.1215723377065174
+    },
+    {
+      "date": "20161027",
+      "profile": "C",
+      "budget": 0.1,
+      "routes": 9951,
+      "traffic_budget_allowed": 6147,
+      "traffic_budget_exceeded": 3804,
+      "allowed_with_unknown": 6097,
+      "mean_unknown_share": 0.09662892014048415,
+      "mean_low_support_share": 0.1215723377065174
+    },
+    {
+      "date": "20161027",
+      "profile": "M",
+      "budget": 0.0,
+      "routes": 9951,
+      "traffic_budget_allowed": 6011,
+      "traffic_budget_exceeded": 3940,
+      "allowed_with_unknown": 5927,
+      "mean_unknown_share": 0.09662892014048415,
+      "mean_low_support_share": 0.1215723377065174
+    },
+    {
+      "date": "20161027",
+      "profile": "M",
+      "budget": 0.05,
+      "routes": 9951,
+      "traffic_budget_allowed": 9793,
+      "traffic_budget_exceeded": 158,
+      "allowed_with_unknown": 9681,
+      "mean_unknown_share": 0.09662892014048415,
+      "mean_low_support_share": 0.1215723377065174
+    },
+    {
+      "date": "20161027",
+      "profile": "M",
+      "budget": 0.1,
+      "routes": 9951,
+      "traffic_budget_allowed": 9907,
+      "traffic_budget_exceeded": 44,
+      "allowed_with_unknown": 9789,
+      "mean_unknown_share": 0.09662892014048415,
+      "mean_low_support_share": 0.1215723377065174
+    },
+    {
+      "date": "20161027",
+      "profile": "A",
+      "budget": 0.0,
+      "routes": 9951,
+      "traffic_budget_allowed": 9951,
+      "traffic_budget_exceeded": 0,
+      "allowed_with_unknown": 9830,
+      "mean_unknown_share": 0.09662892014048415,
+      "mean_low_support_share": 0.1215723377065174
+    },
+    {
+      "date": "20161027",
+      "profile": "A",
+      "budget": 0.05,
+      "routes": 9951,
+      "traffic_budget_allowed": 9951,
+      "traffic_budget_exceeded": 0,
+      "allowed_with_unknown": 9830,
+      "mean_unknown_share": 0.09662892014048415,
+      "mean_low_support_share": 0.1215723377065174
+    },
+    {
+      "date": "20161027",
+      "profile": "A",
+      "budget": 0.1,
+      "routes": 9951,
+      "traffic_budget_allowed": 9951,
+      "traffic_budget_exceeded": 0,
+      "allowed_with_unknown": 9830,
+      "mean_unknown_share": 0.09662892014048415,
+      "mean_low_support_share": 0.1215723377065174
+    },
+    {
+      "date": "20161031",
+      "profile": "C",
+      "budget": 0.0,
+      "routes": 29864,
+      "traffic_budget_allowed": 4034,
+      "traffic_budget_exceeded": 25830,
+      "allowed_with_unknown": 3970,
+      "mean_unknown_share": 0.09868623978273687,
+      "mean_low_support_share": 0.12098141356161889
+    },
+    {
+      "date": "20161031",
+      "profile": "C",
+      "budget": 0.05,
+      "routes": 29864,
+      "traffic_budget_allowed": 16983,
+      "traffic_budget_exceeded": 12881,
+      "allowed_with_unknown": 16865,
+      "mean_unknown_share": 0.09868623978273687,
+      "mean_low_support_share": 0.12098141356161889
+    },
+    {
+      "date": "20161031",
+      "profile": "C",
+      "budget": 0.1,
+      "routes": 29864,
+      "traffic_budget_allowed": 21897,
+      "traffic_budget_exceeded": 7967,
+      "allowed_with_unknown": 21741,
+      "mean_unknown_share": 0.09868623978273687,
+      "mean_low_support_share": 0.12098141356161889
+    },
+    {
+      "date": "20161031",
+      "profile": "M",
+      "budget": 0.0,
+      "routes": 29864,
+      "traffic_budget_allowed": 18090,
+      "traffic_budget_exceeded": 11774,
+      "allowed_with_unknown": 17865,
+      "mean_unknown_share": 0.09868623978273687,
+      "mean_low_support_share": 0.12098141356161889
+    },
+    {
+      "date": "20161031",
+      "profile": "M",
+      "budget": 0.05,
+      "routes": 29864,
+      "traffic_budget_allowed": 29616,
+      "traffic_budget_exceeded": 248,
+      "allowed_with_unknown": 29315,
+      "mean_unknown_share": 0.09868623978273687,
+      "mean_low_support_share": 0.12098141356161889
+    },
+    {
+      "date": "20161031",
+      "profile": "M",
+      "budget": 0.1,
+      "routes": 29864,
+      "traffic_budget_allowed": 29777,
+      "traffic_budget_exceeded": 87,
+      "allowed_with_unknown": 29472,
+      "mean_unknown_share": 0.09868623978273687,
+      "mean_low_support_share": 0.12098141356161889
+    },
+    {
+      "date": "20161031",
+      "profile": "A",
+      "budget": 0.0,
+      "routes": 29864,
+      "traffic_budget_allowed": 29864,
+      "traffic_budget_exceeded": 0,
+      "allowed_with_unknown": 29557,
+      "mean_unknown_share": 0.09868623978273687,
+      "mean_low_support_share": 0.12098141356161889
+    },
+    {
+      "date": "20161031",
+      "profile": "A",
+      "budget": 0.05,
+      "routes": 29864,
+      "traffic_budget_allowed": 29864,
+      "traffic_budget_exceeded": 0,
+      "allowed_with_unknown": 29557,
+      "mean_unknown_share": 0.09868623978273687,
+      "mean_low_support_share": 0.12098141356161889
+    },
+    {
+      "date": "20161031",
+      "profile": "A",
+      "budget": 0.1,
+      "routes": 29864,
+      "traffic_budget_allowed": 29864,
+      "traffic_budget_exceeded": 0,
+      "allowed_with_unknown": 29557,
+      "mean_unknown_share": 0.09868623978273687,
+      "mean_low_support_share": 0.12098141356161889
+    }
+  ],
+  "sources": [
+    {
+      "path": "stage3\\output\\traffic_state_support\\tokens_date=20161025.parquet",
+      "sha256": "2e665ea5f7b6d71d30512dae88b70288144ff769fd7afa2b1e21dcdec9b5fbb1"
+    },
+    {
+      "path": "stage3\\output\\traffic_state_batch2\\route_overlap_date=20161025.parquet",
+      "sha256": "0d209a7f768f2ea72acdb8d54a38982a75e24d846f649101250e0f8017801b15"
+    },
+    {
+      "path": "stage3\\output\\traffic_state_support\\tokens_date=20161026.parquet",
+      "sha256": "0e49d135e3e8e3d9e3a6d460e91f309c453199119b4e8080798a9a8990e860eb"
+    },
+    {
+      "path": "stage3\\output\\traffic_state_batch2\\route_overlap_date=20161026.parquet",
+      "sha256": "cb579ab6525b52a2e05f0edeb9e75fdd039d300e4e56cbfbd5eadd7930966a6b"
+    },
+    {
+      "path": "stage3\\output\\traffic_state_support\\tokens_date=20161027.parquet",
+      "sha256": "939fc1bed2e74fe5472d2bdc2ba81282a9d504b580b809a5e58d5e31cb28d911"
+    },
+    {
+      "path": "stage3\\output\\traffic_state_batch2\\route_overlap_date=20161027.parquet",
+      "sha256": "e5dafac7706e9a8af1ec431f0f66e0c361e84cff0c87357bc87483848286a44e"
+    },
+    {
+      "path": "stage3\\output\\odd_tod\\s4\\test31_m3_predictions.parquet",
+      "sha256": "96855b6bc291f5743e5966ef4b71af41952eaf3fc69bbcb345b73219a06931c7"
+    },
+    {
+      "path": "stage2\\output_v4\\route_conditioned_dataset\\revealed_route_proxy\\day=20161031.parquet",
+      "sha256": "9da0bc2fc0b676d6eac3f5cfb9398bf5103ecadae31f8f2be611f36774f10c9f"
+    },
+    {
+      "path": "stage3\\output\\odd_tod\\s4\\test31_original_route_descriptors.parquet",
+      "sha256": "d28cdae5995a6a8b839993ae92f1395da33088a0d9c559bf82b18c64fbae2ef4"
+    }
+  ],
+  "protected_sha256": {
+    "stage3\\config\\stage3_av_capability_profiles.json": "bea54c12a0c013995c3644a0bab84b35413d5df8a6785dfdd6a03fd49f32978e",
+    "stage3\\config\\traffic_state_batch1.json": "5064c16767aa6017bb3bd519f675e7e1e2c9d48616b07ac25a215a76bb4238fa",
+    "stage3\\output\\traffic_state_batch1\\train_reference.parquet": "a82186c02cb4d9fb515d629c982b131bf3220ee946fa8427b2a6c1bdbb17f6c3"
+  },
+  "profile_modified": false,
+  "new_inference": false,
+  "interpretation": "Traffic-budget counts only; Gamma and other eligibility conditions not evaluated"
+}

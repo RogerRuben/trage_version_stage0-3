@@ -1,0 +1,32 @@
+{
+  "status": "FIXED_STATE_RT_COMPLETE",
+  "physical_states": 4,
+  "variants": 4,
+  "comparisons": 16,
+  "root_request_count": 30000,
+  "recovered_parameters_sha256": "bbaf84dbc7caf09c3557c0ba93db39a7b5454645174e64494494738cc3c87018",
+  "canonical_sources": [
+    {
+      "scenario_id": "ODD_Q50_M_P70_REFERENCE",
+      "config_sha256": "3fdf2cf53c04ee3262d6060c318e468426d77321b4ef9e8e4a3483b639f3bbe4",
+      "assignment_log_sha256": "77bc76ba02a42988c5546af6d95e577f90f7ce2b8a2b76c8009fd637ffcca69c"
+    },
+    {
+      "scenario_id": "MAIN_Q75_M_P70",
+      "config_sha256": "9f68bccc06e1ec0ccd32fea88d4b4408a1351a43bcdd65dfe002bc18e495f1cf",
+      "assignment_log_sha256": "b1adc849cc3c20779eabd558b41247a26ca063f4551934bfb9c8222058093beb"
+    }
+  ],
+  "full_day_simulation": false,
+  "vehicle_progression": false,
+  "prediction_reinference": false,
+  "solver_executed": false,
+  "conditioning": "canonical prior assignments and physical vehicle state retained; no counterfactual history",
+  "descriptor_caveat": "Frozen route descriptors are held constant, not asserted to be available at the earlier RT release.",
+  "carry_over": "waiting membership and failed-round proxy are derived from release using the unchanged 30s/300s rules",
+  "expired_orders": "NOT_ESTIMATED: canonical assignment history is not an RT counterfactual history",
+  "timestamp_precision": "original microsecond request timestamp retained; fixed-state analysis does not quantize to integer seconds",
+  "routing_arcs": 5979,
+  "routing_failures": 0,
+  "runtime_s": 54.707010599995556
+}

@@ -1,0 +1,142 @@
+[
+  {
+    "epoch_id": "0730",
+    "witness_role": "BASELINE",
+    "reason_kind": "remaining_unknown",
+    "reason": "MOVEMENT_LOOKUP_UNRESOLVED",
+    "arc_occurrences": 7
+  },
+  {
+    "epoch_id": "0730",
+    "witness_role": "BASELINE",
+    "reason_kind": "remaining_unknown",
+    "reason": "UNRESOLVED_ROUTE_IDENTITY",
+    "arc_occurrences": 1
+  },
+  {
+    "epoch_id": "0730",
+    "witness_role": "A1_ALTERNATIVE",
+    "reason_kind": "remaining_unknown",
+    "reason": "MOVEMENT_LOOKUP_UNRESOLVED",
+    "arc_occurrences": 7
+  },
+  {
+    "epoch_id": "0730",
+    "witness_role": "A1_ALTERNATIVE",
+    "reason_kind": "remaining_unknown",
+    "reason": "UNRESOLVED_ROUTE_IDENTITY",
+    "arc_occurrences": 1
+  },
+  {
+    "epoch_id": "0830",
+    "witness_role": "BASELINE",
+    "reason_kind": "remaining_hard",
+    "reason": "UTURN_PROFILE_INCOMPATIBLE",
+    "arc_occurrences": 1
+  },
+  {
+    "epoch_id": "0830",
+    "witness_role": "BASELINE",
+    "reason_kind": "remaining_unknown",
+    "reason": "MOVEMENT_LOOKUP_UNRESOLVED",
+    "arc_occurrences": 7
+  },
+  {
+    "epoch_id": "0830",
+    "witness_role": "BASELINE",
+    "reason_kind": "remaining_unknown",
+    "reason": "UNRESOLVED_ROUTE_IDENTITY",
+    "arc_occurrences": 1
+  },
+  {
+    "epoch_id": "0830",
+    "witness_role": "A1_ALTERNATIVE",
+    "reason_kind": "remaining_hard",
+    "reason": "UTURN_PROFILE_INCOMPATIBLE",
+    "arc_occurrences": 1
+  },
+  {
+    "epoch_id": "0830",
+    "witness_role": "A1_ALTERNATIVE",
+    "reason_kind": "remaining_unknown",
+    "reason": "MOVEMENT_LOOKUP_UNRESOLVED",
+    "arc_occurrences": 8
+  },
+  {
+    "epoch_id": "0830",
+    "witness_role": "A1_ALTERNATIVE",
+    "reason_kind": "remaining_unknown",
+    "reason": "UNRESOLVED_ROUTE_IDENTITY",
+    "arc_occurrences": 1
+  },
+  {
+    "epoch_id": "1300",
+    "witness_role": "BASELINE",
+    "reason_kind": "remaining_unknown",
+    "reason": "MOVEMENT_LOOKUP_UNRESOLVED",
+    "arc_occurrences": 7
+  },
+  {
+    "epoch_id": "1300",
+    "witness_role": "A1_ALTERNATIVE",
+    "reason_kind": "remaining_unknown",
+    "reason": "MOVEMENT_LOOKUP_UNRESOLVED",
+    "arc_occurrences": 8
+  },
+  {
+    "epoch_id": "1800",
+    "witness_role": "BASELINE",
+    "reason_kind": "remaining_unknown",
+    "reason": "MOVEMENT_LOOKUP_UNRESOLVED",
+    "arc_occurrences": 5
+  },
+  {
+    "epoch_id": "1800",
+    "witness_role": "A1_ALTERNATIVE",
+    "reason_kind": "remaining_unknown",
+    "reason": "MOVEMENT_LOOKUP_UNRESOLVED",
+    "arc_occurrences": 5
+  },
+  {
+    "epoch_id": "1830",
+    "witness_role": "BASELINE",
+    "reason_kind": "remaining_hard",
+    "reason": "UTURN_PROFILE_INCOMPATIBLE",
+    "arc_occurrences": 1
+  },
+  {
+    "epoch_id": "1830",
+    "witness_role": "BASELINE",
+    "reason_kind": "remaining_unknown",
+    "reason": "MOVEMENT_LOOKUP_UNRESOLVED",
+    "arc_occurrences": 2
+  },
+  {
+    "epoch_id": "1830",
+    "witness_role": "BASELINE",
+    "reason_kind": "remaining_unknown",
+    "reason": "UNRESOLVED_ROUTE_IDENTITY",
+    "arc_occurrences": 2
+  },
+  {
+    "epoch_id": "1830",
+    "witness_role": "A1_ALTERNATIVE",
+    "reason_kind": "remaining_hard",
+    "reason": "UTURN_PROFILE_INCOMPATIBLE",
+    "arc_occurrences": 1
+  },
+  {
+    "epoch_id": "1830",
+    "witness_role": "A1_ALTERNATIVE",
+    "reason_kind": "remaining_unknown",
+    "reason": "MOVEMENT_LOOKUP_UNRESOLVED",
+    "arc_occurrences": 2
+  },
+  {
+    "epoch_id": "1830",
+    "witness_role": "A1_ALTERNATIVE",
+    "reason_kind": "remaining_unknown",
+    "reason": "UNRESOLVED_ROUTE_IDENTITY",
+    "arc_occurrences": 2
+  }
+]

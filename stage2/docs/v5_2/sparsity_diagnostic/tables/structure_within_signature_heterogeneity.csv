@@ -1,0 +1,5 @@
+target,minimum_valid_traversals_per_cell,minimum_cells_per_signature,eligible_signature_count,eligible_cell_count,median_within_signature_target_mean_std,median_within_signature_target_mean_range,median_within_signature_m1_mae_std,median_within_signature_m1_mae_range
+crawl,5,2,166,52756,0.17351606342644316,0.5878105167299509,0.1251000852319965,0.424384952057153
+stop,5,2,166,52756,0.0,0.0,0.002919972832835508,0.010677103433893838
+speed_cv,5,2,139,35784,0.03626556878597779,0.13120447075925767,0.01822173818193433,0.07096146259989058
+acceleration_rms,5,2,110,23926,0.064805521565057,0.23595115542411804,0.033989437350806076,0.12896940012772878

@@ -1,0 +1,16 @@
+{
+  "shadow_reconciliation": "PASS",
+  "production_movement_repair_gate": "NOT_ESTABLISHED",
+  "tests_passed": 6,
+  "compileall": "PASS",
+  "diff_check": "PASS",
+  "endpoint_sides_reconciled": 176,
+  "original_encounters_retained": 391,
+  "unique_movement_keys_retained": 117,
+  "movement_repairs": 0,
+  "unknowns_silently_dropped": 0,
+  "clustering_modified": false,
+  "frozen_membership_modified": false,
+  "production_interface_modified": false,
+  "private_order_details_published": false
+}

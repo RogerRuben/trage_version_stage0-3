@@ -1,0 +1,10 @@
+{
+  "schema_version": "stage2_v5_2_deprecated_redirect.1",
+  "status": "DEPRECATED_NOT_A_RELEASE",
+  "deprecated_reason": "The previous file was a Phase B1 status summary, not a formal Stage 2 release manifest.",
+  "replacement_path": "stage2/docs/v5_2/stage2_v5_2_status_manifest.json",
+  "formal_release_schema": "stage2_v5_2_release_manifest.3",
+  "formal_release_command": "build-release-manifest",
+  "formal_release_authorization": "PHASE_D_COMPLETE",
+  "phase_c_authorized": false
+}

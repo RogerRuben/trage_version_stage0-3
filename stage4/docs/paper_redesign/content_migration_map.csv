@@ -1,0 +1,30 @@
+current_content,current_location,action,target_location,rationale
+Mixed-fleet motivation,Introduction paragraphs 1-2,KEEP,Introduction moves 1-2,Retains the operational problem but connects it to prospective knowledge
+Existing literature themes,Literature review,MOVE,Literature review expanded themes,Add prediction-to-decision and repositioning strands after citation verification
+Central question and three RQs,Introduction,KEEP,Introduction final third,Already coherent with strengthened storyline
+Four contribution list,Introduction,EXPAND,Introduction contribution paragraph,Recover network/indicator/prediction chain without adding unsupported novelty
+Dynamic order and patience setting,Problem description,KEEP,Section 3.2 mixed-fleet process,Core service process remains unchanged
+Notation summary,Problem description,APPENDIX,Notation table plus essential inline definitions,Reduce interruption of empirical-system narrative
+Route-suitability interface,Methodology 4.1,EXPAND,Methodology 4.4,Retain strong emphasis and connect prediction outputs to decision variables
+Fleet reconstruction,Methodology 4.2,MOVE,Methodology 4.5,Place after suitability and before assignment
+Passenger acceptance,Methodology 4.3,MOVE,Methodology 4.5,Combine mixed-fleet eligibility mechanisms while preserving p_A/a_o_A distinction
+Sparse assignment constraints,Methodology 4.4,MOVE,Methodology 4.6,Remain a central optimization contribution
+Family Gamma equation,Methodology 4.5,EXPAND,Methodology 4.6 plus theory notes,Add formal guarantees and non-compensation argument
+Lexicographic solve and cost,Methodology 4.6,KEEP,Methodology 4.6,Preserve exact hierarchy; keep cost secondary
+Directed map matching,Current appendix mention,EXPAND,Methodology 4.1,Recover scientific role of physical directed grounding
+Operational indicator definitions,Current appendix mention,EXPAND,Methodology 4.2,Show what dynamic quantities mean and how they are observed
+Deep prediction,Current brief route-interface prose,EXPAND,Methodology 4.3,Explain prospective information and leakage boundary; final emphasis conditional on ablation
+FleetPy/Valhalla implementation,Methodology 4.6,COMPRESS,Methodology 4.7,Describe counterfactual mechanics without software-report framing
+Main factorial design,Experimental design,KEEP,Experimental design baseline subsection,Frozen canonical experiment remains primary
+Benchmark design,Experimental design,KEEP,Experimental design baseline subsection,Preserve all-HV and composition-extreme semantics
+Single REFERENCE comparison,Experimental design and Results,EXPAND,Experimental design robustness plus Results frontier,Place calibrated point in predeclared broader frontier
+Cost robustness,Results 6.6,APPENDIX,Appendix robustness,Secondary to three RQs
+Fleet-penetration result,Results 6.1,KEEP,Results baseline subsection,Canonical RQ1 evidence
+Temporal anchor mechanism,Results 6.3,EXPAND,Results baseline plus gate decomposition,Move from indirect evidence toward observable attrition
+Acceptance/capability interaction,Results 6.2,KEEP,Results baseline subsection,Canonical RQ2 evidence
+Family activity,Results 6.4,KEEP,Results baseline subsection,Core multi-dimensional suitability result
+ODD policy point,Results 6.5,MOVE,Results frontier subsection,Do not overgeneralize from one point
+Current discussion,Discussion 7.1-7.6,COMPRESS,Discussion after robustness,Rewrite only after P0 decision classifications
+Managerial implications,Section 8,KEEP,Discussion and managerial implications,Update conditions after repositioning and prediction results
+Limitations,Section 9,EXPAND,Limitations,Add enhancement-specific assumptions and maintain safety/causal boundaries
+Conclusion,Section 10,DELETE,Future manuscript v2 conclusion,Must be rewritten only after P0 findings

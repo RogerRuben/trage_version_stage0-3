@@ -1,0 +1,460 @@
+{
+  "rows": [
+    {
+      "date": "20161009",
+      "reason": "insufficient_joint_orders",
+      "cells": 77426,
+      "denominator": 108207
+    },
+    {
+      "date": "20161009",
+      "reason": "insufficient_reference",
+      "cells": 8343,
+      "denominator": 108207
+    },
+    {
+      "date": "20161009",
+      "reason": "insufficient_event_span",
+      "cells": 63470,
+      "denominator": 108207
+    },
+    {
+      "date": "20161009",
+      "reason": "stale_or_no_joint_evidence",
+      "cells": 54190,
+      "denominator": 108207
+    },
+    {
+      "date": "20161010",
+      "reason": "insufficient_joint_orders",
+      "cells": 76626,
+      "denominator": 107589
+    },
+    {
+      "date": "20161010",
+      "reason": "insufficient_reference",
+      "cells": 8207,
+      "denominator": 107589
+    },
+    {
+      "date": "20161010",
+      "reason": "insufficient_event_span",
+      "cells": 63021,
+      "denominator": 107589
+    },
+    {
+      "date": "20161010",
+      "reason": "stale_or_no_joint_evidence",
+      "cells": 53942,
+      "denominator": 107589
+    },
+    {
+      "date": "20161011",
+      "reason": "insufficient_joint_orders",
+      "cells": 76910,
+      "denominator": 108259
+    },
+    {
+      "date": "20161011",
+      "reason": "insufficient_reference",
+      "cells": 8138,
+      "denominator": 108259
+    },
+    {
+      "date": "20161011",
+      "reason": "insufficient_event_span",
+      "cells": 63344,
+      "denominator": 108259
+    },
+    {
+      "date": "20161011",
+      "reason": "stale_or_no_joint_evidence",
+      "cells": 55092,
+      "denominator": 108259
+    },
+    {
+      "date": "20161012",
+      "reason": "insufficient_joint_orders",
+      "cells": 77993,
+      "denominator": 108546
+    },
+    {
+      "date": "20161012",
+      "reason": "insufficient_reference",
+      "cells": 8549,
+      "denominator": 108546
+    },
+    {
+      "date": "20161012",
+      "reason": "insufficient_event_span",
+      "cells": 64086,
+      "denominator": 108546
+    },
+    {
+      "date": "20161012",
+      "reason": "stale_or_no_joint_evidence",
+      "cells": 54193,
+      "denominator": 108546
+    },
+    {
+      "date": "20161013",
+      "reason": "insufficient_joint_orders",
+      "cells": 77189,
+      "denominator": 108428
+    },
+    {
+      "date": "20161013",
+      "reason": "insufficient_reference",
+      "cells": 8284,
+      "denominator": 108428
+    },
+    {
+      "date": "20161013",
+      "reason": "insufficient_event_span",
+      "cells": 63424,
+      "denominator": 108428
+    },
+    {
+      "date": "20161013",
+      "reason": "stale_or_no_joint_evidence",
+      "cells": 53818,
+      "denominator": 108428
+    },
+    {
+      "date": "20161014",
+      "reason": "insufficient_joint_orders",
+      "cells": 78169,
+      "denominator": 109191
+    },
+    {
+      "date": "20161014",
+      "reason": "insufficient_reference",
+      "cells": 8831,
+      "denominator": 109191
+    },
+    {
+      "date": "20161014",
+      "reason": "insufficient_event_span",
+      "cells": 64132,
+      "denominator": 109191
+    },
+    {
+      "date": "20161014",
+      "reason": "stale_or_no_joint_evidence",
+      "cells": 54844,
+      "denominator": 109191
+    },
+    {
+      "date": "20161015",
+      "reason": "insufficient_joint_orders",
+      "cells": 77185,
+      "denominator": 107735
+    },
+    {
+      "date": "20161015",
+      "reason": "insufficient_reference",
+      "cells": 8359,
+      "denominator": 107735
+    },
+    {
+      "date": "20161015",
+      "reason": "insufficient_event_span",
+      "cells": 63658,
+      "denominator": 107735
+    },
+    {
+      "date": "20161015",
+      "reason": "stale_or_no_joint_evidence",
+      "cells": 53758,
+      "denominator": 107735
+    },
+    {
+      "date": "20161016",
+      "reason": "insufficient_joint_orders",
+      "cells": 76104,
+      "denominator": 107568
+    },
+    {
+      "date": "20161016",
+      "reason": "insufficient_reference",
+      "cells": 8005,
+      "denominator": 107568
+    },
+    {
+      "date": "20161016",
+      "reason": "insufficient_event_span",
+      "cells": 62630,
+      "denominator": 107568
+    },
+    {
+      "date": "20161016",
+      "reason": "stale_or_no_joint_evidence",
+      "cells": 53616,
+      "denominator": 107568
+    },
+    {
+      "date": "20161017",
+      "reason": "insufficient_joint_orders",
+      "cells": 75648,
+      "denominator": 106529
+    },
+    {
+      "date": "20161017",
+      "reason": "insufficient_reference",
+      "cells": 8043,
+      "denominator": 106529
+    },
+    {
+      "date": "20161017",
+      "reason": "insufficient_event_span",
+      "cells": 62200,
+      "denominator": 106529
+    },
+    {
+      "date": "20161017",
+      "reason": "stale_or_no_joint_evidence",
+      "cells": 52448,
+      "denominator": 106529
+    },
+    {
+      "date": "20161018",
+      "reason": "insufficient_joint_orders",
+      "cells": 77091,
+      "denominator": 108486
+    },
+    {
+      "date": "20161018",
+      "reason": "insufficient_reference",
+      "cells": 8420,
+      "denominator": 108486
+    },
+    {
+      "date": "20161018",
+      "reason": "insufficient_event_span",
+      "cells": 63129,
+      "denominator": 108486
+    },
+    {
+      "date": "20161018",
+      "reason": "stale_or_no_joint_evidence",
+      "cells": 54426,
+      "denominator": 108486
+    },
+    {
+      "date": "20161019",
+      "reason": "insufficient_joint_orders",
+      "cells": 76167,
+      "denominator": 107465
+    },
+    {
+      "date": "20161019",
+      "reason": "insufficient_reference",
+      "cells": 8056,
+      "denominator": 107465
+    },
+    {
+      "date": "20161019",
+      "reason": "insufficient_event_span",
+      "cells": 62585,
+      "denominator": 107465
+    },
+    {
+      "date": "20161019",
+      "reason": "stale_or_no_joint_evidence",
+      "cells": 53245,
+      "denominator": 107465
+    },
+    {
+      "date": "20161020",
+      "reason": "insufficient_joint_orders",
+      "cells": 77108,
+      "denominator": 108594
+    },
+    {
+      "date": "20161020",
+      "reason": "insufficient_reference",
+      "cells": 8361,
+      "denominator": 108594
+    },
+    {
+      "date": "20161020",
+      "reason": "insufficient_event_span",
+      "cells": 63278,
+      "denominator": 108594
+    },
+    {
+      "date": "20161020",
+      "reason": "stale_or_no_joint_evidence",
+      "cells": 54176,
+      "denominator": 108594
+    },
+    {
+      "date": "20161021",
+      "reason": "insufficient_joint_orders",
+      "cells": 79152,
+      "denominator": 110598
+    },
+    {
+      "date": "20161021",
+      "reason": "insufficient_reference",
+      "cells": 8699,
+      "denominator": 110598
+    },
+    {
+      "date": "20161021",
+      "reason": "insufficient_event_span",
+      "cells": 65112,
+      "denominator": 110598
+    },
+    {
+      "date": "20161021",
+      "reason": "stale_or_no_joint_evidence",
+      "cells": 55149,
+      "denominator": 110598
+    },
+    {
+      "date": "20161022",
+      "reason": "insufficient_joint_orders",
+      "cells": 80347,
+      "denominator": 111292
+    },
+    {
+      "date": "20161022",
+      "reason": "insufficient_reference",
+      "cells": 9078,
+      "denominator": 111292
+    },
+    {
+      "date": "20161022",
+      "reason": "insufficient_event_span",
+      "cells": 66002,
+      "denominator": 111292
+    },
+    {
+      "date": "20161022",
+      "reason": "stale_or_no_joint_evidence",
+      "cells": 56501,
+      "denominator": 111292
+    },
+    {
+      "date": "20161023",
+      "reason": "insufficient_joint_orders",
+      "cells": 77448,
+      "denominator": 108204
+    },
+    {
+      "date": "20161023",
+      "reason": "insufficient_reference",
+      "cells": 8429,
+      "denominator": 108204
+    },
+    {
+      "date": "20161023",
+      "reason": "insufficient_event_span",
+      "cells": 63874,
+      "denominator": 108204
+    },
+    {
+      "date": "20161023",
+      "reason": "stale_or_no_joint_evidence",
+      "cells": 54322,
+      "denominator": 108204
+    },
+    {
+      "date": "20161024",
+      "reason": "insufficient_joint_orders",
+      "cells": 79378,
+      "denominator": 109847
+    },
+    {
+      "date": "20161024",
+      "reason": "insufficient_reference",
+      "cells": 9042,
+      "denominator": 109847
+    },
+    {
+      "date": "20161024",
+      "reason": "insufficient_event_span",
+      "cells": 65528,
+      "denominator": 109847
+    },
+    {
+      "date": "20161024",
+      "reason": "stale_or_no_joint_evidence",
+      "cells": 55665,
+      "denominator": 109847
+    },
+    {
+      "date": "20161025",
+      "reason": "insufficient_joint_orders",
+      "cells": 79404,
+      "denominator": 109730
+    },
+    {
+      "date": "20161025",
+      "reason": "insufficient_reference",
+      "cells": 9121,
+      "denominator": 109730
+    },
+    {
+      "date": "20161025",
+      "reason": "insufficient_event_span",
+      "cells": 65420,
+      "denominator": 109730
+    },
+    {
+      "date": "20161025",
+      "reason": "stale_or_no_joint_evidence",
+      "cells": 55768,
+      "denominator": 109730
+    },
+    {
+      "date": "20161026",
+      "reason": "insufficient_joint_orders",
+      "cells": 79086,
+      "denominator": 109805
+    },
+    {
+      "date": "20161026",
+      "reason": "insufficient_reference",
+      "cells": 9136,
+      "denominator": 109805
+    },
+    {
+      "date": "20161026",
+      "reason": "insufficient_event_span",
+      "cells": 65267,
+      "denominator": 109805
+    },
+    {
+      "date": "20161026",
+      "reason": "stale_or_no_joint_evidence",
+      "cells": 55127,
+      "denominator": 109805
+    },
+    {
+      "date": "20161027",
+      "reason": "insufficient_joint_orders",
+      "cells": 79711,
+      "denominator": 109979
+    },
+    {
+      "date": "20161027",
+      "reason": "insufficient_reference",
+      "cells": 9201,
+      "denominator": 109979
+    },
+    {
+      "date": "20161027",
+      "reason": "insufficient_event_span",
+      "cells": 65599,
+      "denominator": 109979
+    },
+    {
+      "date": "20161027",
+      "reason": "stale_or_no_joint_evidence",
+      "cells": 55699,
+      "denominator": 109979
+    }
+  ]
+}

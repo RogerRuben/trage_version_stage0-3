@@ -1,0 +1,32 @@
+{
+  "buckets": {
+    "train": {
+      "label_path": "stage1/output_v3/split=train/date=20161009/bucket=00008/traversal_labels.parquet",
+      "label_sha256": "ef01e317a390c796fe21c11e8c64102ea41a91df7215c32850f3aec2bb060019",
+      "labelled_direct_traversal_count": 4457,
+      "missing_direct_label_count": 0,
+      "non_direct_without_label_count": 7812,
+      "orphan_label_count": 0,
+      "reconciliation_mismatch_count": 0,
+      "traversal_path": "stage1/input_v1/split=train/date=20161009/bucket=00008/link_traversals.parquet",
+      "traversal_sha256": "f672f3d57032e8dd643e30397a4db8fd74204add867eb9c52c265a2ae56440dd",
+      "unique_traversal_count": 12269
+    },
+    "validation": {
+      "label_path": "stage1/output_v3/split=train/date=20161019/bucket=00008/traversal_labels.parquet",
+      "label_sha256": "92eb9a98b7a0d6f259acc771f3385a40966f4e745be5ba1dedab83e9501a51cf",
+      "labelled_direct_traversal_count": 6533,
+      "missing_direct_label_count": 0,
+      "non_direct_without_label_count": 11095,
+      "orphan_label_count": 0,
+      "reconciliation_mismatch_count": 0,
+      "traversal_path": "stage1/input_v1/split=train/date=20161019/bucket=00008/link_traversals.parquet",
+      "traversal_sha256": "c1f8f6493d6ed5c4c9e4c52e7a3fe85b9ee71fd427f7f15fa5a3219ea57151e7",
+      "unique_traversal_count": 17628
+    }
+  },
+  "full_protocol_scanned": false,
+  "schema_version": "stage2_v5_2_phase_b0_one_bucket_correctness.1",
+  "scope": "one_explicit_train_bucket_plus_one_explicit_validation_bucket",
+  "status": "PASS"
+}

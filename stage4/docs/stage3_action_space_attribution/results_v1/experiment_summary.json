@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "condition_states": 50,
+  "endpoints": 100,
+  "routing_keys": 16386,
+  "routing_calls": 0,
+  "Gamma": "OFF",
+  "cost": "OFF",
+  "runtime_s": 81.75879590000113,
+  "internally_sampled_peak_rss_mib": 283.171875,
+  "union_reconciled": true,
+  "all_MILPs_certified": true,
+  "all_witnesses_verified": true
+}

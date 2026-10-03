@@ -1,0 +1,40 @@
+{
+  "schema_version": "stage2_v5_2_phase_c_authorization.1",
+  "status": "PASS",
+  "authorization": "PHASE_C",
+  "authorization_base_commit": "f64d7fd6ab58f9d82a7bb54e97624b0d4c23b84a",
+  "b1_frozen": {
+    "commit": "f64d7fd6ab58f9d82a7bb54e97624b0d4c23b84a",
+    "config_path": "stage2/config/stage2_v5_2.json",
+    "config_sha256": "5e496cd79c569fe1847811fdac13434a5c83afbb90bf744e25dfb829133cf29c",
+    "evidence_bundle_path": "stage2/docs/v5_2/stage2_v5_2_phase_b1_evidence_bundle.json",
+    "evidence_bundle_sha256": "e44629ed30ac86d951012e438d8448eed7fe226edaa915ea6d5305322765d934"
+  },
+  "b1_execution": {
+    "commit": "876f41ea0f879d57ef4e7d8e2e09113bcb855a54",
+    "config_path": "stage2/config/stage2_v5_2.json",
+    "config_sha256": "9fa69c652a6680014fca3d3cdaee19f06934a42b63de217fab0380118e14d67d"
+  },
+  "tau_freeze": {
+    "path": "stage2/output_v5_2/transfer_tuning/stage2_v5_2_tau_freeze.json",
+    "sha256": "5900d6184d151d8093528f1fa04a1afd73a75d07fd0187da7da22abdb44296ec",
+    "selected_candidate": "p25",
+    "selected_tau": 3.0,
+    "reselection_allowed": false
+  },
+  "development_protocol": {
+    "protocol_id": "development",
+    "protocol_sha256": "725a71e76c4685f3a8ba0b0b584a9e10b29df426723a11313cf3a89b2bac6790",
+    "train_dates": [
+      "20161009", "20161010", "20161011", "20161012", "20161013",
+      "20161014", "20161015", "20161016", "20161017", "20161018",
+      "20161019", "20161020", "20161021"
+    ],
+    "validation_dates": ["20161022", "20161023"],
+    "calibration_dates": ["20161024"],
+    "evaluation_dates": ["20161025", "20161026", "20161027"]
+  },
+  "allowed_models": ["M0", "M1", "M2", "M3", "M4"],
+  "forbidden_models": ["M4-p50", "M4-p75", "M5", "M6"],
+  "phase_d_authorized": false
+}

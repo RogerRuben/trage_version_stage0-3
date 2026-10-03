@@ -1,0 +1,118 @@
+{
+  "admission_metrics_modified": false,
+  "dates": [
+    {
+      "date": "20161026",
+      "diagnostic_mae_excluding_predictions_above_1_sec_per_m": 0.02870223834484734,
+      "largest_row_mae_contribution": 0.03176996320682453,
+      "largest_row_share_of_reported_mae": 0.5247423899451752,
+      "maximum_prediction_sec_per_m": 7584.0498046875,
+      "prediction_count_above_10_sec_per_m": 1,
+      "prediction_count_above_1_sec_per_m": 4,
+      "reported_mean_mae": 0.06054392367680423,
+      "valid_count": 238711
+    },
+    {
+      "date": "20161027",
+      "diagnostic_mae_excluding_predictions_above_1_sec_per_m": 0.028302850390741856,
+      "largest_row_mae_contribution": 1.0053045192929443e-05,
+      "largest_row_share_of_reported_mae": 0.00035499644206820187,
+      "maximum_prediction_sec_per_m": 2.737701654434204,
+      "prediction_count_above_10_sec_per_m": 0,
+      "prediction_count_above_1_sec_per_m": 3,
+      "reported_mean_mae": 0.02831872098311919,
+      "valid_count": 237196
+    }
+  ],
+  "interpretation": "The frozen log-normal mean is highly sensitive to a single large predicted scale on 20161026; this diagnostic is explanatory only and the preregistered MAE is unchanged.",
+  "largest_predictions": [
+    {
+      "allocated_distance_m": 25.0440731048584,
+      "date": "20161026",
+      "implied_log_normal_sigma": 4.060747977270402,
+      "order_id": "3f3b2414e5b64e377b0d08b51ede19fb",
+      "pace_log_mu": 0.68896484375,
+      "pace_log_scale": 1.4013671875,
+      "pace_pred_mean": 7584.0498046875,
+      "pace_pred_p50": 1.9916527271270752,
+      "pace_sec_per_m": 0.2101176232099533,
+      "route_sequence": 1.0,
+      "service_time_availability_probability": 0.254150390625,
+      "traversal_id": 1.0
+    },
+    {
+      "allocated_distance_m": 116.43846893310547,
+      "date": "20161026",
+      "implied_log_normal_sigma": 2.4895684320673226,
+      "order_id": "a488617fb821be8cd7eeb6c6f18b7533",
+      "pace_log_mu": -0.87890625,
+      "pace_log_scale": 0.912109375,
+      "pace_pred_mean": 9.20797061920166,
+      "pace_pred_p50": 0.41523683071136475,
+      "pace_sec_per_m": 0.08092644810676575,
+      "route_sequence": 44.0,
+      "service_time_availability_probability": 0.293212890625,
+      "traversal_id": 44.0
+    },
+    {
+      "allocated_distance_m": 11.0,
+      "date": "20161026",
+      "implied_log_normal_sigma": 2.2767611988694902,
+      "order_id": "c53aee6305a03f53b91bb93a284d073b",
+      "pace_log_mu": -0.453125,
+      "pace_log_scale": 0.82275390625,
+      "pace_pred_mean": 8.488357543945312,
+      "pace_pred_p50": 0.6356386542320251,
+      "pace_sec_per_m": 15.944055557250977,
+      "route_sequence": 0.0,
+      "service_time_availability_probability": 0.285888671875,
+      "traversal_id": 0.0
+    },
+    {
+      "allocated_distance_m": 57.0,
+      "date": "20161027",
+      "implied_log_normal_sigma": 1.8555182971413586,
+      "order_id": "174ec9713fcf72a0414991ac589f8a89",
+      "pace_log_mu": -0.71435546875,
+      "pace_log_scale": 0.6181640625,
+      "pace_pred_mean": 2.737701654434204,
+      "pace_pred_p50": 0.4895075261592865,
+      "pace_sec_per_m": 0.3531595468521118,
+      "route_sequence": 68.0,
+      "service_time_availability_probability": 0.330322265625,
+      "traversal_id": 68.0
+    },
+    {
+      "allocated_distance_m": 161.0,
+      "date": "20161027",
+      "implied_log_normal_sigma": 1.5059498491484788,
+      "order_id": "8490c8705a21d03853868bb55322006c",
+      "pace_log_mu": -0.93359375,
+      "pace_log_scale": 0.409423828125,
+      "pace_pred_mean": 1.221828818321228,
+      "pace_pred_p50": 0.3931383490562439,
+      "pace_sec_per_m": 0.10355231910943985,
+      "route_sequence": 7.0,
+      "service_time_availability_probability": 0.80419921875,
+      "traversal_id": 7.0
+    },
+    {
+      "allocated_distance_m": 14.0,
+      "date": "20161027",
+      "implied_log_normal_sigma": 1.3001129845392871,
+      "order_id": "01a91a92c16484a398e9468b26608be5",
+      "pace_log_mu": -0.7744140625,
+      "pace_log_scale": 0.262451171875,
+      "pace_pred_mean": 1.0732944011688232,
+      "pace_pred_p50": 0.4609738290309906,
+      "pace_sec_per_m": 0.7267634272575378,
+      "route_sequence": 1.0,
+      "service_time_availability_probability": 0.11395263671875,
+      "traversal_id": 1.0
+    }
+  ],
+  "predictions_modified": false,
+  "protocol_modified": false,
+  "schema_version": "stage2_v5_frozen_fold3_tail_diagnostic.1",
+  "scope": "read_only_post_evaluation_diagnostic"
+}
