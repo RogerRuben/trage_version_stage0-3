@@ -144,6 +144,9 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
             update = policy.evaluate(request)
             if update is not None:
                 self.request_meta[rid].update(update)
+        research = getattr(self, "research_route_policy", None)
+        if research is not None:
+            self.request_meta[rid].update(research.evaluate(request))
 
     def _expire(self, rid: int, simulation_time: int) -> None:
         self.expired_rids.add(rid)
@@ -228,7 +231,7 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
             )
             meta["final_search_radius_m"] = radius
             exposure: ExposureExcess | None = meta["exposure"]
-            av_ready = bool(request.av_smoke_eligible)
+            av_ready = bool(meta.get("research_route_compatible", request.av_smoke_eligible))
             accepts = bool(meta["passenger_accepts_av"])
             if gate_counts is not None:
                 nearby_av = index.count_vehicle_type_within(
@@ -255,7 +258,11 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                             gate_counts[
                                 "gate_av_loss_evidence_incomplete"
                             ] += nearby_av
-            av_eligible = av_ready and accepts and exposure is not None
+            research_without_budget = (
+                "research_route_compatible" in meta
+                and all(value is None for value in self.gammas.values())
+            )
+            av_eligible = av_ready and accepts and (exposure is not None or research_without_budget)
             if av_eligible and not meta.get("traffic_allowed", True):
                 removed = index.count_vehicle_type_within(request.pickup_lon_wgs84, request.pickup_lat_wgs84, radius, "AV")
                 traffic_pruned += removed
@@ -356,14 +363,18 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
         self.av_candidates_pruned_by_acceptance += pruned_acceptance_epoch
         self.av_candidates_pruned_by_missing_exposure += pruned_exposure_epoch
         solver_started = time.perf_counter()
-        result = solve_lexicographic(
-            arcs,
-            exposure_state=self.exposure_state,
-            gammas=self.gammas,
-            cost_level_enabled=self.cost_level_enabled,
-            pickup_cost_epsilon=self.pickup_cost_epsilon,
-            numerical_tolerance=self.solver_tolerance,
-        )
+        research_solver = getattr(self, "flexibility_adapter", None)
+        if research_solver is None:
+            result = solve_lexicographic(
+                arcs,
+                exposure_state=self.exposure_state,
+                gammas=self.gammas,
+                cost_level_enabled=self.cost_level_enabled,
+                pickup_cost_epsilon=self.pickup_cost_epsilon,
+                numerical_tolerance=self.solver_tolerance,
+            )
+        else:
+            result = research_solver.solve(self, arcs, waiting_ids, simulation_time)
         solver_elapsed = time.perf_counter() - solver_started
         self.solver_time_s += solver_elapsed
         self.cost_level_solve_count += int(result.cost_level_solved)
@@ -388,6 +399,16 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                     "normalized_operating_cost": arc.operating_cost,
                 }
             )
+            if research_solver is not None:
+                self.assignment_rows[-1].update(
+                    research_dispatch_policy=research_solver.policy,
+                    research_exposure_available=self.request_meta[arc.request_id].get(
+                        "research_exposure_available", False),
+                    research_control_assumption_count=self.request_meta[arc.request_id].get(
+                        "research_control_assumption_count", 0),
+                    research_bearing_fallback_count=self.request_meta[arc.request_id].get(
+                        "research_bearing_fallback_count", 0),
+                )
             if arc.vehicle_type == "AV":
                 if "traffic_policy" in self.request_meta[arc.request_id]:
                     self.assignment_rows[-1].update({k: v for k, v in self.request_meta[arc.request_id].items() if k.startswith("traffic_")})
