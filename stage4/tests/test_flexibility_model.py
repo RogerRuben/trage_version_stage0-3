@@ -179,3 +179,34 @@ def test_sparse_resource_limits_and_post_service_position():
     broken = replace(scenario.pickups[0], origin_position="WRONG_PLACE")
     with pytest.raises(ValueError, match="post-service vehicle position"):
         solve_dispatch(replace(problem, scenarios=(replace(scenario, pickups=(broken,)),)), "LOOKAHEAD")
+
+
+def test_service_preserving_does_not_trade_current_count_for_forecast():
+    vehicles = (Vehicle(1, "HV", "S1", 0, 2000), Vehicle(2, "HV", "S2", 0, 2000))
+    waiting = (Request(10, 0, 300, 600, "LONG"), Request(11, 0, 300, 10, "E"))
+    forecast = (Request(20, 60, 200, 10, "F1"), Request(21, 60, 200, 10, "F2"))
+    scenario = Scenario("TRAIN", 1, 0, forecast, (
+        FuturePickup(1, 11, 20, 0, "E"), FuturePickup(2, None, 21, 0, "S2")))
+    problem = Problem(0, vehicles, waiting,
+        (CurrentPickup(1, 10, 0), CurrentPickup(1, 11, 10), CurrentPickup(2, 11, 0)), (scenario,))
+    assert solve_dispatch(problem, "LOOKAHEAD").immediate_service_count == 1
+    protected = solve_dispatch(problem, "SERVICE_PRESERVING_LOOKAHEAD")
+    assert protected.immediate_service_count == solve_dispatch(problem, "MYOPIC").immediate_service_count == 2
+    assert protected.expected_next_service_count == 0
+
+
+def test_service_preserving_uses_future_only_after_current_priority_face():
+    reserve, _ = small_case("flexibility_reservation")
+    protected = solve_dispatch(reserve, "SERVICE_PRESERVING_LOOKAHEAD")
+    assert protected.immediate_service_count == 1 and protected.expected_next_service_count == 1
+    request = Request(1, 0, 300, 10, "END", carry_over=True)
+    other = Request(2, 0, 300, 10, "FUTURE_END")
+    future = Request(3, 60, 200, 10, "LAST")
+    problem = Problem(0, (Vehicle(1, "HV", "START", 0, 1000),), (request, other),
+        (CurrentPickup(1, 1, 0), CurrentPickup(1, 2, 0)),
+        (Scenario("TRAIN", 1, 0, (future,), (FuturePickup(1, 2, 3, 0, "FUTURE_END"),)),))
+    assert solve_dispatch(problem, "SERVICE_PRESERVING_LOOKAHEAD").selected_pairs == ((1, 1),)
+    critical = replace(problem, waiting_requests=(request, replace(other, critical=True)))
+    assert solve_dispatch(critical, "SERVICE_PRESERVING_LOOKAHEAD").selected_pairs == ((1, 2),)
+    absent = replace(reserve, scenarios=())
+    assert solve_dispatch(absent, "SERVICE_PRESERVING_LOOKAHEAD").selected_pairs == solve_dispatch(absent, "MYOPIC").selected_pairs

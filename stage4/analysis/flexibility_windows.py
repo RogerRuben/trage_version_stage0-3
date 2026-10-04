@@ -20,7 +20,7 @@ from stage4.fleetpy_adapter.upstream import load_fleetpy_bindings
 OUTPUT = Path("stage4/output/flexibility_dispatch_v1/windows")
 
 
-def condition(root, checkpoint, cfg, cut, profile, policy, destination, routes, templates):
+def condition(root, checkpoint, cfg, cut, profile, policy, destination, routes, templates, remaining_model=None):
     started = time.monotonic()
     with (root / checkpoint["path"]).open("rb") as stream:
         sim = cloudpickle.load(stream)
@@ -48,7 +48,7 @@ def condition(root, checkpoint, cfg, cut, profile, policy, destination, routes, 
         request.predicted_service_time_s = float(p50[str(request.order_id)])
     for rid, meta in c.request_meta.items():
         meta.update(c.research_route_policy.evaluate(c.request_by_rid[rid]))
-    c.flexibility_adapter = NativeFlexibilityAdapter(policy, TrainDemandForecast(templates, cfg, end), cfg)
+    c.flexibility_adapter = NativeFlexibilityAdapter(policy, TrainDemandForecast(templates, cfg, end), cfg, remaining_model)
     c.eta_adapter = ArcDeterministicValhallaAdapter(root, routing_mode=cfg["routing_mode"])
     c.run_started_perf = time.perf_counter()
     c.runtime_guard_s = cfg["scenario_timeout_s"]

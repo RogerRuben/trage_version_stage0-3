@@ -104,7 +104,7 @@ class TrainDemandForecast:
         return result
 
 
-def predicted_vehicle_states(c, now, horizon, last_assignments):
+def predicted_vehicle_states(c, now, horizon, last_assignments, remaining_model=None, diagnostics=None):
     """Only observable availability and already-booked predicted tasks enter.
 
     No service_end_time, realized duration, future request enumeration, or
@@ -129,7 +129,22 @@ def predicted_vehicle_states(c, now, horizon, last_assignments):
             predicted = float(assignment["predicted_service_time_s"])
             if not isfinite(predicted) or predicted <= 0:
                 continue
-            ready = float(assignment["simulation_time_s"]) + float(assignment["pickup_eta_s"]) + c._pickup_overhead_s() + predicted
+            pickup = float(assignment["simulation_time_s"]) + float(assignment["pickup_eta_s"]) + c._pickup_overhead_s()
+            ready = pickup + predicted
+            legacy_ready = max(ready, now + c.dispatch_interval_s, start)
+            if diagnostics is not None:
+                diagnostics["busy_states"] += 1
+                diagnostics["overdue_busy_states"] += int(ready <= now)
+            if remaining_model is not None:
+                estimate = remaining_model.estimate(predicted, max(0.0, now - pickup))
+                if estimate.remaining_s is None:
+                    if diagnostics is not None:
+                        diagnostics["unsupported_busy_states_omitted"] += 1
+                    continue
+                ready = max(now, pickup) + estimate.remaining_s
+                if diagnostics is not None:
+                    diagnostics["conditional_busy_states"] += 1
+                    diagnostics["busy_ready_shift_sum_s"] += max(ready, now + c.dispatch_interval_s, start) - legacy_ready
             # Still observed busy at t: a past predicted finish cannot make it idle NOW.
             ready = max(ready, now + c.dispatch_interval_s, start)
             booked = c.request_by_rid[int(assignment["native_request_id"])]
@@ -142,8 +157,9 @@ def predicted_vehicle_states(c, now, horizon, last_assignments):
 
 
 class NativeFlexibilityAdapter:
-    def __init__(self, policy, forecast, cfg):
+    def __init__(self, policy, forecast, cfg, remaining_model=None):
         self.policy, self.forecast, self.cfg = policy, forecast, cfg
+        self.remaining_model = remaining_model
         self.last_assignments = {}
         self.assignment_cursor = 0
         self.rows = []
@@ -156,7 +172,10 @@ class NativeFlexibilityAdapter:
 
     def _problem(self, c, arcs, waiting_ids, now):
         self._refresh_booked(c)
-        vehicles = predicted_vehicle_states(c, now, self.cfg["forecast_horizon_s"], self.last_assignments)
+        self.busy_diagnostics = dict(busy_states=0, overdue_busy_states=0, conditional_busy_states=0,
+                                    unsupported_busy_states_omitted=0, busy_ready_shift_sum_s=0.0)
+        vehicles = predicted_vehicle_states(c, now, self.cfg["forecast_horizon_s"], self.last_assignments,
+                                            self.remaining_model, self.busy_diagnostics)
         requests = []
         coordinates = {}
         for rid in waiting_ids:
@@ -176,7 +195,7 @@ class NativeFlexibilityAdapter:
             solver_time_limit_s=self.cfg["solver_time_limit_s"])
         problem = Problem(now, vehicles, tuple(requests),
                           tuple(CurrentPickup(a.vehicle_id, a.request_id, a.pickup_eta_s) for a in arcs), (), limits)
-        if self.policy != "LOOKAHEAD":
+        if self.policy not in ("LOOKAHEAD", "SERVICE_PRESERVING_LOOKAHEAD"):
             return problem
         by_rid = {r.request_id: r for r in requests}
         options = [(v, None, v.ready_time_s, v.ready_position) for v in vehicles]
@@ -222,6 +241,9 @@ class NativeFlexibilityAdapter:
         started = time.perf_counter()
         fallback = None
         decision = None
+        protected = self.policy == "SERVICE_PRESERVING_LOOKAHEAD"
+        current_oracle = solve_lexicographic(arcs) if protected else None
+        self.busy_diagnostics = {}
         if self.policy == "MYOPIC" or not arcs:
             result = solve_lexicographic(arcs)
         else:
@@ -247,4 +269,12 @@ class NativeFlexibilityAdapter:
             resource_fallback=fallback, variable_count=decision.variable_count if decision else None,
             nonzeros=decision.constraint_nonzeros if decision else None,
             expected_next_service=decision.expected_next_service_count if decision else None))
+        if protected:
+            actual = (result.critical_matched, result.total_matched, result.carry_over_matched)
+            optimum = (current_oracle.critical_matched, current_oracle.total_matched,
+                       current_oracle.carry_over_matched)
+            if actual != optimum:
+                raise RuntimeError("service-preserving current lexicographic face violated")
+            self.rows[-1].update(current_critical_optimum=optimum[0], current_service_optimum=optimum[1],
+                current_carry_optimum=optimum[2], current_face_preserved=True, **self.busy_diagnostics)
         return result

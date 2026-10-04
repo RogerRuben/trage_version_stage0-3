@@ -267,7 +267,7 @@ def _solve(problem, policy, fixed_pairs=None):
     options = _options(problem, vehicles, requests)
     option_keys = {(o.vehicle_id, o.request_id): j for j, o in enumerate(options)}
     recourse = []
-    if policy == "LOOKAHEAD" or fixed_pairs is not None:
+    if policy in ("LOOKAHEAD", "SERVICE_PRESERVING_LOOKAHEAD") or fixed_pairs is not None:
         for scenario in problem.scenarios:
             future_requests = {**requests, **{r.request_id: r for r in scenario.new_requests}}
             seen = set()
@@ -352,6 +352,11 @@ def _solve(problem, policy, fixed_pairs=None):
     elif policy == "LOOKAHEAD":
         levels = [(critical, True), (immediate + future_value, True),
                   (immediate, True), (carry, True), (eta, False)]
+    elif policy == "SERVICE_PRESERVING_LOOKAHEAD":
+        # Optimize future flexibility ONLY on the same current-service face as
+        # MYOPIC. This protects epoch counts, not full-window service dominance.
+        levels = [(critical, True), (immediate, True), (carry, True),
+                  (future_value, True), (eta, False)]
     else:  # Simple AV-first control: differs ONLY in the pre-ETA tie-break.
         levels = [(critical, True), (immediate, True), (carry, True), (av, True), (eta, False)]
     solution, runtime = _run_levels(rows, count, levels, problem.limits)
@@ -370,7 +375,7 @@ def _solve(problem, policy, fixed_pairs=None):
 
 def solve_dispatch(problem: Problem, policy: str) -> Decision:
     """MYOPIC reuses the unchanged frozen solver; other policies are opt-in."""
-    if policy not in ("MYOPIC", "AV_FIRST", "LOOKAHEAD"):
+    if policy not in ("MYOPIC", "AV_FIRST", "LOOKAHEAD", "SERVICE_PRESERVING_LOOKAHEAD"):
         raise ValueError("unrecognized research dispatch policy")
     if policy != "MYOPIC":
         return _solve(problem, policy)

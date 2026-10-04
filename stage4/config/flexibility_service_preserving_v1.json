@@ -1,0 +1,16 @@
+{
+  "version": "flexibility_service_preserving_v1",
+  "base_config": "stage4/config/flexibility_windows_v1.json",
+  "profile": "M",
+  "cuts_s": [37800, 63000],
+  "policy": "SERVICE_PRESERVING_LOOKAHEAD",
+  "current_objective_order": ["critical", "matched", "carry_over", "expected_next_service", "pickup_eta"],
+  "remaining_time_method": "TRAIN_EMPIRICAL_RATIO_SURVIVAL_MEDIAN",
+  "remaining_time_train_dates": ["20161010", "20161017", "20161024"],
+  "unsupported_remaining_tail": "OMIT_PROSPECTIVE_BUSY_STATE_KEEP_NATIVE_JOB",
+  "refit_m3": false,
+  "refit_demand": false,
+  "reuse_existing_baselines": true,
+  "additional_conditions": 2,
+  "parameter_search": false
+}

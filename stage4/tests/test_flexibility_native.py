@@ -4,6 +4,7 @@ import pandas as pd
 import pytest
 
 from stage4.dispatch.flexibility_native import TrainDemandForecast, predicted_vehicle_states, position_key
+from stage4.dispatch.remaining_time import TrainRemainingTime
 
 
 def config():
@@ -58,3 +59,35 @@ def test_busy_ready_state_uses_booked_prediction_not_realized_future():
     assert states[1].ready_time_s == 100
     booked[1]["predicted_service_time_s"] = 1
     assert predicted_vehicle_states(c, 60, 600, booked)[0].ready_time_s == 90
+
+
+def timing_model():
+    return TrainRemainingTime(dict(method="TRAIN_EMPIRICAL_RATIO_SURVIVAL_MEDIAN",
+        train_dates=config()["forecast_train_dates"], test31_used_for_fit=False,
+        sorted_duration_prediction_ratios=[1., 2., 3.]))
+
+
+def test_empirical_survival_remaining_time_and_train_only():
+    model = timing_model()
+    estimate = model.estimate(100, 150)
+    assert estimate.remaining_s == 100 and estimate.support_count == 2
+    assert model.estimate(100, 300).remaining_s is None
+    with pytest.raises(ValueError, match="Train-only"):
+        TrainRemainingTime(dict(method="TRAIN_EMPIRICAL_RATIO_SURVIVAL_MEDIAN",
+            train_dates=["20161031"], test31_used_for_fit=True, sorted_duration_prediction_ratios=[1.]))
+
+
+def test_busy_conditioning_never_reads_realized_end_and_unsupported_tail_omits_forecast_only():
+    class NoFuture(dict):
+        def __getitem__(self, key):
+            assert key not in ("realized_service_time_s", "service_end_time")
+            return super().__getitem__(key)
+    c = NS(config={"profile_id": "M"}, dispatch_interval_s=30, max_pickup_wait_s=300,
+        _fixture_seconds=lambda x: x, bindings=NS(states=NS(IDLE=0)), _pickup_overhead_s=lambda: 0,
+        request_by_rid={99:NS(dropoff_lon_wgs84=108.95, dropoff_lat_wgs84=34.25)},
+        runtime_by_vid={1:NS(fixture=NS(vehicle_type="HV", availability_start_time=0, availability_end_time=1000),
+                            native_vehicle=NS(status=1, assigned_route=[1]))})
+    booked = {1:NoFuture(simulation_time_s=0, pickup_eta_s=30, predicted_service_time_s=100, native_request_id=99)}
+    assert predicted_vehicle_states(c, 180, 600, booked, timing_model())[0].ready_time_s == 280
+    assert predicted_vehicle_states(c, 330, 600, booked, timing_model()) == ()
+    assert c.runtime_by_vid[1].native_vehicle.assigned_route == [1]
