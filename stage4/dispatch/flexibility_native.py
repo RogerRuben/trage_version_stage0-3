@@ -49,6 +49,7 @@ class ResearchRoutePolicy:
         rho_speed = row["max_route_speed_domain_kmh"] / self.caps["speed_domain_max_kmh"]
         exposure = exposure_excess(rho_static, rho_var, rho_speed)
         return dict(research_route_compatible=bool(row[f"compatible_{self.profile}"]),
+                    research_base_eligible=bool(row.get("common_eligible", True)),
                     research_data_ready=bool(row["research_data_ready"]), exposure=exposure,
                     research_exposure_available=exposure is not None,
                     research_control_assumption_count=int(row["control_assumption_count"]) if isfinite(row["control_assumption_count"]) else 0,
@@ -183,6 +184,8 @@ class NativeFlexibilityAdapter:
             if not isfinite(source.predicted_service_time_s) or source.predicted_service_time_s <= 0:
                 continue
             meta = c.request_meta[int(rid)]
+            if not meta.get("research_base_eligible", True):
+                continue
             allowed = frozenset((c.config["profile_id"],)) if meta["research_route_compatible"] else frozenset()
             remaining = meta["pickup_deadline_s"] - now
             requests.append(Request(int(rid), source.sim_time_s, meta["pickup_deadline_s"],

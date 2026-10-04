@@ -230,6 +230,11 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                 self.config["search_radius_cap_m"],
             )
             meta["final_search_radius_m"] = radius
+            # Opt-in symmetric research population: missing route support or a
+            # certified common prohibition excludes BOTH HV and AV candidates.
+            # Legacy sidecars have no such field and retain their frozen policy.
+            if not meta.get("research_base_eligible", True):
+                continue
             exposure: ExposureExcess | None = meta["exposure"]
             av_ready = bool(meta.get("research_route_compatible", request.av_smoke_eligible))
             accepts = bool(meta["passenger_accepts_av"])

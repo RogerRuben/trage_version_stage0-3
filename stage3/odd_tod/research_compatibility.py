@@ -55,7 +55,9 @@ def evaluate_research_compatibility(
     not an implicit reinterpretation of the main policy. Static/variability/
     speed utilization stays in a separate Stage4 exposure-budget interface.
     """
-    if profile_id not in PROFILES:
+    # HV is the explicit human-equivalent capability reference. Passenger
+    # acceptance and vehicle availability are dispatch constraints, not capability.
+    if profile_id not in (*PROFILES, "HV"):
         raise ValueError("unrecognized profile")
     if conservative_control_policy not in (
         "SIGNALIZED_CONFLICT_MOVEMENTS", "ALL_ENCOUNTERS_SIGNALIZED"
@@ -85,7 +87,7 @@ def evaluate_research_compatibility(
                             or conservative_control_policy == "ALL_ENCOUNTERS_SIGNALIZED")
             if needs_signal and not movement.signalized:
                 reasons.add("UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE")
-    outside_states = {"C": ("MR", "CG", "SC"), "M": ("SC",), "A": ()}
+    outside_states = {"C": ("MR", "CG", "SC"), "M": ("SC",), "A": (), "HV": ()}
     outside = sum(float(traffic_shares[s]) for s in outside_states[profile_id])
     if outside > outside_budget + 1e-6:
         reasons.add("PREDICTED_ENVIRONMENT_OUTSIDE_BUDGET")

@@ -120,11 +120,13 @@ def identity_summary(frame: pd.DataFrame) -> dict[str, Any]:
 
 def parse_route_complex_encounters(
     typed: pd.DataFrame, boundary_index: pd.DataFrame, movement_lookup: pd.DataFrame,
+    *, roles_cache=None, movement_pairs_cache=None,
 ) -> pd.DataFrame:
-    roles: dict[str, dict[str, set[str]]] = {}
-    for row in boundary_index.itertuples(index=False):
-        roles.setdefault(str(row.stage3_edge_uid), {}).setdefault(str(row.intersection_complex_uid), set()).add(str(row.boundary_role))
-    movement_pairs = set(zip(
+    roles: dict[str, dict[str, set[str]]] = {} if roles_cache is None else roles_cache
+    if roles_cache is None:
+        for row in boundary_index.itertuples(index=False):
+            roles.setdefault(str(row.stage3_edge_uid), {}).setdefault(str(row.intersection_complex_uid), set()).add(str(row.boundary_role))
+    movement_pairs = movement_pairs_cache if movement_pairs_cache is not None else set(zip(
         movement_lookup["intersection_complex_uid"].astype(str),
         movement_lookup["incoming_stage3_edge_uid"].astype(str),
         movement_lookup["outgoing_stage3_edge_uid"].astype(str),
