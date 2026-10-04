@@ -5,6 +5,7 @@ import pandas as pd
 from stage3.odd_tod.research_compatibility import ResearchMovement, evaluate_research_compatibility
 from stage4.analysis.flexibility_prepare import MovementClassifier
 from stage4.analysis.symmetric_research_prepare import HistoricalResearchParser
+from stage4.analysis.symmetric_flexibility_full_day import administrative_timeout
 
 
 def classifier():
@@ -60,3 +61,17 @@ def test_A_equals_HV_and_certified_prohibition_is_common():
         assert evaluate_research_compatibility("HV", m, traffic).compatible
     m = (ResearchMovement("LEFT", True, "POSITIVE_EVIDENCE", True),)
     assert all(not evaluate_research_compatibility(k, m, traffic).compatible for k in ("C", "M", "A", "HV"))
+
+
+def test_administrative_retry_does_not_mutate_model_configuration():
+    import pytest
+    cfg = dict(scenario_timeout_s=10800, solver_time_limit_s=10.,
+        max_model_variables=20000, max_model_nonzeros=150000)
+    before = dict(cfg)
+    assert administrative_timeout(cfg, "SERVICE_PRESERVING_LOOKAHEAD", None) == 10800
+    assert administrative_timeout(cfg, "SERVICE_PRESERVING_LOOKAHEAD", 21600) == 21600
+    assert cfg == before
+    with pytest.raises(ValueError):
+        administrative_timeout(cfg, "MYOPIC", 21600)
+    with pytest.raises(ValueError):
+        administrative_timeout(cfg, "SERVICE_PRESERVING_LOOKAHEAD", 21601)

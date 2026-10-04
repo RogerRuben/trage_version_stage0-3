@@ -64,3 +64,9 @@ python -m stage4.analysis.symmetric_flexibility_full_day --fleetpy-root D:/pycod
 
 输出：`stage4/output/symmetric_flexibility_v1/`；说明与轻量结果：本目录。
 旧结果不覆盖。完成后按用户已有授权提交、推送origin。
+
+## 6. 用户授权的行政时限例外（2026-10-04）
+
+用户明确允许：仅当第二组触发原3小时整组行政时限，保留该中止记录，以`--administrative-timeout-s 21600`从干净初始状态重跑同一第二条件。
+MYOPIC不重跑；不新增科学条件；每轮10秒、20,000变量/150,000非零元、数据、seed、策略、质量及兼容阈值全部不变。配置文件及输入SHA不改。
+这不是按服务结果调参。原进程继续使用已经加载的3小时时限，不尝试注入或热改进程；若它正常完成，则不执行此重跑。

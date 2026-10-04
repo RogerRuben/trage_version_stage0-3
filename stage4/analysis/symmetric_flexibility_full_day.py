@@ -29,6 +29,14 @@ from stage4.fleetpy_adapter.native_simulation import create_native_simulation
 OUTPUT = Path("stage4/output/symmetric_flexibility_v1/full_day")
 
 
+def administrative_timeout(cfg, policy, override):
+    if override is None:
+        return int(cfg["scenario_timeout_s"])
+    if policy != "SERVICE_PRESERVING_LOOKAHEAD" or override != 21600:
+        raise ValueError("only the user-authorized second-policy 6h administrative retry is allowed")
+    return int(override)
+
+
 def analyze(root):
     cfg = json.loads((root / CONFIG).read_text())
     rows = []
@@ -58,12 +66,13 @@ def analyze(root):
     print(json.dumps(result, ensure_ascii=False), flush=True)
 
 
-def run(root, fleetpy, policy, resume):
+def run(root, fleetpy, policy, resume, administrative_timeout_s=None):
     pa.set_cpu_count(1)
     pa.set_io_thread_count(1)
     cfg = json.loads((root / CONFIG).read_text())
     if policy not in cfg["policies"] or cfg["profile"] != "M" or cfg["parameter_search"] or cfg["refit_m3"]:
         raise ValueError("outside authorized two-condition frozen protocol")
+    timeout_s = administrative_timeout(cfg, policy, administrative_timeout_s)
     prep = json.loads((root / INPUT / "preparation_summary.json").read_text())
     if prep["status"] != "COMPLETE" or prep["config_sha256"] != sha(root / CONFIG):
         raise ValueError("prepared configuration mismatch")
@@ -77,7 +86,10 @@ def run(root, fleetpy, policy, resume):
         raise ValueError("existing partial run is not automatically retried")
     directory.mkdir(parents=True, exist_ok=False)
     started = time.monotonic()
-    summary = dict(status="RUNNING", policy=policy, profile="M", source_config=str(CONFIG))
+    summary = dict(status="RUNNING", policy=policy, profile="M", source_config=str(CONFIG),
+        administrative_timeout_s=timeout_s,
+        administrative_extension=administrative_timeout_s is not None,
+        scientific_and_per_epoch_solver_parameters_unchanged=True)
     write_json(directory / "summary.json", summary)
     paths = [CONFIG, INPUT/"test31_research_routes.parquet", INPUT/"train_request_templates.parquet",
         Path(cfg["remaining_time_model"]), Path("stage3/config/stage3_av_capability_profiles.json"),
@@ -109,7 +121,7 @@ def run(root, fleetpy, policy, resume):
             directory/"runtime", native_movement=True, routing_engine=network)
         native_cfg = {**base, "profile_id":"M", "gamma_static":None, "gamma_dynamic":None, "gamma_speed":None,
             "cost_level_enabled":False, "prospective_gate_logging":False, "additional_pickup_overhead_s":0.,
-            "matching_end_s":cfg["last_dispatch_s"], "benchmark_runtime_guard_s":cfg["scenario_timeout_s"]}
+            "matching_end_s":cfg["last_dispatch_s"], "benchmark_runtime_guard_s":timeout_s}
         routing = ArcDeterministicValhallaAdapter(root, routing_mode=cfg["routing_mode"])
         c = create_rolling_or_fleet_control(bindings, vehicles, requests, demand, network, routing, start, end, native_cfg)
         profiles = json.loads((root / "stage3/config/stage3_av_capability_profiles.json").read_text())
@@ -121,7 +133,7 @@ def run(root, fleetpy, policy, resume):
             vehicles=[v.native_vehicle for v in vehicles], fleet_control=c, network=network, native_output=native_output)
         write_json(directory / "fleet_accounting.json", fleet.accounting)
         for tick in range(0, drain_s+30, 30):
-            if time.monotonic()-started > cfg["scenario_timeout_s"]:
+            if time.monotonic()-started > timeout_s:
                 raise TimeoutError("full-day hard timeout")
             sim.step(tick)
             routing.cache.clear()
@@ -199,5 +211,7 @@ if __name__ == "__main__":
     parser.add_argument("--fleetpy-root",type=Path,required=True)
     parser.add_argument("--policy",choices=("MYOPIC","SERVICE_PRESERVING_LOOKAHEAD"),required=True)
     parser.add_argument("--resume",action="store_true")
+    parser.add_argument("--administrative-timeout-s",type=int,choices=(21600,),
+        help="User-authorized 6h retry of the second policy after the original 3h administrative timeout")
     args=parser.parse_args()
-    run(Path.cwd(),args.fleetpy_root,args.policy,args.resume)
+    run(Path.cwd(),args.fleetpy_root,args.policy,args.resume,args.administrative_timeout_s)
