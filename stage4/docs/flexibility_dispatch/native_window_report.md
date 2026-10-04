@@ -117,3 +117,10 @@ conda run -n stage0-valhalla python -m stage4.analysis.flexibility_analysis
 ```
 
 科学分类：`BOUNDED_EXPLORATORY_NATIVE_COMPARISON`；当前 LOOKAHEAD promotion：`NOT_SUPPORTED_BY_THIS_BATCH`。
+
+## 后续独立补充（不修改本批负结果）
+
+2026-10-04 用户另行授权的[保护当前服务两窗口报告](service_preserving/report.md)已完成。
+只新增 M 的两个条件，旧 MYOPIC / AV_FIRST / LOOKAHEAD 产品全部复用并保持不变。
+联合修改目标优先级与 Train-only busy 剩余时长后，服务数为501，参照 MYOPIC 为492；平均等待增加。
+这是独立策略的两个开发窗口结果，不撤销本页旧 LOOKAHEAD 负结果，也不建立全天或 C/A 优势。
