@@ -19,6 +19,7 @@
   "patience_s": 300,
   "measurement_end_s": 86460,
   "last_dispatch_s": 86760,
+  "physical_drain_limit_s": 172800,
   "routing_mode": "SINGLE_SOURCE_MATRIX",
   "remaining_time_model": "stage4/docs/flexibility_dispatch/service_preserving/train_remaining_time_model.json",
   "max_model_variables": 20000,

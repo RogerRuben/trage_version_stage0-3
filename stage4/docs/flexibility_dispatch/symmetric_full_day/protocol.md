@@ -40,6 +40,7 @@ M3预测、Train CDF、动态caps保持不变。这里只重建research compatib
 - MYOPIC vs SERVICE_PRESERVING_LOOKAHEAD；均从0秒干净native状态开始，不沿用旧不对称策略prehistory。
 - 原30,000订单全部对账；共同输入排除单独列出。主服务率分母为共同模型population，同时给出原30,000单分母的服务率。
 - 30秒rolling、300秒到达patience、current TopK20、确定性single-source matrix，实际native物理进展与drain不变。
+- 固定172,800秒行政drain上界，全部已接受任务完成即可提前结束；不根据Test31未来实际时长设置优化器中的AV availability终点。日vehicle-hours仍只按24小时归一化，停止派单后不再引入新需求。
 - 新策略固定critical→current service→carry-over最优面，再最大化预期下一服务数、最后最小接驾ETA。不是个体订单保护或全天优势保证。
 - 每车每情景最多一次下一服务；未来ETA仍是Train预测OD-chord pace近似，不是完整随机VRP。
 - 不新增C/A动态条件，不重跑18窗口或41场景，不作消融网格和结果驱动调参。
@@ -58,6 +59,8 @@ python -m stage4.analysis.symmetric_research_prepare
 python -m stage4.analysis.symmetric_flexibility_full_day --fleetpy-root D:/pycodes/didi_xian_raw/.external/FleetPy --policy MYOPIC
 python -m stage4.analysis.symmetric_flexibility_full_day --fleetpy-root D:/pycodes/didi_xian_raw/.external/FleetPy --policy SERVICE_PRESERVING_LOOKAHEAD
 ```
+
+输入派生发现Train非完整订单的预测时长不可聚合时已显式停止；修复为沿用冻结complete-dynamic订单集合，绝不逐token丢弃或以实际时长补值。`--resume`只复用已经原子落盘的Test31标签，再继续尚未完成的Train派生。
 
 输出：`stage4/output/symmetric_flexibility_v1/`；说明与轻量结果：本目录。
 旧结果不覆盖。完成后按用户已有授权提交、推送origin。

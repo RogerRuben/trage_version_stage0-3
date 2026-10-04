@@ -94,7 +94,9 @@ def run(root, fleetpy, policy, resume):
         route_rows = routes.set_index("order_id").to_dict("index")
         requests = [r for r in raw_requests if route_rows[r.order_id]["common_eligible"]]
         for r in requests: r.predicted_service_time_s = float(route_rows[r.order_id]["predicted_route_time_p50_s"])
-        drain_s = math.ceil((cfg["last_dispatch_s"]+cfg["patience_s"]+max(r.realized_service_time_s for r in raw_requests))/30)*30+30
+        # Administrative bound frozen before outcomes; never derive a vehicle's
+        # modeled availability from unobserved future Test31 trip durations.
+        drain_s = int(cfg["physical_drain_limit_s"])
         end = start+pd.Timedelta(seconds=drain_s)
         fleet = build_fleet_scenario(root, benchmark_start=start, simulation_end=end,
             requested_q_a=base["av_vehicle_hour_share"], seed=base["fleet_sampling_seed"],

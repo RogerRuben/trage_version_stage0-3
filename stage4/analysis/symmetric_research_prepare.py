@@ -159,12 +159,18 @@ def classify_day(parser, identity_path, traffic, predictions, cfg, ids=None):
     return result
 
 
-def prepare(root):
+def prepare(root, resume=False):
     pa.set_cpu_count(1)
     pa.set_io_thread_count(1)
     cfg = json.loads((root / CONFIG).read_text())
     destination = root / OUT
-    destination.mkdir(parents=True, exist_ok=False)
+    destination.mkdir(parents=True, exist_ok=resume)
+    manifest = destination / "preparation_summary.json"
+    if resume and manifest.is_file():
+        done = json.loads(manifest.read_text())
+        if done["status"] == "COMPLETE" and done["config_sha256"] == sha(root / CONFIG):
+            print(json.dumps(dict(skipped_completed="symmetric_input")), flush=True)
+            return
     complexes = pd.read_parquet(root / OLD_INPUT / "complex_control_overlay.parquet")
     classifier = MovementClassifier(root, complexes)
     boundary = pd.read_parquet(root / S2B / "stage3_edge_complex_boundary_index.parquet")
@@ -174,10 +180,13 @@ def prepare(root):
     traffic = old.drop(columns=["research_data_ready", "compatible_C", "compatible_M", "compatible_A",
         "control_assumption_count", "bearing_fallback_count", "encounter_count", "signalized_encounter_count",
         "unresolved_maneuver_count"], errors="ignore")
-    new = classify_day(parser, root / S4 / "test31_route_identity_resolution.parquet", traffic,
-                       old, cfg)
-    routes = new.merge(traffic, on="order_id", validate="one_to_one")
-    write_parquet(destination / "test31_research_routes.parquet", routes)
+    route_path = destination / "test31_research_routes.parquet"
+    if resume and route_path.is_file():
+        routes = pd.read_parquet(route_path)
+    else:
+        new = classify_day(parser, root / S4 / "test31_route_identity_resolution.parquet", traffic, old, cfg)
+        routes = new.merge(traffic, on="order_id", validate="one_to_one")
+        write_parquet(route_path, routes)
     train_parts, train_sources = [], []
     traffic_cfg = json.loads((root / "stage3/config/traffic_state_batch1.json").read_text())
     reference = pd.read_parquet(root / "stage3/output/traffic_state_batch1/train_reference.parquet")
@@ -188,9 +197,10 @@ def prepare(root):
         base["order_id"] = base.order_id.astype(str)
         cache = root / S3 / f"cache/train/date={date}"
         dynamic = pd.read_parquet(cache / "dynamic_descriptors.parquet")
+        eligible = list(dynamic.order_id.astype(str))
         prediction = root / S3 / f"cache/m3/date={date}.parquet"
-        tokens = pd.read_parquet(prediction, columns=["order_id", "traversal_id", "pred_pace_p50", "pred_crawl", "pred_stop", "travel_time_p50_s"])
-        route = pd.read_parquet(root / f"stage2/output_v4/route_conditioned_dataset/revealed_route_proxy/day={date}.parquet", columns=["order_id", "traversal_id", EDGE])
+        tokens = pd.read_parquet(prediction, columns=["order_id", "traversal_id", "pred_pace_p50", "pred_crawl", "pred_stop", "travel_time_p50_s"], filters=[("order_id", "in", eligible)])
+        route = pd.read_parquet(root / f"stage2/output_v4/route_conditioned_dataset/revealed_route_proxy/day={date}.parquet", columns=["order_id", "traversal_id", EDGE], filters=[("order_id", "in", eligible)])
         tokens = tokens.merge(route, on=["order_id", "traversal_id"], validate="one_to_one")
         t = aggregate(decompose(tokens.merge(reference, on=EDGE, how="left", validate="many_to_one"), traffic_cfg))
         del tokens, route
@@ -232,5 +242,7 @@ def prepare(root):
 
 
 if __name__ == "__main__":
-    argparse.ArgumentParser(description=__doc__).parse_args()
-    prepare(Path.cwd())
+    args_parser = argparse.ArgumentParser(description=__doc__)
+    args_parser.add_argument("--resume", action="store_true")
+    args = args_parser.parse_args()
+    prepare(Path.cwd(), args.resume)
