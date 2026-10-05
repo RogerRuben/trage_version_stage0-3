@@ -47,11 +47,13 @@ def acceleration_settings(root, path):
     allowed = {"recourse_mode", "solver_backend", "highspy_runtime_dir", "fast_forecast",
                "persistent_cache_size", "route_workers", "lock_current_face"}
     version = spec.get("version")
-    if version == "symmetric_flexibility_acceleration_v2":
+    if version in ("symmetric_flexibility_acceleration_v2", "symmetric_flexibility_acceleration_v3"):
         allowed |= {"cached_geometry", "event_calendar", "fast_future_graph", "epoch_routing_queue",
                     "pre_route_session_certificate", "compress_fixed_states", "trim_flow_rows", "offline_assets",
                     "disk_route_cache", "disk_cache_limit_mib", "disk_cache_max_entries", "route_queue_chunk_size", "lazy_worker_actor"}
-    if (version not in ("symmetric_flexibility_acceleration_v1", "symmetric_flexibility_acceleration_v2")
+    if version == "symmetric_flexibility_acceleration_v3":
+        allowed |= {"decompose_model", "demand_routing", "grouped_sources"}
+    if (version not in ("symmetric_flexibility_acceleration_v1", "symmetric_flexibility_acceleration_v2", "symmetric_flexibility_acceleration_v3")
             or Path(spec.get("base_config", "")) != CONFIG
             or set(spec.get("settings", {})) != allowed
             or set(spec) != {"version", "base_config", "settings", "process_group_memory_limit_mib"}):
@@ -68,7 +70,7 @@ def acceleration_settings(root, path):
             or not 1 <= settings["route_workers"] <= 4
             or spec["process_group_memory_limit_mib"] != 2048):
         raise ValueError("acceleration resource or solver settings are invalid")
-    if version == "symmetric_flexibility_acceleration_v2":
+    if version in ("symmetric_flexibility_acceleration_v2", "symmetric_flexibility_acceleration_v3"):
         for key in ("cached_geometry", "event_calendar", "fast_future_graph", "epoch_routing_queue",
                     "pre_route_session_certificate", "compress_fixed_states", "trim_flow_rows", "lazy_worker_actor"):
             if type(settings[key]) is not bool:
@@ -82,6 +84,9 @@ def acceleration_settings(root, path):
                 or not 1 <= settings["disk_cache_max_entries"] <= 2_000_000
                 or not 1 <= settings["route_queue_chunk_size"] <= 256):
             raise ValueError("v2 acceleration resource bound exceeded")
+    if version == "symmetric_flexibility_acceleration_v3":
+        if any(type(settings[key]) is not bool for key in ("decompose_model", "demand_routing", "grouped_sources")):
+            raise ValueError("v3 switches must be explicit booleans")
     return settings, path, spec["process_group_memory_limit_mib"]
 
 
@@ -132,8 +137,9 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
     technical, acceleration_path, group_limit = acceleration_settings(root, acceleration_config)
     cfg.update(technical)
     is_v2 = "offline_assets" in technical
-    output_root = OUTPUT if acceleration_path is None else OUTPUT.parent / ("accelerated_v2_full_day" if is_v2 else "accelerated_full_day")
-    doc_root = DOC if acceleration_path is None else Path("stage4/docs/flexibility_dispatch") / ("acceleration_v2" if is_v2 else "acceleration_v1")
+    is_v3 = "demand_routing" in technical
+    output_root = OUTPUT if acceleration_path is None else OUTPUT.parent / ("accelerated_v3_full_day" if is_v3 else "accelerated_v2_full_day" if is_v2 else "accelerated_full_day")
+    doc_root = DOC if acceleration_path is None else Path("stage4/docs/flexibility_dispatch") / ("acceleration_v3" if is_v3 else "acceleration_v2" if is_v2 else "acceleration_v1")
     if policy not in cfg["policies"] or cfg["profile"] != "M" or cfg["parameter_search"] or cfg["refit_m3"]:
         raise ValueError("outside authorized two-condition frozen protocol")
     timeout_s = administrative_timeout(cfg, policy, administrative_timeout_s)
@@ -216,7 +222,12 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
             route_options = dict(disk_cache_path=cfg["disk_route_cache"], routing_context=assets.manifest["routing_context"],
                 disk_cache_limit_mib=cfg["disk_cache_limit_mib"], disk_cache_max_entries=cfg["disk_cache_max_entries"],
                 route_queue_chunk_size=cfg["route_queue_chunk_size"], lazy_worker_actor=cfg["lazy_worker_actor"])
-        routing = ArcDeterministicValhallaAdapter(root, routing_mode=cfg["routing_mode"],
+        router_class = ArcDeterministicValhallaAdapter
+        if cfg.get("demand_routing"):
+            from stage4.dispatch.routing_v3 import DemandRoutingAdapter
+            router_class = DemandRoutingAdapter
+            route_options["grouped_sources"] = cfg["grouped_sources"]
+        routing = router_class(root, routing_mode=cfg["routing_mode"],
             persistent_cache_size=cfg.get("persistent_cache_size", 0), route_workers=cfg.get("route_workers", 1), **route_options)
         c = create_rolling_or_fleet_control(bindings, vehicles, requests, demand, network, routing, start, end, native_cfg)
         profiles = json.loads((root / "stage3/config/stage3_av_capability_profiles.json").read_text())
@@ -332,6 +343,12 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
             peak_process_group_rss_mib=peak_group_rss if acceleration_path is not None else summary["peak_rss_mib"])
         if is_v2:
             summary["peak_process_group_private_committed_mib"] = peak_group_private
+        if is_v3:
+            summary.update(raw_prefetch_avoided=routing.raw_prefetch_avoided,
+                source_group_queries=routing.source_group_queries,
+                group_cell_fallback_queries=routing.group_cell_fallback_queries,
+                decomposition_components=int(traces.decomposed_component_count.sum()),
+                pure_future_components=int(traces.pure_future_component_count.sum()))
     except Exception as error:
         summary.update(status="STOPPED", error=repr(error), runtime_s=time.monotonic()-started)
         write_json(directory / "summary.json", summary)

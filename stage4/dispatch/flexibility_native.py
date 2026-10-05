@@ -380,7 +380,12 @@ class NativeFlexibilityAdapter:
                 self.stage_timings["problem_setup_time_s"] = max(0.0, time.perf_counter() - preparation_started
                     - self.stage_timings["forecast_sampling_time_s"] - self.stage_timings["future_graph_time_s"])
                 attempt_started = time.perf_counter()
-                if self.cfg.get("lock_current_face", False) and current_oracle is not None:
+                if self.cfg.get("decompose_model", False):
+                    from .flexibility_v3 import solve_dispatch_v3
+                    face = CurrentServiceFace.from_arcs(arcs, current_oracle) if current_oracle is not None else None
+                    selection = tuple((arcs[i].vehicle_id, arcs[i].request_id) for i in current_oracle.selected_indices) if current_oracle is not None else None
+                    decision = solve_dispatch_v3(problem, self.policy, current_face=face, current_selection=selection)
+                elif self.cfg.get("lock_current_face", False) and current_oracle is not None:
                     face = CurrentServiceFace.from_arcs(arcs, current_oracle)
                     decision = solve_dispatch(problem, self.policy, current_face=face)
                 else:
@@ -411,6 +416,10 @@ class NativeFlexibilityAdapter:
             expected_next_service=decision.expected_next_service_count if decision else None,
             integer_variable_count=decision.integer_variable_count if decision else None,
             eliminated_fixed_variables=decision.eliminated_fixed_variables if decision else 0,
+            decomposed_component_count=getattr(decision, "component_count", 0),
+            pure_future_component_count=getattr(decision, "pure_future_component_count", 0),
+            pure_future_edges=getattr(decision, "pure_future_edges", 0),
+            pure_future_expected_count=getattr(decision, "pure_future_expected_count", 0.),
             model_build_time_s=decision.model_build_time_s if decision else 0.0,
             optimization_time_s=decision.solve_time_s if decision else result.solve_time_s,
             recourse_recovery_time_s=decision.recourse_recovery_time_s if decision else 0.0,
