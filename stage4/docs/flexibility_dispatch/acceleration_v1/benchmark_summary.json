@@ -1,0 +1,177 @@
+{
+  "status": "COMPLETE",
+  "native_scientific_conditions_added": 0,
+  "dense_matrix": false,
+  "gpu_used": false,
+  "concurrent_native_run": false,
+  "stale_native_running_summary": true,
+  "math": {
+    "highs_version": "1.12.0",
+    "synthetic_not_native": true,
+    "cases": [
+      {
+        "dimensions": [
+          12,
+          8,
+          12
+        ],
+        "all_variants_optimal_and_equivalent": true,
+        "rows": [
+          {
+            "status": "OPTIMAL",
+            "mode": "BINARY",
+            "backend": "SCIPY",
+            "wall_s": 0.3297609999999622,
+            "objective_vector": [
+              2,
+              8,
+              4,
+              11.333333333333332,
+              -100.0
+            ],
+            "variables": 465,
+            "integer_variables": 465,
+            "nonzeros": 2268,
+            "matrix_bytes": 29316,
+            "build_s": 0.001425500000550528,
+            "optimization_s": 0.32762759999968694,
+            "recovery_s": 0.0
+          },
+          {
+            "status": "OPTIMAL",
+            "mode": "FLOW_RELAXED",
+            "backend": "SCIPY",
+            "wall_s": 0.04511640000055195,
+            "objective_vector": [
+              2,
+              8,
+              4,
+              11.333333333333336,
+              -100.0
+            ],
+            "variables": 465,
+            "integer_variables": 38,
+            "nonzeros": 1955,
+            "matrix_bytes": 24308,
+            "build_s": 0.0013551000001825741,
+            "optimization_s": 0.04196509999928821,
+            "recovery_s": 0.0008496999998897081
+          },
+          {
+            "status": "OPTIMAL",
+            "mode": "FLOW_RELAXED",
+            "backend": "HIGHS_PERSISTENT",
+            "wall_s": 0.05037679999986722,
+            "objective_vector": [
+              2,
+              8,
+              4,
+              11.333333333333336,
+              -100.0
+            ],
+            "variables": 465,
+            "integer_variables": 38,
+            "nonzeros": 1955,
+            "matrix_bytes": 24308,
+            "build_s": 0.0013171999999030959,
+            "optimization_s": 0.04797409999991942,
+            "recovery_s": 0.0004121000001759967
+          }
+        ]
+      },
+      {
+        "dimensions": [
+          36,
+          24,
+          30
+        ],
+        "all_variants_optimal_and_equivalent": true,
+        "rows": [
+          {
+            "status": "OPTIMAL",
+            "mode": "BINARY",
+            "backend": "SCIPY",
+            "wall_s": 0.7407523000001675,
+            "objective_vector": [
+              4,
+              24,
+              10,
+              29.666666666666664,
+              -314.0
+            ],
+            "variables": 1228,
+            "integer_variables": 1228,
+            "nonzeros": 5949,
+            "matrix_bytes": 76872,
+            "build_s": 0.0037887999997110455,
+            "optimization_s": 0.7353698000006261,
+            "recovery_s": 0.0
+          },
+          {
+            "status": "OPTIMAL",
+            "mode": "FLOW_RELAXED",
+            "backend": "SCIPY",
+            "wall_s": 0.1442525000002206,
+            "objective_vector": [
+              4,
+              24,
+              10,
+              29.66666666666663,
+              -314.0
+            ],
+            "variables": 1228,
+            "integer_variables": 119,
+            "nonzeros": 5187,
+            "matrix_bytes": 64680,
+            "build_s": 0.004280900000594556,
+            "optimization_s": 0.13741989999925863,
+            "recovery_s": 0.0007052999999359599
+          },
+          {
+            "status": "OPTIMAL",
+            "mode": "FLOW_RELAXED",
+            "backend": "HIGHS_PERSISTENT",
+            "wall_s": 0.15794160000041302,
+            "objective_vector": [
+              4,
+              24,
+              10,
+              29.66666666666663,
+              -314.0
+            ],
+            "variables": 1228,
+            "integer_variables": 119,
+            "nonzeros": 5187,
+            "matrix_bytes": 64680,
+            "build_s": 0.0032990999998219195,
+            "optimization_s": 0.1518988999996509,
+            "recovery_s": 0.0010836000001290813
+          }
+        ]
+      }
+    ]
+  },
+  "forecast": {
+    "train_rows": 28335,
+    "windows": 8,
+    "generated_requests": 4988,
+    "exact_equal": true,
+    "legacy_initialization_s": 0.4110746000005747,
+    "indexed_initialization_s": 0.6292027999998027,
+    "legacy_sampling_s": 0.5115869999999632,
+    "indexed_sampling_s": 0.049824500000795524
+  },
+  "routing": {
+    "query_batches": 100,
+    "arc_lookups": 2000,
+    "exact_equal": true,
+    "legacy_cold_s": 3.327276800000618,
+    "parallel_cold_s": 2.1041026000002603,
+    "repeated_identical_within_minute_s": 0.03875789999983681,
+    "persistent_cache_hits": 1980,
+    "process_group_rss_mib": 394.0703125,
+    "caveat": "Cold parallel time includes worker startup. Repeated queries measure cache reuse, not real full-day hit rate."
+  },
+  "runtime_s": 9.047789599999305,
+  "peak_parent_rss_mib": 235.7734375
+}

@@ -65,6 +65,19 @@ class TrainDemandForecast:
             ["release_second", "order_id"]).reset_index(drop=True) for date in sorted(dates)}
         self.cfg = cfg
         self.end_s = int(measurement_end_s)
+        self._compiled_days = {}
+        if cfg.get("fast_forecast", False):
+            profile_sets = {}
+            for date, day in self.days.items():
+                records = []
+                for source in day.itertuples(index=False):
+                    flags = tuple(bool(getattr(source, f"compatible_{k}")) for k in ("C", "M", "A"))
+                    allowed = profile_sets.setdefault(flags, frozenset(k for k, flag in zip(("C", "M", "A"), flags) if flag))
+                    records.append((float(source.release_second),
+                        position_key(source.start_lon_wgs84, source.start_lat_wgs84),
+                        position_key(source.end_lon_wgs84, source.end_lat_wgs84),
+                        float(source.predicted_route_time_p50_s), allowed))
+                self._compiled_days[date] = (day.release_second.to_numpy(float), tuple(records))
         # Prediction-only chord pace absorbs a crude detour/congestion factor.
         points_start = np.stack([xy(position_key(r.start_lon_wgs84, r.start_lat_wgs84))
                                  for r in templates.itertuples(index=False)])
@@ -80,6 +93,8 @@ class TrainDemandForecast:
             raise ValueError("Train M3 chord pace unavailable")
 
     def scenarios(self, now, profile, acceptance_rate, acceptance_seed):
+        if self.cfg.get("fast_forecast", False):
+            return self._indexed_scenarios(now, acceptance_rate, acceptance_seed)
         result = []
         horizon_end = min(now + self.cfg["forecast_horizon_s"], self.end_s - 1)
         for scenario_index, (date, day) in enumerate(self.days.items()):
@@ -99,6 +114,30 @@ class TrainDemandForecast:
                 request = Request(rid, release, release + self.cfg["patience_s"],
                                   float(source.predicted_route_time_p50_s), dropoff, allowed, accepts)
                 requests.append(request)
+                coordinates[rid] = pickup
+            result.append((Scenario(f"TRAIN_DAY_{date}", 1 / len(self.days), -7 * 86400,
+                                    tuple(requests), ()), coordinates))
+        return result
+
+    def _indexed_scenarios(self, now, acceptance_rate, acceptance_seed):
+        """Same pool, RNG draws and request identities; no repeated iloc/strings."""
+        result = []
+        horizon_end = min(now + self.cfg["forecast_horizon_s"], self.end_s - 1)
+        for scenario_index, (date, (release_times, records)) in enumerate(self._compiled_days.items()):
+            left = int(np.searchsorted(release_times, now, side="right"))
+            right = max(left, int(np.searchsorted(release_times, horizon_end, side="right")))
+            size = right - left
+            seed = int.from_bytes(hashlib.sha256(f'{self.cfg["forecast_seed"]}|{now}|{date}'.encode()).digest()[:8], "little")
+            rng = np.random.default_rng(seed)
+            count = int(rng.poisson(size * self.cfg["forecast_sampling_multiplier"])) if size else 0
+            requests, coordinates = [], {}
+            for index, source_index in enumerate(rng.integers(0, size, size=count) if count else []):
+                release_s, pickup, dropoff, duration, allowed = records[left + int(source_index)]
+                rid = -(scenario_index + 1) * 1_000_000 - index - 1
+                release = float(np.clip(release_s + rng.uniform(-15, 15), now + 1, horizon_end))
+                accepts = passenger_acceptance(f"FORECAST|{now}|{date}|{index}", acceptance_rate, acceptance_seed).passenger_accepts_av
+                requests.append(Request(rid, release, release + self.cfg["patience_s"],
+                                        duration, dropoff, allowed, accepts))
                 coordinates[rid] = pickup
             result.append((Scenario(f"TRAIN_DAY_{date}", 1 / len(self.days), -7 * 86400,
                                     tuple(requests), ()), coordinates))
@@ -164,6 +203,9 @@ class NativeFlexibilityAdapter:
         self.last_assignments = {}
         self.assignment_cursor = 0
         self.rows = []
+        if cfg.get("solver_backend") == "HIGHS_PERSISTENT":
+            from .persistent_highs import load_highspy
+            load_highspy(cfg.get("highspy_runtime_dir"))
 
     def _refresh_booked(self, c):
         columns = ("simulation_time_s", "native_vehicle_id", "native_request_id", "pickup_eta_s", "predicted_service_time_s")
@@ -195,11 +237,15 @@ class NativeFlexibilityAdapter:
             coordinates[int(rid)] = position_key(source.pickup_lon_wgs84, source.pickup_lat_wgs84)
         limits = ModelLimits(horizon_s=self.cfg["forecast_horizon_s"], rolling_step_s=c.dispatch_interval_s,
             max_variables=self.cfg["max_model_variables"], max_nonzeros=self.cfg["max_model_nonzeros"],
-            solver_time_limit_s=self.cfg["solver_time_limit_s"])
+            solver_time_limit_s=self.cfg["solver_time_limit_s"],
+            recourse_mode=self.cfg.get("recourse_mode", "BINARY"),
+            solver_backend=self.cfg.get("solver_backend", "SCIPY"),
+            highspy_runtime_dir=self.cfg.get("highspy_runtime_dir"))
         problem = Problem(now, vehicles, tuple(requests),
                           tuple(CurrentPickup(a.vehicle_id, a.request_id, a.pickup_eta_s) for a in arcs), (), limits)
         if self.policy not in ("LOOKAHEAD", "SERVICE_PRESERVING_LOOKAHEAD"):
             return problem
+        future_started = time.perf_counter()
         by_rid = {r.request_id: r for r in requests}
         options = [(v, None, v.ready_time_s, v.ready_position) for v in vehicles]
         vehicle_map = {v.vehicle_id: v for v in vehicles}
@@ -209,7 +255,10 @@ class NativeFlexibilityAdapter:
         points = np.stack([xy(state[3]) for state in options]) if options else np.empty((0, 2))
         tree = cKDTree(points) if options else None
         scenarios = []
-        for scenario, pickups in self.forecast.scenarios(now, c.config["profile_id"], c.acceptance_rate, c.acceptance_seed):
+        sampling_started = time.perf_counter()
+        scenario_inputs = self.forecast.scenarios(now, c.config["profile_id"], c.acceptance_rate, c.acceptance_seed)
+        self.stage_timings["forecast_sampling_time_s"] = time.perf_counter() - sampling_started
+        for scenario, pickups in scenario_inputs:
             all_requests = (*requests, *scenario.new_requests)
             destination = {**coordinates, **pickups}
             future_arcs = []
@@ -238,12 +287,15 @@ class NativeFlexibilityAdapter:
             from dataclasses import replace
             scenarios.append(replace(scenario, pickups=tuple(future_arcs)))
         from dataclasses import replace
+        self.stage_timings["future_graph_time_s"] = time.perf_counter() - future_started - self.stage_timings["forecast_sampling_time_s"]
         return replace(problem, scenarios=tuple(scenarios))
 
     def solve(self, c, arcs, waiting_ids, now):
         started = time.perf_counter()
         fallback = None
         decision = None
+        self.stage_timings = dict(forecast_sampling_time_s=0.0, future_graph_time_s=0.0,
+                                 problem_setup_time_s=0.0, failed_model_attempt_time_s=0.0)
         protected = self.policy == "SERVICE_PRESERVING_LOOKAHEAD"
         current_oracle = solve_lexicographic(arcs) if protected else None
         self.busy_diagnostics = {}
@@ -251,7 +303,11 @@ class NativeFlexibilityAdapter:
             result = solve_lexicographic(arcs)
         else:
             try:
+                preparation_started = time.perf_counter()
                 problem = self._problem(c, arcs, waiting_ids, now)
+                self.stage_timings["problem_setup_time_s"] = max(0.0, time.perf_counter() - preparation_started
+                    - self.stage_timings["forecast_sampling_time_s"] - self.stage_timings["future_graph_time_s"])
+                attempt_started = time.perf_counter()
                 decision = solve_dispatch(problem, self.policy)
                 selected = set(decision.selected_pairs)
                 indices = tuple(i for i, a in enumerate(arcs) if (a.vehicle_id, a.request_id) in selected)
@@ -266,12 +322,19 @@ class NativeFlexibilityAdapter:
                 if "resource cap" not in str(error) and "not proven optimal" not in str(error) and "solver timeout" not in str(error):
                     raise
                 fallback = str(error)
+                if "attempt_started" in locals():
+                    self.stage_timings["failed_model_attempt_time_s"] = time.perf_counter() - attempt_started
                 result = solve_lexicographic(arcs)
         self.rows.append(dict(simulation_time_s=now, policy=self.policy, current_arc_count=len(arcs),
             current_selected=result.total_matched, solver_time_s=time.perf_counter() - started,
             resource_fallback=fallback, variable_count=decision.variable_count if decision else None,
             nonzeros=decision.constraint_nonzeros if decision else None,
-            expected_next_service=decision.expected_next_service_count if decision else None))
+            expected_next_service=decision.expected_next_service_count if decision else None,
+            integer_variable_count=decision.integer_variable_count if decision else None,
+            model_build_time_s=decision.model_build_time_s if decision else 0.0,
+            optimization_time_s=decision.solve_time_s if decision else result.solve_time_s,
+            recourse_recovery_time_s=decision.recourse_recovery_time_s if decision else 0.0,
+            **self.stage_timings))
         if protected:
             actual = (result.critical_matched, result.total_matched, result.carry_over_matched)
             optimum = (current_oracle.critical_matched, current_oracle.total_matched,

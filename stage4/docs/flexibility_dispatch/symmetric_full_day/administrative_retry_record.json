@@ -1,0 +1,38 @@
+{
+  "user_authorization": "允许仅延长总时限重跑",
+  "authorization_date": "2026-10-04",
+  "latest_user_direction": "先完成代码优化，不重跑全天",
+  "latest_direction_date": "2026-10-05",
+  "policy": "SERVICE_PRESERVING_LOOKAHEAD",
+  "original_attempt": {
+    "execution_code_commit": "8559cf7",
+    "administrative_timeout_s": 10800,
+    "status": "STOPPED",
+    "error": "TimeoutError('full-day hard timeout')",
+    "runtime_s": 10804.06199999999,
+    "last_saved_simulation_tick_s": 57600,
+    "archive_directory": "stage4/output/symmetric_flexibility_v1/full_day/aborted/SERVICE_PRESERVING_LOOKAHEAD_10800s",
+    "partial_results_are_not_full_day_results": true
+  },
+  "retry": {
+    "execution_code_commit": "0e69b42",
+    "administrative_timeout_s": 21600,
+    "status": "PROCESS_ABSENT_WITHOUT_COMPLETION",
+    "observed_at_local": "2026-10-05T12:51:13+08:00",
+    "last_saved_simulation_tick_s": 52200,
+    "last_progress_saved_at_local": "2026-10-05T00:44:52+08:00",
+    "last_progress_runtime_s": 3928.7030000000086,
+    "original_exec_session": "unavailable; unknown process id 60165",
+    "exit_cause": "UNAVAILABLE",
+    "partial_results_are_not_full_day_results": true,
+    "started_at_utc": "2026-10-04T15:39:22Z",
+    "clean_initial_state": true,
+    "per_epoch_solver_time_limit_s": 10,
+    "model_variable_limit": 20000,
+    "model_nonzero_limit": 150000,
+    "scientific_configuration_sha256": "92865914130ce9ebc23ebe5ca45a3c5d01da3dd1b2c7d4e4293462ea059d65e9",
+    "data_seeds_policy_and_thresholds_unchanged": true,
+    "myopic_rerun": false,
+    "additional_scientific_conditions": 0
+  }
+}

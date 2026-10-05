@@ -13,6 +13,7 @@ from math import isfinite
 import numpy as np
 from scipy.optimize import Bounds, LinearConstraint, milp
 from scipy.sparse import csr_matrix
+from scipy.sparse.csgraph import maximum_bipartite_matching
 
 from .solver import AssignmentArc, solve_lexicographic
 
@@ -74,6 +75,9 @@ class ModelLimits:
     max_nonzeros: int = 150_000
     max_rows: int = 50_000
     solver_time_limit_s: float = 30.0
+    recourse_mode: str = "BINARY"
+    solver_backend: str = "SCIPY"
+    highspy_runtime_dir: str | None = None
 
 
 @dataclass(frozen=True)
@@ -98,6 +102,11 @@ class Decision:
     constraint_nonzeros: int
     sparse_matrix_bytes: int
     recourse_pairs: tuple[tuple[str, int, int], ...] = ()
+    integer_variable_count: int = 0
+    model_build_time_s: float = 0.0
+    recourse_recovery_time_s: float = 0.0
+    solver_backend: str = "SCIPY"
+    recourse_mode: str = "BINARY"
 
 
 @dataclass(frozen=True)
@@ -154,6 +163,8 @@ def _allowed(vehicle, request):
 
 def _validate(problem, *, fixed_action=False):
     limits = problem.limits
+    if limits.recourse_mode not in ("BINARY", "FLOW_RELAXED") or limits.solver_backend not in ("SCIPY", "HIGHS_PERSISTENT"):
+        raise ValueError("unrecognized acceleration mode")
     if (not isfinite(problem.now_s) or not isfinite(limits.horizon_s)
             or limits.horizon_s <= 0 or not isfinite(limits.rolling_step_s)
             or not 0 < limits.rolling_step_s <= limits.horizon_s
@@ -226,9 +237,12 @@ def _options(problem, vehicles, requests):
     return options
 
 
-def _run_levels(rows, count, levels, limits):
+def _run_levels(rows, count, levels, limits, integrality=None):
     if count == 0:
         return np.zeros(0), 0.0
+    if limits.solver_backend == "HIGHS_PERSISTENT":
+        from .persistent_highs import run_levels
+        return run_levels(rows, count, levels, limits, integrality)
     started = time.perf_counter()
     solution = None
     for objective, maximize in levels:
@@ -238,7 +252,7 @@ def _run_levels(rows, count, levels, limits):
         if remaining <= 0:
             raise RuntimeError("sparse model solver timeout")
         result = milp(-objective if maximize else objective,
-                      integrality=np.ones(count, dtype=np.int8),
+                      integrality=np.ones(count, dtype=np.int8) if integrality is None else integrality,
                       bounds=Bounds(np.zeros(count), np.ones(count)),
                       constraints=LinearConstraint(rows.matrix(count), rows.lower, rows.upper),
                       options={"presolve": True, "time_limit": remaining, "mip_rel_gap": 0.0})
@@ -252,7 +266,7 @@ def _run_levels(rows, count, levels, limits):
     if solution is None:  # Idle-only model still has vehicle-state equalities.
         objective = np.ones(count)
         remaining = limits.solver_time_limit_s - (time.perf_counter() - started)
-        result = milp(objective, integrality=np.ones(count, dtype=np.int8),
+        result = milp(objective, integrality=np.ones(count, dtype=np.int8) if integrality is None else integrality,
                       bounds=Bounds(np.zeros(count), np.ones(count)),
                       constraints=LinearConstraint(rows.matrix(count), rows.lower, rows.upper),
                       options={"time_limit": max(remaining, 0.001), "mip_rel_gap": 0.0})
@@ -262,7 +276,39 @@ def _run_levels(rows, count, levels, limits):
     return solution, time.perf_counter() - started
 
 
+def _recover_recourse(problem, recourse, solution, selected):
+    """Integral maximum matchings for the selected first-stage vehicle states.
+
+    This applies to the ONE-next-service model only. Current served requests
+    have zero residual capacity; each remaining vehicle/request has capacity 1.
+    No dense assignment matrix or rounding of fractional future edges is used.
+    """
+    served_now = {request for _, request in selected}
+    recovered = []
+    expected = 0.0
+    for scenario in problem.scenarios:
+        edges = sorted({(pickup.vehicle_id, pickup.request_id)
+                        for s, pickup, option_j in recourse
+                        if s.scenario_id == scenario.scenario_id
+                        and solution[option_j] > .5 and pickup.request_id not in served_now})
+        if not edges:
+            continue
+        vehicles = {v: i for i, v in enumerate(sorted({v for v, _ in edges}))}
+        requests = {r: i for i, r in enumerate(sorted({r for _, r in edges}))}
+        graph = csr_matrix((np.ones(len(edges), dtype=np.int8),
+                            ([vehicles[v] for v, _ in edges], [requests[r] for _, r in edges])),
+                           shape=(len(vehicles), len(requests)))
+        matching = maximum_bipartite_matching(graph, perm_type="column")
+        request_ids = list(requests)
+        for vehicle, row in vehicles.items():
+            if matching[row] >= 0:
+                recovered.append((scenario.scenario_id, vehicle, request_ids[matching[row]]))
+                expected += scenario.probability
+    return tuple(recovered), expected
+
+
 def _solve(problem, policy, fixed_pairs=None):
+    build_started = time.perf_counter()
     vehicles, requests = _validate(problem, fixed_action=fixed_pairs is not None)
     options = _options(problem, vehicles, requests)
     option_keys = {(o.vehicle_id, o.request_id): j for j, o in enumerate(options)}
@@ -323,10 +369,18 @@ def _solve(problem, policy, fixed_pairs=None):
             rows.add({option_keys[key]: 1.0}, 1.0, 1.0)
     per_future_vehicle = {}
     per_future_request = {}
+    per_future_option = {}
     for i, (scenario, pickup, option_j) in enumerate(recourse, start=len(options)):
-        rows.add({i: 1.0, option_j: -1.0}, upper=0.0)
+        if problem.limits.recourse_mode == "FLOW_RELAXED":
+            per_future_option.setdefault((scenario.scenario_id, option_j), {})[i] = 1.0
+        else:
+            rows.add({i: 1.0, option_j: -1.0}, upper=0.0)
         per_future_vehicle.setdefault((scenario.scenario_id, pickup.vehicle_id), {})[i] = 1.0
         per_future_request.setdefault((scenario.scenario_id, pickup.request_id), {})[i] = 1.0
+    # Capacity on a chosen state, not merely one independent gate per edge.
+    # Equivalent for binary x, and stronger/fewer rows in the LP relaxation.
+    for (_, option_j), coefficients in per_future_option.items():
+        rows.add({**coefficients, option_j: -1.0}, upper=0.0)
     for coefficients in per_future_vehicle.values():
         rows.add(coefficients, upper=1.0)
     for (_, request_id), coefficients in per_future_request.items():
@@ -359,7 +413,12 @@ def _solve(problem, policy, fixed_pairs=None):
                   (future_value, True), (eta, False)]
     else:  # Simple AV-first control: differs ONLY in the pre-ETA tie-break.
         levels = [(critical, True), (immediate, True), (carry, True), (av, True), (eta, False)]
-    solution, runtime = _run_levels(rows, count, levels, problem.limits)
+    integrality = None
+    if problem.limits.recourse_mode == "FLOW_RELAXED":
+        integrality = np.zeros(count, dtype=np.int8)
+        integrality[:len(options)] = 1
+    build_time = time.perf_counter() - build_started
+    solution, runtime = _run_levels(rows, count, levels, problem.limits, integrality)
     selected = tuple(sorted((o.vehicle_id, o.request_id) for j, o in enumerate(options)
                             if o.request_id is not None and solution[j] > 0.5))
     selected_future = tuple((s.scenario_id, p.vehicle_id, p.request_id)
@@ -367,10 +426,20 @@ def _solve(problem, policy, fixed_pairs=None):
                             if solution[i] > 0.5)
     matrix = rows.matrix(count)
     future = float(future_value @ solution)
+    recovery_time = 0.0
+    if problem.limits.recourse_mode == "FLOW_RELAXED":
+        recovery_started = time.perf_counter()
+        selected_future, recovered_value = _recover_recourse(problem, recourse, solution, selected)
+        if abs(recovered_value - future) > 1e-6:
+            raise RuntimeError("continuous recourse failed integral matching recovery")
+        future = recovered_value
+        recovery_time = time.perf_counter() - recovery_started
     return Decision(policy, selected, len(selected), future, len(selected) + future,
                     runtime, count, matrix.nnz,
                     matrix.data.nbytes + matrix.indices.nbytes + matrix.indptr.nbytes,
-                    selected_future)
+                    selected_future, integer_variable_count=count if integrality is None else int(integrality.sum()),
+                    model_build_time_s=build_time, recourse_recovery_time_s=recovery_time,
+                    solver_backend=problem.limits.solver_backend, recourse_mode=problem.limits.recourse_mode)
 
 
 def solve_dispatch(problem: Problem, policy: str) -> Decision:
