@@ -51,19 +51,20 @@ def benchmark_math(root):
     for dimensions in ((12,8,12),(36,24,30)):
         problem = sparse_case(*dimensions)
         rows = []
-        for mode,backend in (("BINARY","SCIPY"),("FLOW_RELAXED","SCIPY"),("FLOW_RELAXED","HIGHS_PERSISTENT")):
+        for mode,backend,lock in (("BINARY","SCIPY",False),("FLOW_RELAXED","SCIPY",False),
+                                  ("FLOW_RELAXED","SCIPY",True),("FLOW_RELAXED","HIGHS_PERSISTENT",True)):
             changed = replace(problem,limits=replace(problem.limits,recourse_mode=mode,
-                solver_backend=backend,highspy_runtime_dir=str(runtime)))
+                solver_backend=backend,highspy_runtime_dir=str(runtime),lock_current_face=lock))
             started = time.perf_counter()
             try:
                 d = solve_dispatch(changed,"SERVICE_PRESERVING_LOOKAHEAD")
-                row = dict(status="OPTIMAL",mode=mode,backend=backend,wall_s=time.perf_counter()-started,
+                row = dict(status="OPTIMAL",mode=mode,backend=backend,lock_current_face=lock,wall_s=time.perf_counter()-started,
                     objective_vector=vector(changed,d),variables=d.variable_count,integer_variables=d.integer_variable_count,
                     nonzeros=d.constraint_nonzeros,matrix_bytes=d.sparse_matrix_bytes,
                     build_s=d.model_build_time_s,optimization_s=d.solve_time_s,recovery_s=d.recourse_recovery_time_s)
             except RuntimeError as error:
                 if "solver timeout" not in str(error) and "not proven optimal" not in str(error): raise
-                row = dict(status="NOT_PROVEN_WITHIN_BUDGET",mode=mode,backend=backend,
+                row = dict(status="NOT_PROVEN_WITHIN_BUDGET",mode=mode,backend=backend,lock_current_face=lock,
                            wall_s=time.perf_counter()-started,error=str(error))
             rows.append(row)
         completed = [r for r in rows if r["status"]=="OPTIMAL"]

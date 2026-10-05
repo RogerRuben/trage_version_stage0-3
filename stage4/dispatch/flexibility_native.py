@@ -240,7 +240,8 @@ class NativeFlexibilityAdapter:
             solver_time_limit_s=self.cfg["solver_time_limit_s"],
             recourse_mode=self.cfg.get("recourse_mode", "BINARY"),
             solver_backend=self.cfg.get("solver_backend", "SCIPY"),
-            highspy_runtime_dir=self.cfg.get("highspy_runtime_dir"))
+            highspy_runtime_dir=self.cfg.get("highspy_runtime_dir"),
+            lock_current_face=self.cfg.get("lock_current_face", False))
         problem = Problem(now, vehicles, tuple(requests),
                           tuple(CurrentPickup(a.vehicle_id, a.request_id, a.pickup_eta_s) for a in arcs), (), limits)
         if self.policy not in ("LOOKAHEAD", "SERVICE_PRESERVING_LOOKAHEAD"):

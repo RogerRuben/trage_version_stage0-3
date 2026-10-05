@@ -78,6 +78,7 @@ class ModelLimits:
     recourse_mode: str = "BINARY"
     solver_backend: str = "SCIPY"
     highspy_runtime_dir: str | None = None
+    lock_current_face: bool = False
 
 
 @dataclass(frozen=True)
@@ -163,6 +164,8 @@ def _allowed(vehicle, request):
 
 def _validate(problem, *, fixed_action=False):
     limits = problem.limits
+    if type(limits.lock_current_face) is not bool:
+        raise ValueError("current face lock must be an explicit boolean")
     if limits.recourse_mode not in ("BINARY", "FLOW_RELAXED") or limits.solver_backend not in ("SCIPY", "HIGHS_PERSISTENT"):
         raise ValueError("unrecognized acceleration mode")
     if (not isfinite(problem.now_s) or not isfinite(limits.horizon_s)
@@ -409,8 +412,25 @@ def _solve(problem, policy, fixed_pairs=None):
     elif policy == "SERVICE_PRESERVING_LOOKAHEAD":
         # Optimize future flexibility ONLY on the same current-service face as
         # MYOPIC. This protects epoch counts, not full-window service dominance.
-        levels = [(critical, True), (immediate, True), (carry, True),
-                  (future_value, True), (eta, False)]
+        if problem.limits.lock_current_face:
+            # y=0 is feasible for every feasible first action. The first three
+            # optima therefore come from the current sparse graph alone.
+            current_arcs = [AssignmentArc(o.vehicle_id, o.request_id, o.pickup_eta_s,
+                requests[o.request_id].critical, requests[o.request_id].carry_over,
+                vehicle_type="HV" if vehicles[o.vehicle_id].profile_id == "HV" else "AV")
+                for o in options if o.request_id is not None]
+            face = solve_lexicographic(current_arcs)
+            for objective, optimum in ((critical, face.critical_matched),
+                                       (immediate, face.total_matched),
+                                       (carry, face.carry_over_matched)):
+                nonzero = np.flatnonzero(objective)
+                if len(nonzero):
+                    rows.add({int(j): float(objective[j]) for j in nonzero},
+                             optimum - 1e-7, optimum + 1e-7)
+            levels = [(future_value, True), (eta, False)]
+        else:
+            levels = [(critical, True), (immediate, True), (carry, True),
+                      (future_value, True), (eta, False)]
     else:  # Simple AV-first control: differs ONLY in the pre-ETA tie-break.
         levels = [(critical, True), (immediate, True), (carry, True), (av, True), (eta, False)]
     integrality = None

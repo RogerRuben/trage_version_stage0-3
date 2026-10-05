@@ -45,7 +45,8 @@ def test_continuous_recourse_preserves_lex_objectives_and_integral_recovery(back
         for policy in ("LOOKAHEAD", "SERVICE_PRESERVING_LOOKAHEAD"):
             baseline = solve_dispatch(original, policy)
             fast = replace(original, limits=replace(original.limits,
-                recourse_mode="FLOW_RELAXED", solver_backend=backend, highspy_runtime_dir=str(RUNTIME)))
+                recourse_mode="FLOW_RELAXED", solver_backend=backend, highspy_runtime_dir=str(RUNTIME),
+                lock_current_face=True))
             result = solve_dispatch(fast, policy)
             assert objective_vector(original, result, policy) == pytest.approx(objective_vector(original, baseline, policy), abs=1e-6)
             assert result.integer_variable_count < result.variable_count

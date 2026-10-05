@@ -58,16 +58,26 @@
 
 可选HiGHS固定版本1.12.0只安装到`stage4/output/runtime_dependencies/highspy_1_12_0`，不更改conda、NumPy或SciPy。默认SCIPY路径不需要它。[HiGHS接口](https://ergo-code.github.io/HiGHS/dev/interfaces/python/example-py/)
 
-未来获授权后的加速执行入口：
+加速执行入口（后续授权见下节）：
 
 ```powershell
 python -m stage4.analysis.symmetric_flexibility_full_day --fleetpy-root D:/pycodes/didi_xian_raw/.external/FleetPy --policy SERVICE_PRESERVING_LOOKAHEAD --acceleration-config stage4/config/symmetric_flexibility_acceleration_v1.json --administrative-timeout-s 21600
 ```
 
-用户已明确选择“先完成代码优化，不重跑全天”。本轮不运行该native命令，不新增C/A、日期、接受率或配额条件。10秒求解、20,000变量/150,000非零元上限不变。
+此前用户选择“先完成代码优化，不重跑全天”，该阶段仅完成有限QA与提交。后续运行授权单独记录如下。不新增C/A、日期、接受率或配额条件；10秒求解、20,000变量/150,000非零元上限不变。
+
+## 2026-10-05 后续检查与新授权
+
+用户随后明确要求“接着完成刚才升级代码后的检查与分析，思考还能不能优化之后运行实验”，覆盖前述本轮暂不运行的指令。仅执行相同M条件的第二组，复用完整MYOPIC，不新增C/A/日期/参数条件。
+
+追加实现`lock_current_face`：在当前小图上求critical/current/carry最优值，固定相同最优面，仅在扩展模型求future和ETA。y=0对任意可行当前分配可行，所以前三层不受未来情景影响。默认仍关闭，独立可切换。
+
+实测FLOW_RELAXED SciPy无锁/有锁分别0.0438/0.0430秒和0.1438/0.1475秒，目标向量相等；总耗时没有稳定收益，故本次正式配置关闭该开关。Highs仍非默认。不同结果仅根据技术计时选择，未依据服务结果调参。
+
+新入口支持从旧目录复用已完成MYOPIC，并核对双方共同冻结输入SHA一致。旧中止产物不覆盖。新隐藏后台runner记录stdout、stderr、PID和退出码，启用Python faulthandler；不依赖旧的临时exec会话恢复退出原因。
 
 ## 5. 原任务现状与QA异常
 
-MYOPIC完整结果保留，不重跑。原第二组6小时尝试的进程目前不存在，最后保存于2026-10-05 00:44、模拟14:30；原始summary仍为RUNNING，无法读取原exec退出记录，不猜测退出原因，不当成完成结果。本轮按用户明确答复仅完成优化代码和有限QA，停止于提交推送，不重跑该科学条件。
+MYOPIC完整结果保留，不重跑。原第二组6小时尝试的进程目前不存在，最后保存于2026-10-05 00:44、模拟14:30；原始summary仍为RUNNING，无法读取原exec退出记录，不猜测退出原因，不当成完成结果。此前优化阶段按用户答复没有重跑；本次按照上节新授权，只在独立accelerated_full_day目录运行第二组。
 
 首轮微基准计算结束后因新文档目录不存在而写出失败；已修复显式创建目录，再运行约9.05秒成功落盘。它不是native处理异常或科学结果重试。

@@ -6,6 +6,7 @@
     "solver_backend": "SCIPY",
     "highspy_runtime_dir": "stage4/output/runtime_dependencies/highspy_1_12_0",
     "fast_forecast": true,
+    "lock_current_face": false,
     "persistent_cache_size": 50000,
     "route_workers": 2
   },

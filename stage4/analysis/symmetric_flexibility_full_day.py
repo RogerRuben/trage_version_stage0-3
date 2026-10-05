@@ -45,7 +45,7 @@ def acceleration_settings(root, path):
         raise ValueError("acceleration configuration must stay in the workspace")
     spec = json.loads(path.read_text())
     allowed = {"recourse_mode", "solver_backend", "highspy_runtime_dir", "fast_forecast",
-               "persistent_cache_size", "route_workers"}
+               "persistent_cache_size", "route_workers", "lock_current_face"}
     if (spec.get("version") != "symmetric_flexibility_acceleration_v1"
             or Path(spec.get("base_config", "")) != CONFIG
             or set(spec.get("settings", {})) != allowed
@@ -58,6 +58,7 @@ def acceleration_settings(root, path):
     settings["highspy_runtime_dir"] = str(runtime)
     if (settings["recourse_mode"] != "FLOW_RELAXED" or settings["solver_backend"] not in ("SCIPY", "HIGHS_PERSISTENT")
             or type(settings["fast_forecast"]) is not bool
+            or type(settings["lock_current_face"]) is not bool
             or not 0 <= settings["persistent_cache_size"] <= 50000
             or not 1 <= settings["route_workers"] <= 4
             or spec["process_group_memory_limit_mib"] != 2048):
@@ -69,13 +70,23 @@ def analyze(root, output_root=OUTPUT, doc_root=DOC):
     cfg = json.loads((root / CONFIG).read_text())
     rows = []
     outcomes = []
+    provenance = []
     for policy in cfg["policies"]:
         directory = root / output_root / policy
+        reused = False
+        if policy == "MYOPIC" and output_root != OUTPUT and not (directory / "summary.json").exists():
+            directory = root / OUTPUT / policy
+            reused = True
         if not (directory / "summary.json").exists(): return
         row = json.loads((directory / "summary.json").read_text())
         if row["status"] != "COMPLETE": return
         rows.append(row)
+        provenance.append(dict(policy=policy,path=str(directory),reused_completed_myopic=reused))
         outcomes.append(pd.read_parquet(directory / "cohort_outcomes.parquet"))
+    first = {str(p).replace('\\','/'):h for p,h in rows[0]["inputs_sha256"].items()}
+    second = {str(p).replace('\\','/'):h for p,h in rows[1]["inputs_sha256"].items()}
+    if any(second.get(p) != h for p,h in first.items()):
+        raise ValueError("paired frozen execution inputs differ")
     pair = outcomes[0].merge(outcomes[1], on="order_id", validate="one_to_one", suffixes=("_base", "_new"))
     if len(pair) != len(outcomes[0]) or len(pair) != len(outcomes[1]):
         raise ValueError("full-day paired cohort mismatch")
@@ -83,6 +94,7 @@ def analyze(root, output_root=OUTPUT, doc_root=DOC):
         raise ValueError("comparison populations differ")
     common = pair.matched_base & pair.matched_new
     result = dict(status="COMPLETE", rows=rows, original_orders=len(pair),
+        execution_provenance=provenance,
         common_eligible=int(pair.common_eligible_base.sum()),
         gained=int((~pair.matched_base & pair.matched_new).sum()), lost=int((pair.matched_base & ~pair.matched_new).sum()),
         net_matched_change=int(pair.matched_new.sum()-pair.matched_base.sum()),
