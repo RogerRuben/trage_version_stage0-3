@@ -320,7 +320,10 @@ class NativeFlexibilityAdapter:
                     backend="SPARSE_TWO_STAGE_RESEARCH", pickup_eta_optimum_s=sum(a.pickup_eta_s for a in chosen))
             except (ValueError, RuntimeError) as error:
                 # Only the preregistered RESOURCE/TIME fallback, never hide data bugs.
-                if "resource cap" not in str(error) and "not proven optimal" not in str(error) and "solver timeout" not in str(error):
+                message = str(error).casefold()
+                time_limited = ("solver timeout" in message or
+                    ("sparse model not proven optimal:" in message and "time limit" in message))
+                if "resource cap" not in message and not time_limited:
                     raise
                 fallback = str(error)
                 if "attempt_started" in locals():

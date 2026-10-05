@@ -91,3 +91,29 @@ def test_busy_conditioning_never_reads_realized_end_and_unsupported_tail_omits_f
     assert predicted_vehicle_states(c, 180, 600, booked, timing_model())[0].ready_time_s == 280
     assert predicted_vehicle_states(c, 330, 600, booked, timing_model()) == ()
     assert c.runtime_by_vid[1].native_vehicle.assigned_route == [1]
+
+
+@pytest.mark.parametrize("error,allowed", [
+    (ValueError("variable resource cap exceeded"), True),
+    (RuntimeError("sparse model solver timeout"), True),
+    (RuntimeError("sparse model not proven optimal: Time limit reached"), True),
+    (RuntimeError("sparse model not proven optimal: Infeasible"), False),
+    (RuntimeError("sparse model not proven optimal: Solve error"), False),
+])
+def test_only_budget_failures_allow_current_service_fallback(monkeypatch, error, allowed):
+    from stage4.dispatch import flexibility_native as module
+    from stage4.dispatch.solver import AssignmentArc
+    adapter = module.NativeFlexibilityAdapter("SERVICE_PRESERVING_LOOKAHEAD", None, {})
+    monkeypatch.setattr(adapter, "_problem", lambda *args: None)
+    def fail(*args):
+        raise error
+    monkeypatch.setattr(module, "solve_dispatch", fail)
+    arcs = [AssignmentArc(1, 2, 30., True, True)]
+    if allowed:
+        result = adapter.solve(NS(), arcs, [2], 0)
+        assert result.total_matched == 1
+        assert adapter.rows[-1]["current_face_preserved"]
+        assert adapter.rows[-1]["resource_fallback"] == str(error)
+    else:
+        with pytest.raises(type(error), match=str(error)):
+            adapter.solve(NS(), arcs, [2], 0)

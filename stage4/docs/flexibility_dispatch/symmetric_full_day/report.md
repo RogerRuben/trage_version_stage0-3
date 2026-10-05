@@ -3,7 +3,7 @@
 ## Material Passport
 
 - academic-research-suite / experiment-agent；2026-10-04；run + validate。
-- 执行状态：第二组在原3小时行政超时后，按用户授权以6小时总时限重跑；2026-10-05 12:51（Asia/Singapore）检查发现进程已不存在且没有完成summary。第一组结果为ANALYZED，不是独立复跑VERIFIED。
+- 执行状态：两组已完成。旧3小时超时与旧6小时进程消失的部分产品保留；2026-10-05按新授权在独立加速目录完成第二组（执行代码6b46f54），复用MYOPIC。为内部ANALYZED，不是独立复跑VERIFIED。
 - 输入与执行前代码提交：`d50b02b`、`8559cf7`。协议在新增native全天结果之前提交。
 - 仅两组M全天条件，不新增C/A动态条件，不覆盖冻结基线，不按结果调参。
 
@@ -47,20 +47,20 @@ busy剩余时长模型复用上一轮3,400个Train配对，不重新拟合。新
 
 ## 3. 全天结果
 
-第二组原尝试运行10,804.062秒后触发行政超时，中止产物保存在`full_day/aborted/SERVICE_PRESERVING_LOOKAHEAD_10800s/`。原尝试不计为完整全天结果。6小时重跑最后落盘为模拟14:30、9,255单、3,928.703秒；文件保存于2026-10-05 00:44，12:51检查时已无对应进程，原exec会话不可读取，退出原因无法证实。原始RUNNING summary及部分产物保留，不把它改成伪造的完成结果；以下不构成策略优劣结论。
+第二组原尝试运行10,804.062秒后触发行政超时，中止产物保存在`full_day/aborted/SERVICE_PRESERVING_LOOKAHEAD_10800s/`。原尝试不计为完整全天结果。旧6小时重跑最后落盘为模拟14:30、9,255单、3,928.703秒；文件保存于2026-10-05 00:44，12:51检查时已无对应进程，原exec会话不可读取，退出原因无法证实。原始RUNNING summary及部分产物保留，不把它改成伪造的完成结果。以上为旧尝试历史；下表的第二组来自新授权的独立加速版完整执行，不拼接旧部分数据。
 
 | 指标 | MYOPIC | SERVICE_PRESERVING_LOOKAHEAD |
 |---|---:|---:|
-| 服务订单 | 18,702 | 待完成 |
-| AV服务 / HV服务 | 4,338 / 14,364 | 待完成 |
-| 共同集合服务率 | 65.9287% | 待完成 |
-| 原30,000单服务率 | 62.3400% | 待完成 |
-| 共同集合中耐心超时 | 9,665 | 待完成 |
-| 共同输入排除 | 1,633 | 待完成 |
-| 已服务订单平均等待，秒 | 170.774 | 待完成 |
-| 等待P50 / P90 / P95，秒 | 184.178 / 281.298 / 290.846 | 待完成 |
+| 服务订单 | 18,702 | 19,398 |
+| AV服务 / HV服务 | 4,338 / 14,364 | 4,647 / 14,751 |
+| 共同集合服务率 | 65.9287% | 68.3823% |
+| 原30,000单服务率 | 62.3400% | 64.6600% |
+| 共同集合中耐心超时 | 9,665 | 8,969 |
+| 共同输入排除 | 1,633 | 1,633 |
+| 已服务订单平均等待，秒 | 170.774 | 181.427 |
+| 等待P50 / P90 / P95，秒 | 184.178 / 281.298 / 290.846 | 199.914 / 284.502 / 292.302 |
 
-配对gained/lost和共同获服务订单等待变化将在第二组完成后填入。等待均值与分位数是条件于已服务的指标，不把未服务订单当零等待。
+配对新增获服务2,573、丢失服务1,877、净增696；共同获服务16,825单平均等待增加10.0895秒。是吞吐—等待权衡，不是Pareto改善。等待指标条件于已服务，不把未服务订单当零等待。完整数据与解释见[加速执行报告](../acceleration_v1/report.md)。
 
 ## 4. 资源与执行正确性
 
@@ -70,8 +70,9 @@ MYOPIC：运行5,119.375秒（85.323分钟），native Python峰值549.230 MiB�
 native任务全部完成，接驾耐心、任务不重叠、车辆/订单/位置及物理时间链对账通过，受保护执行输入SHA未变。
 MYOPIC实际AV分配包含1,947单历史反向路线，HV包含7,018单；AV的M能力违规为0。这证明新接口并非只生成离线标签，旧反向否决没有继续潜藏在native分配中。
 
-第二组资源与当轮最优面检查未完成。每轮20,000变量/150,000非零元/10秒求解上限不变；原6小时重跑的进程目前已不存在，没有重新启动。原3小时中止记录和6小时部分记录都保留。详见[行政重跑记录](administrative_retry_record.json)。
-两组单进程顺序运行，CPU线程1，CUDA禁用，无稠密订单×车辆矩阵。输入派生峰值1,790.020 MiB，不跨日期累计token表。
+第二组加速版完成8,158.813秒（135.980分钟），父进程峰值663.555 MiB、进程组step采样峰值1,024.496 MiB；最大7,194变量、28,072非零元，回退/当轮最优面违规/路由失败均0，全部接受任务完成drain。实际AV历史反向路线2,127单，M能力违规0。六个共同冻结输入SHA未变。
+每轮20,000变量/150,000非零元/10秒求解上限不变；旧3小时和6小时部分记录保留。详见[行政重跑记录](administrative_retry_record.json)，该文件是旧尝试历史，不是新版完成状态。
+仅一个native情景主进程运行，加速版另有两个独立路由worker；数值线程环境1、CUDA禁用，无稠密订单×车辆矩阵。输入派生峰值1,790.020 MiB，不跨日期累计token表。
 
 ## 5. 解释边界
 
@@ -79,12 +80,12 @@ MYOPIC实际AV分配包含1,947单历史反向路线，HV包含7,018单；AV的M
 只有一日M动态比较，不外推到C/A、其他日期、真实安全性或全天必然优势。A是human-equivalent研究上界，不是实际AV车型认证。
 未来ETA是Train OD-chord pace近似；每车每情景最多一次下一服务，不是完整多次服务随机VRP。剩余时长模型的原训练支持只有两个时间带；route time proxy是冻结traversal预测聚合，不称校准的joint route P50。
 封存699处信号包含693处地图/高德证据及6处旧推断；2026控制补齐用于研究情景，不能写成2016控制真值。
-11/11解释风险检查将在配对完成后连同AV/HV分工与服务选择偏差报告。不进行基于订单独立性的显著性检验。
+11类解释风险与AV/HV分工、服务选择偏差已在[完整报告](../acceleration_v1/report.md)记录。不进行基于订单独立性的显著性检验，也不把一日M结果升级成普遍决策优越性。
 
 ## 6. 文件与复现
 
 - [定义闭环](definition_closure.md)、[执行前协议](protocol.md)、[输入数字](input_summary.json)。
-- 已完成：[MYOPIC summary](myopic_summary.json)；第二组summary与analysis.json待落盘。
-- 本地产物：`stage4/output/symmetric_flexibility_v1/full_day/<policy>/`，含assignments、cohort_outcomes、solver_trace、epochs及fleet_accounting。
+- 已完成：[MYOPIC summary](myopic_summary.json)、[第二组summary](../acceleration_v1/service_preserving_lookahead_summary.json)、[配对analysis](../acceleration_v1/analysis.json)。
+- 本地产物：MYOPIC位于`stage4/output/symmetric_flexibility_v1/full_day/MYOPIC/`；第二组位于`stage4/output/symmetric_flexibility_v1/accelerated_full_day/SERVICE_PRESERVING_LOOKAHEAD/`，含assignments、cohort_outcomes、solver_trace、epochs及fleet_accounting。
 - 执行入口：`stage4.analysis.symmetric_research_prepare`及`stage4.analysis.symmetric_flexibility_full_day`，详见协议。
 - 旧18窗口、41场景、旧负结果、冻结profile/CDF/M3/路网/信号产品均保留。
