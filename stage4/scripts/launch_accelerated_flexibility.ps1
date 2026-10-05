@@ -1,12 +1,17 @@
 param(
     [string]$Workspace = 'D:/pycodes/didi_xian_raw/.worktrees/stage0-v6-valhalla',
     [string]$FleetPy = 'D:/pycodes/didi_xian_raw/.external/FleetPy',
+    [string]$AccelerationConfig = 'stage4/config/symmetric_flexibility_acceleration_v1.json',
     [string]$RunLogDirectory,
     [switch]$Worker
 )
 $ErrorActionPreference = 'Stop'
 $Workspace = (Resolve-Path -LiteralPath $Workspace).ProviderPath
-$policyDirectory = Join-Path $Workspace 'stage4/output/symmetric_flexibility_v1/accelerated_full_day/SERVICE_PRESERVING_LOOKAHEAD'
+$configPath = (Resolve-Path -LiteralPath (Join-Path $Workspace $AccelerationConfig)).ProviderPath
+$version = (Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json).version
+if ($version -notin @('symmetric_flexibility_acceleration_v1','symmetric_flexibility_acceleration_v2')) { throw 'Unknown acceleration version' }
+$outputName = if ($version -eq 'symmetric_flexibility_acceleration_v2') {'accelerated_v2_full_day'} else {'accelerated_full_day'}
+$policyDirectory = Join-Path $Workspace ("stage4/output/symmetric_flexibility_v1/$outputName/SERVICE_PRESERVING_LOOKAHEAD")
 if (-not $Worker) {
     if (Test-Path -LiteralPath $policyDirectory) { throw 'Existing accelerated output is never automatically restarted or overwritten' }
     $live = @(Get-CimInstance Win32_Process -Filter "Name='python.exe'" | Where-Object { $_.CommandLine -like '*stage4.analysis.symmetric_flexibility_full_day*' })
@@ -16,11 +21,15 @@ if (-not $Worker) {
     New-Item -ItemType Directory -Path $RunLogDirectory -Force | Out-Null
     $codeSha = (& git -C $Workspace -c "safe.directory=$Workspace" rev-parse HEAD).Trim()
     if ($LASTEXITCODE -ne 0) { throw 'Cannot record the execution commit' }
-    $accelerationSha = (Get-FileHash -LiteralPath (Join-Path $Workspace 'stage4/config/symmetric_flexibility_acceleration_v1.json') -Algorithm SHA256).Hash.ToLowerInvariant()
+    $accelerationSha = (Get-FileHash -LiteralPath $configPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    if ($version -eq 'symmetric_flexibility_acceleration_v2') {
+        $checks = Get-Content -LiteralPath (Join-Path $Workspace 'stage4/docs/flexibility_dispatch/acceleration_v2/checks.json') -Raw | ConvertFrom-Json
+        if ($checks.status -ne 'PASS' -or $checks.acceleration_config_sha256 -ne $accelerationSha) { throw 'The finite v2 construction checks are not complete for this configuration' }
+    }
     $shell = (Get-Process -Id $PID).Path
     $script = $PSCommandPath
     $arguments = @('-NoProfile','-ExecutionPolicy','Bypass','-File',$script,
-                   '-Workspace',$Workspace,'-FleetPy',$FleetPy,'-RunLogDirectory',$RunLogDirectory,'-Worker')
+                   '-Workspace',$Workspace,'-FleetPy',$FleetPy,'-AccelerationConfig',$AccelerationConfig,'-RunLogDirectory',$RunLogDirectory,'-Worker')
     $process = Start-Process -FilePath $shell -ArgumentList $arguments -WorkingDirectory $Workspace -WindowStyle Hidden `
         -RedirectStandardOutput (Join-Path $RunLogDirectory 'stdout.log') `
         -RedirectStandardError (Join-Path $RunLogDirectory 'stderr.log') -PassThru
@@ -42,7 +51,7 @@ $failure = $null
 try {
     & 'D:/anaconda/envs/stage0-valhalla/python.exe' -X faulthandler -m stage4.analysis.symmetric_flexibility_full_day `
         --fleetpy-root $FleetPy --policy SERVICE_PRESERVING_LOOKAHEAD `
-        --acceleration-config stage4/config/symmetric_flexibility_acceleration_v1.json --administrative-timeout-s 21600
+        --acceleration-config $AccelerationConfig --administrative-timeout-s 21600
     $exitCode = $LASTEXITCODE
 } catch { $failure = $_.Exception.ToString() }
 finally {

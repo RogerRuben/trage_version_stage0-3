@@ -192,13 +192,11 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
             ):
                 self._expire(rid, simulation_time)
                 waiting_ids.remove(rid)
-        available = [
-            runtime
-            for runtime in self.runtime_by_vid.values()
-            if self._available(runtime, simulation_time)
-        ]
+        calendar = getattr(self, "event_calendar", None)
+        runtimes = (self.runtime_by_vid[v] for v in calendar.active_ids(simulation_time)) if calendar else self.runtime_by_vid.values()
+        available = [runtime for runtime in runtimes if self._available(runtime, simulation_time)]
         spatial = [self._spatial_vehicle(runtime) for runtime in available]
-        index = SparseCandidateIndex(spatial)
+        index = SparseCandidateIndex(spatial, cached_geometry=self.config.get("cached_geometry", False))
         by_vid = {int(runtime.fixture.native_id): runtime for runtime in available}
         timestamp = self._timestamp(simulation_time)
         arcs: list[AssignmentArc] = []
@@ -213,6 +211,8 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
         gate_counts = empty_gate_counts() if self.prospective_gate_logging else None
         traffic_pruned = 0
         routing_before = self.eta_adapter.routing_time_s
+        candidate_plans = []
+        certified_session_prunes = 0
         for rid in waiting_ids:
             request = self.request_by_rid[rid]
             meta = self.request_meta[rid]
@@ -295,13 +295,44 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
             )
             spatial_pairs += raw_count
             topk_pairs += len(candidates)
-            estimates = self.eta_adapter.estimate_many(
-                [item[0] for item in candidates],
-                request.pickup_lon_wgs84,
-                request.pickup_lat_wgs84,
-                timestamp,
-            )
+            certified = set()
+            if self.config.get("pre_route_session_certificate", False) and gate_counts is None:
+                predicted = request.predicted_service_time_s + self._pickup_overhead_s()
+                for vehicle, _ in candidates:
+                    runtime = by_vid[vehicle.native_vehicle_id]
+                    if runtime.fixture.availability_policy == "EMPIRICAL_SESSION":
+                        window_end = self.fixture_windows_s[vehicle.native_vehicle_id][1]
+                        if not isfinite(predicted) or simulation_time + predicted > window_end:
+                            certified.add(vehicle.native_vehicle_id)
+                certified_session_prunes += len(certified)
+            candidate_plans.append((rid, candidates, remaining, critical, exposure, certified))
+        if certified_session_prunes:
+            def rounded_key(vehicle, rid):
+                r = self.request_by_rid[rid]
+                return tuple(round(float(x), 7) for x in (vehicle.lon_wgs84, vehicle.lat_wgs84,
+                             r.pickup_lon_wgs84, r.pickup_lat_wgs84))
+            retained_keys = {rounded_key(v, rid) for rid, candidates, _, _, _, certified in candidate_plans
+                             for v, _ in candidates if v.native_vehicle_id not in certified}
+            for rid, candidates, _, _, _, certified in candidate_plans:
+                for v, _ in candidates:
+                    if v.native_vehicle_id in certified and rounded_key(v, rid) in retained_keys:
+                        certified.discard(v.native_vehicle_id)
+            # Preserve old rounded-cache precedence in the rare alias case.
+            # Never refill Top-K from the 21st vehicle after a certificate.
+            certified_session_prunes = sum(len(plan[-1]) for plan in candidate_plans)
+        route_batches = [([v for v, _ in candidates if v.native_vehicle_id not in certified],
+            self.request_by_rid[rid].pickup_lon_wgs84, self.request_by_rid[rid].pickup_lat_wgs84, timestamp)
+            for rid, candidates, _, _, _, certified in candidate_plans]
+        if self.config.get("epoch_routing_queue", False):
+            all_estimates = self.eta_adapter.estimate_epoch(route_batches)
+        else:
+            all_estimates = [self.eta_adapter.estimate_many(*batch) for batch in route_batches]
+        for (rid, candidates, remaining, critical, exposure, certified), estimates in zip(candidate_plans, all_estimates):
+            request = self.request_by_rid[rid]
+            meta = self.request_meta[rid]
             for vehicle, _distance in candidates:
+                if vehicle.native_vehicle_id in certified:
+                    continue
                 is_av = vehicle.vehicle_type == "AV"
                 if gate_counts is not None and is_av:
                     gate_counts["gate_av_n3a_shared_topk"] += 1
@@ -326,9 +357,9 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                     predicted_end = (
                         simulation_time + estimate.corrected_pickup_eta_s + predicted
                     )
-                    if predicted_end > self._fixture_seconds(
-                        runtime.fixture.availability_end_time
-                    ):
+                    window_end = (self.fixture_windows_s[vehicle.native_vehicle_id][1] if calendar is not None
+                                  else self._fixture_seconds(runtime.fixture.availability_end_time))
+                    if predicted_end > window_end:
                         invalid_hv_window += 1
                         self.hv_session_end_exclusions.add(
                             (simulation_time, vehicle.native_vehicle_id, rid)
@@ -472,6 +503,7 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                 "patience_arc_exclusions": invalid_patience,
                 "hv_window_arc_exclusions": invalid_hv_window,
                 "cost_evidence_arc_exclusions": invalid_cost_evidence,
+                "zero_eta_session_certified_prunes": certified_session_prunes,
                 "av_candidates_pruned_by_acceptance": pruned_acceptance_epoch,
                 "av_candidates_pruned_by_missing_exposure": pruned_exposure_epoch,
                 "enabled_gamma_constraint_count": result.enabled_gamma_constraint_count,

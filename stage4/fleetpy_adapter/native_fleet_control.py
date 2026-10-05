@@ -59,6 +59,18 @@ class _NativeFleetControlCore:
         self.vehicle_state_reconciliation_failures = 0
         self.completed_rids: set[int] = set()
         self.cancelled_rids: set[int] = set()
+        self.fixture_windows_s = {
+            int(vid): (self._fixture_seconds(r.fixture.availability_start_time),
+                       self._fixture_seconds(r.fixture.availability_end_time))
+            for vid, r in self.runtime_by_vid.items()
+        }
+        self.assignment_index_by_rid: dict[int, int] = {}
+
+    def enable_event_calendar(self, windows=None) -> None:
+        from stage4.dispatch.runtime_calendar import FleetEventCalendar
+        if windows is not None and dict(windows) != self.fixture_windows_s:
+            raise ValueError("offline fleet windows disagree with live fixtures")
+        self.event_calendar = FleetEventCalendar(self.fixture_windows_s, self.runtime_by_vid)
 
     def _timestamp(self, sim_time: float) -> pd.Timestamp:
         return self.start + pd.Timedelta(seconds=float(sim_time))
@@ -74,16 +86,17 @@ class _NativeFleetControlCore:
         return float((timestamp - self.start).total_seconds())
 
     def _available(self, runtime: VehicleRuntime, sim_time: int) -> bool:
-        timestamp = self._timestamp(sim_time)
         fixture = runtime.fixture
         native = runtime.native_vehicle
         native_free = (
             native.status == self.bindings.states.IDLE and not native.assigned_route
         )
-        inside_window = (
-            timestamp >= fixture.availability_start_time
-            and timestamp < fixture.availability_end_time
-        )
+        if getattr(self, "event_calendar", None) is not None:
+            inside_window = self.event_calendar.inside(fixture.native_id, sim_time)
+        else:
+            timestamp = self._timestamp(sim_time)
+            inside_window = (timestamp >= fixture.availability_start_time
+                             and timestamp < fixture.availability_end_time)
         return native_free and inside_window
 
     def user_request(self, rq: Any, simulation_time: int) -> None:
@@ -245,6 +258,9 @@ class _NativeFleetControlCore:
                 "dispatch_policy": "MIN_CORRECTED_PICKUP_ETA_STUB",
             }
         )
+        if not hasattr(self, "assignment_index_by_rid"):
+            self.assignment_index_by_rid = {}
+        self.assignment_index_by_rid[request.native_id] = len(self.assignment_rows) - 1
 
     def time_trigger(self, simulation_time: int) -> None:
         self.sim_time = int(simulation_time)
@@ -310,7 +326,9 @@ class _NativeFleetControlCore:
 
     def acknowledge_boarding(self, rid: int, vid: int, simulation_time: float) -> None:
         rid = int(rid)
-        for row in reversed(self.assignment_rows):
+        index = getattr(self, "assignment_index_by_rid", {}).get(rid)
+        rows = [self.assignment_rows[index]] if index is not None else reversed(self.assignment_rows)
+        for row in rows:
             if row["native_request_id"] == rid:
                 row["pickup_time"] = self._timestamp(simulation_time)
                 break
@@ -333,7 +351,9 @@ class _NativeFleetControlCore:
         expected = self.rid_to_assigned_vid.get(rid)
         if expected != int(vid):
             self.request_state_reconciliation_failures += 1
-        for row in reversed(self.assignment_rows):
+        index = getattr(self, "assignment_index_by_rid", {}).get(rid)
+        rows = [self.assignment_rows[index]] if index is not None else reversed(self.assignment_rows)
+        for row in rows:
             if row["native_request_id"] == rid:
                 row["service_end_time"] = self._timestamp(simulation_time)
                 row["completed"] = True

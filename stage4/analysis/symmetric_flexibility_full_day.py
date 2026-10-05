@@ -46,7 +46,12 @@ def acceleration_settings(root, path):
     spec = json.loads(path.read_text())
     allowed = {"recourse_mode", "solver_backend", "highspy_runtime_dir", "fast_forecast",
                "persistent_cache_size", "route_workers", "lock_current_face"}
-    if (spec.get("version") != "symmetric_flexibility_acceleration_v1"
+    version = spec.get("version")
+    if version == "symmetric_flexibility_acceleration_v2":
+        allowed |= {"cached_geometry", "event_calendar", "fast_future_graph", "epoch_routing_queue",
+                    "pre_route_session_certificate", "compress_fixed_states", "trim_flow_rows", "offline_assets",
+                    "disk_route_cache", "disk_cache_limit_mib", "disk_cache_max_entries", "route_queue_chunk_size", "lazy_worker_actor"}
+    if (version not in ("symmetric_flexibility_acceleration_v1", "symmetric_flexibility_acceleration_v2")
             or Path(spec.get("base_config", "")) != CONFIG
             or set(spec.get("settings", {})) != allowed
             or set(spec) != {"version", "base_config", "settings", "process_group_memory_limit_mib"}):
@@ -63,6 +68,20 @@ def acceleration_settings(root, path):
             or not 1 <= settings["route_workers"] <= 4
             or spec["process_group_memory_limit_mib"] != 2048):
         raise ValueError("acceleration resource or solver settings are invalid")
+    if version == "symmetric_flexibility_acceleration_v2":
+        for key in ("cached_geometry", "event_calendar", "fast_future_graph", "epoch_routing_queue",
+                    "pre_route_session_certificate", "compress_fixed_states", "trim_flow_rows", "lazy_worker_actor"):
+            if type(settings[key]) is not bool:
+                raise ValueError("v2 acceleration switches must be explicit booleans")
+        for key in ("offline_assets", "disk_route_cache"):
+            target = (root / settings[key]).resolve()
+            if not target.is_relative_to(root.resolve()):
+                raise ValueError("offline acceleration products must stay in the workspace")
+            settings[key] = str(target)
+        if (settings["route_workers"] > 2 or not 16 <= settings["disk_cache_limit_mib"] <= 512
+                or not 1 <= settings["disk_cache_max_entries"] <= 2_000_000
+                or not 1 <= settings["route_queue_chunk_size"] <= 256):
+            raise ValueError("v2 acceleration resource bound exceeded")
     return settings, path, spec["process_group_memory_limit_mib"]
 
 
@@ -112,8 +131,9 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
     cfg = json.loads((root / CONFIG).read_text())
     technical, acceleration_path, group_limit = acceleration_settings(root, acceleration_config)
     cfg.update(technical)
-    output_root = OUTPUT if acceleration_path is None else OUTPUT.parent / "accelerated_full_day"
-    doc_root = DOC if acceleration_path is None else Path("stage4/docs/flexibility_dispatch/acceleration_v1")
+    is_v2 = "offline_assets" in technical
+    output_root = OUTPUT if acceleration_path is None else OUTPUT.parent / ("accelerated_v2_full_day" if is_v2 else "accelerated_full_day")
+    doc_root = DOC if acceleration_path is None else Path("stage4/docs/flexibility_dispatch") / ("acceleration_v2" if is_v2 else "acceleration_v1")
     if policy not in cfg["policies"] or cfg["profile"] != "M" or cfg["parameter_search"] or cfg["refit_m3"]:
         raise ValueError("outside authorized two-condition frozen protocol")
     timeout_s = administrative_timeout(cfg, policy, administrative_timeout_s)
@@ -148,24 +168,39 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
         protected[str(acceleration_path.relative_to(root.resolve()))] = sha(acceleration_path)
     routing = None
     peak_group_rss = 0.0
+    peak_group_private = 0.0
     try:
         bindings = load_fleetpy_bindings(fleetpy)
         source = root / "stage4/output/final_experiments" / cfg["source_scenario"]
         base = json.loads((source / "scenario_config.json").read_text())["runtime_configuration"]
         start = pd.Timestamp("2016-10-31T00:00:00+08:00")
-        raw_requests = load_all_test31_requests(root, start=start, end=start+pd.Timedelta(seconds=cfg["measurement_end_s"]), profile_id="M")
+        assets = None
+        if is_v2:
+            from stage4.analysis.acceleration_assets import asset_input_hashes
+            from stage4.dispatch.runtime_assets import RuntimeAssets, routing_context
+            assets = RuntimeAssets(cfg["offline_assets"], expected_inputs=asset_input_hashes(root, cfg))
+            if assets.manifest["routing_context"] != routing_context(root):
+                raise ValueError("frozen routing engine context changed")
+            raw_requests = assets.requests()
+            protected[str((assets.directory / "manifest.json").relative_to(root))] = sha(assets.directory / "manifest.json")
+        else:
+            raw_requests = load_all_test31_requests(root, start=start, end=start+pd.Timedelta(seconds=cfg["measurement_end_s"]), profile_id="M")
         if len(raw_requests) != 30000: raise ValueError("source Test31 cohort is not 30000")
-        routes = pd.read_parquet(root / INPUT / "test31_research_routes.parquet")
-        route_rows = routes.set_index("order_id").to_dict("index")
+        if assets is not None:
+            routes = None
+            route_rows = {str(r["order_id"]): dict(common_eligible=bool(r["common"]), compatible_M=bool(r["mask"] & 2),
+                predicted_route_time_p50_s=float(r["predicted"])) for r in assets.orders}
+        else:
+            routes = pd.read_parquet(root / INPUT / "test31_research_routes.parquet")
+            route_rows = routes.set_index("order_id").to_dict("index")
         requests = [r for r in raw_requests if route_rows[r.order_id]["common_eligible"]]
         for r in requests: r.predicted_service_time_s = float(route_rows[r.order_id]["predicted_route_time_p50_s"])
         # Administrative bound frozen before outcomes; never derive a vehicle's
         # modeled availability from unobserved future Test31 trip durations.
         drain_s = int(cfg["physical_drain_limit_s"])
         end = start+pd.Timedelta(seconds=drain_s)
-        fleet = build_fleet_scenario(root, benchmark_start=start, simulation_end=end,
-            requested_q_a=base["av_vehicle_hour_share"], seed=base["fleet_sampling_seed"],
-            max_hv_hour_error_pct=base["max_hv_vehicle_hour_error_pct"])
+        fleet = assets.fleet() if assets is not None else build_fleet_scenario(root, benchmark_start=start, simulation_end=end,
+            requested_q_a=base["av_vehicle_hour_share"], seed=base["fleet_sampling_seed"], max_hv_hour_error_pct=base["max_hv_vehicle_hour_error_pct"])
         registry = CoordinateRegistry()
         attach_fleetpy_requests(requests, bindings, registry)
         network = create_native_network(bindings, registry)
@@ -174,15 +209,29 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
             directory/"runtime", native_movement=True, routing_engine=network)
         native_cfg = {**base, "profile_id":"M", "gamma_static":None, "gamma_dynamic":None, "gamma_speed":None,
             "cost_level_enabled":False, "prospective_gate_logging":False, "additional_pickup_overhead_s":0.,
-            "matching_end_s":cfg["last_dispatch_s"], "benchmark_runtime_guard_s":timeout_s}
+            "matching_end_s":cfg["last_dispatch_s"], "benchmark_runtime_guard_s":timeout_s,
+            **{k: cfg[k] for k in ("cached_geometry", "epoch_routing_queue", "pre_route_session_certificate") if k in cfg}}
+        route_options = {}
+        if assets is not None:
+            route_options = dict(disk_cache_path=cfg["disk_route_cache"], routing_context=assets.manifest["routing_context"],
+                disk_cache_limit_mib=cfg["disk_cache_limit_mib"], disk_cache_max_entries=cfg["disk_cache_max_entries"],
+                route_queue_chunk_size=cfg["route_queue_chunk_size"], lazy_worker_actor=cfg["lazy_worker_actor"])
         routing = ArcDeterministicValhallaAdapter(root, routing_mode=cfg["routing_mode"],
-            persistent_cache_size=cfg.get("persistent_cache_size", 0), route_workers=cfg.get("route_workers", 1))
+            persistent_cache_size=cfg.get("persistent_cache_size", 0), route_workers=cfg.get("route_workers", 1), **route_options)
         c = create_rolling_or_fleet_control(bindings, vehicles, requests, demand, network, routing, start, end, native_cfg)
         profiles = json.loads((root / "stage3/config/stage3_av_capability_profiles.json").read_text())
-        c.research_route_policy = ResearchRoutePolicy(routes, "M", profiles)
-        templates = pd.read_parquet(root / INPUT / "train_request_templates.parquet")
+        if assets is not None:
+            from stage4.dispatch.runtime_assets import CompactResearchRoutePolicy, DrawTapeForecast
+            c.research_route_policy = CompactResearchRoutePolicy(assets, "M", profiles)
+            forecast = DrawTapeForecast(assets.directory / "forecast")
+            if cfg.get("event_calendar"):
+                c.enable_event_calendar(assets.windows())
+        else:
+            c.research_route_policy = ResearchRoutePolicy(routes, "M", profiles)
+            templates = pd.read_parquet(root / INPUT / "train_request_templates.parquet")
+            forecast = TrainDemandForecast(templates, cfg, cfg["measurement_end_s"])
         model = TrainRemainingTime(json.loads((root / cfg["remaining_time_model"]).read_text()))
-        c.flexibility_adapter = NativeFlexibilityAdapter(policy, TrainDemandForecast(templates, cfg, cfg["measurement_end_s"]), cfg, model)
+        c.flexibility_adapter = NativeFlexibilityAdapter(policy, forecast, cfg, model)
         sim = create_native_simulation(bindings, simulation_end_s=drain_s, time_step_s=30, demand=demand,
             vehicles=[v.native_vehicle for v in vehicles], fleet_control=c, network=network, native_output=native_output)
         write_json(directory / "fleet_accounting.json", fleet.accounting)
@@ -192,13 +241,22 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
             sim.step(tick)
             routing.cache.clear()
             if acceleration_path is not None:
-                group_rss = routing.process_group_rss_mib()
+                resources = routing.process_group_resources()
+                group_rss = resources["rss_mib"]
                 peak_group_rss = max(peak_group_rss, group_rss)
+                peak_group_private = max(peak_group_private, resources["private_committed_mib"])
                 if group_rss > group_limit:
                     raise MemoryError("acceleration process group memory limit exceeded")
+                if is_v2 and psutil.disk_usage(root.anchor).free < 512 * 2**20:
+                    raise OSError("v2 local disk reserve below 512 MiB; output/cache preserved, no automatic retry")
             if tick % 1800 == 0:
                 progress = dict(policy=policy, tick=tick, matched=len(c.assignment_rows),
                     runtime_s=time.monotonic()-started, rss_mib=psutil.Process().memory_info().rss/2**20)
+                if is_v2:
+                    progress.update(process_group_rss_mib=group_rss,
+                        process_group_private_committed_mib=resources["private_committed_mib"],
+                        system_available_ram_mib=psutil.virtual_memory().available / 2**20,
+                        local_disk_free_gib=psutil.disk_usage(root.anchor).free / 2**30)
                 write_json(directory / "progress.json", progress)
                 print(json.dumps(progress), flush=True)
             if tick > cfg["last_dispatch_s"] and not (set(c.rid_to_assigned_vid)-c.completed_rids): break
@@ -264,7 +322,16 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
                  "failed_model_attempt_time_s") if k in traces},
             arc_lookups=routing.arc_lookup_count, arc_cache_hits=routing.cache_hit_count,
             cross_epoch_exact_cache_hits=routing.persistent_cache_hits,
+            disk_route_cache_hits=routing.disk_cache_hits, raw_lru_hits=routing.raw_lru_hits,
+            raw_query_deduplications=routing.raw_query_deduplications, epoch_route_batches=routing.epoch_route_batches,
+            prefetched_unused_raw_arcs=routing.prefetched_unused_raw_arcs,
+            routing_queue_pipeline_time_s=routing.routing_queue_pipeline_time_s,
+            disk_cache_lookup_time_s=routing.disk_cache_lookup_time_s,
+            zero_eta_session_certified_prunes=int(epochs.zero_eta_session_certified_prunes.sum()),
+            eliminated_fixed_variables=int(traces.eliminated_fixed_variables.sum()),
             peak_process_group_rss_mib=peak_group_rss if acceleration_path is not None else summary["peak_rss_mib"])
+        if is_v2:
+            summary["peak_process_group_private_committed_mib"] = peak_group_private
     except Exception as error:
         summary.update(status="STOPPED", error=repr(error), runtime_s=time.monotonic()-started)
         write_json(directory / "summary.json", summary)

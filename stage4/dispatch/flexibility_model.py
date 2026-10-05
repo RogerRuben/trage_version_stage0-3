@@ -79,6 +79,8 @@ class ModelLimits:
     solver_backend: str = "SCIPY"
     highspy_runtime_dir: str | None = None
     lock_current_face: bool = False
+    compress_fixed_states: bool = False
+    trim_flow_rows: bool = False
 
 
 @dataclass(frozen=True)
@@ -108,6 +110,23 @@ class Decision:
     recourse_recovery_time_s: float = 0.0
     solver_backend: str = "SCIPY"
     recourse_mode: str = "BINARY"
+    eliminated_fixed_variables: int = 0
+
+
+@dataclass(frozen=True)
+class CurrentServiceFace:
+    """Reuse a solved face only for exactly the same current sparse graph."""
+    signature: tuple
+    critical_matched: int
+    total_matched: int
+    carry_over_matched: int
+
+    @staticmethod
+    def from_arcs(arcs, result):
+        signature = tuple(sorted((a.vehicle_id, a.request_id, a.pickup_eta_s,
+                                  bool(a.critical), bool(a.carry_over)) for a in arcs))
+        return CurrentServiceFace(signature, result.critical_matched,
+                                  result.total_matched, result.carry_over_matched)
 
 
 @dataclass(frozen=True)
@@ -164,7 +183,7 @@ def _allowed(vehicle, request):
 
 def _validate(problem, *, fixed_action=False):
     limits = problem.limits
-    if type(limits.lock_current_face) is not bool:
+    if any(type(x) is not bool for x in (limits.lock_current_face, limits.compress_fixed_states, limits.trim_flow_rows)):
         raise ValueError("current face lock must be an explicit boolean")
     if limits.recourse_mode not in ("BINARY", "FLOW_RELAXED") or limits.solver_backend not in ("SCIPY", "HIGHS_PERSISTENT"):
         raise ValueError("unrecognized acceleration mode")
@@ -279,6 +298,39 @@ def _run_levels(rows, count, levels, limits, integrality=None):
     return solution, time.perf_counter() - started
 
 
+def _run_compressed(rows, count, levels, limits, integrality, fixed):
+    """Substitute certified constant idle states before sending a sparse MIP.
+
+    Nothing is rounded: A_fixed * 1 is subtracted from both row bounds. The
+    full state vector is reconstructed for the existing recourse recovery.
+    """
+    if not fixed:
+        solution, runtime = _run_levels(rows, count, levels, limits, integrality)
+        return solution, runtime, count, int(count if integrality is None else integrality.sum()), rows
+    fixed = np.asarray(sorted(fixed), dtype=np.int32)
+    free = np.setdiff1d(np.arange(count), fixed, assume_unique=True)
+    matrix = rows.matrix(count)
+    constants = np.asarray(matrix[:, fixed].sum(axis=1)).ravel()
+    reduced = matrix[:, free].tocsr()
+    lower = np.asarray(rows.lower) - constants
+    upper = np.asarray(rows.upper) - constants
+    compressed = _SparseRows(limits)
+    for i in range(reduced.shape[0]):
+        left, right = reduced.indptr[i:i + 2]
+        if left == right:
+            if lower[i] > 1e-7 or upper[i] < -1e-7:
+                raise RuntimeError("fixed-state substitution produced an infeasible constant row")
+            continue
+        compressed.add(dict(zip(reduced.indices[left:right].tolist(), reduced.data[left:right].tolist())),
+                       lower[i], upper[i])
+    objectives = [(objective[free], maximize) for objective, maximize in levels]
+    integer = None if integrality is None else integrality[free]
+    partial, runtime = _run_levels(compressed, len(free), objectives, limits, integer)
+    solution = np.ones(count)
+    solution[free] = partial
+    return solution, runtime, len(free), int(len(free) if integer is None else integer.sum()), compressed
+
+
 def _recover_recourse(problem, recourse, solution, selected):
     """Integral maximum matchings for the selected first-stage vehicle states.
 
@@ -310,7 +362,7 @@ def _recover_recourse(problem, recourse, solution, selected):
     return tuple(recovered), expected
 
 
-def _solve(problem, policy, fixed_pairs=None):
+def _solve(problem, policy, fixed_pairs=None, current_face=None):
     build_started = time.perf_counter()
     vehicles, requests = _validate(problem, fixed_action=fixed_pairs is not None)
     options = _options(problem, vehicles, requests)
@@ -384,8 +436,11 @@ def _solve(problem, policy, fixed_pairs=None):
     # Equivalent for binary x, and stronger/fewer rows in the LP relaxation.
     for (_, option_j), coefficients in per_future_option.items():
         rows.add({**coefficients, option_j: -1.0}, upper=0.0)
-    for coefficients in per_future_vehicle.values():
-        rows.add(coefficients, upper=1.0)
+    if not (problem.limits.trim_flow_rows and problem.limits.recourse_mode == "FLOW_RELAXED"):
+        for coefficients in per_future_vehicle.values():
+            rows.add(coefficients, upper=1.0)
+    # In FLOW_RELAXED, sum_state(y) <= x_state and sum_state(x)=1
+    # already imply the per-vehicle future capacity, even at fractional x.
     for (_, request_id), coefficients in per_future_request.items():
         # Known waiting requests can be served now OR later, never twice.
         rows.add({**coefficients, **by_current_request.get(request_id, {})}, upper=1.0)
@@ -419,7 +474,14 @@ def _solve(problem, policy, fixed_pairs=None):
                 requests[o.request_id].critical, requests[o.request_id].carry_over,
                 vehicle_type="HV" if vehicles[o.vehicle_id].profile_id == "HV" else "AV")
                 for o in options if o.request_id is not None]
-            face = solve_lexicographic(current_arcs)
+            if current_face is None:
+                face = solve_lexicographic(current_arcs)
+            else:
+                signature = tuple(sorted((a.vehicle_id, a.request_id, a.pickup_eta_s,
+                                          bool(a.critical), bool(a.carry_over)) for a in current_arcs))
+                if current_face.signature != signature:
+                    raise ValueError("reused current-service face belongs to a different sparse graph")
+                face = current_face
             for objective, optimum in ((critical, face.critical_matched),
                                        (immediate, face.total_matched),
                                        (carry, face.carry_over_matched)):
@@ -438,13 +500,21 @@ def _solve(problem, policy, fixed_pairs=None):
         integrality = np.zeros(count, dtype=np.int8)
         integrality[:len(options)] = 1
     build_time = time.perf_counter() - build_started
-    solution, runtime = _run_levels(rows, count, levels, problem.limits, integrality)
+    fixed = [j for j, o in enumerate(options) if len(by_vehicle[o.vehicle_id]) == 1]
+    if problem.limits.compress_fixed_states:
+        compression_started = time.perf_counter()
+        solution, runtime, solver_count, integer_count, solver_rows = _run_compressed(
+            rows, count, levels, problem.limits, integrality, fixed)
+        build_time += max(0., time.perf_counter() - compression_started - runtime)
+    else:
+        solution, runtime = _run_levels(rows, count, levels, problem.limits, integrality)
+        solver_count, integer_count, solver_rows = count, int(count if integrality is None else integrality.sum()), rows
     selected = tuple(sorted((o.vehicle_id, o.request_id) for j, o in enumerate(options)
                             if o.request_id is not None and solution[j] > 0.5))
     selected_future = tuple((s.scenario_id, p.vehicle_id, p.request_id)
                             for i, (s, p, _) in enumerate(recourse, start=len(options))
                             if solution[i] > 0.5)
-    matrix = rows.matrix(count)
+    matrix = solver_rows.matrix(solver_count)
     future = float(future_value @ solution)
     recovery_time = 0.0
     if problem.limits.recourse_mode == "FLOW_RELAXED":
@@ -455,19 +525,20 @@ def _solve(problem, policy, fixed_pairs=None):
         future = recovered_value
         recovery_time = time.perf_counter() - recovery_started
     return Decision(policy, selected, len(selected), future, len(selected) + future,
-                    runtime, count, matrix.nnz,
+                    runtime, solver_count, matrix.nnz,
                     matrix.data.nbytes + matrix.indices.nbytes + matrix.indptr.nbytes,
-                    selected_future, integer_variable_count=count if integrality is None else int(integrality.sum()),
+                    selected_future, integer_variable_count=integer_count,
                     model_build_time_s=build_time, recourse_recovery_time_s=recovery_time,
-                    solver_backend=problem.limits.solver_backend, recourse_mode=problem.limits.recourse_mode)
+                    solver_backend=problem.limits.solver_backend, recourse_mode=problem.limits.recourse_mode,
+                    eliminated_fixed_variables=count - solver_count)
 
 
-def solve_dispatch(problem: Problem, policy: str) -> Decision:
+def solve_dispatch(problem: Problem, policy: str, *, current_face=None) -> Decision:
     """MYOPIC reuses the unchanged frozen solver; other policies are opt-in."""
     if policy not in ("MYOPIC", "AV_FIRST", "LOOKAHEAD", "SERVICE_PRESERVING_LOOKAHEAD"):
         raise ValueError("unrecognized research dispatch policy")
     if policy != "MYOPIC":
-        return _solve(problem, policy)
+        return _solve(problem, policy, current_face=current_face)
     vehicles, requests = _validate(problem)
     options = _options(problem, vehicles, requests)
     arcs = [AssignmentArc(o.vehicle_id, o.request_id, o.pickup_eta_s,

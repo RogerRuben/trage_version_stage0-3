@@ -38,6 +38,7 @@ class ValhallaPickupTimeAdapter:
         root: str | Path,
         *,
         actor: Any | None = None,
+        defer_actor: bool = False,
     ) -> None:
         self.root = Path(root).resolve()
         calibration = pd.read_parquet(self.root / CALIBRATION_REL)
@@ -55,7 +56,16 @@ class ValhallaPickupTimeAdapter:
             raise FleetPyCompatibilityError(
                 "S0 pickup ETA beta contains non-finite values"
             )
-        if actor is None:
+        self._actor = actor
+        if actor is None and not defer_actor:
+            self.actor  # Legacy path still constructs the actor eagerly.
+        self.cache: dict[tuple, PickupEstimate] = {}
+        self.call_log: list[dict[str, Any]] = []
+        self.cache_hit_count = 0
+
+    @property
+    def actor(self):
+        if self._actor is None:
             try:
                 from valhalla import Actor
             except ImportError as exc:
@@ -65,11 +75,12 @@ class ValhallaPickupTimeAdapter:
             stage3_config = json.loads(
                 (self.root / STAGE3_CONFIG_REL).read_text(encoding="utf-8")
             )
-            actor = Actor(str(Path(str(stage3_config["valhalla_config"])).resolve()))
-        self.actor = actor
-        self.cache: dict[tuple, PickupEstimate] = {}
-        self.call_log: list[dict[str, Any]] = []
-        self.cache_hit_count = 0
+            self._actor = Actor(str(Path(str(stage3_config["valhalla_config"])).resolve()))
+        return self._actor
+
+    @actor.setter
+    def actor(self, value):
+        self._actor = value
 
     @staticmethod
     def _validate_wgs84(lon: float, lat: float) -> None:

@@ -44,8 +44,9 @@ class SpatialVehicle:
 class SparseCandidateIndex:
     """Two cKDTree indexes, preserving the scientific HV/AV eligibility split."""
 
-    def __init__(self, vehicles: Iterable[SpatialVehicle]) -> None:
+    def __init__(self, vehicles: Iterable[SpatialVehicle], *, cached_geometry: bool = False) -> None:
         self.vehicles = list(vehicles)
+        self.cached_geometry = bool(cached_geometry)
         self.reference_lat = (
             float(np.mean([v.lat_wgs84 for v in self.vehicles]))
             if self.vehicles
@@ -88,11 +89,11 @@ class SparseCandidateIndex:
                 vehicle = group[int(index)]
                 distance = float(
                     np.linalg.norm(
-                        _xy(
+                        (tree.data[int(index)] if self.cached_geometry else _xy(
                             np.asarray([vehicle.lon_wgs84]),
                             np.asarray([vehicle.lat_wgs84]),
                             self.reference_lat,
-                        )[0]
+                        )[0])
                         - point
                     )
                 )

@@ -8,6 +8,8 @@ from __future__ import annotations
 import hashlib
 from math import isfinite
 import time
+from collections import OrderedDict
+from functools import lru_cache
 
 import numpy as np
 from scipy.spatial import cKDTree
@@ -15,7 +17,7 @@ from scipy.spatial import cKDTree
 from .acceptance import passenger_acceptance
 from .exposure import exposure_excess
 from .flexibility_model import (
-    CurrentPickup, FuturePickup, ModelLimits, Problem, Request, Scenario, Vehicle, solve_dispatch,
+    CurrentPickup, CurrentServiceFace, FuturePickup, ModelLimits, Problem, Request, Scenario, Vehicle, solve_dispatch,
 )
 from .solver import LexicographicResult, solve_lexicographic
 
@@ -27,6 +29,13 @@ def position_key(lon, lat):
 def xy(position):
     lon, lat = map(float, position.split(","))
     return np.asarray((lon * 111320 * np.cos(np.deg2rad(34.25)), lat * 110540))
+
+
+@lru_cache(maxsize=50_000)
+def cached_xy(position):
+    point = xy(position)
+    point.flags.writeable = False
+    return point
 
 
 class ResearchRoutePolicy:
@@ -151,10 +160,16 @@ def predicted_vehicle_states(c, now, horizon, last_assignments, remaining_model=
     position after an unbooked order is accessed here.
     """
     result = []
-    for vid, runtime in sorted(c.runtime_by_vid.items()):
+    calendar = getattr(c, "event_calendar", None)
+    ids = calendar.horizon_ids(now, horizon) if calendar is not None else sorted(c.runtime_by_vid)
+    for vid in ids:
+        runtime = c.runtime_by_vid[vid]
         fixture = runtime.fixture
-        start = c._fixture_seconds(fixture.availability_start_time)
-        end = c._fixture_seconds(fixture.availability_end_time)
+        if calendar is not None:
+            start, end = calendar.windows[vid]
+        else:
+            start = c._fixture_seconds(fixture.availability_start_time)
+            end = c._fixture_seconds(fixture.availability_end_time)
         if end <= now or start > now + horizon:
             continue
         native_free = runtime.native_vehicle.status == c.bindings.states.IDLE and not runtime.native_vehicle.assigned_route
@@ -241,7 +256,9 @@ class NativeFlexibilityAdapter:
             recourse_mode=self.cfg.get("recourse_mode", "BINARY"),
             solver_backend=self.cfg.get("solver_backend", "SCIPY"),
             highspy_runtime_dir=self.cfg.get("highspy_runtime_dir"),
-            lock_current_face=self.cfg.get("lock_current_face", False))
+            lock_current_face=self.cfg.get("lock_current_face", False),
+            compress_fixed_states=self.cfg.get("compress_fixed_states", False),
+            trim_flow_rows=self.cfg.get("trim_flow_rows", False))
         problem = Problem(now, vehicles, tuple(requests),
                           tuple(CurrentPickup(a.vehicle_id, a.request_id, a.pickup_eta_s) for a in arcs), (), limits)
         if self.policy not in ("LOOKAHEAD", "SERVICE_PRESERVING_LOOKAHEAD"):
@@ -253,12 +270,66 @@ class NativeFlexibilityAdapter:
         for arc in arcs:
             v, r = vehicle_map[arc.vehicle_id], by_rid[arc.request_id]
             options.append((v, r.request_id, now + arc.pickup_eta_s + r.pickup_overhead_s + r.predicted_service_time_s, r.dropoff_position))
-        points = np.stack([xy(state[3]) for state in options]) if options else np.empty((0, 2))
+        fast_graph = self.cfg.get("fast_future_graph", False)
+        project = cached_xy if fast_graph else xy
+        points = np.stack([project(state[3]) for state in options]) if options else np.empty((0, 2))
         tree = cKDTree(points) if options else None
         scenarios = []
         sampling_started = time.perf_counter()
         scenario_inputs = self.forecast.scenarios(now, c.config["profile_id"], c.acceptance_rate, c.acceptance_seed)
         self.stage_timings["forecast_sampling_time_s"] = time.perf_counter() - sampling_started
+        if fast_graph:
+            # Geometry is local to this epoch: live ready states may change.
+            # Bound the cache, not a requests x vehicles distance matrix.
+            geometry = OrderedDict()
+
+            def pickups_for(request, pickup_position):
+                nearby = geometry.get(pickup_position)
+                if nearby is None:
+                    point = project(pickup_position)
+                    nearby = tuple((int(i), float(np.linalg.norm(points[i] - point)))
+                        for i in tree.query_ball_point(point, self.cfg["future_search_radius_m"])) if tree else ()
+                    geometry[pickup_position] = nearby
+                    if len(geometry) > 128:
+                        geometry.popitem(last=False)
+                else:
+                    geometry.move_to_end(pickup_position)
+                candidates = []
+                for index, distance in nearby:
+                    v, after, ready, origin = options[index]
+                    if v.profile_id != "HV" and (v.profile_id not in request.compatible_profiles or not request.passenger_accepts_av):
+                        continue
+                    departure = max(now + c.dispatch_interval_s, ready, request.release_time_s)
+                    # Nonnegative ETA certificate, independent of routing.
+                    if (departure > request.pickup_deadline_s or
+                            departure + request.pickup_overhead_s + request.predicted_service_time_s > v.availability_end_s):
+                        continue
+                    pace = self.forecast.pace_by_slot.get(int(departure // 1800), self.forecast.global_pace)
+                    eta = distance * pace
+                    if (departure + eta > request.pickup_deadline_s or
+                            departure + eta + request.pickup_overhead_s + request.predicted_service_time_s > v.availability_end_s):
+                        continue
+                    candidates.append((distance, v.vehicle_id, -1 if after is None else after, after, origin, eta))
+                candidates.sort(key=lambda x: x[:3])
+                chosen = set()
+                for _, vid, *_ in candidates:
+                    if len(chosen) < self.cfg["future_top_k_vehicles"]:
+                        chosen.add(vid)
+                return tuple(FuturePickup(vid, after, request.request_id, eta, origin)
+                             for _, vid, _, after, origin, eta in candidates if vid in chosen)
+
+            # Waiting requests are identical across all forecast scenarios.
+            known_pickups = tuple(p for r in requests for p in pickups_for(r, coordinates[r.request_id]))
+            from dataclasses import replace
+            for scenario, pickups in scenario_inputs:
+                future_arcs = list(known_pickups)
+                for r in scenario.new_requests:
+                    future_arcs.extend(pickups_for(r, pickups[r.request_id]))
+                scenarios.append(replace(scenario, pickups=tuple(future_arcs)))
+                if len(options) + sum(len(s.pickups) for s in scenarios) > limits.max_variables:
+                    raise ValueError("variable resource cap exceeded during sparse future graph construction")
+            self.stage_timings["future_graph_time_s"] = time.perf_counter() - future_started - self.stage_timings["forecast_sampling_time_s"]
+            return replace(problem, scenarios=tuple(scenarios))
         for scenario, pickups in scenario_inputs:
             all_requests = (*requests, *scenario.new_requests)
             destination = {**coordinates, **pickups}
@@ -309,7 +380,11 @@ class NativeFlexibilityAdapter:
                 self.stage_timings["problem_setup_time_s"] = max(0.0, time.perf_counter() - preparation_started
                     - self.stage_timings["forecast_sampling_time_s"] - self.stage_timings["future_graph_time_s"])
                 attempt_started = time.perf_counter()
-                decision = solve_dispatch(problem, self.policy)
+                if self.cfg.get("lock_current_face", False) and current_oracle is not None:
+                    face = CurrentServiceFace.from_arcs(arcs, current_oracle)
+                    decision = solve_dispatch(problem, self.policy, current_face=face)
+                else:
+                    decision = solve_dispatch(problem, self.policy)
                 selected = set(decision.selected_pairs)
                 indices = tuple(i for i, a in enumerate(arcs) if (a.vehicle_id, a.request_id) in selected)
                 if len(indices) != len(selected):
@@ -335,6 +410,7 @@ class NativeFlexibilityAdapter:
             nonzeros=decision.constraint_nonzeros if decision else None,
             expected_next_service=decision.expected_next_service_count if decision else None,
             integer_variable_count=decision.integer_variable_count if decision else None,
+            eliminated_fixed_variables=decision.eliminated_fixed_variables if decision else 0,
             model_build_time_s=decision.model_build_time_s if decision else 0.0,
             optimization_time_s=decision.solve_time_s if decision else result.solve_time_s,
             recourse_recovery_time_s=decision.recourse_recovery_time_s if decision else 0.0,
