@@ -9,6 +9,7 @@ import hashlib
 import json
 from pathlib import Path
 import time
+from zoneinfo import ZoneInfo
 
 import numpy as np
 import pandas as pd
@@ -464,7 +465,7 @@ def collect_comparison(root):
     paired["service_rate_original_difference_pp"] = 100 * (scenarios[SCENARIOS[1]]["orders"]["service_rate_original"] - scenarios[SCENARIOS[0]]["orders"]["service_rate_original"])
     flags = [name for name, passed in checks.items() if passed is False]
     result = dict(status="ANALYZED" if not flags else "ANALYZED_WITH_DIAGNOSTIC_FLAGS", version="controlled_replay_v2",
-                  analyzed_at=datetime.now(timezone.utc).isoformat(), scenarios=scenarios, paired_orders=paired,
+                  analyzed_at=datetime.now(timezone.utc).astimezone(ZoneInfo("Asia/Singapore")).isoformat(), scenarios=scenarios, paired_orders=paired,
                   supply_control=supply, provenance=provenance, integrity_checks=checks, diagnostic_flags=flags,
                   unavailable_checks=[name for name, passed in checks.items() if passed is None],
                   one_day_one_profile_one_supply_seed=True, request_time_equals_boarding_accepted=True,
@@ -487,6 +488,8 @@ def render_report(result):
     hv, mixed = (result["scenarios"][name] for name in SCENARIOS)
     pair, supply = result["paired_orders"], result["supply_control"]
     lines = ["# 共同班次供给回放：纯HV与M混合车队", "",
+        "Origin Skill: academic-research-suite / experiment-agent；Mode: completed-run validation。",
+        "Verification Status: 已与两组完整本地产物对账；Version: controlled_replay_v2_first_pair。", "",
         "本轮比较纯HV与目标10%预定AV车时、70%乘客接受AV的M混合场景。两组均使用既定的前瞻派单、停止接新单后完成已承诺任务、基于训练期历史订单分布的空车调位。上车时刻近似请求释放时间沿用本研究已接受的假设，接驾耐心保持300秒。", "",
         f"汇总状态：`{result['status']}`；生成时间：{result['analyzed_at']}。本报告只读取两组完成产物，未新增模拟。", "",
         "## 订单与等待", "", "| 指标 | 纯HV | M混合（目标10% / 接受70%） |", "|---|---:|---:|"]
@@ -545,6 +548,7 @@ def render_report(result):
         f"两组实际记录{provenance['shared_input_count']}项共享输入；键集合一致={provenance['input_key_sets_identical']}，共享SHA一致={provenance['shared_hashes_identical']}，当前冻结文件未变={provenance['frozen_files_unchanged']}，共同配置SHA一致={provenance['configuration_hashes_identical']}。逐文件摘要、实际模式定义和汇总代码摘要均记录于comparison.json。", "",
         f"纯HV执行代码SHA：`{provenance['execution_code_sha_by_scenario']['PURE_HV']}`；混合执行代码SHA：`{provenance['execution_code_sha_by_scenario']['M_Q10_P70']}`。", "",
         "本轮两组比较的是同一共同回放环境下的车辆类型标签、M服务适配及70%乘客接受AV这一组合条件；不能单独分解为某一个能力约束、接受率或派单算法的因果效应。实际位置、忙闲状态与运营车时是派单结果，不要求它们相同。这里只做单日、固定供给种子和既定策略的描述性配对比较，不作统计显著性宣称。", "",
+        "结果解释风险已检查11/11类：未估计相关性或因果系数，不把日总差值解释为逐小时单调规律；共同输入筛选范围和原始分母明确保留。等待时间的配对比较只适用于两组都服务的订单，存在条件选择，不能推广到所有请求；未选择最好场景、重选种子或按结果调整参数。本次不计算显著性、置信区间或跨日期总体效应。", "",
         "旧82.40%纯HV与68.58%混合结果属于经验HV班次/AV全天在线的旧环境，保留作背景，未直接作为本轮配对对照。文档只包含聚合数据，没有逐订单身份或GPS坐标。", "",
         "本报告由AI辅助读取实际完成产物并汇总；未重新训练模型、改变请求释放时刻、搜索比例或新增实验条件。", ""]
     return "\n".join(lines)
