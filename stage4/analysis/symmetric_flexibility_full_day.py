@@ -47,13 +47,15 @@ def acceleration_settings(root, path):
     allowed = {"recourse_mode", "solver_backend", "highspy_runtime_dir", "fast_forecast",
                "persistent_cache_size", "route_workers", "lock_current_face"}
     version = spec.get("version")
-    if version in ("symmetric_flexibility_acceleration_v2", "symmetric_flexibility_acceleration_v3"):
+    if version in ("symmetric_flexibility_acceleration_v2", "symmetric_flexibility_acceleration_v3", "symmetric_flexibility_acceleration_v4"):
         allowed |= {"cached_geometry", "event_calendar", "fast_future_graph", "epoch_routing_queue",
                     "pre_route_session_certificate", "compress_fixed_states", "trim_flow_rows", "offline_assets",
                     "disk_route_cache", "disk_cache_limit_mib", "disk_cache_max_entries", "route_queue_chunk_size", "lazy_worker_actor"}
-    if version == "symmetric_flexibility_acceleration_v3":
+    if version in ("symmetric_flexibility_acceleration_v3", "symmetric_flexibility_acceleration_v4"):
         allowed |= {"decompose_model", "demand_routing", "grouped_sources"}
-    if (version not in ("symmetric_flexibility_acceleration_v1", "symmetric_flexibility_acceleration_v2", "symmetric_flexibility_acceleration_v3")
+    if version == "symmetric_flexibility_acceleration_v4":
+        allowed |= {"static_raw_od", "raw_od_cache_size", "certified_eta_pruning"}
+    if (version not in ("symmetric_flexibility_acceleration_v1", "symmetric_flexibility_acceleration_v2", "symmetric_flexibility_acceleration_v3", "symmetric_flexibility_acceleration_v4")
             or Path(spec.get("base_config", "")) != CONFIG
             or set(spec.get("settings", {})) != allowed
             or set(spec) != {"version", "base_config", "settings", "process_group_memory_limit_mib"}):
@@ -70,7 +72,7 @@ def acceleration_settings(root, path):
             or not 1 <= settings["route_workers"] <= 4
             or spec["process_group_memory_limit_mib"] != 2048):
         raise ValueError("acceleration resource or solver settings are invalid")
-    if version in ("symmetric_flexibility_acceleration_v2", "symmetric_flexibility_acceleration_v3"):
+    if version in ("symmetric_flexibility_acceleration_v2", "symmetric_flexibility_acceleration_v3", "symmetric_flexibility_acceleration_v4"):
         for key in ("cached_geometry", "event_calendar", "fast_future_graph", "epoch_routing_queue",
                     "pre_route_session_certificate", "compress_fixed_states", "trim_flow_rows", "lazy_worker_actor"):
             if type(settings[key]) is not bool:
@@ -84,9 +86,14 @@ def acceleration_settings(root, path):
                 or not 1 <= settings["disk_cache_max_entries"] <= 2_000_000
                 or not 1 <= settings["route_queue_chunk_size"] <= 256):
             raise ValueError("v2 acceleration resource bound exceeded")
-    if version == "symmetric_flexibility_acceleration_v3":
+    if version in ("symmetric_flexibility_acceleration_v3", "symmetric_flexibility_acceleration_v4"):
         if any(type(settings[key]) is not bool for key in ("decompose_model", "demand_routing", "grouped_sources")):
             raise ValueError("v3 switches must be explicit booleans")
+    if version == "symmetric_flexibility_acceleration_v4":
+        if (any(type(settings[key]) is not bool for key in ("static_raw_od", "certified_eta_pruning"))
+                or type(settings["raw_od_cache_size"]) is not int or not 0 <= settings["raw_od_cache_size"] <= 50000
+                or not settings["demand_routing"] or not settings["epoch_routing_queue"]):
+            raise ValueError("v4 raw OD/pruning settings are invalid")
     return settings, path, spec["process_group_memory_limit_mib"]
 
 
@@ -138,8 +145,9 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
     cfg.update(technical)
     is_v2 = "offline_assets" in technical
     is_v3 = "demand_routing" in technical
-    output_root = OUTPUT if acceleration_path is None else OUTPUT.parent / ("accelerated_v3_full_day" if is_v3 else "accelerated_v2_full_day" if is_v2 else "accelerated_full_day")
-    doc_root = DOC if acceleration_path is None else Path("stage4/docs/flexibility_dispatch") / ("acceleration_v3" if is_v3 else "acceleration_v2" if is_v2 else "acceleration_v1")
+    is_v4 = "static_raw_od" in technical
+    output_root = OUTPUT if acceleration_path is None else OUTPUT.parent / ("accelerated_v4_full_day" if is_v4 else "accelerated_v3_full_day" if is_v3 else "accelerated_v2_full_day" if is_v2 else "accelerated_full_day")
+    doc_root = DOC if acceleration_path is None else Path("stage4/docs/flexibility_dispatch") / ("acceleration_v4" if is_v4 else "acceleration_v3" if is_v3 else "acceleration_v2" if is_v2 else "acceleration_v1")
     if policy not in cfg["policies"] or cfg["profile"] != "M" or cfg["parameter_search"] or cfg["refit_m3"]:
         raise ValueError("outside authorized two-condition frozen protocol")
     timeout_s = administrative_timeout(cfg, policy, administrative_timeout_s)
@@ -216,7 +224,7 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
         native_cfg = {**base, "profile_id":"M", "gamma_static":None, "gamma_dynamic":None, "gamma_speed":None,
             "cost_level_enabled":False, "prospective_gate_logging":False, "additional_pickup_overhead_s":0.,
             "matching_end_s":cfg["last_dispatch_s"], "benchmark_runtime_guard_s":timeout_s,
-            **{k: cfg[k] for k in ("cached_geometry", "epoch_routing_queue", "pre_route_session_certificate") if k in cfg}}
+            **{k: cfg[k] for k in ("cached_geometry", "epoch_routing_queue", "pre_route_session_certificate", "certified_eta_pruning") if k in cfg}}
         route_options = {}
         if assets is not None:
             route_options = dict(disk_cache_path=cfg["disk_route_cache"], routing_context=assets.manifest["routing_context"],
@@ -227,6 +235,10 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
             from stage4.dispatch.routing_v3 import DemandRoutingAdapter
             router_class = DemandRoutingAdapter
             route_options["grouped_sources"] = cfg["grouped_sources"]
+        if is_v4:
+            from stage4.dispatch.routing_v4 import StaticRawRoutingAdapter
+            router_class = StaticRawRoutingAdapter
+            route_options.update({k: cfg[k] for k in ("static_raw_od", "raw_od_cache_size", "certified_eta_pruning")})
         routing = router_class(root, routing_mode=cfg["routing_mode"],
             persistent_cache_size=cfg.get("persistent_cache_size", 0), route_workers=cfg.get("route_workers", 1), **route_options)
         c = create_rolling_or_fleet_control(bindings, vehicles, requests, demand, network, routing, start, end, native_cfg)
@@ -349,6 +361,8 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
                 group_cell_fallback_queries=routing.group_cell_fallback_queries,
                 decomposition_components=int(traces.decomposed_component_count.sum()),
                 pure_future_components=int(traces.pure_future_component_count.sum()))
+        if is_v4:
+            summary["routing_v4"] = routing.diagnostics()
     except Exception as error:
         summary.update(status="STOPPED", error=repr(error), runtime_s=time.monotonic()-started)
         write_json(directory / "summary.json", summary)

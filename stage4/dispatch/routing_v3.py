@@ -67,11 +67,21 @@ class DemandRoutingAdapter(ArcDeterministicValhallaAdapter):
         self.source_group_queries = 0
         self.group_cell_fallback_queries = 0
 
+    def _answer_origin(self, key):
+        return "COMPUTED"
+
+    def _groupable(self, key, query):
+        return True
+
+    def _raw_answers_before_disk(self, needed):
+        return {}
+
     def _evaluate(self, payloads):
         if self.grouped_sources:
             by_source = defaultdict(list)
             for key, q in payloads:
-                by_source[q[0], q[1], q[2], q[5]].append((key, q))
+                group_key = (q[0], q[1], q[2], q[5]) if self._groupable(key, q) else ("INDEPENDENT", key)
+                by_source[group_key].append((key, q))
             groups = [group[left:left + 32] for group in by_source.values() for left in range(0, len(group), 32)]
         else:
             groups = [payloads[left:left + 8] for left in range(0, len(payloads), 8)]
@@ -153,16 +163,19 @@ class DemandRoutingAdapter(ArcDeterministicValhallaAdapter):
         answers, origins = {}, {}
         if self._disk_cache is not None and needed:
             t = time.perf_counter()
-            digests = {self._disk_cache.key(key): key for key in needed}
-            for digest, value in self._disk_cache.get_many(digests).items():
-                key = digests[digest]
-                answers[key], origins[key] = (*value, None), "DISK"
+            for key, value in self._raw_answers_before_disk(needed).items():
+                answers[key], origins[key] = (*value, None), "RAW_OD_MEMORY"
+            digests = {self._disk_cache.key(key): key for key in needed if key not in answers}
+            if digests:
+                for digest, value in self._disk_cache.get_many(digests).items():
+                    key = digests[digest]
+                    answers[key], origins[key] = (*value, None), "DISK"
             self.disk_cache_lookup_time_s += time.perf_counter() - t
         pending = [(key, q) for key, q in needed.items() if key not in answers]
         for key, (raw, distance, error, work) in self._evaluate(pending):
             self.routing_backend_work_time_s += work
-            answers[key], origins[key] = (raw, distance, error), "COMPUTED"
-            if error is None and self._disk_cache is not None:
+            answers[key], origins[key] = (raw, distance, error), self._answer_origin(key)
+            if error is None and self._disk_cache is not None and origins[key] == "COMPUTED":
                 self._disk_cache.remember(self._disk_cache.key(key), raw, distance)
         results, consumed = [], set()
         for rows, local, bin_index, beta, lon, lat in plans:
@@ -191,7 +204,7 @@ class DemandRoutingAdapter(ArcDeterministicValhallaAdapter):
                     _, value = self._evaluate([(raw_key, q)])[0]
                     raw, distance, error, work = value
                     self.routing_backend_work_time_s += work
-                    answers[raw_key], origins[raw_key] = (raw, distance, error), "COMPUTED"
+                    answers[raw_key], origins[raw_key] = (raw, distance, error), self._answer_origin(raw_key)
                     answer = answers[raw_key]
                 raw, distance, error = answer
                 duplicate = raw_key in consumed
@@ -202,13 +215,14 @@ class DemandRoutingAdapter(ArcDeterministicValhallaAdapter):
                     self._record_failed_arc(vehicle, lon, lat, local, error)
                     continue
                 disk_hit = origins[raw_key] == "DISK"
-                self.cache_hit_count += int(disk_hit)
+                reused_raw = disk_hit or origins[raw_key] == "RAW_OD_MEMORY"
+                self.cache_hit_count += int(reused_raw)
                 self.disk_cache_hits += int(disk_hit)
-                self.raw_query_deduplications += int(duplicate and not disk_hit)
+                self.raw_query_deduplications += int(duplicate and not reused_raw)
                 stored = PickupEstimate(raw, raw * beta, distance, beta, bin_index, False)
                 self.cache[key] = stored
                 self._remember(exact, stored)
-                found[vehicle.native_vehicle_id] = PickupEstimate(**{**stored.__dict__, "cache_hit": disk_hit})
+                found[vehicle.native_vehicle_id] = PickupEstimate(**{**stored.__dict__, "cache_hit": reused_raw})
             results.append(found)
         self.prefetched_unused_raw_arcs += sum(origins[k] == "COMPUTED" and k not in consumed for k in answers)
         if self._disk_cache is not None:

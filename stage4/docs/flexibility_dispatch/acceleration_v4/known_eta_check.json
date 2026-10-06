@@ -1,0 +1,36 @@
+{
+  "status": "COMPLETE",
+  "scope": "ONE_EXISTING_ASOF_STATE_CACHED_ETA_API_CHECK",
+  "tick": 28800,
+  "route_batches": 20,
+  "logical_arcs": 400,
+  "valid_arcs_before": 1,
+  "valid_arcs_after": 1,
+  "valid_arc_values_equal": true,
+  "warm_backend_queries": 0,
+  "warm_raw_arcs": 0,
+  "diagnostics": {
+    "static_matrix_certificate": {
+      "schema": "STATIC_AUTO_OD_3_8_2_V1",
+      "valhalla_version": "3.8.2",
+      "config_sha256": "f2eb80488a2ec832208b8ee1a7433aa4905e58243fe1c0d5b81d48a3368ec696",
+      "timedep_matrix_distance": 0,
+      "conservative_static_guard_m": 10.0,
+      "mutable_traffic_or_remote_tiles": false
+    },
+    "raw_od_cache_entries": 395,
+    "raw_od_memory_queries_avoided": 395,
+    "raw_od_cross_minute_reuses": 0,
+    "raw_od_beta_bin_reuses": 0,
+    "certified_eta_prunes": 399,
+    "known_eta_prunes_before_backend": 399,
+    "grouped_source_queries": 159,
+    "grouped_cell_fallback_queries": 0
+  },
+  "runtime_s": 2.672000000005937,
+  "process_group_rss_snapshot_mib": 578.9296875,
+  "native_scientific_conditions_added": 0,
+  "physical_state_advanced": false,
+  "unknown_od_queries_were_not_pruned": true,
+  "independent_pruning_speedup_not_claimed": true
+}

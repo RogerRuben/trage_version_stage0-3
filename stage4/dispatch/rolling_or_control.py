@@ -323,15 +323,41 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
         route_batches = [([v for v, _ in candidates if v.native_vehicle_id not in certified],
             self.request_by_rid[rid].pickup_lon_wgs84, self.request_by_rid[rid].pickup_lat_wgs84, timestamp)
             for rid, candidates, _, _, _, certified in candidate_plans]
+        eta_certificates = [{} for _ in route_batches]
         if self.config.get("epoch_routing_queue", False):
-            all_estimates = self.eta_adapter.estimate_epoch(route_batches)
+            if self.config.get("certified_eta_pruning", False) and gate_counts is None:
+                from .routing_v4 import PickupEtaBudget
+                budgets = []
+                for (rid, _, remaining, _, _, _), batch in zip(candidate_plans, route_batches):
+                    predicted = float(self.request_by_rid[rid].predicted_service_time_s) + self._pickup_overhead_s()
+                    row = {}
+                    for vehicle in batch[0]:
+                        runtime = by_vid[vehicle.native_vehicle_id]
+                        empirical = runtime.fixture.availability_policy == "EMPIRICAL_SESSION"
+                        window_end = ((self.fixture_windows_s[vehicle.native_vehicle_id][1] if calendar is not None
+                                       else self._fixture_seconds(runtime.fixture.availability_end_time)) if empirical else None)
+                        row[vehicle.native_vehicle_id] = PickupEtaBudget(remaining, simulation_time, predicted, window_end)
+                    budgets.append(row)
+                all_estimates = self.eta_adapter.estimate_epoch(route_batches, eta_budgets=budgets)
+                eta_certificates = self.eta_adapter.last_certified_prunes
+            else:
+                all_estimates = self.eta_adapter.estimate_epoch(route_batches)
         else:
             all_estimates = [self.eta_adapter.estimate_many(*batch) for batch in route_batches]
-        for (rid, candidates, remaining, critical, exposure, certified), estimates in zip(candidate_plans, all_estimates):
+        for (rid, candidates, remaining, critical, exposure, certified), estimates, eta_pruned in zip(candidate_plans, all_estimates, eta_certificates):
             request = self.request_by_rid[rid]
             meta = self.request_meta[rid]
             for vehicle, _distance in candidates:
                 if vehicle.native_vehicle_id in certified:
+                    continue
+                reason = eta_pruned.get(vehicle.native_vehicle_id)
+                if reason == "PATIENCE":
+                    invalid_patience += 1
+                    continue
+                if reason in ("HV_SESSION_END", "HV_SESSION_EVIDENCE"):
+                    invalid_hv_window += 1
+                    if reason == "HV_SESSION_END":
+                        self.hv_session_end_exclusions.add((simulation_time, vehicle.native_vehicle_id, rid))
                     continue
                 is_av = vehicle.vehicle_type == "AV"
                 if gate_counts is not None and is_av:
@@ -504,6 +530,7 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                 "hv_window_arc_exclusions": invalid_hv_window,
                 "cost_evidence_arc_exclusions": invalid_cost_evidence,
                 "zero_eta_session_certified_prunes": certified_session_prunes,
+                "cached_eta_certified_prunes": sum(len(row) for row in eta_certificates),
                 "av_candidates_pruned_by_acceptance": pruned_acceptance_epoch,
                 "av_candidates_pruned_by_missing_exposure": pruned_exposure_epoch,
                 "enabled_gamma_constraint_count": result.enabled_gamma_constraint_count,
