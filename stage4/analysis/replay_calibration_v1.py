@@ -205,7 +205,9 @@ def diagnostic(root, finalize_existing=False):
     finally:
         if router is not None:
             router.close()
-    sample.to_csv(docs / "routed_chain_sample.csv", index=False)
+    # Keep raw order/driver identities and coordinates local, under ignored
+    # output products. Only aggregate reports accompany the code push.
+    sample.to_csv(out / "routed_chain_sample.csv", index=False)
     ok = sample.loc[sample.route_status.eq("OK")].copy()
     flags = list(witness_flags(1., 0., 0.))
     sample_groups = []
@@ -248,6 +250,48 @@ def diagnostic(root, finalize_existing=False):
     print(json.dumps(result), flush=True)
 
 
+def additional_offline_checks(root, diagnostic_directory):
+    """Read existing products only; no inference, routes or simulation."""
+    sample = pd.read_parquet(diagnostic_directory/"routed_chain_sample.parquet")
+    subset = sample.loc[sample.previous_in_common_cohort & sample.route_status.eq("OK")]
+    qualified = {"n":len(subset), **{k:int(subset[k].fillna(False).sum()) for k in witness_flags(1.,0.,0.)}}
+    totals = []
+    for path in sorted(root.glob("stage1/input_v1/split=test/date=20161031/bucket=*/link_traversals.parquet")):
+        frame = pd.read_parquet(path, columns=["order_id","allocated_distance_m"])
+        totals.append(frame.groupby("order_id").allocated_distance_m.sum())
+    distance = pd.concat(totals).groupby(level=0).sum().rename("historical_route_distance_m")
+    auto = pd.read_parquet(root/"stage4/input/replay_foundation/historical_valhalla_auto_eta.parquet",
+        columns=["order_id","valhalla_route_distance_m","valhalla_route_time_s"])
+    actual = pd.read_parquet(root/"stage4/input/replay_foundation/stage4_order_replay_base.parquet",
+        columns=["order_id","realized_service_time_s"]).drop_duplicates("order_id")
+    loaded = auto.merge(distance.reset_index(),on="order_id",validate="one_to_one").merge(actual,on="order_id",validate="one_to_one")
+    ratio = loaded.historical_route_distance_m/loaded.valhalla_route_distance_m
+    sessions = pd.read_parquet(root/"stage4/input/replay_foundation/full_test31_driver_sessions.parquet",
+        columns=["session_id","session_end_time","last_order_id"])
+    core = pd.read_parquet(diagnostic_directory/"common_order_chains.parquet")
+    core = core.loc[core.common_eligible].copy()
+    core = core.merge(sessions,left_on="source_session_id",right_on="session_id",validate="many_to_one")
+    arr = np.load(root/ASSETS/"orders.npy",mmap_mode="r",allow_pickle=False)
+    pred = pd.DataFrame({"order_id":arr["order_id"],"m3_p50_s":arr["predicted"]})
+    core = core.merge(pred,on="order_id",validate="one_to_one")
+    core["zero_pickup_own_session_forbidden"] = core.canonical_request_time + pd.to_timedelta(core.m3_p50_s,unit="s") > core.session_end_time
+    template = pd.read_parquet(root/"stage4/input/replay_foundation/replay_fleet_template.parquet",columns=["source_session_id"])
+    own = core.loc[core.source_session_id.isin(template.source_session_id)]
+    last = core.loc[core.order_id.eq(core.last_order_id)]
+    return dict(both_common_quality_predecessor_sample=qualified,
+        loaded_route_distance_ratio=distribution(ratio), loaded_distance_order_count=len(loaded),
+        loaded_distance_ratio_gt15_share=float(ratio.gt(1.5).mean()),
+        loaded_time_ratio=distribution(loaded.realized_service_time_s/loaded.valhalla_route_time_s),
+        route_length_adjusted_time_ratio=distribution((loaded.realized_service_time_s/loaded.valhalla_route_time_s)/ratio),
+        original_session_represented_all_hv_count=len(own),
+        original_session_represented_all_hv_share=float(len(own)/len(core)),
+        zero_pickup_predicted_end_forbidden_all_common=int(core.zero_pickup_own_session_forbidden.sum()),
+        zero_pickup_predicted_end_forbidden_retained_session=int(own.zero_pickup_own_session_forbidden.sum()),
+        common_historical_last_order_count=len(last),
+        zero_pickup_predicted_end_forbidden_last_order=int(last.zero_pickup_own_session_forbidden.sum()),
+        historical_last_order_prediction_test_not_dispatch_loss_attribution=True)
+
+
 def report(root):
     spec, _ = load_calibration(root, CONFIG)
     docs = root/spec["doc_output"]
@@ -257,6 +301,12 @@ def report(root):
     hv = json.loads((hv_dir/"summary.json").read_text())
     if hv["status"] != "COMPLETE" or diag["status"] != "COMPLETE":
         raise ValueError("reference or diagnostic did not complete")
+    shared_inputs = {str(p).replace('\\','/'):v for p,v in mixed["inputs_sha256"].items()}
+    hv_inputs = {str(p).replace('\\','/'):v for p,v in hv["inputs_sha256"].items()}
+    if any(hv_inputs.get(p) != digest for p,digest in shared_inputs.items()):
+        raise ValueError("shared frozen inputs differ between all-HV and mixed reference")
+    extra = additional_offline_checks(root, root/spec["diagnostic_output"])
+    write_json(docs/"additional_checks.json",extra)
     a = pd.read_parquet(root/REFERENCE/"cohort_outcomes.parquet")
     b = pd.read_parquet(hv_dir/"cohort_outcomes.parquet")
     paired = a.merge(b,on="order_id",suffixes=("_mixed","_hv"),validate="one_to_one")
@@ -277,6 +327,9 @@ def report(root):
                 hv_vehicle_hours=float(h[frame.vehicle_type.eq("HV")].sum()/3600),
                 av_vehicle_hours=float(h[frame.vehicle_type.eq("AV")].sum()/3600)))
     pd.DataFrame(supply).to_csv(docs/"hourly_supply.csv", index=False)
+    supply_frame = pd.DataFrame(supply).pivot(index="hour",columns="scenario",values="available_vehicle_hours")
+    daytime_hv = float(supply_frame.loc[8:22,"ALL_HV"].sum())
+    daytime_mixed = float(supply_frame.loc[8:22,"MIXED"].sum())
     reference = dict(status="COMPLETE", mixed_reference=str(REFERENCE), all_hv_reference=str(hv_dir.relative_to(root)),
         controlled_change="fleet composition/layout/availability plus AV compatibility/acceptance; not pure ODD or policy causal attribution",
         gained_all_hv=int((~paired.matched_mixed & paired.matched_hv).sum()),
@@ -284,7 +337,12 @@ def report(root):
         common_served=int(common.sum()), matched_difference=int(hv["matched"]-mixed["matched"]),
         service_rate_difference_pp=100*(hv["service_rate_common_population"]-mixed["service_rate_common_population"]),
         paired_served_mean_wait_delta_s=float((paired.loc[common,"wait_s_hv"]-paired.loc[common,"wait_s_mixed"]).mean()),
-        all_hv=hv, mixed=mixed, hourly_supply=supply, all_hv_diagnostics=dispatch_diagnostics(root,hv_dir),
+        all_hv=hv, mixed=mixed, hourly_supply=supply, additional_offline_checks=extra,
+        shared_input_hashes_identical=True, shared_input_count=len(shared_inputs),
+        daytime_08_to_23_hv_vehicle_hours=daytime_hv,
+        daytime_08_to_23_mixed_vehicle_hours=daytime_mixed,
+        daytime_mixed_supply_deficit_share=1-daytime_mixed/daytime_hv,
+        all_hv_diagnostics=dispatch_diagnostics(root,hv_dir),
         historical_service_rate_calibrated=False, no_new_timing_or_reposition_scenarios=True)
     write_json(docs/"comparison.json",reference)
     all_group = diag["sample_groups"][0]
@@ -301,6 +359,13 @@ def report(root):
         f"| 已服务者平均等待（秒） | {mixed['mean_wait_s']:.2f} | {hv['mean_wait_s']:.2f} |", "",
         f"纯HV新增服务{reference['gained_all_hv']:,}单、失去{reference['lost_all_hv']:,}单，净变化{reference['matched_difference']:+,}单，共同口径变化{reference['service_rate_difference_pp']:+.3f}个百分点。",
         "这是车队组成与可替代性组合参考；不是单独ODD、接受率或派单算法的因果效应。纯HV仍不是原历史车队逐司机订单链回放。", "",
+        f"两组共同被服务{reference['common_served']:,}单的平均等待差（纯HV−混合）为{reference['paired_served_mean_wait_delta_s']:+.2f}秒；它仍是条件于两组均服务的描述性比较。",
+        "全天总车时对齐不等于逐小时供给对齐：混合场景将一部分日间HV班次车时换成256辆全天AV车时。", "",
+        "| 时段 | 纯HV可用车时 | 混合可用车时 | 混合相对变化 |", "|---|---:|---:|---:|"]
+    for hour in (5,15,18):
+        h,m=float(supply_frame.loc[hour,"ALL_HV"]),float(supply_frame.loc[hour,"MIXED"])
+        lines.append(f"| {hour:02d}:00–{hour+1:02d}:00 | {h:.2f} | {m:.2f} | {m/h-1:+.2%} |")
+    lines += ["",f"08:00–23:00纯HV可用车时{daytime_hv:.2f}，混合{daytime_mixed:.2f}，混合少{1-daytime_mixed/daytime_hv:.2%}；全部24小时见hourly_supply.csv。它是q实验内生的时段供给重分配，不是纯能力约束效应，也不是小于0.2%的全天归一化误差。",
         "## 2. 历史链与接驾倍率", "",
         f"前序构建使用{diag['full_history_valid_orders']:,}条有效原始订单，而不是只用30,000条研究订单。共同人口中{diag['common_no_predecessor_count']:,}单没有当日已观测前序，{diag['common_overlap_count']:,}单历史时间重叠，{diag['common_session_break_count']:,}单跨90分钟session边界。",
         f"同session且无重叠候选{diag['common_chain_candidate_count']:,}对，其中前序不在研究共同人口的比例{diag['predecessor_outside_common_share']:.2%}。",
@@ -313,7 +378,10 @@ def report(root):
         count = n-all_group[key] if key == "raw_fits_historical_gap" else all_group[key]
         lines.append(f"| {name} | {count:,} | {count/n:.2%} |")
     lines += ["", "历史两单间隔包含未知空驶、停车或其他未观测活动，是可用时间上界，不是真实接驾标签。以上只证明当前时间/空间重构与一部分历史连接存在冲突，不能直接声称这些订单会被新策略救回。",
+        f"前后两单均在高质量共同人口的子集为{extra['both_common_quality_predecessor_sample']['n']}对，其中{extra['both_common_quality_predecessor_sample']['timing_idle_hold_conflict']}对仍出现校准ETA在历史间隔内、却超过300秒的冲突；该子集不重新路由。",
         "冻结beta从载客OD真实耗时与Valhalla OD耗时比值拟合；它同时可能包含拥堵、实际与最短路线差异及路网误差。当前没有独立空驶接驾标签，不能据此宣布beta过高或将其改为1。", "",
+        f"30,000单匹配物理距离/Valhalla载客OD距离的中位数为{extra['loaded_route_distance_ratio']['p50']:.4f}；距离比超过1.5的比例为{extra['loaded_distance_ratio_gt15_share']:.2%}。整体约2.4的时长倍率不能简单解释为整体约2.4倍路线绕行。",
+        f"即使假设原司机在该单历史起点、接驾时间为0，共同人口中仍有{extra['zero_pickup_predicted_end_forbidden_all_common']:,}单因M3 P50完成时刻超过推断session结束而被规则判不可接。其中历史session末单{extra['common_historical_last_order_count']:,}单中有{extra['zero_pickup_predicted_end_forbidden_last_order']:,}单出现此现象。它是预测与推断班次硬边界的冲突见证，不是实际超时订单的因果分摊。", "",
         "## 3. 供给与候选流失", ""]
     for name,d in (("混合",diag['canonical_mixed']),("纯HV",reference['all_hv_diagnostics'])):
         visits=d['candidate_visits']
@@ -324,12 +392,13 @@ def report(root):
     lines += ["## 4. 执行与约束", "",
         f"离线诊断实际计算耗时{diag['runtime_s']:.2f}秒（完整路由阶段与聚合修复后finalization的测量值之和），观测最大RSS {diag['peak_rss_mib']:.2f} MiB（{diag['rss_measurement']}）。纯HV实际耗时{hv['runtime_s']/60:.2f}分钟，进程组峰值RSS {hv['peak_process_group_rss_mib']:.2f} MiB；private committed {hv.get('peak_process_group_private_committed_mib',0):.2f} MiB。GPU未用、无稠密订单×车辆矩阵。",
         f"纯HV执行代码SHA `{hv['execution_code_sha']}`；路由失败={hv['routing_failures']}；资源降级={hv['resource_fallback_epochs']}；当前服务面违规={hv['current_face_violation_epochs']}；物理对账={hv['physical_reconciliation']}。",
+        f"两组{len(shared_inputs)}个共享输入SHA一致。纯HV标签M仅复用已有路线/预测产品，HV不受M适配或AV接受率限制。",
         "请求时刻、300秒耐心、ETA倍率、M3、C/M/A定义、重定位与旧产物未更改。仅新增一组纯HV参考，不自动重试、不参数搜索。", "",
         "## 5. 文献与后续设计", "", "参见 [定向文献来源](literature_sources.md)。根据本轮实测与一手来源形成的建议在单独的 conclusions.md 中列出，不将建议误写为已经执行的场景。", "",
         "## 6. 解释风险（11/11检查）", "",
         "选择/幸存者风险：样本仅含历史完成订单；聚合风险：车时不等于局部匹配能力，重复arc计数不等于订单数；条件等待样本风险：只服务者的平均等待不是全体请求福利；因果风险：同一天/seed与组合车队改变不支持现实因果分解。Simpson/生态/Berkson/碰撞点/基率/均值回归/幸存者/look-elsewhere/forking paths/相关因果/反向因果均已检查；本报告不做显著性或因果效应宣称。", "",
         "## 文件", "", "- diagnostic_summary.json：完整离线计数、输入来源与分组。",
-        "- routed_chain_sample.csv：可直接打开的1,200对样本。", "- all_hv_summary.json：真实纯HV执行结果。",
+        "- 本地样本CSV：`stage4/output/replay_calibration_v1/diagnostic/routed_chain_sample.csv`（含原始身份/坐标，不推送Git）。", "- all_hv_summary.json：真实纯HV执行结果。",
         "- comparison.json：同口径订单对比及候选/占用诊断。", "", "本报告由AI辅助代码分析与来源检索生成，最终科研判断仍由作者作出。", ""]
     (docs/"report.md").write_text("\n".join(lines), encoding="utf-8")
     print(json.dumps({k:reference[k] for k in ('status','matched_difference','service_rate_difference_pp','gained_all_hv','lost_all_hv')}),flush=True)

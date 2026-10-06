@@ -21,7 +21,7 @@ Explain the gap between historically completed trips and the current counterfact
 - Apply the frozen beta at the next historical boarding proxy, matching the canonical zero-lead decision clock. Compare raw and corrected ETA with (a) the observed inter-trip gap and (b) 300 seconds. The gap is an upper budget including unknown idle time, not an observed pickup-time label.
 - A corrected ETA within the historic gap but over 300 seconds is a **timing/idle-hold conflict witness**, not proof that a specific canonical unserved order would be recovered.
 - Report cohort groups, candidate-visit attrition, and day-clipped pickup+service vehicle-hours. Do not interpret repeated arc counts as disjoint order-level causes.
-- Do not refit beta from the Test31 gaps; do not change request release or import realized future information into dispatch.
+- Do not refit beta from the Test31 gaps; do not change request release or add any order-specific realized future column to dispatch. The already frozen, day-specific Test31 aggregate beta remains an ex-post replay traffic calibration, not a strict out-of-sample decision-time ETA predictor. M3/forecast inputs remain unchanged.
 
 ## One same-interface all-HV reference
 
@@ -45,4 +45,4 @@ python -m stage4.analysis.replay_calibration_v1 --phase report
 
 ## Interpretation and stop
 
-Report actual execution times, resource peaks, baseline hashes, reference service/wait differences, and limits of historical-gap inference. Only one date/seed; neither historical completed-trip sampling nor this replay estimates the real platform's unconditional request acceptance rate. Stop after the diagnosis/report and commit/push; any timing/reposition/ETA redesign requires a separately declared experiment rather than tuning to 100%.
+Report actual execution times, resource peaks, baseline hashes, reference service/wait differences, and limits of historical-gap inference. Only one date/seed; neither historical completed-trip sampling nor this replay estimates the real platform's unconditional request acceptance rate. Keep the order/driver/coordinate sample CSV in ignored local output; push code and aggregate scientific reports only. Stop after the diagnosis/report and commit/push; any timing/reposition/ETA redesign requires a separately declared experiment rather than tuning to 100%.
