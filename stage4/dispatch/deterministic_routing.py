@@ -93,6 +93,8 @@ class ArcDeterministicValhallaAdapter(SparseValhallaMatrixAdapter):
             self._executor = None
         if self._disk_cache is not None:
             self._disk_cache.close()
+            if hasattr(self._disk_cache, "diagnostics"):
+                self._closed_disk_cache_diagnostics = self._disk_cache.diagnostics()
             self._disk_cache = None
         if self.lazy_worker_actor:
             self._actor = None

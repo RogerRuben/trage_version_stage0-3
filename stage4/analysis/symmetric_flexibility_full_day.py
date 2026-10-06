@@ -2,11 +2,15 @@
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timezone
 import gc
 import json
 import math
+import os
 from pathlib import Path
+import subprocess
 import time
+from zoneinfo import ZoneInfo
 
 import pandas as pd
 import psutil
@@ -170,6 +174,10 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
         administrative_timeout_s=timeout_s,
         administrative_extension=administrative_timeout_s is not None,
         scientific_and_per_epoch_solver_parameters_unchanged=True)
+    summary.update(execution_pid=os.getpid(),
+        execution_started_at=datetime.now(timezone.utc).astimezone(ZoneInfo("Asia/Singapore")).isoformat(),
+        execution_code_sha=subprocess.check_output(["git", "-c", f"safe.directory={root.resolve().as_posix()}",
+            "rev-parse", "HEAD"], cwd=root, text=True).strip())
     if acceleration_path is not None:
         summary.update(acceleration_config_sha256=sha(acceleration_path), execution_settings=technical,
             optimum_equivalence_not_bitwise_trajectory_identity=True)
@@ -280,6 +288,12 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
                         process_group_private_committed_mib=resources["private_committed_mib"],
                         system_available_ram_mib=psutil.virtual_memory().available / 2**20,
                         local_disk_free_gib=psutil.disk_usage(root.anchor).free / 2**30)
+                if is_v4:
+                    progress.update(routing_arc_evaluations=routing.routing_arc_evaluations,
+                        arc_lookups=routing.arc_lookup_count, arc_cache_hits=routing.cache_hit_count,
+                        raw_od_memory_queries_avoided=routing.raw_od_memory_queries_avoided,
+                        raw_od_cache_evictions=routing.raw_od_cache_evictions,
+                        optional_cache_write_error=routing._disk_cache.write_error if routing._disk_cache else None)
                 write_json(directory / "progress.json", progress)
                 print(json.dumps(progress), flush=True)
             if tick > cfg["last_dispatch_s"] and not (set(c.rid_to_assigned_vid)-c.completed_rids): break
@@ -370,6 +384,12 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
     finally:
         if routing is not None:
             routing.close()
+            if is_v4:
+                summary["routing_v4"] = routing.diagnostics()
+        summary.update(runtime_s=time.monotonic()-started,
+            execution_finished_at=datetime.now(timezone.utc).astimezone(ZoneInfo("Asia/Singapore")).isoformat())
+        if summary.get("status") == "STOPPED":
+            write_json(directory / "summary.json", summary)
     write_json(directory / "summary.json", summary)
     (root / doc_root).mkdir(parents=True,exist_ok=True)
     write_json(root / doc_root / (policy.lower()+"_summary.json"),summary)

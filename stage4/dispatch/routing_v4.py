@@ -94,6 +94,7 @@ class StaticRawRoutingAdapter(DemandRoutingAdapter):
         self._raw_od_cache = OrderedDict()
         self._memory_answers = set()
         self.raw_od_memory_queries_avoided = 0
+        self.raw_od_cache_evictions = 0
         self.raw_od_cross_minute_reuses = 0
         self.raw_od_beta_bin_reuses = 0
         self.certified_eta_prunes = 0
@@ -116,6 +117,7 @@ class StaticRawRoutingAdapter(DemandRoutingAdapter):
         self._raw_od_cache.move_to_end(key)
         while len(self._raw_od_cache) > self.raw_od_cache_size:
             self._raw_od_cache.popitem(last=False)
+            self.raw_od_cache_evictions += 1
 
     def _remember(self, key, estimate):
         super()._remember(key, estimate)
@@ -226,10 +228,13 @@ class StaticRawRoutingAdapter(DemandRoutingAdapter):
     def diagnostics(self):
         return dict(static_matrix_certificate=self.static_certificate,
             raw_od_cache_entries=len(self._raw_od_cache),
+            raw_od_cache_evictions=self.raw_od_cache_evictions,
             raw_od_memory_queries_avoided=self.raw_od_memory_queries_avoided,
             raw_od_cross_minute_reuses=self.raw_od_cross_minute_reuses,
             raw_od_beta_bin_reuses=self.raw_od_beta_bin_reuses,
             certified_eta_prunes=self.certified_eta_prunes,
             known_eta_prunes_before_backend=self.known_eta_prunes_before_backend,
             grouped_source_queries=self.source_group_queries,
-            grouped_cell_fallback_queries=self.group_cell_fallback_queries)
+            grouped_cell_fallback_queries=self.group_cell_fallback_queries,
+            optional_disk_cache=(self._disk_cache.diagnostics() if self._disk_cache is not None
+                else getattr(self, "_closed_disk_cache_diagnostics", None)))
