@@ -300,7 +300,7 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                 predicted = request.predicted_service_time_s + self._pickup_overhead_s()
                 for vehicle, _ in candidates:
                     runtime = by_vid[vehicle.native_vehicle_id]
-                    if runtime.fixture.availability_policy == "EMPIRICAL_SESSION":
+                    if self._requires_completion_by_window_end(runtime):
                         window_end = self.fixture_windows_s[vehicle.native_vehicle_id][1]
                         if not isfinite(predicted) or simulation_time + predicted > window_end:
                             certified.add(vehicle.native_vehicle_id)
@@ -333,7 +333,7 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                     row = {}
                     for vehicle in batch[0]:
                         runtime = by_vid[vehicle.native_vehicle_id]
-                        empirical = runtime.fixture.availability_policy == "EMPIRICAL_SESSION"
+                        empirical = self._requires_completion_by_window_end(runtime)
                         window_end = ((self.fixture_windows_s[vehicle.native_vehicle_id][1] if calendar is not None
                                        else self._fixture_seconds(runtime.fixture.availability_end_time)) if empirical else None)
                         row[vehicle.native_vehicle_id] = PickupEtaBudget(remaining, simulation_time, predicted, window_end)
@@ -376,7 +376,7 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                 # Arrival patience is unchanged; stationary pickup time belongs
                 # in planned completion/session admission and operating time.
                 predicted = float(request.predicted_service_time_s) + self._pickup_overhead_s()
-                if runtime.fixture.availability_policy == "EMPIRICAL_SESSION":
+                if self._requires_completion_by_window_end(runtime):
                     if not isfinite(predicted):
                         invalid_hv_window += 1
                         continue

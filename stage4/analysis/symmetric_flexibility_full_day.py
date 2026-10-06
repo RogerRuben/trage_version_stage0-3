@@ -143,13 +143,27 @@ def analyze(root, output_root=OUTPUT, doc_root=DOC):
 
 
 def run(root, fleetpy, policy, resume, administrative_timeout_s=None, acceleration_config=None,
-        calibration_config=None):
+        calibration_config=None, controlled_scenario=None, smoke=False):
     pa.set_cpu_count(1)
     pa.set_io_thread_count(1)
     cfg = json.loads((root / CONFIG).read_text())
     technical, acceleration_path, group_limit = acceleration_settings(root, acceleration_config)
     calibration = None
     calibration_path = None
+    controlled = None
+    controlled_path = root / "stage4/config/controlled_replay_v2.json"
+    if controlled_scenario is not None:
+        controlled = json.loads(controlled_path.read_text())
+        if (controlled_scenario not in ("PURE_HV","M_Q10_P70")
+                or set(controlled["scenarios"]) != {"PURE_HV","M_Q10_P70"}
+                or controlled["scenarios"]["PURE_HV"] != {"requested_q_a":0.,"passenger_acceptance_rate":1.}
+                or controlled["scenarios"]["M_Q10_P70"] != {"requested_q_a":.1,"passenger_acceptance_rate":.7}
+                or controlled["parameter_search"] or controlled["model_refit"]
+                or policy != controlled["policy"] or calibration_config is not None
+                or acceleration_path is None or administrative_timeout_s is not None):
+            raise ValueError("outside authorized two-condition controlled replay")
+    elif smoke:
+        raise ValueError("smoke is only available for the separate controlled mode")
     if calibration_config is not None:
         from stage4.analysis.replay_calibration_contract import load_calibration
         calibration, calibration_path = load_calibration(root, calibration_config)
@@ -166,6 +180,12 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
     if calibration is not None:
         output_root = Path(calibration["all_hv_output"])
         doc_root = Path(calibration["doc_output"])
+    if controlled is not None:
+        output_root = Path("stage4/output/controlled_replay_v2") / ("smoke" if smoke else "runs") / controlled_scenario
+        doc_root = Path("stage4/docs/controlled_replay_v2") / ("smoke" if smoke else "results")
+        if smoke:
+            cfg["measurement_end_s"] = int(controlled["smoke_end_s"])
+            cfg["last_dispatch_s"] = int(controlled["smoke_end_s"]) + cfg["patience_s"]
     if policy not in cfg["policies"] or cfg["profile"] != "M" or cfg["parameter_search"] or cfg["refit_m3"]:
         raise ValueError("outside authorized two-condition frozen protocol")
     timeout_s = administrative_timeout(cfg, policy, administrative_timeout_s)
@@ -179,7 +199,10 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
             print(json.dumps(dict(skipped_completed=policy)), flush=True)
             if acceleration_path is not None and done.get("acceleration_config_sha256") != sha(acceleration_path):
                 raise ValueError("completed acceleration settings differ")
-            if calibration is not None:
+            if controlled is not None:
+                if done.get("controlled_config_sha256") != sha(controlled_path):
+                    raise ValueError("completed controlled settings differ")
+            elif calibration is not None:
                 if done.get("calibration_config_sha256") != sha(calibration_path):
                     raise ValueError("completed calibration settings differ")
             else:
@@ -205,6 +228,13 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
             controlled_changes={"requested_q_a": 0.0, "passenger_acceptance_rate": 1.0},
             historical_driver_chain_replayed=False, request_times_changed=False,
             pickup_eta_calibration_changed=False, repositioning_enabled=False)
+    if controlled is not None:
+        summary.update(controlled_config_sha256=sha(controlled_path), controlled_scenario=controlled_scenario,
+            controlled_replay_v2=True, smoke_diagnostic=smoke,
+            scientific_and_per_epoch_solver_parameters_unchanged=False,
+            shared_request_model_profile_solver_parameters_unchanged=True,
+            request_time_equals_boarding_accepted=True, new_route_traffic_evidence="UNKNOWN_U_EXPLICIT",
+            repositioning_enabled=True, repositioning_vehicle_types=["HV","AV"])
     write_json(directory / "summary.json", summary)
     paths = [CONFIG, INPUT/"test31_research_routes.parquet", INPUT/"train_request_templates.parquet",
         Path(cfg["remaining_time_model"]), Path("stage3/config/stage3_av_capability_profiles.json"),
@@ -214,7 +244,18 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
         protected[str(acceleration_path.relative_to(root.resolve()))] = sha(acceleration_path)
     if calibration_path is not None:
         protected[str(calibration_path.relative_to(root.resolve()))] = sha(calibration_path)
+    if controlled is not None:
+        protected[str(controlled_path.relative_to(root))] = sha(controlled_path)
+        from stage4.dispatch.repositioning_policy import REFERENCE_REL, REFERENCE_MANIFEST_REL
+        for p in (REFERENCE_REL, REFERENCE_MANIFEST_REL): protected[str(p)] = sha(root/p)
+        for p in (Path("stage3/output/odd_tod/s2a/stage3_full_network_edges.parquet"),
+                  Path("stage3/output/odd_tod/s2b/final/stage3_edge_complex_boundary_index.parquet"),
+                  Path("stage3/output/odd_tod/s2b/final/stage3_route_movement_lookup.parquet"),
+                  Path("stage4/output/flexibility_dispatch_v1/input/complex_control_overlay.parquet")):
+            protected[str(p)] = sha(root/p)
     routing = None
+    empty_router = None
+    manager = None
     peak_group_rss = 0.0
     peak_group_private = 0.0
     try:
@@ -223,6 +264,10 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
         base = json.loads((source / "scenario_config.json").read_text())["runtime_configuration"]
         if calibration is not None:
             base = {**base, "av_vehicle_hour_share": 0.0, "passenger_acceptance_rate": 1.0}
+        if controlled is not None:
+            setting = controlled["scenarios"][controlled_scenario]
+            base = {**base, "av_vehicle_hour_share": setting["requested_q_a"],
+                "passenger_acceptance_rate": setting["passenger_acceptance_rate"]}
         start = pd.Timestamp("2016-10-31T00:00:00+08:00")
         assets = None
         if is_v2:
@@ -236,6 +281,8 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
         else:
             raw_requests = load_all_test31_requests(root, start=start, end=start+pd.Timedelta(seconds=cfg["measurement_end_s"]), profile_id="M")
         if len(raw_requests) != 30000: raise ValueError("source Test31 cohort is not 30000")
+        if controlled is not None and smoke:
+            raw_requests = [r for r in raw_requests if 0 <= r.sim_time_s < cfg["measurement_end_s"]]
         if assets is not None:
             routes = None
             route_rows = {str(r["order_id"]): dict(common_eligible=bool(r["common"]), compatible_M=bool(r["mask"] & 2),
@@ -251,6 +298,10 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
         end = start+pd.Timedelta(seconds=drain_s)
         fleet = assets.fleet() if assets is not None and calibration is None else build_fleet_scenario(root, benchmark_start=start, simulation_end=end,
             requested_q_a=base["av_vehicle_hour_share"], seed=base["fleet_sampling_seed"], max_hv_hour_error_pct=base["max_hv_vehicle_hour_error_pct"])
+        if controlled is not None:
+            from stage4.dispatch.controlled_fleet import build_controlled_fleet
+            fleet = build_controlled_fleet(root, benchmark_start=start, simulation_end=end,
+                requested_q_a=base["av_vehicle_hour_share"], seed=controlled["supply_seed"])
         registry = CoordinateRegistry()
         attach_fleetpy_requests(requests, bindings, registry)
         network = create_native_network(bindings, registry)
@@ -261,6 +312,8 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
             "cost_level_enabled":False, "prospective_gate_logging":False, "additional_pickup_overhead_s":0.,
             "matching_end_s":cfg["last_dispatch_s"], "benchmark_runtime_guard_s":timeout_s,
             **{k: cfg[k] for k in ("cached_geometry", "epoch_routing_queue", "pre_route_session_certificate", "certified_eta_pruning") if k in cfg}}
+        if controlled is not None:
+            native_cfg["controlled_replay_v2"] = True
         route_options = {}
         if assets is not None:
             route_options = dict(disk_cache_path=cfg["disk_route_cache"], routing_context=assets.manifest["routing_context"],
@@ -286,17 +339,28 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
             if cfg.get("event_calendar"):
                 # q=0 has 8,435 sessions, not the mixed offline asset's 4,444
                 # fixtures. Reuse requests/geometry, but use the actual fleet.
-                c.enable_event_calendar(assets.windows() if calibration is None else None)
+                c.enable_event_calendar(assets.windows() if calibration is None and controlled is None else None)
         else:
             c.research_route_policy = ResearchRoutePolicy(routes, "M", profiles)
             templates = pd.read_parquet(root / INPUT / "train_request_templates.parquet")
             forecast = TrainDemandForecast(templates, cfg, cfg["measurement_end_s"])
         model = TrainRemainingTime(json.loads((root / cfg["remaining_time_model"]).read_text()))
         c.flexibility_adapter = NativeFlexibilityAdapter(policy, forecast, cfg, model)
+        if controlled is not None:
+            from stage4.dispatch.controlled_routes import ControlledEmptyRouter
+            from stage4.dispatch.controlled_movement import CommonIdleMovementManager
+            from stage4.dispatch.repositioning_policy import load_train_demand_reference
+            reference,_ = load_train_demand_reference(root)
+            empty_router = ControlledEmptyRouter(root, routing)
+            manager = CommonIdleMovementManager(c, reference, empty_router,
+                max_moves=controlled["reposition_max_moves"], radius_m=controlled["reposition_radius_m"],
+                max_eta_s=controlled["reposition_max_eta_s"], top_k=controlled["reposition_top_k"],
+                day_end_s=min(controlled["reposition_day_end_s"], cfg["measurement_end_s"]))
+            c.repositioning_manager = manager
         sim = create_native_simulation(bindings, simulation_end_s=drain_s, time_step_s=30, demand=demand,
             vehicles=[v.native_vehicle for v in vehicles], fleet_control=c, network=network, native_output=native_output)
         write_json(directory / "fleet_accounting.json", fleet.accounting)
-        if calibration is not None:
+        if calibration is not None or controlled is not None:
             fixtures = []
             for fixture in fleet.native_fixtures:
                 row = asdict(fixture)
@@ -334,12 +398,20 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
                         optional_cache_write_error=routing._disk_cache.write_error if routing._disk_cache else None)
                 write_json(directory / "progress.json", progress)
                 print(json.dumps(progress), flush=True)
-            if tick > cfg["last_dispatch_s"] and not (set(c.rid_to_assigned_vid)-c.completed_rids): break
+            if tick > cfg["last_dispatch_s"] and not (set(c.rid_to_assigned_vid)-c.completed_rids) and not (manager and manager.active): break
         c.reconcile()
         if any((c.position_reconciliation_failures, c.request_state_reconciliation_failures,
                 c.vehicle_state_reconciliation_failures, c.av_availability_violations)):
             raise RuntimeError("native physical reconciliation failure")
         if set(c.rid_to_assigned_vid)-c.completed_rids: raise RuntimeError("physical drain incomplete")
+        if manager is not None:
+            manager.finalize(tick)
+            movements = pd.DataFrame(manager.rows)
+            if len(movements): movements["destination_position"] = movements.destination_position.astype(str)
+            write_parquet(directory / "empty_movements.parquet", movements)
+            write_parquet(directory / "empty_movement_epochs.parquet", pd.DataFrame(manager.epochs))
+            summary["empty_movements"] = manager.summary()
+            summary["empty_route_diagnostics"] = empty_router.diagnostics()
         assignments = pd.DataFrame(c.assignment_rows)
         assigned = assignments.set_index("native_request_id")
         outcomes = []
@@ -430,11 +502,11 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
             write_json(directory / "summary.json", summary)
     write_json(directory / "summary.json", summary)
     (root / doc_root).mkdir(parents=True,exist_ok=True)
-    summary_name = "all_hv_summary.json" if calibration is not None else policy.lower()+"_summary.json"
+    summary_name = controlled_scenario.lower()+"_summary.json" if controlled is not None else "all_hv_summary.json" if calibration is not None else policy.lower()+"_summary.json"
     write_json(root / doc_root / summary_name, summary)
     print(json.dumps(summary),flush=True)
     gc.collect()
-    if calibration is None:
+    if calibration is None and controlled is None:
         analyze(root, output_root, doc_root)
 
 
@@ -449,6 +521,8 @@ if __name__ == "__main__":
         help="Opt-in technical acceleration; writes to a separate output directory")
     parser.add_argument("--calibration-config", type=Path,
         help="One opt-in all-HV absolute replay reference; never changes frozen mixed runs")
+    parser.add_argument("--controlled-scenario", choices=("PURE_HV","M_Q10_P70"))
+    parser.add_argument("--smoke", action="store_true", help="One-hour engineering check for controlled mode only")
     args=parser.parse_args()
     run(Path.cwd(),args.fleetpy_root,args.policy,args.resume,args.administrative_timeout_s,
-        args.acceleration_config,args.calibration_config)
+        args.acceleration_config,args.calibration_config,args.controlled_scenario,args.smoke)

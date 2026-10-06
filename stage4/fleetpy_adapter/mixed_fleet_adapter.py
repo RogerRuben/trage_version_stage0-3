@@ -34,7 +34,9 @@ class VehicleFixture:
         if self.availability_policy is None:
             object.__setattr__(self, "availability_policy",
                                "EMPIRICAL_SESSION" if self.vehicle_type == "HV" else "FULL_HORIZON")
-        if self.availability_policy not in {"EMPIRICAL_SESSION", "FULL_HORIZON"}:
+        if self.availability_policy not in {
+            "EMPIRICAL_SESSION", "FULL_HORIZON", "STOP_ADMISSION_FINISH_COMMITTED"
+        }:
             raise ValueError(f"Unknown availability policy: {self.availability_policy}")
 
 

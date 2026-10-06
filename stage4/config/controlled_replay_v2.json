@@ -1,0 +1,25 @@
+{
+  "version": "controlled_replay_v2",
+  "base_config": "stage4/config/symmetric_flexibility_full_day_v1.json",
+  "acceleration_config": "stage4/config/symmetric_flexibility_acceleration_v4.json",
+  "scenarios": {
+    "PURE_HV": {"requested_q_a": 0.0, "passenger_acceptance_rate": 1.0},
+    "M_Q10_P70": {"requested_q_a": 0.1, "passenger_acceptance_rate": 0.7}
+  },
+  "profile": "M",
+  "policy": "SERVICE_PRESERVING_LOOKAHEAD",
+  "supply_seed": 20260824,
+  "stop_admission_policy": "STOP_ADMISSION_FINISH_COMMITTED",
+  "reposition_interval_s": 900,
+  "reposition_day_end_s": 86400,
+  "reposition_radius_m": 2000.0,
+  "reposition_top_k": 3,
+  "reposition_max_eta_s": 300.0,
+  "reposition_max_moves": 50,
+  "empty_route_cache_size": 1024,
+  "empty_traffic_policy": "UNKNOWN_U_EXPLICIT_EXISTING_RESEARCH_ASSUMPTION",
+  "smoke_end_s": 3600,
+  "new_native_conditions": 2,
+  "parameter_search": false,
+  "model_refit": false
+}

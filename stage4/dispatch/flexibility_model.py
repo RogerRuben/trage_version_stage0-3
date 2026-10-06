@@ -25,6 +25,7 @@ class Vehicle:
     ready_position: str
     ready_time_s: float
     availability_end_s: float
+    strict_completion_deadline: bool = True
 
 
 @dataclass(frozen=True)
@@ -181,6 +182,13 @@ def _allowed(vehicle, request):
         request.passenger_accepts_av and vehicle.profile_id in request.compatible_profiles)
 
 
+def _admission_feasible(vehicle, departure_time_s, completion_time_s, *, completion_tolerance_s=1e-7):
+    """Legacy windows constrain completion; controlled windows stop admission."""
+    if vehicle.strict_completion_deadline:
+        return completion_time_s <= vehicle.availability_end_s + completion_tolerance_s
+    return departure_time_s < vehicle.availability_end_s
+
+
 def _validate(problem, *, fixed_action=False):
     limits = problem.limits
     if any(type(x) is not bool for x in (limits.lock_current_face, limits.compress_fixed_states, limits.trim_flow_rows)):
@@ -208,7 +216,9 @@ def _validate(problem, *, fixed_action=False):
     for vehicle in vehicles.values():
         if (vehicle.profile_id not in ("HV", "C", "M", "A")
                 or not all(isfinite(x) for x in (vehicle.ready_time_s, vehicle.availability_end_s))
-                or vehicle.availability_end_s < vehicle.ready_time_s):
+                or type(vehicle.strict_completion_deadline) is not bool
+                or (vehicle.strict_completion_deadline
+                    and vehicle.availability_end_s < vehicle.ready_time_s)):
             raise ValueError("invalid vehicle state")
     for request in requests.values():
         _validate_request(request)
@@ -253,7 +263,7 @@ def _options(problem, vehicles, requests):
         completion = arrival + request.pickup_overhead_s + request.predicted_service_time_s
         if (vehicle.ready_time_s <= problem.now_s and _allowed(vehicle, request)
                 and arrival <= request.pickup_deadline_s + 1e-7
-                and completion <= vehicle.availability_end_s + 1e-7):
+                and _admission_feasible(vehicle, problem.now_s, completion)):
             options.append(_Option(vehicle.vehicle_id, request.request_id, completion,
                                    request.dropoff_position, pickup.pickup_eta_s))
     return options
@@ -397,7 +407,7 @@ def _solve(problem, policy, fixed_pairs=None, current_face=None):
                 completion = arrival + request.pickup_overhead_s + request.predicted_service_time_s
                 if (_allowed(vehicle, request)
                         and arrival <= request.pickup_deadline_s + 1e-7
-                        and completion <= vehicle.availability_end_s + 1e-7):
+                        and _admission_feasible(vehicle, departure, completion)):
                     recourse.append((scenario, pickup, j))
     count = len(options) + len(recourse)
     rows = _SparseRows(problem.limits)

@@ -85,18 +85,33 @@ class _NativeFleetControlCore:
     def _fixture_seconds(self, timestamp: pd.Timestamp) -> float:
         return float((timestamp - self.start).total_seconds())
 
+    @staticmethod
+    def _finish_committed(runtime: VehicleRuntime) -> bool:
+        return runtime.fixture.availability_policy == "STOP_ADMISSION_FINISH_COMMITTED"
+
+    @staticmethod
+    def _requires_completion_by_window_end(runtime: VehicleRuntime) -> bool:
+        return runtime.fixture.availability_policy == "EMPIRICAL_SESSION"
+
     def _available(self, runtime: VehicleRuntime, sim_time: int) -> bool:
         fixture = runtime.fixture
         native = runtime.native_vehicle
         native_free = (
             native.status == self.bindings.states.IDLE and not native.assigned_route
         )
+        if self._finish_committed(runtime) and runtime.active_order_id is not None:
+            return False
         if getattr(self, "event_calendar", None) is not None:
             inside_window = self.event_calendar.inside(fixture.native_id, sim_time)
         else:
             timestamp = self._timestamp(sim_time)
             inside_window = (timestamp >= fixture.availability_start_time
                              and timestamp < fixture.availability_end_time)
+        manager = getattr(self, "repositioning_manager", None)
+        if (inside_window and not native_free and self._finish_committed(runtime)
+                and getattr(self, "config", {}).get("controlled_replay_v2", False)
+                and runtime.active_order_id is None and manager is not None):
+            native_free = manager.is_interruptible(runtime, sim_time)
         return native_free and inside_window
 
     def user_request(self, rq: Any, simulation_time: int) -> None:
@@ -158,7 +173,13 @@ class _NativeFleetControlCore:
         except Exception:
             self.routing_failures += 1
             return None
-        if runtime.fixture.vehicle_type == "HV":
+        if self._finish_committed(runtime) and (
+            not isfinite(estimate.corrected_pickup_eta_s)
+            or simulation_time + estimate.corrected_pickup_eta_s
+            > request.sim_time_s + getattr(self, "max_pickup_wait_s", 300)
+        ):
+            return None
+        if self._requires_completion_by_window_end(runtime):
             predicted_end = simulation_time + (
                 estimate.corrected_pickup_eta_s + request.predicted_service_time_s + self._pickup_overhead_s()
             )
@@ -180,6 +201,8 @@ class _NativeFleetControlCore:
         native = runtime.native_vehicle
         if native.status != self.bindings.states.IDLE or native.assigned_route:
             raise FleetPyCompatibilityError("native assignment requires idle vehicle")
+        if self._finish_committed(runtime) and not self._available(runtime, simulation_time):
+            raise FleetPyCompatibilityError("native assignment outside admission window")
         sim_vid_id = (self.op_id, runtime.fixture.native_id)
         self.routing_engine.register_vehicle_leg(
             sim_vid_id,
@@ -225,11 +248,12 @@ class _NativeFleetControlCore:
         self.rid_to_assigned_vid[request.native_id] = runtime.fixture.native_id
         runtime.active_order_id = request.order_id
         runtime.state = "NATIVE_ASSIGNED"
-        if runtime.fixture.vehicle_type == "AV" and not (
-            runtime.fixture.availability_start_time == self.start
-            and runtime.fixture.availability_end_time == self.end
-            and not runtime.fixture.av_source_session_end_inherited
-        ):
+        if (runtime.fixture.vehicle_type == "AV" and not self._finish_committed(runtime)
+                and not (
+                    runtime.fixture.availability_start_time == self.start
+                    and runtime.fixture.availability_end_time == self.end
+                    and not runtime.fixture.av_source_session_end_inherited
+        )):
             self.av_availability_violations += 1
         self.assignment_rows.append(
             {
@@ -258,6 +282,12 @@ class _NativeFleetControlCore:
                 "dispatch_policy": "MIN_CORRECTED_PICKUP_ETA_STUB",
             }
         )
+        if self._finish_committed(runtime):
+            self.assignment_rows[-1].update(
+                availability_policy=runtime.fixture.availability_policy,
+                availability_start_time=runtime.fixture.availability_start_time,
+                availability_end_time=runtime.fixture.availability_end_time,
+            )
         if not hasattr(self, "assignment_index_by_rid"):
             self.assignment_index_by_rid = {}
         self.assignment_index_by_rid[request.native_id] = len(self.assignment_rows) - 1
@@ -369,7 +399,8 @@ class _NativeFleetControlCore:
         runtime.active_order_id = None
         runtime.state = (
             "OFFLINE_AFTER_COMPLETION"
-            if runtime.fixture.vehicle_type == "HV" and simulation_time >= fixture_end_s
+            if (runtime.fixture.vehicle_type == "HV" or self._finish_committed(runtime))
+            and simulation_time >= fixture_end_s
             else "NATIVE_AVAILABLE"
         )
 
@@ -385,7 +416,9 @@ class _NativeFleetControlCore:
             native_free = (
                 native.status == self.bindings.states.IDLE and not native.assigned_route
             )
-            if runtime.fixture.vehicle_type == "HV" and not inside_window:
+            if self._finish_committed(runtime) and not inside_window:
+                availability_state = "OUTSIDE_ADMISSION_WINDOW"
+            elif runtime.fixture.vehicle_type == "HV" and not inside_window:
                 availability_state = "OUTSIDE_HV_SESSION"
             elif native_free:
                 availability_state = "AVAILABLE"
@@ -408,7 +441,9 @@ class _NativeFleetControlCore:
                     "availability_start_time": runtime.fixture.availability_start_time,
                     "availability_end_time": runtime.fixture.availability_end_time,
                     "availability_policy": (
-                        "FULL_SIMULATION_HORIZON"
+                        runtime.fixture.availability_policy
+                        if self._finish_committed(runtime)
+                        else "FULL_SIMULATION_HORIZON"
                         if runtime.fixture.vehicle_type == "AV"
                         else "RECONSTRUCTED_S0_SESSION_WINDOW"
                     ),
@@ -431,11 +466,12 @@ class _NativeFleetControlCore:
                 if native.do_pos != request.dropoff_position:
                     self.position_reconciliation_failures += 1
         for runtime in self.runtime_by_vid.values():
-            if runtime.fixture.vehicle_type == "AV" and (
-                runtime.fixture.availability_start_time != self.start
-                or runtime.fixture.availability_end_time != self.end
-                or runtime.fixture.av_source_session_end_inherited
-            ):
+            if (runtime.fixture.vehicle_type == "AV" and not self._finish_committed(runtime)
+                    and (
+                        runtime.fixture.availability_start_time != self.start
+                        or runtime.fixture.availability_end_time != self.end
+                        or runtime.fixture.av_source_session_end_inherited
+            )):
                 self.av_availability_violations += 1
         values = [
             row["pickup_eta_s"]

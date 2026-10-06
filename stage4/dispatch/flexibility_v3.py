@@ -137,7 +137,7 @@ def _compile(problem):
             arrival = departure + pickup.pickup_eta_s
             completion = arrival + request.pickup_overhead_s + request.predicted_service_time_s
             if (base._allowed(vehicle, request) and arrival <= request.pickup_deadline_s + 1e-7
-                    and completion <= vehicle.availability_end_s + 1e-7):
+                    and base._admission_feasible(vehicle, departure, completion)):
                 recourse.append((scene, pickup, j))
     # Preserve full logical model caps, BEFORE decomposing or substituting x=1.
     states = {(s.scenario_id, j) for s, _, j in recourse}

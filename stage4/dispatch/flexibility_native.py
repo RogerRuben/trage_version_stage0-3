@@ -18,6 +18,7 @@ from .acceptance import passenger_acceptance
 from .exposure import exposure_excess
 from .flexibility_model import (
     CurrentPickup, CurrentServiceFace, FuturePickup, ModelLimits, Problem, Request, Scenario, Vehicle, solve_dispatch,
+    _admission_feasible,
 )
 from .solver import LexicographicResult, solve_lexicographic
 
@@ -165,6 +166,7 @@ def predicted_vehicle_states(c, now, horizon, last_assignments, remaining_model=
     for vid in ids:
         runtime = c.runtime_by_vid[vid]
         fixture = runtime.fixture
+        finish_committed = getattr(fixture, "availability_policy", None) == "STOP_ADMISSION_FINISH_COMMITTED"
         if calendar is not None:
             start, end = calendar.windows[vid]
         else:
@@ -173,6 +175,12 @@ def predicted_vehicle_states(c, now, horizon, last_assignments, remaining_model=
         if end <= now or start > now + horizon:
             continue
         native_free = runtime.native_vehicle.status == c.bindings.states.IDLE and not runtime.native_vehicle.assigned_route
+        if finish_committed and getattr(runtime, "active_order_id", None) is not None:
+            native_free = False
+        manager = getattr(c, "repositioning_manager", None)
+        if (not native_free and finish_committed and c.config.get("controlled_replay_v2", False)
+                and getattr(runtime, "active_order_id", None) is None and manager is not None):
+            native_free = manager.is_interruptible(runtime, now)
         if native_free:
             lon, lat = c.routing_engine.return_position_coordinates(runtime.native_vehicle.pos)
             ready = max(float(now), start)
@@ -204,10 +212,11 @@ def predicted_vehicle_states(c, now, horizon, last_assignments, remaining_model=
             ready = max(ready, now + c.dispatch_interval_s, start)
             booked = c.request_by_rid[int(assignment["native_request_id"])]
             position = position_key(booked.dropoff_lon_wgs84, booked.dropoff_lat_wgs84)
-        if ready > end or ready > now + horizon + c.max_pickup_wait_s:
+        if ((ready >= end if finish_committed else ready > end)
+                or ready > now + horizon + c.max_pickup_wait_s):
             continue
         result.append(Vehicle(int(vid), "HV" if fixture.vehicle_type == "HV" else c.config["profile_id"],
-                              position, ready, end))
+                              position, ready, end, strict_completion_deadline=not finish_committed))
     return tuple(result)
 
 
@@ -269,7 +278,9 @@ class NativeFlexibilityAdapter:
         vehicle_map = {v.vehicle_id: v for v in vehicles}
         for arc in arcs:
             v, r = vehicle_map[arc.vehicle_id], by_rid[arc.request_id]
-            options.append((v, r.request_id, now + arc.pickup_eta_s + r.pickup_overhead_s + r.predicted_service_time_s, r.dropoff_position))
+            ready = now + arc.pickup_eta_s + r.pickup_overhead_s + r.predicted_service_time_s
+            if v.strict_completion_deadline or ready < v.availability_end_s:
+                options.append((v, r.request_id, ready, r.dropoff_position))
         fast_graph = self.cfg.get("fast_future_graph", False)
         project = cached_xy if fast_graph else xy
         points = np.stack([project(state[3]) for state in options]) if options else np.empty((0, 2))
@@ -302,12 +313,16 @@ class NativeFlexibilityAdapter:
                     departure = max(now + c.dispatch_interval_s, ready, request.release_time_s)
                     # Nonnegative ETA certificate, independent of routing.
                     if (departure > request.pickup_deadline_s or
-                            departure + request.pickup_overhead_s + request.predicted_service_time_s > v.availability_end_s):
+                            not _admission_feasible(v, departure,
+                                departure + request.pickup_overhead_s + request.predicted_service_time_s,
+                                completion_tolerance_s=0)):
                         continue
                     pace = self.forecast.pace_by_slot.get(int(departure // 1800), self.forecast.global_pace)
                     eta = distance * pace
                     if (departure + eta > request.pickup_deadline_s or
-                            departure + eta + request.pickup_overhead_s + request.predicted_service_time_s > v.availability_end_s):
+                            not _admission_feasible(v, departure,
+                                departure + eta + request.pickup_overhead_s + request.predicted_service_time_s,
+                                completion_tolerance_s=0)):
                         continue
                     candidates.append((distance, v.vehicle_id, -1 if after is None else after, after, origin, eta))
                 candidates.sort(key=lambda x: x[:3])
@@ -345,7 +360,10 @@ class NativeFlexibilityAdapter:
                     distance = float(np.linalg.norm(points[index] - point))
                     pace = self.forecast.pace_by_slot.get(int(departure // 1800), self.forecast.global_pace)
                     eta = distance * pace
-                    if departure + eta > r.pickup_deadline_s or departure + eta + r.pickup_overhead_s + r.predicted_service_time_s > v.availability_end_s:
+                    if (departure + eta > r.pickup_deadline_s or
+                            not _admission_feasible(v, departure,
+                                departure + eta + r.pickup_overhead_s + r.predicted_service_time_s,
+                                completion_tolerance_s=0)):
                         continue
                     candidates.append((distance, v.vehicle_id, -1 if after is None else after, after, origin, eta))
                 candidates.sort(key=lambda x: x[:3])
