@@ -1,0 +1,846 @@
+{
+  "status": "COMPLETE",
+  "scientific_scope": "INTERNAL_TEST31_M_SINGLE_SEED_FROZEN_PAIRED_REPLAY",
+  "reused_myopic": true,
+  "myopic_rerun": false,
+  "new_native_conditions": 1,
+  "canonical_timing": {
+    "request_release": "OBSERVED_DEPARTURE_PROXY",
+    "request_lead_s": 0,
+    "pickup_patience_s": 300
+  },
+  "original_orders": 30000,
+  "common_orders": 28367,
+  "excluded_input": 1633,
+  "base_served": 18702,
+  "new_served": 19454,
+  "net_served_change": 752,
+  "service_rate_common_pp_change": 2.650967673705362,
+  "service_rate_original_pp_change": 2.506666666666667,
+  "gained": 2635,
+  "lost": 1883,
+  "common_served": 16819,
+  "all_served_wait_s": {
+    "base": {
+      "n": 18702,
+      "mean": 170.7737844127366,
+      "p50": 184.177548,
+      "p90": 281.2977991,
+      "p95": 290.8456684
+    },
+    "new": {
+      "n": 19454,
+      "mean": 180.90977379608307,
+      "p50": 199.21839549999999,
+      "p90": 284.364016,
+      "p95": 292.5764228
+    }
+  },
+  "same_served_wait_delta_s": {
+    "n": 16819,
+    "mean": 9.772147722159463,
+    "p50": 0.0,
+    "p90": 105.1700082,
+    "p95": 155.091151
+  },
+  "paired_wait_changes": {
+    "lower": 3937,
+    "same": 7264,
+    "higher": 5618
+  },
+  "gained_new_wait_s": {
+    "n": 2635,
+    "mean": 210.2820181149905,
+    "p50": 232.318487,
+    "p90": 289.20386740000004,
+    "p95": 294.94264880000003
+  },
+  "lost_base_wait_s": {
+    "n": 1883,
+    "mean": 208.62636586829527,
+    "p50": 229.522079,
+    "p90": 289.3822826,
+    "p95": 295.3518375
+  },
+  "vehicle_type_transitions": {
+    "HV_TO_HV": 11254,
+    "HV_TO_AV": 1571,
+    "AV_TO_HV": 1468,
+    "AV_TO_AV": 2526
+  },
+  "gained_by_type": {
+    "HV": 2204,
+    "AV": 431
+  },
+  "lost_by_type": {
+    "HV": 1539,
+    "AV": 344
+  },
+  "operations": {
+    "base": {
+      "HV": {
+        "served": 14364,
+        "mean_pickup_eta_s": 137.474463003273,
+        "mean_realized_service_s": 692.8703007518797,
+        "pickup_task_hours": 548.5231073830593,
+        "service_task_hours": 2764.5525,
+        "completed_task_hours_including_drain": 3313.0756073830594,
+        "unique_active_service_vehicles": 3527
+      },
+      "AV": {
+        "served": 4338,
+        "mean_pickup_eta_s": 148.46199585255852,
+        "mean_realized_service_s": 637.5915168280313,
+        "pickup_task_hours": 178.896705002333,
+        "service_task_hours": 768.2977777777778,
+        "completed_task_hours_including_drain": 947.1944827801108,
+        "unique_active_service_vehicles": 255
+      }
+    },
+    "new": {
+      "HV": {
+        "served": 14926,
+        "mean_pickup_eta_s": 148.05817188769092,
+        "mean_realized_service_s": 678.41042476216,
+        "pickup_task_hours": 613.865631554354,
+        "service_task_hours": 2812.765,
+        "completed_task_hours_including_drain": 3426.630631554354,
+        "unique_active_service_vehicles": 3475
+      },
+      "AV": {
+        "served": 4528,
+        "mean_pickup_eta_s": 161.4883999127393,
+        "mean_realized_service_s": 654.514796819788,
+        "pickup_task_hours": 203.11652077913433,
+        "service_task_hours": 823.2341666666666,
+        "completed_task_hours_including_drain": 1026.350687445801,
+        "unique_active_service_vehicles": 255
+      }
+    }
+  },
+  "by_release_hour": [
+    {
+      "hour": 0,
+      "original_orders": 356,
+      "common_orders": 341,
+      "base_served": 290,
+      "new_served": 297,
+      "gained": 11,
+      "lost": 4,
+      "net": 7,
+      "base_av": 176,
+      "new_av": 186,
+      "paired_wait_delta": {
+        "n": 286,
+        "mean": 16.931258678321676,
+        "p50": 0.0,
+        "p90": 87.519958,
+        "p95": 139.64761775
+      }
+    },
+    {
+      "hour": 1,
+      "original_orders": 236,
+      "common_orders": 225,
+      "base_served": 191,
+      "new_served": 202,
+      "gained": 12,
+      "lost": 1,
+      "net": 11,
+      "base_av": 121,
+      "new_av": 134,
+      "paired_wait_delta": {
+        "n": 190,
+        "mean": 1.919189663157894,
+        "p50": 0.0,
+        "p90": 51.92508389999994,
+        "p95": 86.47899569999989
+      }
+    },
+    {
+      "hour": 2,
+      "original_orders": 170,
+      "common_orders": 156,
+      "base_served": 132,
+      "new_served": 135,
+      "gained": 10,
+      "lost": 7,
+      "net": 3,
+      "base_av": 84,
+      "new_av": 86,
+      "paired_wait_delta": {
+        "n": 125,
+        "mean": 14.627420224000002,
+        "p50": 0.0,
+        "p90": 102.05165540000003,
+        "p95": 124.0432268
+      }
+    },
+    {
+      "hour": 3,
+      "original_orders": 124,
+      "common_orders": 121,
+      "base_served": 86,
+      "new_served": 93,
+      "gained": 8,
+      "lost": 1,
+      "net": 7,
+      "base_av": 65,
+      "new_av": 64,
+      "paired_wait_delta": {
+        "n": 85,
+        "mean": 3.251977141176469,
+        "p50": 0.0,
+        "p90": 61.68945700000006,
+        "p95": 112.60006959999998
+      }
+    },
+    {
+      "hour": 4,
+      "original_orders": 82,
+      "common_orders": 79,
+      "base_served": 58,
+      "new_served": 65,
+      "gained": 8,
+      "lost": 1,
+      "net": 7,
+      "base_av": 43,
+      "new_av": 42,
+      "paired_wait_delta": {
+        "n": 57,
+        "mean": 3.4358211403508774,
+        "p50": 0.0,
+        "p90": 23.203108599999993,
+        "p95": 61.69297359999999
+      }
+    },
+    {
+      "hour": 5,
+      "original_orders": 110,
+      "common_orders": 104,
+      "base_served": 75,
+      "new_served": 80,
+      "gained": 6,
+      "lost": 1,
+      "net": 5,
+      "base_av": 57,
+      "new_av": 60,
+      "paired_wait_delta": {
+        "n": 74,
+        "mean": 3.750676824324326,
+        "p50": 0.0,
+        "p90": 11.753593200000017,
+        "p95": 62.109469299999894
+      }
+    },
+    {
+      "hour": 6,
+      "original_orders": 351,
+      "common_orders": 329,
+      "base_served": 272,
+      "new_served": 272,
+      "gained": 12,
+      "lost": 12,
+      "net": 0,
+      "base_av": 151,
+      "new_av": 160,
+      "paired_wait_delta": {
+        "n": 260,
+        "mean": 13.443256092307692,
+        "p50": 0.0,
+        "p90": 118.31317200000001,
+        "p95": 147.99486705
+      }
+    },
+    {
+      "hour": 7,
+      "original_orders": 889,
+      "common_orders": 854,
+      "base_served": 516,
+      "new_served": 522,
+      "gained": 40,
+      "lost": 34,
+      "net": 6,
+      "base_av": 181,
+      "new_av": 197,
+      "paired_wait_delta": {
+        "n": 482,
+        "mean": 10.342538004149379,
+        "p50": 0.0,
+        "p90": 69.78659440000011,
+        "p95": 138.14197959999993
+      }
+    },
+    {
+      "hour": 8,
+      "original_orders": 1458,
+      "common_orders": 1397,
+      "base_served": 924,
+      "new_served": 937,
+      "gained": 98,
+      "lost": 85,
+      "net": 13,
+      "base_av": 245,
+      "new_av": 261,
+      "paired_wait_delta": {
+        "n": 839,
+        "mean": 13.114615170441,
+        "p50": 0.0,
+        "p90": 92.1820926000001,
+        "p95": 159.83444599999933
+      }
+    },
+    {
+      "hour": 9,
+      "original_orders": 1779,
+      "common_orders": 1674,
+      "base_served": 1242,
+      "new_served": 1280,
+      "gained": 112,
+      "lost": 74,
+      "net": 38,
+      "base_av": 350,
+      "new_av": 360,
+      "paired_wait_delta": {
+        "n": 1168,
+        "mean": 13.131635797945206,
+        "p50": 0.0,
+        "p90": 105.7802409,
+        "p95": 162.1445019999996
+      }
+    },
+    {
+      "hour": 10,
+      "original_orders": 1599,
+      "common_orders": 1516,
+      "base_served": 1096,
+      "new_served": 1163,
+      "gained": 139,
+      "lost": 72,
+      "net": 67,
+      "base_av": 313,
+      "new_av": 329,
+      "paired_wait_delta": {
+        "n": 1024,
+        "mean": 13.511343255859376,
+        "p50": 0.0,
+        "p90": 127.04752570000015,
+        "p95": 178.9806096999999
+      }
+    },
+    {
+      "hour": 11,
+      "original_orders": 1667,
+      "common_orders": 1577,
+      "base_served": 1152,
+      "new_served": 1183,
+      "gained": 129,
+      "lost": 98,
+      "net": 31,
+      "base_av": 316,
+      "new_av": 344,
+      "paired_wait_delta": {
+        "n": 1054,
+        "mean": 9.527072802656548,
+        "p50": 0.0,
+        "p90": 114.75868330000009,
+        "p95": 160.16761099999988
+      }
+    },
+    {
+      "hour": 12,
+      "original_orders": 1609,
+      "common_orders": 1525,
+      "base_served": 1171,
+      "new_served": 1191,
+      "gained": 114,
+      "lost": 94,
+      "net": 20,
+      "base_av": 326,
+      "new_av": 334,
+      "paired_wait_delta": {
+        "n": 1077,
+        "mean": 15.7917655273909,
+        "p50": 0.0,
+        "p90": 130.1564658,
+        "p95": 176.7560781999999
+      }
+    },
+    {
+      "hour": 13,
+      "original_orders": 1754,
+      "common_orders": 1646,
+      "base_served": 1182,
+      "new_served": 1236,
+      "gained": 151,
+      "lost": 97,
+      "net": 54,
+      "base_av": 272,
+      "new_av": 272,
+      "paired_wait_delta": {
+        "n": 1085,
+        "mean": 7.5730976497695845,
+        "p50": 0.0,
+        "p90": 109.86307820000003,
+        "p95": 155.8996713999999
+      }
+    },
+    {
+      "hour": 14,
+      "original_orders": 1871,
+      "common_orders": 1768,
+      "base_served": 1113,
+      "new_served": 1181,
+      "gained": 193,
+      "lost": 125,
+      "net": 68,
+      "base_av": 196,
+      "new_av": 213,
+      "paired_wait_delta": {
+        "n": 988,
+        "mean": 5.706116096153847,
+        "p50": 0.0,
+        "p90": 90.15096430000001,
+        "p95": 143.10459064999998
+      }
+    },
+    {
+      "hour": 15,
+      "original_orders": 2055,
+      "common_orders": 1928,
+      "base_served": 1214,
+      "new_served": 1273,
+      "gained": 202,
+      "lost": 143,
+      "net": 59,
+      "base_av": 218,
+      "new_av": 213,
+      "paired_wait_delta": {
+        "n": 1071,
+        "mean": 7.129333445378151,
+        "p50": 0.0,
+        "p90": 97.37893400000002,
+        "p95": 157.133113
+      }
+    },
+    {
+      "hour": 16,
+      "original_orders": 1961,
+      "common_orders": 1860,
+      "base_served": 1091,
+      "new_served": 1128,
+      "gained": 182,
+      "lost": 145,
+      "net": 37,
+      "base_av": 150,
+      "new_av": 143,
+      "paired_wait_delta": {
+        "n": 946,
+        "mean": 6.744651674418604,
+        "p50": 0.0,
+        "p90": 92.720889,
+        "p95": 150.0
+      }
+    },
+    {
+      "hour": 17,
+      "original_orders": 1833,
+      "common_orders": 1740,
+      "base_served": 885,
+      "new_served": 922,
+      "gained": 169,
+      "lost": 132,
+      "net": 37,
+      "base_av": 121,
+      "new_av": 91,
+      "paired_wait_delta": {
+        "n": 753,
+        "mean": 7.827568280212484,
+        "p50": 0.0,
+        "p90": 75.7844340000002,
+        "p95": 124.66101499999998
+      }
+    },
+    {
+      "hour": 18,
+      "original_orders": 1756,
+      "common_orders": 1669,
+      "base_served": 879,
+      "new_served": 885,
+      "gained": 149,
+      "lost": 143,
+      "net": 6,
+      "base_av": 105,
+      "new_av": 99,
+      "paired_wait_delta": {
+        "n": 736,
+        "mean": 7.200014558423912,
+        "p50": 0.0,
+        "p90": 88.52375349999998,
+        "p95": 158.30057599999998
+      }
+    },
+    {
+      "hour": 19,
+      "original_orders": 2160,
+      "common_orders": 2011,
+      "base_served": 1217,
+      "new_served": 1302,
+      "gained": 254,
+      "lost": 169,
+      "net": 85,
+      "base_av": 155,
+      "new_av": 156,
+      "paired_wait_delta": {
+        "n": 1048,
+        "mean": 4.601599932251909,
+        "p50": 0.0,
+        "p90": 101.57293200000001,
+        "p95": 148.41957709999988
+      }
+    },
+    {
+      "hour": 20,
+      "original_orders": 1839,
+      "common_orders": 1724,
+      "base_served": 1200,
+      "new_served": 1261,
+      "gained": 174,
+      "lost": 113,
+      "net": 61,
+      "base_av": 180,
+      "new_av": 185,
+      "paired_wait_delta": {
+        "n": 1087,
+        "mean": 9.675053026678935,
+        "p50": 0.0,
+        "p90": 118.05575119999999,
+        "p95": 160.92600910000007
+      }
+    },
+    {
+      "hour": 21,
+      "original_orders": 1938,
+      "common_orders": 1828,
+      "base_served": 1199,
+      "new_served": 1255,
+      "gained": 188,
+      "lost": 132,
+      "net": 56,
+      "base_av": 163,
+      "new_av": 190,
+      "paired_wait_delta": {
+        "n": 1067,
+        "mean": 10.972587158388006,
+        "p50": 0.0,
+        "p90": 118.08496179999999,
+        "p95": 161.10705529999996
+      }
+    },
+    {
+      "hour": 22,
+      "original_orders": 1489,
+      "common_orders": 1416,
+      "base_served": 966,
+      "new_served": 1012,
+      "gained": 158,
+      "lost": 112,
+      "net": 46,
+      "base_av": 177,
+      "new_av": 193,
+      "paired_wait_delta": {
+        "n": 854,
+        "mean": 9.48555849882904,
+        "p50": 0.0,
+        "p90": 108.49909710000006,
+        "p95": 153.27245434999963
+      }
+    },
+    {
+      "hour": 23,
+      "original_orders": 912,
+      "common_orders": 877,
+      "base_served": 551,
+      "new_served": 579,
+      "gained": 116,
+      "lost": 88,
+      "net": 28,
+      "base_av": 173,
+      "new_av": 216,
+      "paired_wait_delta": {
+        "n": 463,
+        "mean": 14.37349458099352,
+        "p50": 0.0,
+        "p90": 102.5616978,
+        "p95": 141.29371209999994
+      }
+    },
+    {
+      "hour": 24,
+      "original_orders": 2,
+      "common_orders": 2,
+      "base_served": 0,
+      "new_served": 0,
+      "gained": 0,
+      "lost": 0,
+      "net": 0,
+      "base_av": 0,
+      "new_av": 0,
+      "paired_wait_delta": {
+        "n": 0,
+        "mean": null,
+        "p50": null,
+        "p90": null,
+        "p95": null
+      }
+    }
+  ],
+  "runtime_components_s": {
+    "v2": {
+      "total": 6438.938000000002,
+      "candidate": 610.3760530998479,
+      "routing": 2551.1750947001274,
+      "forecast_sampling": 46.263001900159,
+      "future_graph": 803.3713306998179,
+      "problem_setup": 61.75627710018307,
+      "model_build": 169.15258970027207,
+      "optimization": 1839.1397074999986,
+      "recourse_recovery": 27.547066799990716,
+      "failed_model_attempt": 0.0,
+      "other": 330.1568784996052
+    },
+    "v4": {
+      "total": 1679.0310000000027,
+      "candidate": 185.72481070025242,
+      "routing": 351.0031321995775,
+      "forecast_sampling": 17.596727400101372,
+      "future_graph": 249.39852830012387,
+      "problem_setup": 27.00597119946906,
+      "model_build": 88.28548950052937,
+      "optimization": 609.9563302996976,
+      "recourse_recovery": 16.132764897920424,
+      "failed_model_attempt": 0.0,
+      "other": 133.92724550233106
+    }
+  },
+  "total_runtime_speedup_v2_to_v4": 3.834913113575623,
+  "routing_speedup_v2_to_v4": 7.268240253906196,
+  "v4_versus_v2_served_change": 46,
+  "scientific_inputs_equal": true,
+  "no_future_information_or_refit": true,
+  "cma_stability": "NOT_IDENTIFIED_M_ONLY_NO_C_OR_A_NEW_RUNS",
+  "causal_or_significance_claim": false,
+  "technical_backend_change_not_bitwise_trajectory_identity": true,
+  "base_summary": {
+    "status": "COMPLETE",
+    "policy": "MYOPIC",
+    "profile": "M",
+    "source_config": "stage4\\config\\symmetric_flexibility_full_day_v1.json",
+    "original_orders": 30000,
+    "common_eligible": 28367,
+    "matched": 18702,
+    "av": 4338,
+    "hv": 14364,
+    "expired": 9665,
+    "excluded_input": 1633,
+    "service_rate_common_population": 0.6592871999153946,
+    "service_rate_original_30000": 0.6234,
+    "mean_wait_s": 170.7737844127366,
+    "wait_quantiles_s": {
+      "0.5": 184.177548,
+      "0.9": 281.2977991,
+      "0.95": 290.8456684
+    },
+    "maximum_model_variables": 0,
+    "maximum_model_nonzeros": 0,
+    "resource_fallback_epochs": 0,
+    "current_face_violation_epochs": 0,
+    "dispatch_epochs": 2893,
+    "maximum_topk_pairs": 2294,
+    "maximum_valid_arcs": 104,
+    "routing_failures": 0,
+    "routing_arc_evaluations": 2331641,
+    "solver_time_s": 17.477707100100815,
+    "runtime_s": 5119.375,
+    "peak_rss_mib": 549.23046875,
+    "gpu_used": false,
+    "dense_matrix": false,
+    "physical_reconciliation": true,
+    "inputs_sha256": {
+      "stage4\\config\\symmetric_flexibility_full_day_v1.json": "92865914130ce9ebc23ebe5ca45a3c5d01da3dd1b2c7d4e4293462ea059d65e9",
+      "stage4\\output\\symmetric_flexibility_v1\\input\\test31_research_routes.parquet": "672d635fa24690ba7082b2e925f8419e6b6d67aca2dec613ea0a87835e7e57f7",
+      "stage4\\output\\symmetric_flexibility_v1\\input\\train_request_templates.parquet": "f0ee98eb4ad5aca69125ace8610ce4ff2c40edb6b7f5e62016ee321a432af652",
+      "stage4\\docs\\flexibility_dispatch\\service_preserving\\train_remaining_time_model.json": "207dfa3385bf1d59fb380e897e876a745bd8484ee52a53e62b150baa5b33488f",
+      "stage3\\config\\stage3_av_capability_profiles.json": "bea54c12a0c013995c3644a0bab84b35413d5df8a6785dfdd6a03fd49f32978e",
+      "stage2\\output_v5_2\\development\\M3\\epoch_004.pt": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde"
+    },
+    "train_remaining_model_refitted": false,
+    "native_start_s": 0,
+    "drain_end_s": 86790
+  },
+  "new_summary": {
+    "status": "COMPLETE",
+    "policy": "SERVICE_PRESERVING_LOOKAHEAD",
+    "profile": "M",
+    "source_config": "stage4\\config\\symmetric_flexibility_full_day_v1.json",
+    "administrative_timeout_s": 10800,
+    "administrative_extension": false,
+    "scientific_and_per_epoch_solver_parameters_unchanged": true,
+    "execution_pid": 22888,
+    "execution_started_at": "2026-10-06T10:48:44.443790+08:00",
+    "execution_code_sha": "4d3d3c3cd4507e2803123e019c3d5ab060b8e71d",
+    "acceleration_config_sha256": "0dee50323154a0833546e0b5c36bb0479a042b03972543db0dbff29799173ff7",
+    "execution_settings": {
+      "recourse_mode": "FLOW_RELAXED",
+      "solver_backend": "SCIPY",
+      "highspy_runtime_dir": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\runtime_dependencies\\highspy_1_12_0",
+      "fast_forecast": true,
+      "lock_current_face": true,
+      "persistent_cache_size": 50000,
+      "route_workers": 2,
+      "lazy_worker_actor": true,
+      "cached_geometry": true,
+      "event_calendar": true,
+      "fast_future_graph": true,
+      "epoch_routing_queue": true,
+      "pre_route_session_certificate": true,
+      "compress_fixed_states": false,
+      "trim_flow_rows": false,
+      "offline_assets": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\runtime_acceleration_v2\\assets",
+      "disk_route_cache": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\runtime_acceleration_v4\\routing\\cache.sqlite3",
+      "disk_cache_limit_mib": 512,
+      "disk_cache_max_entries": 2000000,
+      "route_queue_chunk_size": 256,
+      "decompose_model": true,
+      "demand_routing": true,
+      "grouped_sources": true,
+      "static_raw_od": true,
+      "raw_od_cache_size": 50000,
+      "certified_eta_pruning": true
+    },
+    "optimum_equivalence_not_bitwise_trajectory_identity": true,
+    "original_orders": 30000,
+    "common_eligible": 28367,
+    "matched": 19454,
+    "av": 4528,
+    "hv": 14926,
+    "expired": 8913,
+    "excluded_input": 1633,
+    "service_rate_common_population": 0.6857968766524483,
+    "service_rate_original_30000": 0.6484666666666666,
+    "mean_wait_s": 180.90977379608307,
+    "wait_quantiles_s": {
+      "0.5": 199.21839549999999,
+      "0.9": 284.364016,
+      "0.95": 292.5764228
+    },
+    "maximum_model_variables": 6180,
+    "maximum_model_nonzeros": 24912,
+    "resource_fallback_epochs": 0,
+    "current_face_violation_epochs": 0,
+    "dispatch_epochs": 2893,
+    "maximum_topk_pairs": 2290,
+    "maximum_valid_arcs": 102,
+    "routing_failures": 0,
+    "routing_arc_evaluations": 511563,
+    "solver_time_s": 1027.4796220000426,
+    "runtime_s": 1679.0310000000027,
+    "peak_rss_mib": 719.0,
+    "gpu_used": false,
+    "dense_matrix": false,
+    "physical_reconciliation": true,
+    "inputs_sha256": {
+      "stage4\\config\\symmetric_flexibility_full_day_v1.json": "92865914130ce9ebc23ebe5ca45a3c5d01da3dd1b2c7d4e4293462ea059d65e9",
+      "stage4\\output\\symmetric_flexibility_v1\\input\\test31_research_routes.parquet": "672d635fa24690ba7082b2e925f8419e6b6d67aca2dec613ea0a87835e7e57f7",
+      "stage4\\output\\symmetric_flexibility_v1\\input\\train_request_templates.parquet": "f0ee98eb4ad5aca69125ace8610ce4ff2c40edb6b7f5e62016ee321a432af652",
+      "stage4\\docs\\flexibility_dispatch\\service_preserving\\train_remaining_time_model.json": "207dfa3385bf1d59fb380e897e876a745bd8484ee52a53e62b150baa5b33488f",
+      "stage3\\config\\stage3_av_capability_profiles.json": "bea54c12a0c013995c3644a0bab84b35413d5df8a6785dfdd6a03fd49f32978e",
+      "stage2\\output_v5_2\\development\\M3\\epoch_004.pt": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde",
+      "stage4\\config\\symmetric_flexibility_acceleration_v4.json": "0dee50323154a0833546e0b5c36bb0479a042b03972543db0dbff29799173ff7",
+      "stage4\\output\\runtime_acceleration_v2\\assets\\manifest.json": "d0cc0e1c20bc2e484b95f2ca387af035fe05ee4cade457e9adcea2fddec61940"
+    },
+    "train_remaining_model_refitted": false,
+    "native_start_s": 0,
+    "drain_end_s": 86790,
+    "timing_totals_s": {
+      "candidate_generation": 185.72481070025242,
+      "routing_wall": 351.0031321995775,
+      "solver_pipeline": 1027.4796220000426
+    },
+    "solver_pipeline_components_s": {
+      "forecast_sampling_time_s": 17.596727400101372,
+      "future_graph_time_s": 249.39852830012387,
+      "problem_setup_time_s": 27.00597119946906,
+      "model_build_time_s": 88.28548950052937,
+      "optimization_time_s": 609.9563302996976,
+      "recourse_recovery_time_s": 16.132764897920424,
+      "failed_model_attempt_time_s": 0.0
+    },
+    "arc_lookups": 1980345,
+    "arc_cache_hits": 1453614,
+    "cross_epoch_exact_cache_hits": 683029,
+    "disk_route_cache_hits": 20860,
+    "raw_lru_hits": 683029,
+    "raw_query_deduplications": 15168,
+    "epoch_route_batches": 2847,
+    "prefetched_unused_raw_arcs": 0,
+    "routing_queue_pipeline_time_s": 433.58493869996164,
+    "disk_cache_lookup_time_s": 7.745279399998253,
+    "zero_eta_session_certified_prunes": 245024,
+    "eliminated_fixed_variables": 1295211,
+    "peak_process_group_rss_mib": 1112.078125,
+    "peak_process_group_private_committed_mib": 2639.875,
+    "raw_prefetch_avoided": 0,
+    "source_group_queries": 249086,
+    "group_cell_fallback_queries": 0,
+    "decomposition_components": 51863,
+    "pure_future_components": 48728,
+    "routing_v4": {
+      "static_matrix_certificate": {
+        "schema": "STATIC_AUTO_OD_3_8_2_V1",
+        "valhalla_version": "3.8.2",
+        "config_sha256": "f2eb80488a2ec832208b8ee1a7433aa4905e58243fe1c0d5b81d48a3368ec696",
+        "timedep_matrix_distance": 0,
+        "conservative_static_guard_m": 10.0,
+        "mutable_traffic_or_remote_tiles": false
+      },
+      "raw_od_cache_entries": 50000,
+      "raw_od_cache_evictions": 478258,
+      "raw_od_memory_queries_avoided": 667313,
+      "raw_od_cross_minute_reuses": 667313,
+      "raw_od_beta_bin_reuses": 61968,
+      "certified_eta_prunes": 1426871,
+      "known_eta_prunes_before_backend": 1426871,
+      "grouped_source_queries": 249086,
+      "grouped_cell_fallback_queries": 0,
+      "optional_disk_cache": {
+        "entry_count": 511563,
+        "dropped_optional_writes": 0,
+        "write_time_s": 79.94925629963109,
+        "read_error": null,
+        "write_error": null,
+        "close_error": null,
+        "disabled_reads": false,
+        "disabled_writes": false,
+        "closed": true,
+        "writer_alive": false
+      }
+    },
+    "execution_finished_at": "2026-10-06T11:16:43.497146+08:00"
+  },
+  "inputs_sha256": {
+    "stage4\\output\\symmetric_flexibility_v1\\full_day\\MYOPIC\\summary.json": "96619b4a139360aacd268e3cdf9671bccf70599162805d188ef93bd209e78979",
+    "stage4\\output\\symmetric_flexibility_v1\\accelerated_v4_full_day\\SERVICE_PRESERVING_LOOKAHEAD\\summary.json": "83b44b61f0da2fb9a612ac12f8fbf2ae712c55495f9c487d51b5b159db227506",
+    "stage4\\output\\symmetric_flexibility_v1\\full_day\\MYOPIC\\cohort_outcomes.parquet": "1cd45ebc9f27318eb82e0c0b546be73bb837bc77679a3213a33b3b83b159ff15",
+    "stage4\\output\\symmetric_flexibility_v1\\accelerated_v4_full_day\\SERVICE_PRESERVING_LOOKAHEAD\\cohort_outcomes.parquet": "67c54ee8814681729837dba6a0279ddb1056e192cda20258e6c49e8e692d6c9d"
+  },
+  "interpretation_checks": {
+    "coverage": "11/11 checked",
+    "ecological_extrapolation": "No routing-only倍率 interpreted as full-day倍率",
+    "sampling": "Single date/seed; release-hour strata and both served/unserved retained",
+    "composition": "All-served and common-served wait explicitly separated",
+    "forking_paths": "Frozen configuration; no quality/capacity thresholds changed by outcome",
+    "causality": "Conditional replay comparison, not field causal effect",
+    "other_statistical_fallacies": "No regression/correlation/classifier significance inference was used"
+  }
+}
