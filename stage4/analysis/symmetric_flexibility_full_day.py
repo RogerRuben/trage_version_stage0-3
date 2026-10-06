@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import asdict
 from datetime import datetime, timezone
 import gc
 import json
@@ -141,17 +142,30 @@ def analyze(root, output_root=OUTPUT, doc_root=DOC):
     print(json.dumps(result, ensure_ascii=False), flush=True)
 
 
-def run(root, fleetpy, policy, resume, administrative_timeout_s=None, acceleration_config=None):
+def run(root, fleetpy, policy, resume, administrative_timeout_s=None, acceleration_config=None,
+        calibration_config=None):
     pa.set_cpu_count(1)
     pa.set_io_thread_count(1)
     cfg = json.loads((root / CONFIG).read_text())
     technical, acceleration_path, group_limit = acceleration_settings(root, acceleration_config)
+    calibration = None
+    calibration_path = None
+    if calibration_config is not None:
+        from stage4.analysis.replay_calibration_contract import load_calibration
+        calibration, calibration_path = load_calibration(root, calibration_config)
+        if (policy != calibration["reference_policy"] or acceleration_path is None
+                or acceleration_path.relative_to(root.resolve()).as_posix() != calibration["acceleration_config"]
+                or administrative_timeout_s is not None):
+            raise ValueError("all-HV reference requires the fixed v4 policy and timeout")
     cfg.update(technical)
     is_v2 = "offline_assets" in technical
     is_v3 = "demand_routing" in technical
     is_v4 = "static_raw_od" in technical
     output_root = OUTPUT if acceleration_path is None else OUTPUT.parent / ("accelerated_v4_full_day" if is_v4 else "accelerated_v3_full_day" if is_v3 else "accelerated_v2_full_day" if is_v2 else "accelerated_full_day")
     doc_root = DOC if acceleration_path is None else Path("stage4/docs/flexibility_dispatch") / ("acceleration_v4" if is_v4 else "acceleration_v3" if is_v3 else "acceleration_v2" if is_v2 else "acceleration_v1")
+    if calibration is not None:
+        output_root = Path(calibration["all_hv_output"])
+        doc_root = Path(calibration["doc_output"])
     if policy not in cfg["policies"] or cfg["profile"] != "M" or cfg["parameter_search"] or cfg["refit_m3"]:
         raise ValueError("outside authorized two-condition frozen protocol")
     timeout_s = administrative_timeout(cfg, policy, administrative_timeout_s)
@@ -165,7 +179,11 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
             print(json.dumps(dict(skipped_completed=policy)), flush=True)
             if acceleration_path is not None and done.get("acceleration_config_sha256") != sha(acceleration_path):
                 raise ValueError("completed acceleration settings differ")
-            analyze(root, output_root, doc_root)
+            if calibration is not None:
+                if done.get("calibration_config_sha256") != sha(calibration_path):
+                    raise ValueError("completed calibration settings differ")
+            else:
+                analyze(root, output_root, doc_root)
             return
         raise ValueError("existing partial run is not automatically retried")
     directory.mkdir(parents=True, exist_ok=False)
@@ -181,6 +199,12 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
     if acceleration_path is not None:
         summary.update(acceleration_config_sha256=sha(acceleration_path), execution_settings=technical,
             optimum_equivalence_not_bitwise_trajectory_identity=True)
+    if calibration is not None:
+        summary.update(calibration_config_sha256=sha(calibration_path),
+            experiment_role="CURRENT_VERSION_ALL_HV_ABSOLUTE_REPLAY_REFERENCE",
+            controlled_changes={"requested_q_a": 0.0, "passenger_acceptance_rate": 1.0},
+            historical_driver_chain_replayed=False, request_times_changed=False,
+            pickup_eta_calibration_changed=False, repositioning_enabled=False)
     write_json(directory / "summary.json", summary)
     paths = [CONFIG, INPUT/"test31_research_routes.parquet", INPUT/"train_request_templates.parquet",
         Path(cfg["remaining_time_model"]), Path("stage3/config/stage3_av_capability_profiles.json"),
@@ -188,6 +212,8 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
     protected = {str(p):sha(root/p) for p in paths}
     if acceleration_path is not None:
         protected[str(acceleration_path.relative_to(root.resolve()))] = sha(acceleration_path)
+    if calibration_path is not None:
+        protected[str(calibration_path.relative_to(root.resolve()))] = sha(calibration_path)
     routing = None
     peak_group_rss = 0.0
     peak_group_private = 0.0
@@ -195,6 +221,8 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
         bindings = load_fleetpy_bindings(fleetpy)
         source = root / "stage4/output/final_experiments" / cfg["source_scenario"]
         base = json.loads((source / "scenario_config.json").read_text())["runtime_configuration"]
+        if calibration is not None:
+            base = {**base, "av_vehicle_hour_share": 0.0, "passenger_acceptance_rate": 1.0}
         start = pd.Timestamp("2016-10-31T00:00:00+08:00")
         assets = None
         if is_v2:
@@ -221,7 +249,7 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
         # modeled availability from unobserved future Test31 trip durations.
         drain_s = int(cfg["physical_drain_limit_s"])
         end = start+pd.Timedelta(seconds=drain_s)
-        fleet = assets.fleet() if assets is not None else build_fleet_scenario(root, benchmark_start=start, simulation_end=end,
+        fleet = assets.fleet() if assets is not None and calibration is None else build_fleet_scenario(root, benchmark_start=start, simulation_end=end,
             requested_q_a=base["av_vehicle_hour_share"], seed=base["fleet_sampling_seed"], max_hv_hour_error_pct=base["max_hv_vehicle_hour_error_pct"])
         registry = CoordinateRegistry()
         attach_fleetpy_requests(requests, bindings, registry)
@@ -256,7 +284,9 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
             c.research_route_policy = CompactResearchRoutePolicy(assets, "M", profiles)
             forecast = DrawTapeForecast(assets.directory / "forecast")
             if cfg.get("event_calendar"):
-                c.enable_event_calendar(assets.windows())
+                # q=0 has 8,435 sessions, not the mixed offline asset's 4,444
+                # fixtures. Reuse requests/geometry, but use the actual fleet.
+                c.enable_event_calendar(assets.windows() if calibration is None else None)
         else:
             c.research_route_policy = ResearchRoutePolicy(routes, "M", profiles)
             templates = pd.read_parquet(root / INPUT / "train_request_templates.parquet")
@@ -266,6 +296,14 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
         sim = create_native_simulation(bindings, simulation_end_s=drain_s, time_step_s=30, demand=demand,
             vehicles=[v.native_vehicle for v in vehicles], fleet_control=c, network=network, native_output=native_output)
         write_json(directory / "fleet_accounting.json", fleet.accounting)
+        if calibration is not None:
+            fixtures = []
+            for fixture in fleet.native_fixtures:
+                row = asdict(fixture)
+                for key in ("availability_start_time", "availability_end_time"):
+                    row[key] = row[key].isoformat()
+                fixtures.append(row)
+            write_json(directory / "fleet_fixtures.json", {"fixtures": fixtures})
         for tick in range(0, drain_s+30, 30):
             if time.monotonic()-started > timeout_s:
                 raise TimeoutError("full-day hard timeout")
@@ -392,10 +430,12 @@ def run(root, fleetpy, policy, resume, administrative_timeout_s=None, accelerati
             write_json(directory / "summary.json", summary)
     write_json(directory / "summary.json", summary)
     (root / doc_root).mkdir(parents=True,exist_ok=True)
-    write_json(root / doc_root / (policy.lower()+"_summary.json"),summary)
+    summary_name = "all_hv_summary.json" if calibration is not None else policy.lower()+"_summary.json"
+    write_json(root / doc_root / summary_name, summary)
     print(json.dumps(summary),flush=True)
     gc.collect()
-    analyze(root, output_root, doc_root)
+    if calibration is None:
+        analyze(root, output_root, doc_root)
 
 
 if __name__ == "__main__":
@@ -407,5 +447,8 @@ if __name__ == "__main__":
         help="User-authorized 6h retry of the second policy after the original 3h administrative timeout")
     parser.add_argument("--acceleration-config",type=Path,
         help="Opt-in technical acceleration; writes to a separate output directory")
+    parser.add_argument("--calibration-config", type=Path,
+        help="One opt-in all-HV absolute replay reference; never changes frozen mixed runs")
     args=parser.parse_args()
-    run(Path.cwd(),args.fleetpy_root,args.policy,args.resume,args.administrative_timeout_s,args.acceleration_config)
+    run(Path.cwd(),args.fleetpy_root,args.policy,args.resume,args.administrative_timeout_s,
+        args.acceleration_config,args.calibration_config)
