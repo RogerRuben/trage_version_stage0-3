@@ -93,7 +93,7 @@ def summarize(root,result):
     return result
 
 
-def run(root,cfg_path=CONFIG,prepare_only=False):
+def run(root,cfg_path=CONFIG,prepare_only=False,resume=False):
     started=perf_counter()
     cfg=json.loads((root/cfg_path).read_text(encoding="utf-8"))
     if cfg["full_day_or_native"] or cfg["refit_M3_or_time_proxy"] or cfg["parameter_search"]:
@@ -102,13 +102,23 @@ def run(root,cfg_path=CONFIG,prepare_only=False):
     if prepare_only:
         print(json.dumps(info),flush=True)
         return info
+    previous=None
+    summary_path=root/OUT/"run_summary.json"
+    if resume and summary_path.is_file():
+        previous=json.loads(summary_path.read_text(encoding="utf-8"))
+        if previous["reference_preparation"] != info:
+            raise ValueError("resume requires exactly the same reference, data and protocol")
+        if previous["status"]=="FAILED":
+            failure_path=root/OUT/"failed_attempt_001.json"
+            if not failure_path.exists():
+                atomic_json(failure_path,previous)
     pa.set_cpu_count(1);pa.set_io_thread_count(1)
     proxy=json.loads((root/fixed["time_proxy_source"]).read_text(encoding="utf-8"))
     adapter=HistoricalPredictionTimeProxy(root)
     adapter.factors={int(r["window_start_s"]):float(r["factor"]) for r in proxy["factors"]}
     router=InstanceRouter(root,adapter);process=psutil.Process()
     result=dict(status="RUNNING",kind="WAIT_ENABLED_GENERIC_STRUCTURE_COMPARISON_NOT_CITY_EVALUATION",
-        reference_preparation=info,cases=[])
+        reference_preparation=info,cases=[],resume_requested=resume,reused_completed_cases=[])
     atomic_json(root/OUT/"run_summary.json",result)
 
     def budget_check():
@@ -121,6 +131,21 @@ def run(root,cfg_path=CONFIG,prepare_only=False):
 
     for case in cases:
         inputs=case["inputs"];source=case["source"]
+        destination=root/OUT/case["case_id"]
+        case_meta=dict(case_id=case["case_id"],fixed_source=str(source.relative_to(root)),
+            private_output=str(destination.relative_to(root)),reference=case["reference"],
+            shared_initial_layout={r["resource_id"]:r["location_id"] for r in inputs["shared_initial_resources"]},
+            reference_is_not_a_physical_recourse_certificate=True)
+        completed_path=destination/"TIME_TYPE_DEFER_full_result.json"
+        if resume and completed_path.is_file():
+            completed=json.loads(completed_path.read_text(encoding="utf-8"))
+            if (completed["policy"]!="TIME_TYPE_DEFER" or completed["actual_cohort_count"]!=len(inputs["actual_tasks"])
+                or completed["epochs"][0]["valuation_model"]["reference"]!=case["reference"]):
+                raise ValueError("completed case does not match the fixed control reference")
+            result["cases"].append(case_meta)
+            result["reused_completed_cases"].append(case["case_id"])
+            print(json.dumps(dict(reused_completed_case=case["case_id"],new_execution=False)),flush=True)
+            continue
         universe=pd.read_parquet(source/"private_source_mapping.parquet")
         evidence=MixedDateEvidence(root,router,universe,fixed)
         provider=ConnectionProvider(router,evidence,universe,inputs["sites"],fixed,case["cut"])
@@ -136,13 +161,9 @@ def run(root,cfg_path=CONFIG,prepare_only=False):
             provider,"CHAIN_DEFER",run_cfg,budget_check,
             problem_transform=lambda problem:project_post_service_geometry(problem,reference),
             report_policy="TIME_TYPE_DEFER")
-        destination=root/OUT/case["case_id"]
         atomic_json(destination/"TIME_TYPE_DEFER_full_result.json",replay)
         atomic_parquet(destination/"TIME_TYPE_DEFER_events.parquet",pd.DataFrame(replay["executed_events"]))
-        result["cases"].append(dict(case_id=case["case_id"],fixed_source=str(source.relative_to(root)),
-            private_output=str(destination.relative_to(root)),reference=reference,
-            shared_initial_layout={r["resource_id"]:r["location_id"] for r in inputs["shared_initial_resources"]},
-            reference_is_not_a_physical_recourse_certificate=True))
+        result["cases"].append(case_meta)
         atomic_json(root/OUT/"run_summary.json",result)
         budget_check()
     result.update(status="WAIT_ENABLED_GENERIC_COMPARISON_COMPLETE",runtime_s=perf_counter()-started,
@@ -159,12 +180,13 @@ def main():
     parser.add_argument("--config",type=Path,default=CONFIG)
     parser.add_argument("--prepare-only",action="store_true")
     parser.add_argument("--summarize-existing",action="store_true")
+    parser.add_argument("--resume",action="store_true",help="reuse exact completed windows without rerunning them")
     args=parser.parse_args();root=args.root.resolve()
     if args.summarize_existing:
         summarize(root,json.loads((root/OUT/"run_summary.json").read_text(encoding="utf-8")))
     else:
         try:
-            run(root,args.config,args.prepare_only)
+            run(root,args.config,args.prepare_only,args.resume)
         except Exception as exc:
             path=root/OUT/"run_summary.json"
             if path.is_file() and not args.prepare_only:

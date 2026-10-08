@@ -1,4 +1,5 @@
 from copy import deepcopy
+from itertools import product
 import json
 
 import pytest
@@ -93,6 +94,27 @@ def test_two_scenarios_share_one_first_action_and_forecast_cannot_be_first_serve
         resources=[dict(resource_id=car, profile_id="C", admission_end_s=300) for car in ("car_1", "car_2")])
     assert solver.solve_epoch(duplicated, "SERVICE_PRESERVING")["current_served"] == 1
     json.dumps(result, allow_nan=False)
+    # Unequal action counts: mixed-radix codes 0..23 have exactly the same
+    # order as all (rank_a, rank_m, rank_z) tuples. Input order is reversed to
+    # verify the existing stable resource/action sorting remains authoritative.
+    counts = {"car_z": 4, "car_a": 2, "car_m": 3}
+    rank_actions = [_action(f"{car}_choice_{rank}", "WAIT", 30, "start", resource=car)
+                    for car, count in counts.items() for rank in reversed(range(count))]
+    ranked = _problem(rank_actions, [_scenario([], [])],
+                      resources=[dict(resource_id=car, profile_id="C", admission_end_s=300) for car in counts])
+    ranked_solution = solver.solve_epoch(ranked, "CHAIN_DEFER")
+    encoding = ranked_solution["model"]["stable_first_actions_encoding"]
+    assert encoding["resource_order"] == ["car_a", "car_m", "car_z"]
+    assert encoding["radices"] == [2, 3, 4] and encoding["multipliers"] == [12, 4, 1]
+    rank_tuples = list(product(*(range(radix) for radix in encoding["radices"])))
+    codes = [sum(rank * multiplier for rank, multiplier in zip(ranks, encoding["multipliers"]))
+             for ranks in rank_tuples]
+    assert codes == list(range(24)) and encoding["maximum_code"] == 23 < 2**53
+    assert [action["action_id"] for action in ranked_solution["selected_actions"]] == [
+        "car_a_choice_0", "car_m_choice_0", "car_z_choice_0"]
+    tie_stages = [stage for stage in ranked_solution["stages"] if stage["stage"].startswith("stable_first")]
+    assert len(tie_stages) == 1 and tie_stages[0]["stage"] == "stable_first_actions:mixed_radix"
+    assert tie_stages[0]["tie_encoding"]["tie_only"]
 
 
 def test_relocate_only_moves_location_sparse_master_and_hard_limits(monkeypatch):

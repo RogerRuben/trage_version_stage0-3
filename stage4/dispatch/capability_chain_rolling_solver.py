@@ -651,14 +651,32 @@ def _milp_selection(model, paths, rows, action_columns, policy, budget):
 
     for name in order:
         stage(name, coefficients[name], name != "expected_empty_distance_m")
-    # One exact integer rank objective per resource fixes a common first
-    # action. At most three extra solves are needed; no tiny epsilon is used.
-    for resource in model.resources:
-        actions = [action for action in model.actions if action.resource_id == resource.resource_id]
-        ranks = [Fraction(0)] * size
+    # The mixed-radix code orders first-action rank tuples exactly as the old
+    # sequential per-resource lexicographic solves. It is used ONLY after all
+    # service and distance objectives above have been fixed, never to mix them.
+    action_groups = [[action for action in model.actions if action.resource_id == resource.resource_id]
+                     for resource in model.resources]
+    radices = [len(actions) for actions in action_groups]
+    maximum_code = math.prod(radices) - 1
+    # At most three groups and <=20,000 total first actions imply even the
+    # loose bound 20,000**3=8e12 <2**53. Also check the actual bound explicitly.
+    if maximum_code >= 2**53:
+        raise RollingModelLimitError("stable mixed-radix code exceeds the exact double integer range")
+    multipliers = [math.prod(radices[index + 1:]) for index in range(len(radices))]
+    code = [Fraction(0)] * size
+    for actions, multiplier in zip(action_groups, multipliers):
         for rank, action in enumerate(actions):
-            ranks[action_columns[action.action_id]] = Fraction(rank)
-        stage(f"stable_first_action:{resource.resource_id}", ranks, False)
+            code[action_columns[action.action_id]] = Fraction(rank * multiplier)
+    stage("stable_first_actions:mixed_radix", code, False)
+    stages[-1]["tie_encoding"] = dict(
+        kind="EXACT_MIXED_RADIX_FIRST_ACTION_RANKS", tie_only=True,
+        equivalent_to_sequential_resource_action_lexicographic_order=True,
+        previous_objectives_remain_exactly_fixed=True,
+        resource_order=[resource.resource_id for resource in model.resources],
+        action_order=[[action.action_id for action in actions] for actions in action_groups],
+        radices=radices, multipliers=multipliers, maximum_code=maximum_code,
+        exact_double_integer_bound=2**53, coefficients_and_code_are_exact_double_integers=True,
+        formula="sum_i rank_i * product_{j>i} action_count_j")
     if selected_indices is None:
         stage("feasibility", [Fraction(0)] * size, False, force=True)
     return selected_indices, stages
@@ -828,6 +846,8 @@ def solve_epoch(problem, policy):
         model=dict(rows=len(rows.lower), columns=rows.columns, cols=rows.columns,
                    nonzeros=len(rows.values), nnz=len(rows.values), base_rows=base_rows, base_nonzeros=base_nonzeros,
                    sparse=True, first_action_variables=len(model.actions), scenario_chain_variables=len(paths),
+                   stable_first_actions_encoding=deepcopy(next(
+                       stage["tie_encoding"] for stage in stages if "tie_encoding" in stage)),
                    chains_per_resource_scenario=chain_counts, complete_enumeration=True,
                    task_limit_per_scenario=model.task_limit,
                    default_task_limit_per_scenario=MAX_TASKS_PER_SCENARIO,
