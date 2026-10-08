@@ -1,0 +1,29 @@
+{
+  "kind": "HISTORICAL_PREDICTION_TO_AUTO_TIME_TRANSFER_PROXY_NOT_OBSERVED_EMPTY_TIME",
+  "history_dates": [
+    "20161010",
+    "20161017"
+  ],
+  "replay_date_used": false,
+  "Test31_used": false,
+  "factors": [
+    {
+      "window_start_s": 27000,
+      "sample_count": 40,
+      "factor": 1.9649007659145712,
+      "ratio_p10": 1.52028146037292,
+      "ratio_p90": 2.379803793656474
+    },
+    {
+      "window_start_s": 61200,
+      "sample_count": 40,
+      "factor": 1.9253402443312662,
+      "ratio_p10": 1.67533681099832,
+      "ratio_p90": 2.3146864677013688
+    }
+  ],
+  "source_route_may_differ_from_auto_route": true,
+  "transfer_to_empty_route_is_model_assumption": true,
+  "new_M3_inference": false,
+  "retrained": false
+}

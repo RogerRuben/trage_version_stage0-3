@@ -230,8 +230,10 @@ class JoinEvidence:
 
     def evaluate(self, source_order, target_order, routed, tolerance):
         previous = self.tokens[source_order].copy() if source_order else pd.DataFrame(columns=IDENTITY_COLUMNS)
-        following = self.tokens[target_order].copy()
-        empty = pd.DataFrame([dict(date=str(following.date.iloc[0]), order_id="EMPTY",
+        following = self.tokens[target_order].copy() if target_order else pd.DataFrame(columns=IDENTITY_COLUMNS)
+        date = (str(following.date.iloc[0]) if len(following) else str(previous.date.iloc[0])
+                if len(previous) else getattr(self, "simulation_date", "MODEL_CONNECTION"))
+        empty = pd.DataFrame([dict(date=date, order_id="EMPTY",
             route_sequence=i, canonical_edge_uid=None, route_token_type="FULL_NETWORK_EDGE",
             resolved_stage3_edge_uid=e["stage3_edge_uid"]) for i, e in enumerate(routed["edges"])], columns=IDENTITY_COLUMNS)
         pieces = [("PREVIOUS", previous), ("EMPTY", empty), ("FOLLOWING", following)]
@@ -274,10 +276,11 @@ class JoinEvidence:
                 src = self.selected.loc[source_order]
                 interfaces.append((endpoint(previous, False), endpoint(empty, True),
                     (src.end_lon_wgs84, src.end_lat_wgs84), routed["snapped_origin"]))
-            dst = self.selected.loc[target_order]
-            interfaces.append((endpoint(empty, False), endpoint(following, True), routed["snapped_target"],
-                (dst.start_lon_wgs84, dst.start_lat_wgs84)))
-        elif len(previous):
+            if len(following):
+                dst = self.selected.loc[target_order]
+                interfaces.append((endpoint(empty, False), endpoint(following, True), routed["snapped_target"],
+                    (dst.start_lon_wgs84, dst.start_lat_wgs84)))
+        elif len(previous) and len(following):
             src, dst = self.selected.loc[source_order], self.selected.loc[target_order]
             interfaces.append((endpoint(previous, False), endpoint(following, True),
                 (src.end_lon_wgs84, src.end_lat_wgs84), (dst.start_lon_wgs84, dst.start_lat_wgs84)))
@@ -295,6 +298,9 @@ class JoinEvidence:
                 work["order_id"] = label
                 work["route_sequence"] = np.arange(len(work))
                 groups.append(work)
+        if not groups:
+            return dict(supported=True, reason_codes=[], compatible_profiles=["HV", "C"],
+                join_encounter_count=0, join_maneuvers=[], C_reason_codes=[], join_bearing_fallback_count=0)
         identity, _, _, encounters = parser.parse(pd.concat(groups, ignore_index=True))
         if not identity.direction_supported.all():
             return dict(supported=False, reason_codes=["JOIN_DIRECTION_UNSUPPORTED"])
