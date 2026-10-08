@@ -1,0 +1,427 @@
+{
+  "status": "WAIT_ENABLED_GENERIC_COMPARISON_COMPLETE",
+  "kind": "WAIT_ENABLED_GENERIC_STRUCTURE_COMPARISON_NOT_CITY_EVALUATION",
+  "reference_preparation": {
+    "status": "GENERIC_REFERENCE_FIXED_BEFORE_NEW_CONTROL",
+    "base_output": "stage4/output/capability_chain_planning/local_v2",
+    "config": {
+      "version": "generic_defer_comparison_v1",
+      "fixed_local_config": "stage4/config/capability_chain_local_v2.json",
+      "fixed_local_output": "stage4/output/capability_chain_planning/local_v2",
+      "new_policy": "TIME_TYPE_DEFER",
+      "solver_policy": "CHAIN_DEFER",
+      "reference_rule": "MEDIAN_OF_EARLIER_FORECAST_CUSTOMERS_BEST_CACHED_SERVICEABLE_SITE_PICKUP",
+      "reference_max_pickup_s": 300,
+      "history_dates": [
+        "20161010",
+        "20161017"
+      ],
+      "reuse_existing_controls": [
+        "SERVICE_PRESERVING",
+        "CHAIN_DEFER"
+      ],
+      "new_conditions": 2,
+      "full_day_or_native": false,
+      "refit_M3_or_time_proxy": false,
+      "parameter_search": false
+    },
+    "fixed_local_config_sha256": "be4c99a1075124960e2192ac5fe5fc7b1e508e7de120d4bfed7d5786ce1f2d3b",
+    "cases": [
+      {
+        "case_id": "LOCAL_20161024_0730",
+        "reference": {
+          "kind": "EARLIER_HISTORY_TYPICAL_SERVICEABLE_PICKUP",
+          "history_dates": [
+            "20161010",
+            "20161017"
+          ],
+          "travel_time_s": 130.2218333602223,
+          "empty_distance_m": 754.5,
+          "historical_customer_sample_count": 16,
+          "historical_customer_population": 29,
+          "target_day_actual_orders_used": false,
+          "source_definition": "MEDIAN_OF_EARLIER_FORECAST_CUSTOMERS_BEST_CACHED_SERVICEABLE_SITE_PICKUP",
+          "estimation_scope": "AVAILABLE_FROZEN_SITE_TO_HISTORY_FORECAST_CONNECTIONS_NOT_OBSERVED_EMPTY_TRIPS",
+          "source_cached_connections_sha256": "9c8f512310d5267ae6b902948cca2f75be66bca16fc58d47b745cfdca47c4809"
+        },
+        "fixed_input_sha256": "835e11519efd661a902387f63a2776f31060960c9b7cdc6b37f05d2f701d6a95"
+      },
+      {
+        "case_id": "LOCAL_20161024_1700",
+        "reference": {
+          "kind": "EARLIER_HISTORY_TYPICAL_SERVICEABLE_PICKUP",
+          "history_dates": [
+            "20161010",
+            "20161017"
+          ],
+          "travel_time_s": 128.9034546982226,
+          "empty_distance_m": 762.0,
+          "historical_customer_sample_count": 33,
+          "historical_customer_population": 47,
+          "target_day_actual_orders_used": false,
+          "source_definition": "MEDIAN_OF_EARLIER_FORECAST_CUSTOMERS_BEST_CACHED_SERVICEABLE_SITE_PICKUP",
+          "estimation_scope": "AVAILABLE_FROZEN_SITE_TO_HISTORY_FORECAST_CONNECTIONS_NOT_OBSERVED_EMPTY_TRIPS",
+          "source_cached_connections_sha256": "15c2468005912b7bd706431c5723872c15cf53a98446fa897253f72cba4d1075"
+        },
+        "fixed_input_sha256": "8023ba4a6ea9c2b81114eb2095df9d0c19bb58f5bbf6ef50ee5e4a0ee2c8e805"
+      }
+    ],
+    "no_existing_control_reruns": true
+  },
+  "cases": [
+    {
+      "case_id": "LOCAL_20161024_0730",
+      "fixed_source": "stage4\\output\\capability_chain_planning\\local_v2\\LOCAL_20161024_0730",
+      "private_output": "stage4\\output\\capability_chain_planning\\generic_defer_v1\\LOCAL_20161024_0730",
+      "reference": {
+        "kind": "EARLIER_HISTORY_TYPICAL_SERVICEABLE_PICKUP",
+        "history_dates": [
+          "20161010",
+          "20161017"
+        ],
+        "travel_time_s": 130.2218333602223,
+        "empty_distance_m": 754.5,
+        "historical_customer_sample_count": 16,
+        "historical_customer_population": 29,
+        "target_day_actual_orders_used": false,
+        "source_definition": "MEDIAN_OF_EARLIER_FORECAST_CUSTOMERS_BEST_CACHED_SERVICEABLE_SITE_PICKUP",
+        "estimation_scope": "AVAILABLE_FROZEN_SITE_TO_HISTORY_FORECAST_CONNECTIONS_NOT_OBSERVED_EMPTY_TRIPS",
+        "source_cached_connections_sha256": "9c8f512310d5267ae6b902948cca2f75be66bca16fc58d47b745cfdca47c4809"
+      },
+      "shared_initial_layout": {
+        "H1": "S04",
+        "H2": "S02",
+        "C1": "S03"
+      },
+      "reference_is_not_a_physical_recourse_certificate": true,
+      "policies": [
+        {
+          "policy": "SERVICE_PRESERVING",
+          "actual_cohort_count": 12,
+          "realized_committed": 2,
+          "realized_completed_after_drain": 2,
+          "unserved_count": 10,
+          "served_by_profile": {
+            "HV": 2
+          },
+          "customer_pickup_empty_distance_m": 3495.0,
+          "independent_idle_moves": 1,
+          "idle_move_distance_m": 2466.0,
+          "mean_pickup_wait_s": 266.8416001469716,
+          "waiting_beyond_first_epoch_count": 0,
+          "cross_window_commitment_completion_count": 0,
+          "physical_last_completion_s": 1652.4225037712954,
+          "no_predicted_service_counted_as_realized": true,
+          "duplicate_realized_customer_count": 0,
+          "overlapping_resource_action_count": 0,
+          "maximum_time_conservation_error_s": 5.684341886080802e-14,
+          "forecast_reference_updates": 6,
+          "runtime_s": 23.106245000031777,
+          "served_anonymous_jobs": [
+            "A001",
+            "A006"
+          ],
+          "maximum_model_variables": 113,
+          "maximum_model_nonzeros": 415,
+          "model_solver_total_s": 0.41793969966238365,
+          "build_and_routing_total_s": 22.646173600049224,
+          "decision_time_p50_s": 0.003672349965199828,
+          "decision_time_p95_s": 0.013406069998745765,
+          "maximum_decision_time_s": 0.0438156999880448,
+          "total_executed_empty_distance_m": 5961.0,
+          "modeled_passenger_service_time_s": 1050.6453018188477,
+          "post_window_committed_work_s": 0
+        },
+        {
+          "policy": "CHAIN_DEFER",
+          "actual_cohort_count": 12,
+          "realized_committed": 2,
+          "realized_completed_after_drain": 2,
+          "unserved_count": 10,
+          "served_by_profile": {
+            "HV": 2
+          },
+          "customer_pickup_empty_distance_m": 3627.0,
+          "independent_idle_moves": 1,
+          "idle_move_distance_m": 2466.0,
+          "mean_pickup_wait_s": 284.6233730976671,
+          "waiting_beyond_first_epoch_count": 0,
+          "cross_window_commitment_completion_count": 0,
+          "physical_last_completion_s": 1648.047563811862,
+          "no_predicted_service_counted_as_realized": true,
+          "duplicate_realized_customer_count": 0,
+          "overlapping_resource_action_count": 0,
+          "maximum_time_conservation_error_s": 1.1368683772161603e-13,
+          "forecast_reference_updates": 6,
+          "runtime_s": 0.9922020999947563,
+          "served_anonymous_jobs": [
+            "A001",
+            "A007"
+          ],
+          "maximum_model_variables": 113,
+          "maximum_model_nonzeros": 415,
+          "model_solver_total_s": 0.443981799937319,
+          "build_and_routing_total_s": 0.5028653996996582,
+          "decision_time_p50_s": 0.005936599976848811,
+          "decision_time_p95_s": 0.013853129991912244,
+          "maximum_decision_time_s": 0.0428906999877654,
+          "total_executed_empty_distance_m": 6093.0,
+          "modeled_passenger_service_time_s": 734.7068159580231,
+          "post_window_committed_work_s": 0
+        },
+        {
+          "policy": "TIME_TYPE_DEFER",
+          "actual_cohort_count": 12,
+          "realized_committed": 3,
+          "realized_completed_after_drain": 3,
+          "unserved_count": 9,
+          "served_by_profile": {
+            "HV": 3
+          },
+          "customer_pickup_empty_distance_m": 4232.0,
+          "independent_idle_moves": 2,
+          "idle_move_distance_m": 3722.0,
+          "mean_pickup_wait_s": 232.88506422710884,
+          "waiting_beyond_first_epoch_count": 0,
+          "cross_window_commitment_completion_count": 0,
+          "physical_last_completion_s": 1652.4225037712954,
+          "no_predicted_service_counted_as_realized": true,
+          "duplicate_realized_customer_count": 0,
+          "overlapping_resource_action_count": 0,
+          "maximum_time_conservation_error_s": 2.842170943040401e-14,
+          "forecast_reference_updates": 6,
+          "runtime_s": 26.263338899996597,
+          "served_anonymous_jobs": [
+            "A004",
+            "A006",
+            "A007"
+          ],
+          "maximum_model_variables": 594,
+          "maximum_model_nonzeros": 3143,
+          "model_solver_total_s": 9.291592400171794,
+          "build_and_routing_total_s": 16.362972799804993,
+          "decision_time_p50_s": 0.03613789999508299,
+          "decision_time_p95_s": 0.8327925050223711,
+          "maximum_decision_time_s": 0.9134446000098251,
+          "total_executed_empty_distance_m": 7954.0,
+          "modeled_passenger_service_time_s": 1364.3568987846375,
+          "post_window_committed_work_s": 0
+        }
+      ],
+      "main_vs_wait_enabled_generic": {
+        "net_service_difference": -1,
+        "main_only_jobs": [
+          "A001"
+        ],
+        "generic_only_jobs": [
+          "A004",
+          "A006"
+        ],
+        "common_served_count": 1,
+        "paired_mean_pickup_wait_difference_s": 73.88026879838799
+      }
+    },
+    {
+      "case_id": "LOCAL_20161024_1700",
+      "fixed_source": "stage4\\output\\capability_chain_planning\\local_v2\\LOCAL_20161024_1700",
+      "private_output": "stage4\\output\\capability_chain_planning\\generic_defer_v1\\LOCAL_20161024_1700",
+      "reference": {
+        "kind": "EARLIER_HISTORY_TYPICAL_SERVICEABLE_PICKUP",
+        "history_dates": [
+          "20161010",
+          "20161017"
+        ],
+        "travel_time_s": 128.9034546982226,
+        "empty_distance_m": 762.0,
+        "historical_customer_sample_count": 33,
+        "historical_customer_population": 47,
+        "target_day_actual_orders_used": false,
+        "source_definition": "MEDIAN_OF_EARLIER_FORECAST_CUSTOMERS_BEST_CACHED_SERVICEABLE_SITE_PICKUP",
+        "estimation_scope": "AVAILABLE_FROZEN_SITE_TO_HISTORY_FORECAST_CONNECTIONS_NOT_OBSERVED_EMPTY_TRIPS",
+        "source_cached_connections_sha256": "15c2468005912b7bd706431c5723872c15cf53a98446fa897253f72cba4d1075"
+      },
+      "shared_initial_layout": {
+        "H1": "S04",
+        "H2": "S02",
+        "C1": "S03"
+      },
+      "reference_is_not_a_physical_recourse_certificate": true,
+      "policies": [
+        {
+          "policy": "SERVICE_PRESERVING",
+          "actual_cohort_count": 16,
+          "realized_committed": 3,
+          "realized_completed_after_drain": 3,
+          "unserved_count": 13,
+          "served_by_profile": {
+            "HV": 2,
+            "C": 1
+          },
+          "customer_pickup_empty_distance_m": 3114.0,
+          "independent_idle_moves": 1,
+          "idle_move_distance_m": 2466.0,
+          "mean_pickup_wait_s": 182.7008108817811,
+          "waiting_beyond_first_epoch_count": 0,
+          "cross_window_commitment_completion_count": 0,
+          "physical_last_completion_s": 1733.3627459059298,
+          "no_predicted_service_counted_as_realized": true,
+          "duplicate_realized_customer_count": 0,
+          "overlapping_resource_action_count": 0,
+          "maximum_time_conservation_error_s": 1.1368683772161603e-13,
+          "forecast_reference_updates": 6,
+          "runtime_s": 43.71716330002528,
+          "served_anonymous_jobs": [
+            "A002",
+            "A003",
+            "A004"
+          ],
+          "maximum_model_variables": 224,
+          "maximum_model_nonzeros": 885,
+          "model_solver_total_s": 0.5643691002042033,
+          "build_and_routing_total_s": 43.09677920024842,
+          "decision_time_p50_s": 0.0030319000070448965,
+          "decision_time_p95_s": 0.06440362501889467,
+          "maximum_decision_time_s": 0.08851219998905435,
+          "total_executed_empty_distance_m": 5580.0,
+          "modeled_passenger_service_time_s": 2411.454155921936,
+          "post_window_committed_work_s": 0
+        },
+        {
+          "policy": "CHAIN_DEFER",
+          "actual_cohort_count": 16,
+          "realized_committed": 5,
+          "realized_completed_after_drain": 5,
+          "unserved_count": 11,
+          "served_by_profile": {
+            "C": 1,
+            "HV": 4
+          },
+          "customer_pickup_empty_distance_m": 5160.0,
+          "independent_idle_moves": 1,
+          "idle_move_distance_m": 2466.0,
+          "mean_pickup_wait_s": 205.71162056217298,
+          "waiting_beyond_first_epoch_count": 1,
+          "cross_window_commitment_completion_count": 1,
+          "physical_last_completion_s": 2240.2838772856967,
+          "no_predicted_service_counted_as_realized": true,
+          "duplicate_realized_customer_count": 0,
+          "overlapping_resource_action_count": 0,
+          "maximum_time_conservation_error_s": 2.2737367544323206e-13,
+          "forecast_reference_updates": 6,
+          "runtime_s": 10.809630000032485,
+          "served_anonymous_jobs": [
+            "A003",
+            "A006",
+            "A007",
+            "A009",
+            "A013"
+          ],
+          "maximum_model_variables": 224,
+          "maximum_model_nonzeros": 885,
+          "model_solver_total_s": 1.7075273998780176,
+          "build_and_routing_total_s": 9.020472400356084,
+          "decision_time_p50_s": 0.006480749987531453,
+          "decision_time_p95_s": 0.08231473997293505,
+          "maximum_decision_time_s": 0.08816330000991002,
+          "total_executed_empty_distance_m": 7626.0,
+          "modeled_passenger_service_time_s": 1411.0756043195724,
+          "post_window_committed_work_s": 440.2838772856967
+        },
+        {
+          "policy": "TIME_TYPE_DEFER",
+          "actual_cohort_count": 16,
+          "realized_committed": 3,
+          "realized_completed_after_drain": 3,
+          "unserved_count": 13,
+          "served_by_profile": {
+            "C": 1,
+            "HV": 2
+          },
+          "customer_pickup_empty_distance_m": 1550.0,
+          "independent_idle_moves": 1,
+          "idle_move_distance_m": 1275.0,
+          "mean_pickup_wait_s": 153.98758642865357,
+          "waiting_beyond_first_epoch_count": 1,
+          "cross_window_commitment_completion_count": 0,
+          "physical_last_completion_s": 1149.2147036373117,
+          "no_predicted_service_counted_as_realized": true,
+          "duplicate_realized_customer_count": 0,
+          "overlapping_resource_action_count": 0,
+          "maximum_time_conservation_error_s": 1.1368683772161603e-13,
+          "forecast_reference_updates": 6,
+          "runtime_s": 83.55287060001865,
+          "served_anonymous_jobs": [
+            "A003",
+            "A004",
+            "A005"
+          ],
+          "maximum_model_variables": 2852,
+          "maximum_model_nonzeros": 16173,
+          "model_solver_total_s": 74.75617550004972,
+          "build_and_routing_total_s": 7.378092700208072,
+          "decision_time_p50_s": 0.04784129999461584,
+          "decision_time_p95_s": 6.269734449998941,
+          "maximum_decision_time_s": 7.7647911999956705,
+          "total_executed_empty_distance_m": 2825.0,
+          "modeled_passenger_service_time_s": 1510.2885239124298,
+          "post_window_committed_work_s": 0
+        }
+      ],
+      "main_vs_wait_enabled_generic": {
+        "net_service_difference": 2,
+        "main_only_jobs": [
+          "A006",
+          "A007",
+          "A009",
+          "A013"
+        ],
+        "generic_only_jobs": [
+          "A004",
+          "A005"
+        ],
+        "common_served_count": 1,
+        "paired_mean_pickup_wait_difference_s": 0.0
+      }
+    }
+  ],
+  "resume_requested": true,
+  "reused_completed_cases": [
+    "LOCAL_20161024_0730"
+  ],
+  "runtime_s": 84.3191652999958,
+  "peak_rss_mib": 570.1640625,
+  "routing": {
+    "route_requests": 36,
+    "scalar_route_calls": 36,
+    "edge_walk_calls": 36,
+    "route_cache_hits": 0,
+    "route_cache_entries": 36,
+    "route_cache_limit": 1024,
+    "bearing_cache_entries": 0,
+    "common_support_evaluations": {
+      "supported": 36
+    },
+    "common_failure_reason_counts": {},
+    "columnar_evidence_mib": 89.02912616729736,
+    "traffic_policy": "EXPLICIT_U_FOR_NEW_ROUTE_WITHOUT_FROZEN_M3_FEATURE_ROWS",
+    "traffic_partition": {
+      "NC": 0.0,
+      "ML": 0.0,
+      "MR": 0.0,
+      "CG": 0.0,
+      "SC": 0.0,
+      "U": 1.0
+    },
+    "traffic_unknown_share": 1.0,
+    "dynamic_evidence_complete": false,
+    "dynamic_reason_codes": [
+      "FROZEN_M3_EXACT_INPUT_CONTRACT_UNAVAILABLE_FOR_NEW_ROUTE"
+    ],
+    "conservative_control_policy": "SIGNALIZED_CONFLICT_MOVEMENTS",
+    "traffic_outside_budget": 0.05
+  },
+  "existing_control_reruns": 0,
+  "gpu_used": false,
+  "full_day_runs": 0,
+  "native_runs": 0
+}
