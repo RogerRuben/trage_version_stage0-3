@@ -2,6 +2,7 @@ from dataclasses import replace
 from types import SimpleNamespace as NS
 
 import pytest
+import numpy as np
 
 from stage4.dispatch.city_defer_native import (
     CityDeferNativeAdapter, build_city_future_problem, solve_city_defer,
@@ -131,3 +132,47 @@ def test_generic_equal_time_resources_are_distributed_across_future_requests():
     for request in future:
         assert len({arc.vehicle_id for arc in future_arcs if arc.request_id == request.request_id}) == 5
     assert len({arc.vehicle_id for arc in future_arcs}) > 5
+
+
+def test_tight_numeric_contract_exact_thirds_locks_and_rejects_real_fraction(monkeypatch):
+    from stage4.dispatch import city_defer_native as city
+    problem = _defer_case()
+    problem = replace(problem, scenarios=tuple(replace(problem.scenarios[0], scenario_id=f"H{i}", probability=1/3)
+                                               for i in range(3)))
+    real_milp = city.milp
+    magnitude = [city.MIP_FEASIBILITY_TOLERANCE / 8]
+    seen_options = []
+
+    def perturbed_milp(*args, **kwargs):
+        assert kwargs["options"]["mip_feasibility_tolerance"] == 1e-9
+        assert kwargs["options"]["primal_feasibility_tolerance"] == 1e-9
+        seen_options.append(kwargs["options"])
+        result = real_milp(*args, **kwargs)
+        integer_indices = np.flatnonzero(kwargs["integrality"])
+        selected = next(index for index in integer_indices if result.x[index] > .5)
+        idle = next(index for index in integer_indices if result.x[index] < .5)
+        # Numerical perturbation is certified only within the explicit solver
+        # tolerance, with exact capacity/previous-grid locks rechecked after
+        # binary projection and integer matching reconstruction.
+        result.x[selected] -= magnitude[0]
+        result.x[idle] += magnitude[0]
+        objective = args[0] if args else kwargs["c"]
+        result.fun = float(np.asarray(objective) @ result.x)
+        return result
+
+    monkeypatch.setattr(city, "milp", perturbed_milp)
+    decision = city.solve_city_defer(problem)
+    assert seen_options and decision.selected_pairs == () and decision.expected_total_service_count == 3
+    contract = decision.numerical_contract
+    assert contract["expected_service_lattice_denominator"] == 3
+    assert 0 < contract["max_binary_deviation"] <= 1e-9 < 1e-7
+    assert contract["max_certified_row_violation"] == 0
+    assert contract["solver_options_receipt"]["bundled_options_manager_and_pass_options_verified"]
+    tiers = [stage for stage in decision.stages if stage["stage"] == "expected_total_service"]
+    assert all(stage["objective_lattice_denominator"] == 3 and stage["exact_objective_lock"]
+               and type(stage["grid_units"]) is int for stage in tiers)
+    magnitude[0] = 1e-4
+    with pytest.raises(city.CityNumericalContractError, match="binary deviation") as failure:
+        city.solve_city_defer(problem)
+    assert failure.value.diagnostics["max_binary_deviation"] > 1e-7
+    assert "request_ids" not in failure.value.diagnostics

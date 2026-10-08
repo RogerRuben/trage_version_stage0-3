@@ -1,9 +1,10 @@
 from types import SimpleNamespace
+import json
 
 import pandas as pd
 import pytest
 
-from stage4.analysis.city_joint_validation import time_chain_check, outcome_table
+from stage4.analysis.city_joint_validation import time_chain_check, outcome_table, archive_stopped_run, OUT
 
 
 def test_environment_duration_time_chain_and_overlap():
@@ -38,3 +39,19 @@ def test_carry_in_is_separate_and_expired_orders_reconcile():
     assert outcome.matched.tolist() == [True, False]
     assert outcome.expired.tolist() == [False, True]
     assert outcome.iloc[0].wait_s == 30.
+
+
+def test_only_stopped_output_is_archived_without_overwrite(tmp_path):
+    policy = "LOCATION_AWARE_DEFER"
+    source = tmp_path / OUT / policy
+    source.mkdir(parents=True)
+    receipt = {"status": "STOPPED", "code_sha": "original"}
+    (source / "summary.json").write_text(json.dumps(receipt), encoding="utf-8")
+    archived = tmp_path / archive_stopped_run(tmp_path, policy)
+    assert not source.exists()
+    assert json.loads((archived / "summary.json").read_text(encoding="utf-8")) == receipt
+    source.mkdir()
+    (source / "summary.json").write_text('{"status":"CITY_NATIVE_SHORT_WINDOW_COMPLETE"}', encoding="utf-8")
+    with pytest.raises(ValueError, match="only a stopped"):
+        archive_stopped_run(tmp_path, policy)
+    assert source.exists() and archived.exists()

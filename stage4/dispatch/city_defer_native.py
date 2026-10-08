@@ -13,12 +13,16 @@ from collections import defaultdict
 from collections.abc import Mapping
 from copy import deepcopy
 from dataclasses import dataclass, replace
+from fractions import Fraction
+from functools import lru_cache
 from heapq import merge
 import hashlib
-from math import isfinite
+from math import ceil, isfinite, lcm
 from time import perf_counter
+import warnings
 
 import numpy as np
+from scipy.optimize import Bounds, LinearConstraint, milp
 from scipy.spatial import cKDTree
 
 from . import flexibility_model as base
@@ -33,6 +37,132 @@ KIND = "CITY_TWO_STAGE_ONE_NEXT_SERVICE_APPROXIMATION_NOT_COMPLETE_CHAIN_OPTIMUM
 MAX_VARIABLES = 20_000
 MAX_NONZEROS = 150_000
 DECISION_TIME_LIMIT_S = 10.0
+MIP_FEASIBILITY_TOLERANCE = 1e-9
+PRIMAL_FEASIBILITY_TOLERANCE = 1e-9
+
+
+class CityNumericalContractError(RuntimeError):
+    """Numerical failure with aggregate diagnostics, never raw request IDs."""
+    def __init__(self, message, diagnostics):
+        self.diagnostics = deepcopy(diagnostics)
+        super().__init__(f"{message}; numerical_diagnostics={self.diagnostics!r}")
+
+
+@lru_cache(maxsize=1)
+def _solver_options_receipt():
+    # This is the same bundled core/OptionsManager/passOptions path used by
+    # SciPy's _highs_wrapper. Never claim a tolerance merely from a warning.
+    from scipy.optimize._highspy import _core, _highs_options
+    probe, options = _core._Highs(), _core.HighsOptions()
+    manager = _highs_options.HighsOptionsManager()
+    options.output_flag = False
+    requested = dict(mip_feasibility_tolerance=MIP_FEASIBILITY_TOLERANCE,
+                     primal_feasibility_tolerance=PRIMAL_FEASIBILITY_TOLERANCE,
+                     dual_feasibility_tolerance=1e-9, mip_abs_gap=0.0)
+    for key, value in requested.items():
+        if manager.get_option_type(key) == -1:
+            raise CityNumericalContractError("bundled HiGHS does not recognize a required option", dict(option=key))
+        setattr(options, key, value)
+    if probe.passOptions(options) != _core.HighsStatus.kOk:
+        raise CityNumericalContractError("bundled HiGHS rejected explicit numerical options", {})
+    for key, value in requested.items():
+        status, actual = probe.getOptionValue(key)
+        if status != _core.HighsStatus.kOk or actual != value:
+            raise CityNumericalContractError("bundled HiGHS numerical option readback disagrees", dict(option=key))
+    return dict(highs_version=probe.version(), options=requested,
+                bundled_options_manager_and_pass_options_verified=True,
+                scipy_forwarding_path="MILP_IV_OPTIONS_UPDATE_THEN_HIGHS_OPTIONS_MANAGER_PASSOPTIONS")
+
+
+def _scenario_lattice(problem):
+    probabilities = [scene.probability for scene in problem.scenarios]
+    if not probabilities:
+        fractions = []
+    elif all(value == float(Fraction(1, len(probabilities))) for value in probabilities):
+        # Configured equally weighted history days are exactly 1/N; preserve
+        # their float input records while avoiding binary 1/3 objective locks.
+        fractions = [Fraction(1, len(probabilities))] * len(probabilities)
+    else:
+        fractions = [Fraction(str(value)) for value in probabilities]
+        if sum(fractions) != 1:
+            raise CityNumericalContractError("nonuniform scenario weights have no exact unit-sum decimal lattice", {})
+    denominator = lcm(*(value.denominator for value in fractions)) if fractions else 1
+    numerators = {scene.scenario_id: int(value * denominator) for scene, value in zip(problem.scenarios, fractions)}
+    return denominator, numerators
+
+
+def _maximum_row_violation(rows, count, vector):
+    lhs = rows.matrix(count) @ vector
+    return max(0.0, float(np.max(np.asarray(rows.lower) - lhs, initial=0.0)),
+               float(np.max(lhs - np.asarray(rows.upper), initial=0.0)))
+
+
+def _run_city_levels(rows, count, objectives, integrality, certify, budget):
+    receipt = _solver_options_receipt()
+    stages, solution = [], None
+    optimize_s = 0.0
+    for name, objective, maximize, divisor in objectives:
+        budget.remaining(name)
+        if not np.any(objective):
+            stages.append(dict(stage=name, value=0.0, opt_status="CONSTANT_EXACT", objective_lattice_denominator=divisor))
+            continue
+        if divisor is not None and float(np.sum(np.abs(objective))) >= 2**53:
+            raise CityNumericalContractError("integer objective exceeds exact double lattice range", dict(stage=name))
+        options = dict(receipt["options"], time_limit=budget.remaining(name), mip_rel_gap=0.0, presolve=True)
+        started = perf_counter()
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            result = milp(-objective if maximize else objective, integrality=integrality,
+                          bounds=Bounds(np.zeros(count), np.ones(count)),
+                          constraints=LinearConstraint(rows.matrix(count), rows.lower, rows.upper), options=options)
+        optimize_s += perf_counter() - started
+        # SciPy's advertised forwarding warning is expected. A wrapper-level
+        # rejection/ignored-value warning is fatal, not silently suppressed.
+        for warning in caught:
+            message = str(warning.message)
+            if not ("Unrecognized options detected" in message and "passed to HiGHS verbatim" in message):
+                raise CityNumericalContractError("solver warned that numerical options may not apply", dict(stage=name, warning=message))
+        if result.status == 1:
+            raise CityDecisionTimeout(f"{name}: sparse model not proven optimal: {result.message}")
+        if result.status != 0 or not result.success or result.x is None:
+            raise RuntimeError(f"{name}: sparse model not proven optimal: {result.message}")
+        budget.remaining(name)
+        solution, diagnostics = certify(result.x, name)
+        certified_value = float(objective @ solution)
+        native_value = float(-result.fun if maximize else result.fun)
+        # A feasible integral matching, not rounding of a floating objective,
+        # determines the exact lattice value. Bound numerical objective drift
+        # by explicitly declared variable/row tolerances and finite coefficients.
+        coefficient_sum = float(np.sum(np.abs(objective)))
+        largest_coefficient = float(np.max(np.abs(objective), initial=0.0))
+        error_bound = (MIP_FEASIBILITY_TOLERANCE * coefficient_sum
+                       + PRIMAL_FEASIBILITY_TOLERANCE * len(rows.lower) * largest_coefficient
+                       + 64 * np.finfo(float).eps * max(1.0, coefficient_sum))
+        diagnostics.update(native_objective_value=native_value, certified_objective_value=certified_value,
+                           objective_numeric_error_bound=error_bound)
+        if abs(native_value - certified_value) > error_bound:
+            raise CityNumericalContractError("matching certificate changed the tier objective beyond numerical bounds", diagnostics)
+        grid_units = None
+        if divisor is not None:
+            if error_bound >= .25 or certified_value != int(certified_value):
+                raise CityNumericalContractError("tier has no uniquely certified integer lattice value", diagnostics)
+            grid_units = int(certified_value)
+            bound = getattr(result, "mip_dual_bound", None)
+            min_value = -grid_units if maximize else grid_units
+            if bound is None or not isfinite(bound) or ceil(float(bound) - error_bound) < min_value:
+                raise CityNumericalContractError("optimal solver status does not certify the integer objective grid", diagnostics)
+            indices = np.flatnonzero(objective)
+            rows.add_sparse(indices, objective[indices], lower=grid_units, upper=grid_units)
+        # Pickup ETA is last: do not manufacture a floating +/-epsilon face.
+        if _maximum_row_violation(rows, count, solution) != 0.0:
+            raise CityNumericalContractError("integral certificate violates an exact tier lock", diagnostics)
+        stages.append(dict(stage=name, value=certified_value / divisor if divisor else certified_value,
+                           opt_status="OPTIMAL", status=int(result.status),
+                           objective_lattice_denominator=divisor, grid_units=grid_units,
+                           exact_objective_lock=divisor is not None, numerical_diagnostics=diagnostics))
+    if solution is None:
+        raise RuntimeError("city component has no decision-relevant objective")
+    return solution, optimize_s, tuple(stages), receipt
 
 
 class CityDecisionTimeout(TimeoutError):
@@ -63,6 +193,7 @@ class CityDeferDecision(decomposed.DecisionV3):
     carry_over_matched: int = 0
     stages: tuple = ()
     provenance: dict | None = None
+    numerical_contract: dict | None = None
 
 
 def _bounded_problem(problem, remaining):
@@ -73,7 +204,7 @@ def _bounded_problem(problem, remaining):
     return replace(problem, limits=limits)
 
 
-def _solve_component(problem, waiting, options, by_vehicle, by_request, option_ids, records, budget):
+def _solve_component(problem, waiting, options, by_vehicle, by_request, option_ids, records, budget, lattice):
     started = perf_counter()
     free_ids = [j for j in option_ids if len(by_vehicle[options[j].vehicle_id]) > 1]
     columns = {j: index for index, j in enumerate(free_ids)}
@@ -104,44 +235,82 @@ def _solve_component(problem, waiting, options, by_vehicle, by_request, option_i
             request = waiting[option.request_id]
             critical[index], immediate[index], carry[index] = request.critical, 1., request.carry_over
             eta[index] = option.pickup_eta_s
+    denominator, numerators = lattice
     for index, (scene, _, _) in enumerate(records, len(free_ids)):
-        future[index] = scene.probability
+        future[index] = numerators[scene.scenario_id]
     objectives = (("critical_now", critical, True),
-                  ("expected_total_service", immediate + future, True),
+                  ("expected_total_service", denominator * immediate + future, True),
                   ("current_service", immediate, True), ("current_carry_over", carry, True),
                   ("current_pickup_eta_s", eta, False))
+    objectives = tuple((name, objective, maximize,
+                        None if name == "current_pickup_eta_s" else denominator if name == "expected_total_service" else 1)
+                       for name, objective, maximize in objectives)
     integer = np.zeros(count, dtype=np.int8)
     integer[:len(free_ids)] = 1
     build_s = perf_counter() - started
-    limits = replace(problem.limits, solver_time_limit_s=budget.remaining("component lexicographic optimization"))
-    try:
-        partial, optimize_s = base._run_levels(rows, count,
-            [(objective, maximize) for _, objective, maximize in objectives], limits, integer)
-    except RuntimeError as error:
-        if "time" in str(error).casefold():
-            raise CityDecisionTimeout(str(error)) from error
-        raise
+    if problem.limits.solver_backend != "SCIPY":
+        raise ValueError("city certified numerical contract requires the declared SCIPY backend")
+    recovery_s = 0.0
+    last_pairs = ()
+
+    def certify(raw, stage):
+        nonlocal recovery_s, last_pairs
+        budget.remaining("tier integer/matching certification")
+        diagnostics = dict(stage=stage, binary_tolerance=MIP_FEASIBILITY_TOLERANCE,
+                           primal_row_tolerance=PRIMAL_FEASIBILITY_TOLERANCE)
+        raw = np.asarray(raw)
+        if raw.shape != (count,) or not np.all(np.isfinite(raw)):
+            raise CityNumericalContractError("invalid numerical solution vector", diagnostics)
+        binary = np.rint(raw[:len(free_ids)])
+        deviation = float(np.max(np.abs(raw[:len(free_ids)] - binary), initial=0.0))
+        diagnostics["max_binary_deviation"] = deviation
+        if deviation > MIP_FEASIBILITY_TOLERANCE or np.any((binary != 0) & (binary != 1)):
+            raise CityNumericalContractError("binary deviation exceeds the explicit solver tolerance", diagnostics)
+        raw_violation = _maximum_row_violation(rows, count, raw)
+        diagnostics["max_raw_row_violation"] = raw_violation
+        bound_violation = max(0.0, float(-raw.min()), float(raw.max() - 1))
+        diagnostics["max_raw_bound_violation"] = bound_violation
+        if raw_violation > PRIMAL_FEASIBILITY_TOLERANCE or bound_violation > MIP_FEASIBILITY_TOLERANCE:
+            raise CityNumericalContractError("raw solution violates declared row/bound tolerances", diagnostics)
+        certified = np.zeros(count)
+        certified[:len(free_ids)] = binary
+        full = np.ones(len(options))
+        for j, index in columns.items():
+            full[j] = binary[index]
+        selected_now = tuple(sorted((options[j].vehicle_id, options[j].request_id) for j, index in columns.items()
+                                    if options[j].request_id is not None and binary[index] == 1))
+        recovery_started = perf_counter()
+        pairs, _ = base._recover_recourse(problem, records, full, selected_now)
+        recovery_s += perf_counter() - recovery_started
+        active_edges = {(scene.scenario_id, pickup.vehicle_id, pickup.request_id): index
+                        for index, (scene, pickup, j) in enumerate(records, len(free_ids)) if full[j] == 1}
+        for pair in pairs:
+            if pair not in active_edges:
+                raise CityNumericalContractError("matching used an inactive state edge", diagnostics)
+            certified[active_edges[pair]] = 1
+        violation = _maximum_row_violation(rows, count, certified)
+        diagnostics.update(max_certified_row_violation=violation,
+                           binary_projection_within_explicit_tolerance=True,
+                           matching_reconstructed_integral_recourse=True)
+        if violation != 0.0:
+            raise CityNumericalContractError("projected binary/matching certificate violates a capacity or earlier tier lock", diagnostics)
+        last_pairs = pairs
+        budget.remaining("tier full-row and objective-lock verification")
+        return certified, diagnostics
+
+    partial, optimize_s, stages, receipt = _run_city_levels(rows, count, objectives, integer, certify, budget)
     budget.remaining("component optimality completion")
-    if len(free_ids) and np.max(np.abs(partial[:len(free_ids)] - np.rint(partial[:len(free_ids)]))) > 1e-7:
-        raise RuntimeError("city component returned a noninteger common first action")
     selected = tuple(sorted((options[j].vehicle_id, options[j].request_id) for j, index in columns.items()
                             if options[j].request_id is not None and partial[index] > .5))
-    full = np.ones(len(options))
-    for j, index in columns.items():
-        full[j] = partial[index]
-    recovery_started = perf_counter()
-    pairs, q = base._recover_recourse(problem, records, full, selected)
-    if abs(q - float(future @ partial)) > 1e-6:
-        raise RuntimeError("city ONE-next-service integral matching recovery changed expected service")
-    budget.remaining("component integral recourse recovery")
-    recovery_s = perf_counter() - recovery_started
+    pairs = last_pairs
+    q_units = sum(numerators[sid] for sid, _, _ in pairs)
+    if int(future @ partial) != q_units:
+        raise RuntimeError("city matching objective disagrees with its exact scenario lattice")
+    q = q_units / denominator
     matrix = rows.matrix(count)
-    stages = tuple(dict(stage=name, value=float(objective @ partial),
-                        opt_status="OPTIMAL" if np.any(objective) else "CONSTANT_EXACT")
-                   for name, objective, _ in objectives)
     return dict(selected=selected, pairs=pairs, expected=q, variables=count, integer_count=len(free_ids),
                 nonzeros=int(matrix.nnz), matrix_bytes=int(matrix.data.nbytes + matrix.indices.nbytes + matrix.indptr.nbytes),
-                build_s=build_s, optimize_s=optimize_s, recovery_s=recovery_s, stages=stages)
+                build_s=build_s, optimize_s=optimize_s, recovery_s=recovery_s, stages=stages, solver_receipt=receipt)
 
 
 def solve_city_defer(problem, policy="LOCATION_AWARE_DEFER", *, _budget=None):
@@ -158,6 +327,8 @@ def solve_city_defer(problem, policy="LOCATION_AWARE_DEFER", *, _budget=None):
     started = perf_counter()
     problem = _bounded_problem(problem, budget.remaining("sparse model compilation"))
     vehicles, waiting, options, by_v, by_r, recourse = decomposed._compile(problem)
+    lattice = _scenario_lattice(problem)
+    denominator, numerators = lattice
     states = {(scene.scenario_id, j) for scene, _, j in recourse}
     future_v = {(scene.scenario_id, pickup.vehicle_id) for scene, pickup, _ in recourse}
     future_r = {(scene.scenario_id, pickup.request_id) for scene, pickup, _ in recourse}
@@ -188,6 +359,7 @@ def solve_city_defer(problem, policy="LOCATION_AWARE_DEFER", *, _budget=None):
     build_s = perf_counter() - started
     selected, recovered, stages = [], [], []
     expected = optimize_s = recovery_s = pure_expected = 0.0
+    pure_expected_units = 0
     variables = integer_count = nnz = matrix_bytes = pure_count = pure_edges = mip_count = 0
     for component_id, group in enumerate(groups.values()):
         budget.remaining("component allocation")
@@ -200,6 +372,7 @@ def solve_city_defer(problem, policy="LOCATION_AWARE_DEFER", *, _budget=None):
             recovered.extend(pairs)
             expected += q
             pure_expected += q
+            pure_expected_units += sum(numerators[sid] for sid, _, _ in pairs)
             pure_count += 1
             pure_edges += len(records)
             matrix_bytes += memory
@@ -207,7 +380,7 @@ def solve_city_defer(problem, policy="LOCATION_AWARE_DEFER", *, _budget=None):
         vids = set(group["vehicles"])
         fixed_ids = {j for _, _, j in records if options[j].vehicle_id not in vids}
         option_ids = [j for j, option in enumerate(options) if option.vehicle_id in vids or j in fixed_ids]
-        result = _solve_component(problem, waiting, options, by_v, by_r, option_ids, records, budget)
+        result = _solve_component(problem, waiting, options, by_v, by_r, option_ids, records, budget, lattice)
         selected.extend(result["selected"])
         recovered.extend(result["pairs"])
         expected += result["expected"]
@@ -230,6 +403,20 @@ def solve_city_defer(problem, policy="LOCATION_AWARE_DEFER", *, _budget=None):
                 or {rid for _, rid in pairs} & {rid for _, rid in selected}):
             raise RuntimeError("city integral recourse duplicated capacity or a current service")
     budget.remaining("city result validation")
+    expected = sum(numerators[sid] for sid, _, _ in recovered) / denominator
+    pure_expected = pure_expected_units / denominator
+    diagnostics = [stage["numerical_diagnostics"] for stage in stages if "numerical_diagnostics" in stage]
+    numerical_contract = dict(
+        mip_feasibility_tolerance=MIP_FEASIBILITY_TOLERANCE,
+        primal_feasibility_tolerance=PRIMAL_FEASIBILITY_TOLERANCE,
+        expected_service_lattice_denominator=denominator,
+        max_binary_deviation=max((entry["max_binary_deviation"] for entry in diagnostics), default=0.0),
+        max_raw_row_violation=max((entry["max_raw_row_violation"] for entry in diagnostics), default=0.0),
+        max_certified_row_violation=max((entry["max_certified_row_violation"] for entry in diagnostics), default=0.0),
+        integer_tier_locks_are_exact_equalities=True, pickup_eta_is_final_without_float_face_lock=True,
+        no_projection_outside_explicit_solver_tolerance=True,
+        all_matching_capacity_and_prior_objective_rows_rechecked=True,
+        solver_options_receipt=deepcopy(_solver_options_receipt()) if diagnostics else None)
     return CityDeferDecision(
         policy=policy, selected_pairs=tuple(sorted(selected)), immediate_service_count=len(selected),
         expected_next_service_count=expected, expected_total_service_count=len(selected) + expected,
@@ -244,6 +431,7 @@ def solve_city_defer(problem, policy="LOCATION_AWARE_DEFER", *, _budget=None):
         logical_nonzeros=logical_nnz, logical_rows=logical_rows,
         critical_matched=sum(waiting[rid].critical for _, rid in selected),
         carry_over_matched=sum(waiting[rid].carry_over for _, rid in selected), stages=tuple(stages),
+        numerical_contract=numerical_contract,
         provenance=dict(kind=KIND, complete_chain_equivalence=False,
             exact_decomposition_scope="COMPLETE_SUPPLIED_SPARSE_ONE_NEXT_SERVICE_MODEL_ONLY",
             current_service_face_locked=False,
@@ -518,6 +706,7 @@ class CityDeferNativeAdapter(NativeFlexibilityAdapter):
             pure_future_edges=decision.pure_future_edges, pure_future_expected_count=decision.pure_future_expected_count,
             model_build_time_s=decision.model_build_time_s, optimization_time_s=decision.solve_time_s,
             recourse_recovery_time_s=decision.recourse_recovery_time_s,
+            numerical_contract=decision.numerical_contract,
             provenance=decision.provenance, future_graph=self.future_diagnostics,
             **self.stage_timings, **self.busy_diagnostics))
         return result

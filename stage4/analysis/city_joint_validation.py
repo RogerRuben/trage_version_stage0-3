@@ -11,6 +11,7 @@ import gc
 import json
 from math import isfinite
 from pathlib import Path
+import shutil
 import subprocess
 from time import perf_counter
 
@@ -181,6 +182,8 @@ def run_policy(root, fleetpy, cfg, reference, protected, policy):
         generic_reference=reference, gpu_used=False, dense_matrix=False, full_day=False)
     atomic_json(directory / "summary.json", summary)
     routing = None
+    bridge = control = None
+    tick = None
     try:
         start = pd.Timestamp("2016-10-31T00:00:00+08:00")
         episode = load_research_episode(root, profile_id=cfg["profile_id"], requested_q_a=cfg["requested_q_a"])
@@ -306,6 +309,16 @@ def run_policy(root, fleetpy, cfg, reference, protected, policy):
         return summary
     except Exception as error:
         summary.update(status="STOPPED", error=repr(error), runtime_s=perf_counter()-started)
+        if control is not None:
+            summary["partial_execution_not_a_finished_result"] = dict(
+                last_tick_s=tick, committed=len(control.assignment_rows),
+                completed=len(control.completed_rids), expired=len(control.expired_rids))
+            # Observed/committed environment records only; never label them as
+            # a completed window or calculate a service rate from this prefix.
+            if bridge is not None:
+                atomic_parquet(directory / "partial_assignments.parquet", bridge.environment_assignments())
+            if getattr(control, "flexibility_adapter", None) is not None:
+                atomic_parquet(directory / "partial_solver_trace.parquet", pd.DataFrame(control.flexibility_adapter.rows))
         atomic_json(directory / "summary.json", summary)
         raise
     finally:
@@ -313,7 +326,26 @@ def run_policy(root, fleetpy, cfg, reference, protected, policy):
             routing.close()
 
 
-def run(root, fleetpy=FLEETPY, config=CONFIG, *, prepare_only=False):
+def archive_stopped_run(root, policy):
+    """Recoverable exact-child archive, only for a user-authorized retry."""
+    base = (root / OUT).resolve()
+    source = (base / policy).resolve()
+    source.relative_to(base)
+    receipt = json.loads((source / "summary.json").read_text(encoding="utf-8"))
+    if receipt.get("status") != "STOPPED":
+        raise ValueError("only a stopped run may be archived for an explicit retry")
+    parent = base / "failed_attempts"
+    number = 1
+    while (parent / f"attempt_{number:03d}" / policy).exists():
+        number += 1
+    destination = (parent / f"attempt_{number:03d}" / policy).resolve()
+    destination.relative_to(base)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.move(str(source), str(destination))
+    return str(destination.relative_to(root))
+
+
+def run(root, fleetpy=FLEETPY, config=CONFIG, *, prepare_only=False, retry_failed=False):
     root = Path(root).resolve()
     cfg, reference, protected = load_protocol(root, config)
     preparation = dict(status="FIXED_CITY_JOINT_PROTOCOL", code_sha=code_sha(root),
@@ -327,15 +359,19 @@ def run(root, fleetpy=FLEETPY, config=CONFIG, *, prepare_only=False):
     pa.set_cpu_count(1)
     pa.set_io_thread_count(1)
     summaries=[]
+    archived=[]
     for policy in cfg["policies"]:
         directory = root / OUT / policy
         if (directory / "summary.json").exists():
-            raise ValueError("existing real run found; no implicit rerun or overwrite")
+            if not retry_failed:
+                raise ValueError("existing real run found; no implicit rerun or overwrite")
+            archived.append(archive_stopped_run(root, policy))
         summaries.append(run_policy(root, Path(fleetpy), cfg, reference, protected, policy))
         gc.collect()
     summary = dict(status="CITY_JOINT_VALIDATION_COMPLETE", kind=cfg["comparison_kind"],
         preparation=preparation, policies=summaries, full_day_runs=0, new_native_conditions=2,
-        gpu_used=False, dense_matrix=False, parameter_search=False, model_refit=False)
+        gpu_used=False, dense_matrix=False, parameter_search=False, model_refit=False,
+        archived_failed_attempts=archived)
     atomic_json(root / DOC / "summary.json", summary)
     atomic_json(root / OUT / "summary.json", summary)
     print(json.dumps(dict(status=summary["status"],service_counts={s["policy"]:
@@ -349,8 +385,10 @@ def main():
     parser.add_argument("--fleetpy-root",type=Path,default=FLEETPY)
     parser.add_argument("--config",type=Path,default=CONFIG)
     parser.add_argument("--prepare-only",action="store_true")
+    parser.add_argument("--retry-failed",action="store_true",
+        help="archive STOPPED output then rerun only after explicit user authorization")
     args=parser.parse_args()
-    run(args.root,args.fleetpy_root,args.config,prepare_only=args.prepare_only)
+    run(args.root,args.fleetpy_root,args.config,prepare_only=args.prepare_only,retry_failed=args.retry_failed)
 
 
 if __name__ == "__main__":
