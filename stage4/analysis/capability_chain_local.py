@@ -141,6 +141,15 @@ def summarize(root, result):
         before = json.loads((destination / "SERVICE_PRESERVING_full_result.json").read_text(encoding="utf-8"))
         after = json.loads((destination / "CHAIN_DEFER_full_result.json").read_text(encoding="utf-8"))
         case["policies"] = [compact_policy(before), compact_policy(after)]
+        for compact, full in zip(case["policies"], [before, after]):
+            events = full["executed_events"]
+            horizon = result["preparation"]["config"]["horizon_s"]
+            compact.update(completed_within_admission_window=sum(e["kind"] == "SERVE" and e["finish_s"] <= horizon for e in events),
+                total_executed_empty_distance_m=sum(e["empty_distance_m"] for e in events),
+                total_executed_empty_time_s=sum(e["empty_time_s"] for e in events),
+                modeled_passenger_service_time_s=sum(e["service_time_s"] for e in events),
+                total_resource_busy_time_s=sum(e["finish_s"]-e["epoch_s"] for e in events),
+                post_window_committed_work_s=sum(max(0,e["finish_s"]-max(horizon,e["epoch_s"])) for e in events))
         b, a = before["committed_jobs"], after["committed_jobs"]
         shared = sorted(set(b)&set(a))
         case["comparison"] = dict(realized_service_gain=len(a)-len(b), gained_jobs=sorted(set(a)-set(b)),
@@ -148,6 +157,16 @@ def summarize(root, result):
             paired_mean_pickup_wait_change_s=float(np.mean([a[j]["pickup_s"]-b[j]["pickup_s"] for j in shared])) if shared else None,
             executed_sequences_identical=[{k:v for k,v in e.items() if k != "policy"} for e in before["executed_events"]]
                 == [{k:v for k,v in e.items() if k != "policy"} for e in after["executed_events"]])
+        for old, new in zip(before["epochs"], after["epochs"]):
+            if old["current_served"] != new["current_served"]:
+                tick = old["epoch_s"]
+                old_prior = [{k:v for k,v in e.items() if k != "policy"} for e in before["executed_events"] if e["epoch_s"] < tick]
+                new_prior = [{k:v for k,v in e.items() if k != "policy"} for e in after["executed_events"] if e["epoch_s"] < tick]
+                case["first_admission_divergence"] = dict(epoch_s=tick, identical_prior_executed_events=old_prior==new_prior,
+                    baseline_current_served=old["current_served"], chain_current_served=new["current_served"],
+                    baseline_expected_plan_services=old["expected_served"], chain_expected_plan_services=new["expected_served"],
+                    reconstructed_from_saved_epochs_not_new_experiment=True)
+                break
         for policy, full in [("SERVICE_PRESERVING",before),("CHAIN_DEFER",after)]:
             diagnostics = dict(total_expanded_prefixes=0, total_dominated_prefixes=0,
                 total_emitted_columns=0, total_retained_columns=0, maximum_single_decision_s=0)
