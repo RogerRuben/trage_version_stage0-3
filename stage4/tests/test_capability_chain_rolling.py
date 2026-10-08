@@ -61,3 +61,19 @@ def test_relocation_stop_does_not_invent_a_next_customer_or_outgoing_edge():
     result = evidence.evaluate(None, None, dict(edges=[dict(stage3_edge_uid="E1"), dict(stage3_edge_uid="E2")]), 80)
     assert result["supported"] and result["join_encounter_count"] == 0
     assert result["compatible_profiles"] == ["HV", "C"]
+    # Exercise the adapter record as well: _evaluate already carries an
+    # evidence_kind, which must be deliberately replaced, not passed twice.
+    from types import SimpleNamespace
+    from stage4.analysis.capability_chain_rolling import ConnectionProvider
+    provider = ConnectionProvider.__new__(ConnectionProvider)
+    provider.locations = {"S1":(108.9,34.2), "S2":(108.901,34.2)}
+    provider.moves = {}
+    contexts = []
+    provider.evidence = SimpleNamespace(add_context=lambda *args:contexts.append(args))
+    provider._evaluate = lambda origin,destination:(dict(supported=True,travel_time_s=20,
+        empty_distance_m=100,compatible_profiles=["HV","C"],reason_codes=[],
+        evidence_kind="MODELED_DIRECTED_CONNECTION"),dict(edges=[dict(stage3_edge_uid="E1")]))
+    move = provider.relocation("S1","S2")
+    assert move["evidence_kind"] == "INDEPENDENT_IDLE_RELOCATION_NOT_PICKUP"
+    assert move["arrival_location_id"].startswith("R:") and len(contexts) == 1
+    assert provider.relocation("S1","S2") == move and len(contexts) == 1

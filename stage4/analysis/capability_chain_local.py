@@ -256,7 +256,18 @@ def main():
         summarize(root,json.loads((root/OUT/"run_summary.json").read_text(encoding="utf-8")))
         print(json.dumps(dict(status="EXISTING_LOCAL_RESULTS_AGGREGATED_NO_RERUN")),flush=True)
     else:
-        run(root,args.config,args.prepare_only)
+        try:
+            run(root,args.config,args.prepare_only)
+        except Exception as exc:
+            # A stopped process must not remain advertised as RUNNING. Keep the
+            # partial local artifacts; never retry or turn a failure into PASS.
+            path = root/OUT/"run_summary.json"
+            if path.is_file() and not args.prepare_only:
+                failed=json.loads(path.read_text(encoding="utf-8"))
+                if failed.get("status") == "RUNNING":
+                    failed.update(status="FAILED",failure_type=type(exc).__name__,failure_detail=str(exc))
+                    atomic_json(path,failed)
+            raise
 
 
 if __name__ == "__main__":

@@ -204,8 +204,10 @@ class ConnectionProvider:
                 self.locations[context] = point
             else:
                 context = site_id
-            self.moves[key] = dict(**value, arrival_location_id=context, site_id=site_id,
+            move = dict(value)
+            move.update(arrival_location_id=context, site_id=site_id,
                 origin_id=origin, evidence_kind="INDEPENDENT_IDLE_RELOCATION_NOT_PICKUP")
+            self.moves[key] = move
         return self.moves[key]
 
 
