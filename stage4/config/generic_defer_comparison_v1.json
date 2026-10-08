@@ -1,0 +1,15 @@
+{
+  "version": "generic_defer_comparison_v1",
+  "fixed_local_config": "stage4/config/capability_chain_local_v2.json",
+  "fixed_local_output": "stage4/output/capability_chain_planning/local_v2",
+  "new_policy": "TIME_TYPE_DEFER",
+  "solver_policy": "CHAIN_DEFER",
+  "reference_rule": "MEDIAN_OF_EARLIER_FORECAST_CUSTOMERS_BEST_CACHED_SERVICEABLE_SITE_PICKUP",
+  "reference_max_pickup_s": 300,
+  "history_dates": ["20161010", "20161017"],
+  "reuse_existing_controls": ["SERVICE_PRESERVING", "CHAIN_DEFER"],
+  "new_conditions": 2,
+  "full_day_or_native": false,
+  "refit_M3_or_time_proxy": false,
+  "parameter_search": false
+}

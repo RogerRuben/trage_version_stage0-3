@@ -1,0 +1,67 @@
+{
+  "status": "GENERIC_REFERENCE_FIXED_BEFORE_NEW_CONTROL",
+  "base_output": "stage4/output/capability_chain_planning/local_v2",
+  "config": {
+    "version": "generic_defer_comparison_v1",
+    "fixed_local_config": "stage4/config/capability_chain_local_v2.json",
+    "fixed_local_output": "stage4/output/capability_chain_planning/local_v2",
+    "new_policy": "TIME_TYPE_DEFER",
+    "solver_policy": "CHAIN_DEFER",
+    "reference_rule": "MEDIAN_OF_EARLIER_FORECAST_CUSTOMERS_BEST_CACHED_SERVICEABLE_SITE_PICKUP",
+    "reference_max_pickup_s": 300,
+    "history_dates": [
+      "20161010",
+      "20161017"
+    ],
+    "reuse_existing_controls": [
+      "SERVICE_PRESERVING",
+      "CHAIN_DEFER"
+    ],
+    "new_conditions": 2,
+    "full_day_or_native": false,
+    "refit_M3_or_time_proxy": false,
+    "parameter_search": false
+  },
+  "fixed_local_config_sha256": "be4c99a1075124960e2192ac5fe5fc7b1e508e7de120d4bfed7d5786ce1f2d3b",
+  "cases": [
+    {
+      "case_id": "LOCAL_20161024_0730",
+      "reference": {
+        "kind": "EARLIER_HISTORY_TYPICAL_SERVICEABLE_PICKUP",
+        "history_dates": [
+          "20161010",
+          "20161017"
+        ],
+        "travel_time_s": 130.2218333602223,
+        "empty_distance_m": 754.5,
+        "historical_customer_sample_count": 16,
+        "historical_customer_population": 29,
+        "target_day_actual_orders_used": false,
+        "source_definition": "MEDIAN_OF_EARLIER_FORECAST_CUSTOMERS_BEST_CACHED_SERVICEABLE_SITE_PICKUP",
+        "estimation_scope": "AVAILABLE_FROZEN_SITE_TO_HISTORY_FORECAST_CONNECTIONS_NOT_OBSERVED_EMPTY_TRIPS",
+        "source_cached_connections_sha256": "9c8f512310d5267ae6b902948cca2f75be66bca16fc58d47b745cfdca47c4809"
+      },
+      "fixed_input_sha256": "835e11519efd661a902387f63a2776f31060960c9b7cdc6b37f05d2f701d6a95"
+    },
+    {
+      "case_id": "LOCAL_20161024_1700",
+      "reference": {
+        "kind": "EARLIER_HISTORY_TYPICAL_SERVICEABLE_PICKUP",
+        "history_dates": [
+          "20161010",
+          "20161017"
+        ],
+        "travel_time_s": 128.9034546982226,
+        "empty_distance_m": 762.0,
+        "historical_customer_sample_count": 33,
+        "historical_customer_population": 47,
+        "target_day_actual_orders_used": false,
+        "source_definition": "MEDIAN_OF_EARLIER_FORECAST_CUSTOMERS_BEST_CACHED_SERVICEABLE_SITE_PICKUP",
+        "estimation_scope": "AVAILABLE_FROZEN_SITE_TO_HISTORY_FORECAST_CONNECTIONS_NOT_OBSERVED_EMPTY_TRIPS",
+        "source_cached_connections_sha256": "15c2468005912b7bd706431c5723872c15cf53a98446fa897253f72cba4d1075"
+      },
+      "fixed_input_sha256": "8023ba4a6ea9c2b81114eb2095df9d0c19bb58f5bbf6ef50ee5e4a0ee2c8e805"
+    }
+  ],
+  "no_existing_control_reruns": true
+}

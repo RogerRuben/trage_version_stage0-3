@@ -311,6 +311,8 @@ def epoch_problem(resources, pending, forecasts, actions, provider, now, cfg):
             origin_profiles.setdefault(task["job_id"], set()).update(task["compatible_profiles"])
         connections = []
         for origin, ready in readiness.items():
+            if cfg.get("skip_planned_post_service_geometry_queries", False) and origin in allowed:
+                continue  # A valuation projection supplies this layer, never actual first actions.
             for task in tasks:
                 if origin == task["job_id"] or ready > task["deadline_s"]:
                     continue
@@ -352,11 +354,13 @@ def shared_initial_layout(provider, cohorts, sites, ranking, cfg):
     return atomic, solution
 
 
-def replay_policy(actual_tasks, cohorts, initial, provider, policy, cfg, budget_check):
+def replay_policy(actual_tasks, cohorts, initial, provider, policy, cfg, budget_check,
+                  *, problem_transform=None, report_policy=None):
     from stage4.dispatch.capability_chain_rolling_solver import solve_epoch, validate_epoch_solution
     states = [dict(r) for r in initial]
     forecast_reference = HistoricalForecastReference(cohorts, cfg)
     committed, events, epochs = {}, [], []
+    report_policy = report_policy or policy
     start = perf_counter()
     for now in range(0, cfg["horizon_s"], cfg["step_s"]):
         budget_check()
@@ -364,6 +368,8 @@ def replay_policy(actual_tasks, cohorts, initial, provider, policy, cfg, budget_
         action_started = perf_counter()
         actions = first_actions(states, pending, provider, now, cfg)
         problem = epoch_problem(states, pending, forecast_reference.view(now), actions, provider, now, cfg)
+        if problem_transform is not None:
+            problem = problem_transform(problem)
         build_s = perf_counter()-action_started
         solution = solve_epoch(problem, policy)
         validate_epoch_solution(problem, solution)
@@ -388,16 +394,18 @@ def replay_policy(actual_tasks, cohorts, initial, provider, policy, cfg, budget_
                 resource["relocation_count"] += 1
             else:
                 raise RuntimeError("layout or hypothetical future action leaked into execution")
-            events.append(dict(policy=policy, epoch_s=now, resource_id=resource["resource_id"],
+            events.append(dict(policy=report_policy, epoch_s=now, resource_id=resource["resource_id"],
                 profile_id=resource["profile_id"], kind=action["kind"], job_id=action["job_id"],
                 origin_id=origin, destination_id=resource["location_id"], empty_distance_m=action["empty_distance_m"],
                 empty_time_s=action["travel_time_s"], pickup_s=action.get("pickup_s"), finish_s=resource["ready_s"],
                 service_time_s=task["service_time_s"] if action["kind"] == "SERVE" else 0.0,
                 release_s=committed[action["job_id"]]["release_s"] if action["kind"] == "SERVE" else None))
         metrics = {k:v for k,v in solution.items() if k not in ("recourse_paths", "selected_actions")}
+        if problem_transform is not None:
+            metrics["valuation_model"] = problem.get("valuation_model")
         epochs.append(dict(epoch_s=now, pending_count=len(pending), build_and_routing_s=build_s, **metrics))
         if now % 300 == 0:
-            print(json.dumps(dict(policy=policy, epoch_s=now, committed=len(committed),
+            print(json.dumps(dict(policy=report_policy, epoch_s=now, committed=len(committed),
                 actual_waiting=len(pending), rss_mib=round(psutil.Process().memory_info().rss/2**20, 2))), flush=True)
     waits = [a["pickup_s"]-a["release_s"] for a in committed.values()]
     customer = [e for e in events if e["kind"] == "SERVE"]
@@ -410,7 +418,7 @@ def replay_policy(actual_tasks, cohorts, initial, provider, policy, cfg, budget_
         overlaps += sum(b["epoch_s"] < a["finish_s"]-1e-8 for a,b in zip(ordered, ordered[1:]))
     if duplicate_count or overlaps or max(errors, default=0) > 1e-8:
         raise RuntimeError("executed finite resource ledger failed conservation/uniqueness")
-    summary = dict(policy=policy, actual_cohort_count=len(actual_tasks), realized_committed=len(committed),
+    summary = dict(policy=report_policy, actual_cohort_count=len(actual_tasks), realized_committed=len(committed),
         realized_completed_after_drain=len(committed), unserved_count=len(actual_tasks)-len(committed),
         served_by_profile=dict(Counter(e["profile_id"] for e in customer)),
         customer_pickup_empty_distance_m=sum(e["empty_distance_m"] for e in customer),
