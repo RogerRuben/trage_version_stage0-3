@@ -19,11 +19,13 @@ from scipy.sparse import coo_matrix
 
 
 MAX_TASKS_PER_SCENARIO = 20
+HARD_MAX_TASKS_PER_SCENARIO = 64
 MAX_RESOURCES = 3
 MAX_SCENARIOS = 2
 MAX_CHAINS_PER_RESOURCE_SCENARIO = 4_000
 MAX_MASTER_VARIABLES = 20_000
 MAX_MASTER_NONZEROS = 150_000
+MAX_PREFIX_LABELS_TOTAL = 50_000
 DECISION_TIME_LIMIT_S = 10.0
 KIND = "TWO_STAGE_HISTORICAL_SCENARIO_RECEDING_HORIZON_NOT_MULTISTAGE_OPTIMUM"
 POLICIES = ("SERVICE_PRESERVING", "CHAIN_DEFER")
@@ -93,6 +95,8 @@ class _Problem:
     resources: tuple[_Resource, ...]
     actions: tuple[_Action, ...]
     scenarios: tuple[_Scenario, ...]
+    task_limit: int
+    exact_chain_compression: bool
 
 
 @dataclass(frozen=True)
@@ -169,6 +173,15 @@ def _same_number(row, field, expected, label):
 def _prepare(problem):
     if not isinstance(problem, Mapping):
         raise ValueError("problem must be an object")
+    task_limit = problem.get("task_limit_per_scenario", MAX_TASKS_PER_SCENARIO)
+    if type(task_limit) is not int or task_limit <= 0:
+        raise ValueError("task_limit_per_scenario must be a positive integer")
+    if task_limit > HARD_MAX_TASKS_PER_SCENARIO:
+        raise RollingModelLimitError(
+            f"task_limit_per_scenario exceeds hard maximum {HARD_MAX_TASKS_PER_SCENARIO}")
+    compression = problem.get("exact_chain_compression", False)
+    if type(compression) is not bool:
+        raise ValueError("exact_chain_compression must be a boolean")
     now = _number(problem.get("now_s"), "now_s")
     step = _number(problem.get("step_s"), "step_s")
     if step != 30:
@@ -197,7 +210,7 @@ def _prepare(problem):
             raise ValueError("scenario weights must be positive")
         tasks = []
         job_ids = set()
-        for task_row in _rows(row, "tasks", MAX_TASKS_PER_SCENARIO):
+        for task_row in _rows(row, "tasks", task_limit):
             job_id = _id(task_row.get("job_id"), "job_id")
             if job_id in job_ids:
                 raise ValueError(f"{scenario_id}: duplicate job_id")
@@ -299,7 +312,7 @@ def _prepare(problem):
         raise RollingModelLimitError("master variable limit exceeded by first actions")
     return _Problem(now, step, tuple(sorted(resources, key=lambda resource: resource.resource_id)),
                     tuple(sorted(actions, key=lambda action: (action.resource_id, action.action_id))),
-                    tuple(sorted(scenarios, key=lambda scenario: scenario.scenario_id)))
+                    tuple(sorted(scenarios, key=lambda scenario: scenario.scenario_id)), task_limit, compression)
 
 
 def _ceil_step(value, step):
@@ -307,7 +320,7 @@ def _ceil_step(value, step):
     return ((quotient.numerator + quotient.denominator - 1) // quotient.denominator) * step
 
 
-def _enumerate(model, budget):
+def _enumerate_uncompressed(model, budget):
     paths = []
     counts = []
     for resource in model.resources:
@@ -364,6 +377,136 @@ def _enumerate(model, budget):
             counts.append(dict(resource_id=resource.resource_id, scenario_id=scenario.scenario_id,
                                chain_count=count, per_first_action=per_action))
     return tuple(paths), counts
+
+
+def _compression_statistics(enabled):
+    return dict(enabled=enabled, expanded_prefixes=0, dominated_prefixes=0,
+                emitted_columns=0, retained_columns=0, accepted_prefix_labels=0,
+                labels_removed_by_new_dominance=0, max_pareto_labels_per_state=0,
+                emitted_columns_scope="GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+                max_total_accepted_prefix_labels=MAX_PREFIX_LABELS_TOTAL if enabled else None)
+
+
+def _terminal_key(path):
+    # Column equivalence does not depend on its endpoint or timing. Sequence
+    # and earliest timing make replacement deterministic when distance ties.
+    return (path.distance, tuple(visit.job_id for visit in path.visits),
+            tuple((visit.commit, visit.pickup, visit.finish) for visit in path.visits))
+
+
+def _enumerate_compressed(model, budget):
+    """Exact Pareto labels and minimum-cost job-mask master columns.
+
+    Prefix dominance applies ONLY within the same resource, scenario, first
+    action, current origin and served mask. Final columns may have different
+    endpoints, because all master constraints and rewards depend only on their
+    resource/scenario/action/job set. Removed labels' already generated children
+    remain legal; final job-mask replacement removes inferior terminal columns.
+    """
+    paths, counts = [], []
+    statistics = _compression_statistics(True)
+    for resource in model.resources:
+        actions = [action for action in model.actions if action.resource_id == resource.resource_id]
+        for scenario in model.scenarios:
+            bits = {task.job_id: 1 << index for index, task in enumerate(scenario.tasks)}
+            terminals = {}
+            frontiers = {}
+            local = _compression_statistics(True)
+
+            def increment(field, value=1):
+                statistics[field] += value
+                local[field] += value
+
+            def emit(path):
+                budget.remaining("exact chain compression")
+                increment("emitted_columns")
+                key = (path.action_id, path.mask)
+                previous = terminals.get(key)
+                if previous is None:
+                    if len(terminals) >= MAX_CHAINS_PER_RESOURCE_SCENARIO:
+                        raise RollingModelLimitError(
+                            f"retained chain limit exceeded for {resource.resource_id}/{scenario.scenario_id}; "
+                            "compression was not truncated")
+                    if len(model.actions) + len(paths) + len(terminals) >= MAX_MASTER_VARIABLES:
+                        raise RollingModelLimitError("master variable limit exceeded; compression was not truncated")
+                if previous is None or _terminal_key(path) < _terminal_key(previous):
+                    terminals[key] = path
+
+            for action in actions:
+                first_job = action.job_id if action.kind == "SERVE" else None
+                initial_mask = bits[first_job] if first_job else 0
+
+                def extend(origin, ready, mask, visits, distance):
+                    budget.remaining("exact chain compression")
+                    path = _Path(resource.resource_id, scenario.scenario_id, action.action_id,
+                                 first_job, visits, mask, distance)
+                    # Every emitted path is physically feasible. Updating this
+                    # endpoint-independent mask column never controls expansion.
+                    emit(path)
+                    state = (action.action_id, origin, mask)
+                    frontier = frontiers.get(state, ())
+                    for old_ready, old_distance in frontier:
+                        budget.remaining("prefix dominance comparison")
+                        if old_ready <= ready and old_distance <= distance:
+                            increment("dominated_prefixes")
+                            return
+                    if statistics["accepted_prefix_labels"] >= MAX_PREFIX_LABELS_TOTAL:
+                        raise RollingModelLimitError(
+                            f"total prefix label limit exceeded: maximum {MAX_PREFIX_LABELS_TOTAL}; "
+                            "compression was not truncated")
+                    surviving = []
+                    for old_ready, old_distance in frontier:
+                        budget.remaining("prefix dominance comparison")
+                        if ready <= old_ready and distance <= old_distance:
+                            increment("labels_removed_by_new_dominance")
+                        else:
+                            surviving.append((old_ready, old_distance))
+                    surviving.append((ready, distance))
+                    frontiers[state] = surviving
+                    increment("accepted_prefix_labels")
+                    increment("expanded_prefixes")
+                    statistics["max_pareto_labels_per_state"] = max(
+                        statistics["max_pareto_labels_per_state"], len(surviving))
+                    local["max_pareto_labels_per_state"] = max(local["max_pareto_labels_per_state"], len(surviving))
+                    for index, task in enumerate(scenario.tasks):
+                        budget.remaining("compressed successor enumeration")
+                        bit = 1 << index
+                        if mask & bit or resource.profile_id not in task.profiles:
+                            continue
+                        connection = scenario.connections.get((origin, task.job_id))
+                        if (connection is None or not connection.supported
+                                or resource.profile_id not in connection.profiles):
+                            continue
+                        commit = _ceil_step(max(ready, task.release), model.step)
+                        pickup = commit + connection.travel
+                        if commit >= resource.end or pickup > task.deadline:
+                            continue
+                        finish = pickup + task.service
+                        visit = _Visit(task.job_id, origin, commit, pickup, finish,
+                                       connection.travel, connection.distance)
+                        extend(task.job_id, finish, mask | bit, visits + (visit,), distance + connection.distance)
+
+                extend(action.location_id, action.ready, initial_mask, (), action.distance)
+            retained = sorted(terminals.values(), key=lambda path: (path.action_id, _terminal_key(path)))
+            paths.extend(retained)
+            local["retained_columns"] = len(retained)
+            statistics["retained_columns"] += len(retained)
+            per_action = {action.action_id: 0 for action in actions}
+            for path in retained:
+                per_action[path.action_id] += 1
+            counts.append(dict(resource_id=resource.resource_id, scenario_id=scenario.scenario_id,
+                               chain_count=len(retained), per_first_action=per_action,
+                               compression_statistics=local))
+    return tuple(paths), counts, statistics
+
+
+def _enumerate(model, budget):
+    if model.exact_chain_compression:
+        return _enumerate_compressed(model, budget)
+    paths, counts = _enumerate_uncompressed(model, budget)
+    statistics = _compression_statistics(False)
+    statistics.update(expanded_prefixes=len(paths), emitted_columns=len(paths), retained_columns=len(paths))
+    return paths, counts, statistics
 
 
 class _SparseRows:
@@ -657,7 +800,7 @@ def solve_epoch(problem, policy):
     model = _prepare(problem)
     preparation_s = perf_counter() - budget.started
     enumeration_started = perf_counter()
-    paths, chain_counts = _enumerate(model, budget)
+    paths, chain_counts, compression_statistics = _enumerate(model, budget)
     enumeration_s = perf_counter() - enumeration_started
     master_started = perf_counter()
     rows, action_columns = _master(model, paths)
@@ -686,6 +829,21 @@ def solve_epoch(problem, policy):
                    nonzeros=len(rows.values), nnz=len(rows.values), base_rows=base_rows, base_nonzeros=base_nonzeros,
                    sparse=True, first_action_variables=len(model.actions), scenario_chain_variables=len(paths),
                    chains_per_resource_scenario=chain_counts, complete_enumeration=True,
+                   task_limit_per_scenario=model.task_limit,
+                   default_task_limit_per_scenario=MAX_TASKS_PER_SCENARIO,
+                   hard_task_limit_per_scenario=HARD_MAX_TASKS_PER_SCENARIO,
+                   exact_chain_compression=model.exact_chain_compression,
+                   complete_finite_domain=True,
+                   complete_enumeration_scope=("EXACT_EQUIVALENT_PREFIX_AND_MASK_COLUMN_REPRESENTATION"
+                                               if model.exact_chain_compression else "ALL_FEASIBLE_TASK_SEQUENCES"),
+                   all_task_sequences_enumerated=not model.exact_chain_compression,
+                   compression_statistics=compression_statistics,
+                   dominance=("Only equal resource/scenario/first-action/last-origin/served-mask prefixes "
+                              "are compared: earlier-or-equal ready and lower-or-equal distance dominates, "
+                              "under constant connection times and waiting. No cross-mask or cross-action pruning."),
+                   compressed_column_scope=("Within equal resource/scenario/first-action/served-mask, keep the "
+                                            "minimum-distance legal column. Master constraints and served reward "
+                                            "are identical, so the finite-domain lexicographic decision is equivalent."),
                    max_chains_per_resource_scenario=MAX_CHAINS_PER_RESOURCE_SCENARIO,
                    max_variables=MAX_MASTER_VARIABLES, max_nonzeros=MAX_MASTER_NONZEROS),
         stages=stages,
@@ -700,6 +858,8 @@ def solve_epoch(problem, policy):
             earliest_schedule_dominance="Constant connection times and waiting allow the earliest schedule to dominate later schedules.",
             deadline_is_original_and_never_reset=True, future_commitment_requires_release=True,
             resource_profile_is_fixed=True, committed_service_may_finish_after_admission_end=True,
+            complete_finite_domain=True, exact_chain_compression=model.exact_chain_compression,
+            compression_is_equivalent_column_and_prefix_dominance_not_top_k=True,
             decision_time_limit_s=DECISION_TIME_LIMIT_S))
     validation_started = perf_counter()
     solution["validation"] = validate_epoch_solution(problem, solution)

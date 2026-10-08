@@ -134,3 +134,89 @@ def test_relocate_only_moves_location_sparse_master_and_hard_limits(monkeypatch)
         limited.setattr(solver, "DECISION_TIME_LIMIT_S", 0)
         with pytest.raises(solver.DecisionTimeout, match="budget expired"):
             solver.solve_epoch(problem, "CHAIN_DEFER")
+
+
+def test_exact_compression_preserves_decision_masks_and_pareto_tradeoffs(monkeypatch):
+    # A,B,C reaches C early at cost 10; B,A,C reaches it late at cost 1.
+    # Both labels are necessary: only the early one can add D, while the late
+    # one is the best three-job terminal column. A,C is earlier and cheaper
+    # still, but has a DIFFERENT served mask and cannot dominate either label.
+    tasks = [_task(job, 0, 300) for job in ("a", "b", "c")] + [_task("d", 60, 60)]
+    edges = [_edge("start", "a"), _edge("start", "b"),
+             _edge("a", "b", travel=60, distance=10), _edge("b", "a", travel=120, distance=1),
+             _edge("a", "c"), _edge("b", "c"), _edge("c", "d")]
+    problem = _problem([_action("layout", "LAYOUT", 0, "start"),
+                        _action("wait", "WAIT", 30, "start")], [_scenario(tasks, edges)])
+    compressed = deepcopy(problem)
+    compressed["exact_chain_compression"] = True
+    fields = ("critical_now", "current_served", "carry_over_current_served", "expected_served",
+              "expected_empty_distance_m", "actual_first_empty_distance_m")
+    for policy in solver.POLICIES:
+        full = solver.solve_epoch(problem, policy)
+        reduced = solver.solve_epoch(compressed, policy)
+        assert {field: full[field] for field in fields} == {field: reduced[field] for field in fields}
+        assert full["selected_actions"] == reduced["selected_actions"]
+        assert reduced["expected_served"] == 4 and reduced["expected_empty_distance_m"] == 10
+        assert reduced["model"]["compression_statistics"]["max_pareto_labels_per_state"] == 2
+        assert reduced["model"]["complete_finite_domain"]
+        assert not reduced["model"]["all_task_sequences_enumerated"]
+        assert solver.validate_epoch_solution(compressed, reduced)["valid"]
+    for candidate in (problem, compressed):
+        cheaper = deepcopy(candidate)
+        cheaper["scenarios"][0]["connections"][-1]["supported"] = False
+        result = solver.solve_epoch(cheaper, "CHAIN_DEFER")
+        assert result["expected_served"] == 3 and result["expected_empty_distance_m"] == 1
+    dominated = deepcopy(compressed)
+    dominated["scenarios"][0]["connections"][3].update(travel_time_s=60, empty_distance_m=20)
+    dominated_result = solver.solve_epoch(dominated, "CHAIN_DEFER")
+    assert dominated_result["model"]["compression_statistics"]["dominated_prefixes"] > 0
+    # The expensive A,B,C branch was expanded first. Discovering the cheaper
+    # and earlier B,A,C branch later must replace its terminal descendants.
+    discovered_later = deepcopy(compressed)
+    discovered_later["scenarios"][0]["connections"][3]["travel_time_s"] = 0
+    replaced = solver.solve_epoch(discovered_later, "CHAIN_DEFER")
+    assert replaced["expected_served"] == 4 and replaced["expected_empty_distance_m"] == 1
+    assert replaced["model"]["compression_statistics"]["labels_removed_by_new_dominance"] > 0
+    # >4,000 raw permutations, but exactly 128 equivalent final job-mask
+    # columns. The retained-column limit must not apply to raw sequences.
+    jobs = [f"job_{index}" for index in range(7)]
+    dense_edges = [_edge("start", job) for job in jobs]
+    dense_edges += [_edge(origin, target) for origin in jobs for target in jobs if origin != target]
+    dense = _problem([_action("layout", "LAYOUT", 0, "start")],
+                     [_scenario([_task(job, 0, 300) for job in jobs], dense_edges)])
+    with pytest.raises(solver.RollingModelLimitError, match="chain limit"):
+        solver.solve_epoch(dense, "CHAIN_DEFER")
+    dense["exact_chain_compression"] = True
+    exact = solver.solve_epoch(dense, "CHAIN_DEFER")
+    assert exact["expected_served"] == 7
+    assert exact["model"]["scenario_chain_variables"] == 128
+    stats = exact["model"]["compression_statistics"]
+    assert stats["emitted_columns"] > stats["retained_columns"] and stats["dominated_prefixes"] > 0
+    with monkeypatch.context() as limited:
+        limited.setattr(solver, "MAX_PREFIX_LABELS_TOTAL", 2)
+        with pytest.raises(solver.RollingModelLimitError, match="prefix label limit"):
+            solver.solve_epoch(dense, "CHAIN_DEFER")
+
+
+def test_explicit_task_cap_up_to_64_preserves_default_20():
+    problem = _problem([_action("wait", "WAIT", 30, "start")],
+                       [_scenario([_task(f"forecast_{index}", 60, 60) for index in range(21)], [])])
+    with pytest.raises(solver.RollingModelLimitError, match="maximum 20"):
+        solver.solve_epoch(problem, "CHAIN_DEFER")
+    problem["task_limit_per_scenario"] = 21
+    result = solver.solve_epoch(problem, "CHAIN_DEFER")
+    assert result["model"]["task_limit_per_scenario"] == 21
+    assert not result["model"]["exact_chain_compression"]
+    assert result["model"]["default_task_limit_per_scenario"] == 20
+    problem["task_limit_per_scenario"] = 64
+    problem["exact_chain_compression"] = True
+    problem["scenarios"][0]["tasks"] = [_task(f"forecast_{index}", 60, 60) for index in range(64)]
+    assert solver.solve_epoch(problem, "CHAIN_DEFER")["model"]["hard_task_limit_per_scenario"] == 64
+    for value in (0, -1, True, 21.0, "21", 65):
+        invalid = deepcopy(problem)
+        invalid["task_limit_per_scenario"] = value
+        with pytest.raises(ValueError, match="task_limit_per_scenario"):
+            solver.solve_epoch(invalid, "CHAIN_DEFER")
+    problem["scenarios"][0]["tasks"].append(_task("too_many", 60, 60))
+    with pytest.raises(solver.RollingModelLimitError, match="maximum 64"):
+        solver.solve_epoch(problem, "CHAIN_DEFER")

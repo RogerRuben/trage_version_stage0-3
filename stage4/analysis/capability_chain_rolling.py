@@ -292,21 +292,27 @@ def first_actions(resources, pending, provider, now, cfg):
 
 def epoch_problem(resources, pending, forecasts, actions, provider, now, cfg):
     scenarios = []
+    resource_profiles = {r["resource_id"]:r["profile_id"] for r in resources}
     for forecast in forecasts:
         tasks = [*pending, *forecast["tasks"]]
         allowed = {t["job_id"] for t in tasks}
         readiness = {}
+        origin_profiles = {}
         for action in actions:
             loc = action["location_id"]
             readiness[loc] = min(action["ready_s"], readiness.get(loc, float("inf")))
+            origin_profiles.setdefault(loc, set()).add(resource_profiles[action["resource_id"]])
         for task in tasks:
             # Optimistic zero-pickup lower bound is safe for routing pruning.
             value = max(now, task["release_s"]) + task["service_time_s"]
             readiness[task["job_id"]] = min(value, readiness.get(task["job_id"], float("inf")))
+            origin_profiles.setdefault(task["job_id"], set()).update(task["compatible_profiles"])
         connections = []
         for origin, ready in readiness.items():
             for task in tasks:
                 if origin == task["job_id"] or ready > task["deadline_s"]:
+                    continue
+                if cfg.get("prune_connection_profiles", False) and not origin_profiles[origin].intersection(task["compatible_profiles"]):
                     continue
                 link = provider.connection(origin, task["job_id"], allowed)
                 # The constant routing snapshot is unchanged across model builds.
@@ -314,9 +320,14 @@ def epoch_problem(resources, pending, forecasts, actions, provider, now, cfg):
                     connections.append(link)
         scenarios.append(dict(scenario_id=forecast["scenario_id"], weight=forecast["weight"],
             tasks=tasks, connections=connections))
-    return dict(now_s=now, step_s=cfg["step_s"],
+    problem = dict(now_s=now, step_s=cfg["step_s"],
         resources=[{k:r[k] for k in ("resource_id", "profile_id", "admission_end_s")} for r in resources],
         actions=actions, scenarios=scenarios, solver_time_limit_s=cfg["solver_decision_limit_s"])
+    if "task_limit_per_scenario" in cfg:
+        problem["task_limit_per_scenario"] = cfg["task_limit_per_scenario"]
+    if "exact_chain_compression" in cfg:
+        problem["exact_chain_compression"] = cfg["exact_chain_compression"]
+    return problem
 
 
 def shared_initial_layout(provider, cohorts, sites, ranking, cfg):
