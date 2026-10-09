@@ -1,0 +1,1251 @@
+{
+  "status": "SCHEME_A_FINITE_JOINT_QUALITY_COMPLETE",
+  "kind": "JOINT_FINITE_CORE_AND_SAME_DOMAIN_QUALITY_NOT_NEW_POLICY_SERVICE_RATE_EXPERIMENT",
+  "execution_code_sha": "cf76f7ecdab7404c958b15d122e7c86b0a5ba3b7",
+  "config_sha256": "933e37ff901d8e48d7c47ef67d9b93837a951ca68dcb86bab0baacd967e0e965",
+  "config": {
+    "version": "scheme_a_joint_v1",
+    "source_local_output": "stage4/output/capability_chain_planning/local_v2",
+    "cases": [
+      "LOCAL_20161024_0730",
+      "LOCAL_20161024_1700"
+    ],
+    "history_dates": [
+      "20161010",
+      "20161017"
+    ],
+    "replay_date": "20161024",
+    "planning_horizon_s": 1800,
+    "coarse_reference_update_s": 300,
+    "step_s": 30,
+    "patience_s": 300,
+    "layout_modes": [
+      "HOTSPOT_FIXED",
+      "CHAIN_JOINT"
+    ],
+    "finite_quality_policy": "CHAIN_DEFER",
+    "layout_baseline_rule": "HIGHEST_EARLIER_HISTORY_ALL_DEMAND_SUBCELL_SAME_COMMON_SITES",
+    "cached_connection_domain": "REUSED_DIRECTED_PROFILE_SUPPORTED_LOCAL_SNAPSHOT_NO_NEW_ROUTING",
+    "maximum_runtime_s": 120,
+    "maximum_rss_mib": 1536,
+    "solver_decision_limit_s": 10.0,
+    "maximum_model_variables": 20000,
+    "maximum_model_nonzeros": 150000,
+    "full_day": false,
+    "native_execution": false,
+    "city_scale": false,
+    "formal_q10": false,
+    "parameter_search": false,
+    "model_retraining": false,
+    "new_routing": false,
+    "future_target_requests_used_for_layout": false,
+    "first_batch_scope": "JOINT_FINITE_CORE_AND_SAME_DOMAIN_QUALITY_NOT_NEW_POLICY_SERVICE_RATE_EXPERIMENT"
+  },
+  "cases": [
+    {
+      "case_id": "LOCAL_20161024_0730",
+      "source": "stage4\\output\\capability_chain_planning\\local_v2\\LOCAL_20161024_0730",
+      "sources_sha256": {
+        "input.json": "835e11519efd661a902387f63a2776f31060960c9b7cdc6b37f05d2f701d6a95",
+        "private_source_mapping.parquet": "aff8c84c1afe1a5a990e363362f3ed87d9ad0988a8d65491b7b6d3af710cfe5c",
+        "sparse_connections.parquet": "9c8f512310d5267ae6b902948cca2f75be66bca16fc58d47b745cfdca47c4809",
+        "idle_move_connections.parquet": "ebcabbf1cae2b726281fd8fec235f271f1745e15c593deb1b03e65dd14fdba59"
+      },
+      "candidate_site_count": 12,
+      "historical_scenario_task_counts": {
+        "20161010": 15,
+        "20161017": 14
+      },
+      "resources": 3,
+      "resource_profiles": [
+        "HV",
+        "HV",
+        "C"
+      ],
+      "models": [
+        {
+          "layout_mode": "HOTSPOT_FIXED",
+          "policy": "CHAIN_DEFER",
+          "opt_status": "OPTIMAL",
+          "expected_planned_services": 3.5,
+          "expected_planned_empty_distance_m": 2476.0,
+          "selected_layout": {
+            "C1": "S04",
+            "H1": "S04",
+            "H2": "S02"
+          },
+          "maximum_customer_chain_length": 2,
+          "maximum_C_customer_chain_length": 1,
+          "C_scenario_service_counts": {
+            "20161010": 0,
+            "20161017": 1
+          },
+          "model": {
+            "rows": 40,
+            "columns": 35,
+            "cols": 35,
+            "nonzeros": 120,
+            "nnz": 120,
+            "sparse": true,
+            "base_rows": 38,
+            "base_nonzeros": 70,
+            "first_action_variables": 3,
+            "scenario_chain_variables": 32,
+            "stable_first_actions_encoding": {
+              "kind": "EXACT_MIXED_RADIX_FIRST_ACTION_RANKS",
+              "tie_only": true,
+              "resource_order": [
+                "C1",
+                "H1",
+                "H2"
+              ],
+              "action_order": [
+                [
+                  "C1:LAYOUT:S04"
+                ],
+                [
+                  "H1:LAYOUT:S04"
+                ],
+                [
+                  "H2:LAYOUT:S02"
+                ]
+              ],
+              "radices": [
+                1,
+                1,
+                1
+              ],
+              "multipliers": [
+                1,
+                1,
+                1
+              ],
+              "maximum_code": 0
+            },
+            "chains_per_resource_scenario": [
+              {
+                "resource_id": "C1",
+                "scenario_id": "20161010",
+                "chain_count": 1,
+                "per_first_action": {
+                  "C1:LAYOUT:S04": 1
+                },
+                "compression_statistics": {
+                  "enabled": true,
+                  "expanded_prefixes": 1,
+                  "dominated_prefixes": 0,
+                  "emitted_columns": 1,
+                  "retained_columns": 1,
+                  "accepted_prefix_labels": 1,
+                  "labels_removed_by_new_dominance": 0,
+                  "max_pareto_labels_per_state": 1,
+                  "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+                  "max_total_accepted_prefix_labels": 50000
+                }
+              },
+              {
+                "resource_id": "C1",
+                "scenario_id": "20161017",
+                "chain_count": 3,
+                "per_first_action": {
+                  "C1:LAYOUT:S04": 3
+                },
+                "compression_statistics": {
+                  "enabled": true,
+                  "expanded_prefixes": 3,
+                  "dominated_prefixes": 0,
+                  "emitted_columns": 3,
+                  "retained_columns": 3,
+                  "accepted_prefix_labels": 3,
+                  "labels_removed_by_new_dominance": 0,
+                  "max_pareto_labels_per_state": 1,
+                  "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+                  "max_total_accepted_prefix_labels": 50000
+                }
+              },
+              {
+                "resource_id": "H1",
+                "scenario_id": "20161010",
+                "chain_count": 8,
+                "per_first_action": {
+                  "H1:LAYOUT:S04": 8
+                },
+                "compression_statistics": {
+                  "enabled": true,
+                  "expanded_prefixes": 8,
+                  "dominated_prefixes": 0,
+                  "emitted_columns": 8,
+                  "retained_columns": 8,
+                  "accepted_prefix_labels": 8,
+                  "labels_removed_by_new_dominance": 0,
+                  "max_pareto_labels_per_state": 1,
+                  "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+                  "max_total_accepted_prefix_labels": 50000
+                }
+              },
+              {
+                "resource_id": "H1",
+                "scenario_id": "20161017",
+                "chain_count": 9,
+                "per_first_action": {
+                  "H1:LAYOUT:S04": 9
+                },
+                "compression_statistics": {
+                  "enabled": true,
+                  "expanded_prefixes": 9,
+                  "dominated_prefixes": 0,
+                  "emitted_columns": 9,
+                  "retained_columns": 9,
+                  "accepted_prefix_labels": 9,
+                  "labels_removed_by_new_dominance": 0,
+                  "max_pareto_labels_per_state": 1,
+                  "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+                  "max_total_accepted_prefix_labels": 50000
+                }
+              },
+              {
+                "resource_id": "H2",
+                "scenario_id": "20161010",
+                "chain_count": 5,
+                "per_first_action": {
+                  "H2:LAYOUT:S02": 5
+                },
+                "compression_statistics": {
+                  "enabled": true,
+                  "expanded_prefixes": 5,
+                  "dominated_prefixes": 0,
+                  "emitted_columns": 5,
+                  "retained_columns": 5,
+                  "accepted_prefix_labels": 5,
+                  "labels_removed_by_new_dominance": 0,
+                  "max_pareto_labels_per_state": 1,
+                  "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+                  "max_total_accepted_prefix_labels": 50000
+                }
+              },
+              {
+                "resource_id": "H2",
+                "scenario_id": "20161017",
+                "chain_count": 6,
+                "per_first_action": {
+                  "H2:LAYOUT:S02": 6
+                },
+                "compression_statistics": {
+                  "enabled": true,
+                  "expanded_prefixes": 6,
+                  "dominated_prefixes": 0,
+                  "emitted_columns": 6,
+                  "retained_columns": 6,
+                  "accepted_prefix_labels": 6,
+                  "labels_removed_by_new_dominance": 0,
+                  "max_pareto_labels_per_state": 1,
+                  "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+                  "max_total_accepted_prefix_labels": 50000
+                }
+              }
+            ],
+            "complete_enumeration": true,
+            "complete_finite_domain": true,
+            "task_limit_per_scenario": 64,
+            "hard_task_limit_per_scenario": 64,
+            "default_task_limit_per_scenario": 20,
+            "exact_chain_compression": true,
+            "all_task_sequences_enumerated": false,
+            "complete_enumeration_scope": "EXACT_EQUIVALENT_PREFIX_AND_MASK_COLUMN_REPRESENTATION",
+            "compression_statistics": {
+              "enabled": true,
+              "expanded_prefixes": 32,
+              "dominated_prefixes": 0,
+              "emitted_columns": 32,
+              "retained_columns": 32,
+              "accepted_prefix_labels": 32,
+              "labels_removed_by_new_dominance": 0,
+              "max_pareto_labels_per_state": 1,
+              "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+              "max_total_accepted_prefix_labels": 50000
+            },
+            "max_variables": 20000,
+            "max_nonzeros": 150000,
+            "max_chains_per_resource_scenario": 4000
+          },
+          "quality_certificate": {
+            "status": "OPTIMAL_LP_WITH_EXACT_RATIONAL_DUAL_UPPER_CERTIFICATE",
+            "LP_upper_bound": 3.5,
+            "LP_upper_bound_exact": "7/2",
+            "lp_primal_expected_service": 3.5,
+            "integer_optimal_expected_service": 3.5,
+            "integer_optimal_expected_service_exact": "7/2",
+            "integer_to_bound_gap": 0.0,
+            "bound_scope": "COMPLETE_SUPPLIED_FINITE_CONSTANT_TIME_CHAIN_DOMAIN_CONDITIONED_ON_PRECEDING_INTEGER_TIERS",
+            "conditioned_tiers": {
+              "critical_now": 0.0
+            },
+            "expected_service_optimal_face_not_locked": true,
+            "distance_and_action_tie_faces_not_locked": true,
+            "exact_dual_arithmetic": true,
+            "sparse": true,
+            "lp_rows": 38,
+            "lp_columns": 35,
+            "lp_nonzeros": 70,
+            "max_lp_primal_row_violation": 0.0,
+            "runtime_s": 0.003258599999753642,
+            "online_or_citywide_optimality_claimed": false,
+            "complete_supplied_domain": true,
+            "integer_service_tiers_exactly_certified": true,
+            "total_decision_budget_s": 10.0,
+            "all_preparation_mip_lp_certification_share_budget": true
+          },
+          "timing_s": {
+            "preparation": 0.0011931999997614184,
+            "enumeration": 0.0006334999998216517,
+            "sparse_master": 8.630000047560316e-05,
+            "lexicographic_milp": 0.022356999999828986,
+            "optional_lp_and_certificate": 0.003258599999753642,
+            "independent_validation": 0.0014144999986456241,
+            "total": 0.02968229999896721
+          },
+          "validation": {
+            "valid": true,
+            "checked_first_actions": 3,
+            "checked_recourse_paths": 6,
+            "current_served": 0,
+            "critical_now": 0,
+            "expected_served": 3.5,
+            "expected_empty_distance_m": 2476.0,
+            "independent_reconstruction": true,
+            "realized_service_is_first_actions_only": true
+          },
+          "scheme_a_scope": {
+            "kind": "FINITE_JOINT_LAYOUT_AND_MULTI_SERVICE_CHAIN_CURRENT_ACTION_PROTOTYPE",
+            "maximum_planning_horizon_s": 1800,
+            "execution_step_s": 30,
+            "coarse_history_refresh_s": 300,
+            "refresh_is_input_reference_not_separate_macro_optimizer": true,
+            "scenario_paths_are_value_approximations_not_future_execution": true,
+            "only_shared_first_action_executable": true,
+            "customer_and_connector_profiles_both_enforced": true,
+            "future_customer_to_customer_connections": "SUPPLIED_DIRECTED_SUPPORTED_SNAPSHOT",
+            "current_relocation_is_in_same_master_as_SERVE_WAIT_BUSY": true,
+            "future_independent_relocations_between_customers_in_recourse": false,
+            "native_execution": false,
+            "city_scale": false,
+            "formal_q10": false
+          }
+        },
+        {
+          "layout_mode": "CHAIN_JOINT",
+          "policy": "CHAIN_DEFER",
+          "opt_status": "OPTIMAL",
+          "expected_planned_services": 3.5,
+          "expected_planned_empty_distance_m": 1838.0,
+          "selected_layout": {
+            "C1": "S03",
+            "H1": "S04",
+            "H2": "S02"
+          },
+          "maximum_customer_chain_length": 2,
+          "maximum_C_customer_chain_length": 1,
+          "C_scenario_service_counts": {
+            "20161010": 0,
+            "20161017": 1
+          },
+          "model": {
+            "rows": 63,
+            "columns": 72,
+            "cols": 72,
+            "nonzeros": 202,
+            "nnz": 202,
+            "sparse": true,
+            "base_rows": 60,
+            "base_nonzeros": 133,
+            "first_action_variables": 14,
+            "scenario_chain_variables": 58,
+            "stable_first_actions_encoding": {
+              "kind": "EXACT_MIXED_RADIX_FIRST_ACTION_RANKS",
+              "tie_only": true,
+              "resource_order": [
+                "C1",
+                "H1",
+                "H2"
+              ],
+              "action_order": [
+                [
+                  "C1:LAYOUT:S01",
+                  "C1:LAYOUT:S02",
+                  "C1:LAYOUT:S03",
+                  "C1:LAYOUT:S04",
+                  "C1:LAYOUT:S05",
+                  "C1:LAYOUT:S06",
+                  "C1:LAYOUT:S07",
+                  "C1:LAYOUT:S08",
+                  "C1:LAYOUT:S09",
+                  "C1:LAYOUT:S10",
+                  "C1:LAYOUT:S11",
+                  "C1:LAYOUT:S12"
+                ],
+                [
+                  "H1:LAYOUT:S04"
+                ],
+                [
+                  "H2:LAYOUT:S02"
+                ]
+              ],
+              "radices": [
+                12,
+                1,
+                1
+              ],
+              "multipliers": [
+                1,
+                1,
+                1
+              ],
+              "maximum_code": 11
+            },
+            "chains_per_resource_scenario": [
+              {
+                "resource_id": "C1",
+                "scenario_id": "20161010",
+                "chain_count": 13,
+                "per_first_action": {
+                  "C1:LAYOUT:S01": 1,
+                  "C1:LAYOUT:S02": 1,
+                  "C1:LAYOUT:S03": 1,
+                  "C1:LAYOUT:S04": 1,
+                  "C1:LAYOUT:S05": 1,
+                  "C1:LAYOUT:S06": 1,
+                  "C1:LAYOUT:S07": 1,
+                  "C1:LAYOUT:S08": 1,
+                  "C1:LAYOUT:S09": 1,
+                  "C1:LAYOUT:S10": 1,
+                  "C1:LAYOUT:S11": 1,
+                  "C1:LAYOUT:S12": 2
+                },
+                "compression_statistics": {
+                  "enabled": true,
+                  "expanded_prefixes": 13,
+                  "dominated_prefixes": 0,
+                  "emitted_columns": 13,
+                  "retained_columns": 13,
+                  "accepted_prefix_labels": 13,
+                  "labels_removed_by_new_dominance": 0,
+                  "max_pareto_labels_per_state": 1,
+                  "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+                  "max_total_accepted_prefix_labels": 50000
+                }
+              },
+              {
+                "resource_id": "C1",
+                "scenario_id": "20161017",
+                "chain_count": 17,
+                "per_first_action": {
+                  "C1:LAYOUT:S01": 1,
+                  "C1:LAYOUT:S02": 1,
+                  "C1:LAYOUT:S03": 2,
+                  "C1:LAYOUT:S04": 3,
+                  "C1:LAYOUT:S05": 1,
+                  "C1:LAYOUT:S06": 1,
+                  "C1:LAYOUT:S07": 2,
+                  "C1:LAYOUT:S08": 1,
+                  "C1:LAYOUT:S09": 1,
+                  "C1:LAYOUT:S10": 1,
+                  "C1:LAYOUT:S11": 1,
+                  "C1:LAYOUT:S12": 2
+                },
+                "compression_statistics": {
+                  "enabled": true,
+                  "expanded_prefixes": 17,
+                  "dominated_prefixes": 0,
+                  "emitted_columns": 17,
+                  "retained_columns": 17,
+                  "accepted_prefix_labels": 17,
+                  "labels_removed_by_new_dominance": 0,
+                  "max_pareto_labels_per_state": 1,
+                  "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+                  "max_total_accepted_prefix_labels": 50000
+                }
+              },
+              {
+                "resource_id": "H1",
+                "scenario_id": "20161010",
+                "chain_count": 8,
+                "per_first_action": {
+                  "H1:LAYOUT:S04": 8
+                },
+                "compression_statistics": {
+                  "enabled": true,
+                  "expanded_prefixes": 8,
+                  "dominated_prefixes": 0,
+                  "emitted_columns": 8,
+                  "retained_columns": 8,
+                  "accepted_prefix_labels": 8,
+                  "labels_removed_by_new_dominance": 0,
+                  "max_pareto_labels_per_state": 1,
+                  "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+                  "max_total_accepted_prefix_labels": 50000
+                }
+              },
+              {
+                "resource_id": "H1",
+                "scenario_id": "20161017",
+                "chain_count": 9,
+                "per_first_action": {
+                  "H1:LAYOUT:S04": 9
+                },
+                "compression_statistics": {
+                  "enabled": true,
+                  "expanded_prefixes": 9,
+                  "dominated_prefixes": 0,
+                  "emitted_columns": 9,
+                  "retained_columns": 9,
+                  "accepted_prefix_labels": 9,
+                  "labels_removed_by_new_dominance": 0,
+                  "max_pareto_labels_per_state": 1,
+                  "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+                  "max_total_accepted_prefix_labels": 50000
+                }
+              },
+              {
+                "resource_id": "H2",
+                "scenario_id": "20161010",
+                "chain_count": 5,
+                "per_first_action": {
+                  "H2:LAYOUT:S02": 5
+                },
+                "compression_statistics": {
+                  "enabled": true,
+                  "expanded_prefixes": 5,
+                  "dominated_prefixes": 0,
+                  "emitted_columns": 5,
+                  "retained_columns": 5,
+                  "accepted_prefix_labels": 5,
+                  "labels_removed_by_new_dominance": 0,
+                  "max_pareto_labels_per_state": 1,
+                  "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+                  "max_total_accepted_prefix_labels": 50000
+                }
+              },
+              {
+                "resource_id": "H2",
+                "scenario_id": "20161017",
+                "chain_count": 6,
+                "per_first_action": {
+                  "H2:LAYOUT:S02": 6
+                },
+                "compression_statistics": {
+                  "enabled": true,
+                  "expanded_prefixes": 6,
+                  "dominated_prefixes": 0,
+                  "emitted_columns": 6,
+                  "retained_columns": 6,
+                  "accepted_prefix_labels": 6,
+                  "labels_removed_by_new_dominance": 0,
+                  "max_pareto_labels_per_state": 1,
+                  "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+                  "max_total_accepted_prefix_labels": 50000
+                }
+              }
+            ],
+            "complete_enumeration": true,
+            "complete_finite_domain": true,
+            "task_limit_per_scenario": 64,
+            "hard_task_limit_per_scenario": 64,
+            "default_task_limit_per_scenario": 20,
+            "exact_chain_compression": true,
+            "all_task_sequences_enumerated": false,
+            "complete_enumeration_scope": "EXACT_EQUIVALENT_PREFIX_AND_MASK_COLUMN_REPRESENTATION",
+            "compression_statistics": {
+              "enabled": true,
+              "expanded_prefixes": 58,
+              "dominated_prefixes": 0,
+              "emitted_columns": 58,
+              "retained_columns": 58,
+              "accepted_prefix_labels": 58,
+              "labels_removed_by_new_dominance": 0,
+              "max_pareto_labels_per_state": 1,
+              "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+              "max_total_accepted_prefix_labels": 50000
+            },
+            "max_variables": 20000,
+            "max_nonzeros": 150000,
+            "max_chains_per_resource_scenario": 4000
+          },
+          "quality_certificate": {
+            "status": "OPTIMAL_LP_WITH_EXACT_RATIONAL_DUAL_UPPER_CERTIFICATE",
+            "LP_upper_bound": 3.5,
+            "LP_upper_bound_exact": "7/2",
+            "lp_primal_expected_service": 3.5,
+            "integer_optimal_expected_service": 3.5,
+            "integer_optimal_expected_service_exact": "7/2",
+            "integer_to_bound_gap": 0.0,
+            "bound_scope": "COMPLETE_SUPPLIED_FINITE_CONSTANT_TIME_CHAIN_DOMAIN_CONDITIONED_ON_PRECEDING_INTEGER_TIERS",
+            "conditioned_tiers": {
+              "critical_now": 0.0
+            },
+            "expected_service_optimal_face_not_locked": true,
+            "distance_and_action_tie_faces_not_locked": true,
+            "exact_dual_arithmetic": true,
+            "sparse": true,
+            "lp_rows": 60,
+            "lp_columns": 72,
+            "lp_nonzeros": 133,
+            "max_lp_primal_row_violation": 0.0,
+            "runtime_s": 0.002495800001270254,
+            "online_or_citywide_optimality_claimed": false,
+            "complete_supplied_domain": true,
+            "integer_service_tiers_exactly_certified": true,
+            "total_decision_budget_s": 10.0,
+            "all_preparation_mip_lp_certification_share_budget": true
+          },
+          "timing_s": {
+            "preparation": 0.001388500000757631,
+            "enumeration": 0.0011634000002231915,
+            "sparse_master": 0.00012659999993047677,
+            "lexicographic_milp": 0.021314600000550854,
+            "optional_lp_and_certificate": 0.002495800001270254,
+            "independent_validation": 0.0013299000002007233,
+            "total": 0.02865860000019893
+          },
+          "validation": {
+            "valid": true,
+            "checked_first_actions": 3,
+            "checked_recourse_paths": 6,
+            "current_served": 0,
+            "critical_now": 0,
+            "expected_served": 3.5,
+            "expected_empty_distance_m": 1838.0,
+            "independent_reconstruction": true,
+            "realized_service_is_first_actions_only": true
+          },
+          "scheme_a_scope": {
+            "kind": "FINITE_JOINT_LAYOUT_AND_MULTI_SERVICE_CHAIN_CURRENT_ACTION_PROTOTYPE",
+            "maximum_planning_horizon_s": 1800,
+            "execution_step_s": 30,
+            "coarse_history_refresh_s": 300,
+            "refresh_is_input_reference_not_separate_macro_optimizer": true,
+            "scenario_paths_are_value_approximations_not_future_execution": true,
+            "only_shared_first_action_executable": true,
+            "customer_and_connector_profiles_both_enforced": true,
+            "future_customer_to_customer_connections": "SUPPLIED_DIRECTED_SUPPORTED_SNAPSHOT",
+            "current_relocation_is_in_same_master_as_SERVE_WAIT_BUSY": true,
+            "future_independent_relocations_between_customers_in_recourse": false,
+            "native_execution": false,
+            "city_scale": false,
+            "formal_q10": false
+          }
+        }
+      ],
+      "joint_minus_fixed_expected_services": 0.0,
+      "joint_minus_fixed_expected_empty_m": -638.0,
+      "missing_snapshot_queries": {}
+    },
+    {
+      "case_id": "LOCAL_20161024_1700",
+      "source": "stage4\\output\\capability_chain_planning\\local_v2\\LOCAL_20161024_1700",
+      "sources_sha256": {
+        "input.json": "8023ba4a6ea9c2b81114eb2095df9d0c19bb58f5bbf6ef50ee5e4a0ee2c8e805",
+        "private_source_mapping.parquet": "77d0f173294b44aa3723ead3cf655ab678528c5ac5553830beffe76f037224e0",
+        "sparse_connections.parquet": "15c2468005912b7bd706431c5723872c15cf53a98446fa897253f72cba4d1075",
+        "idle_move_connections.parquet": "bbb6eed14d92ed972016937f6dc0648b7f45a791789492ed4be95605b4092b3b"
+      },
+      "candidate_site_count": 12,
+      "historical_scenario_task_counts": {
+        "20161010": 21,
+        "20161017": 26
+      },
+      "resources": 3,
+      "resource_profiles": [
+        "HV",
+        "HV",
+        "C"
+      ],
+      "models": [
+        {
+          "layout_mode": "HOTSPOT_FIXED",
+          "policy": "CHAIN_DEFER",
+          "opt_status": "OPTIMAL",
+          "expected_planned_services": 3.0,
+          "expected_planned_empty_distance_m": 1836.0,
+          "selected_layout": {
+            "C1": "S04",
+            "H1": "S04",
+            "H2": "S02"
+          },
+          "maximum_customer_chain_length": 2,
+          "maximum_C_customer_chain_length": 1,
+          "C_scenario_service_counts": {
+            "20161010": 1,
+            "20161017": 0
+          },
+          "model": {
+            "rows": 58,
+            "columns": 67,
+            "cols": 67,
+            "nonzeros": 256,
+            "nnz": 256,
+            "sparse": true,
+            "base_rows": 56,
+            "base_nonzeros": 140,
+            "first_action_variables": 3,
+            "scenario_chain_variables": 64,
+            "stable_first_actions_encoding": {
+              "kind": "EXACT_MIXED_RADIX_FIRST_ACTION_RANKS",
+              "tie_only": true,
+              "resource_order": [
+                "C1",
+                "H1",
+                "H2"
+              ],
+              "action_order": [
+                [
+                  "C1:LAYOUT:S04"
+                ],
+                [
+                  "H1:LAYOUT:S04"
+                ],
+                [
+                  "H2:LAYOUT:S02"
+                ]
+              ],
+              "radices": [
+                1,
+                1,
+                1
+              ],
+              "multipliers": [
+                1,
+                1,
+                1
+              ],
+              "maximum_code": 0
+            },
+            "chains_per_resource_scenario": [
+              {
+                "resource_id": "C1",
+                "scenario_id": "20161010",
+                "chain_count": 2,
+                "per_first_action": {
+                  "C1:LAYOUT:S04": 2
+                },
+                "compression_statistics": {
+                  "enabled": true,
+                  "expanded_prefixes": 2,
+                  "dominated_prefixes": 0,
+                  "emitted_columns": 2,
+                  "retained_columns": 2,
+                  "accepted_prefix_labels": 2,
+                  "labels_removed_by_new_dominance": 0,
+                  "max_pareto_labels_per_state": 1,
+                  "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+                  "max_total_accepted_prefix_labels": 50000
+                }
+              },
+              {
+                "resource_id": "C1",
+                "scenario_id": "20161017",
+                "chain_count": 1,
+                "per_first_action": {
+                  "C1:LAYOUT:S04": 1
+                },
+                "compression_statistics": {
+                  "enabled": true,
+                  "expanded_prefixes": 1,
+                  "dominated_prefixes": 0,
+                  "emitted_columns": 1,
+                  "retained_columns": 1,
+                  "accepted_prefix_labels": 1,
+                  "labels_removed_by_new_dominance": 0,
+                  "max_pareto_labels_per_state": 1,
+                  "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+                  "max_total_accepted_prefix_labels": 50000
+                }
+              },
+              {
+                "resource_id": "H1",
+                "scenario_id": "20161010",
+                "chain_count": 9,
+                "per_first_action": {
+                  "H1:LAYOUT:S04": 9
+                },
+                "compression_statistics": {
+                  "enabled": true,
+                  "expanded_prefixes": 9,
+                  "dominated_prefixes": 0,
+                  "emitted_columns": 9,
+                  "retained_columns": 9,
+                  "accepted_prefix_labels": 9,
+                  "labels_removed_by_new_dominance": 0,
+                  "max_pareto_labels_per_state": 1,
+                  "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+                  "max_total_accepted_prefix_labels": 50000
+                }
+              },
+              {
+                "resource_id": "H1",
+                "scenario_id": "20161017",
+                "chain_count": 14,
+                "per_first_action": {
+                  "H1:LAYOUT:S04": 14
+                },
+                "compression_statistics": {
+                  "enabled": true,
+                  "expanded_prefixes": 14,
+                  "dominated_prefixes": 0,
+                  "emitted_columns": 14,
+                  "retained_columns": 14,
+                  "accepted_prefix_labels": 14,
+                  "labels_removed_by_new_dominance": 0,
+                  "max_pareto_labels_per_state": 1,
+                  "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+                  "max_total_accepted_prefix_labels": 50000
+                }
+              },
+              {
+                "resource_id": "H2",
+                "scenario_id": "20161010",
+                "chain_count": 11,
+                "per_first_action": {
+                  "H2:LAYOUT:S02": 11
+                },
+                "compression_statistics": {
+                  "enabled": true,
+                  "expanded_prefixes": 11,
+                  "dominated_prefixes": 0,
+                  "emitted_columns": 11,
+                  "retained_columns": 11,
+                  "accepted_prefix_labels": 11,
+                  "labels_removed_by_new_dominance": 0,
+                  "max_pareto_labels_per_state": 1,
+                  "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+                  "max_total_accepted_prefix_labels": 50000
+                }
+              },
+              {
+                "resource_id": "H2",
+                "scenario_id": "20161017",
+                "chain_count": 27,
+                "per_first_action": {
+                  "H2:LAYOUT:S02": 27
+                },
+                "compression_statistics": {
+                  "enabled": true,
+                  "expanded_prefixes": 27,
+                  "dominated_prefixes": 0,
+                  "emitted_columns": 27,
+                  "retained_columns": 27,
+                  "accepted_prefix_labels": 27,
+                  "labels_removed_by_new_dominance": 0,
+                  "max_pareto_labels_per_state": 1,
+                  "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+                  "max_total_accepted_prefix_labels": 50000
+                }
+              }
+            ],
+            "complete_enumeration": true,
+            "complete_finite_domain": true,
+            "task_limit_per_scenario": 64,
+            "hard_task_limit_per_scenario": 64,
+            "default_task_limit_per_scenario": 20,
+            "exact_chain_compression": true,
+            "all_task_sequences_enumerated": false,
+            "complete_enumeration_scope": "EXACT_EQUIVALENT_PREFIX_AND_MASK_COLUMN_REPRESENTATION",
+            "compression_statistics": {
+              "enabled": true,
+              "expanded_prefixes": 64,
+              "dominated_prefixes": 0,
+              "emitted_columns": 64,
+              "retained_columns": 64,
+              "accepted_prefix_labels": 64,
+              "labels_removed_by_new_dominance": 0,
+              "max_pareto_labels_per_state": 1,
+              "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+              "max_total_accepted_prefix_labels": 50000
+            },
+            "max_variables": 20000,
+            "max_nonzeros": 150000,
+            "max_chains_per_resource_scenario": 4000
+          },
+          "quality_certificate": {
+            "status": "OPTIMAL_LP_WITH_EXACT_RATIONAL_DUAL_UPPER_CERTIFICATE",
+            "LP_upper_bound": 3.0,
+            "LP_upper_bound_exact": "3",
+            "lp_primal_expected_service": 3.0,
+            "integer_optimal_expected_service": 3.0,
+            "integer_optimal_expected_service_exact": "3",
+            "integer_to_bound_gap": 0.0,
+            "bound_scope": "COMPLETE_SUPPLIED_FINITE_CONSTANT_TIME_CHAIN_DOMAIN_CONDITIONED_ON_PRECEDING_INTEGER_TIERS",
+            "conditioned_tiers": {
+              "critical_now": 0.0
+            },
+            "expected_service_optimal_face_not_locked": true,
+            "distance_and_action_tie_faces_not_locked": true,
+            "exact_dual_arithmetic": true,
+            "sparse": true,
+            "lp_rows": 56,
+            "lp_columns": 67,
+            "lp_nonzeros": 140,
+            "max_lp_primal_row_violation": 0.0,
+            "runtime_s": 0.0023951999992277706,
+            "online_or_citywide_optimality_claimed": false,
+            "complete_supplied_domain": true,
+            "integer_service_tiers_exactly_certified": true,
+            "total_decision_budget_s": 10.0,
+            "all_preparation_mip_lp_certification_share_budget": true
+          },
+          "timing_s": {
+            "preparation": 0.0011907999996765284,
+            "enumeration": 0.0019400000001041917,
+            "sparse_master": 0.00011379999887140002,
+            "lexicographic_milp": 0.004988499998944462,
+            "optional_lp_and_certificate": 0.0023951999992277706,
+            "independent_validation": 0.0015120999996725004,
+            "total": 0.012811800001145457
+          },
+          "validation": {
+            "valid": true,
+            "checked_first_actions": 3,
+            "checked_recourse_paths": 6,
+            "current_served": 0,
+            "critical_now": 0,
+            "expected_served": 3.0,
+            "expected_empty_distance_m": 1836.0,
+            "independent_reconstruction": true,
+            "realized_service_is_first_actions_only": true
+          },
+          "scheme_a_scope": {
+            "kind": "FINITE_JOINT_LAYOUT_AND_MULTI_SERVICE_CHAIN_CURRENT_ACTION_PROTOTYPE",
+            "maximum_planning_horizon_s": 1800,
+            "execution_step_s": 30,
+            "coarse_history_refresh_s": 300,
+            "refresh_is_input_reference_not_separate_macro_optimizer": true,
+            "scenario_paths_are_value_approximations_not_future_execution": true,
+            "only_shared_first_action_executable": true,
+            "customer_and_connector_profiles_both_enforced": true,
+            "future_customer_to_customer_connections": "SUPPLIED_DIRECTED_SUPPORTED_SNAPSHOT",
+            "current_relocation_is_in_same_master_as_SERVE_WAIT_BUSY": true,
+            "future_independent_relocations_between_customers_in_recourse": false,
+            "native_execution": false,
+            "city_scale": false,
+            "formal_q10": false
+          }
+        },
+        {
+          "layout_mode": "CHAIN_JOINT",
+          "policy": "CHAIN_DEFER",
+          "opt_status": "OPTIMAL",
+          "expected_planned_services": 3.0,
+          "expected_planned_empty_distance_m": 1198.0,
+          "selected_layout": {
+            "C1": "S03",
+            "H1": "S04",
+            "H2": "S02"
+          },
+          "maximum_customer_chain_length": 2,
+          "maximum_C_customer_chain_length": 1,
+          "C_scenario_service_counts": {
+            "20161010": 1,
+            "20161017": 0
+          },
+          "model": {
+            "rows": 81,
+            "columns": 103,
+            "cols": 103,
+            "nonzeros": 334,
+            "nnz": 334,
+            "sparse": true,
+            "base_rows": 78,
+            "base_nonzeros": 201,
+            "first_action_variables": 14,
+            "scenario_chain_variables": 89,
+            "stable_first_actions_encoding": {
+              "kind": "EXACT_MIXED_RADIX_FIRST_ACTION_RANKS",
+              "tie_only": true,
+              "resource_order": [
+                "C1",
+                "H1",
+                "H2"
+              ],
+              "action_order": [
+                [
+                  "C1:LAYOUT:S01",
+                  "C1:LAYOUT:S02",
+                  "C1:LAYOUT:S03",
+                  "C1:LAYOUT:S04",
+                  "C1:LAYOUT:S05",
+                  "C1:LAYOUT:S06",
+                  "C1:LAYOUT:S07",
+                  "C1:LAYOUT:S08",
+                  "C1:LAYOUT:S09",
+                  "C1:LAYOUT:S10",
+                  "C1:LAYOUT:S11",
+                  "C1:LAYOUT:S12"
+                ],
+                [
+                  "H1:LAYOUT:S04"
+                ],
+                [
+                  "H2:LAYOUT:S02"
+                ]
+              ],
+              "radices": [
+                12,
+                1,
+                1
+              ],
+              "multipliers": [
+                1,
+                1,
+                1
+              ],
+              "maximum_code": 11
+            },
+            "chains_per_resource_scenario": [
+              {
+                "resource_id": "C1",
+                "scenario_id": "20161010",
+                "chain_count": 16,
+                "per_first_action": {
+                  "C1:LAYOUT:S01": 1,
+                  "C1:LAYOUT:S02": 1,
+                  "C1:LAYOUT:S03": 2,
+                  "C1:LAYOUT:S04": 2,
+                  "C1:LAYOUT:S05": 1,
+                  "C1:LAYOUT:S06": 1,
+                  "C1:LAYOUT:S07": 2,
+                  "C1:LAYOUT:S08": 1,
+                  "C1:LAYOUT:S09": 1,
+                  "C1:LAYOUT:S10": 2,
+                  "C1:LAYOUT:S11": 1,
+                  "C1:LAYOUT:S12": 1
+                },
+                "compression_statistics": {
+                  "enabled": true,
+                  "expanded_prefixes": 16,
+                  "dominated_prefixes": 0,
+                  "emitted_columns": 16,
+                  "retained_columns": 16,
+                  "accepted_prefix_labels": 16,
+                  "labels_removed_by_new_dominance": 0,
+                  "max_pareto_labels_per_state": 1,
+                  "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+                  "max_total_accepted_prefix_labels": 50000
+                }
+              },
+              {
+                "resource_id": "C1",
+                "scenario_id": "20161017",
+                "chain_count": 12,
+                "per_first_action": {
+                  "C1:LAYOUT:S01": 1,
+                  "C1:LAYOUT:S02": 1,
+                  "C1:LAYOUT:S03": 1,
+                  "C1:LAYOUT:S04": 1,
+                  "C1:LAYOUT:S05": 1,
+                  "C1:LAYOUT:S06": 1,
+                  "C1:LAYOUT:S07": 1,
+                  "C1:LAYOUT:S08": 1,
+                  "C1:LAYOUT:S09": 1,
+                  "C1:LAYOUT:S10": 1,
+                  "C1:LAYOUT:S11": 1,
+                  "C1:LAYOUT:S12": 1
+                },
+                "compression_statistics": {
+                  "enabled": true,
+                  "expanded_prefixes": 12,
+                  "dominated_prefixes": 0,
+                  "emitted_columns": 12,
+                  "retained_columns": 12,
+                  "accepted_prefix_labels": 12,
+                  "labels_removed_by_new_dominance": 0,
+                  "max_pareto_labels_per_state": 1,
+                  "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+                  "max_total_accepted_prefix_labels": 50000
+                }
+              },
+              {
+                "resource_id": "H1",
+                "scenario_id": "20161010",
+                "chain_count": 9,
+                "per_first_action": {
+                  "H1:LAYOUT:S04": 9
+                },
+                "compression_statistics": {
+                  "enabled": true,
+                  "expanded_prefixes": 9,
+                  "dominated_prefixes": 0,
+                  "emitted_columns": 9,
+                  "retained_columns": 9,
+                  "accepted_prefix_labels": 9,
+                  "labels_removed_by_new_dominance": 0,
+                  "max_pareto_labels_per_state": 1,
+                  "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+                  "max_total_accepted_prefix_labels": 50000
+                }
+              },
+              {
+                "resource_id": "H1",
+                "scenario_id": "20161017",
+                "chain_count": 14,
+                "per_first_action": {
+                  "H1:LAYOUT:S04": 14
+                },
+                "compression_statistics": {
+                  "enabled": true,
+                  "expanded_prefixes": 14,
+                  "dominated_prefixes": 0,
+                  "emitted_columns": 14,
+                  "retained_columns": 14,
+                  "accepted_prefix_labels": 14,
+                  "labels_removed_by_new_dominance": 0,
+                  "max_pareto_labels_per_state": 1,
+                  "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+                  "max_total_accepted_prefix_labels": 50000
+                }
+              },
+              {
+                "resource_id": "H2",
+                "scenario_id": "20161010",
+                "chain_count": 11,
+                "per_first_action": {
+                  "H2:LAYOUT:S02": 11
+                },
+                "compression_statistics": {
+                  "enabled": true,
+                  "expanded_prefixes": 11,
+                  "dominated_prefixes": 0,
+                  "emitted_columns": 11,
+                  "retained_columns": 11,
+                  "accepted_prefix_labels": 11,
+                  "labels_removed_by_new_dominance": 0,
+                  "max_pareto_labels_per_state": 1,
+                  "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+                  "max_total_accepted_prefix_labels": 50000
+                }
+              },
+              {
+                "resource_id": "H2",
+                "scenario_id": "20161017",
+                "chain_count": 27,
+                "per_first_action": {
+                  "H2:LAYOUT:S02": 27
+                },
+                "compression_statistics": {
+                  "enabled": true,
+                  "expanded_prefixes": 27,
+                  "dominated_prefixes": 0,
+                  "emitted_columns": 27,
+                  "retained_columns": 27,
+                  "accepted_prefix_labels": 27,
+                  "labels_removed_by_new_dominance": 0,
+                  "max_pareto_labels_per_state": 1,
+                  "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+                  "max_total_accepted_prefix_labels": 50000
+                }
+              }
+            ],
+            "complete_enumeration": true,
+            "complete_finite_domain": true,
+            "task_limit_per_scenario": 64,
+            "hard_task_limit_per_scenario": 64,
+            "default_task_limit_per_scenario": 20,
+            "exact_chain_compression": true,
+            "all_task_sequences_enumerated": false,
+            "complete_enumeration_scope": "EXACT_EQUIVALENT_PREFIX_AND_MASK_COLUMN_REPRESENTATION",
+            "compression_statistics": {
+              "enabled": true,
+              "expanded_prefixes": 89,
+              "dominated_prefixes": 0,
+              "emitted_columns": 89,
+              "retained_columns": 89,
+              "accepted_prefix_labels": 89,
+              "labels_removed_by_new_dominance": 0,
+              "max_pareto_labels_per_state": 1,
+              "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+              "max_total_accepted_prefix_labels": 50000
+            },
+            "max_variables": 20000,
+            "max_nonzeros": 150000,
+            "max_chains_per_resource_scenario": 4000
+          },
+          "quality_certificate": {
+            "status": "OPTIMAL_LP_WITH_EXACT_RATIONAL_DUAL_UPPER_CERTIFICATE",
+            "LP_upper_bound": 3.0,
+            "LP_upper_bound_exact": "3",
+            "lp_primal_expected_service": 3.0,
+            "integer_optimal_expected_service": 3.0,
+            "integer_optimal_expected_service_exact": "3",
+            "integer_to_bound_gap": 0.0,
+            "bound_scope": "COMPLETE_SUPPLIED_FINITE_CONSTANT_TIME_CHAIN_DOMAIN_CONDITIONED_ON_PRECEDING_INTEGER_TIERS",
+            "conditioned_tiers": {
+              "critical_now": 0.0
+            },
+            "expected_service_optimal_face_not_locked": true,
+            "distance_and_action_tie_faces_not_locked": true,
+            "exact_dual_arithmetic": true,
+            "sparse": true,
+            "lp_rows": 78,
+            "lp_columns": 103,
+            "lp_nonzeros": 201,
+            "max_lp_primal_row_violation": 0.0,
+            "runtime_s": 0.0022681999998894753,
+            "online_or_citywide_optimality_claimed": false,
+            "complete_supplied_domain": true,
+            "integer_service_tiers_exactly_certified": true,
+            "total_decision_budget_s": 10.0,
+            "all_preparation_mip_lp_certification_share_budget": true
+          },
+          "timing_s": {
+            "preparation": 0.0013720000006287592,
+            "enumeration": 0.001977199999600998,
+            "sparse_master": 0.00017670000124780927,
+            "lexicographic_milp": 0.02068380000127945,
+            "optional_lp_and_certificate": 0.0022681999998894753,
+            "independent_validation": 0.0017299999999522697,
+            "total": 0.02908940000088478
+          },
+          "validation": {
+            "valid": true,
+            "checked_first_actions": 3,
+            "checked_recourse_paths": 6,
+            "current_served": 0,
+            "critical_now": 0,
+            "expected_served": 3.0,
+            "expected_empty_distance_m": 1198.0,
+            "independent_reconstruction": true,
+            "realized_service_is_first_actions_only": true
+          },
+          "scheme_a_scope": {
+            "kind": "FINITE_JOINT_LAYOUT_AND_MULTI_SERVICE_CHAIN_CURRENT_ACTION_PROTOTYPE",
+            "maximum_planning_horizon_s": 1800,
+            "execution_step_s": 30,
+            "coarse_history_refresh_s": 300,
+            "refresh_is_input_reference_not_separate_macro_optimizer": true,
+            "scenario_paths_are_value_approximations_not_future_execution": true,
+            "only_shared_first_action_executable": true,
+            "customer_and_connector_profiles_both_enforced": true,
+            "future_customer_to_customer_connections": "SUPPLIED_DIRECTED_SUPPORTED_SNAPSHOT",
+            "current_relocation_is_in_same_master_as_SERVE_WAIT_BUSY": true,
+            "future_independent_relocations_between_customers_in_recourse": false,
+            "native_execution": false,
+            "city_scale": false,
+            "formal_q10": false
+          }
+        }
+      ],
+      "joint_minus_fixed_expected_services": 0.0,
+      "joint_minus_fixed_expected_empty_m": -638.0,
+      "missing_snapshot_queries": {}
+    }
+  ],
+  "new_routing_queries": 0,
+  "new_M3_inference": false,
+  "raw_target_future_used": false,
+  "native_runs": 0,
+  "full_day_runs": 0,
+  "dense_matrix": false,
+  "gpu_used": false,
+  "runtime_s": 0.36400829999911366,
+  "peak_rss_mib": 145.48828125,
+  "scientific_scope": "HISTORICAL_SCENARIO_MODEL_QUALITY_NOT_REALIZED_SERVICE_GAIN",
+  "city_joint_validation_superseded": false
+}
