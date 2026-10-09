@@ -78,16 +78,27 @@ def _column_allocation(actions, scenes, states, limit, now, horizon):
 
 
 def build_and_solve(actions, states, scenes, weights, connectors, sites, cfg, now, policy,
-        *, pending=()):
+        *, pending=(), offline_layout=False, diagnostics_sink=None):
     started = perf_counter()
     evidence_before = float(connectors.timings["total_connection_time_s"])
+    graph_limit = cfg["layout_graph_cpu_limit_s"] if offline_layout else cfg["solver_time_limit_s"]
+    diagnostic = dict(stage="GRAPH_CONSTRUCTION", decision_time_s=now,
+        offline_layout=offline_layout, graph_cpu_limit_s=graph_limit,
+        realtime_or_limit_s=cfg["solver_time_limit_s"], current_action_count=len(actions),
+        scenario_count=len(scenes), completed_option_scene_groups=0,
+        generated_chain_columns=0)
 
     def or_elapsed():
         evidence = float(connectors.timings["total_connection_time_s"]) - evidence_before
         return max(0., perf_counter() - started - evidence)
 
     def check():
-        if or_elapsed() >= cfg["solver_time_limit_s"]:
+        if or_elapsed() >= graph_limit:
+            diagnostic.update(graph_cpu_s=or_elapsed(),
+                connector_evidence_time_s=float(connectors.timings["total_connection_time_s"])-evidence_before,
+                wall_time_s=perf_counter()-started)
+            if diagnostics_sink is not None:
+                diagnostics_sink(dict(diagnostic))
             raise TimeoutError("Scheme-A graph/model OR budget exceeded; no fallback")
 
     horizon = min(float(now + cfg["planning_horizon_s"]), float(cfg["admission_end_s"]))
@@ -100,12 +111,16 @@ def build_and_solve(actions, states, scenes, weights, connectors, sites, cfg, no
             capacity = quota.get((action.action_id, scene), 0)
             if not capacity:
                 continue
+            diagnostic.update(current_action_id=action.action_id, current_scene=scene,
+                current_scene_tasks=len(tasks))
             options = dict(cfg, decision_time_s=now, planning_horizon_end_s=horizon,
                 exclude_request_ids=(() if action.request_id is None else (action.request_id,)))
             built, info = build_restricted_chains(action.action_id, action.vehicle_id, scene,
                 states[action.action_id], tasks, sites, connectors, options, check)
             statistics["column_budget_discarded_chains"] += max(0, len(built)-capacity)
             chains.extend(built[:capacity])
+            diagnostic["completed_option_scene_groups"] += 1
+            diagnostic["generated_chain_columns"] = len(chains)
             for field in ("labels_generated", "labels_expanded", "connector_queries",
                 "connector_rejected", "deadline_rejected", "beam_truncated", "retained_chain_truncated"):
                 statistics[field] += int(info.get(field, 0))
@@ -116,10 +131,18 @@ def build_and_solve(actions, states, scenes, weights, connectors, sites, cfg, no
     check()
     graph_or_s = or_elapsed()
     graph_wall_s = perf_counter() - started
-    solved = solve_city_master(actions, chains, weights, policy=policy,
-        time_limit_s=cfg["solver_time_limit_s"]-graph_or_s,
-        max_variables=cfg["maximum_model_variables"], max_nonzeros=cfg["maximum_model_nonzeros"],
-        relocation_cap=cfg["reposition_max_moves"])
+    diagnostic.update(stage="INTEGER_MASTER", graph_cpu_s=graph_or_s,
+        connector_evidence_time_s=graph_wall_s-graph_or_s)
+    try:
+        solved = solve_city_master(actions, chains, weights, policy=policy,
+            time_limit_s=(cfg["solver_time_limit_s"] if offline_layout else cfg["solver_time_limit_s"]-graph_or_s),
+            max_variables=cfg["maximum_model_variables"], max_nonzeros=cfg["maximum_model_nonzeros"],
+            relocation_cap=cfg["reposition_max_moves"])
+    except Exception as error:
+        diagnostic.update(error=repr(error), generated_chain_columns=len(chains))
+        if diagnostics_sink is not None:
+            diagnostics_sink(dict(diagnostic))
+        raise
     selected = set(solved["selected_chain_ids"])
     chosen = [chain for chain in chains if chain.chain_id in selected]
     solved["restricted_graph"] = dict(statistics, **allocation,
@@ -133,7 +156,9 @@ def build_and_solve(actions, states, scenes, weights, connectors, sites, cfg, no
     solved["graph_wall_time_s"] = graph_wall_s
     solved["graph_connector_evidence_time_s"] = graph_wall_s-graph_or_s
     solved["total_or_time_s"] = graph_or_s + solved["runtime_s"]
-    if solved["total_or_time_s"] > cfg["solver_time_limit_s"]:
+    solved["offline_layout_graph_budget_separate"] = offline_layout
+    solved["graph_cpu_limit_s"] = graph_limit
+    if not offline_layout and solved["total_or_time_s"] > cfg["solver_time_limit_s"]:
         raise TimeoutError("total Scheme-A OR/model budget exceeded")
     return solved
 
@@ -286,7 +311,8 @@ class NativeSchemeAAdapter:
             backend="SCHEME_A_RESTRICTED_MULTI_SERVICE_CHAIN_MASTER")
 
 
-def plan_av_layout(episode, library, reference, connectors, cfg, guard, progress):
+def plan_av_layout(episode, library, reference, connectors, cfg, guard, progress,
+        *, checkpoint=None, diagnostics_sink=None, restored=None):
     """Earlier-history mixed-resource placement proxy; not target-day rollout.
 
     Batches contain the AV slots activating in one 30-min bin. Other planned
@@ -297,7 +323,16 @@ def plan_av_layout(episode, library, reference, connectors, cfg, guard, progress
     bins = sorted({int(p.activation_s // cfg["layout_planning_bin_s"])
         for p in plans if p.vehicle_type == "AV"})
     hotspot, joint, records = {}, {}, []
+    completed = 0
+    if restored is not None:
+        completed = int(restored["completed_bins"])
+        if (restored["total_bins"] != len(bins) or completed != len(restored["records"])
+            or [r["bin_s"] for r in restored["records"]] != [b*cfg["layout_planning_bin_s"] for b in bins[:completed]]):
+            raise ValueError("layout checkpoint is not an exact completed prefix")
+        hotspot, joint, records = dict(restored["hotspot"]), dict(restored["joint"]), list(restored["records"])
     for ordinal, bin_id in enumerate(bins):
+        if ordinal < completed:
+            continue
         guard()
         now = bin_id*cfg["layout_planning_bin_s"]
         sites = sites_for(reference, now, cfg)
@@ -328,7 +363,8 @@ def plan_av_layout(episode, library, reference, connectors, cfg, guard, progress
                 states[aid] = RouteState(site["position"], max(float(now), p.activation_s), p.admission_end_s,
                     p.profile_id, None)
         result = build_and_solve(actions, states, library.view(now), library.weights,
-            connectors, sites, cfg, now, "CHAIN_DEFER")
+            connectors, sites, cfg, now, "CHAIN_DEFER", offline_layout=True,
+            diagnostics_sink=diagnostics_sink)
         picked = set(result["selected_action_ids"])
         for action in actions:
             if action.action_id in picked and action.vehicle_id in chosen_ids:
@@ -337,7 +373,13 @@ def plan_av_layout(episode, library, reference, connectors, cfg, guard, progress
         if not all(p.vehicle_id in joint for p in av):
             raise RuntimeError("an AV initial location was omitted")
         records.append(dict(bin_s=now, newly_placed_AV_slots=len(av), expected_services=result["expected_served"],
-            model=compact_master(result), graph=result["restricted_graph"], total_or_time_s=result["total_or_time_s"]))
+            model=compact_master(result), graph=result["restricted_graph"],
+            graph_cpu_s=result["graph_or_time_s"], master_or_s=result["runtime_s"],
+            total_or_time_s=result["total_or_time_s"]))
+        if checkpoint is not None:
+            checkpoint(dict(hotspot=hotspot, joint=joint, records=records,
+                completed_bins=ordinal+1, total_bins=len(bins),
+                last_completed_bin_s=now))
         progress(ordinal+1, len(bins), len(joint))
     return dict(hotspot=hotspot, joint=joint, records=records,
         layout_reference_supply_states="PLANNED_TEMPLATE_PREPARATION_POSITIONS_NOT_OBSERVED_MIDDAY_LOCATIONS",

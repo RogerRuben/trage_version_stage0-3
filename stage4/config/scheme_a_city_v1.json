@@ -29,6 +29,7 @@
   "solver_fallback": "NONE",
   "scenario_timeout_s": 10800,
   "layout_timeout_s": 7200,
+  "layout_graph_cpu_limit_s": 60,
   "physical_drain_limit_s": 100800,
   "maximum_rss_mib": 1536,
   "minimum_initial_available_ram_mib": 1536,

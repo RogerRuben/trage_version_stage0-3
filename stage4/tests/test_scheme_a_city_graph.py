@@ -1,9 +1,12 @@
 """Four focused contracts for the restricted city service-chain graph."""
 from dataclasses import replace
+from math import ceil
 
+import numpy as np
 import pandas as pd
 import pytest
 
+from stage4.dispatch import scheme_a_city_graph as graph
 from stage4.dispatch.scheme_a_city_graph import (
     ChainTask, CoarseHistoricalLibrary, RouteState, build_restricted_chains,
 )
@@ -137,3 +140,59 @@ def test_historical_forecast_refresh_is_stable_between_300_second_boundaries():
         CoarseHistoricalLibrary(templates.assign(realized_service_time_s=10), settings)
     with pytest.raises(ValueError, match="by 20161024"):
         CoarseHistoricalLibrary(templates, dict(settings, forecast_train_dates=["20161031"]))
+
+
+def test_cached_vectorized_candidate_choice_equals_literal_full_scan_with_ties_and_exclusions():
+    """One equivalence case, synthetic inputs only; no routing / timing run."""
+    rng = np.random.default_rng(20261009)
+    tasks = []
+    for rid in range(256):
+        release = float(rng.integers(0, 1900))
+        pickup_m = float(rng.integers(-3000, 3001))
+        # Deliberate common positions, exact time ties and request-ID tie keys.
+        if rid % 8 == 0:
+            release, pickup_m = 600.0, 250.0
+        profiles = ({"HV", "C"}, {"HV"}, {"M", "C"}, {"A"})[rid % 4]
+        value = task(rid, release, pickup_m, pickup_m + 100,
+            profiles=frozenset(profiles))
+        tasks.append(replace(value, passenger_accepts_av=bool(rid % 3),
+            deadline_s=release + (0.0 if rid % 11 == 0 else 300.0)))
+    for rid, release in enumerate((29.999999999, 30.0, 30.000000001), start=1000):
+        tasks.append(task(rid, release, 0, 100))
+    index = graph._task_index(tasks)
+
+    def literal(state, horizon, excluded, used):
+        here = np.asarray(graph._xy(state.position))
+        neighbors = index.tree.query_ball_point(here, 2000)
+        candidates = []
+        for neighbor in neighbors:
+            value = index.tasks[neighbor]
+            if value.request_id in excluded or value.request_id in used:
+                continue
+            if state.profile_id not in value.compatible_profiles:
+                continue
+            if state.profile_id != "HV" and not value.passenger_accepts_av:
+                continue
+            departure = float(ceil(max(state.ready_s, value.release_s) / 30) * 30)
+            if departure >= min(state.admission_end_s, horizon) or departure > value.deadline_s:
+                continue
+            candidates.append((float(np.linalg.norm(index.points[neighbor] - here)),
+                value.deadline_s, value.release_s, value.request_id, departure, value))
+        candidates.sort(key=lambda row: row[:4])
+        return [(row[-2], row[-1]) for row in candidates[:3]], len(neighbors), len(candidates)
+
+    cache_hits = 0
+    for origin_m in (0, 250, -1000, 0, 250):
+        for profile in ("C", "HV", "M", "A", "NO_MATCH"):
+            for ready in (0.0, 30.0, 599.999999999, 900.0, 1500.0):
+                state = RouteState(point(origin_m), ready, 1700, profile)
+                excluded, used = {8, 16, 1001}, (0, 32, 1000)
+                horizon = 1600.0 if ready >= 900 else 1800.0
+                expected, spatial, eligible = literal(state, horizon, excluded, used)
+                selected, actual_spatial, actual_eligible, cache_hit = graph._candidate_tasks(
+                    index, state, 2000, 3, 30, horizon, excluded, used)
+                assert selected == expected
+                assert (actual_spatial, actual_eligible) == (spatial, eligible)
+                cache_hits += int(cache_hit)
+    assert cache_hits > 0
+    assert graph._SPATIAL_ORDER_CACHE.resident_bytes <= graph._SPATIAL_ORDER_CACHE.limit_bytes == 32 * 1024 * 1024

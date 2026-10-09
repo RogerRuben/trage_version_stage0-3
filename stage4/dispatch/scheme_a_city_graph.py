@@ -12,7 +12,9 @@ from collections import OrderedDict
 from dataclasses import dataclass
 import hashlib
 from math import ceil, cos, isfinite, pi
+import sys
 from typing import Callable, Mapping, Sequence
+import weakref
 
 import numpy as np
 import pandas as pd
@@ -222,6 +224,15 @@ class _TaskIndex:
         self.duplicates = len(tasks) - len(self.tasks)
         self.points = np.asarray([_xy(t.pickup) for t in self.tasks], dtype=float).reshape(-1, 2)
         self.tree = cKDTree(self.points) if self.tasks else None
+        self.release_times = np.asarray([t.release_s for t in self.tasks], dtype=float)
+        self.deadlines = np.asarray([t.deadline_s for t in self.tasks], dtype=float)
+        ids = [t.request_id for t in self.tasks]
+        self.request_ids = np.asarray(ids,
+            dtype=np.int64 if all(-(1 << 63) <= rid < (1 << 63) for rid in ids) else object)
+        self.accepts_av = np.asarray([bool(t.passenger_accepts_av) for t in self.tasks], dtype=bool)
+        profiles = set().union(*(t.compatible_profiles for t in self.tasks)) if self.tasks else set()
+        self.profile_masks = {profile: np.asarray(
+            [profile in t.compatible_profiles for t in self.tasks], dtype=bool) for profile in profiles}
 
 
 _TASK_INDEX_CACHE: OrderedDict[int, tuple[Sequence[ChainTask], _TaskIndex]] = OrderedDict()
@@ -240,6 +251,89 @@ def _task_index(tasks: Sequence[ChainTask]) -> _TaskIndex:
     while len(_TASK_INDEX_CACHE) > 8:
         _TASK_INDEX_CACHE.popitem(last=False)
     return result
+
+
+class _ExactSpatialOrderingCache:
+    """Global byte-bounded LRU of complete radius neighborhoods, never top-N.
+
+    The key uses exact origin coordinates and the task-index identity; timing,
+    admission, profile and exclusions remain per-label filters. Weak ownership
+    prevents this cache retaining historical task libraries after their index
+    is evicted. The 1024-byte per-entry allowance conservatively accounts for
+    keys, tuples, weak references and OrderedDict entries in addition to the
+    ndarray's own allocation. No coordinate rounding or eligibility shortcut
+    changes the old distance/deadline/release/identity ordering.
+    """
+
+    def __init__(self):
+        self.limit_bytes = 32 * 1024 * 1024
+        self.resident_bytes = 1024  # Cache instance / empty-container allowance.
+        self.entries = OrderedDict()
+
+    def _remove(self, key):
+        _, _, size = self.entries.pop(key)
+        self.resident_bytes -= size
+
+    def ordered(self, index: _TaskIndex, position: Position, radius: float):
+        key = (id(index), position, float(radius))
+        cached = self.entries.get(key)
+        if cached is not None:
+            owner, ordered, _ = cached
+            if owner() is index:
+                self.entries.move_to_end(key)
+                return ordered, True
+            self._remove(key)
+        here = np.asarray(_xy(position))
+        neighbors = index.tree.query_ball_point(here, radius) if index.tree is not None else []
+        # Preserve the original scalar norm evaluation as well as all four
+        # sort keys. Vectorized norms could perturb a near-tie by one ulp.
+        neighbors.sort(key=lambda neighbor: (
+            float(np.linalg.norm(index.points[neighbor] - here)),
+            index.tasks[neighbor].deadline_s, index.tasks[neighbor].release_s,
+            index.tasks[neighbor].request_id))
+        ordered = np.asarray(neighbors,
+            dtype=np.int32 if len(index.tasks) < (1 << 31) else np.int64)
+        ordered.flags.writeable = False
+        size = sys.getsizeof(ordered) + 1024
+        if size + 1024 <= self.limit_bytes:
+            while self.entries and self.resident_bytes + size > self.limit_bytes:
+                self._remove(next(iter(self.entries)))
+            self.entries[key] = (weakref.ref(index), ordered, size)
+            self.resident_bytes += size
+        return ordered, False
+
+
+_SPATIAL_ORDER_CACHE = _ExactSpatialOrderingCache()
+
+
+def _candidate_tasks(index: _TaskIndex, state: RouteState, radius: float, top_k: int,
+                     step: int, horizon: float, excluded: set[int], used: tuple[int, ...]):
+    """Exact old eligible Top-K using a cached complete spatial ordering.
+
+    All eligibility masks and both diagnostic cardinalities remain exact. The
+    function allocates one-dimensional arrays only, not a vehicle-task matrix.
+    Returned pairs are ``(departure_s, ChainTask)`` in the old deterministic
+    order; unsupported directed routes are still checked later by the caller.
+    """
+    ordered, cache_hit = _SPATIAL_ORDER_CACHE.ordered(index, state.position, radius)
+    spatial_count = len(ordered)
+    if not spatial_count or state.profile_id not in index.profile_masks:
+        return [], spatial_count, 0, cache_hit
+    profile = index.profile_masks[state.profile_id]
+    eligible = profile[ordered].copy()
+    if state.profile_id != "HV":
+        eligible &= index.accepts_av[ordered]
+    departures = np.ceil(np.maximum(state.ready_s, index.release_times[ordered]) / step) * step
+    eligible &= departures < min(state.admission_end_s, horizon)
+    eligible &= departures <= index.deadlines[ordered]
+    if excluded or used:
+        request_ids = index.request_ids[ordered]
+        for rid in excluded.union(used):
+            eligible &= request_ids != rid
+    eligible_count = int(np.count_nonzero(eligible))
+    selected = np.flatnonzero(eligible)[:top_k]
+    return [(float(departures[offset]), index.tasks[int(ordered[offset])]) for offset in selected], \
+        spatial_count, eligible_count, cache_hit
 
 
 @dataclass(frozen=True)
@@ -314,6 +408,7 @@ def build_restricted_chains(
         input_task_count=len(index.tasks), duplicate_input_task_count=index.duplicates,
         labels_generated=1, labels_expanded=0, task_spatial_candidates=0,
         task_temporal_profile_candidates=0, task_top_k_truncated=0,
+        task_spatial_order_cache_hits=0, task_spatial_order_cache_misses=0,
         site_spatial_candidates=0, site_top_k_truncated=0,
         connector_queries=0, connector_rejected=0, deadline_rejected=0,
         beam_truncated=0, chain_prefix_count=0, retained_chain_truncated=0,
@@ -350,27 +445,14 @@ def build_restricted_chains(
                 continue
             here = np.asarray(_xy(state.position))
             if len(label.request_ids) < service_cap and index.tree is not None:
-                neighbors = index.tree.query_ball_point(here, radius)
-                diagnostics["task_spatial_candidates"] += len(neighbors)
-                candidates = []
-                for neighbor in neighbors:
-                    task = index.tasks[neighbor]
-                    if task.request_id in excluded or task.request_id in label.request_ids:
-                        continue
-                    if state.profile_id not in task.compatible_profiles:
-                        continue
-                    if state.profile_id != "HV" and not task.passenger_accepts_av:
-                        continue
-                    depart = float(ceil(max(state.ready_s, task.release_s) / step) * step)
-                    # Zero-empty-time admission/deadline bounds precede routing.
-                    if depart >= min(state.admission_end_s, horizon) or depart > task.deadline_s:
-                        continue
-                    candidates.append((float(np.linalg.norm(index.points[neighbor] - here)),
-                        task.deadline_s, task.release_s, task.request_id, depart, task))
-                candidates.sort(key=lambda row: row[:4])
-                diagnostics["task_temporal_profile_candidates"] += len(candidates)
-                diagnostics["task_top_k_truncated"] += max(0, len(candidates) - top_k)
-                for _, _, _, _, depart, task in candidates[:top_k]:
+                candidates, spatial_count, eligible_count, cache_hit = _candidate_tasks(
+                    index, state, radius, top_k, step, horizon, excluded, label.request_ids)
+                diagnostics["task_spatial_candidates"] += spatial_count
+                diagnostics["task_temporal_profile_candidates"] += eligible_count
+                diagnostics["task_top_k_truncated"] += max(0, eligible_count - top_k)
+                diagnostics["task_spatial_order_cache_hits" if cache_hit else
+                    "task_spatial_order_cache_misses"] += 1
+                for depart, task in candidates:
                     check_budget()
                     connection = connector(state, task, depart, state.profile_id)
                     diagnostics["connector_queries"] += 1
@@ -461,4 +543,6 @@ def build_restricted_chains(
     diagnostics["chains_returned"] = len(chains)
     diagnostics["max_service_chain_length"] = max((len(c.request_ids) for c in chains), default=0)
     diagnostics["max_future_relocation_count"] = max((len(c.relocation_slots) for c in chains), default=0)
+    diagnostics["task_spatial_order_cache_resident_bytes"] = _SPATIAL_ORDER_CACHE.resident_bytes
+    diagnostics["task_spatial_order_cache_limit_bytes"] = _SPATIAL_ORDER_CACHE.limit_bytes
     return chains, diagnostics

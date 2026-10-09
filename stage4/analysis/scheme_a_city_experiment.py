@@ -10,6 +10,7 @@ import argparse
 import gc
 import json
 from pathlib import Path
+import shutil
 from time import perf_counter
 from types import SimpleNamespace
 
@@ -96,9 +97,33 @@ def _clock_cfg(episode, cfg):
         process_group_memory_limit_mib=cfg["maximum_rss_mib"])
 
 
-def prepare_layout(root, cfg, protected, *, resume=False):
+def archive_failed_layout(root):
+    base = (root/OUT).resolve()
+    source = (base/"layout").resolve()
+    source.relative_to(base)
+    status = json.loads((source/"status.json").read_text(encoding="utf-8"))
+    if status["status"] != "STOPPED":
+        raise ValueError("only STOPPED layout can be archived for explicit retry")
+    index = 1
+    while (base/"failed_attempts"/f"layout_{index:03d}").exists():
+        index += 1
+    destination = (base/"failed_attempts"/f"layout_{index:03d}").resolve()
+    destination.relative_to(base)
+    checkpoint = source/"partial_layout_checkpoint.json"
+    restored = json.loads(checkpoint.read_text(encoding="utf-8")) if checkpoint.exists() else None
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.move(str(source),str(destination))
+    return destination, restored
+
+
+def prepare_layout(root, cfg, protected, *, resume=False, retry_layout=False):
     destination = root/OUT/"layout"
     path = destination/"placements.json"
+    archived, restored = None, None
+    if retry_layout:
+        archived, recovered = archive_failed_layout(root)
+        if recovered is not None and recovered["inputs_sha256"] == protected:
+            restored = recovered["partial"]
     if path.exists():
         receipt = json.loads(path.read_text(encoding="utf-8"))
         if not resume or receipt["status"] != "LAYOUT_COMPLETE" or receipt["inputs_sha256"] != protected:
@@ -109,7 +134,10 @@ def prepare_layout(root, cfg, protected, *, resume=False):
     started = perf_counter()
     guard(root, cfg, started, phase="layout", initial=True)
     receipt = dict(status="RUNNING", phase="EARLIER_HISTORY_INITIAL_LAYOUT",
-        code_sha=code_sha(root), inputs_sha256=protected)
+        code_sha=code_sha(root), inputs_sha256=protected,
+        explicitly_authorized_failed_layout_retry=retry_layout,
+        archived_failure=str(archived.relative_to(root)) if archived is not None else None,
+        restored_completed_bins=int(restored["completed_bins"]) if restored is not None else 0)
     atomic_json(destination/"status.json", receipt)
     routing = None
     try:
@@ -139,7 +167,16 @@ def prepare_layout(root, cfg, protected, *, resume=False):
             atomic_json(destination/"progress.json", info)
             print(json.dumps(info), flush=True)
 
-        positions = plan_av_layout(episode, library, reference, connectors, clock_cfg, check, progress)
+        def checkpoint(partial):
+            atomic_json(destination/"partial_layout_checkpoint.json", dict(
+                status="PARTIAL_LAYOUT_NOT_AN_OPERATING_RESULT", code_sha=code_sha(root),
+                inputs_sha256=protected, partial=partial))
+
+        def diagnostics(info):
+            atomic_json(destination/"failed_graph_diagnostics.json", info)
+
+        positions = plan_av_layout(episode, library, reference, connectors, clock_cfg, check, progress,
+            checkpoint=checkpoint, diagnostics_sink=diagnostics, restored=restored)
         if len(positions["hotspot"]) != 851 or set(positions["joint"]) != set(positions["hotspot"]):
             raise RuntimeError("initial layout does not cover the identical851AV slots")
         receipt.update(status="LAYOUT_COMPLETE", clock_cfg=clock_cfg, placements=positions,
@@ -291,12 +328,12 @@ def run_group(root, cfg, protected, layout, group, *, resume=False):
             routing.close()
 
 
-def run(root, *, config_path=CONFIG, resume=False, prepare_only=False):
+def run(root, *, config_path=CONFIG, resume=False, prepare_only=False, retry_layout=False):
     root = Path(root).resolve()
     cfg, protected = protocol(root, config_path)
     pa.set_cpu_count(1)
     pa.set_io_thread_count(1)
-    layout = prepare_layout(root, cfg, protected, resume=resume)
+    layout = prepare_layout(root, cfg, protected, resume=resume, retry_layout=retry_layout)
     gc.collect()
     if prepare_only:
         return layout
@@ -321,8 +358,10 @@ def main():
     parser.add_argument("--config", type=Path, default=CONFIG)
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--prepare-only", action="store_true")
+    parser.add_argument("--retry-layout", action="store_true",
+        help="archive STOPPED layout only after explicit user approval; preserve completed same-input prefix")
     args = parser.parse_args()
-    run(args.root, config_path=args.config, resume=args.resume, prepare_only=args.prepare_only)
+    run(args.root, config_path=args.config, resume=args.resume, prepare_only=args.prepare_only, retry_layout=args.retry_layout)
 
 
 if __name__ == "__main__":

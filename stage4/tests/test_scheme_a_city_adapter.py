@@ -2,6 +2,7 @@ from collections import Counter
 from types import SimpleNamespace
 
 import pandas as pd
+import pytest
 
 from stage4.dispatch.flexibility_model import Vehicle
 from stage4.dispatch.scheme_a_city_master import CurrentAction
@@ -70,3 +71,29 @@ def test_native_adapter_uses_real_vehicle_fields_and_original_arc_index(monkeypa
     result = planner.solve(control,[arc],[5],0)
     assert result.selected_indices == (0,) and result.total_matched == 1
     assert planner.rows[-1]["variables"] > 0
+
+
+def test_offline_graph_budget_is_separate_but_integer_and_realtime_limits_stay_10(monkeypatch):
+    from stage4.dispatch import scheme_a_city_adapter as module
+    cfg = dict(layout_graph_cpu_limit_s=60., solver_time_limit_s=10., planning_horizon_s=1800,
+        admission_end_s=1800, maximum_model_variables=20000,maximum_model_nonzeros=150000,
+        reposition_max_moves=50,coarse_reference_update_s=300)
+    action = CurrentAction("L",1,"LAYOUT",None)
+    starts = {"L":RouteState((108.,34.),0.,1800.,"C")}
+    connector = SimpleNamespace(timings=Counter())
+    info = dict(max_service_chain_length=0,max_future_relocation_count=0)
+    monkeypatch.setattr(module,"build_restricted_chains",lambda *args:([],info))
+    limits=[]
+    def master(*args,**kwargs):
+        limits.append(kwargs["time_limit_s"])
+        return dict(selected_chain_ids=(),runtime_s=.1,model={})
+    monkeypatch.setattr(module,"solve_city_master",master)
+    ticks=iter([0.,12.,12.,12.])
+    monkeypatch.setattr(module,"perf_counter",lambda:next(ticks,12.))
+    result=module.build_and_solve([action],starts,{"h":[]},{"h":1.},connector,[],cfg,0,"CHAIN_DEFER",offline_layout=True)
+    assert limits == [10.] and result["graph_or_time_s"] == 12.
+    assert result["offline_layout_graph_budget_separate"]
+    ticks=iter([0.,12.,12.,12.])
+    with pytest.raises(TimeoutError,match="OR budget"):
+        module.build_and_solve([action],starts,{"h":[]},{"h":1.},connector,[],cfg,0,"CHAIN_DEFER")
+    assert limits == [10.]
