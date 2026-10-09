@@ -9,6 +9,24 @@ import pytest
 from stage4.dispatch import scheme_a_city_master as city
 
 
+def test_effective_offline_budget_is_30_and_realtime_is_still_hard_capped_10(monkeypatch):
+    clock={"now":0.}
+    monkeypatch.setattr(city,"perf_counter",lambda:clock["now"])
+    realtime=city._Budget(30.)
+    offline=city._Budget(30.,offline_layout=True)
+    assert realtime.seconds == 10. and offline.seconds == 30.
+    assert city._Budget(90.,offline_layout=True).seconds == 30.
+    clock["now"]=11.
+    assert offline.remaining("offline") == 19.
+    with pytest.raises(city.CityMasterTimeout):
+        realtime.remaining("realtime")
+    action=city.CurrentAction("a",1,"WAIT",None)
+    result=city.solve_city_master([action],[],{"h":1.},time_limit_s=30.,offline_layout=True)
+    assert result["effective_integer_master_budget_s"] == 30.
+    result=city.solve_city_master([action],[],{"h":1.},time_limit_s=30.)
+    assert result["effective_integer_master_budget_s"] == 10.
+
+
 def _action(aid, vid, kind="WAIT", rid=None, distance=0., critical=False, carry=False, slot=0):
     payload = {"relocation_slot_s": slot} if kind == "RELOCATE" else None
     return city.CurrentAction(aid, vid, kind, rid, critical, carry, distance, payload)

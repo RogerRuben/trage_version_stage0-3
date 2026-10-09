@@ -160,7 +160,7 @@ def recover_layout_prefix(cfg, protected, archived, recovered, config_path=CONFI
     previous = recovered["inputs_sha256"]
     if previous == protected:
         return recovered["partial"], dict(mode="IDENTICAL_INPUTS_AND_CONFIGURATION",
-            original_code_sha=recovered["code_sha"])
+            original_code_sha=recovered["code_sha"], upstream_prefix_recovery=recovered.get("prefix_recovery"))
     key = Path(config_path).as_posix()
     if ({k:v for k,v in previous.items() if k != key}
         != {k:v for k,v in protected.items() if k != key}):
@@ -204,6 +204,10 @@ def prepare_layout(root, cfg, protected, *, resume=False, retry_layout=False, co
         prefix_recovery=recovery_info)
     atomic_json(destination/"status.json", receipt)
     shutil.copyfile(root/config_path, destination/"configuration_at_run.json")
+    if restored is not None:
+        atomic_json(destination/"partial_layout_checkpoint.json", dict(
+            status="PARTIAL_LAYOUT_NOT_AN_OPERATING_RESULT", code_sha=code_sha(root),
+            inputs_sha256=protected, partial=restored, prefix_recovery=recovery_info))
     routing = None
     try:
         episode = load_research_episode(root, profile_id="C", requested_q_a=.1)

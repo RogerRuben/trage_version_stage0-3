@@ -60,10 +60,12 @@ class CityMasterTimeout(TimeoutError):
 
 
 class _Budget:
-    def __init__(self, seconds):
+    def __init__(self, seconds, *, offline_layout=False):
         if isinstance(seconds, bool) or not isinstance(seconds, (float, int)) or not math.isfinite(seconds) or seconds <= 0:
             raise ValueError("time_limit_s must be positive and finite")
-        self.seconds = min(float(seconds), DECISION_TIME_LIMIT_S)
+        if type(offline_layout) is not bool:
+            raise ValueError("offline_layout must be an explicit boolean")
+        self.seconds = min(float(seconds), 30.0 if offline_layout else DECISION_TIME_LIMIT_S)
         self.started = perf_counter()
 
     def remaining(self, stage):
@@ -493,7 +495,7 @@ def _validate_selection(actions, chains, weights, action_ids, chain_ids, cap):
         constrained_relocations_by_scenario_slot=combined)
 
 
-def solve_city_master(actions, chains, scenario_weights, *, policy="CHAIN_DEFER", time_limit_s=10.,
+def solve_city_master(actions, chains, scenario_weights, *, policy="CHAIN_DEFER", time_limit_s=10., offline_layout=False,
                       max_variables=20_000, max_nonzeros=150_000, relocation_cap=50):
     """Solve the supplied restricted-column city master under one total budget.
 
@@ -503,7 +505,7 @@ def solve_city_master(actions, chains, scenario_weights, *, policy="CHAIN_DEFER"
     strictly certified binary MILP tiers. No incumbent/time-limit fallback,
     future customer truth, dense matrix, or global optimality bound is used.
     """
-    budget = _Budget(time_limit_s)
+    budget = _Budget(time_limit_s, offline_layout=offline_layout)
     if policy not in POLICIES:
         raise ValueError(f"policy must be one of {POLICIES!r}")
     for value, label in ((max_variables, "max_variables"), (max_nonzeros, "max_nonzeros")):
@@ -572,6 +574,7 @@ def solve_city_master(actions, chains, scenario_weights, *, policy="CHAIN_DEFER"
     elapsed = perf_counter() - budget.started
     return dict(
         kind="SCHEME_A_CITY_RESTRICTED_SUPPLIED_MULTI_SERVICE_CHAIN_MASTER", policy=policy, opt_status="OPTIMAL",
+        effective_integer_master_budget_s=budget.seconds, offline_layout=offline_layout,
         selected_action_ids=tuple(action.action_id for action in selected_actions),
         selected_chain_ids=tuple(chain.chain_id for chain in selected_chains),
         critical_now=int(values["critical_now"]), current_served=int(values["current_served"]),

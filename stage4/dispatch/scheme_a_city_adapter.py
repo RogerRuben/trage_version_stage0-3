@@ -138,11 +138,13 @@ def build_and_solve(actions, states, scenes, weights, connectors, sites, cfg, no
     diagnostic["integer_master_limit_s"] = master_budget
     try:
         solved = solve_city_master(actions, chains, weights, policy=policy,
-            time_limit_s=master_budget,
+            time_limit_s=master_budget, offline_layout=offline_layout,
             max_variables=cfg["maximum_model_variables"], max_nonzeros=cfg["maximum_model_nonzeros"],
             relocation_cap=cfg["reposition_max_moves"])
     except Exception as error:
         diagnostic.update(error=repr(error), generated_chain_columns=len(chains))
+        if hasattr(error, "solver_diagnostics"):
+            diagnostic["solver_diagnostics"] = error.solver_diagnostics
         if diagnostics_sink is not None:
             diagnostics_sink(dict(diagnostic))
         raise
@@ -379,7 +381,8 @@ def plan_av_layout(episode, library, reference, connectors, cfg, guard, progress
         records.append(dict(bin_s=now, newly_placed_AV_slots=len(av), expected_services=result["expected_served"],
             model=compact_master(result), graph=result["restricted_graph"],
             graph_cpu_s=result["graph_or_time_s"], master_or_s=result["runtime_s"],
-            total_or_time_s=result["total_or_time_s"]))
+            total_or_time_s=result["total_or_time_s"],
+            effective_integer_master_budget_s=result["effective_integer_master_budget_s"]))
         if checkpoint is not None:
             checkpoint(dict(hotspot=hotspot, joint=joint, records=records,
                 completed_bins=ordinal+1, total_bins=len(bins),

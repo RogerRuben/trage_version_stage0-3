@@ -84,8 +84,10 @@ def test_offline_graph_and_master_budgets_are_separate_and_realtime_stays_10(mon
     info = dict(max_service_chain_length=0,max_future_relocation_count=0)
     monkeypatch.setattr(module,"build_restricted_chains",lambda *args:([],info))
     limits=[]
+    scopes=[]
     def master(*args,**kwargs):
         limits.append(kwargs["time_limit_s"])
+        scopes.append(kwargs["offline_layout"])
         return dict(selected_chain_ids=(),runtime_s=.1,model={})
     monkeypatch.setattr(module,"solve_city_master",master)
     ticks=iter([0.,12.,12.,12.])
@@ -108,6 +110,7 @@ def test_offline_graph_and_master_budgets_are_separate_and_realtime_stays_10(mon
     monkeypatch.setattr(module,"perf_counter",lambda:next(ticks,.5))
     result=module.build_and_solve([action],starts,{"h":[]},{"h":1.},connector,[],cfg,0,"CHAIN_DEFER")
     assert limits[-1] == 9.5 and result["integer_master_limit_s"] == 9.5
+    assert scopes == [True,True,False]
 
 
 def test_prefix_recovery_allows_only_hash_bound_offline_10_to_30_budget(tmp_path):
