@@ -55,9 +55,46 @@ def protocol(root, config_path=CONFIG):
     if any(cfg.get(k) != v for k, v in fixed.items()) or tuple(cfg["groups"]) != GROUPS:
         raise ValueError("outside the fixed three-group Scheme-A protocol")
     protected = [config_path, ORDER_BASE_REL, FLEET_REL, Path(cfg["source_routes"]),
-        Path(cfg["source_history_templates"]), Path(cfg["remaining_time_model"]),
+        Path(cfg["source_history_templates"]), Path(cfg["source_history_manifest"]), Path(cfg["remaining_time_model"]),
         Path(cfg["controlled_source_config"]), Path(cfg["frozen_profile_config"])]
     return cfg, {p.as_posix(): sha(root/p) for p in protected}
+
+
+def load_history_templates(root, cfg):
+    """Use the existing full-day history, never the old two-window library.
+
+    The source producer records complete-day row counts. Matching those counts
+    catches a truncated/window-only input without imposing a new demand or
+    quality threshold. Only prediction/identity columns enter the planner.
+    """
+    source = Path(cfg["source_history_templates"])
+    manifest_path = Path(cfg["source_history_manifest"])
+    manifest = json.loads((root/manifest_path).read_text(encoding="utf-8"))
+    if (manifest.get("status") != "COMPLETE"
+        or manifest.get("full_day_Train_library_not_test31_future_demand") is not True):
+        raise ValueError("Scheme-A requires a verified full-day historical template source, not local windows")
+    dates = tuple(sorted(map(str, cfg["forecast_train_dates"])))
+    declared = {str(row["date"]): int(row["templates"]) for row in manifest["train_templates"]}
+    if not set(dates) <= set(declared):
+        raise ValueError("full-day history manifest does not cover the configured historical dates")
+    columns = list(CoarseHistoricalLibrary._COLUMNS) + ["research_data_ready"]
+    templates = pd.read_parquet(root/source, columns=columns)
+    templates = templates.loc[templates.date.astype(str).isin(dates)].copy()
+    counts = {str(d): int(n) for d, n in templates.groupby(templates.date.astype(str)).size().items()}
+    if counts != {d: declared[d] for d in dates}:
+        raise ValueError("historical templates do not match complete-day source counts; window/truncated input rejected")
+    if templates.duplicated(["date", "order_id"]).any():
+        raise ValueError("duplicate historical source identity")
+    inventory = dict(source=source.as_posix(), source_manifest=manifest_path.as_posix(),
+        full_day_source_verified=True, total_rows=len(templates),
+        prediction_only_projection=True, new_M3_inference=False, dates={})
+    for date in dates:
+        day = templates.loc[templates.date.astype(str).eq(date)]
+        hours = (day.release_second//3600).astype(int).value_counts().sort_index()
+        inventory["dates"][date] = dict(row_count=len(day), ready_row_count=int(day.research_data_ready.eq(True).sum()),
+            release_min_s=float(day.release_second.min()), release_max_s=float(day.release_second.max()),
+            hourly_row_counts={str(h): int(n) for h, n in hours.items()})
+    return templates, inventory
 
 
 def guard(root, cfg, started, *, phase="scenario", initial=False):
@@ -144,7 +181,7 @@ def prepare_layout(root, cfg, protected, *, resume=False, retry_layout=False):
         episode = load_research_episode(root, profile_id="C", requested_q_a=.1)
         clock_cfg = _clock_cfg(episode, cfg)
         start = pd.Timestamp("2016-10-31T00:00:00+08:00")
-        templates = pd.read_parquet(root/cfg["source_history_templates"])
+        templates, history_inventory = load_history_templates(root, cfg)
         reference, reference_manifest = load_train_demand_reference(root)
         routing = make_routing(root, cfg)
         pseudo = SimpleNamespace(eta_adapter=routing, request_by_rid={}, runtime_by_vid={},
@@ -182,6 +219,7 @@ def prepare_layout(root, cfg, protected, *, resume=False, retry_layout=False):
         receipt.update(status="LAYOUT_COMPLETE", clock_cfg=clock_cfg, placements=positions,
             runtime_s=perf_counter()-started, connectors=connectors.diagnostics(),
             library=library.diagnostics(), reference_manifest=reference_manifest,
+            history_template_inventory=history_inventory,
             peak_rss_mib=psutil.Process().memory_info().peak_wset/2**20,
             all_day_supply=episode.supply.inventory(), new_M3_inference=False,
             future_target_requests_or_outcomes_used=False)
@@ -252,7 +290,7 @@ def run_group(root, cfg, protected, layout, group, *, resume=False):
         scope = [r.order_id for r in episode.requests._requests if "C" in r.compatible_profiles]
         summary["private_feature_store_setup"] = validator.prepare_private_identity_store(scope)
         del scope
-        templates = pd.read_parquet(root/cfg["source_history_templates"])
+        templates, history_inventory = load_history_templates(root, cfg)
         library = CoarseHistoricalLibrary(templates, clock_cfg)
         connectors = SchemeACityConnectors(control, empty_router, validator, templates, geometry_timestamp=start)
         del templates
@@ -261,7 +299,8 @@ def run_group(root, cfg, protected, layout, group, *, resume=False):
         control.flexibility_adapter = adapter
         simulation = bridge.create_simulation(simulation_end_s=cfg["physical_drain_limit_s"],
             time_step_s=30, vehicles=vehicles, fleet_control=control, network=network, native_output=native_output)
-        summary.update(native_input_counts=bridge.input_counts(), all_day_supply=episode.supply.inventory())
+        summary.update(native_input_counts=bridge.input_counts(), all_day_supply=episode.supply.inventory(),
+            history_template_inventory=history_inventory)
         atomic_json(summary_path, summary)
         for tick in range(0, cfg["physical_drain_limit_s"]+30, 30):
             resources = guard(root, cfg, started)
@@ -333,6 +372,9 @@ def run(root, *, config_path=CONFIG, resume=False, prepare_only=False, retry_lay
     cfg, protected = protocol(root, config_path)
     pa.set_cpu_count(1)
     pa.set_io_thread_count(1)
+    templates, history_inventory = load_history_templates(root, cfg)
+    del templates
+    atomic_json(root/DOC/"history_template_inventory.json", history_inventory)
     layout = prepare_layout(root, cfg, protected, resume=resume, retry_layout=retry_layout)
     gc.collect()
     if prepare_only:
@@ -342,7 +384,8 @@ def run(root, *, config_path=CONFIG, resume=False, prepare_only=False, retry_lay
         results.append(run_group(root, cfg, protected, layout, group, resume=resume))
         gc.collect()
     result = dict(status="SCHEME_A_THREE_GROUP_CITY_COMPARISON_COMPLETE", inputs_sha256=protected,
-        frozen_protocol=cfg, groups=results, full_day_runs=3, no_parameter_search=True,
+        frozen_protocol=cfg, history_template_inventory=history_inventory,
+        groups=results, full_day_runs=3, no_parameter_search=True,
         no_extra_conditions=True, same_joint_layout_for_groups_2_3=True,
         restricted_chain_candidate_heuristic=True, city_global_optimality_claimed=False,
         gpu_used=False, dense_matrix=False)

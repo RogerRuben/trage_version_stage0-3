@@ -97,3 +97,32 @@ def test_offline_graph_budget_is_separate_but_integer_and_realtime_limits_stay_1
     with pytest.raises(TimeoutError,match="OR budget"):
         module.build_and_solve([action],starts,{"h":[]},{"h":1.},connector,[],cfg,0,"CHAIN_DEFER")
     assert limits == [10.]
+
+
+def test_full_day_history_source_rejects_window_manifest_and_truncated_rows(tmp_path):
+    import json
+    from stage4.analysis.scheme_a_city_experiment import load_history_templates
+    dates = ["20161010", "20161017", "20161024"]
+    rows = [dict(date=d, order_id=f"{d}_{h}", release_second=h*3600.+30.,
+        start_lon_wgs84=108., start_lat_wgs84=34., end_lon_wgs84=108.01, end_lat_wgs84=34.01,
+        predicted_route_time_p50_s=60., compatible_C=True, compatible_M=True, compatible_A=True,
+        research_data_ready=True) for d in dates for h in range(24)]
+    frame = pd.DataFrame(rows)
+    frame.to_parquet(tmp_path/"history.parquet", index=False)
+    manifest = dict(status="COMPLETE", full_day_Train_library_not_test31_future_demand=True,
+        train_templates=[dict(date=d, templates=24) for d in dates])
+    (tmp_path/"manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+    cfg = dict(source_history_templates="history.parquet", source_history_manifest="manifest.json",
+        forecast_train_dates=dates)
+    loaded, inventory = load_history_templates(tmp_path, cfg)
+    assert len(loaded) == 72 and inventory["full_day_source_verified"]
+    assert all(len(v["hourly_row_counts"]) == 24 for v in inventory["dates"].values())
+    manifest["full_day_Train_library_not_test31_future_demand"] = False
+    (tmp_path/"manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+    with pytest.raises(ValueError, match="full-day"):
+        load_history_templates(tmp_path, cfg)
+    manifest["full_day_Train_library_not_test31_future_demand"] = True
+    (tmp_path/"manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+    frame.loc[frame.release_second.between(36000, 43200)].to_parquet(tmp_path/"history.parquet", index=False)
+    with pytest.raises(ValueError, match="complete-day source counts"):
+        load_history_templates(tmp_path, cfg)
