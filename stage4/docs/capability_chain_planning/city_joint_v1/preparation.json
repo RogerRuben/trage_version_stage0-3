@@ -1,6 +1,6 @@
 {
   "status": "FIXED_CITY_JOINT_PROTOCOL",
-  "code_sha": "aeec12ad84d666190182fe0675197367afc2e7d0",
+  "code_sha": "141a2ec3c96df41527d44c808c75d059026b28a9",
   "config": {
     "version": "city_joint_validation_v1",
     "test_date": "20161031",
