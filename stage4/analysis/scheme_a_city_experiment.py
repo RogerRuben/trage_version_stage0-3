@@ -50,7 +50,8 @@ def protocol(root, config_path=CONFIG):
     fixed = dict(test_date="20161031", profile_id="C", requested_q_a=.1,
         passenger_acceptance_rate=.7, planning_horizon_s=1800,
         coarse_reference_update_s=300, rolling_step_s=30, patience_s=300,
-        solver_time_limit_s=10., maximum_model_variables=20000, maximum_model_nonzeros=150000,
+        solver_time_limit_s=10., layout_solver_time_limit_s=30.,
+        maximum_model_variables=20000, maximum_model_nonzeros=150000,
         solver_fallback="NONE", dense_matrix=False, gpu_used=False, parameter_search=False, model_refit=False)
     if any(cfg.get(k) != v for k, v in fixed.items()) or tuple(cfg["groups"]) != GROUPS:
         raise ValueError("outside the fixed three-group Scheme-A protocol")
@@ -153,14 +154,39 @@ def archive_failed_layout(root):
     return destination, restored
 
 
-def prepare_layout(root, cfg, protected, *, resume=False, retry_layout=False):
+def recover_layout_prefix(cfg, protected, archived, recovered, config_path=CONFIG):
+    if recovered is None:
+        return None, None
+    previous = recovered["inputs_sha256"]
+    if previous == protected:
+        return recovered["partial"], dict(mode="IDENTICAL_INPUTS_AND_CONFIGURATION",
+            original_code_sha=recovered["code_sha"])
+    key = Path(config_path).as_posix()
+    if ({k:v for k,v in previous.items() if k != key}
+        != {k:v for k,v in protected.items() if k != key}):
+        raise ValueError("layout prefix raw inputs changed; refuse recovery")
+    snapshot = archived/"configuration_at_run.json"
+    if not snapshot.is_file() or sha(snapshot) != previous.get(key):
+        raise ValueError("layout prefix configuration snapshot is missing or not hash-bound")
+    old = json.loads(snapshot.read_text(encoding="utf-8"))
+    field = "layout_solver_time_limit_s"
+    if ({k:v for k,v in old.items() if k != field}
+        != {k:v for k,v in cfg.items() if k != field}
+        or old.get(field, old["solver_time_limit_s"]) != 10.
+        or cfg.get(field) != 30.):
+        raise ValueError("only the authorized offline master budget 10-to-30 change permits prefix recovery")
+    return recovered["partial"], dict(mode="RAW_INPUTS_AND_POLICY_IDENTICAL_OFFLINE_MASTER_10_TO_30_ONLY",
+        original_code_sha=recovered["code_sha"], original_config_sha256=previous[key],
+        current_config_sha256=protected[key], changed_field=field, old_value_s=10., new_value_s=30.)
+
+
+def prepare_layout(root, cfg, protected, *, resume=False, retry_layout=False, config_path=CONFIG):
     destination = root/OUT/"layout"
     path = destination/"placements.json"
-    archived, restored = None, None
+    archived, restored, recovery_info = None, None, None
     if retry_layout:
         archived, recovered = archive_failed_layout(root)
-        if recovered is not None and recovered["inputs_sha256"] == protected:
-            restored = recovered["partial"]
+        restored, recovery_info = recover_layout_prefix(cfg, protected, archived, recovered, config_path)
     if path.exists():
         receipt = json.loads(path.read_text(encoding="utf-8"))
         if not resume or receipt["status"] != "LAYOUT_COMPLETE" or receipt["inputs_sha256"] != protected:
@@ -174,8 +200,10 @@ def prepare_layout(root, cfg, protected, *, resume=False, retry_layout=False):
         code_sha=code_sha(root), inputs_sha256=protected,
         explicitly_authorized_failed_layout_retry=retry_layout,
         archived_failure=str(archived.relative_to(root)) if archived is not None else None,
-        restored_completed_bins=int(restored["completed_bins"]) if restored is not None else 0)
+        restored_completed_bins=int(restored["completed_bins"]) if restored is not None else 0,
+        prefix_recovery=recovery_info)
     atomic_json(destination/"status.json", receipt)
+    shutil.copyfile(root/config_path, destination/"configuration_at_run.json")
     routing = None
     try:
         episode = load_research_episode(root, profile_id="C", requested_q_a=.1)
@@ -375,7 +403,8 @@ def run(root, *, config_path=CONFIG, resume=False, prepare_only=False, retry_lay
     templates, history_inventory = load_history_templates(root, cfg)
     del templates
     atomic_json(root/DOC/"history_template_inventory.json", history_inventory)
-    layout = prepare_layout(root, cfg, protected, resume=resume, retry_layout=retry_layout)
+    layout = prepare_layout(root, cfg, protected, resume=resume, retry_layout=retry_layout,
+        config_path=config_path)
     gc.collect()
     if prepare_only:
         return layout

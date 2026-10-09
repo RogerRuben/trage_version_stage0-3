@@ -133,9 +133,12 @@ def build_and_solve(actions, states, scenes, weights, connectors, sites, cfg, no
     graph_wall_s = perf_counter() - started
     diagnostic.update(stage="INTEGER_MASTER", graph_cpu_s=graph_or_s,
         connector_evidence_time_s=graph_wall_s-graph_or_s)
+    master_budget = (cfg.get("layout_solver_time_limit_s", cfg["solver_time_limit_s"])
+        if offline_layout else cfg["solver_time_limit_s"]-graph_or_s)
+    diagnostic["integer_master_limit_s"] = master_budget
     try:
         solved = solve_city_master(actions, chains, weights, policy=policy,
-            time_limit_s=(cfg["solver_time_limit_s"] if offline_layout else cfg["solver_time_limit_s"]-graph_or_s),
+            time_limit_s=master_budget,
             max_variables=cfg["maximum_model_variables"], max_nonzeros=cfg["maximum_model_nonzeros"],
             relocation_cap=cfg["reposition_max_moves"])
     except Exception as error:
@@ -158,6 +161,7 @@ def build_and_solve(actions, states, scenes, weights, connectors, sites, cfg, no
     solved["total_or_time_s"] = graph_or_s + solved["runtime_s"]
     solved["offline_layout_graph_budget_separate"] = offline_layout
     solved["graph_cpu_limit_s"] = graph_limit
+    solved["integer_master_limit_s"] = master_budget
     if not offline_layout and solved["total_or_time_s"] > cfg["solver_time_limit_s"]:
         raise TimeoutError("total Scheme-A OR/model budget exceeded")
     return solved

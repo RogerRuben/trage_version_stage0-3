@@ -1,5 +1,5 @@
 {
-  "status": "HISTORY_INTERFACE_FIXED_AWAITING_EXPLICIT_FULL_DAY_RERUN",
+  "status": "OFFLINE_MASTER_30S_AUTHORIZED_CHECKED_READY_TO_RESUME_38_BINS",
   "initial_attempt_status": "STOPPED",
   "initial_code_sha": "dd3fdfb29f0c9b6af9a5f449cd568312bf7ba694",
   "initial_config_sha256": "54af66f569d6b13b8668b03540cf0d18d966108f80dc4e262aeca96a247c997d",
@@ -18,9 +18,9 @@
   "retry_authorization": "USER_EXPLICIT_CONTINUE_2026_10_09",
   "equivalent_full_radius_sort_cache_limit_mib": 32,
   "equivalence_combinations_checked": 125,
-  "focused_checks_passed": 18,
+  "focused_checks_passed": 19,
   "offline_layout_graph_cpu_limit_s": 60,
-  "offline_layout_integer_solver_limit_s": 10,
+  "offline_layout_integer_solver_limit_s": 30,
   "realtime_graph_plus_solver_limit_s": 10,
   "scientific_parameters_changed": false,
   "computational_offline_graph_budget_changed": true,
@@ -39,5 +39,34 @@
   "new_M3_inference": false,
   "new_calibration_or_quality_threshold": false,
   "correction_config_sha256": "3c51b56d345bc99608e295315f1a6e18ba1767d298552ab8a20a952c54cb730b",
-  "automatic_rerun": false
+  "automatic_rerun": false,
+  "full_history_rerun_authorized": true,
+  "full_history_rerun_authorization": "USER_EXPLICIT_START_2026_10_09",
+  "full_history_rerun_code_sha": "4adca4d9bceb07f31462b5755f63e945aa5f94fa",
+  "attempt_003": {
+    "status": "STOPPED_OFFLINE_LAST_DISTANCE_OBJECTIVE_NOT_PROVEN_WITHIN_10S",
+    "code_sha": "4adca4d9bceb07f31462b5755f63e945aa5f94fa",
+    "runtime_s": 2551.941752400002,
+    "completed_bins": 38,
+    "placed_AV_slots": 683,
+    "valid_full_history_prefix": true,
+    "full_day_groups_started": 0,
+    "record": "stage4/docs/capability_chain_planning/scheme_a_city_v1/attempt_003.md"
+  },
+  "current_attempt": {
+    "attempt": 4,
+    "phase": "AUTHORIZED_RECOVERY_FROM_LAYOUT_BIN_39",
+    "layout_completed_bins_at_last_status_update": 38,
+    "placed_AV_slots_at_last_status_update": 683,
+    "invalid_window_history_prefix_reused": false,
+    "valid_full_history_prefix_verified": true,
+    "full_day_groups_started": 0,
+    "full_day_groups_completed": 0,
+    "scientific_parameters_changed": false,
+    "only_offline_integer_budget_changed": true,
+    "offline_integer_budget_s": 30,
+    "realtime_graph_and_solver_budget_s": 10,
+    "authorization": "USER_EXPLICIT_OFFLINE_INTEGER_10_TO_30_2026_10_09",
+    "config_sha256": "8022d88c8c1377fd87f925bf7f0e35584b9bb3f500bc5cb8fd9d16ea9a0ef47e"
+  }
 }

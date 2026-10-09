@@ -73,7 +73,7 @@ def test_native_adapter_uses_real_vehicle_fields_and_original_arc_index(monkeypa
     assert planner.rows[-1]["variables"] > 0
 
 
-def test_offline_graph_budget_is_separate_but_integer_and_realtime_limits_stay_10(monkeypatch):
+def test_offline_graph_and_master_budgets_are_separate_and_realtime_stays_10(monkeypatch):
     from stage4.dispatch import scheme_a_city_adapter as module
     cfg = dict(layout_graph_cpu_limit_s=60., solver_time_limit_s=10., planning_horizon_s=1800,
         admission_end_s=1800, maximum_model_variables=20000,maximum_model_nonzeros=150000,
@@ -97,6 +97,38 @@ def test_offline_graph_budget_is_separate_but_integer_and_realtime_limits_stay_1
     with pytest.raises(TimeoutError,match="OR budget"):
         module.build_and_solve([action],starts,{"h":[]},{"h":1.},connector,[],cfg,0,"CHAIN_DEFER")
     assert limits == [10.]
+    cfg["layout_solver_time_limit_s"] = 30.
+    ticks=iter([0.,12.,12.,12.])
+    result=module.build_and_solve([action],starts,{"h":[]},{"h":1.},connector,[],cfg,0,"CHAIN_DEFER",offline_layout=True)
+    assert limits == [10.,30.] and result["integer_master_limit_s"] == 30.
+    ticks=iter([0.,12.,12.,12.])
+    with pytest.raises(TimeoutError,match="OR budget"):
+        module.build_and_solve([action],starts,{"h":[]},{"h":1.},connector,[],cfg,0,"CHAIN_DEFER")
+    ticks=iter([0.,.5,.5,.5])
+    monkeypatch.setattr(module,"perf_counter",lambda:next(ticks,.5))
+    result=module.build_and_solve([action],starts,{"h":[]},{"h":1.},connector,[],cfg,0,"CHAIN_DEFER")
+    assert limits[-1] == 9.5 and result["integer_master_limit_s"] == 9.5
+
+
+def test_prefix_recovery_allows_only_hash_bound_offline_10_to_30_budget(tmp_path):
+    import json
+    from pathlib import Path
+    from stage4.analysis.scheme_a_city_experiment import recover_layout_prefix
+    from stage4.analysis.capability_chain_instances import sha
+    old=dict(solver_time_limit_s=10.,layout_graph_cpu_limit_s=60.,max_future_services=3,seed=7)
+    snapshot=tmp_path/"configuration_at_run.json"
+    snapshot.write_text(json.dumps(old),encoding="utf-8")
+    prior={"cfg.json":sha(snapshot),"history.parquet":"unchanged-history"}
+    current={"cfg.json":"new-config","history.parquet":"unchanged-history"}
+    partial=dict(completed_bins=38,total_bins=47)
+    recovered=dict(inputs_sha256=prior,partial=partial,code_sha="old-code")
+    cfg=dict(old,layout_solver_time_limit_s=30.)
+    restored,info=recover_layout_prefix(cfg,current,tmp_path,recovered,Path("cfg.json"))
+    assert restored is partial and info["old_value_s"] == 10. and info["new_value_s"] == 30.
+    with pytest.raises(ValueError,match="only the authorized"):
+        recover_layout_prefix(dict(cfg,max_future_services=4),current,tmp_path,recovered,Path("cfg.json"))
+    with pytest.raises(ValueError,match="raw inputs changed"):
+        recover_layout_prefix(cfg,dict(current,**{"history.parquet":"changed"}),tmp_path,recovered,Path("cfg.json"))
 
 
 def test_full_day_history_source_rejects_window_manifest_and_truncated_rows(tmp_path):
