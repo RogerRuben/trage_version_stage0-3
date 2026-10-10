@@ -526,13 +526,19 @@ not permission to execute a scenario's hypothetical future customer path.
         return dict(supported=False, compatible_profiles=(), travel_time_s=None,
             empty_distance_m=None, arrival_context=None, reason_codes=reasons, routed=routed)
 
-    def _certificate_source_key(self, origin_state, *, profile=None):
+    def _certificate_source_key(self, origin_state, *, profile=None, hv_auto_od=False):
         """Cache only exact immutable evidence, never a vehicle ID alone."""
         origin, context = _point(_value(origin_state, "position")), _value(origin_state, "context")
         if context is None:
             return ("INITIAL", origin), None
         kind = context.get("kind")
         if kind == "NATIVE_VEHICLE":
+            if profile == "HV" and hv_auto_od:
+                # This explicitly enabled customer-AUTO branch does not read
+                # an incoming edge or native ID. Cache its exact static OD,
+                # but still recompute the departure beta/deadline every call.
+                # Never apply this shortcut to a C seam or a site MOVE.
+                return ("HV_AUTO_OD_ORIGIN", origin), None
             if profile != "C":
                 return None, None
             try:
@@ -758,7 +764,7 @@ This branch is enabled explicitly by the parent protocol, never for site MOVE.
                     eligible = False
                     break
                 origin, point = _point(_value(state, "position")), _point(_value(target, "pickup"))
-                source_key, reason = self._certificate_source_key(state, profile="HV")
+                source_key, reason = self._certificate_source_key(state, profile="HV", hv_auto_od=True)
                 identity, target_reason = self._task_metadata(target)
                 if reason or target_reason or "HV" not in _value(target, "compatible_profiles", ()):
                     eligible = False
@@ -824,7 +830,11 @@ This branch is enabled explicitly by the parent protocol, never for site MOVE.
             origin = _point(_value(origin_state, "position"))
             site = isinstance(target, dict) and "site_id" in target
             target_point = _point(target["position"] if site else _value(target, "pickup"))
-            source_key, reason = self._certificate_source_key(origin_state, profile=profile)
+            fast_hv = bool(profile == "HV" and not site
+                and getattr(self.control, "config", {}).get("scheme_a_fast_forecast_hv", False)
+                and hasattr(self.control.eta_adapter, "estimate_many"))
+            source_key, reason = self._certificate_source_key(
+                origin_state, profile=profile, hv_auto_od=fast_hv)
             if reason:
                 return self._reject([reason])
             identity = None
@@ -842,9 +852,6 @@ This branch is enabled explicitly by the parent protocol, never for site MOVE.
             if not isfinite(beta) or beta <= 0:
                 return self._reject(["CONNECTOR_DEPARTURE_BETA_INVALID"])
             require_geometry = bool(site and target.get("require_geometry", False))
-            fast_hv = bool(profile == "HV" and not site
-                and getattr(self.control, "config", {}).get("scheme_a_fast_forecast_hv", False)
-                and hasattr(self.control.eta_adapter, "estimate_many"))
             target_key = (("SITE", str(target["site_id"]), target_point) if site else
                 ("CUSTOMER", *identity, target_point, _point(_value(target, "dropoff"))))
             key = (self._certificate_key("AUTO_OD" if fast_hv else "TYPED_SCALAR",

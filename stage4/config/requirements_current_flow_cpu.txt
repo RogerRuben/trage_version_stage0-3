@@ -1,0 +1,3 @@
+# Optional CPU-only current min-cost-flow runtime. Isolate with --no-deps
+# --target stage4/runtime/ortools_current_flow; do NOT upgrade NumPy/SciPy.
+ortools==9.15.6755

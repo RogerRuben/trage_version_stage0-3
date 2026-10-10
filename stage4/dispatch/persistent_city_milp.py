@@ -28,6 +28,7 @@ class BundledIntegerSession:
         self.lower = self.upper = None
         self.binary = None
         self.model_loads = self.incremental_rows = self.warm_starts = self.runs = 0
+        self.last_run_status = self.last_model_status = None
 
     def _checked(self, status):
         if status != self.core.HighsStatus.kOk:
@@ -72,18 +73,24 @@ class BundledIntegerSession:
             self._checked(h.setSolution(rows.columns, columns, self.binary))
             self.warm_starts += 1
         self._checked(h.setOptionValue("time_limit", float(remaining())))
-        self._checked(h.run())
+        run_status = h.run()
         self.runs += 1
         status = h.getModelStatus()
+        # run() reports API status, not optimality. In particular, kWarning
+        # can accompany a time limit. Read the model status before deciding,
+        # just as SciPy's wrapper does; the caller still certifies every x.
+        self.last_run_status = str(run_status)
+        self.last_model_status = h.modelStatusToString(status)
         mapping = {core.HighsModelStatus.kOptimal:0, core.HighsModelStatus.kTimeLimit:1,
             core.HighsModelStatus.kIterationLimit:1, core.HighsModelStatus.kInfeasible:2,
             core.HighsModelStatus.kUnbounded:3}
-        code = mapping.get(status, 4)
+        code = 4 if run_status == core.HighsStatus.kError else mapping.get(status, 4)
         solution, info = h.getSolution(), h.getInfo()
         x = np.asarray(solution.col_value, dtype=float) if solution.value_valid else None
         return OptimizeResult(status=code, success=code == 0, x=x,
             fun=float(info.objective_function_value) if x is not None else None,
-            message=h.modelStatusToString(status), mip_gap=float(info.mip_gap),
+            message=h.modelStatusToString(status), highs_run_status=str(run_status),
+            highs_model_status=str(status), mip_gap=float(info.mip_gap),
             mip_dual_bound=float(info.mip_dual_bound), mip_node_count=int(info.mip_node_count))
 
     def accept_certified_binary(self, binary):
@@ -93,4 +100,5 @@ class BundledIntegerSession:
         return dict(backend="SCIPY_BUNDLED_HIGHS_PERSISTENT", highs_version=self.h.version(),
             model_loads=self.model_loads, incremental_exact_rows=self.incremental_rows,
             certified_binary_warm_starts=self.warm_starts, solver_runs=self.runs,
+            last_run_status=self.last_run_status, last_model_status=self.last_model_status,
             incumbent_fallback=False, objective_faces_use_epsilon=False)

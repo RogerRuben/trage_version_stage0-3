@@ -1,4 +1,4 @@
-"""Six engineering contracts, without native replay or production data."""
+"""Focused engineering contracts, without native replay or production data."""
 from collections import Counter, OrderedDict
 from dataclasses import asdict
 from math import ceil
@@ -7,6 +7,7 @@ from types import SimpleNamespace as NS
 import numpy as np
 import pandas as pd
 import pyarrow as pa
+import pytest
 
 from stage4.dispatch import scheme_a_city_adapter as adapter
 from stage4.dispatch import scheme_a_city_graph as graph
@@ -239,3 +240,55 @@ def test_persistent_integer_tiers_equal_cold_solves_with_exact_locks_and_warm_st
     assert metrics["model_loads"] == 1 and metrics["incremental_exact_rows"] == 1
     assert metrics["certified_binary_warm_starts"] == 1 and metrics["solver_runs"] == 2
     assert metrics["incumbent_fallback"] is False and metrics["objective_faces_use_epsilon"] is False
+
+
+def test_bundled_run_warning_reads_model_status_and_keeps_timeout_failure():
+    from stage4.dispatch import scheme_a_city_master as city
+    from stage4.dispatch.persistent_city_milp import BundledIntegerSession
+    receipt = city.contract._solver_options_receipt()
+    for mode in ("optimal_warning", "time_warning", "api_error"):
+        limited = mode == "time_warning"
+        session = BundledIntegerSession(receipt)
+        native, core, calls = session.h, session.core, []
+        class WarningResult:
+            def __getattr__(self, name):
+                return getattr(native, name)
+            def run(self):
+                native.run()
+                calls.append("run")
+                return core.HighsStatus.kError if mode == "api_error" else core.HighsStatus.kWarning
+            def getModelStatus(self):
+                calls.append("model_status")
+                return core.HighsModelStatus.kTimeLimit if limited else native.getModelStatus()
+        session.h = WarningResult()
+        rows = city._Rows(2, city._NonzeroLedger(100))
+        rows.add([(0, 1), (1, 1)], 0, 1)
+        rows._persistent_solver = session
+        if mode == "api_error":
+            with pytest.raises(RuntimeError) as error:
+                city.contract._run_milp(np.array([-1., -1.]), rows, city._Budget(10.), receipt, "service")
+            assert error.value.solver_diagnostics["solver_status"] == 4
+            assert "kError" in error.value.solver_diagnostics["highs_run_status"]
+        elif limited:
+            with pytest.raises(city.contract.domain.DecisionTimeout) as error:
+                city.contract._run_milp(np.array([-1., -1.]), rows, city._Budget(10.), receipt, "service")
+            diag = error.value.solver_diagnostics
+            assert diag["stage"] == "service" and diag["solver_status"] == 1
+            assert "kWarning" in diag["highs_run_status"]
+            assert "TimeLimit" in diag["highs_model_status"]
+        else:
+            result, binary, _ = city.contract._run_milp(
+                np.array([-1., -1.]), rows, city._Budget(10.), receipt, "service")
+            assert result.success and binary.sum() == 1
+        assert calls == ["run", "model_status"]
+
+
+def test_hv_native_auto_key_does_not_bypass_static_cache_or_bypass_c_direction():
+    state = graph.RouteState(ORIGIN, 10., 1000., "HV",
+        dict(kind="NATIVE_VEHICLE", native_vehicle_id=3, timestamp_s=10.))
+    connector = SchemeACityConnectors.__new__(SchemeACityConnectors)
+    key, reason = connector._certificate_source_key(state, profile="HV", hv_auto_od=True)
+    assert reason is None and key == ("HV_AUTO_OD_ORIGIN", ORIGIN)
+    assert connector._certificate_source_key(state, profile="HV") == (None, None)
+    # No C token evidence is available: the shortcut cannot manufacture it.
+    assert connector._certificate_source_key(state, profile="C", hv_auto_od=True) == (None, None)

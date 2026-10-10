@@ -108,13 +108,18 @@ def _run_milp(objective, rows, budget, receipt, name):
         if not ("Unrecognized options detected" in message and "passed to HiGHS verbatim" in message):
             raise JointNumericalContractError(f"{name}: solver options warning: {message}")
     elapsed = perf_counter() - started
-    if result.status == 1:
-        error = domain.DecisionTimeout(f"{name}: not proven optimal within the common decision budget")
+    if result.status != 0 or not result.success or result.x is None:
+        error = (domain.DecisionTimeout(f"{name}: not proven optimal within the common decision budget")
+            if result.status == 1 else RuntimeError(
+                f"{name}: finite sparse MILP failed: {result.message}; "
+                f"run_status={getattr(result, 'highs_run_status', None)}"))
         def finite_result(field):
             value = getattr(result, field, None)
             return float(value) if value is not None and math.isfinite(float(value)) else None
         error.solver_diagnostics = dict(stage=name, solver_status=int(result.status),
             solver_message=str(result.message), effective_total_budget_s=getattr(budget, "seconds", domain.DECISION_TIME_LIMIT_S),
+            highs_run_status=getattr(result, "highs_run_status", None),
+            highs_model_status=getattr(result, "highs_model_status", None),
             stage_time_limit_s=options["time_limit"], stage_elapsed_s=elapsed,
             columns=rows.columns, nonzeros=int(matrix.nnz), incumbent_returned=result.x is not None,
             incumbent_objective=finite_result("fun"), dual_bound=finite_result("mip_dual_bound"),
@@ -122,8 +127,6 @@ def _run_milp(objective, rows, budget, receipt, name):
         if session is not None:
             error.solver_diagnostics["persistent_session"] = session.diagnostics()
         raise error
-    if result.status != 0 or not result.success or result.x is None:
-        raise RuntimeError(f"{name}: finite sparse MILP did not reach optimality: {result.message}")
     budget.remaining(name)
     raw = np.asarray(result.x)
     if raw.shape != (rows.columns,) or not np.all(np.isfinite(raw)):

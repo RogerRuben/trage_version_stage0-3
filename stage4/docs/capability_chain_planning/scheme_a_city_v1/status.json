@@ -1,5 +1,5 @@
 {
-  "status": "STOPPED_BUNDLED_HIGHS_RUN_WARNING_MODEL_STATUS_UNRECORDED",
+  "status": "REASSESSED_LEGACY_REALTIME_CHAIN_RETIRED",
   "initial_attempt_status": "STOPPED",
   "initial_code_sha": "dd3fdfb29f0c9b6af9a5f449cd568312bf7ba694",
   "initial_config_sha256": "54af66f569d6b13b8668b03540cf0d18d966108f80dc4e262aeca96a247c997d",
@@ -119,6 +119,21 @@
     "old_failure_recovery_demonstrated": false,
     "incumbent_fallback": false,
     "record": "stage4/docs/capability_chain_planning/engineering_efficiency_v1/report.md"
+  },
+  "method_reassessment": {
+    "date": "2026-10-10",
+    "authorization": "USER_REQUEST_THOROUGH_CODE_REASSESSMENT_AND_APPROPRIATE_SIMPLIFICATION",
+    "legacy_full_day_retry_planned": false,
+    "legacy_realtime_chain_path_retired": true,
+    "selected_architecture": "COARSE_CONTINUATION_VALUE_AND_SPARSE_CURRENT_ACTION_FLOW",
+    "algorithm_semantics_changed": true,
+    "current_flow_kernel_implemented": true,
+    "coarse_value_provider_implemented": false,
+    "native_replay_integration_complete": false,
+    "new_full_day_started": false,
+    "old_layout_and_products_preserved": true,
+    "raw_data_or_capability_thresholds_changed": false,
+    "record": "stage4/docs/capability_chain_planning/reassessment_and_simplification_v2.md"
   },
   "current_attempt": {
     "attempt": 7,
