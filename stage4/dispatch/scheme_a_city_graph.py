@@ -189,21 +189,21 @@ class CoarseHistoricalLibrary:
                     duration, pickup, dropoff, allowed, accepted, date, order))
             tasks.sort(key=lambda task: (task.release_s, task.request_id))
             scene = f"TRAIN_DAY_{date}"
-            snapshot[scene] = tasks
+            snapshot[scene] = tuple(tasks)
         self._snapshot = snapshot
         self.spatial_indexes = {scene: _task_index(tasks) for scene, tasks in snapshot.items()}
         self.last_refresh_s = coarse_s
         self.refresh_count += 1
 
-    def view(self, now: float) -> dict[str, list[ChainTask]]:
+    def view(self, now: float) -> dict[str, Sequence[ChainTask]]:
         if not isfinite(float(now)) or now < 0:
             raise ValueError("invalid scenario decision time")
         coarse = int(now // self.refresh_s) * self.refresh_s
         if self.last_refresh_s != coarse:
             self._refresh(coarse)
         end = min(now + self.horizon_s, self.end_s - 1.0)
-        return {scene: [task for task in tasks if now < task.release_s <= end]
-            for scene, tasks in self._snapshot.items()}
+        return {scene: TaskWindow(self.spatial_indexes[scene], now, end)
+            for scene in self._snapshot}
 
     def diagnostics(self) -> dict:
         return dict(source_kind="EARLIER_HISTORY_M3_P50_ONLY", refresh_count=self.refresh_count,
@@ -235,10 +235,125 @@ class _TaskIndex:
             [profile in t.compatible_profiles for t in self.tasks], dtype=bool) for profile in profiles}
 
 
+class TaskWindow(Sequence):
+    """A fine-time view of one immutable coarse index, not a rebuilt tree.
+
+    Iteration is exactly the old filtered list order. The complete spatial
+    ordering belongs to ``base``; release-window filtering stays per view.
+    """
+    def __init__(self, base: _TaskIndex, after_s: float, through_s: float):
+        self.base = base
+        self.mask = (base.release_times > after_s) & (base.release_times <= through_s)
+        self.offsets = np.flatnonzero(self.mask)
+        self.index = _WindowIndex(base, self.mask)
+
+    def __len__(self):
+        return len(self.offsets)
+
+    def __getitem__(self, item):
+        if isinstance(item, slice):
+            return tuple(self.base.tasks[int(i)] for i in self.offsets[item])
+        return self.base.tasks[int(self.offsets[item])]
+
+
+class _WindowIndex:
+    def __init__(self, base, mask):
+        self.base, self.mask = base, mask
+        self.visible_count = int(np.count_nonzero(mask))
+        self.tree = base.tree if self.visible_count else None
+        self.duplicates = 0
+
+    def __getattr__(self, name):
+        return getattr(self.base, name)
+
+
+class _CombinedTasks(Sequence):
+    def __init__(self, pending, window):
+        prefix = _task_index(pending)
+        by_id = {task.request_id: task for task in prefix.tasks}
+        overlap = []
+        for offset in window.offsets:
+            task = window.base.tasks[int(offset)]
+            prior = by_id.get(task.request_id)
+            if prior is not None:
+                if prior != task:
+                    raise ValueError("conflicting task records share a request identity")
+                overlap.append(int(offset))
+        tail = window.index
+        if overlap:
+            mask = window.mask.copy()
+            mask[overlap] = False
+            tail = _WindowIndex(window.base, mask)
+        self.index = _CombinedIndex(prefix, tail, len(overlap))
+        self._supplied = pending, window
+
+    def __len__(self):
+        return len(self._supplied[0]) + len(self._supplied[1])
+
+    def __getitem__(self, item):
+        # The supplied sequence preserves duplicates, as the old concatenation
+        # did. Only its index deduplicates, with the same pending-first rule.
+        first, last = self._supplied
+        if isinstance(item, slice):
+            return tuple(self)[item]
+        if item < 0:
+            item += len(self)
+        if not 0 <= item < len(self):
+            raise IndexError("combined task index out of range")
+        return first[item] if item < len(first) else last[item - len(first)]
+
+
+class _CombinedIndex:
+    def __init__(self, prefix, tail, overlap_count):
+        self.parts = prefix, tail
+        self.visible_count = len(prefix.tasks) + tail.visible_count
+        self.duplicates = prefix.duplicates + overlap_count
+        self.tree = True if any(part.tree is not None for part in self.parts) else None
+
+
+def combine_tasks(pending: Sequence[ChainTask], tasks: Sequence[ChainTask]):
+    """Add observed pending tasks without rebuilding the forecast KDTree."""
+    if isinstance(tasks, TaskWindow):
+        return _CombinedTasks(pending, tasks) if pending else tasks
+    return (*pending, *tasks)
+
+
+_SITE_GEOMETRY_CACHE = OrderedDict()
+
+
+class PreparedSites(Sequence):
+    def __init__(self, sites):
+        self.rows = tuple(dict(site, position=_point(site["position"])) for site in sites)
+        key = tuple(site["position"] for site in self.rows)
+        cached = _SITE_GEOMETRY_CACHE.get(key)
+        if cached is None:
+            points = np.asarray([_xy(point) for point in key], dtype=float).reshape(-1, 2)
+            points.flags.writeable = False
+            cached = points, cKDTree(points) if len(points) else None
+            _SITE_GEOMETRY_CACHE[key] = cached
+            while len(_SITE_GEOMETRY_CACHE) > 8:
+                _SITE_GEOMETRY_CACHE.popitem(last=False)
+        else:
+            _SITE_GEOMETRY_CACHE.move_to_end(key)
+        self.points, self.tree = cached
+
+    def __len__(self):
+        return len(self.rows)
+
+    def __getitem__(self, item):
+        return self.rows[item]
+
+
+def prepare_sites(sites):
+    return sites if isinstance(sites, PreparedSites) else PreparedSites(sites)
+
+
 _TASK_INDEX_CACHE: OrderedDict[int, tuple[Sequence[ChainTask], _TaskIndex]] = OrderedDict()
 
 
 def _task_index(tasks: Sequence[ChainTask]) -> _TaskIndex:
+    if isinstance(tasks, (TaskWindow, _CombinedTasks)):
+        return tasks.index
     # Retaining the sequence prevents Python object-ID reuse. The caller must
     # not mutate the sequence during a decision; ChainTask itself is frozen.
     key = id(tasks)
@@ -315,7 +430,22 @@ def _candidate_tasks(index: _TaskIndex, state: RouteState, radius: float, top_k:
     Returned pairs are ``(departure_s, ChainTask)`` in the old deterministic
     order; unsupported directed routes are still checked later by the caller.
     """
-    ordered, cache_hit = _SPATIAL_ORDER_CACHE.ordered(index, state.position, radius)
+    if isinstance(index, _CombinedIndex):
+        # A component's first K eligible items suffice for the union's first K.
+        # All spatial/eligible counts still use the complete neighborhoods.
+        parts = [_candidate_tasks(part, state, radius, top_k, step, horizon, excluded, used)
+                 for part in index.parts]
+        here = np.asarray(_xy(state.position))
+        candidates = [candidate for part in parts for candidate in part[0]]
+        candidates.sort(key=lambda pair: (
+            float(np.linalg.norm(np.asarray(_xy(pair[1].pickup)) - here)),
+            pair[1].deadline_s, pair[1].release_s, pair[1].request_id))
+        return candidates[:top_k], sum(p[1] for p in parts), sum(p[2] for p in parts), \
+            all(p[3] for p in parts)
+    owner = index.base if isinstance(index, _WindowIndex) else index
+    ordered, cache_hit = _SPATIAL_ORDER_CACHE.ordered(owner, state.position, radius)
+    if isinstance(index, _WindowIndex):
+        ordered = ordered[index.mask[ordered]]
     spatial_count = len(ordered)
     if not spatial_count or state.profile_id not in index.profile_masks:
         return [], spatial_count, 0, cache_hit
@@ -400,12 +530,12 @@ def build_restricted_chains(
         raise ValueError("invalid chain planning horizon")
     excluded = set(map(int, cfg.get("exclude_request_ids", ())))
     index = _task_index(tasks)
-    site_rows = tuple(dict(site, position=_point(site["position"])) for site in sites)
-    site_points = np.asarray([_xy(s["position"]) for s in site_rows], dtype=float).reshape(-1, 2)
-    site_tree = cKDTree(site_points) if len(site_rows) else None
+    site_index = prepare_sites(sites)
+    site_rows, site_points, site_tree = site_index.rows, site_index.points, site_index.tree
     diagnostics = dict(scope="DECLARED_RESTRICTED_CHAIN_HEURISTIC",
         full_path_domain=False, global_upper_bound_claimed=False, dense_matrix_used=False,
-        input_task_count=len(index.tasks), duplicate_input_task_count=index.duplicates,
+        input_task_count=(index.visible_count if isinstance(index, (_WindowIndex, _CombinedIndex))
+                          else len(index.tasks)), duplicate_input_task_count=index.duplicates,
         labels_generated=1, labels_expanded=0, task_spatial_candidates=0,
         task_temporal_profile_candidates=0, task_top_k_truncated=0,
         task_spatial_order_cache_hits=0, task_spatial_order_cache_misses=0,
@@ -452,9 +582,17 @@ def build_restricted_chains(
                 diagnostics["task_top_k_truncated"] += max(0, eligible_count - top_k)
                 diagnostics["task_spatial_order_cache_hits" if cache_hit else
                     "task_spatial_order_cache_misses"] += 1
-                for depart, task in candidates:
+                connections = None
+                if len(candidates) > 1 and state.profile_id == "HV" and hasattr(connector, "evaluate_many"):
                     check_budget()
-                    connection = connector(state, task, depart, state.profile_id)
+                    connections = connector.evaluate_many([
+                        (state, task, depart, state.profile_id) for depart, task in candidates])
+                    if len(connections) != len(candidates):
+                        raise RuntimeError("typed connector batch result lost an input")
+                for candidate_index, (depart, task) in enumerate(candidates):
+                    check_budget()
+                    connection = (connections[candidate_index] if connections is not None
+                                  else connector(state, task, depart, state.profile_id))
                     diagnostics["connector_queries"] += 1
                     if not _certified(connection, state.profile_id):
                         diagnostics["connector_rejected"] += 1

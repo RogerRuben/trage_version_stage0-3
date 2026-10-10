@@ -19,6 +19,7 @@ import warnings
 
 import numpy as np
 from scipy.optimize import Bounds, LinearConstraint, linprog, milp
+_ORIGINAL_SCIPY_MILP = milp
 
 from . import capability_chain_rolling_solver as domain
 
@@ -92,11 +93,16 @@ def _run_milp(objective, rows, budget, receipt, name):
     options = dict(receipt["options"], time_limit=budget.remaining(name),
                    mip_rel_gap=0.0, presolve=True)
     started = perf_counter()
-    with warnings.catch_warnings(record=True) as caught:
-        warnings.simplefilter("always")
-        result = milp(objective, integrality=np.ones(rows.columns, dtype=np.int8),
-                      bounds=Bounds(np.zeros(rows.columns), np.ones(rows.columns)),
-                      constraints=LinearConstraint(matrix, rows.lower, rows.upper), options=options)
+    session = getattr(rows, "_persistent_solver", None) if milp is _ORIGINAL_SCIPY_MILP else None
+    caught = []
+    if session is not None:
+        result = session.solve(objective, rows, matrix, lambda:budget.remaining(name))
+    else:
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            result = milp(objective, integrality=np.ones(rows.columns, dtype=np.int8),
+                          bounds=Bounds(np.zeros(rows.columns), np.ones(rows.columns)),
+                          constraints=LinearConstraint(matrix, rows.lower, rows.upper), options=options)
     for warning in caught:
         message = str(warning.message)
         if not ("Unrecognized options detected" in message and "passed to HiGHS verbatim" in message):
@@ -113,6 +119,8 @@ def _run_milp(objective, rows, budget, receipt, name):
             columns=rows.columns, nonzeros=int(matrix.nnz), incumbent_returned=result.x is not None,
             incumbent_objective=finite_result("fun"), dual_bound=finite_result("mip_dual_bound"),
             mip_gap=finite_result("mip_gap"))
+        if session is not None:
+            error.solver_diagnostics["persistent_session"] = session.diagnostics()
         raise error
     if result.status != 0 or not result.success or result.x is None:
         raise RuntimeError(f"{name}: finite sparse MILP did not reach optimality: {result.message}")
@@ -134,11 +142,14 @@ def _run_milp(objective, rows, budget, receipt, name):
     certified_violation = _violation(matrix, rows, binary)
     if certified_violation != 0:
         raise JointNumericalContractError(f"{name}: projected integer certificate violates an exact row")
+    if session is not None:
+        session.accept_certified_binary(binary)
     return result, binary, dict(runtime_s=elapsed, max_binary_deviation=deviation,
                                max_raw_row_violation=raw_violation,
                                max_raw_bound_violation=bound_violation,
                                max_certified_row_violation=certified_violation,
-                               rounding_tolerance=NUMERICAL_TOLERANCE)
+                               rounding_tolerance=NUMERICAL_TOLERANCE,
+                               persistent_session=session.diagnostics() if session is not None else None)
 
 
 def _action_tie(model, action_columns, size):

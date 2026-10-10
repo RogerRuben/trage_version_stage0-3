@@ -341,7 +341,14 @@ def run_group(root, cfg, protected, layout, group, *, resume=False):
             if tick % 900 == 0:
                 progress = dict(group=group, tick=tick, matched=len(control.assignment_rows),
                     completed=len(control.completed_rids), expired=len(control.expired_rids),
-                    runtime_s=perf_counter()-started, **resources)
+                    runtime_s=perf_counter()-started, **resources,
+                    performance=dict(adapter=adapter.progress_summary(),
+                        connections=dict(timings_s=dict(connectors.timings), counts=dict(connectors.counts)),
+                        scalar_eta=dict(wall_time_s=float(getattr(routing, "routing_time_s", 0.)),
+                            backend_work_time_s=float(getattr(routing, "routing_backend_work_time_s", 0.)),
+                            arc_evaluations=int(getattr(routing, "routing_arc_evaluations", 0)),
+                            cache_hits=int(getattr(routing, "cache_hit_count", 0))),
+                        timing_components_are_nested_do_not_sum=True))
                 atomic_json(directory/"progress.json", progress)
                 print(json.dumps(progress), flush=True)
             if tick > clock_cfg["admission_end_s"] and not (
@@ -388,6 +395,8 @@ def run_group(root, cfg, protected, layout, group, *, resume=False):
         return summary
     except Exception as error:
         summary.update(status="STOPPED", error=repr(error), tick=tick, runtime_s=perf_counter()-started)
+        if hasattr(error, "solver_diagnostics"):
+            summary["solver_diagnostics"] = error.solver_diagnostics
         if bridge is not None and control is not None:
             atomic_parquet(directory/"partial_assignments.parquet", bridge.environment_assignments())
         if adapter is not None:

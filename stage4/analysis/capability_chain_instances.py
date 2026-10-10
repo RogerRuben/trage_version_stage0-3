@@ -241,12 +241,16 @@ class JoinEvidence:
         uids = set(joined.loc[joined.route_token_type.eq("FULL_NETWORK_EDGE"), "resolved_stage3_edge_uid"].dropna())
         reverse_keys = set(joined.loc[joined.route_token_type.eq("HISTORICAL_REVERSE_OVERLAY"), "canonical_edge_uid"])
         uids |= {self.overlay_forward[k] for k in reverse_keys if k in self.overlay_forward}
-        geometry = self.router.small_geometry(uids)
-        boundary = _select(self.router._boundary, "stage3_edge_uid", uids).to_pandas()
-        cids = set(boundary.intersection_complex_uid.astype(str))
-        movements = _select(self.router._movements, "intersection_complex_uid", cids)
-        movements = _select(_select(movements, "incoming_stage3_edge_uid", uids), "outgoing_stage3_edge_uid", uids).to_pandas()
-        controls = _select(self.router._controls, "intersection_complex_uid", cids).to_pandas()
+        if hasattr(self.router, "join_static_inputs"):
+            geometry, boundary, movements, controls, bearings = self.router.join_static_inputs(uids)
+        else:
+            geometry = self.router.small_geometry(uids)
+            boundary = _select(self.router._boundary, "stage3_edge_uid", uids).to_pandas()
+            cids = set(boundary.intersection_complex_uid.astype(str))
+            movements = _select(self.router._movements, "intersection_complex_uid", cids)
+            movements = _select(_select(movements, "incoming_stage3_edge_uid", uids), "outgoing_stage3_edge_uid", uids).to_pandas()
+            controls = _select(self.router._controls, "intersection_complex_uid", cids).to_pandas()
+            bearings = self.router._bearings_for(uids)
         classifier = MovementClassifier.__new__(MovementClassifier)
         classifier.complexes = controls.set_index("intersection_complex_uid").to_dict("index")
         classifier.lookup = {}
@@ -255,7 +259,7 @@ class JoinEvidence:
             if record["movement_legality_state"] == "CERTIFIED_PROHIBITED":
                 record["movement_legality_state"] = "PROHIBITED"
             classifier.lookup[tuple(str(record[c]) for c in MOVEMENT_COLUMNS[:3])] = SimpleNamespace(**record)
-        classifier.bearings = self.router._bearings_for(uids)
+        classifier.bearings = bearings
         parser = HistoricalResearchParser(boundary, self.overlay.loc[self.overlay.canonical_edge_uid.isin(reverse_keys)], classifier)
         for canonical, virtual in parser.virtual.items():
             forward = self.overlay_forward[canonical]
@@ -291,6 +295,23 @@ class JoinEvidence:
             if not valid:
                 return dict(supported=False, reason_codes=[reason])
 
+        # Only the frozen topological parse is reusable. Current stop/snap
+        # geometry has just been rechecked; connector beta and original
+        # pickup deadline are checked separately by the decision caller.
+        parse_key = None
+        if hasattr(self.router, "join_parse_key"):
+            parse_key = self.router.join_parse_key(pieces,
+                {key:self.overlay_forward.get(key) for key in reverse_keys},
+                (CONTROL_POLICY, TRAFFIC_OUTSIDE_BUDGET, tuple(sorted(UNKNOWN_TRAFFIC.items()))))
+            cached = self.router.join_parse_get(parse_key)
+            if cached is not None:
+                return cached
+
+        def finish(result):
+            if parse_key is not None:
+                self.router.join_parse_put(parse_key, result)
+            return result
+
         groups = []
         for label, frame in [("JOINT", joined), *pieces]:
             if len(frame):
@@ -299,11 +320,11 @@ class JoinEvidence:
                 work["route_sequence"] = np.arange(len(work))
                 groups.append(work)
         if not groups:
-            return dict(supported=True, reason_codes=[], compatible_profiles=["HV", "C"],
-                join_encounter_count=0, join_maneuvers=[], C_reason_codes=[], join_bearing_fallback_count=0)
+            return finish(dict(supported=True, reason_codes=[], compatible_profiles=["HV", "C"],
+                join_encounter_count=0, join_maneuvers=[], C_reason_codes=[], join_bearing_fallback_count=0))
         identity, _, _, encounters = parser.parse(pd.concat(groups, ignore_index=True))
         if not identity.direction_supported.all():
-            return dict(supported=False, reason_codes=["JOIN_DIRECTION_UNSUPPORTED"])
+            return finish(dict(supported=False, reason_codes=["JOIN_DIRECTION_UNSUPPORTED"]))
         individual = Counter(self._signature(r) for r in encounters.loc[~encounters.order_id.eq("JOINT")].itertuples(index=False)) if len(encounters) else Counter()
         added = []
         if len(encounters):
@@ -314,22 +335,22 @@ class JoinEvidence:
                 else:
                     added.append(row._asdict())
         if any(individual.values()):
-            return dict(supported=False, reason_codes=["JOIN_CHANGED_STANDALONE_MOVEMENT_PARSE"])
+            return finish(dict(supported=False, reason_codes=["JOIN_CHANGED_STANDALONE_MOVEMENT_PARSE"]))
         extra = pd.DataFrame(added)
         if len(extra):
             extra["order_id"] = "JOIN"
         classified, summary = classifier.summarize(extra)
         valid, actions = classified.get("JOIN", (True, ()))
         if not valid:
-            return dict(supported=False, reason_codes=["JOIN_MANEUVER_UNRESOLVED"])
+            return finish(dict(supported=False, reason_codes=["JOIN_MANEUVER_UNRESOLVED"]))
         evaluations = {k: evaluate_research_compatibility(k, actions, dict(UNKNOWN_TRAFFIC),
             conservative_control_policy=CONTROL_POLICY, outside_budget=TRAFFIC_OUTSIDE_BUDGET) for k in ("HV", "C")}
         prohibited = any(m.certified_prohibited for m in actions)
-        return dict(supported=not prohibited, reason_codes=["CERTIFIED_COMMON_PROHIBITION"] if prohibited else [],
+        return finish(dict(supported=not prohibited, reason_codes=["CERTIFIED_COMMON_PROHIBITION"] if prohibited else [],
             compatible_profiles=[k for k, result in evaluations.items() if result.compatible],
             join_encounter_count=len(actions), join_maneuvers=[m.maneuver for m in actions],
             C_reason_codes=list(evaluations["C"].reason_codes),
-            join_bearing_fallback_count=int(summary.bearing_fallback_count.sum()) if len(summary) else 0)
+            join_bearing_fallback_count=int(summary.bearing_fallback_count.sum()) if len(summary) else 0))
 
 
 def result_metrics(solution, horizon_s):

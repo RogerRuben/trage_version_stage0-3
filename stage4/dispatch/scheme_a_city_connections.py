@@ -7,7 +7,9 @@ retimed with the frozen pickup multiplier at its predicted departure time.
 """
 from __future__ import annotations
 
-from collections import Counter, OrderedDict
+from collections import Counter, OrderedDict, defaultdict, deque
+from copy import deepcopy
+import hashlib
 from math import isfinite
 from pathlib import Path
 import sys
@@ -20,13 +22,14 @@ import pyarrow as pa
 import pyarrow.compute as pc
 import pyarrow.parquet as pq
 
+from stage3.odd_tod.intersection_complex import _bearing
 from stage4.analysis.capability_chain_instances import IDENTITY_COLUMNS, JoinEvidence
 from stage4.analysis.flexibility_prepare import S3
 from stage4.dispatch.city_pickup_support import (
     OVERLAY_REL, TOPOLOGY_COLUMNS, _SmallJoinRouter, _matched_batches,
 )
 from stage4.dispatch.controlled_movement import CommonIdleMovementManager
-from stage4.dispatch.controlled_routes import S2A, _gap_m
+from stage4.dispatch.controlled_routes import S2A, _gap_m, _select
 from stage4.dispatch.candidate_graph import SpatialVehicle
 from stage4.fleetpy_adapter.valhalla_time_adapter import TIMEZONE
 
@@ -37,6 +40,7 @@ INTERFACE_SNAP_TOLERANCE_M = 80.0
 GEOMETRY_ROWGROUP_CACHE_BYTES = 64 * 2**20
 CERTIFICATE_CACHE_BYTES = 32 * 2**20
 CERTIFICATE_CACHE_ENTRIES = 50000
+JOIN_STATIC_CACHE_BYTES = 16 * 2**20
 
 
 def _value(obj, name, default=None):
@@ -88,6 +92,10 @@ selected evidence or Python geometry objects.
         self.row_group_bytes = 0
         self.row_group_reads, self.row_group_hits = 0, 0
         self.missing_uids = OrderedDict()
+        self.join_static_cache = OrderedDict()
+        self.join_static_bytes = 0
+        self.join_static_hits, self.join_static_misses = 0, 0
+        self.join_parse_hits, self.join_parse_misses = 0, 0
 
     def prepare_geometry(self, uids):
         wanted = {str(uid) for uid in uids if uid is not None}
@@ -135,6 +143,72 @@ selected evidence or Python geometry objects.
             self.geometry_cache.popitem(last=False)
         return result
 
+    def join_static_inputs(self, uids):
+        """Frozen geometry/control slices, not cached dynamic interface tests.
+
+        Identical UID sets need no repeated whole-table Arrow selection or
+        geometry decode. Parser bearings/geometry maps are copied because
+        historical reversal adds virtual identities to those maps.
+        """
+        key = "INPUTS", tuple(sorted(uids))
+        cached = self.join_static_cache.get(key)
+        if cached is None:
+            self.join_static_misses += 1
+            geometry = self.small_geometry(uids)
+            boundary = _select(self._boundary, "stage3_edge_uid", uids).to_pandas()
+            cids = set(boundary.intersection_complex_uid.astype(str))
+            movements = _select(self._movements, "intersection_complex_uid", cids)
+            movements = _select(_select(movements, "incoming_stage3_edge_uid", uids),
+                                "outgoing_stage3_edge_uid", uids).to_pandas()
+            controls = _select(self._controls, "intersection_complex_uid", cids).to_pandas()
+            bearings = {}
+            for uid, record in geometry.items():
+                points = record["geometry"]
+                bearings[uid] = ((_bearing(points[0], points[1]), _bearing(points[-2], points[-1]))
+                                 if len(points) >= 2 else (None, None))
+            cached = geometry, boundary, movements, controls, bearings
+            self._remember_join_data(key, cached)
+        else:
+            self.join_static_hits += 1
+            self.join_static_cache.move_to_end(key)
+            cached, _ = cached
+        geometry, boundary, movements, controls, bearings = cached
+        return dict(geometry), boundary, movements, controls, dict(bearings)
+
+    def _remember_join_data(self, key, value):
+        size = SchemeACityConnectors._certificate_size(key, value)
+        if size > JOIN_STATIC_CACHE_BYTES:
+            return
+        old = self.join_static_cache.pop(key, None)
+        if old is not None:
+            self.join_static_bytes -= old[1]
+        while self.join_static_cache and (len(self.join_static_cache) >= 128
+                or self.join_static_bytes + size > JOIN_STATIC_CACHE_BYTES):
+            _, (_, old_size) = self.join_static_cache.popitem(last=False)
+            self.join_static_bytes -= old_size
+        self.join_static_cache[key] = value, size
+        self.join_static_bytes += size
+
+    @staticmethod
+    def join_parse_key(pieces, overlay, policy):
+        columns = ["date", "canonical_edge_uid", "route_token_type", "resolved_stage3_edge_uid"]
+        sequence = tuple((label, tuple(frame[columns].itertuples(index=False, name=None)))
+                         for label, frame in pieces)
+        return "PARSE", hashlib.sha256(repr((sequence, tuple(sorted(overlay.items())), policy))
+                                     .encode("utf-8")).digest()
+
+    def join_parse_get(self, key):
+        cached = self.join_static_cache.get(key)
+        if cached is None:
+            self.join_parse_misses += 1
+            return None
+        self.join_parse_hits += 1
+        self.join_static_cache.move_to_end(key)
+        return deepcopy(cached[0])
+
+    def join_parse_put(self, key, result):
+        self._remember_join_data(key, deepcopy(result))
+
 
 class SchemeACityConnectors:
     """Callable scalar/identity/seam support shared by layout and chain plans.
@@ -175,6 +249,9 @@ not permission to execute a scenario's hypothetical future customer path.
         self.route_cache = OrderedDict()
         self.body_cache = OrderedDict()
         self.native_context_cache = OrderedDict()
+        self.native_signature_cache = OrderedDict()
+        self._native_scope = None
+        self._prefetched_hv = None
         self.certificate_cache = OrderedDict()
         self.certificate_bytes = 0
         self.train_tables, self.train_ranges = {}, {}
@@ -315,6 +392,11 @@ not permission to execute a scenario's hypothetical future customer path.
         if _gap_m(current, origin) > 1e-5:
             return None, None, "NATIVE_DEPARTURE_POSITION_MISMATCH"
         key = (vid, now, current, len(c.assignment_rows))
+        scope = now, len(c.assignment_rows)
+        if self._native_scope != scope:
+            self.native_context_cache.clear()
+            self.native_signature_cache.clear()
+            self._native_scope = scope
         if key in self.native_context_cache:
             self.native_context_cache.move_to_end(key)
             return self.native_context_cache[key]
@@ -444,14 +526,37 @@ not permission to execute a scenario's hypothetical future customer path.
         return dict(supported=False, compatible_profiles=(), travel_time_s=None,
             empty_distance_m=None, arrival_context=None, reason_codes=reasons, routed=routed)
 
-    def _certificate_source_key(self, origin_state):
-        """Moving native prefixes bypass; immutable customer/empty views reuse."""
+    def _certificate_source_key(self, origin_state, *, profile=None):
+        """Cache only exact immutable evidence, never a vehicle ID alone."""
         origin, context = _point(_value(origin_state, "position")), _value(origin_state, "context")
         if context is None:
             return ("INITIAL", origin), None
         kind = context.get("kind")
         if kind == "NATIVE_VEHICLE":
-            return None, None
+            if profile != "C":
+                return None, None
+            try:
+                frame, coords, reason = self._native_source(context, origin)
+            except (KeyError, AttributeError, ValueError):
+                return None, None
+            if reason:
+                # Preserve the old route-before-seam rejection priority.
+                return None, None
+            cache_key = (int(context["native_vehicle_id"]), float(context["timestamp_s"]),
+                         origin, len(self.control.assignment_rows))
+            signature = self.native_signature_cache.get(cache_key)
+            if signature is None:
+                rows = tuple(frame[IDENTITY_COLUMNS].itertuples(index=False, name=None)) \
+                    if frame is not None else ()
+                source = rows, tuple(sorted((coords or {}).items()))
+                signature = hashlib.sha256(repr(source).encode("utf-8")).digest()
+                self.native_signature_cache[cache_key] = signature
+                while len(self.native_signature_cache) > BODY_CACHE_LIMIT:
+                    self.native_signature_cache.popitem(last=False)
+            else:
+                self.native_signature_cache.move_to_end(cache_key)
+            self.counts["native_exact_prefix_certificate_keys"] += 1
+            return ("NATIVE_IMMUTABLE_PREFIX", origin, signature), None
         if kind == "CUSTOMER":
             task = context["task"]
             identity, reason = self._task_metadata(task)
@@ -474,6 +579,15 @@ not permission to execute a scenario's hypothetical future customer path.
             return ("EMPTY_ARRIVAL", origin, edges), None
         return None, "DEPARTURE_CONTEXT_KIND_UNSUPPORTED"
 
+    def _certificate_key(self, mode, profile, origin, source_key, target_key):
+        if source_key is None:
+            return None
+        full = self._geometry_key, mode, profile, origin, source_key, target_key
+        # Complete evidence is hashed, not truncated or rounded. Keeping its
+        # digest rather than repeated long edge-ID tuples improves the hit
+        # rate within the SAME 32-MiB conservative allocation ceiling.
+        return hashlib.sha256(repr(full).encode("utf-8")).digest()
+
     @staticmethod
     def _certificate_size(key, certificate):
         """Conservative Python allocation size, including nested context tokens."""
@@ -488,6 +602,10 @@ not permission to execute a scenario's hypothetical future customer path.
                 count += sum(size(k) + size(v) for k, v in value.items())
             elif isinstance(value, (tuple, list, set, frozenset)):
                 count += sum(map(size, value))
+            elif isinstance(value, pd.DataFrame):
+                count += int(value.memory_usage(index=True, deep=True).sum()) + 4096
+            elif isinstance(value, np.ndarray):
+                count += value.nbytes
             elif hasattr(value, "__dict__"):
                 count += size(vars(value))
             return count
@@ -590,10 +708,16 @@ This branch is enabled explicitly by the parent protocol, never for site MOVE.
             connection_evidence_state="HV_STATIC_AUTO_OD_ROUTABLE",
             coincident_od=origin == target_point, allow_zero_auto_od=True)
         try:
-            vehicle = SpatialVehicle(vehicle_id="SCHEME_A_HV_FORECAST", native_vehicle_id=0,
-                vehicle_type="HV", lon_wgs84=origin[0], lat_wgs84=origin[1])
-            answers = self.control.eta_adapter.estimate_many([vehicle], *target_point, stamp)
-            estimate = answers.get(0)
+            request_key = origin, target_point, pd.Timestamp(stamp).isoformat()
+            prepared = (self._prefetched_hv.get(request_key) if self._prefetched_hv is not None else None)
+            if prepared:
+                estimate = prepared.popleft()
+                self.counts["HV_future_batch_answers_consumed"] += 1
+            else:
+                vehicle = SpatialVehicle(vehicle_id="SCHEME_A_HV_FORECAST", native_vehicle_id=0,
+                    vehicle_type="HV", lon_wgs84=origin[0], lat_wgs84=origin[1])
+                answers = self.control.eta_adapter.estimate_many([vehicle], *target_point, stamp)
+                estimate = answers.get(0)
             if estimate is None:
                 certificate["reason_codes"] = ("HV_AUTO_OD_ROUTING_RESULT_MISSING",)
                 return certificate, None
@@ -612,6 +736,81 @@ This branch is enabled explicitly by the parent protocol, never for site MOVE.
         finally:
             self.timings["HV_future_auto_OD_time_s"] += perf_counter() - started
 
+    def evaluate_many(self, queries):
+        """Route one label's sparse HV candidates in original logical order.
+
+        The existing epoch adapter preserves sequential cache-fill and rounded
+        alias semantics. A mixed/cached certificate batch uses the scalar path
+        instead of prefetching speculative arcs. C and MOVE never use ETA-only
+        evidence. At most the frozen Top-3 inputs are queued by the generator.
+        """
+        queries = tuple(queries)
+        eta = self.control.eta_adapter
+        if (not queries or len(queries) > 3 or self._prefetched_hv is not None
+                or not getattr(self.control, "config", {}).get("scheme_a_fast_forecast_hv", False)
+                or not hasattr(eta, "estimate_epoch")):
+            return [self(*query) for query in queries]
+        batches, keys, seen_certificates = [], [], set()
+        eligible = True
+        try:
+            for state, target, departure, profile in queries:
+                if profile != "HV" or isinstance(target, dict) or not isfinite(float(departure)) or departure < 0:
+                    eligible = False
+                    break
+                origin, point = _point(_value(state, "position")), _point(_value(target, "pickup"))
+                source_key, reason = self._certificate_source_key(state, profile="HV")
+                identity, target_reason = self._task_metadata(target)
+                if reason or target_reason or "HV" not in _value(target, "compatible_profiles", ()):
+                    eligible = False
+                    break
+                target_key = ("CUSTOMER", *identity, point, _point(_value(target, "dropoff")))
+                key = self._certificate_key("AUTO_OD", "HV", origin, source_key, target_key)
+                if key is not None and key in self.certificate_cache:
+                    eligible = False
+                    break
+                stamp = self.control._timestamp(float(departure))
+                _, beta = eta.beta_for(stamp)
+                if not isfinite(float(beta)) or beta <= 0 or self.geometry_timestamp.isoformat() != self._geometry_key:
+                    eligible = False
+                    break
+                if key is not None and key in seen_certificates:
+                    continue  # Later call hits the first static certificate.
+                seen_certificates.add(key)
+                vehicle = SpatialVehicle(vehicle_id="SCHEME_A_HV_FORECAST", native_vehicle_id=0,
+                    vehicle_type="HV", lon_wgs84=origin[0], lat_wgs84=origin[1])
+                batches.append(([vehicle], *point, stamp))
+                keys.append((origin, point, pd.Timestamp(stamp).isoformat()))
+        except (ValueError, TypeError, KeyError):
+            eligible = False
+        if not eligible:
+            return [self(*query) for query in queries]
+        started = perf_counter()
+        failed = False
+        try:
+            results = eta.estimate_epoch(batches)
+            if len(results) != len(batches):
+                raise ValueError("HV sparse epoch dropped a batch result")
+        except Exception:
+            self.counts["HV_future_batch_adapter_exception_scalar_fallback"] += 1
+            failed = True
+        finally:
+            elapsed = perf_counter() - started
+            self.timings["HV_future_batch_queue_time_s"] += elapsed
+            self.timings["HV_future_auto_OD_time_s"] += elapsed
+            self.timings["total_connection_time_s"] += elapsed
+        if failed:
+            return [self(*query) for query in queries]
+        self.counts["HV_future_batch_calls"] += 1
+        self.counts["HV_future_batch_arc_inputs"] += len(batches)
+        prepared = defaultdict(deque)
+        for key, result in zip(keys, results):
+            prepared[key].append(result.get(0))
+        self._prefetched_hv = prepared
+        try:
+            return [self(*query) for query in queries]
+        finally:
+            self._prefetched_hv = None
+
     def __call__(self, origin_state, target, departure_s, profile_id):
         started = perf_counter()
         self.counts["examined_connections"] += 1
@@ -625,7 +824,7 @@ This branch is enabled explicitly by the parent protocol, never for site MOVE.
             origin = _point(_value(origin_state, "position"))
             site = isinstance(target, dict) and "site_id" in target
             target_point = _point(target["position"] if site else _value(target, "pickup"))
-            source_key, reason = self._certificate_source_key(origin_state)
+            source_key, reason = self._certificate_source_key(origin_state, profile=profile)
             if reason:
                 return self._reject([reason])
             identity = None
@@ -648,9 +847,8 @@ This branch is enabled explicitly by the parent protocol, never for site MOVE.
                 and hasattr(self.control.eta_adapter, "estimate_many"))
             target_key = (("SITE", str(target["site_id"]), target_point) if site else
                 ("CUSTOMER", *identity, target_point, _point(_value(target, "dropoff"))))
-            key = ((self._geometry_key, "AUTO_OD" if fast_hv else "TYPED_SCALAR",
-                profile, origin, source_key, target_key)
-                if source_key is not None and not require_geometry else None)
+            key = (self._certificate_key("AUTO_OD" if fast_hv else "TYPED_SCALAR",
+                profile, origin, source_key, target_key) if not require_geometry else None)
             if key is not None and key in self.certificate_cache:
                 certificate, _ = self.certificate_cache[key]
                 self.certificate_cache.move_to_end(key)
@@ -700,6 +898,8 @@ This branch is enabled explicitly by the parent protocol, never for site MOVE.
             geometry_object_cache_entries=len(getattr(self.join_router, "geometry_cache", ())),
             actual_body_view_cache_entries=len(self.actual_evidence.tokens),
             certificate_cache_entries=len(self.certificate_cache),
+            certificate_cache_key_format="SHA256_COMPLETE_EXACT_CONTEXT_NOT_COORDINATE_ROUNDING",
+            native_signature_cache_entries=len(self.native_signature_cache),
             certificate_cache_entry_limit=CERTIFICATE_CACHE_ENTRIES,
             certificate_cache_mib=self.certificate_bytes / 2**20,
             certificate_cache_byte_limit_mib=CERTIFICATE_CACHE_BYTES / 2**20,
@@ -708,6 +908,13 @@ This branch is enabled explicitly by the parent protocol, never for site MOVE.
             geometry_rowgroup_cache_limit_mib=GEOMETRY_ROWGROUP_CACHE_BYTES / 2**20,
             geometry_rowgroup_reads=getattr(self.join_router, "row_group_reads", None),
             geometry_rowgroup_cache_hits=getattr(self.join_router, "row_group_hits", None),
+            join_static_cache_entries=len(getattr(self.join_router, "join_static_cache", ())),
+            join_static_cache_mib=getattr(self.join_router, "join_static_bytes", 0) / 2**20,
+            join_static_cache_limit_mib=JOIN_STATIC_CACHE_BYTES / 2**20,
+            join_static_cache_hits=getattr(self.join_router, "join_static_hits", 0),
+            join_static_cache_misses=getattr(self.join_router, "join_static_misses", 0),
+            join_parse_cache_hits=getattr(self.join_router, "join_parse_hits", 0),
+            join_parse_cache_misses=getattr(self.join_router, "join_parse_misses", 0),
             geometry_timestamp=self.geometry_timestamp.isoformat(),
             eta_beta_time="ACTUAL_OR_PREDICTED_CONNECTOR_DEPARTURE",
             traffic_policy="EXPLICIT_U_FOR_NEW_EMPTY_CONNECTOR_NO_M3_FABRICATION",

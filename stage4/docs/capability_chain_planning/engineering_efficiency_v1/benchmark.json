@@ -1,0 +1,99 @@
+{
+  "status": "ENGINEERING_COLUMN_EQUIVALENCE_PASS",
+  "native_simulation": false,
+  "whole_day_experiment": false,
+  "master_solved": false,
+  "real_valhalla_queries": 0,
+  "connector_model": "IDENTICAL_GEOMETRIC_SCALAR_MOCK_NOT_PHYSICAL_ROUTE_EVIDENCE",
+  "historical_template_rows": 28335,
+  "epochs": 3,
+  "actions_per_epoch": 96,
+  "reference_code_sha": "aaf73e20f9c4a46ad5ae74cc3ef307b01bf2cf86",
+  "input_sha256": {
+    "config": "8022d88c8c1377fd87f925bf7f0e35584b9bb3f500bc5cb8fd9d16ea9a0ef47e",
+    "templates": "f0ee98eb4ad5aca69125ace8610ce4ff2c40edb6b7f5e62016ee321a432af652",
+    "reference_graph": "f60348008b2ec5fbd3500593f1472fa6d35615fcd54481b1e79b5313ff3ab337",
+    "reference_adapter": "582c65f785eba27c380347d8d46c1a6b91c49a4aff3fcada13279d29ee54c69b"
+  },
+  "old": {
+    "wall_s": 0.4848835999982839,
+    "connector_calls": 11336,
+    "column_digests": [
+      "6c7c3047b973095a7ee721fcd097334aedef754f05eaef9fc2170506f37e28ca",
+      "b54cbb475b63a006fd5a6cf76fcc288a84330e1635ea841ad4d5e4980a014823",
+      "bde9962e80990384ec417e0773551df61e2b0ab259ac5d2b8c16fde69423ce8d"
+    ],
+    "epochs": [
+      {
+        "epoch_s": 61200.0,
+        "current_actions": 96,
+        "columns": 576,
+        "chain_builds_executed": null,
+        "chain_builds_reused": 0,
+        "graph_wall_s": 0.11700259999997797,
+        "continuation_cache_bytes": 0
+      },
+      {
+        "epoch_s": 61230.0,
+        "current_actions": 96,
+        "columns": 576,
+        "chain_builds_executed": null,
+        "chain_builds_reused": 0,
+        "graph_wall_s": 0.13258069999938016,
+        "continuation_cache_bytes": 0
+      },
+      {
+        "epoch_s": 61260.0,
+        "current_actions": 96,
+        "columns": 576,
+        "chain_builds_executed": null,
+        "chain_builds_reused": 0,
+        "graph_wall_s": 0.13337639999735984,
+        "continuation_cache_bytes": 0
+      }
+    ]
+  },
+  "optimized": {
+    "wall_s": 0.253544499999407,
+    "connector_calls": 1417,
+    "column_digests": [
+      "6c7c3047b973095a7ee721fcd097334aedef754f05eaef9fc2170506f37e28ca",
+      "b54cbb475b63a006fd5a6cf76fcc288a84330e1635ea841ad4d5e4980a014823",
+      "bde9962e80990384ec417e0773551df61e2b0ab259ac5d2b8c16fde69423ce8d"
+    ],
+    "epochs": [
+      {
+        "epoch_s": 61200.0,
+        "current_actions": 96,
+        "columns": 576,
+        "chain_builds_executed": 36,
+        "chain_builds_reused": 252,
+        "graph_wall_s": 0.052389899999980116,
+        "continuation_cache_bytes": 373367
+      },
+      {
+        "epoch_s": 61230.0,
+        "current_actions": 96,
+        "columns": 576,
+        "chain_builds_executed": 36,
+        "chain_builds_reused": 252,
+        "graph_wall_s": 0.0338225000014063,
+        "continuation_cache_bytes": 372634
+      },
+      {
+        "epoch_s": 61260.0,
+        "current_actions": 96,
+        "columns": 576,
+        "chain_builds_executed": 36,
+        "chain_builds_reused": 252,
+        "graph_wall_s": 0.06746449999991455,
+        "continuation_cache_bytes": 373006
+      }
+    ]
+  },
+  "construction_speed_ratio": 1.9124201077105518,
+  "connector_calls_avoided": 9919,
+  "peak_rss_mib": 177.09765625,
+  "python_main_wall_s": 1.510701600000175,
+  "full_day_speedup_not_identified": true
+}

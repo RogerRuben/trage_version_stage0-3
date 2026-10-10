@@ -373,6 +373,8 @@ def _component_rows(matrix, rows, group):
 
 
 def _coupled_selection(rows, objectives, local_actions, policy, budget, receipt):
+    from .persistent_city_milp import BundledIntegerSession
+    rows._persistent_solver = BundledIntegerSession(receipt)
     selected = None
     fixed, stages = [], []
 

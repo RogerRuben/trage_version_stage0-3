@@ -6,17 +6,21 @@ or scenario action is sent to the native executor.
 """
 from __future__ import annotations
 
-from collections import Counter, defaultdict
+from collections import Counter, OrderedDict, defaultdict
+from copy import deepcopy
 from dataclasses import replace
 import hashlib
-from math import ceil, cos, pi
+from math import ceil, cos, isfinite, pi
+import sys
 from time import perf_counter
 
 import numpy as np
 from scipy.spatial import cKDTree
 
 from .flexibility_native import predicted_vehicle_states
-from .scheme_a_city_graph import ChainTask, RouteState, build_restricted_chains
+from .scheme_a_city_graph import (
+    ChainTask, RouteState, build_restricted_chains, combine_tasks, prepare_sites,
+)
 from .scheme_a_city_master import CurrentAction, solve_city_master
 from .solver import LexicographicResult
 
@@ -77,6 +81,82 @@ def _column_allocation(actions, scenes, states, limit, now, horizon):
         allocation_is_declared_restricted_domain=True)
 
 
+def _continuation_key(state, tasks, excluded, horizon):
+    """Exact sufficient state for a nonempty continuation within one epoch.
+
+    Both service departures and move departures lie on grids divisible by
+    30 s. No continuation observes sub-grid ready time or an admission end
+    beyond this epoch's horizon. Native moving prefixes are deliberately not
+    coalesced. No time/position approximation is added to a physical route.
+    """
+    context = state.context
+    if context is None:
+        source = None
+    elif not isinstance(context, dict):
+        return None
+    elif context.get("kind") == "CUSTOMER" and isinstance(context.get("task"), ChainTask):
+        source = ("CUSTOMER", context["task"])
+    elif context.get("kind") == "EMPTY_ARRIVAL" and context.get("edge_uids"):
+        if tuple(context.get("point", ())) != state.position:
+            return None
+        source = ("EMPTY_ARRIVAL", tuple(context["edge_uids"]),
+                  context.get("geometry_timestamp"))
+    else:
+        return None
+    return (id(tasks), state.position, float(ceil(state.ready_s / 30) * 30),
+            min(state.admission_end_s, horizon), state.profile_id, source,
+            state.last_move_s, state.moves_used, tuple(sorted(excluded)))
+
+
+class _ContinuationMemo:
+    """An epoch-local, byte-bounded cache, never an all-day chain library."""
+    def __init__(self):
+        self.entries = OrderedDict()
+        self.resident_bytes = 0
+        self.limit_bytes = 8 * 1024 * 1024
+
+    @staticmethod
+    def _size(value):
+        seen = set()
+        def visit(item):
+            if id(item) in seen:
+                return 0
+            seen.add(id(item))
+            size = sys.getsizeof(item)
+            if isinstance(item, dict):
+                size += sum(visit(k) + visit(v) for k, v in item.items())
+            elif isinstance(item, (tuple, list, set, frozenset)):
+                size += sum(map(visit, item))
+            elif hasattr(item, "__dict__"):
+                size += visit(vars(item))
+            return size
+        return visit(value) + 160
+
+    def get(self, key, action, scene):
+        cached = self.entries.get(key) if key is not None else None
+        if cached is None:
+            return None
+        self.entries.move_to_end(key)
+        chains, info, _ = cached
+        cloned = [replace(chain, chain_id=f"{action.action_id}|{scene}|CHAIN{i}",
+            scenario_id=str(scene), vehicle_id=int(action.vehicle_id),
+            action_id=str(action.action_id), payload=deepcopy(chain.payload))
+            for i, chain in enumerate(chains)]
+        return cloned, dict(info)
+
+    def put(self, key, chains, info):
+        if key is None:
+            return
+        size = self._size((key, chains, info))
+        if size > self.limit_bytes:
+            return
+        while self.entries and (len(self.entries) >= 2048 or self.resident_bytes + size > self.limit_bytes):
+            _, (_, _, old_size) = self.entries.popitem(last=False)
+            self.resident_bytes -= old_size
+        self.entries[key] = (tuple(chains), dict(info), size)
+        self.resident_bytes += size
+
+
 def build_and_solve(actions, states, scenes, weights, connectors, sites, cfg, now, policy,
         *, pending=(), offline_layout=False, diagnostics_sink=None):
     started = perf_counter()
@@ -104,7 +184,10 @@ def build_and_solve(actions, states, scenes, weights, connectors, sites, cfg, no
     horizon = min(float(now + cfg["planning_horizon_s"]), float(cfg["admission_end_s"]))
     quota, allocation = _column_allocation(actions, scenes, states,
         cfg["maximum_model_variables"], now, horizon)
-    scene_tasks = {scene: [*pending, *tasks] for scene, tasks in scenes.items()}
+    pending = tuple(pending)
+    scene_tasks = {scene: combine_tasks(pending, tasks) for scene, tasks in scenes.items()}
+    sites = prepare_sites(sites)
+    memo = _ContinuationMemo()
     chains, statistics = [], Counter()
     for action in actions:
         for scene, tasks in scene_tasks.items():
@@ -115,15 +198,26 @@ def build_and_solve(actions, states, scenes, weights, connectors, sites, cfg, no
                 current_scene_tasks=len(tasks))
             options = dict(cfg, decision_time_s=now, planning_horizon_end_s=horizon,
                 exclude_request_ids=(() if action.request_id is None else (action.request_id,)))
-            built, info = build_restricted_chains(action.action_id, action.vehicle_id, scene,
-                states[action.action_id], tasks, sites, connectors, options, check)
+            memo_key = _continuation_key(states[action.action_id], tasks,
+                options["exclude_request_ids"], horizon)
+            reused = memo.get(memo_key, action, scene)
+            if reused is None:
+                built, info = build_restricted_chains(action.action_id, action.vehicle_id, scene,
+                    states[action.action_id], tasks, sites, connectors, options, check)
+                memo.put(memo_key, built, info)
+                statistics["chain_builds_executed"] += 1
+            else:
+                built, info = reused
+                statistics["chain_builds_reused"] += 1
+                statistics["connector_queries_avoided_by_chain_reuse"] += int(info.get("connector_queries", 0))
+            statistics["logical_connector_queries"] += int(info.get("connector_queries", 0))
             statistics["column_budget_discarded_chains"] += max(0, len(built)-capacity)
             chains.extend(built[:capacity])
             diagnostic["completed_option_scene_groups"] += 1
             diagnostic["generated_chain_columns"] = len(chains)
             for field in ("labels_generated", "labels_expanded", "connector_queries",
                 "connector_rejected", "deadline_rejected", "beam_truncated", "retained_chain_truncated"):
-                statistics[field] += int(info.get(field, 0))
+                statistics[field] += int(info.get(field, 0)) if reused is None else 0
             statistics["maximum_generated_service_chain_length"] = max(
                 statistics["maximum_generated_service_chain_length"], info["max_service_chain_length"])
             statistics["maximum_generated_future_relocations"] = max(
@@ -156,7 +250,10 @@ def build_and_solve(actions, states, scenes, weights, connectors, sites, cfg, no
         selected_future_move_activities=sum(len(c.relocation_slots) for c in chosen),
         horizon_s=cfg["planning_horizon_s"], coarse_history_update_s=cfg["coarse_reference_update_s"],
         typed_connector_evidence=True, complete_city_chain_domain=False,
-        global_optimality_bound_claimed=False, dense_matrix=False)
+        global_optimality_bound_claimed=False, dense_matrix=False,
+        continuation_cache_bytes=memo.resident_bytes,
+        continuation_cache_limit_bytes=memo.limit_bytes,
+        operation_counts_are_executed_not_reused=True)
     solved["graph_or_time_s"] = graph_or_s
     solved["graph_wall_time_s"] = graph_wall_s
     solved["graph_connector_evidence_time_s"] = graph_wall_s-graph_or_s
@@ -181,9 +278,26 @@ class NativeSchemeAAdapter:
         self.policy, self.library, self.reference = policy, library, reference
         self.connectors, self.validator, self.remaining_model, self.cfg = connectors, validator, remaining_model, cfg
         self.rows = []
+        self.timing_totals = Counter()
+        self.operation_totals = Counter()
         self.last_assignments = {}
         self.assignment_cursor = 0
         self.move_contexts = {}
+
+    def _record(self, row):
+        self.rows.append(row)
+        for name in ("solve_wall_time_s", "physical_validation_time_s", "graph_or_time_s",
+                     "graph_wall_time_s", "graph_connector_evidence_time_s", "master_time_s"):
+            value = row.get(name)
+            if value is not None and isfinite(float(value)):
+                self.timing_totals[name] += float(value)
+        for name in ("chain_builds_executed", "chain_builds_reused", "connector_queries",
+                     "logical_connector_queries", "connector_queries_avoided_by_chain_reuse"):
+            self.operation_totals[name] += int(row.get("graph", {}).get(name, 0))
+
+    def progress_summary(self):
+        return dict(decisions_recorded=len(self.rows), timings_s=dict(self.timing_totals),
+                    operations=dict(self.operation_totals), timing_components_are_nested=True)
 
     def _task(self, c, rid):
         request = c.request_by_rid[int(rid)]
@@ -202,6 +316,7 @@ class NativeSchemeAAdapter:
         self.assignment_cursor = len(c.assignment_rows)
 
     def solve(self, c, original_arcs, waiting_ids, now):
+        solve_started = perf_counter()
         self._sync(c)
         started = perf_counter()
         valid = self.validator(c, original_arcs, now)
@@ -286,12 +401,13 @@ class NativeSchemeAAdapter:
                 end, "HV" if arc.vehicle_type == "HV" else "C", dict(kind="CUSTOMER", task=task))
         if not any(a.kind in ("SERVE", "RELOCATE") for a in actions):
             manager.queue_actions([], now)
-            self.rows.append(dict(simulation_time_s=now, policy=self.policy,
+            self._record(dict(simulation_time_s=now, policy=self.policy,
                 opt_status="FIXED_CURRENT_ACTIONS", current_selected=0,
                 physical_validation_time_s=physical_s, graph_or_time_s=0., master_time_s=0.,
                 total_or_time_s=0., variables=len(actions), nonzeros=0,
                 selected_multi_service_chains=0, selected_future_move_activities=0,
-                expected_served=None, resource_fallback=False))
+                expected_served=None, resource_fallback=False,
+                solve_wall_time_s=perf_counter()-solve_started))
             return LexicographicResult((), 0., 0, 0, 0, backend="SCHEME_A_FIXED_CURRENT_ACTIONS")
         result = build_and_solve(actions, starts, scenes, self.library.weights,
             self.connectors, sites, self.cfg, now, self.policy, pending=pending)
@@ -301,7 +417,7 @@ class NativeSchemeAAdapter:
         for action in moves:
             self.move_contexts[action.vehicle_id] = (starts[action.action_id].context, float(now))
         manager.queue_actions([a.payload["move"] for a in moves], now)
-        self.rows.append(dict(simulation_time_s=now, policy=self.policy, opt_status=result["opt_status"],
+        self._record(dict(simulation_time_s=now, policy=self.policy, opt_status=result["opt_status"],
             current_selected=len(serves), physical_validation_time_s=physical_s,
             graph_or_time_s=result["graph_or_time_s"], graph_wall_time_s=result["graph_wall_time_s"],
             graph_connector_evidence_time_s=result["graph_connector_evidence_time_s"],
@@ -311,7 +427,8 @@ class NativeSchemeAAdapter:
             selected_multi_service_chains=result["restricted_graph"]["selected_multi_service_chains"],
             selected_future_move_activities=result["restricted_graph"]["selected_future_move_activities"],
             max_selected_chain_length=result["restricted_graph"]["max_selected_chain_length"],
-            resource_fallback=False, model=compact_master(result), graph=result["restricted_graph"], **busy))
+            resource_fallback=False, model=compact_master(result), graph=result["restricted_graph"],
+            solve_wall_time_s=perf_counter()-solve_started, **busy))
         return LexicographicResult(tuple(sorted(a.payload["arc_index"] for a in serves)),
             result["total_or_time_s"], result["critical_now"], len(serves), result["carry_over_current_served"],
             backend="SCHEME_A_RESTRICTED_MULTI_SERVICE_CHAIN_MASTER")

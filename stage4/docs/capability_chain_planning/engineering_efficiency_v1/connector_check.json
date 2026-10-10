@@ -1,0 +1,219 @@
+{
+  "status": "REAL_CONNECTOR_EQUIVALENCE_PASS",
+  "native_simulation": false,
+  "whole_day_experiment": false,
+  "fixed_pairs": 8,
+  "visits_per_pair": 2,
+  "source_scope": "EARLIER_HISTORY_IDENTITIES_ONLY_NO_TEST31_REQUESTS_OR_TRUTH",
+  "time_window_is_engineering_fixture_not_reconstructed_request_times": true,
+  "direct_parser_outputs_equal": true,
+  "direct_parser_checks": 16,
+  "direct_parser_invocation_is_not_an_eligibility_override": true,
+  "outcomes": {
+    "REJECTED": 8
+  },
+  "rejection_reasons": {
+    "UTURN_OUTSIDE_RESEARCH_PROFILE": 6,
+    "UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 2
+  },
+  "old": {
+    "setup_s": 0.5794163999999,
+    "query_wall_s": 1.1556253999988257,
+    "direct_join_s": 0.9476087000002735,
+    "connector": {
+      "counts": {
+        "train_identity_projection_scans": 3,
+        "train_identity_orders_loaded": 12,
+        "train_identity_tokens_loaded": 860,
+        "train_overlay_projection_scans": 1,
+        "examined_connections": 16,
+        "certificate_cache_misses": 8,
+        "scalar_route_evaluations": 7,
+        "rejected_connections": 16,
+        "customer_body_views_materialized": 12,
+        "customer_body_cache_hits": 20,
+        "route_cache_hits": 1,
+        "certificate_cache_hits": 8
+      },
+      "rejection_reason_counts": {
+        "TRAIN_TEMPLATE_IDENTITY_MISSING": 0,
+        "UTURN_OUTSIDE_RESEARCH_PROFILE": 12,
+        "UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 4
+      },
+      "timings_s": {
+        "train_identity_geometry_preparation_s": 0.41019130000131554,
+        "scalar_routing_time_s": 0.2026337000024796,
+        "total_connection_time_s": 0.2055553999998665
+      },
+      "route_cache_entries": 7,
+      "route_cache_limit": 1024,
+      "body_view_cache_entries": 12,
+      "body_view_cache_limit": 256,
+      "native_context_cache_entries": 0,
+      "train_identity_arrow_mib": 0.10372257232666016,
+      "train_overlay_arrow_mib": 0.00128173828125,
+      "shared_geometry_arrow_mib": 0.07308673858642578,
+      "geometry_object_cache_entries": 256,
+      "actual_body_view_cache_entries": 0,
+      "certificate_cache_entries": 8,
+      "certificate_cache_entry_limit": 50000,
+      "certificate_cache_mib": 0.0180511474609375,
+      "certificate_cache_byte_limit_mib": 32.0,
+      "geometry_uid_rowgroup_index_mib": 7.9900360107421875,
+      "geometry_rowgroup_cache_mib": 50.67617416381836,
+      "geometry_rowgroup_cache_limit_mib": 64.0,
+      "geometry_rowgroup_reads": 1,
+      "geometry_rowgroup_cache_hits": 4,
+      "geometry_timestamp": "2016-10-31T00:00:00+08:00",
+      "eta_beta_time": "ACTUAL_OR_PREDICTED_CONNECTOR_DEPARTURE",
+      "traffic_policy": "EXPLICIT_U_FOR_NEW_EMPTY_CONNECTOR_NO_M3_FABRICATION",
+      "full_customer_token_views": true,
+      "arbitrary_terminal_edge_truncation": false,
+      "HV_semantics": "AUTO_ROUTABLE_WITHOUT_C_CAPABILITY_OR_SEAM_GATE"
+    },
+    "router": {
+      "route_requests": 23,
+      "scalar_route_calls": 7,
+      "edge_walk_calls": 7,
+      "route_cache_hits": 16,
+      "route_cache_entries": 7,
+      "route_cache_limit": 1024,
+      "bearing_cache_entries": 0,
+      "common_support_evaluations": {
+        "supported": 7
+      },
+      "common_failure_reason_counts": {},
+      "columnar_evidence_mib": 89.02912616729736,
+      "traffic_policy": "EXPLICIT_U_FOR_NEW_ROUTE_WITHOUT_FROZEN_M3_FEATURE_ROWS",
+      "traffic_partition": {
+        "NC": 0.0,
+        "ML": 0.0,
+        "MR": 0.0,
+        "CG": 0.0,
+        "SC": 0.0,
+        "U": 1.0
+      },
+      "traffic_unknown_share": 1.0,
+      "dynamic_evidence_complete": false,
+      "dynamic_reason_codes": [
+        "FROZEN_M3_EXACT_INPUT_CONTRACT_UNAVAILABLE_FOR_NEW_ROUTE"
+      ],
+      "conservative_control_policy": "SIGNALIZED_CONFLICT_MOVEMENTS",
+      "traffic_outside_budget": 0.05
+    }
+  },
+  "optimized": {
+    "setup_s": 1.3722663999978977,
+    "query_wall_s": 2.647698599997966,
+    "direct_join_s": 2.146856999996089,
+    "connector": {
+      "counts": {
+        "train_identity_projection_scans": 3,
+        "train_identity_orders_loaded": 12,
+        "train_identity_tokens_loaded": 860,
+        "train_overlay_projection_scans": 1,
+        "examined_connections": 16,
+        "certificate_cache_misses": 8,
+        "scalar_route_evaluations": 7,
+        "rejected_connections": 16,
+        "customer_body_views_materialized": 12,
+        "customer_body_cache_hits": 20,
+        "route_cache_hits": 1,
+        "certificate_cache_hits": 8
+      },
+      "rejection_reason_counts": {
+        "TRAIN_TEMPLATE_IDENTITY_MISSING": 0,
+        "UTURN_OUTSIDE_RESEARCH_PROFILE": 12,
+        "UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 4
+      },
+      "timings_s": {
+        "train_identity_geometry_preparation_s": 1.0737255999993067,
+        "scalar_routing_time_s": 0.48633450000124867,
+        "total_connection_time_s": 0.494666500002495
+      },
+      "route_cache_entries": 7,
+      "route_cache_limit": 1024,
+      "body_view_cache_entries": 12,
+      "body_view_cache_limit": 256,
+      "native_context_cache_entries": 0,
+      "train_identity_arrow_mib": 0.10372257232666016,
+      "train_overlay_arrow_mib": 0.00128173828125,
+      "shared_geometry_arrow_mib": 0.07308673858642578,
+      "geometry_object_cache_entries": 256,
+      "actual_body_view_cache_entries": 0,
+      "certificate_cache_entries": 8,
+      "certificate_cache_key_format": "SHA256_COMPLETE_EXACT_CONTEXT_NOT_COORDINATE_ROUNDING",
+      "native_signature_cache_entries": 0,
+      "certificate_cache_entry_limit": 50000,
+      "certificate_cache_mib": 0.00910186767578125,
+      "certificate_cache_byte_limit_mib": 32.0,
+      "geometry_uid_rowgroup_index_mib": 7.9900360107421875,
+      "geometry_rowgroup_cache_mib": 50.67617416381836,
+      "geometry_rowgroup_cache_limit_mib": 64.0,
+      "geometry_rowgroup_reads": 1,
+      "geometry_rowgroup_cache_hits": 4,
+      "join_static_cache_entries": 15,
+      "join_static_cache_mib": 0.8230180740356445,
+      "join_static_cache_limit_mib": 16.0,
+      "join_static_cache_hits": 9,
+      "join_static_cache_misses": 7,
+      "join_parse_cache_hits": 8,
+      "join_parse_cache_misses": 8,
+      "geometry_timestamp": "2016-10-31T00:00:00+08:00",
+      "eta_beta_time": "ACTUAL_OR_PREDICTED_CONNECTOR_DEPARTURE",
+      "traffic_policy": "EXPLICIT_U_FOR_NEW_EMPTY_CONNECTOR_NO_M3_FABRICATION",
+      "full_customer_token_views": true,
+      "arbitrary_terminal_edge_truncation": false,
+      "HV_semantics": "AUTO_ROUTABLE_WITHOUT_C_CAPABILITY_OR_SEAM_GATE"
+    },
+    "router": {
+      "route_requests": 23,
+      "scalar_route_calls": 7,
+      "edge_walk_calls": 7,
+      "route_cache_hits": 16,
+      "route_cache_entries": 7,
+      "route_cache_limit": 1024,
+      "bearing_cache_entries": 0,
+      "common_support_evaluations": {
+        "supported": 7
+      },
+      "common_failure_reason_counts": {},
+      "columnar_evidence_mib": 89.02912616729736,
+      "traffic_policy": "EXPLICIT_U_FOR_NEW_ROUTE_WITHOUT_FROZEN_M3_FEATURE_ROWS",
+      "traffic_partition": {
+        "NC": 0.0,
+        "ML": 0.0,
+        "MR": 0.0,
+        "CG": 0.0,
+        "SC": 0.0,
+        "U": 1.0
+      },
+      "traffic_unknown_share": 1.0,
+      "dynamic_evidence_complete": false,
+      "dynamic_reason_codes": [
+        "FROZEN_M3_EXACT_INPUT_CONTRACT_UNAVAILABLE_FOR_NEW_ROUTE"
+      ],
+      "conservative_control_policy": "SIGNALIZED_CONFLICT_MOVEMENTS",
+      "traffic_outside_budget": 0.05
+    }
+  },
+  "alternating_warm_parser": {
+    "status": "WARM_PARSER_EQUIVALENCE_PASS",
+    "paired_calls_per_side": 16,
+    "old_wall_s": 3.271321500007616,
+    "optimized_wall_s": 1.0008282999915536,
+    "old_process_cpu_s": 3.28125,
+    "optimized_process_cpu_s": 0.921875,
+    "alternating_order": true,
+    "real_new_routes_in_timed_kernel": 0,
+    "optimized_parse_cache_hits": 16,
+    "speed_ratio": 3.2686141069704204,
+    "whole_day_speed_ratio_not_identified": true
+  },
+  "input_sha256": {
+    "config": "8022d88c8c1377fd87f925bf7f0e35584b9bb3f500bc5cb8fd9d16ea9a0ef47e",
+    "templates": "f0ee98eb4ad5aca69125ace8610ce4ff2c40edb6b7f5e62016ee321a432af652"
+  },
+  "peak_rss_mib": 687.29296875,
+  "cold_cache_time_comparison_not_a_full_day_speed_estimate": true
+}
