@@ -1,0 +1,22 @@
+{
+  "version": "scheme_a_two_scale_city_v2",
+  "base_config": "stage4/config/scheme_a_two_scale_v2.json",
+  "base_config_sha256": "24c6d0d36583635e091416b9edc9ad90d3e9a0f7ca57980b7b045106b6fb6855",
+  "groups": ["HOTSPOT_BASELINE", "CHAIN_LAYOUT_BASELINE", "CHAIN_LAYOUT_JOINT"],
+  "window_start_s": 0,
+  "measurement_end_s": 86434,
+  "admission_end_s": 86760,
+  "last_dispatch_s": 86760,
+  "physical_drain_limit_s": 100800,
+  "carry_in_lookback_s": 0,
+  "include_carry_in": false,
+  "scenario_timeout_s": 10800,
+  "progress_interval_s": 300,
+  "log_limit_mib": 16,
+  "log_tail_kib": 64,
+  "full_day": true,
+  "native_execution": true,
+  "method_scope": "COARSE_APPROXIMATE_SERVICE_VALUE_AND_EXACT_CURRENT_ACTION_FLOW",
+  "experiment_scope": "FIXED_THREE_GROUP_FULL_DAY_LAYOUT_AND_CONTROL_COMPARISON",
+  "automatic_retry": false
+}

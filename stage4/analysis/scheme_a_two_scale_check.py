@@ -111,6 +111,7 @@ class _HardStop:
     """Process-local administrative limit, not a solver or scientific fallback."""
     def __init__(self, directory, started, seconds, summary):
         self.directory, self.started = Path(directory), started
+        self.seconds = float(seconds)
         self.lock = threading.RLock()
         self.published = dict(summary)
         self.timer = threading.Timer(max(.001, seconds - (perf_counter() - started)), self._stop)
@@ -128,7 +129,7 @@ class _HardStop:
         try:
             with self.lock:
                 marker = dict(status="STOPPED_HARD_TIMEOUT", pid=os.getpid(),
-                    runtime_s=perf_counter() - self.started, hard_limit_s=900,
+                    runtime_s=perf_counter() - self.started, hard_limit_s=self.seconds,
                     last_durable_progress=self.published.get("durable_progress"),
                     current_call_may_not_have_saved_partial_state=True,
                     final_service_result_available=False, automatic_retry=False)
@@ -148,7 +149,7 @@ def _resource_guard(root, cfg, started, *, initial=False):
         available_ram_mib=psutil.virtual_memory().available / 2**20,
         free_disk_mib=psutil.disk_usage(Path(root).anchor).free / 2**20)
     if perf_counter() - started >= cfg["scenario_timeout_s"]:
-        raise TimeoutError("fixed 900-second native check limit exceeded")
+        raise TimeoutError(f"fixed {cfg['scenario_timeout_s']:g}-second native execution limit exceeded")
     if resources["rss_mib"] > cfg["maximum_rss_mib"]:
         raise MemoryError("native check exceeds the unchanged 1536-MiB RSS cap")
     if initial and resources["available_ram_mib"] < cfg["minimum_initial_available_ram_mib"]:
@@ -168,27 +169,38 @@ def _timing_delta(after, before):
             for key, value in after.items()}
 
 
-def run(root, fleetpy=FLEETPY, config=CONFIG):
-    started = perf_counter()
+def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
+                completion_status, group=None, execution_binding=None, started=None):
+    """Shared physical execution after the calling CLI validates its protocol.
+
+    This private function cannot widen the public short-check CLI. Full-day
+    group configuration is supplied only by the separate fixed city protocol.
+    """
+    started = perf_counter() if started is None else started
     for name in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS"):
         os.environ[name] = "1"
     os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
     root = Path(root).resolve()
-    cfg = load_protocol(root, config)
-    directory = root / OUT
+    directory = Path(directory)
     if directory.exists() and any(directory.iterdir()):
-        raise ValueError("existing check output is retained; no implicit retry or overwrite")
+        raise ValueError("existing native output is retained; no implicit retry or overwrite")
     resources = _resource_guard(root, cfg, started, initial=True)
+    full_day = bool(cfg["full_day"])
     summary = dict(status="RUNNING", version=cfg["version"], pid=os.getpid(),
-        policy=cfg["policy"], window_start_s=cfg["window_start_s"],
+        policy=cfg["policy"], layout_mode=cfg["layout_mode"], window_start_s=cfg["window_start_s"],
         measurement_end_s=cfg["measurement_end_s"], admission_end_s=cfg["admission_end_s"],
-        physical_drain_limit_s=cfg["physical_drain_limit_s"], full_day=False,
-        initialization="COLD_START_FROZEN_JOINT_LAYOUT_NOT_RECOVERED_0830_STATE",
-        strategy_comparison=False, scientific_conclusion_from_service_rate=False,
+        physical_drain_limit_s=cfg["physical_drain_limit_s"], full_day=full_day,
+        initialization=("ORIGINAL_HV_START_AND_FROZEN_EARLIER_HISTORY_AV_LAYOUT_FROM_MIDNIGHT"
+            if full_day else "COLD_START_FROZEN_JOINT_LAYOUT_NOT_RECOVERED_0830_STATE"),
+        strategy_comparison=full_day, scientific_conclusion_from_service_rate=False,
         no_future_test31_requests_in_policy=True, future_values_are_not_realized_service=True,
         algorithm_semantics_changed=True, legacy_realtime_chain_used=False,
         gpu_used=False, dense_matrix=False, layout_recomputed=False,
         hard_limit_s=cfg["scenario_timeout_s"], **resources)
+    if group is not None:
+        summary["group"] = group
+    if execution_binding is not None:
+        summary["execution_binding"] = execution_binding
     hard_stop = _HardStop(directory, started, cfg["scenario_timeout_s"], summary)
     hard_stop.publish(summary)
     hard_stop.start()
@@ -204,7 +216,7 @@ def run(root, fleetpy=FLEETPY, config=CONFIG):
         import pyarrow as pa
         from stage4.analysis.capability_chain_instances import atomic_parquet
         from stage4.analysis.city_joint_validation import code_sha, native_configuration, outcome_table, time_chain_check
-        from stage4.analysis.scheme_a_city_experiment import make_routing, load_history_templates
+        from stage4.analysis.scheme_a_city_experiment import make_routing, load_history_templates, _clock_cfg
         from stage4.dispatch.controlled_routes import ControlledEmptyRouter
         from stage4.dispatch.remaining_time import TrainRemainingTime
         from stage4.dispatch.repositioning_policy import load_train_demand_reference
@@ -224,11 +236,22 @@ def run(root, fleetpy=FLEETPY, config=CONFIG):
         pa.set_cpu_count(1)
         pa.set_io_thread_count(1)
         summary["code_sha"] = code_sha(root)
+        if execution_binding is not None and summary["code_sha"] != execution_binding["code_sha"]:
+            raise RuntimeError("code commit changed after sequential experiment preparation")
         loaded = perf_counter()
         layout, protected = load_frozen_layout(root, cfg)
         protected.update({Path(config).as_posix(): _sha(root / config),
+                          cfg["base_config"]: _sha(root / cfg["base_config"]),
                           cfg["source_layout"]: _sha(root / cfg["source_layout"])})
+        if execution_binding is not None and protected != execution_binding["inputs_sha256"]:
+            raise RuntimeError("source inputs changed after sequential experiment preparation")
         episode = load_research_episode(root, profile_id=cfg["profile_id"], requested_q_a=cfg["requested_q_a"])
+        if full_day:
+            # Derive the original source's 33-second tail, not a hard truncation
+            # at midnight or a cold-start window masquerading as a full day.
+            cfg = _clock_cfg(episode, cfg)
+            if (cfg["measurement_end_s"], cfg["admission_end_s"]) != (86434, 86760):
+                raise RuntimeError("full-day source clock differs from the frozen Test31 span")
         if apply_av_layout(episode, layout["placements"][cfg["layout_mode"]]) != cfg["expected_av_slots"]:
             raise RuntimeError("reused layout does not cover the exact original AV slots")
         phases["frozen_layout_and_episode_load_s"] = perf_counter() - loaded
@@ -241,6 +264,8 @@ def run(root, fleetpy=FLEETPY, config=CONFIG):
         bridge = ResearchNativeBridge(episode, bindings, registry,
             window_start_s=cfg["window_start_s"], measurement_end_s=cfg["measurement_end_s"],
             admission_end_s=cfg["admission_end_s"], include_carry_in=cfg["include_carry_in"])
+        if full_day and bridge.input_counts()["window_new_requests"] != len(episode.requests._requests):
+            raise RuntimeError("full-day native bridge dropped original common requests")
         network = create_native_network(bindings, registry)
         demand = bridge.create_demand(network, directory)
         fixtures = bridge.native_fixtures()
@@ -291,9 +316,11 @@ def run(root, fleetpy=FLEETPY, config=CONFIG):
         summary.update(setup_time_s=setup_s, setup_phases_s=phases,
             native_input_counts=bridge.input_counts(), historical_template_inventory=history_inventory,
             reference_manifest=reference_manifest,
-            future_supply_scope="ORIGINAL_WINDOW_OVERLAPPING_SLOTS_NOT_COMPLETE_FUTURE_DAY_SUPPLY",
-            source_slot_times_clipped=False, prediction_horizon_s=1800,
-            prediction_window_independent_of_short_measurement_end=True)
+            future_supply_scope=("ORIGINAL_FULL_DAY_SUPPLY_NO_SLOT_TIME_CLIPPING" if full_day
+                else "ORIGINAL_WINDOW_OVERLAPPING_SLOTS_NOT_COMPLETE_FUTURE_DAY_SUPPLY"),
+            source_slot_times_clipped=False, prediction_horizon_s=1800)
+        if not full_day:
+            summary["prediction_window_independent_of_short_measurement_end"] = True
         hard_stop.publish(summary)
         simulation_started = perf_counter()
         peak_rss = resources["rss_mib"]
@@ -326,11 +353,16 @@ def run(root, fleetpy=FLEETPY, config=CONFIG):
                 matched=len(control.assignment_rows), completed=len(control.completed_rids),
                 expired=len(control.expired_rids), **resources)
             summary["durable_progress"] = durable
-            hard_stop.publish(summary)
-            _atomic_json(directory / "progress.json", dict(durable,
-                performance=adapter.progress_summary(), coarse_value=provider.diagnostics()))
-            if tick % 300 == 0:
+            progress_interval = cfg.get("progress_interval_s", 300)
+            if not full_day or tick % progress_interval == 0:
+                hard_stop.publish(summary)
+                _atomic_json(directory / "progress.json", dict(durable,
+                    performance=adapter.progress_summary(), coarse_value=provider.diagnostics()))
+            if tick % progress_interval == 0:
                 atomic_parquet(directory / "partial_step_timings.parquet", pd.DataFrame(step_rows))
+                if full_day:
+                    atomic_parquet(directory / "partial_solver_trace.parquet", pd.DataFrame(adapter.rows))
+                    _atomic_json(directory / "coarse_refreshes.json", provider.refresh_records)
                 print(json.dumps(durable), flush=True)
             if (tick >= cfg["admission_end_s"]
                     and not (set(control.rid_to_assigned_vid) - control.completed_rids)
@@ -342,7 +374,7 @@ def run(root, fleetpy=FLEETPY, config=CONFIG):
                 control.vehicle_state_reconciliation_failures, control.av_availability_violations)):
             raise RuntimeError("native physical reconciliation failed")
         if set(control.rid_to_assigned_vid) - control.completed_rids or manager.active:
-            raise RuntimeError("committed physical work was not drained by the fixed 10:30 bound")
+            raise RuntimeError(f"committed physical work was not drained by the fixed {cfg['physical_drain_limit_s']}s bound")
         assignments = bridge.environment_assignments()
         if len(assignments):
             # Do not export the shared control's legacy generic policy label
@@ -359,7 +391,16 @@ def run(root, fleetpy=FLEETPY, config=CONFIG):
             atomic_parquet(directory / f"{name}.parquet", frame)
         if protected != {relative: _sha(root / relative) for relative in protected}:
             raise RuntimeError("frozen inputs changed during the check")
-        summary.update(status="TWO_SCALE_NATIVE_SHORT_CHECK_COMPLETE", native_execution_performed=True,
+        bridge_diagnostics = bridge.diagnostics()
+        if full_day:
+            bridge_diagnostics["initial_position_source"] = summary["initialization"]
+            _atomic_json(directory / "coarse_refreshes.json", provider.refresh_records)
+            summary["coarse_refresh_summary"] = dict(refresh_count=len(provider.refresh_records),
+                unavailable_count=sum(not record["available"] for record in provider.refresh_records),
+                all_pricing_closed_count=sum(bool(record.get("all_pricing_closed", False))
+                    for record in provider.refresh_records),
+                final_snapshot_is_not_an_all_day_convergence_certificate=True)
+        summary.update(status=completion_status, native_execution_performed=True,
             drain_end_s=tick, setup_time_s=setup_s, simulation_loop_wall_s=simulation_loop_s,
             total_runner_wall_s=perf_counter() - started,
             sum_complete_step_wall_s=sum(r["step_wall_s"] for r in step_rows),
@@ -370,15 +411,17 @@ def run(root, fleetpy=FLEETPY, config=CONFIG):
             committed_C_orders=int(assignments.vehicle_type.eq("AV").sum()) if len(assignments) else 0,
             committed_HV_orders=int(assignments.vehicle_type.eq("HV").sum()) if len(assignments) else 0,
             all_day_supply=episode.supply.inventory(), physical_accounting=physics,
-            execution_bridge=bridge.diagnostics(), current_pickup=validator.diagnostics(),
+            execution_bridge=bridge_diagnostics, current_pickup=validator.diagnostics(),
             adapter_performance=adapter.progress_summary(), coarse_value=provider.diagnostics(),
             connector=connectors.diagnostics(), actual_routing=routing.diagnostics(),
+            idle_movement=manager.summary(),
             truth_access="ENVIRONMENT_ONLY_AFTER_IRREVERSIBLE_COMMITMENT",
             real_future_test31_requests_used_for_prediction=False,
-            no_full_day_runtime_or_service_advantage_claim=True)
+            no_full_day_runtime_or_service_advantage_claim=not full_day,
+            city_global_optimality_claimed=False)
         _resource_guard(root, cfg, started)
         hard_stop.publish(summary)
-        _atomic_json(root / DOC / "native_check_summary.json", summary)
+        _atomic_json(doc_summary_path, summary)
         print(json.dumps(dict(status=summary["status"], setup_time_s=setup_s,
             simulation_loop_wall_s=simulation_loop_s, total_runner_wall_s=summary["total_runner_wall_s"],
             maximum_step_wall_s=summary["maximum_complete_step_wall_s"], completed_orders=summary["completed_orders"])), flush=True)
@@ -396,12 +439,24 @@ def run(root, fleetpy=FLEETPY, config=CONFIG):
             if adapter is not None:
                 atomic_parquet(directory / "partial_solver_trace.parquet", pd.DataFrame(adapter.rows))
             atomic_parquet(directory / "partial_step_timings.parquet", pd.DataFrame(step_rows))
+        if full_day and provider is not None:
+            _atomic_json(directory / "coarse_refreshes.json", provider.refresh_records)
         hard_stop.publish(summary)
         raise
     finally:
         hard_stop.close()
         if routing is not None:
             routing.close()
+
+
+def run(root, fleetpy=FLEETPY, config=CONFIG):
+    """Keep the original strictly fixed 08:15 short-check entry point."""
+    started = perf_counter()
+    root = Path(root).resolve()
+    cfg = load_protocol(root, config)
+    return _run_native(root, fleetpy, config, cfg, directory=root / OUT,
+        doc_summary_path=root / DOC / "native_check_summary.json",
+        completion_status="TWO_SCALE_NATIVE_SHORT_CHECK_COMPLETE", started=started)
 
 
 def main():
