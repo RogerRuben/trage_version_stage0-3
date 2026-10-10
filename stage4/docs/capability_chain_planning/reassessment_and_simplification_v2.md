@@ -1,3 +1,5 @@
+> 后续状态（2026-10-10）：粗层与原生接入已完成；一次高负载短窗含加载38.332秒、峰值686.57MiB、未来连接查询0。详见[two_scale_v2/report.md](two_scale_v2/report.md)。以下保留此前复评时点的工作状态，不代表当前接入仍未完成。
+
 ## Material Passport
 
 - Origin Skill: academic-research-suite，方法复评、代码检查与实现。
