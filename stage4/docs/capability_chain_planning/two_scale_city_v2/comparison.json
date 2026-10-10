@@ -1,0 +1,1037 @@
+{
+  "status": "TWO_SCALE_THREE_GROUP_RESULTS_ANALYZED",
+  "groups": {
+    "HOTSPOT_BASELINE": {
+      "policy": "SERVICE_PRESERVING",
+      "layout_mode": "hotspot",
+      "common_requests": 28367,
+      "completed": 22955,
+      "expired": 5412,
+      "service_rate": 0.8092149328445024,
+      "served_C": 728,
+      "served_HV": 22227,
+      "C_body_compatible_orders": 9275,
+      "C_after_passenger_acceptance_orders": 6534,
+      "C_eligible_served_by_HV": 4911,
+      "served_wait_mean_s": 180.35545643145284,
+      "served_wait_p90_s": 286.15517439999996,
+      "pickup_empty_km": 18525.603,
+      "idle_empty_km": 888.698008679159,
+      "total_empty_km": 19414.30100867916,
+      "actual_idle_moves": 688,
+      "movement_status": {
+        "COMPLETED": 623,
+        "INTERRUPTED_BY_CUSTOMER": 65
+      },
+      "C_serving_slots": 436,
+      "C_slots_serving_at_least_two": 185,
+      "C_max_services_per_slot": 7,
+      "C_services_per_planned_vehicle_hour": 0.5928665986812519,
+      "C_customer_busy_hours": 135.0710861190661,
+      "C_loaded_hours": 114.55666666666667,
+      "total_customer_busy_hours": 5411.39736466818,
+      "planned_AV_vehicle_hours": 1227.9322222222222,
+      "planned_HV_vehicle_hours": 11050.801944444445,
+      "baseline_vehicle_hours": 12278.734166666667,
+      "planned_AV_hour_ratio": 0.10000478921969946,
+      "supply_slots": 8435,
+      "runtime_s": 2828.4767487999998,
+      "setup_time_s": 109.55343500000163,
+      "simulation_loop_wall_s": 2707.6549872999967,
+      "peak_rss_mib": 1218.14453125,
+      "active_step_p50_s": 0.604389350002748,
+      "active_step_p90_s": 1.6353578000045674,
+      "maximum_complete_step_wall_s": 11.7045478,
+      "maximum_adapter_wall_s": 10.142995700000029,
+      "candidate_generation_time_s": 259.0690271003841,
+      "candidate_routing_time_s": 978.3377468995241,
+      "adapter_timings_s": {
+        "validator_time_s": 443.69702559983125,
+        "current_move_time_s": 442.2376166994727,
+        "coarse_time_s": 208.04708690000552,
+        "value_lookup_time_s": 23.41705709900998,
+        "current_flow_time_s": 4.912110999779543,
+        "solve_wall_time_s": 1129.6582652001089
+      },
+      "maximum_current_actions": 694,
+      "maximum_current_residual_edges": 2456,
+      "decision_count": 2892,
+      "current_flow_status": {
+        "OPTIMAL_PRIMARY_CURRENT_FLOW_APPROXIMATE_FUTURE": 2552,
+        "FIXED_CURRENT_WAIT": 322,
+        "FEASIBLE_BACKUP_SERVICE_FIRST": 18
+      },
+      "effective_policy_counts": {
+        "SERVICE_PRESERVING": 2892
+      },
+      "coarse_refresh_count": 288,
+      "unavailable_coarse_refresh_count": 0,
+      "pricing_closed_refresh_count": 26,
+      "coarse_record_count": 288,
+      "maximum_sparse_LP_columns": 1261,
+      "maximum_sparse_LP_nonzeros": 3226,
+      "adapter_wall_overrun_count": 18,
+      "explicit_fallback_decisions": 18,
+      "optional_move_budget_cutoffs": 18,
+      "move_screen_counts": {
+        "coarse_refreshes": 288,
+        "current_move_connector_queries": 23678,
+        "current_move_proposed_count": 65939,
+        "current_move_upper_screened_count": 36815,
+        "current_move_routed_count": 23678,
+        "current_move_arrival_screened_count": 5369,
+        "current_move_budget_skipped_count": 5446,
+        "current_move_value_unavailable_skipped_count": 0,
+        "optional_move_budget_cutoffs": 18,
+        "future_chain_variables": 0,
+        "future_connector_queries": 0
+      },
+      "physical_accounting": {
+        "duplicate_orders": 0,
+        "vehicle_task_overlap": 0,
+        "maximum_time_error_s": 1.0006147022068035e-09
+      },
+      "future_connector_queries": 0,
+      "coarse_prices_are_approximate": true,
+      "source_code_sha": "c588cd105e7b3b22a9521aff6a1ae5787a701c2d",
+      "hourly": [
+        {
+          "hour": 0,
+          "requests": 341,
+          "completed": 296,
+          "expired": 45,
+          "served_C": 12,
+          "served_HV": 284,
+          "service_rate": 0.8680351906158358
+        },
+        {
+          "hour": 1,
+          "requests": 225,
+          "completed": 182,
+          "expired": 43,
+          "served_C": 7,
+          "served_HV": 175,
+          "service_rate": 0.8088888888888889
+        },
+        {
+          "hour": 2,
+          "requests": 156,
+          "completed": 128,
+          "expired": 28,
+          "served_C": 3,
+          "served_HV": 125,
+          "service_rate": 0.8205128205128205
+        },
+        {
+          "hour": 3,
+          "requests": 121,
+          "completed": 75,
+          "expired": 46,
+          "served_C": 0,
+          "served_HV": 75,
+          "service_rate": 0.6198347107438017
+        },
+        {
+          "hour": 4,
+          "requests": 79,
+          "completed": 51,
+          "expired": 28,
+          "served_C": 0,
+          "served_HV": 51,
+          "service_rate": 0.6455696202531646
+        },
+        {
+          "hour": 5,
+          "requests": 104,
+          "completed": 70,
+          "expired": 34,
+          "served_C": 1,
+          "served_HV": 69,
+          "service_rate": 0.6730769230769231
+        },
+        {
+          "hour": 6,
+          "requests": 329,
+          "completed": 267,
+          "expired": 62,
+          "served_C": 8,
+          "served_HV": 259,
+          "service_rate": 0.8115501519756839
+        },
+        {
+          "hour": 7,
+          "requests": 854,
+          "completed": 606,
+          "expired": 248,
+          "served_C": 9,
+          "served_HV": 597,
+          "service_rate": 0.7096018735362998
+        },
+        {
+          "hour": 8,
+          "requests": 1397,
+          "completed": 1159,
+          "expired": 238,
+          "served_C": 28,
+          "served_HV": 1131,
+          "service_rate": 0.8296349319971367
+        },
+        {
+          "hour": 9,
+          "requests": 1674,
+          "completed": 1483,
+          "expired": 191,
+          "served_C": 50,
+          "served_HV": 1433,
+          "service_rate": 0.8859020310633214
+        },
+        {
+          "hour": 10,
+          "requests": 1516,
+          "completed": 1321,
+          "expired": 195,
+          "served_C": 41,
+          "served_HV": 1280,
+          "service_rate": 0.8713720316622692
+        },
+        {
+          "hour": 11,
+          "requests": 1577,
+          "completed": 1369,
+          "expired": 208,
+          "served_C": 43,
+          "served_HV": 1326,
+          "service_rate": 0.8681039949270767
+        },
+        {
+          "hour": 12,
+          "requests": 1525,
+          "completed": 1365,
+          "expired": 160,
+          "served_C": 62,
+          "served_HV": 1303,
+          "service_rate": 0.8950819672131147
+        },
+        {
+          "hour": 13,
+          "requests": 1646,
+          "completed": 1389,
+          "expired": 257,
+          "served_C": 69,
+          "served_HV": 1320,
+          "service_rate": 0.8438639125151883
+        },
+        {
+          "hour": 14,
+          "requests": 1768,
+          "completed": 1439,
+          "expired": 329,
+          "served_C": 39,
+          "served_HV": 1400,
+          "service_rate": 0.8139140271493213
+        },
+        {
+          "hour": 15,
+          "requests": 1928,
+          "completed": 1568,
+          "expired": 360,
+          "served_C": 40,
+          "served_HV": 1528,
+          "service_rate": 0.8132780082987552
+        },
+        {
+          "hour": 16,
+          "requests": 1860,
+          "completed": 1335,
+          "expired": 525,
+          "served_C": 35,
+          "served_HV": 1300,
+          "service_rate": 0.717741935483871
+        },
+        {
+          "hour": 17,
+          "requests": 1740,
+          "completed": 1146,
+          "expired": 594,
+          "served_C": 9,
+          "served_HV": 1137,
+          "service_rate": 0.6586206896551724
+        },
+        {
+          "hour": 18,
+          "requests": 1669,
+          "completed": 1159,
+          "expired": 510,
+          "served_C": 11,
+          "served_HV": 1148,
+          "service_rate": 0.6944278010784901
+        },
+        {
+          "hour": 19,
+          "requests": 2011,
+          "completed": 1621,
+          "expired": 390,
+          "served_C": 60,
+          "served_HV": 1561,
+          "service_rate": 0.8060666335156639
+        },
+        {
+          "hour": 20,
+          "requests": 1724,
+          "completed": 1493,
+          "expired": 231,
+          "served_C": 67,
+          "served_HV": 1426,
+          "service_rate": 0.8660092807424594
+        },
+        {
+          "hour": 21,
+          "requests": 1828,
+          "completed": 1512,
+          "expired": 316,
+          "served_C": 57,
+          "served_HV": 1455,
+          "service_rate": 0.8271334792122538
+        },
+        {
+          "hour": 22,
+          "requests": 1416,
+          "completed": 1191,
+          "expired": 225,
+          "served_C": 47,
+          "served_HV": 1144,
+          "service_rate": 0.8411016949152542
+        },
+        {
+          "hour": 23,
+          "requests": 877,
+          "completed": 729,
+          "expired": 148,
+          "served_C": 30,
+          "served_HV": 699,
+          "service_rate": 0.8312428734321551
+        },
+        {
+          "hour": 24,
+          "requests": 2,
+          "completed": 1,
+          "expired": 1,
+          "served_C": 0,
+          "served_HV": 1,
+          "service_rate": 0.5
+        }
+      ]
+    },
+    "CHAIN_LAYOUT_BASELINE": {
+      "policy": "SERVICE_PRESERVING",
+      "layout_mode": "joint",
+      "common_requests": 28367,
+      "completed": 23055,
+      "expired": 5312,
+      "service_rate": 0.8127401558148553,
+      "served_C": 739,
+      "served_HV": 22316,
+      "C_body_compatible_orders": 9275,
+      "C_after_passenger_acceptance_orders": 6534,
+      "C_eligible_served_by_HV": 4896,
+      "served_wait_mean_s": 180.00263554179136,
+      "served_wait_p90_s": 285.6524992,
+      "pickup_empty_km": 18597.641,
+      "idle_empty_km": 1064.091848980073,
+      "total_empty_km": 19661.73284898007,
+      "actual_idle_moves": 815,
+      "movement_status": {
+        "COMPLETED": 749,
+        "INTERRUPTED_BY_CUSTOMER": 66
+      },
+      "C_serving_slots": 476,
+      "C_slots_serving_at_least_two": 175,
+      "C_max_services_per_slot": 6,
+      "C_services_per_planned_vehicle_hour": 0.6018247478371499,
+      "C_customer_busy_hours": 138.08826296995417,
+      "C_loaded_hours": 118.17388888888888,
+      "total_customer_busy_hours": 5437.946881359683,
+      "planned_AV_vehicle_hours": 1227.9322222222222,
+      "planned_HV_vehicle_hours": 11050.801944444445,
+      "baseline_vehicle_hours": 12278.734166666667,
+      "planned_AV_hour_ratio": 0.10000478921969946,
+      "supply_slots": 8435,
+      "runtime_s": 1837.4266993000056,
+      "setup_time_s": 40.147810300004494,
+      "simulation_loop_wall_s": 1785.1457016999993,
+      "peak_rss_mib": 1233.046875,
+      "active_step_p50_s": 0.47671154999989085,
+      "active_step_p90_s": 0.9510177600051977,
+      "maximum_complete_step_wall_s": 10.533743299994967,
+      "maximum_adapter_wall_s": 10.017586800000572,
+      "candidate_generation_time_s": 164.59559579952474,
+      "candidate_routing_time_s": 626.7505614003749,
+      "adapter_timings_s": {
+        "validator_time_s": 320.52954820005834,
+        "current_move_time_s": 368.0254247003686,
+        "coarse_time_s": 108.00010620002286,
+        "value_lookup_time_s": 12.598854500902235,
+        "current_flow_time_s": 3.127848899937817,
+        "solve_wall_time_s": 817.8241052996527
+      },
+      "maximum_current_actions": 708,
+      "maximum_current_residual_edges": 2474,
+      "decision_count": 2892,
+      "current_flow_status": {
+        "OPTIMAL_PRIMARY_CURRENT_FLOW_APPROXIMATE_FUTURE": 2564,
+        "FIXED_CURRENT_WAIT": 327,
+        "FEASIBLE_BACKUP_SERVICE_FIRST": 1
+      },
+      "effective_policy_counts": {
+        "SERVICE_PRESERVING": 2892
+      },
+      "coarse_refresh_count": 288,
+      "unavailable_coarse_refresh_count": 0,
+      "pricing_closed_refresh_count": 25,
+      "coarse_record_count": 288,
+      "maximum_sparse_LP_columns": 1221,
+      "maximum_sparse_LP_nonzeros": 3047,
+      "adapter_wall_overrun_count": 1,
+      "explicit_fallback_decisions": 1,
+      "optional_move_budget_cutoffs": 1,
+      "move_screen_counts": {
+        "coarse_refreshes": 288,
+        "current_move_connector_queries": 27184,
+        "current_move_proposed_count": 65442,
+        "current_move_upper_screened_count": 38225,
+        "current_move_routed_count": 27184,
+        "current_move_arrival_screened_count": 6326,
+        "current_move_budget_skipped_count": 33,
+        "current_move_value_unavailable_skipped_count": 0,
+        "optional_move_budget_cutoffs": 1,
+        "future_chain_variables": 0,
+        "future_connector_queries": 0
+      },
+      "physical_accounting": {
+        "duplicate_orders": 0,
+        "vehicle_task_overlap": 0,
+        "maximum_time_error_s": 1.0006147022068035e-09
+      },
+      "future_connector_queries": 0,
+      "coarse_prices_are_approximate": true,
+      "source_code_sha": "c588cd105e7b3b22a9521aff6a1ae5787a701c2d",
+      "hourly": [
+        {
+          "hour": 0,
+          "requests": 341,
+          "completed": 299,
+          "expired": 42,
+          "served_C": 11,
+          "served_HV": 288,
+          "service_rate": 0.8768328445747801
+        },
+        {
+          "hour": 1,
+          "requests": 225,
+          "completed": 188,
+          "expired": 37,
+          "served_C": 8,
+          "served_HV": 180,
+          "service_rate": 0.8355555555555556
+        },
+        {
+          "hour": 2,
+          "requests": 156,
+          "completed": 126,
+          "expired": 30,
+          "served_C": 6,
+          "served_HV": 120,
+          "service_rate": 0.8076923076923077
+        },
+        {
+          "hour": 3,
+          "requests": 121,
+          "completed": 73,
+          "expired": 48,
+          "served_C": 0,
+          "served_HV": 73,
+          "service_rate": 0.6033057851239669
+        },
+        {
+          "hour": 4,
+          "requests": 79,
+          "completed": 50,
+          "expired": 29,
+          "served_C": 1,
+          "served_HV": 49,
+          "service_rate": 0.6329113924050633
+        },
+        {
+          "hour": 5,
+          "requests": 104,
+          "completed": 71,
+          "expired": 33,
+          "served_C": 2,
+          "served_HV": 69,
+          "service_rate": 0.6826923076923077
+        },
+        {
+          "hour": 6,
+          "requests": 329,
+          "completed": 272,
+          "expired": 57,
+          "served_C": 8,
+          "served_HV": 264,
+          "service_rate": 0.8267477203647416
+        },
+        {
+          "hour": 7,
+          "requests": 854,
+          "completed": 614,
+          "expired": 240,
+          "served_C": 16,
+          "served_HV": 598,
+          "service_rate": 0.7189695550351288
+        },
+        {
+          "hour": 8,
+          "requests": 1397,
+          "completed": 1163,
+          "expired": 234,
+          "served_C": 22,
+          "served_HV": 1141,
+          "service_rate": 0.8324982104509664
+        },
+        {
+          "hour": 9,
+          "requests": 1674,
+          "completed": 1489,
+          "expired": 185,
+          "served_C": 66,
+          "served_HV": 1423,
+          "service_rate": 0.8894862604540024
+        },
+        {
+          "hour": 10,
+          "requests": 1516,
+          "completed": 1319,
+          "expired": 197,
+          "served_C": 33,
+          "served_HV": 1286,
+          "service_rate": 0.8700527704485488
+        },
+        {
+          "hour": 11,
+          "requests": 1577,
+          "completed": 1386,
+          "expired": 191,
+          "served_C": 56,
+          "served_HV": 1330,
+          "service_rate": 0.8788839568801522
+        },
+        {
+          "hour": 12,
+          "requests": 1525,
+          "completed": 1351,
+          "expired": 174,
+          "served_C": 48,
+          "served_HV": 1303,
+          "service_rate": 0.8859016393442622
+        },
+        {
+          "hour": 13,
+          "requests": 1646,
+          "completed": 1398,
+          "expired": 248,
+          "served_C": 70,
+          "served_HV": 1328,
+          "service_rate": 0.8493317132442284
+        },
+        {
+          "hour": 14,
+          "requests": 1768,
+          "completed": 1417,
+          "expired": 351,
+          "served_C": 44,
+          "served_HV": 1373,
+          "service_rate": 0.8014705882352942
+        },
+        {
+          "hour": 15,
+          "requests": 1928,
+          "completed": 1539,
+          "expired": 389,
+          "served_C": 40,
+          "served_HV": 1499,
+          "service_rate": 0.7982365145228216
+        },
+        {
+          "hour": 16,
+          "requests": 1860,
+          "completed": 1337,
+          "expired": 523,
+          "served_C": 47,
+          "served_HV": 1290,
+          "service_rate": 0.7188172043010753
+        },
+        {
+          "hour": 17,
+          "requests": 1740,
+          "completed": 1179,
+          "expired": 561,
+          "served_C": 16,
+          "served_HV": 1163,
+          "service_rate": 0.6775862068965517
+        },
+        {
+          "hour": 18,
+          "requests": 1669,
+          "completed": 1185,
+          "expired": 484,
+          "served_C": 7,
+          "served_HV": 1178,
+          "service_rate": 0.7100059916117436
+        },
+        {
+          "hour": 19,
+          "requests": 2011,
+          "completed": 1644,
+          "expired": 367,
+          "served_C": 57,
+          "served_HV": 1587,
+          "service_rate": 0.817503729487817
+        },
+        {
+          "hour": 20,
+          "requests": 1724,
+          "completed": 1485,
+          "expired": 239,
+          "served_C": 70,
+          "served_HV": 1415,
+          "service_rate": 0.861368909512761
+        },
+        {
+          "hour": 21,
+          "requests": 1828,
+          "completed": 1534,
+          "expired": 294,
+          "served_C": 58,
+          "served_HV": 1476,
+          "service_rate": 0.8391684901531729
+        },
+        {
+          "hour": 22,
+          "requests": 1416,
+          "completed": 1221,
+          "expired": 195,
+          "served_C": 32,
+          "served_HV": 1189,
+          "service_rate": 0.8622881355932204
+        },
+        {
+          "hour": 23,
+          "requests": 877,
+          "completed": 715,
+          "expired": 162,
+          "served_C": 21,
+          "served_HV": 694,
+          "service_rate": 0.8152793614595211
+        },
+        {
+          "hour": 24,
+          "requests": 2,
+          "completed": 0,
+          "expired": 2,
+          "served_C": 0,
+          "served_HV": 0,
+          "service_rate": 0.0
+        }
+      ]
+    },
+    "CHAIN_LAYOUT_JOINT": {
+      "policy": "CHAIN_DEFER",
+      "layout_mode": "joint",
+      "common_requests": 28367,
+      "completed": 22663,
+      "expired": 5704,
+      "service_rate": 0.798921281771072,
+      "served_C": 759,
+      "served_HV": 21904,
+      "C_body_compatible_orders": 9275,
+      "C_after_passenger_acceptance_orders": 6534,
+      "C_eligible_served_by_HV": 4841,
+      "served_wait_mean_s": 178.11884041733222,
+      "served_wait_p90_s": 285.504512,
+      "pickup_empty_km": 17877.445,
+      "idle_empty_km": 1054.3717308494206,
+      "total_empty_km": 18931.81673084942,
+      "actual_idle_moves": 813,
+      "movement_status": {
+        "COMPLETED": 740,
+        "INTERRUPTED_BY_CUSTOMER": 73
+      },
+      "C_serving_slots": 477,
+      "C_slots_serving_at_least_two": 181,
+      "C_max_services_per_slot": 9,
+      "C_services_per_planned_vehicle_hour": 0.6181122917569645,
+      "C_customer_busy_hours": 139.66291443867888,
+      "C_loaded_hours": 119.50166666666667,
+      "total_customer_busy_hours": 5253.493969600998,
+      "planned_AV_vehicle_hours": 1227.9322222222222,
+      "planned_HV_vehicle_hours": 11050.801944444445,
+      "baseline_vehicle_hours": 12278.734166666667,
+      "planned_AV_hour_ratio": 0.10000478921969946,
+      "supply_slots": 8435,
+      "runtime_s": 1856.1359630000006,
+      "setup_time_s": 40.64190599999711,
+      "simulation_loop_wall_s": 1803.3272255999982,
+      "peak_rss_mib": 1226.8359375,
+      "active_step_p50_s": 0.47948010000254726,
+      "active_step_p90_s": 0.9510535600005824,
+      "maximum_complete_step_wall_s": 10.550268500002858,
+      "maximum_adapter_wall_s": 10.013406399993983,
+      "candidate_generation_time_s": 178.24404589956248,
+      "candidate_routing_time_s": 629.9581866003718,
+      "adapter_timings_s": {
+        "validator_time_s": 302.93437459969573,
+        "current_move_time_s": 385.9131651994976,
+        "coarse_time_s": 106.8881739000717,
+        "value_lookup_time_s": 13.40348020032252,
+        "current_flow_time_s": 4.883157499898516,
+        "solve_wall_time_s": 819.279321300186
+      },
+      "maximum_current_actions": 728,
+      "maximum_current_residual_edges": 2728,
+      "decision_count": 2892,
+      "current_flow_status": {
+        "OPTIMAL_PRIMARY_CURRENT_FLOW_APPROXIMATE_FUTURE": 2578,
+        "FIXED_CURRENT_WAIT": 310,
+        "FEASIBLE_BACKUP_SERVICE_FIRST": 4
+      },
+      "effective_policy_counts": {
+        "CHAIN_DEFER": 2878,
+        "SERVICE_PRESERVING": 14
+      },
+      "coarse_refresh_count": 287,
+      "unavailable_coarse_refresh_count": 0,
+      "pricing_closed_refresh_count": 24,
+      "coarse_record_count": 287,
+      "maximum_sparse_LP_columns": 1258,
+      "maximum_sparse_LP_nonzeros": 3101,
+      "adapter_wall_overrun_count": 4,
+      "explicit_fallback_decisions": 4,
+      "optional_move_budget_cutoffs": 4,
+      "move_screen_counts": {
+        "coarse_refreshes": 287,
+        "current_move_connector_queries": 28454,
+        "current_move_proposed_count": 69027,
+        "current_move_upper_screened_count": 40333,
+        "current_move_routed_count": 28454,
+        "current_move_arrival_screened_count": 6581,
+        "current_move_budget_skipped_count": 240,
+        "current_move_value_unavailable_skipped_count": 0,
+        "optional_move_budget_cutoffs": 4,
+        "future_chain_variables": 0,
+        "future_connector_queries": 0
+      },
+      "physical_accounting": {
+        "duplicate_orders": 0,
+        "vehicle_task_overlap": 0,
+        "maximum_time_error_s": 1.0006147022068035e-09
+      },
+      "future_connector_queries": 0,
+      "coarse_prices_are_approximate": true,
+      "source_code_sha": "c588cd105e7b3b22a9521aff6a1ae5787a701c2d",
+      "hourly": [
+        {
+          "hour": 0,
+          "requests": 341,
+          "completed": 295,
+          "expired": 46,
+          "served_C": 12,
+          "served_HV": 283,
+          "service_rate": 0.8651026392961877
+        },
+        {
+          "hour": 1,
+          "requests": 225,
+          "completed": 178,
+          "expired": 47,
+          "served_C": 10,
+          "served_HV": 168,
+          "service_rate": 0.7911111111111111
+        },
+        {
+          "hour": 2,
+          "requests": 156,
+          "completed": 129,
+          "expired": 27,
+          "served_C": 7,
+          "served_HV": 122,
+          "service_rate": 0.8269230769230769
+        },
+        {
+          "hour": 3,
+          "requests": 121,
+          "completed": 85,
+          "expired": 36,
+          "served_C": 0,
+          "served_HV": 85,
+          "service_rate": 0.7024793388429752
+        },
+        {
+          "hour": 4,
+          "requests": 79,
+          "completed": 53,
+          "expired": 26,
+          "served_C": 1,
+          "served_HV": 52,
+          "service_rate": 0.6708860759493671
+        },
+        {
+          "hour": 5,
+          "requests": 104,
+          "completed": 71,
+          "expired": 33,
+          "served_C": 2,
+          "served_HV": 69,
+          "service_rate": 0.6826923076923077
+        },
+        {
+          "hour": 6,
+          "requests": 329,
+          "completed": 266,
+          "expired": 63,
+          "served_C": 8,
+          "served_HV": 258,
+          "service_rate": 0.8085106382978723
+        },
+        {
+          "hour": 7,
+          "requests": 854,
+          "completed": 607,
+          "expired": 247,
+          "served_C": 15,
+          "served_HV": 592,
+          "service_rate": 0.7107728337236534
+        },
+        {
+          "hour": 8,
+          "requests": 1397,
+          "completed": 1134,
+          "expired": 263,
+          "served_C": 26,
+          "served_HV": 1108,
+          "service_rate": 0.8117394416607016
+        },
+        {
+          "hour": 9,
+          "requests": 1674,
+          "completed": 1431,
+          "expired": 243,
+          "served_C": 56,
+          "served_HV": 1375,
+          "service_rate": 0.8548387096774194
+        },
+        {
+          "hour": 10,
+          "requests": 1516,
+          "completed": 1299,
+          "expired": 217,
+          "served_C": 36,
+          "served_HV": 1263,
+          "service_rate": 0.8568601583113457
+        },
+        {
+          "hour": 11,
+          "requests": 1577,
+          "completed": 1368,
+          "expired": 209,
+          "served_C": 59,
+          "served_HV": 1309,
+          "service_rate": 0.8674698795180723
+        },
+        {
+          "hour": 12,
+          "requests": 1525,
+          "completed": 1351,
+          "expired": 174,
+          "served_C": 53,
+          "served_HV": 1298,
+          "service_rate": 0.8859016393442622
+        },
+        {
+          "hour": 13,
+          "requests": 1646,
+          "completed": 1347,
+          "expired": 299,
+          "served_C": 73,
+          "served_HV": 1274,
+          "service_rate": 0.8183475091130012
+        },
+        {
+          "hour": 14,
+          "requests": 1768,
+          "completed": 1394,
+          "expired": 374,
+          "served_C": 37,
+          "served_HV": 1357,
+          "service_rate": 0.7884615384615384
+        },
+        {
+          "hour": 15,
+          "requests": 1928,
+          "completed": 1536,
+          "expired": 392,
+          "served_C": 50,
+          "served_HV": 1486,
+          "service_rate": 0.7966804979253111
+        },
+        {
+          "hour": 16,
+          "requests": 1860,
+          "completed": 1338,
+          "expired": 522,
+          "served_C": 42,
+          "served_HV": 1296,
+          "service_rate": 0.7193548387096774
+        },
+        {
+          "hour": 17,
+          "requests": 1740,
+          "completed": 1143,
+          "expired": 597,
+          "served_C": 15,
+          "served_HV": 1128,
+          "service_rate": 0.656896551724138
+        },
+        {
+          "hour": 18,
+          "requests": 1669,
+          "completed": 1127,
+          "expired": 542,
+          "served_C": 7,
+          "served_HV": 1120,
+          "service_rate": 0.6752546434991012
+        },
+        {
+          "hour": 19,
+          "requests": 2011,
+          "completed": 1600,
+          "expired": 411,
+          "served_C": 45,
+          "served_HV": 1555,
+          "service_rate": 0.7956240676280457
+        },
+        {
+          "hour": 20,
+          "requests": 1724,
+          "completed": 1456,
+          "expired": 268,
+          "served_C": 66,
+          "served_HV": 1390,
+          "service_rate": 0.8445475638051044
+        },
+        {
+          "hour": 21,
+          "requests": 1828,
+          "completed": 1502,
+          "expired": 326,
+          "served_C": 72,
+          "served_HV": 1430,
+          "service_rate": 0.8216630196936543
+        },
+        {
+          "hour": 22,
+          "requests": 1416,
+          "completed": 1216,
+          "expired": 200,
+          "served_C": 43,
+          "served_HV": 1173,
+          "service_rate": 0.8587570621468926
+        },
+        {
+          "hour": 23,
+          "requests": 877,
+          "completed": 737,
+          "expired": 140,
+          "served_C": 24,
+          "served_HV": 713,
+          "service_rate": 0.8403648802736602
+        },
+        {
+          "hour": 24,
+          "requests": 2,
+          "completed": 0,
+          "expired": 2,
+          "served_C": 0,
+          "served_HV": 0,
+          "service_rate": 0.0
+        }
+      ]
+    }
+  },
+  "paired": {
+    "layout_effect": {
+      "before": "HOTSPOT_BASELINE",
+      "after": "CHAIN_LAYOUT_BASELINE",
+      "net_service_difference": 100,
+      "service_rate_difference_percentage_points": 0.3525222970352848,
+      "gained_service_count": 1524,
+      "lost_service_count": 1424,
+      "shared_served_count": 21531,
+      "shared_served_wait_mean_change_s": -0.4762806323440621,
+      "C_service_difference": 11,
+      "HV_service_difference": 89,
+      "total_empty_km_difference": 247.43184030091288
+    },
+    "control_effect": {
+      "before": "CHAIN_LAYOUT_BASELINE",
+      "after": "CHAIN_LAYOUT_JOINT",
+      "net_service_difference": -392,
+      "service_rate_difference_percentage_points": -1.3818874043783236,
+      "gained_service_count": 1584,
+      "lost_service_count": 1976,
+      "shared_served_count": 21079,
+      "shared_served_wait_mean_change_s": -1.1248265411547038,
+      "C_service_difference": 20,
+      "HV_service_difference": -412,
+      "total_empty_km_difference": -729.9161181306517
+    },
+    "combined_effect": {
+      "before": "HOTSPOT_BASELINE",
+      "after": "CHAIN_LAYOUT_JOINT",
+      "net_service_difference": -292,
+      "service_rate_difference_percentage_points": -1.0293651073430388,
+      "gained_service_count": 1706,
+      "lost_service_count": 1998,
+      "shared_served_count": 20957,
+      "shared_served_wait_mean_change_s": -1.5614129814858997,
+      "C_service_difference": 31,
+      "HV_service_difference": -323,
+      "total_empty_km_difference": -482.48427782973886
+    }
+  },
+  "common_cohort_count": 28367,
+  "inputs_sha256": {
+    "stage4/config/scheme_a_city_v1.json": "8022d88c8c1377fd87f925bf7f0e35584b9bb3f500bc5cb8fd9d16ea9a0ef47e",
+    "stage4/input/replay_foundation/stage4_order_replay_base.parquet": "dc590c415e08e65ef3975cb7b8122484b04dbef76788d29ee1f2c831e236c874",
+    "stage4/input/replay_foundation/replay_fleet_template.parquet": "09fc04e8250b873274ee2e397060417edb081908c2eb4f9f24a0459328b045b0",
+    "stage4/output/symmetric_flexibility_v1/input/test31_research_routes.parquet": "672d635fa24690ba7082b2e925f8419e6b6d67aca2dec613ea0a87835e7e57f7",
+    "stage4/output/symmetric_flexibility_v1/input/train_request_templates.parquet": "f0ee98eb4ad5aca69125ace8610ce4ff2c40edb6b7f5e62016ee321a432af652",
+    "stage4/output/symmetric_flexibility_v1/input/preparation_summary.json": "916f22a9b2c8aca89254ad6874f2aabaf75be2f75bca2340d3c2582d66cb4d7e",
+    "stage4/docs/flexibility_dispatch/service_preserving/train_remaining_time_model.json": "207dfa3385bf1d59fb380e897e876a745bd8484ee52a53e62b150baa5b33488f",
+    "stage4/config/controlled_replay_v2.json": "2c516b377d9b6d83313016de38738c0939f1f68e58f83b8882431be0a7d338b9",
+    "stage3/config/stage3_av_capability_profiles.json": "bea54c12a0c013995c3644a0bab84b35413d5df8a6785dfdd6a03fd49f32978e",
+    "stage4/config/scheme_a_two_scale_city_v2.json": "e405b8d90ed23d530ea2b94e79011fc10ba0e97c18cbe33af50c757038d1f93a",
+    "stage4/config/scheme_a_two_scale_v2.json": "24c6d0d36583635e091416b9edc9ad90d3e9a0f7ca57980b7b045106b6fb6855",
+    "stage4/output/capability_chain_planning/scheme_a_city_v1/layout/placements.json": "c3b96033aa9039a4c094d43fdcb07bbf596ce0cf4edcd4481ff538b73500cf04"
+  },
+  "code_sha": "c588cd105e7b3b22a9521aff6a1ae5787a701c2d",
+  "layout_sha256": "c3b96033aa9039a4c094d43fdcb07bbf596ce0cf4edcd4481ff538b73500cf04",
+  "test_date": "20161031",
+  "profile": "C",
+  "q_a": 0.1,
+  "passenger_acceptance": 0.7,
+  "one_day_one_seed": true,
+  "statistical_significance_claimed": false,
+  "predictor_decision_superiority_claimed": false,
+  "global_city_optimality_claimed": false,
+  "no_new_experiments": true,
+  "per_order_or_coordinate_information_exported": false
+}
