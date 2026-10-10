@@ -1,0 +1,75 @@
+{
+  "artifact_sha256": "c5c5a6cbe93fd261368d8a06965753febe668e4520d2fd48abd79c9aaf68a0a9",
+  "count_maximum": 222,
+  "count_minimum": 1,
+  "count_record_count": 547027,
+  "count_records_sha256": "b1e3342b1a621896cc9e99964381d114233f1083615d0961231314b1a9a1672a",
+  "count_sum": 9313366,
+  "duplicate_removed_count": 0,
+  "evaluation_rows_used": 0,
+  "fit_dates": [
+    "20161009",
+    "20161010",
+    "20161011",
+    "20161012",
+    "20161013",
+    "20161014",
+    "20161015",
+    "20161016",
+    "20161017",
+    "20161018",
+    "20161019",
+    "20161020",
+    "20161021"
+  ],
+  "fit_dates_observed": [
+    "20161009",
+    "20161010",
+    "20161011",
+    "20161012",
+    "20161013",
+    "20161014",
+    "20161015",
+    "20161016",
+    "20161017",
+    "20161018",
+    "20161019",
+    "20161020",
+    "20161021"
+  ],
+  "fit_scope": "train_only",
+  "missing_edge_count": 591,
+  "positive_quantiles": {
+    "p25": 2.0,
+    "p50": 7.0,
+    "p75": 23.0,
+    "p90": 47.0
+  },
+  "protocol_id": "development",
+  "schema_version": "stage2_v5_2_sparsity_support.1",
+  "source_inputs_sha256": "0b2b9bf8243ccf3ccabc8f922088bb222737eebabf10d07bac002d09cb237b2b",
+  "source_row_count": 9313957,
+  "status": "PASS",
+  "support_group_record_counts": {
+    "high": 133694,
+    "low": 155944,
+    "medium": 257389,
+    "unseen": 0
+  },
+  "support_group_rule": {
+    "high": "n > train_positive_p75",
+    "low": "0 < n <= train_positive_p25",
+    "medium": "train_positive_p25 < n <= train_positive_p75",
+    "unseen": "n == 0"
+  },
+  "support_kind": "spatiotemporal",
+  "target": null,
+  "time_bin": {
+    "column": "estimated_time_bin",
+    "definition": "Xi'an local half-hour bucket: hour * 2 + (minute >= 30)",
+    "definition_source": "stage2/v4/entry_time.py",
+    "valid_maximum": 47,
+    "valid_minimum": 0
+  },
+  "unique_physical_traversal_count": 9313957
+}

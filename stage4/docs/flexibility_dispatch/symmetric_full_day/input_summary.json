@@ -1,0 +1,57 @@
+{
+  "status": "COMPLETE",
+  "policy_version": "SYMMETRIC_HISTORICAL_RESEARCH_V1",
+  "config_sha256": "92865914130ce9ebc23ebe5ca45a3c5d01da3dd1b2c7d4e4293462ea059d65e9",
+  "test31_routes": {
+    "orders": 30000,
+    "common_eligible": 28367,
+    "compatible": {
+      "C": 9275,
+      "M": 24201,
+      "A": 28367,
+      "HV": 28367
+    },
+    "reverse_orders": 14837,
+    "reverse_supported_orders": 13754,
+    "unsupported_reverse_orders": 651,
+    "unresolved_orders": 981,
+    "before_compatible": {
+      "C": 5299,
+      "M": 13847,
+      "A": 14613
+    },
+    "new_encounters": 579778,
+    "original_encounters": 538355,
+    "common_exclusion_counts": {
+      "[\"UNSUPPORTED_ROUTE_IDENTITY\"]": 1497,
+      "[\"MISSING_RESEARCH_INPUT\", \"UNSUPPORTED_ROUTE_IDENTITY\"]": 118,
+      "[\"MISSING_RESEARCH_INPUT\"]": 18
+    }
+  },
+  "train_templates": [
+    {
+      "date": "20161010",
+      "templates": 9479,
+      "frozen_prediction_sha256": "546f261d2b008905ce8711604066a5e90ea790b9529666a7e249725ccb440e44"
+    },
+    {
+      "date": "20161017",
+      "templates": 9392,
+      "frozen_prediction_sha256": "144bc5e042ef19fc78e25dc8d78f908c976903ca334cb42b5b7f655d86198c37"
+    },
+    {
+      "date": "20161024",
+      "templates": 9464,
+      "frozen_prediction_sha256": "84ad370d5dc74ce2db80842d8125870b299e815932b7d92219a0e297916d69d6"
+    }
+  ],
+  "virtual_reverse_identity_count": 6388,
+  "physical_forward_reference_is_not_traversed_edge": true,
+  "frozen_topology_changed": false,
+  "signal_collection_calls": 0,
+  "new_m3_inference": false,
+  "missing_input_is_common_exclusion_not_capability_failure": true,
+  "A_equals_HV_capability": true,
+  "full_day_Train_library_not_test31_future_demand": true,
+  "peak_rss_mib": 1790.01953125
+}

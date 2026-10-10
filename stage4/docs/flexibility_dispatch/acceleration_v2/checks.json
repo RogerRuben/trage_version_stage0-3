@@ -1,0 +1,21 @@
+{
+  "status": "PASS",
+  "scope": "OFFLINE_AND_FINITE_EQUIVALENCE_ONLY",
+  "full_day_simulation_started": false,
+  "compact_orders_compared": 30000,
+  "route_policies_compared": 30000,
+  "forecast_epochs_compared": 54,
+  "forecast_requests_compared": 28792,
+  "real_raw_routes_compared": 12,
+  "protected_v1_inputs_unchanged": true,
+  "gpu_used": false,
+  "dense_matrix": false,
+  "runtime_s": 29.610824299998058,
+  "peak_parent_rss_mib": 392.37109375,
+  "sampled_route_process_group_rss_mib": 707.4921875,
+  "acceleration_config_sha256": "da85d9e944be7f2456492909349dec2b41f582ed038afb3803bcad2cc1ed39d9",
+  "sampled_route_process_group_private_committed_mib": 1074.99609375,
+  "real_raw_backend_evaluations": 12,
+  "unused_parent_actor_created": false,
+  "assets_manifest_sha256": "d0cc0e1c20bc2e484b95f2ca387af035fe05ee4cade457e9adcea2fddec61940"
+}

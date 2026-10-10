@@ -1,0 +1,44 @@
+{
+  "schema_version": "stage3_s1_static_inventory_config.1",
+  "phase": "S1_STATIC_DATA_INVENTORY",
+  "execution_authorization": "S1_ONLY",
+  "paths": {
+    "stage0_freeze_manifest": "stage0/docs/stage0_v6_freeze_manifest.json",
+    "stage1_release_manifest": "stage1/docs/stage1_v3_release_manifest.json",
+    "stage2_final_release_manifest": "stage2/docs/v5_2/stage2_v5_2_final_release_manifest.json",
+    "stage1_input": "stage1/input_v1",
+    "pbf": "D:/pycodes/didi_xian_raw/map_data/xian_roadmap_update.osm.pbf",
+    "poi": "D:/pycodes/didi_xian_raw/map_data/西安市POI数据.csv",
+    "valhalla_build_manifest": "D:/pycodes/didi_xian_raw/valhalla_data/build_manifest.json",
+    "legacy_canonical_edges": "D:/pycodes/didi_xian_raw/.worktrees/stage0-v5/stage0/output_v5/network/canonical_edges.parquet",
+    "output": "stage3/docs/odd_tod"
+  },
+  "speed_diagnostic_only": {
+    "low_positive_kmh": 5.0,
+    "high_kmh": 160.0
+  },
+  "poi_search_terms": {
+    "signal": ["traffic signal", "traffic light", "signalized", "红绿灯", "交通信号", "信号灯"],
+    "junction": ["junction", "intersection", "crossroad", "crossing", "路口", "交叉口", "十字路口", "丁字路口", "环岛"]
+  },
+  "analysis_boundaries": {
+    "intersection_clustering": false,
+    "intersection_tolerance_selection": false,
+    "static_enrichment_output": false,
+    "profile_calibration": false,
+    "stage2_inference": false,
+    "route_assessment": false,
+    "test31_parameter_fitting": false
+  },
+  "authorizations": {
+    "s1": true,
+    "s2": false,
+    "s3": false,
+    "s4": false,
+    "s5": false,
+    "s6": false,
+    "s7": false,
+    "s8": false,
+    "stage4": false
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "status": "EPOCH_PREFLIGHT_COMPLETE_NOT_NATIVE_CHECKPOINT",
+  "rows": [
+    {
+      "q_A": 0.5,
+      "scenario": "ODD_Q50_M_P70_REFERENCE",
+      "checkpoint_time": "2016-10-31T10:30:00+08:00",
+      "strict_pre_epoch": true,
+      "total_fixtures": 4444,
+      "available_reconstructed": 367,
+      "available_reference": 367,
+      "waiting_reconstructed": 64,
+      "waiting_reference": 64,
+      "in_progress_assignments": 247,
+      "in_progress_pickups": 29,
+      "in_progress_services": 218,
+      "captured_arcs": 19,
+      "reference_arcs": 19,
+      "selected_count": 8,
+      "reference_selected_count": 8,
+      "selected_identity_equal": true,
+      "selected_symmetric_difference": 0,
+      "pickup_objective_s": 1278.5862265889114,
+      "reference_pickup_objective_s": 1278.5862265889114,
+      "routing_arcs": 1166,
+      "routing_failures": 0,
+      "gamma_state": {
+        "av_assignments": 671,
+        "static": 1419.3982843137255,
+        "dynamic": 95.64505263388362,
+        "speed": 0.0
+      },
+      "native_checkpoint_restored": false
+    },
+    {
+      "q_A": 0.75,
+      "scenario": "MAIN_Q75_M_P70",
+      "checkpoint_time": "2016-10-31T10:30:00+08:00",
+      "strict_pre_epoch": true,
+      "total_fixtures": 2485,
+      "available_reconstructed": 396,
+      "available_reference": 396,
+      "waiting_reconstructed": 95,
+      "waiting_reference": 95,
+      "in_progress_assignments": 157,
+      "in_progress_pickups": 18,
+      "in_progress_services": 139,
+      "captured_arcs": 13,
+      "reference_arcs": 13,
+      "selected_count": 7,
+      "reference_selected_count": 7,
+      "selected_identity_equal": true,
+      "selected_symmetric_difference": 0,
+      "pickup_objective_s": 958.3237806225172,
+      "reference_pickup_objective_s": 958.3237806225172,
+      "routing_arcs": 1629,
+      "routing_failures": 0,
+      "gamma_state": {
+        "av_assignments": 918,
+        "static": 2130.2024509803923,
+        "dynamic": 158.92564021647448,
+        "speed": 0.4375
+      },
+      "native_checkpoint_restored": false
+    }
+  ],
+  "runtime_s": 21.729192500000863,
+  "peak_working_set_mib": 304.8984375,
+  "routing_mode": "SINGLE_SOURCE_MATRIX",
+  "full_simulation_run": false
+}

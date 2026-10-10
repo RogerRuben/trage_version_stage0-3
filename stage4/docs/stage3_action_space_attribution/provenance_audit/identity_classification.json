@@ -1,0 +1,12 @@
+[
+  {
+    "issue": "UNMAPPED_FULL_NETWORK_EDGE",
+    "tokens": 19,
+    "unique_orders": 19
+  },
+  {
+    "issue": "NULL_SOURCE_AND_CANONICAL_IDENTITY",
+    "tokens": 4,
+    "unique_orders": 4
+  }
+]

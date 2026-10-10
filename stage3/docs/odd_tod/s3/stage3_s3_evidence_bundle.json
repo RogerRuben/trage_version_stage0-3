@@ -1,0 +1,59 @@
+{
+  "artifact_sha256": "334e0b22c31947c0a1dbb604182545faebfdc8e3d61c804664aad8581ca5f78e",
+  "evidence_verification": "ALL_BOUND_HASHES_VERIFIED",
+  "independent_verification": {
+    "path": "stage3/docs/odd_tod/s3/stage3_s3_evidence_verification.json",
+    "sha256": "47de1012ab559e1736368921fc4e049c25748e06fa033e208fc087f5fb6eb036",
+    "size_bytes": 831
+  },
+  "next_phase_authorized": false,
+  "phase_status": "STAGE3_S31_CLOSURE_COMPLETE",
+  "profile_sha256": "bea54c12a0c013995c3644a0bab84b35413d5df8a6785dfdd6a03fd49f32978e",
+  "release_manifest": {
+    "path": "stage3/docs/odd_tod/s3/stage3_s3_release_manifest.json",
+    "sha256": "45dfe82a7bbf742caba1dac1354d6604a53848781828a1c6ea7ed1e4f91628b1",
+    "size_bytes": 32071
+  },
+  "reports": {
+    "stage3_s31_closure_report.md": {
+      "path": "stage3/docs/odd_tod/s3/stage3_s31_closure_report.md",
+      "sha256": "c698a09811f8dd8ee4142203eaabebf598c297665942c58159fc6e34b24ddfc7",
+      "size_bytes": 1433
+    },
+    "stage3_s3_dynamic_calibration_report.md": {
+      "path": "stage3/docs/odd_tod/s3/stage3_s3_dynamic_calibration_report.md",
+      "sha256": "22cb6152eae00d887282ca1cce3ef645f220c6b9f890a247f3a1c66729c277b0",
+      "size_bytes": 6373
+    },
+    "stage3_s3_identity_resolution_report.md": {
+      "path": "stage3/docs/odd_tod/s3/stage3_s3_identity_resolution_report.md",
+      "sha256": "31c849a8264360ae3f43086a5dfd0124c9f2d5f4a78eb7b4df11b2f7b70c5291",
+      "size_bytes": 772
+    },
+    "stage3_s3_methodology.md": {
+      "path": "stage3/docs/odd_tod/s3/stage3_s3_methodology.md",
+      "sha256": "f3f2611c111e48ab58779c4097729728818f5c464de2e26c808f7cf06ca00b5b",
+      "size_bytes": 1704
+    },
+    "stage3_s3_static_calibration_report.md": {
+      "path": "stage3/docs/odd_tod/s3/stage3_s3_static_calibration_report.md",
+      "sha256": "afd369ca9538f97a300515142b1908d25948c4ca2675c0c3740051f192a2bb53",
+      "size_bytes": 1588
+    },
+    "stage3_s3_validation_sanity_report.md": {
+      "path": "stage3/docs/odd_tod/s3/stage3_s3_validation_sanity_report.md",
+      "sha256": "9f8ae71d723696af616f99066570fc5c731a7076f97af24d018a08689a0ab756",
+      "size_bytes": 2735
+    }
+  },
+  "s4_authorized": false,
+  "schema_version": "stage3_s31_evidence_bundle.1",
+  "test31_used": false,
+  "test_evidence": {
+    "path": "stage3/docs/odd_tod/s3/stage3_s3_test_evidence.json",
+    "sha256": "09015c6657f53d25e3b51f9430e0bb1ad7d8fdf42eb41f40f2c626c460071cf9",
+    "size_bytes": 974
+  },
+  "train_summary_sha256": "47d501275824b677f2751f4957a66b2ca9bd02fceddd5b65d43935652dd51aea",
+  "validation_summary_sha256": "a94a68e8837e5711e3a74ebc49d759c8a05d3fe88329c174a2477a8a7af8a03e"
+}

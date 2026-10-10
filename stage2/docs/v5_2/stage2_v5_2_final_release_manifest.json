@@ -1,0 +1,250 @@
+{
+  "artifact_sha256": "355357e3ed98b08000565266662fc3a3603586e27d5a291694e9c0c0bb3e4e9e",
+  "artifact_storage": {
+    "checkpoint_integrity_is_sha256_bound": true,
+    "checkpoint_repository_tracked": false,
+    "checkpoint_required_for_stage3_inference": true
+  },
+  "authorizations": {
+    "checkpoint_reselection": false,
+    "phase_d": false,
+    "stage2_inference_rerun": false,
+    "stage2_training": false,
+    "stage3": false,
+    "stage3_s1": false,
+    "stage3_s2": false,
+    "stage3_s3": false,
+    "stage3_s4": false,
+    "stage3_s5": false,
+    "stage3_s6": false,
+    "stage3_s7": false,
+    "stage3_s8": false,
+    "stage4": false,
+    "tau_reselection": false,
+    "transfer_v2": false
+  },
+  "closure_artifacts": {
+    "frozen_experiment_config": {
+      "path": "stage2/config/stage2_v5_2.json",
+      "sha256": "5a43e4958c629ad651338321e699c466e420e86eabcbebb9eb82a346df873e53",
+      "size_bytes": 10795
+    },
+    "implementation": {
+      "path": "stage2/v5_2/final_freeze.py",
+      "sha256": "12b8fcb9dafafa44278823f35faf9a3fc3f9b0242a45b5e70bad574d1711f84b",
+      "size_bytes": 31333
+    },
+    "test_evidence": {
+      "path": "stage2/docs/v5_2/stage2_v5_2_final_closure_test_evidence.json",
+      "schema_version": "stage2_v5_2_final_closure_test_evidence.1",
+      "sha256": "ff32dd06c66fd688f3a6b6d40f855096463a266a669e4a30ad9090fe14ef8ae1",
+      "size_bytes": 1070
+    },
+    "tests": {
+      "path": "stage2/tests_v5_2/test_final_freeze.py",
+      "sha256": "705827fda48d6fd2b64ba0271bac0afd9ea1495743fd563531b4b478044f9fce",
+      "size_bytes": 4707
+    }
+  },
+  "closure_base_commit": "69c995290c2b91d86a42f80236a7565fd7113ece",
+  "experiment_decisions": {
+    "M3": {
+      "role": "structured_representation",
+      "status": "SELECTED_FINAL"
+    },
+    "M4": {
+      "reason": "no stable incremental benefit over M3 under the frozen Phase C gate",
+      "status": "REJECTED_ABLATION"
+    },
+    "M5": {
+      "reason": "Phase C did not authorize continuation",
+      "status": "CANCELLED_NOT_RUN"
+    },
+    "M6": {
+      "reason": "Phase C did not authorize continuation",
+      "status": "CANCELLED_NOT_RUN"
+    },
+    "Phase_D": {
+      "reason": "support-aware spatial expansion was rejected",
+      "status": "CANCELLED"
+    },
+    "Transfer_v2": {
+      "reason": "diagnostic evidence did not support a new transfer experiment",
+      "status": "CANCELLED"
+    }
+  },
+  "final_predictor": {
+    "checkpoint": {
+      "path": "stage2/output_v5_2/development/M3/epoch_004.pt",
+      "sha256": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde",
+      "size_bytes": 5665346
+    },
+    "development_evaluation": {
+      "path": "stage2/output_v5_2/development/M3/evaluation/evaluation_manifest.json",
+      "sha256": "e39fe46948f85d747d116e25520ae2ff5a12197999cc1c6c07d2a3853e6285dc",
+      "size_bytes": 10638
+    },
+    "inference_policy": {
+      "candidate_route_adapter_must_use_frozen_m3": true,
+      "checkpoint_reselection_allowed": false,
+      "feature_contract_changes_allowed": false,
+      "retraining_allowed": false,
+      "tau_reselection_allowed": false
+    },
+    "model_id": "M3",
+    "model_role": "structured_representation",
+    "selection_status": "FINAL_FROZEN",
+    "training_manifest": {
+      "path": "stage2/output_v5_2/development/M3/model_manifest.json",
+      "sha256": "2f4acbe5244498598021395382f4bd20a39e22b23b77c4453c19e2914709a388",
+      "size_bytes": 16691
+    },
+    "transfer_input_manifest": {
+      "path": "stage2/output_v5_2/transfer_shards/protocol=development/transfer_manifest.json",
+      "sha256": "204da7ade534af9eecf5cbf79966b843beda29f3a81366a14b20e6985c862f4c",
+      "size_bytes": 118160
+    },
+    "validation_evaluation": {
+      "path": "stage2/output_v5_2/development/M3/validation_evaluation/evaluation_manifest.json",
+      "sha256": "add569601d0b8f576d221cbc3cf25780d587949e6622318b6a4af3d8306e8c37",
+      "size_bytes": 8577
+    }
+  },
+  "next_phase_authorized": false,
+  "phase": "S0_STAGE2_FINAL_CLOSURE",
+  "schema_version": "stage2_v5_2_final_release_manifest.1",
+  "scientific_conclusion": {
+    "final_model": "M3 structured representation",
+    "sparsity_diagnostic": "DIAG-B",
+    "statement": "Structured representation has a repeatable positive signal, while support-aware spatial gating has no reliable incremental benefit; freeze M3 and stop Stage 2 expansion.",
+    "support_aware_gate": "REJECTED",
+    "upstream_sampling_audit": "UP-D"
+  },
+  "scientific_evidence": {
+    "phase_b1": {
+      "path": "stage2/docs/v5_2/stage2_v5_2_phase_b1_evidence_bundle.json",
+      "schema_version": "stage2_v5_2_phase_b1_evidence_bundle.1",
+      "sha256": "e44629ed30ac86d951012e438d8448eed7fe226edaa915ea6d5305322765d934",
+      "size_bytes": 12325,
+      "verification": {
+        "phase_c_authorized": false,
+        "resolved_artifact_count": 39,
+        "schema_version": "stage2_v5_2_phase_b1_evidence_verification.1",
+        "status": "PASS"
+      }
+    },
+    "phase_c": {
+      "path": "stage2/docs/v5_2/stage2_v5_2_phase_c_evidence_bundle.json",
+      "schema_version": "stage2_v5_2_phase_c_evidence_bundle.2",
+      "sha256": "ebbe3ce9d6d0d11351564e0d99664b6ca91a121b470ab8a90e5b330cff6f6644",
+      "size_bytes": 9603,
+      "verification": {
+        "m4_tau_consumption": "PASS",
+        "phase_c_direction": "FAIL",
+        "phase_d_authorized": false,
+        "resolved_artifact_count": 37,
+        "status": "PASS"
+      }
+    },
+    "spatiotemporal_sparsity": {
+      "path": "stage2/docs/v5_2/sparsity_diagnostic/stage2_v5_2_spatiotemporal_sparsity_evidence_bundle.json",
+      "schema_version": "stage2_v5_2_spatiotemporal_sparsity_evidence_bundle.1",
+      "sha256": "988873370798161271b6fdb77e1a7ab554ca1d7d4a436a8ccf2c61492b30c77c",
+      "size_bytes": 15401,
+      "verification": {
+        "diagnostic_classification": "DIAG-B",
+        "phase_d_authorized": false,
+        "resolved_artifact_count": 61,
+        "stage3_authorized": false,
+        "status": "PASS",
+        "transfer_v2_authorized": false
+      }
+    },
+    "upstream_sampling_representativeness": {
+      "path": "stage2/docs/v5_2/upstream_sampling_audit/stage0_stage1_upstream_representativeness_evidence_bundle.json",
+      "schema_version": "stage0_stage1_upstream_representativeness_evidence.1",
+      "sha256": "684c690023c9371a3b4a4d56037dde6e6ba9c17884e82716d7ad53579f58f60d",
+      "size_bytes": 151917,
+      "verification": {
+        "accepted_product_count": 196,
+        "candidate_manifest_count": 20,
+        "execution_head": "035c265596dc86754edc1c683a0f18223ce5ee8d",
+        "figure_count": 6,
+        "phase_d_authorized": false,
+        "rejection_manifest_count": 196,
+        "sparsity_stress_test_authorized": false,
+        "stage3_authorized": false,
+        "status": "PASS",
+        "table_count": 16,
+        "transfer_v2_authorized": false
+      }
+    }
+  },
+  "scientific_reports": {
+    "phase_b1": {
+      "classification": "CASE_C",
+      "path": "stage2/docs/v5_2/stage2_v5_2_phase_b1_transfer_tuning_report.json",
+      "sha256": "afa13f1282fdaa9afec8d529f047dc81681bbaca8b61305a8d2658662b0537c5",
+      "size_bytes": 8973
+    },
+    "phase_c": {
+      "direction": "FAIL",
+      "path": "stage2/docs/v5_2/stage2_v5_2_phase_c_report.json",
+      "sha256": "e7c4c105f2d6ccb0d32675a8821ec69bf1be3cb1805b3f357ccd665438aab9d3",
+      "size_bytes": 24534
+    },
+    "spatiotemporal_sparsity": {
+      "classification": "DIAG-B",
+      "path": "stage2/docs/v5_2/sparsity_diagnostic/stage2_v5_2_spatiotemporal_sparsity_report.json",
+      "sha256": "c76599642f7367e054e0963631ab49af9aa632e55a37ca3e2f3d1fd3326fc586",
+      "size_bytes": 87893
+    },
+    "upstream_sampling_representativeness": {
+      "classification": "UP-D",
+      "path": "stage2/docs/v5_2/upstream_sampling_audit/stage0_stage1_upstream_representativeness_report.json",
+      "sha256": "ceebc3f1bfbe4577742dbf30bd68b216e0d8c079be87099d42aeffb0636b0e0e",
+      "size_bytes": 15529
+    }
+  },
+  "stage2_to_stage3_contract": {
+    "path": "stage2/docs/v5_2/stage2_v5_2_to_stage3_contract.md",
+    "schema_version": "stage2_v5_2_to_stage3_contract.2",
+    "sha256": "8e0b62426b4c29658c45cfff33f7e5802387fb570c83616fb47d8f3bcd9da553",
+    "size_bytes": 2822
+  },
+  "stage3_authorized": false,
+  "status": "STAGE2_FINAL_FROZEN",
+  "target_roles": {
+    "claim_boundary": "predicted_operational_condition_proxies_not_AV_risk_probabilities",
+    "core_micro_targets": [
+      "crawl",
+      "stop",
+      "speed_cv",
+      "acceleration_rms"
+    ],
+    "deployable_outputs": [
+      "travel_time_p50",
+      "pace_p50",
+      "crawl",
+      "stop",
+      "speed_cv",
+      "acceleration_rms"
+    ],
+    "diagnostic_only": [
+      "rts"
+    ],
+    "rts_stage3_deployable": false
+  },
+  "upstream_frozen_releases": {
+    "stage0": {
+      "path": "stage0/docs/stage0_v6_freeze_manifest.json",
+      "sha256": "35a0e8c83c508fa344c74b9ecc2df11f59725d393a9a71f04ee461148762d7d1",
+      "size_bytes": 24194
+    },
+    "stage1": {
+      "path": "stage1/docs/stage1_v3_release_manifest.json",
+      "sha256": "29942f040b7fbd1ce5ccf9ee4586f381cb8f900c27f7aad48482936e7278f26c",
+      "size_bytes": 2661
+    }
+  }
+}

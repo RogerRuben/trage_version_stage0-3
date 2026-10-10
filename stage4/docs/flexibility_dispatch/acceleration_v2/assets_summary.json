@@ -1,0 +1,11 @@
+{
+  "status": "CONSTRUCTED_NO_SIMULATION",
+  "runtime_s": 97.2374032000007,
+  "peak_rss_mib": 285.75390625,
+  "orders": 30000,
+  "common_eligible": 28367,
+  "positions": 67176,
+  "forecast_draws": 1697301,
+  "fleet_fixtures": 4444,
+  "byte_count": 68496326
+}

@@ -1,0 +1,183 @@
+{
+  "status": "CHECKED_FINITE_SYNTHETIC_MODELS",
+  "kind": "MATHEMATICAL_COUNTEREXAMPLES_NOT_REPLAY",
+  "proof_scope": "declared complete finite chain families; no city embedding or novelty certification",
+  "checks": {
+    "hotspot_ordering": {
+      "hotspot": {
+        "served": 1,
+        "selected": [
+          {
+            "resource": "C",
+            "chain": [
+              "a"
+            ]
+          }
+        ],
+        "dp_states": 5,
+        "job_count": 3,
+        "resource_count": 1
+      },
+      "continuation_friendly": {
+        "served": 2,
+        "selected": [
+          {
+            "resource": "C",
+            "chain": [
+              "d",
+              "e"
+            ]
+          }
+        ],
+        "dp_states": 5,
+        "job_count": 2,
+        "resource_count": 1
+      }
+    },
+    "geofence": {
+      "unrestricted": {
+        "served": 2,
+        "selected": [
+          {
+            "resource": "C",
+            "chain": [
+              "a",
+              "b"
+            ]
+          }
+        ],
+        "dp_states": 5,
+        "job_count": 2,
+        "resource_count": 1
+      },
+      "fenced": {
+        "served": 1,
+        "selected": [
+          {
+            "resource": "C",
+            "chain": [
+              "a"
+            ]
+          }
+        ],
+        "dp_states": 3,
+        "job_count": 1,
+        "resource_count": 1
+      }
+    },
+    "fractional_relaxation": {
+      "exact": {
+        "served": 3,
+        "selected": [
+          {
+            "resource": "C",
+            "chain": [
+              "a"
+            ]
+          },
+          {
+            "resource": "H",
+            "chain": [
+              "b",
+              "d"
+            ]
+          }
+        ],
+        "dp_states": 23,
+        "job_count": 4,
+        "resource_count": 2
+      },
+      "relaxed": {
+        "served": 4.0,
+        "columns": 12,
+        "rows": 6,
+        "nonzeros": 28,
+        "nonzero_solution": [
+          {
+            "resource": "C",
+            "chain": [
+              "a",
+              "b"
+            ],
+            "weight": 0.5
+          },
+          {
+            "resource": "C",
+            "chain": [
+              "c",
+              "d"
+            ],
+            "weight": 0.5
+          },
+          {
+            "resource": "H",
+            "chain": [
+              "a",
+              "c"
+            ],
+            "weight": 0.5
+          },
+          {
+            "resource": "H",
+            "chain": [
+              "b",
+              "d"
+            ],
+            "weight": 0.5
+          }
+        ],
+        "job_prices": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 0.0,
+          "d": 0.0
+        },
+        "resource_prices": {
+          "C": 2.0,
+          "H": 2.0
+        },
+        "certificate": {
+          "primal_max_excess": 0.0,
+          "minimum_dual_slack": 0.0,
+          "dual_objective": 4.0,
+          "primal_dual_gap": 0.0
+        }
+      },
+      "integer_gap_jobs": 1.0,
+      "individual_task_sets_nested": true,
+      "equal_start_transition_graphs_claimed": false
+    },
+    "deployment_complementarity": {
+      "values": {
+        "00": 3,
+        "01": 3,
+        "10": 3,
+        "11": 4
+      },
+      "marginal_alone": 0,
+      "marginal_after_other": 1,
+      "submodularity_counterexample": true
+    },
+    "dual_increment": {
+      "before_lp": 4.0,
+      "after_lp": 4.0,
+      "beta": 0.0,
+      "lp_increment": 0.0,
+      "before_ip_gap": 1.0,
+      "before_ip": 3,
+      "after_ip": 4,
+      "ip_increment": 1,
+      "valid_ip_increment_upper_bound": 1.0,
+      "named_dual_certificate": {
+        "objective": 4.0,
+        "minimum_dual_slack": 0.0,
+        "checked_columns": 13,
+        "source": "EXPLICIT_NAMED_CERTIFICATE_NOT_HIGHS_RETURNED_PRICES"
+      },
+      "beta_alone_is_not_a_valid_ip_gain_bound": true
+    }
+  },
+  "maximum_columns": 13,
+  "maximum_nonzeros": 30,
+  "runtime_s": 0.009785399975953624
+}

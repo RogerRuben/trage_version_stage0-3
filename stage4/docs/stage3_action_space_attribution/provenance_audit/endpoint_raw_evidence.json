@@ -1,0 +1,7 @@
+{
+  "unique_osm_node_ids": 51,
+  "osm_node_ids_in_frozen_pbf": 51,
+  "edge_endpoints_without_valhalla_node_id": 88,
+  "edge_endpoints_with_id_in_raw_node_export": 0,
+  "interpretation": "OSM node existence is not an exact directed Valhalla endpoint mapping; no nearest-node repair performed"
+}

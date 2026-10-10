@@ -1,0 +1,20 @@
+{
+  "horizon_gate_selected": true,
+  "horizon_gate_validation_mae": 0.028951252480502367,
+  "new_final_test_consumed": false,
+  "schema_version": "stage2_v5_horizon_ablation.1",
+  "selected_history_mode": "horizon_gate",
+  "selected_validation_mae": 0.028951252480502367,
+  "selection_dates": [
+    "20161025",
+    "20161026"
+  ],
+  "selection_metric": "same-row direct-observed pace_sec_per_m MAE",
+  "status": "PASS",
+  "validation_mae_by_model": {
+    "horizon_gate": 0.028951252480502367,
+    "ordinary_concatenation": 0.029021043533891688,
+    "without_profile": 0.029020183812837823,
+    "without_recent": 0.02904120986919133
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "version": "symmetric_flexibility_acceleration_v2",
+  "base_config": "stage4/config/symmetric_flexibility_full_day_v1.json",
+  "settings": {
+    "recourse_mode": "FLOW_RELAXED",
+    "solver_backend": "SCIPY",
+    "highspy_runtime_dir": "stage4/output/runtime_dependencies/highspy_1_12_0",
+    "fast_forecast": true,
+    "lock_current_face": true,
+    "persistent_cache_size": 50000,
+    "route_workers": 2,
+    "lazy_worker_actor": true,
+    "cached_geometry": true,
+    "event_calendar": true,
+    "fast_future_graph": true,
+    "epoch_routing_queue": true,
+    "pre_route_session_certificate": true,
+    "compress_fixed_states": true,
+    "trim_flow_rows": true,
+    "offline_assets": "stage4/output/runtime_acceleration_v2/assets",
+    "disk_route_cache": "stage4/output/runtime_acceleration_v2/routing/cache.sqlite3",
+    "disk_cache_limit_mib": 512,
+    "disk_cache_max_entries": 2000000,
+    "route_queue_chunk_size": 256
+  },
+  "process_group_memory_limit_mib": 2048
+}

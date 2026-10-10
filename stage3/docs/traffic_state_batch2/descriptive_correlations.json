@@ -1,0 +1,2525 @@
+{
+  "rows": [
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_congested_or_severe_share",
+      "y": "crawl_E",
+      "n": 29851,
+      "spearman": 0.43468684383138395
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_congested_or_severe_share",
+      "y": "crawl_Q",
+      "n": 29851,
+      "spearman": 0.10184652716225882
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_congested_or_severe_share",
+      "y": "crawl_C",
+      "n": 29851,
+      "spearman": 0.1436778784997574
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_congested_or_severe_share",
+      "y": "stop_E",
+      "n": 29851,
+      "spearman": 0.37003443912228456
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_congested_or_severe_share",
+      "y": "stop_Q",
+      "n": 29851,
+      "spearman": -0.08374187364235477
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_congested_or_severe_share",
+      "y": "stop_C",
+      "n": 29851,
+      "spearman": 0.006154157191123367
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_congested_or_severe_share",
+      "y": "speed_cv_E",
+      "n": 29851,
+      "spearman": 0.04425947610057559
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_congested_or_severe_share",
+      "y": "speed_cv_Q",
+      "n": 29851,
+      "spearman": -0.16928021193306347
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_congested_or_severe_share",
+      "y": "speed_cv_C",
+      "n": 29851,
+      "spearman": -0.061670742318263555
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_congested_or_severe_share",
+      "y": "acceleration_rms_E",
+      "n": 29851,
+      "spearman": -0.2489430272699541
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_congested_or_severe_share",
+      "y": "acceleration_rms_Q",
+      "n": 29851,
+      "spearman": -0.1104004381130881
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_congested_or_severe_share",
+      "y": "acceleration_rms_C",
+      "n": 29851,
+      "spearman": -0.07494494869324156
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_congested_or_severe_share",
+      "y": "rho_dynamic_C",
+      "n": 29851,
+      "spearman": 0.05085593345823044
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_congested_or_severe_share",
+      "y": "rho_dynamic_M",
+      "n": 29851,
+      "spearman": 0.1320107920217285
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_congested_or_severe_share",
+      "y": "rho_dynamic_A",
+      "n": 29851,
+      "spearman": 0.21042531045210638
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "crawl_E",
+      "n": 29851,
+      "spearman": 0.08979388484357355
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "crawl_Q",
+      "n": 29851,
+      "spearman": 0.040543712813716944
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "crawl_C",
+      "n": 29851,
+      "spearman": 0.07187650926113773
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "stop_E",
+      "n": 29851,
+      "spearman": 0.08517513255965897
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "stop_Q",
+      "n": 29851,
+      "spearman": 0.054815660506634015
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "stop_C",
+      "n": 29851,
+      "spearman": 0.06572087633983192
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "speed_cv_E",
+      "n": 29851,
+      "spearman": 0.04243896420455566
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "speed_cv_Q",
+      "n": 29851,
+      "spearman": 0.03157003236401084
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "speed_cv_C",
+      "n": 29851,
+      "spearman": 0.04272492758533811
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "acceleration_rms_E",
+      "n": 29851,
+      "spearman": -0.001031336909683731
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "acceleration_rms_Q",
+      "n": 29851,
+      "spearman": 0.09586834035174945
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "acceleration_rms_C",
+      "n": 29851,
+      "spearman": 0.08736677472112672
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "rho_dynamic_C",
+      "n": 29851,
+      "spearman": 0.08734549331923323
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "rho_dynamic_M",
+      "n": 29851,
+      "spearman": 0.08913520958114476
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "rho_dynamic_A",
+      "n": 29851,
+      "spearman": 0.09537069558175852
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_mixed_evidence_share",
+      "y": "crawl_E",
+      "n": 29851,
+      "spearman": 0.544309426758574
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_mixed_evidence_share",
+      "y": "crawl_Q",
+      "n": 29851,
+      "spearman": 0.2241380407464081
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_mixed_evidence_share",
+      "y": "crawl_C",
+      "n": 29851,
+      "spearman": 0.24006165503135635
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_mixed_evidence_share",
+      "y": "stop_E",
+      "n": 29851,
+      "spearman": 0.4234532019500668
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_mixed_evidence_share",
+      "y": "stop_Q",
+      "n": 29851,
+      "spearman": -0.2512310560554153
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_mixed_evidence_share",
+      "y": "stop_C",
+      "n": 29851,
+      "spearman": -0.051481156489264775
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_mixed_evidence_share",
+      "y": "speed_cv_E",
+      "n": 29851,
+      "spearman": -0.09364385025211795
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_mixed_evidence_share",
+      "y": "speed_cv_Q",
+      "n": 29851,
+      "spearman": -0.3611837014122996
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_mixed_evidence_share",
+      "y": "speed_cv_C",
+      "n": 29851,
+      "spearman": -0.14716567061499763
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_mixed_evidence_share",
+      "y": "acceleration_rms_E",
+      "n": 29851,
+      "spearman": -0.451447135984732
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_mixed_evidence_share",
+      "y": "acceleration_rms_Q",
+      "n": 29851,
+      "spearman": -0.2889725790783571
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_mixed_evidence_share",
+      "y": "acceleration_rms_C",
+      "n": 29851,
+      "spearman": -0.2102454445802626
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_mixed_evidence_share",
+      "y": "rho_dynamic_C",
+      "n": 29851,
+      "spearman": -0.023077900621981146
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_mixed_evidence_share",
+      "y": "rho_dynamic_M",
+      "n": 29851,
+      "spearman": 0.05596169695410051
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_mixed_evidence_share",
+      "y": "rho_dynamic_A",
+      "n": 29851,
+      "spearman": 0.12317985651673803
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_unknown_share",
+      "y": "crawl_E",
+      "n": 29851,
+      "spearman": 0.14828697996864468
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_unknown_share",
+      "y": "crawl_Q",
+      "n": 29851,
+      "spearman": 0.5269098901454009
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_unknown_share",
+      "y": "crawl_C",
+      "n": 29851,
+      "spearman": 0.3891528279069615
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_unknown_share",
+      "y": "stop_E",
+      "n": 29851,
+      "spearman": 0.340874928721544
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_unknown_share",
+      "y": "stop_Q",
+      "n": 29851,
+      "spearman": 0.5832707750133257
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_unknown_share",
+      "y": "stop_C",
+      "n": 29851,
+      "spearman": 0.44350670647459545
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_unknown_share",
+      "y": "speed_cv_E",
+      "n": 29851,
+      "spearman": 0.2027102667939496
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_unknown_share",
+      "y": "speed_cv_Q",
+      "n": 29851,
+      "spearman": 0.542393093272949
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_unknown_share",
+      "y": "speed_cv_C",
+      "n": 29851,
+      "spearman": 0.4315177768614822
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_unknown_share",
+      "y": "acceleration_rms_E",
+      "n": 29851,
+      "spearman": -0.31737448978466143
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_unknown_share",
+      "y": "acceleration_rms_Q",
+      "n": 29851,
+      "spearman": 0.00806489220104008
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_unknown_share",
+      "y": "acceleration_rms_C",
+      "n": 29851,
+      "spearman": 0.02051602912350893
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_unknown_share",
+      "y": "rho_dynamic_C",
+      "n": 29851,
+      "spearman": 0.38129545032664647
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_unknown_share",
+      "y": "rho_dynamic_M",
+      "n": 29851,
+      "spearman": 0.31244664181645926
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_unknown_share",
+      "y": "rho_dynamic_A",
+      "n": 29851,
+      "spearman": 0.1880558704899316
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_longest_congested_run_s",
+      "y": "crawl_E",
+      "n": 29851,
+      "spearman": 0.43132146493633583
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_longest_congested_run_s",
+      "y": "crawl_Q",
+      "n": 29851,
+      "spearman": 0.12321936667429166
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_longest_congested_run_s",
+      "y": "crawl_C",
+      "n": 29851,
+      "spearman": 0.20896496452402114
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_longest_congested_run_s",
+      "y": "stop_E",
+      "n": 29851,
+      "spearman": 0.3614465700776469
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_longest_congested_run_s",
+      "y": "stop_Q",
+      "n": 29851,
+      "spearman": -0.08026556432891342
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_longest_congested_run_s",
+      "y": "stop_C",
+      "n": 29851,
+      "spearman": 0.0675627367523705
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_longest_congested_run_s",
+      "y": "speed_cv_E",
+      "n": 29851,
+      "spearman": 0.039811118249687694
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_longest_congested_run_s",
+      "y": "speed_cv_Q",
+      "n": 29851,
+      "spearman": -0.1586443346385749
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_longest_congested_run_s",
+      "y": "speed_cv_C",
+      "n": 29851,
+      "spearman": 0.001368610843677221
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_longest_congested_run_s",
+      "y": "acceleration_rms_E",
+      "n": 29851,
+      "spearman": -0.2620499273917412
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_longest_congested_run_s",
+      "y": "acceleration_rms_Q",
+      "n": 29851,
+      "spearman": -0.09696715986992936
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_longest_congested_run_s",
+      "y": "acceleration_rms_C",
+      "n": 29851,
+      "spearman": -0.029959830973067404
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_longest_congested_run_s",
+      "y": "rho_dynamic_C",
+      "n": 29851,
+      "spearman": 0.07158664345301215
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_longest_congested_run_s",
+      "y": "rho_dynamic_M",
+      "n": 29851,
+      "spearman": 0.13649895834051964
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "pred_longest_congested_run_s",
+      "y": "rho_dynamic_A",
+      "n": 29851,
+      "spearman": 0.19372357705951007
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "obs_congested_or_severe_share",
+      "y": "crawl_E",
+      "n": 29851,
+      "spearman": 0.3465056735282219
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "obs_congested_or_severe_share",
+      "y": "crawl_Q",
+      "n": 29851,
+      "spearman": 0.16302363202808462
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "obs_congested_or_severe_share",
+      "y": "crawl_C",
+      "n": 29851,
+      "spearman": 0.21967521196449427
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "obs_congested_or_severe_share",
+      "y": "stop_E",
+      "n": 29851,
+      "spearman": 0.24087325223318082
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "obs_congested_or_severe_share",
+      "y": "stop_Q",
+      "n": 29851,
+      "spearman": -0.11065130053146702
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "obs_congested_or_severe_share",
+      "y": "stop_C",
+      "n": 29851,
+      "spearman": 0.058689458590932705
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "obs_congested_or_severe_share",
+      "y": "speed_cv_E",
+      "n": 29851,
+      "spearman": -0.07105305627163738
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "obs_congested_or_severe_share",
+      "y": "speed_cv_Q",
+      "n": 29851,
+      "spearman": -0.17286751664873098
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "obs_congested_or_severe_share",
+      "y": "speed_cv_C",
+      "n": 29851,
+      "spearman": 0.004618644724563962
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "obs_congested_or_severe_share",
+      "y": "acceleration_rms_E",
+      "n": 29851,
+      "spearman": -0.3116398981456274
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "obs_congested_or_severe_share",
+      "y": "acceleration_rms_Q",
+      "n": 29851,
+      "spearman": -0.1779036514763169
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "obs_congested_or_severe_share",
+      "y": "acceleration_rms_C",
+      "n": 29851,
+      "spearman": -0.08053395902519749
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "obs_congested_or_severe_share",
+      "y": "rho_dynamic_C",
+      "n": 29851,
+      "spearman": -0.014933844105921586
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "obs_congested_or_severe_share",
+      "y": "rho_dynamic_M",
+      "n": 29851,
+      "spearman": 0.015958013874351293
+    },
+    {
+      "date": "ALL_VALIDATION",
+      "x": "obs_congested_or_severe_share",
+      "y": "rho_dynamic_A",
+      "n": 29851,
+      "spearman": 0.03732676460971664
+    },
+    {
+      "date": "20161025",
+      "x": "pred_congested_or_severe_share",
+      "y": "crawl_E",
+      "n": 9954,
+      "spearman": 0.44511341899153667
+    },
+    {
+      "date": "20161025",
+      "x": "pred_congested_or_severe_share",
+      "y": "crawl_Q",
+      "n": 9954,
+      "spearman": 0.09297561106170507
+    },
+    {
+      "date": "20161025",
+      "x": "pred_congested_or_severe_share",
+      "y": "crawl_C",
+      "n": 9954,
+      "spearman": 0.14119598499337194
+    },
+    {
+      "date": "20161025",
+      "x": "pred_congested_or_severe_share",
+      "y": "stop_E",
+      "n": 9954,
+      "spearman": 0.3714355793726447
+    },
+    {
+      "date": "20161025",
+      "x": "pred_congested_or_severe_share",
+      "y": "stop_Q",
+      "n": 9954,
+      "spearman": -0.10667103292741005
+    },
+    {
+      "date": "20161025",
+      "x": "pred_congested_or_severe_share",
+      "y": "stop_C",
+      "n": 9954,
+      "spearman": -0.0038978902413601764
+    },
+    {
+      "date": "20161025",
+      "x": "pred_congested_or_severe_share",
+      "y": "speed_cv_E",
+      "n": 9954,
+      "spearman": 0.03154809425121663
+    },
+    {
+      "date": "20161025",
+      "x": "pred_congested_or_severe_share",
+      "y": "speed_cv_Q",
+      "n": 9954,
+      "spearman": -0.1948437758907468
+    },
+    {
+      "date": "20161025",
+      "x": "pred_congested_or_severe_share",
+      "y": "speed_cv_C",
+      "n": 9954,
+      "spearman": -0.07319555841443588
+    },
+    {
+      "date": "20161025",
+      "x": "pred_congested_or_severe_share",
+      "y": "acceleration_rms_E",
+      "n": 9954,
+      "spearman": -0.25611243764105623
+    },
+    {
+      "date": "20161025",
+      "x": "pred_congested_or_severe_share",
+      "y": "acceleration_rms_Q",
+      "n": 9954,
+      "spearman": -0.10893767375855172
+    },
+    {
+      "date": "20161025",
+      "x": "pred_congested_or_severe_share",
+      "y": "acceleration_rms_C",
+      "n": 9954,
+      "spearman": -0.07429512800293923
+    },
+    {
+      "date": "20161025",
+      "x": "pred_congested_or_severe_share",
+      "y": "rho_dynamic_C",
+      "n": 9954,
+      "spearman": 0.041247604246833186
+    },
+    {
+      "date": "20161025",
+      "x": "pred_congested_or_severe_share",
+      "y": "rho_dynamic_M",
+      "n": 9954,
+      "spearman": 0.1323995387356308
+    },
+    {
+      "date": "20161025",
+      "x": "pred_congested_or_severe_share",
+      "y": "rho_dynamic_A",
+      "n": 9954,
+      "spearman": 0.21781881255663815
+    },
+    {
+      "date": "20161025",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "crawl_E",
+      "n": 9954,
+      "spearman": 0.09516360515369011
+    },
+    {
+      "date": "20161025",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "crawl_Q",
+      "n": 9954,
+      "spearman": 0.025865563176310884
+    },
+    {
+      "date": "20161025",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "crawl_C",
+      "n": 9954,
+      "spearman": 0.0701811342142106
+    },
+    {
+      "date": "20161025",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "stop_E",
+      "n": 9954,
+      "spearman": 0.08798941904925017
+    },
+    {
+      "date": "20161025",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "stop_Q",
+      "n": 9954,
+      "spearman": 0.04242329945525082
+    },
+    {
+      "date": "20161025",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "stop_C",
+      "n": 9954,
+      "spearman": 0.06629191141676126
+    },
+    {
+      "date": "20161025",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "speed_cv_E",
+      "n": 9954,
+      "spearman": 0.04301117674272577
+    },
+    {
+      "date": "20161025",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "speed_cv_Q",
+      "n": 9954,
+      "spearman": 0.01991101903306416
+    },
+    {
+      "date": "20161025",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "speed_cv_C",
+      "n": 9954,
+      "spearman": 0.04283681255515128
+    },
+    {
+      "date": "20161025",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "acceleration_rms_E",
+      "n": 9954,
+      "spearman": 0.0013755695085976506
+    },
+    {
+      "date": "20161025",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "acceleration_rms_Q",
+      "n": 9954,
+      "spearman": 0.09702535339096204
+    },
+    {
+      "date": "20161025",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "acceleration_rms_C",
+      "n": 9954,
+      "spearman": 0.09321442549836878
+    },
+    {
+      "date": "20161025",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "rho_dynamic_C",
+      "n": 9954,
+      "spearman": 0.08040795166431002
+    },
+    {
+      "date": "20161025",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "rho_dynamic_M",
+      "n": 9954,
+      "spearman": 0.09498960260080055
+    },
+    {
+      "date": "20161025",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "rho_dynamic_A",
+      "n": 9954,
+      "spearman": 0.10317199785188283
+    },
+    {
+      "date": "20161025",
+      "x": "pred_mixed_evidence_share",
+      "y": "crawl_E",
+      "n": 9954,
+      "spearman": 0.5594860481798618
+    },
+    {
+      "date": "20161025",
+      "x": "pred_mixed_evidence_share",
+      "y": "crawl_Q",
+      "n": 9954,
+      "spearman": 0.22161033645529313
+    },
+    {
+      "date": "20161025",
+      "x": "pred_mixed_evidence_share",
+      "y": "crawl_C",
+      "n": 9954,
+      "spearman": 0.25023415969402896
+    },
+    {
+      "date": "20161025",
+      "x": "pred_mixed_evidence_share",
+      "y": "stop_E",
+      "n": 9954,
+      "spearman": 0.4411635618835754
+    },
+    {
+      "date": "20161025",
+      "x": "pred_mixed_evidence_share",
+      "y": "stop_Q",
+      "n": 9954,
+      "spearman": -0.27243021307977316
+    },
+    {
+      "date": "20161025",
+      "x": "pred_mixed_evidence_share",
+      "y": "stop_C",
+      "n": 9954,
+      "spearman": -0.058792273241668275
+    },
+    {
+      "date": "20161025",
+      "x": "pred_mixed_evidence_share",
+      "y": "speed_cv_E",
+      "n": 9954,
+      "spearman": -0.10430621309824493
+    },
+    {
+      "date": "20161025",
+      "x": "pred_mixed_evidence_share",
+      "y": "speed_cv_Q",
+      "n": 9954,
+      "spearman": -0.37945874712533845
+    },
+    {
+      "date": "20161025",
+      "x": "pred_mixed_evidence_share",
+      "y": "speed_cv_C",
+      "n": 9954,
+      "spearman": -0.15408733473366829
+    },
+    {
+      "date": "20161025",
+      "x": "pred_mixed_evidence_share",
+      "y": "acceleration_rms_E",
+      "n": 9954,
+      "spearman": -0.46360543369827595
+    },
+    {
+      "date": "20161025",
+      "x": "pred_mixed_evidence_share",
+      "y": "acceleration_rms_Q",
+      "n": 9954,
+      "spearman": -0.2922978479070842
+    },
+    {
+      "date": "20161025",
+      "x": "pred_mixed_evidence_share",
+      "y": "acceleration_rms_C",
+      "n": 9954,
+      "spearman": -0.20664316583843523
+    },
+    {
+      "date": "20161025",
+      "x": "pred_mixed_evidence_share",
+      "y": "rho_dynamic_C",
+      "n": 9954,
+      "spearman": -0.01918483952297764
+    },
+    {
+      "date": "20161025",
+      "x": "pred_mixed_evidence_share",
+      "y": "rho_dynamic_M",
+      "n": 9954,
+      "spearman": 0.06463033696034814
+    },
+    {
+      "date": "20161025",
+      "x": "pred_mixed_evidence_share",
+      "y": "rho_dynamic_A",
+      "n": 9954,
+      "spearman": 0.1390884804732437
+    },
+    {
+      "date": "20161025",
+      "x": "pred_unknown_share",
+      "y": "crawl_E",
+      "n": 9954,
+      "spearman": 0.1372692730324959
+    },
+    {
+      "date": "20161025",
+      "x": "pred_unknown_share",
+      "y": "crawl_Q",
+      "n": 9954,
+      "spearman": 0.537202694363992
+    },
+    {
+      "date": "20161025",
+      "x": "pred_unknown_share",
+      "y": "crawl_C",
+      "n": 9954,
+      "spearman": 0.3890326616360225
+    },
+    {
+      "date": "20161025",
+      "x": "pred_unknown_share",
+      "y": "stop_E",
+      "n": 9954,
+      "spearman": 0.32734390977308386
+    },
+    {
+      "date": "20161025",
+      "x": "pred_unknown_share",
+      "y": "stop_Q",
+      "n": 9954,
+      "spearman": 0.5868671731403977
+    },
+    {
+      "date": "20161025",
+      "x": "pred_unknown_share",
+      "y": "stop_C",
+      "n": 9954,
+      "spearman": 0.4445000917132975
+    },
+    {
+      "date": "20161025",
+      "x": "pred_unknown_share",
+      "y": "speed_cv_E",
+      "n": 9954,
+      "spearman": 0.20981774551202104
+    },
+    {
+      "date": "20161025",
+      "x": "pred_unknown_share",
+      "y": "speed_cv_Q",
+      "n": 9954,
+      "spearman": 0.5474009459207897
+    },
+    {
+      "date": "20161025",
+      "x": "pred_unknown_share",
+      "y": "speed_cv_C",
+      "n": 9954,
+      "spearman": 0.4295150323264467
+    },
+    {
+      "date": "20161025",
+      "x": "pred_unknown_share",
+      "y": "acceleration_rms_E",
+      "n": 9954,
+      "spearman": -0.3088102879507615
+    },
+    {
+      "date": "20161025",
+      "x": "pred_unknown_share",
+      "y": "acceleration_rms_Q",
+      "n": 9954,
+      "spearman": 0.024579693847431944
+    },
+    {
+      "date": "20161025",
+      "x": "pred_unknown_share",
+      "y": "acceleration_rms_C",
+      "n": 9954,
+      "spearman": 0.03973488706306552
+    },
+    {
+      "date": "20161025",
+      "x": "pred_unknown_share",
+      "y": "rho_dynamic_C",
+      "n": 9954,
+      "spearman": 0.3902112116893982
+    },
+    {
+      "date": "20161025",
+      "x": "pred_unknown_share",
+      "y": "rho_dynamic_M",
+      "n": 9954,
+      "spearman": 0.3107018212901318
+    },
+    {
+      "date": "20161025",
+      "x": "pred_unknown_share",
+      "y": "rho_dynamic_A",
+      "n": 9954,
+      "spearman": 0.18376067022215875
+    },
+    {
+      "date": "20161025",
+      "x": "pred_longest_congested_run_s",
+      "y": "crawl_E",
+      "n": 9954,
+      "spearman": 0.4422631569135349
+    },
+    {
+      "date": "20161025",
+      "x": "pred_longest_congested_run_s",
+      "y": "crawl_Q",
+      "n": 9954,
+      "spearman": 0.11381037636223114
+    },
+    {
+      "date": "20161025",
+      "x": "pred_longest_congested_run_s",
+      "y": "crawl_C",
+      "n": 9954,
+      "spearman": 0.2048428309570095
+    },
+    {
+      "date": "20161025",
+      "x": "pred_longest_congested_run_s",
+      "y": "stop_E",
+      "n": 9954,
+      "spearman": 0.3633186039229916
+    },
+    {
+      "date": "20161025",
+      "x": "pred_longest_congested_run_s",
+      "y": "stop_Q",
+      "n": 9954,
+      "spearman": -0.10188198132851728
+    },
+    {
+      "date": "20161025",
+      "x": "pred_longest_congested_run_s",
+      "y": "stop_C",
+      "n": 9954,
+      "spearman": 0.057874306539232874
+    },
+    {
+      "date": "20161025",
+      "x": "pred_longest_congested_run_s",
+      "y": "speed_cv_E",
+      "n": 9954,
+      "spearman": 0.029200044285689508
+    },
+    {
+      "date": "20161025",
+      "x": "pred_longest_congested_run_s",
+      "y": "speed_cv_Q",
+      "n": 9954,
+      "spearman": -0.1828167307155219
+    },
+    {
+      "date": "20161025",
+      "x": "pred_longest_congested_run_s",
+      "y": "speed_cv_C",
+      "n": 9954,
+      "spearman": -0.008387717381063645
+    },
+    {
+      "date": "20161025",
+      "x": "pred_longest_congested_run_s",
+      "y": "acceleration_rms_E",
+      "n": 9954,
+      "spearman": -0.26919756266690503
+    },
+    {
+      "date": "20161025",
+      "x": "pred_longest_congested_run_s",
+      "y": "acceleration_rms_Q",
+      "n": 9954,
+      "spearman": -0.0941352257798359
+    },
+    {
+      "date": "20161025",
+      "x": "pred_longest_congested_run_s",
+      "y": "acceleration_rms_C",
+      "n": 9954,
+      "spearman": -0.029956373388353885
+    },
+    {
+      "date": "20161025",
+      "x": "pred_longest_congested_run_s",
+      "y": "rho_dynamic_C",
+      "n": 9954,
+      "spearman": 0.06263524006957519
+    },
+    {
+      "date": "20161025",
+      "x": "pred_longest_congested_run_s",
+      "y": "rho_dynamic_M",
+      "n": 9954,
+      "spearman": 0.1360675275317808
+    },
+    {
+      "date": "20161025",
+      "x": "pred_longest_congested_run_s",
+      "y": "rho_dynamic_A",
+      "n": 9954,
+      "spearman": 0.2013903323864551
+    },
+    {
+      "date": "20161025",
+      "x": "obs_congested_or_severe_share",
+      "y": "crawl_E",
+      "n": 9954,
+      "spearman": 0.3674837763564711
+    },
+    {
+      "date": "20161025",
+      "x": "obs_congested_or_severe_share",
+      "y": "crawl_Q",
+      "n": 9954,
+      "spearman": 0.15788639164361604
+    },
+    {
+      "date": "20161025",
+      "x": "obs_congested_or_severe_share",
+      "y": "crawl_C",
+      "n": 9954,
+      "spearman": 0.21866156136692744
+    },
+    {
+      "date": "20161025",
+      "x": "obs_congested_or_severe_share",
+      "y": "stop_E",
+      "n": 9954,
+      "spearman": 0.2561757016719771
+    },
+    {
+      "date": "20161025",
+      "x": "obs_congested_or_severe_share",
+      "y": "stop_Q",
+      "n": 9954,
+      "spearman": -0.13530645106271197
+    },
+    {
+      "date": "20161025",
+      "x": "obs_congested_or_severe_share",
+      "y": "stop_C",
+      "n": 9954,
+      "spearman": 0.053567566327435055
+    },
+    {
+      "date": "20161025",
+      "x": "obs_congested_or_severe_share",
+      "y": "speed_cv_E",
+      "n": 9954,
+      "spearman": -0.07964762386097553
+    },
+    {
+      "date": "20161025",
+      "x": "obs_congested_or_severe_share",
+      "y": "speed_cv_Q",
+      "n": 9954,
+      "spearman": -0.196225431917474
+    },
+    {
+      "date": "20161025",
+      "x": "obs_congested_or_severe_share",
+      "y": "speed_cv_C",
+      "n": 9954,
+      "spearman": 0.001969008331202134
+    },
+    {
+      "date": "20161025",
+      "x": "obs_congested_or_severe_share",
+      "y": "acceleration_rms_E",
+      "n": 9954,
+      "spearman": -0.32272034343198797
+    },
+    {
+      "date": "20161025",
+      "x": "obs_congested_or_severe_share",
+      "y": "acceleration_rms_Q",
+      "n": 9954,
+      "spearman": -0.1838777701015066
+    },
+    {
+      "date": "20161025",
+      "x": "obs_congested_or_severe_share",
+      "y": "acceleration_rms_C",
+      "n": 9954,
+      "spearman": -0.08680711813057349
+    },
+    {
+      "date": "20161025",
+      "x": "obs_congested_or_severe_share",
+      "y": "rho_dynamic_C",
+      "n": 9954,
+      "spearman": -0.021392391771803174
+    },
+    {
+      "date": "20161025",
+      "x": "obs_congested_or_severe_share",
+      "y": "rho_dynamic_M",
+      "n": 9954,
+      "spearman": 0.021685694131459994
+    },
+    {
+      "date": "20161025",
+      "x": "obs_congested_or_severe_share",
+      "y": "rho_dynamic_A",
+      "n": 9954,
+      "spearman": 0.0563339742340966
+    },
+    {
+      "date": "20161026",
+      "x": "pred_congested_or_severe_share",
+      "y": "crawl_E",
+      "n": 9946,
+      "spearman": 0.42822360003804066
+    },
+    {
+      "date": "20161026",
+      "x": "pred_congested_or_severe_share",
+      "y": "crawl_Q",
+      "n": 9946,
+      "spearman": 0.09841868913399293
+    },
+    {
+      "date": "20161026",
+      "x": "pred_congested_or_severe_share",
+      "y": "crawl_C",
+      "n": 9946,
+      "spearman": 0.13515874324401417
+    },
+    {
+      "date": "20161026",
+      "x": "pred_congested_or_severe_share",
+      "y": "stop_E",
+      "n": 9946,
+      "spearman": 0.3695341607223288
+    },
+    {
+      "date": "20161026",
+      "x": "pred_congested_or_severe_share",
+      "y": "stop_Q",
+      "n": 9946,
+      "spearman": -0.05655783883646846
+    },
+    {
+      "date": "20161026",
+      "x": "pred_congested_or_severe_share",
+      "y": "stop_C",
+      "n": 9946,
+      "spearman": 0.01843846264091068
+    },
+    {
+      "date": "20161026",
+      "x": "pred_congested_or_severe_share",
+      "y": "speed_cv_E",
+      "n": 9946,
+      "spearman": 0.05796962626759993
+    },
+    {
+      "date": "20161026",
+      "x": "pred_congested_or_severe_share",
+      "y": "speed_cv_Q",
+      "n": 9946,
+      "spearman": -0.14226889554379082
+    },
+    {
+      "date": "20161026",
+      "x": "pred_congested_or_severe_share",
+      "y": "speed_cv_C",
+      "n": 9946,
+      "spearman": -0.050000880365023696
+    },
+    {
+      "date": "20161026",
+      "x": "pred_congested_or_severe_share",
+      "y": "acceleration_rms_E",
+      "n": 9946,
+      "spearman": -0.23880357222902468
+    },
+    {
+      "date": "20161026",
+      "x": "pred_congested_or_severe_share",
+      "y": "acceleration_rms_Q",
+      "n": 9946,
+      "spearman": -0.10913085083388287
+    },
+    {
+      "date": "20161026",
+      "x": "pred_congested_or_severe_share",
+      "y": "acceleration_rms_C",
+      "n": 9946,
+      "spearman": -0.07925525527318616
+    },
+    {
+      "date": "20161026",
+      "x": "pred_congested_or_severe_share",
+      "y": "rho_dynamic_C",
+      "n": 9946,
+      "spearman": 0.05439893100679712
+    },
+    {
+      "date": "20161026",
+      "x": "pred_congested_or_severe_share",
+      "y": "rho_dynamic_M",
+      "n": 9946,
+      "spearman": 0.1282865914910161
+    },
+    {
+      "date": "20161026",
+      "x": "pred_congested_or_severe_share",
+      "y": "rho_dynamic_A",
+      "n": 9946,
+      "spearman": 0.2091062605770743
+    },
+    {
+      "date": "20161026",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "crawl_E",
+      "n": 9946,
+      "spearman": 0.09441429143242676
+    },
+    {
+      "date": "20161026",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "crawl_Q",
+      "n": 9946,
+      "spearman": 0.051729034657689306
+    },
+    {
+      "date": "20161026",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "crawl_C",
+      "n": 9946,
+      "spearman": 0.07002735013591381
+    },
+    {
+      "date": "20161026",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "stop_E",
+      "n": 9946,
+      "spearman": 0.09500446761789932
+    },
+    {
+      "date": "20161026",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "stop_Q",
+      "n": 9946,
+      "spearman": 0.062381756605326036
+    },
+    {
+      "date": "20161026",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "stop_C",
+      "n": 9946,
+      "spearman": 0.06600703486838154
+    },
+    {
+      "date": "20161026",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "speed_cv_E",
+      "n": 9946,
+      "spearman": 0.0467481086008635
+    },
+    {
+      "date": "20161026",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "speed_cv_Q",
+      "n": 9946,
+      "spearman": 0.03578123543550585
+    },
+    {
+      "date": "20161026",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "speed_cv_C",
+      "n": 9946,
+      "spearman": 0.040316990319636405
+    },
+    {
+      "date": "20161026",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "acceleration_rms_E",
+      "n": 9946,
+      "spearman": -0.0032235442174423767
+    },
+    {
+      "date": "20161026",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "acceleration_rms_Q",
+      "n": 9946,
+      "spearman": 0.09053648448395672
+    },
+    {
+      "date": "20161026",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "acceleration_rms_C",
+      "n": 9946,
+      "spearman": 0.07862472876069573
+    },
+    {
+      "date": "20161026",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "rho_dynamic_C",
+      "n": 9946,
+      "spearman": 0.09034854528770751
+    },
+    {
+      "date": "20161026",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "rho_dynamic_M",
+      "n": 9946,
+      "spearman": 0.08601088836354062
+    },
+    {
+      "date": "20161026",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "rho_dynamic_A",
+      "n": 9946,
+      "spearman": 0.090934120695668
+    },
+    {
+      "date": "20161026",
+      "x": "pred_mixed_evidence_share",
+      "y": "crawl_E",
+      "n": 9946,
+      "spearman": 0.5174456621143135
+    },
+    {
+      "date": "20161026",
+      "x": "pred_mixed_evidence_share",
+      "y": "crawl_Q",
+      "n": 9946,
+      "spearman": 0.20514393938565156
+    },
+    {
+      "date": "20161026",
+      "x": "pred_mixed_evidence_share",
+      "y": "crawl_C",
+      "n": 9946,
+      "spearman": 0.22057691838670226
+    },
+    {
+      "date": "20161026",
+      "x": "pred_mixed_evidence_share",
+      "y": "stop_E",
+      "n": 9946,
+      "spearman": 0.4039996217439149
+    },
+    {
+      "date": "20161026",
+      "x": "pred_mixed_evidence_share",
+      "y": "stop_Q",
+      "n": 9946,
+      "spearman": -0.23936144525065428
+    },
+    {
+      "date": "20161026",
+      "x": "pred_mixed_evidence_share",
+      "y": "stop_C",
+      "n": 9946,
+      "spearman": -0.04941909678429638
+    },
+    {
+      "date": "20161026",
+      "x": "pred_mixed_evidence_share",
+      "y": "speed_cv_E",
+      "n": 9946,
+      "spearman": -0.09629074129820667
+    },
+    {
+      "date": "20161026",
+      "x": "pred_mixed_evidence_share",
+      "y": "speed_cv_Q",
+      "n": 9946,
+      "spearman": -0.35356523960740494
+    },
+    {
+      "date": "20161026",
+      "x": "pred_mixed_evidence_share",
+      "y": "speed_cv_C",
+      "n": 9946,
+      "spearman": -0.1438839248427076
+    },
+    {
+      "date": "20161026",
+      "x": "pred_mixed_evidence_share",
+      "y": "acceleration_rms_E",
+      "n": 9946,
+      "spearman": -0.431680702701938
+    },
+    {
+      "date": "20161026",
+      "x": "pred_mixed_evidence_share",
+      "y": "acceleration_rms_Q",
+      "n": 9946,
+      "spearman": -0.2687282731875105
+    },
+    {
+      "date": "20161026",
+      "x": "pred_mixed_evidence_share",
+      "y": "acceleration_rms_C",
+      "n": 9946,
+      "spearman": -0.19550006669213926
+    },
+    {
+      "date": "20161026",
+      "x": "pred_mixed_evidence_share",
+      "y": "rho_dynamic_C",
+      "n": 9946,
+      "spearman": -0.014432579100865072
+    },
+    {
+      "date": "20161026",
+      "x": "pred_mixed_evidence_share",
+      "y": "rho_dynamic_M",
+      "n": 9946,
+      "spearman": 0.05713200019297441
+    },
+    {
+      "date": "20161026",
+      "x": "pred_mixed_evidence_share",
+      "y": "rho_dynamic_A",
+      "n": 9946,
+      "spearman": 0.11530473086901988
+    },
+    {
+      "date": "20161026",
+      "x": "pred_unknown_share",
+      "y": "crawl_E",
+      "n": 9946,
+      "spearman": 0.1738964550331992
+    },
+    {
+      "date": "20161026",
+      "x": "pred_unknown_share",
+      "y": "crawl_Q",
+      "n": 9946,
+      "spearman": 0.536568139279439
+    },
+    {
+      "date": "20161026",
+      "x": "pred_unknown_share",
+      "y": "crawl_C",
+      "n": 9946,
+      "spearman": 0.40375905009115054
+    },
+    {
+      "date": "20161026",
+      "x": "pred_unknown_share",
+      "y": "stop_E",
+      "n": 9946,
+      "spearman": 0.3627528661390436
+    },
+    {
+      "date": "20161026",
+      "x": "pred_unknown_share",
+      "y": "stop_Q",
+      "n": 9946,
+      "spearman": 0.5910493054889263
+    },
+    {
+      "date": "20161026",
+      "x": "pred_unknown_share",
+      "y": "stop_C",
+      "n": 9946,
+      "spearman": 0.45586778203081857
+    },
+    {
+      "date": "20161026",
+      "x": "pred_unknown_share",
+      "y": "speed_cv_E",
+      "n": 9946,
+      "spearman": 0.21851001545448276
+    },
+    {
+      "date": "20161026",
+      "x": "pred_unknown_share",
+      "y": "speed_cv_Q",
+      "n": 9946,
+      "spearman": 0.5508045746604093
+    },
+    {
+      "date": "20161026",
+      "x": "pred_unknown_share",
+      "y": "speed_cv_C",
+      "n": 9946,
+      "spearman": 0.4448675277821291
+    },
+    {
+      "date": "20161026",
+      "x": "pred_unknown_share",
+      "y": "acceleration_rms_E",
+      "n": 9946,
+      "spearman": -0.3335454944422567
+    },
+    {
+      "date": "20161026",
+      "x": "pred_unknown_share",
+      "y": "acceleration_rms_Q",
+      "n": 9946,
+      "spearman": -0.010294124366030515
+    },
+    {
+      "date": "20161026",
+      "x": "pred_unknown_share",
+      "y": "acceleration_rms_C",
+      "n": 9946,
+      "spearman": 0.0054590120777722245
+    },
+    {
+      "date": "20161026",
+      "x": "pred_unknown_share",
+      "y": "rho_dynamic_C",
+      "n": 9946,
+      "spearman": 0.37063725980047924
+    },
+    {
+      "date": "20161026",
+      "x": "pred_unknown_share",
+      "y": "rho_dynamic_M",
+      "n": 9946,
+      "spearman": 0.3094771344965491
+    },
+    {
+      "date": "20161026",
+      "x": "pred_unknown_share",
+      "y": "rho_dynamic_A",
+      "n": 9946,
+      "spearman": 0.19013587788183464
+    },
+    {
+      "date": "20161026",
+      "x": "pred_longest_congested_run_s",
+      "y": "crawl_E",
+      "n": 9946,
+      "spearman": 0.4236395912014727
+    },
+    {
+      "date": "20161026",
+      "x": "pred_longest_congested_run_s",
+      "y": "crawl_Q",
+      "n": 9946,
+      "spearman": 0.12073916089961682
+    },
+    {
+      "date": "20161026",
+      "x": "pred_longest_congested_run_s",
+      "y": "crawl_C",
+      "n": 9946,
+      "spearman": 0.2017996567204838
+    },
+    {
+      "date": "20161026",
+      "x": "pred_longest_congested_run_s",
+      "y": "stop_E",
+      "n": 9946,
+      "spearman": 0.3602116990128486
+    },
+    {
+      "date": "20161026",
+      "x": "pred_longest_congested_run_s",
+      "y": "stop_Q",
+      "n": 9946,
+      "spearman": -0.05376354055550255
+    },
+    {
+      "date": "20161026",
+      "x": "pred_longest_congested_run_s",
+      "y": "stop_C",
+      "n": 9946,
+      "spearman": 0.07989229399476022
+    },
+    {
+      "date": "20161026",
+      "x": "pred_longest_congested_run_s",
+      "y": "speed_cv_E",
+      "n": 9946,
+      "spearman": 0.05288105634941937
+    },
+    {
+      "date": "20161026",
+      "x": "pred_longest_congested_run_s",
+      "y": "speed_cv_Q",
+      "n": 9946,
+      "spearman": -0.13073486815063728
+    },
+    {
+      "date": "20161026",
+      "x": "pred_longest_congested_run_s",
+      "y": "speed_cv_C",
+      "n": 9946,
+      "spearman": 0.01388869689904142
+    },
+    {
+      "date": "20161026",
+      "x": "pred_longest_congested_run_s",
+      "y": "acceleration_rms_E",
+      "n": 9946,
+      "spearman": -0.2508782395556542
+    },
+    {
+      "date": "20161026",
+      "x": "pred_longest_congested_run_s",
+      "y": "acceleration_rms_Q",
+      "n": 9946,
+      "spearman": -0.09440634322666665
+    },
+    {
+      "date": "20161026",
+      "x": "pred_longest_congested_run_s",
+      "y": "acceleration_rms_C",
+      "n": 9946,
+      "spearman": -0.03169188470781898
+    },
+    {
+      "date": "20161026",
+      "x": "pred_longest_congested_run_s",
+      "y": "rho_dynamic_C",
+      "n": 9946,
+      "spearman": 0.07715540427015692
+    },
+    {
+      "date": "20161026",
+      "x": "pred_longest_congested_run_s",
+      "y": "rho_dynamic_M",
+      "n": 9946,
+      "spearman": 0.1360667745790496
+    },
+    {
+      "date": "20161026",
+      "x": "pred_longest_congested_run_s",
+      "y": "rho_dynamic_A",
+      "n": 9946,
+      "spearman": 0.19456550131452643
+    },
+    {
+      "date": "20161026",
+      "x": "obs_congested_or_severe_share",
+      "y": "crawl_E",
+      "n": 9946,
+      "spearman": 0.3349786820044883
+    },
+    {
+      "date": "20161026",
+      "x": "obs_congested_or_severe_share",
+      "y": "crawl_Q",
+      "n": 9946,
+      "spearman": 0.14642706507251457
+    },
+    {
+      "date": "20161026",
+      "x": "obs_congested_or_severe_share",
+      "y": "crawl_C",
+      "n": 9946,
+      "spearman": 0.21483130771558162
+    },
+    {
+      "date": "20161026",
+      "x": "obs_congested_or_severe_share",
+      "y": "stop_E",
+      "n": 9946,
+      "spearman": 0.2276296055221414
+    },
+    {
+      "date": "20161026",
+      "x": "obs_congested_or_severe_share",
+      "y": "stop_Q",
+      "n": 9946,
+      "spearman": -0.09507153863975583
+    },
+    {
+      "date": "20161026",
+      "x": "obs_congested_or_severe_share",
+      "y": "stop_C",
+      "n": 9946,
+      "spearman": 0.05837414344556206
+    },
+    {
+      "date": "20161026",
+      "x": "obs_congested_or_severe_share",
+      "y": "speed_cv_E",
+      "n": 9946,
+      "spearman": -0.07250730260697207
+    },
+    {
+      "date": "20161026",
+      "x": "obs_congested_or_severe_share",
+      "y": "speed_cv_Q",
+      "n": 9946,
+      "spearman": -0.15634270615238077
+    },
+    {
+      "date": "20161026",
+      "x": "obs_congested_or_severe_share",
+      "y": "speed_cv_C",
+      "n": 9946,
+      "spearman": 0.008128669817616329
+    },
+    {
+      "date": "20161026",
+      "x": "obs_congested_or_severe_share",
+      "y": "acceleration_rms_E",
+      "n": 9946,
+      "spearman": -0.3084294330375914
+    },
+    {
+      "date": "20161026",
+      "x": "obs_congested_or_severe_share",
+      "y": "acceleration_rms_Q",
+      "n": 9946,
+      "spearman": -0.18655285978678562
+    },
+    {
+      "date": "20161026",
+      "x": "obs_congested_or_severe_share",
+      "y": "acceleration_rms_C",
+      "n": 9946,
+      "spearman": -0.09045441364649084
+    },
+    {
+      "date": "20161026",
+      "x": "obs_congested_or_severe_share",
+      "y": "rho_dynamic_C",
+      "n": 9946,
+      "spearman": -0.015791159191809467
+    },
+    {
+      "date": "20161026",
+      "x": "obs_congested_or_severe_share",
+      "y": "rho_dynamic_M",
+      "n": 9946,
+      "spearman": 0.009803257690307344
+    },
+    {
+      "date": "20161026",
+      "x": "obs_congested_or_severe_share",
+      "y": "rho_dynamic_A",
+      "n": 9946,
+      "spearman": 0.02691278932645061
+    },
+    {
+      "date": "20161027",
+      "x": "pred_congested_or_severe_share",
+      "y": "crawl_E",
+      "n": 9951,
+      "spearman": 0.4287347497246415
+    },
+    {
+      "date": "20161027",
+      "x": "pred_congested_or_severe_share",
+      "y": "crawl_Q",
+      "n": 9951,
+      "spearman": 0.1139961738535117
+    },
+    {
+      "date": "20161027",
+      "x": "pred_congested_or_severe_share",
+      "y": "crawl_C",
+      "n": 9951,
+      "spearman": 0.15436426053812444
+    },
+    {
+      "date": "20161027",
+      "x": "pred_congested_or_severe_share",
+      "y": "stop_E",
+      "n": 9951,
+      "spearman": 0.3669753824427179
+    },
+    {
+      "date": "20161027",
+      "x": "pred_congested_or_severe_share",
+      "y": "stop_Q",
+      "n": 9951,
+      "spearman": -0.08730460635311814
+    },
+    {
+      "date": "20161027",
+      "x": "pred_congested_or_severe_share",
+      "y": "stop_C",
+      "n": 9951,
+      "spearman": 0.004170516210139802
+    },
+    {
+      "date": "20161027",
+      "x": "pred_congested_or_severe_share",
+      "y": "speed_cv_E",
+      "n": 9951,
+      "spearman": 0.04308334877082438
+    },
+    {
+      "date": "20161027",
+      "x": "pred_congested_or_severe_share",
+      "y": "speed_cv_Q",
+      "n": 9951,
+      "spearman": -0.17043282997390247
+    },
+    {
+      "date": "20161027",
+      "x": "pred_congested_or_severe_share",
+      "y": "speed_cv_C",
+      "n": 9951,
+      "spearman": -0.062017044296308776
+    },
+    {
+      "date": "20161027",
+      "x": "pred_congested_or_severe_share",
+      "y": "acceleration_rms_E",
+      "n": 9951,
+      "spearman": -0.2508743814178695
+    },
+    {
+      "date": "20161027",
+      "x": "pred_congested_or_severe_share",
+      "y": "acceleration_rms_Q",
+      "n": 9951,
+      "spearman": -0.1117915494571084
+    },
+    {
+      "date": "20161027",
+      "x": "pred_congested_or_severe_share",
+      "y": "acceleration_rms_C",
+      "n": 9951,
+      "spearman": -0.07103928887899201
+    },
+    {
+      "date": "20161027",
+      "x": "pred_congested_or_severe_share",
+      "y": "rho_dynamic_C",
+      "n": 9951,
+      "spearman": 0.05669307951576667
+    },
+    {
+      "date": "20161027",
+      "x": "pred_congested_or_severe_share",
+      "y": "rho_dynamic_M",
+      "n": 9951,
+      "spearman": 0.1346563418358334
+    },
+    {
+      "date": "20161027",
+      "x": "pred_congested_or_severe_share",
+      "y": "rho_dynamic_A",
+      "n": 9951,
+      "spearman": 0.2034379147471941
+    },
+    {
+      "date": "20161027",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "crawl_E",
+      "n": 9951,
+      "spearman": 0.07980475874850794
+    },
+    {
+      "date": "20161027",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "crawl_Q",
+      "n": 9951,
+      "spearman": 0.044063741229055126
+    },
+    {
+      "date": "20161027",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "crawl_C",
+      "n": 9951,
+      "spearman": 0.07534022267383793
+    },
+    {
+      "date": "20161027",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "stop_E",
+      "n": 9951,
+      "spearman": 0.07241019624202545
+    },
+    {
+      "date": "20161027",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "stop_Q",
+      "n": 9951,
+      "spearman": 0.05895019242653889
+    },
+    {
+      "date": "20161027",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "stop_C",
+      "n": 9951,
+      "spearman": 0.06427968735180363
+    },
+    {
+      "date": "20161027",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "speed_cv_E",
+      "n": 9951,
+      "spearman": 0.037300666839831555
+    },
+    {
+      "date": "20161027",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "speed_cv_Q",
+      "n": 9951,
+      "spearman": 0.03796938763160843
+    },
+    {
+      "date": "20161027",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "speed_cv_C",
+      "n": 9951,
+      "spearman": 0.0442117823860508
+    },
+    {
+      "date": "20161027",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "acceleration_rms_E",
+      "n": 9951,
+      "spearman": -0.000992726231057607
+    },
+    {
+      "date": "20161027",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "acceleration_rms_Q",
+      "n": 9951,
+      "spearman": 0.10074042882959541
+    },
+    {
+      "date": "20161027",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "acceleration_rms_C",
+      "n": 9951,
+      "spearman": 0.09014191163825033
+    },
+    {
+      "date": "20161027",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "rho_dynamic_C",
+      "n": 9951,
+      "spearman": 0.09100371173510056
+    },
+    {
+      "date": "20161027",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "rho_dynamic_M",
+      "n": 9951,
+      "spearman": 0.08595751575692602
+    },
+    {
+      "date": "20161027",
+      "x": "pred_severe_congestion_proxy_share",
+      "y": "rho_dynamic_A",
+      "n": 9951,
+      "spearman": 0.09151899276307633
+    },
+    {
+      "date": "20161027",
+      "x": "pred_mixed_evidence_share",
+      "y": "crawl_E",
+      "n": 9951,
+      "spearman": 0.5534773428410672
+    },
+    {
+      "date": "20161027",
+      "x": "pred_mixed_evidence_share",
+      "y": "crawl_Q",
+      "n": 9951,
+      "spearman": 0.24571388390914958
+    },
+    {
+      "date": "20161027",
+      "x": "pred_mixed_evidence_share",
+      "y": "crawl_C",
+      "n": 9951,
+      "spearman": 0.24961772506020094
+    },
+    {
+      "date": "20161027",
+      "x": "pred_mixed_evidence_share",
+      "y": "stop_E",
+      "n": 9951,
+      "spearman": 0.42253650238256824
+    },
+    {
+      "date": "20161027",
+      "x": "pred_mixed_evidence_share",
+      "y": "stop_Q",
+      "n": 9951,
+      "spearman": -0.2405925873456076
+    },
+    {
+      "date": "20161027",
+      "x": "pred_mixed_evidence_share",
+      "y": "stop_C",
+      "n": 9951,
+      "spearman": -0.045164457283628376
+    },
+    {
+      "date": "20161027",
+      "x": "pred_mixed_evidence_share",
+      "y": "speed_cv_E",
+      "n": 9951,
+      "spearman": -0.08071475007553514
+    },
+    {
+      "date": "20161027",
+      "x": "pred_mixed_evidence_share",
+      "y": "speed_cv_Q",
+      "n": 9951,
+      "spearman": -0.34985472201604256
+    },
+    {
+      "date": "20161027",
+      "x": "pred_mixed_evidence_share",
+      "y": "speed_cv_C",
+      "n": 9951,
+      "spearman": -0.14267524517729643
+    },
+    {
+      "date": "20161027",
+      "x": "pred_mixed_evidence_share",
+      "y": "acceleration_rms_E",
+      "n": 9951,
+      "spearman": -0.4582438537990309
+    },
+    {
+      "date": "20161027",
+      "x": "pred_mixed_evidence_share",
+      "y": "acceleration_rms_Q",
+      "n": 9951,
+      "spearman": -0.30445945299784655
+    },
+    {
+      "date": "20161027",
+      "x": "pred_mixed_evidence_share",
+      "y": "acceleration_rms_C",
+      "n": 9951,
+      "spearman": -0.228265219277929
+    },
+    {
+      "date": "20161027",
+      "x": "pred_mixed_evidence_share",
+      "y": "rho_dynamic_C",
+      "n": 9951,
+      "spearman": -0.03533506114493464
+    },
+    {
+      "date": "20161027",
+      "x": "pred_mixed_evidence_share",
+      "y": "rho_dynamic_M",
+      "n": 9951,
+      "spearman": 0.045670286435427074
+    },
+    {
+      "date": "20161027",
+      "x": "pred_mixed_evidence_share",
+      "y": "rho_dynamic_A",
+      "n": 9951,
+      "spearman": 0.11450321428775964
+    },
+    {
+      "date": "20161027",
+      "x": "pred_unknown_share",
+      "y": "crawl_E",
+      "n": 9951,
+      "spearman": 0.13554512662613716
+    },
+    {
+      "date": "20161027",
+      "x": "pred_unknown_share",
+      "y": "crawl_Q",
+      "n": 9951,
+      "spearman": 0.5070528447753387
+    },
+    {
+      "date": "20161027",
+      "x": "pred_unknown_share",
+      "y": "crawl_C",
+      "n": 9951,
+      "spearman": 0.3746593731939564
+    },
+    {
+      "date": "20161027",
+      "x": "pred_unknown_share",
+      "y": "stop_E",
+      "n": 9951,
+      "spearman": 0.3341215547350129
+    },
+    {
+      "date": "20161027",
+      "x": "pred_unknown_share",
+      "y": "stop_Q",
+      "n": 9951,
+      "spearman": 0.5726376603023199
+    },
+    {
+      "date": "20161027",
+      "x": "pred_unknown_share",
+      "y": "stop_C",
+      "n": 9951,
+      "spearman": 0.42971807530676726
+    },
+    {
+      "date": "20161027",
+      "x": "pred_unknown_share",
+      "y": "speed_cv_E",
+      "n": 9951,
+      "spearman": 0.1798683210836383
+    },
+    {
+      "date": "20161027",
+      "x": "pred_unknown_share",
+      "y": "speed_cv_Q",
+      "n": 9951,
+      "spearman": 0.5302615037951418
+    },
+    {
+      "date": "20161027",
+      "x": "pred_unknown_share",
+      "y": "speed_cv_C",
+      "n": 9951,
+      "spearman": 0.42040309001396425
+    },
+    {
+      "date": "20161027",
+      "x": "pred_unknown_share",
+      "y": "acceleration_rms_E",
+      "n": 9951,
+      "spearman": -0.31003581690611776
+    },
+    {
+      "date": "20161027",
+      "x": "pred_unknown_share",
+      "y": "acceleration_rms_Q",
+      "n": 9951,
+      "spearman": 0.009315359982574987
+    },
+    {
+      "date": "20161027",
+      "x": "pred_unknown_share",
+      "y": "acceleration_rms_C",
+      "n": 9951,
+      "spearman": 0.015988300787040714
+    },
+    {
+      "date": "20161027",
+      "x": "pred_unknown_share",
+      "y": "rho_dynamic_C",
+      "n": 9951,
+      "spearman": 0.3829375673410769
+    },
+    {
+      "date": "20161027",
+      "x": "pred_unknown_share",
+      "y": "rho_dynamic_M",
+      "n": 9951,
+      "spearman": 0.31715211876201604
+    },
+    {
+      "date": "20161027",
+      "x": "pred_unknown_share",
+      "y": "rho_dynamic_A",
+      "n": 9951,
+      "spearman": 0.19032365576012356
+    },
+    {
+      "date": "20161027",
+      "x": "pred_longest_congested_run_s",
+      "y": "crawl_E",
+      "n": 9951,
+      "spearman": 0.4258724958953469
+    },
+    {
+      "date": "20161027",
+      "x": "pred_longest_congested_run_s",
+      "y": "crawl_Q",
+      "n": 9951,
+      "spearman": 0.13498947131261754
+    },
+    {
+      "date": "20161027",
+      "x": "pred_longest_congested_run_s",
+      "y": "crawl_C",
+      "n": 9951,
+      "spearman": 0.22019115911967593
+    },
+    {
+      "date": "20161027",
+      "x": "pred_longest_congested_run_s",
+      "y": "stop_E",
+      "n": 9951,
+      "spearman": 0.3584179851530901
+    },
+    {
+      "date": "20161027",
+      "x": "pred_longest_congested_run_s",
+      "y": "stop_Q",
+      "n": 9951,
+      "spearman": -0.08430015940742999
+    },
+    {
+      "date": "20161027",
+      "x": "pred_longest_congested_run_s",
+      "y": "stop_C",
+      "n": 9951,
+      "spearman": 0.06568707515866742
+    },
+    {
+      "date": "20161027",
+      "x": "pred_longest_congested_run_s",
+      "y": "speed_cv_E",
+      "n": 9951,
+      "spearman": 0.03703025209380227
+    },
+    {
+      "date": "20161027",
+      "x": "pred_longest_congested_run_s",
+      "y": "speed_cv_Q",
+      "n": 9951,
+      "spearman": -0.16193957170349352
+    },
+    {
+      "date": "20161027",
+      "x": "pred_longest_congested_run_s",
+      "y": "speed_cv_C",
+      "n": 9951,
+      "spearman": -0.0011172728278287167
+    },
+    {
+      "date": "20161027",
+      "x": "pred_longest_congested_run_s",
+      "y": "acceleration_rms_E",
+      "n": 9951,
+      "spearman": -0.26510131695388056
+    },
+    {
+      "date": "20161027",
+      "x": "pred_longest_congested_run_s",
+      "y": "acceleration_rms_Q",
+      "n": 9951,
+      "spearman": -0.10075731497335373
+    },
+    {
+      "date": "20161027",
+      "x": "pred_longest_congested_run_s",
+      "y": "acceleration_rms_C",
+      "n": 9951,
+      "spearman": -0.0275677356938172
+    },
+    {
+      "date": "20161027",
+      "x": "pred_longest_congested_run_s",
+      "y": "rho_dynamic_C",
+      "n": 9951,
+      "spearman": 0.07512015412716738
+    },
+    {
+      "date": "20161027",
+      "x": "pred_longest_congested_run_s",
+      "y": "rho_dynamic_M",
+      "n": 9951,
+      "spearman": 0.1369623776937108
+    },
+    {
+      "date": "20161027",
+      "x": "pred_longest_congested_run_s",
+      "y": "rho_dynamic_A",
+      "n": 9951,
+      "spearman": 0.184435630605257
+    },
+    {
+      "date": "20161027",
+      "x": "obs_congested_or_severe_share",
+      "y": "crawl_E",
+      "n": 9951,
+      "spearman": 0.33418823205404413
+    },
+    {
+      "date": "20161027",
+      "x": "obs_congested_or_severe_share",
+      "y": "crawl_Q",
+      "n": 9951,
+      "spearman": 0.18456218769892516
+    },
+    {
+      "date": "20161027",
+      "x": "obs_congested_or_severe_share",
+      "y": "crawl_C",
+      "n": 9951,
+      "spearman": 0.22559403145448761
+    },
+    {
+      "date": "20161027",
+      "x": "obs_congested_or_severe_share",
+      "y": "stop_E",
+      "n": 9951,
+      "spearman": 0.23567926897236563
+    },
+    {
+      "date": "20161027",
+      "x": "obs_congested_or_severe_share",
+      "y": "stop_Q",
+      "n": 9951,
+      "spearman": -0.10265904361910305
+    },
+    {
+      "date": "20161027",
+      "x": "obs_congested_or_severe_share",
+      "y": "stop_C",
+      "n": 9951,
+      "spearman": 0.06337680020755161
+    },
+    {
+      "date": "20161027",
+      "x": "obs_congested_or_severe_share",
+      "y": "speed_cv_E",
+      "n": 9951,
+      "spearman": -0.061529582942218095
+    },
+    {
+      "date": "20161027",
+      "x": "obs_congested_or_severe_share",
+      "y": "speed_cv_Q",
+      "n": 9951,
+      "spearman": -0.1672854741306409
+    },
+    {
+      "date": "20161027",
+      "x": "obs_congested_or_severe_share",
+      "y": "speed_cv_C",
+      "n": 9951,
+      "spearman": 0.002494970113303813
+    },
+    {
+      "date": "20161027",
+      "x": "obs_congested_or_severe_share",
+      "y": "acceleration_rms_E",
+      "n": 9951,
+      "spearman": -0.3029273516301392
+    },
+    {
+      "date": "20161027",
+      "x": "obs_congested_or_severe_share",
+      "y": "acceleration_rms_Q",
+      "n": 9951,
+      "spearman": -0.16237745183342
+    },
+    {
+      "date": "20161027",
+      "x": "obs_congested_or_severe_share",
+      "y": "acceleration_rms_C",
+      "n": 9951,
+      "spearman": -0.0641634608593865
+    },
+    {
+      "date": "20161027",
+      "x": "obs_congested_or_severe_share",
+      "y": "rho_dynamic_C",
+      "n": 9951,
+      "spearman": -0.0076859529899841825
+    },
+    {
+      "date": "20161027",
+      "x": "obs_congested_or_severe_share",
+      "y": "rho_dynamic_M",
+      "n": 9951,
+      "spearman": 0.015635267307721464
+    },
+    {
+      "date": "20161027",
+      "x": "obs_congested_or_severe_share",
+      "y": "rho_dynamic_A",
+      "n": 9951,
+      "spearman": 0.027599834995308763
+    }
+  ],
+  "p_values": "not estimated; shared-input descriptive comparison"
+}

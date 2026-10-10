@@ -1,0 +1,352 @@
+[
+  {
+    "epoch_id": "0730",
+    "condition": "D0",
+    "required": 963,
+    "archived": 26,
+    "missing": 937
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D1",
+    "required": 971,
+    "archived": 26,
+    "missing": 945
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D2",
+    "required": 963,
+    "archived": 26,
+    "missing": 937
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D3",
+    "required": 989,
+    "archived": 26,
+    "missing": 963
+  },
+  {
+    "epoch_id": "0730",
+    "condition": "D4",
+    "required": 1057,
+    "archived": 26,
+    "missing": 1031
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D0",
+    "required": 1216,
+    "archived": 6,
+    "missing": 1210
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D1",
+    "required": 1224,
+    "archived": 6,
+    "missing": 1218
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D2",
+    "required": 1216,
+    "archived": 6,
+    "missing": 1210
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D3",
+    "required": 1237,
+    "archived": 6,
+    "missing": 1231
+  },
+  {
+    "epoch_id": "0830",
+    "condition": "D4",
+    "required": 1272,
+    "archived": 6,
+    "missing": 1266
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D0",
+    "required": 1276,
+    "archived": 18,
+    "missing": 1258
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D1",
+    "required": 1310,
+    "archived": 18,
+    "missing": 1292
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D2",
+    "required": 1276,
+    "archived": 18,
+    "missing": 1258
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D3",
+    "required": 1332,
+    "archived": 18,
+    "missing": 1314
+  },
+  {
+    "epoch_id": "1200",
+    "condition": "D4",
+    "required": 1443,
+    "archived": 18,
+    "missing": 1425
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D0",
+    "required": 870,
+    "archived": 14,
+    "missing": 856
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D1",
+    "required": 893,
+    "archived": 14,
+    "missing": 879
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D2",
+    "required": 870,
+    "archived": 14,
+    "missing": 856
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D3",
+    "required": 878,
+    "archived": 14,
+    "missing": 864
+  },
+  {
+    "epoch_id": "1300",
+    "condition": "D4",
+    "required": 926,
+    "archived": 14,
+    "missing": 912
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D0",
+    "required": 1510,
+    "archived": 3,
+    "missing": 1507
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D1",
+    "required": 1518,
+    "archived": 3,
+    "missing": 1515
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D2",
+    "required": 1510,
+    "archived": 3,
+    "missing": 1507
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D3",
+    "required": 1518,
+    "archived": 3,
+    "missing": 1515
+  },
+  {
+    "epoch_id": "1700",
+    "condition": "D4",
+    "required": 1537,
+    "archived": 3,
+    "missing": 1534
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D0",
+    "required": 1594,
+    "archived": 22,
+    "missing": 1572
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D1",
+    "required": 1594,
+    "archived": 22,
+    "missing": 1572
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D2",
+    "required": 1594,
+    "archived": 22,
+    "missing": 1572
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D3",
+    "required": 1594,
+    "archived": 22,
+    "missing": 1572
+  },
+  {
+    "epoch_id": "1730",
+    "condition": "D4",
+    "required": 1640,
+    "archived": 9,
+    "missing": 1631
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D0",
+    "required": 1762,
+    "archived": 18,
+    "missing": 1744
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D1",
+    "required": 1766,
+    "archived": 18,
+    "missing": 1748
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D2",
+    "required": 1768,
+    "archived": 18,
+    "missing": 1750
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D3",
+    "required": 1766,
+    "archived": 18,
+    "missing": 1748
+  },
+  {
+    "epoch_id": "1800",
+    "condition": "D4",
+    "required": 1790,
+    "archived": 18,
+    "missing": 1772
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D0",
+    "required": 1546,
+    "archived": 5,
+    "missing": 1541
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D1",
+    "required": 1565,
+    "archived": 5,
+    "missing": 1560
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D2",
+    "required": 1546,
+    "archived": 5,
+    "missing": 1541
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D3",
+    "required": 1558,
+    "archived": 5,
+    "missing": 1553
+  },
+  {
+    "epoch_id": "1830",
+    "condition": "D4",
+    "required": 1569,
+    "archived": 5,
+    "missing": 1564
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D0",
+    "required": 1555,
+    "archived": 17,
+    "missing": 1538
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D1",
+    "required": 1559,
+    "archived": 17,
+    "missing": 1542
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D2",
+    "required": 1555,
+    "archived": 17,
+    "missing": 1538
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D3",
+    "required": 1574,
+    "archived": 17,
+    "missing": 1557
+  },
+  {
+    "epoch_id": "2100",
+    "condition": "D4",
+    "required": 1590,
+    "archived": 17,
+    "missing": 1573
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D0",
+    "required": 807,
+    "archived": 1,
+    "missing": 806
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D1",
+    "required": 843,
+    "archived": 1,
+    "missing": 842
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D2",
+    "required": 812,
+    "archived": 1,
+    "missing": 811
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D3",
+    "required": 826,
+    "archived": 1,
+    "missing": 825
+  },
+  {
+    "epoch_id": "2300",
+    "condition": "D4",
+    "required": 872,
+    "archived": 1,
+    "missing": 871
+  }
+]

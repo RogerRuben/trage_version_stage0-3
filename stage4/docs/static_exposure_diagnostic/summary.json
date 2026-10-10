@@ -1,0 +1,1415 @@
+{
+  "status": "READ_ONLY_STATIC_EXPOSURE_DIAGNOSTIC_COMPLETE",
+  "code_sha_before_diagnostic": "b549b9c092309b818de7c36aff094be7642e85d5",
+  "sources": {
+    "profile": {
+      "path": "stage3/config/stage3_av_capability_profiles.json",
+      "sha256": "bea54c12a0c013995c3644a0bab84b35413d5df8a6785dfdd6a03fd49f32978e"
+    },
+    "encounters": {
+      "path": "stage3/output/odd_tod/s4/test31_route_complex_encounters.parquet",
+      "sha256": "79738438b2f6dc1565c8dd8a41b3d68610de4ade9589b2f662e6df725e48324c"
+    },
+    "descriptors": {
+      "path": "stage3/output/odd_tod/s4/test31_original_route_descriptors.parquet",
+      "sha256": "d28cdae5995a6a8b839993ae92f1395da33088a0d9c559bf82b18c64fbae2ef4"
+    },
+    "complexes": {
+      "path": "stage3/output/odd_tod/s2b/final/stage3_intersection_complexes.parquet",
+      "sha256": "4c23c7a8a5f49007ce367e21d24405549a979c82bf367d086b4fcf1d281bdeed"
+    },
+    "boundary": {
+      "path": "stage3/output/odd_tod/s2b/final/stage3_edge_complex_boundary_index.parquet",
+      "sha256": "fb46c8d53763c3bca014be26b5a74cbcf546d8ee65859d46569c99702844a532"
+    },
+    "edges": {
+      "path": "stage3/output/odd_tod/s2a/stage3_full_network_edges.parquet",
+      "sha256": "25ed4caf250cacbe251ae258d8e77ff2f0b286884f0376c72b9ef09e33687204"
+    }
+  },
+  "scope": "Test31 original historical routes; not fallback routes or matched dispatch arcs",
+  "weighting": "One encounter one observation; repeated visits retained; not duration or distance weighted",
+  "tail_definition": "Fraction of observed encounters strictly above the existing frozen profile cap",
+  "p90_definition": "Within-route empirical quantile with interpolation=higher; descriptive only",
+  "route_count": 30000,
+  "encounter_rows": 538355,
+  "unique_observed_complexes": 2107,
+  "routes_without_encounters": 74,
+  "full_network_and_movement_resolved_routes_with_encounters": 9848,
+  "routes_with_unresolved_tokens": 981,
+  "routes_with_reverse_overlay_tokens": 14837,
+  "routes_with_unresolved_movement_lookup": 10199,
+  "encounters_per_route": {
+    "n": 29926,
+    "mean": 17.9895408674731,
+    "min": 1.0,
+    "p25": 9.0,
+    "p50": 16.0,
+    "p75": 24.0,
+    "p90": 34.0,
+    "max": 97.0
+  },
+  "unique_complexes_per_route": {
+    "n": 29926,
+    "mean": 17.9286907705674,
+    "min": 1.0,
+    "p25": 9.0,
+    "p50": 16.0,
+    "p75": 24.0,
+    "p90": 34.0,
+    "max": 97.0
+  },
+  "repeated_complex_visit_rows": 1821,
+  "max_reconciliation": {
+    "A": {
+      "orders_checked": 30000,
+      "mismatches": 0
+    },
+    "M": {
+      "orders_checked": 30000,
+      "mismatches": 0
+    },
+    "D": {
+      "orders_checked": 30000,
+      "mismatches": 0
+    },
+    "L": {
+      "orders_checked": 30000,
+      "mismatches": 0
+    }
+  },
+  "input_hashes_unchanged": true,
+  "synthetic_check": "PASS",
+  "dimension_profile_comparison": [
+    {
+      "route_count": 29926,
+      "cap": 4.0,
+      "max_above_cap": 28619,
+      "mean_above_cap": 22385,
+      "max_above_but_mean_at_or_below_cap": 6234,
+      "exactly_one_exceeding_encounter": 2238,
+      "multiple_exceeding_encounters": 26381,
+      "all_encounters_above_cap": 708,
+      "tail_share_among_max_exceeding": {
+        "n": 28619,
+        "mean": 0.4330217904865852,
+        "min": 0.03125,
+        "p25": 0.28,
+        "p50": 0.4166666666666667,
+        "p75": 0.5625,
+        "p90": 0.7,
+        "max": 1.0
+      },
+      "max_over_cap": {
+        "n": 29926,
+        "mean": 2.5217787208447504,
+        "min": 0.75,
+        "p25": 2.0,
+        "p50": 2.5,
+        "p75": 3.25,
+        "p90": 4.0,
+        "max": 4.0
+      },
+      "mean_over_cap": {
+        "n": 29926,
+        "mean": 1.202552432850049,
+        "min": 0.75,
+        "p25": 1.0,
+        "p50": 1.1693548387096775,
+        "p75": 1.35,
+        "p90": 1.5526315789473684,
+        "max": 3.625
+      },
+      "tail_bins_all_routes": {
+        "zero": 1307,
+        "gt0_le10pct": 813,
+        "gt10_le25pct": 5402,
+        "gt25_le50pct": 13273,
+        "gt50_le100pct": 9131
+      },
+      "profile": "C",
+      "dimension": "A",
+      "scope": "all_observed_encounter_routes",
+      "p90_above_cap": 27974
+    },
+    {
+      "route_count": 29926,
+      "cap": 9.0,
+      "max_above_cap": 26180,
+      "mean_above_cap": 14372,
+      "max_above_but_mean_at_or_below_cap": 11808,
+      "exactly_one_exceeding_encounter": 3982,
+      "multiple_exceeding_encounters": 22198,
+      "all_encounters_above_cap": 151,
+      "tail_share_among_max_exceeding": {
+        "n": 26180,
+        "mean": 0.2829405862803002,
+        "min": 0.01694915254237288,
+        "p25": 0.16666666666666666,
+        "p50": 0.26666666666666666,
+        "p75": 0.375,
+        "p90": 0.5,
+        "max": 1.0
+      },
+      "max_over_cap": {
+        "n": 29926,
+        "mean": 3.352086999784654,
+        "min": 0.2222222222222222,
+        "p25": 1.7777777777777777,
+        "p50": 3.3333333333333335,
+        "p75": 4.666666666666667,
+        "p90": 7.111111111111111,
+        "max": 7.111111111111111
+      },
+      "mean_over_cap": {
+        "n": 29926,
+        "mean": 1.0193547322295584,
+        "min": 0.2222222222222222,
+        "p25": 0.6868686868686869,
+        "p50": 0.9888888888888889,
+        "p75": 1.2857142857142856,
+        "p90": 1.6031746031746033,
+        "max": 5.888888888888889
+      },
+      "tail_bins_all_routes": {
+        "zero": 3746,
+        "gt0_le10pct": 3059,
+        "gt10_le25pct": 9578,
+        "gt25_le50pct": 11874,
+        "gt50_le100pct": 1669
+      },
+      "profile": "C",
+      "dimension": "M",
+      "scope": "all_observed_encounter_routes",
+      "p90_above_cap": 23449
+    },
+    {
+      "route_count": 29926,
+      "cap": 2.0,
+      "max_above_cap": 25169,
+      "mean_above_cap": 16103,
+      "max_above_but_mean_at_or_below_cap": 9066,
+      "exactly_one_exceeding_encounter": 4554,
+      "multiple_exceeding_encounters": 20615,
+      "all_encounters_above_cap": 65,
+      "tail_share_among_max_exceeding": {
+        "n": 25169,
+        "mean": 0.2628518348561092,
+        "min": 0.024390243902439025,
+        "p25": 0.14285714285714285,
+        "p50": 0.25,
+        "p75": 0.34782608695652173,
+        "p90": 0.459567567567568,
+        "max": 1.0
+      },
+      "max_over_cap": {
+        "n": 29926,
+        "mean": 1.6335794960903562,
+        "min": 0.5,
+        "p25": 1.5,
+        "p50": 1.5,
+        "p75": 2.0,
+        "p90": 2.0,
+        "max": 2.5
+      },
+      "mean_over_cap": {
+        "n": 29926,
+        "mean": 1.032351615401304,
+        "min": 0.5,
+        "p25": 0.9375,
+        "p50": 1.03125,
+        "p75": 1.125,
+        "p90": 1.206896551724138,
+        "max": 2.0
+      },
+      "tail_bins_all_routes": {
+        "zero": 4757,
+        "gt0_le10pct": 3363,
+        "gt10_le25pct": 10257,
+        "gt25_le50pct": 10163,
+        "gt50_le100pct": 1386
+      },
+      "profile": "C",
+      "dimension": "D",
+      "scope": "all_observed_encounter_routes",
+      "p90_above_cap": 22254
+    },
+    {
+      "route_count": 29926,
+      "cap": 10.0,
+      "max_above_cap": 28979,
+      "mean_above_cap": 23477,
+      "max_above_but_mean_at_or_below_cap": 5502,
+      "exactly_one_exceeding_encounter": 2017,
+      "multiple_exceeding_encounters": 26962,
+      "all_encounters_above_cap": 661,
+      "tail_share_among_max_exceeding": {
+        "n": 28979,
+        "mean": 0.46080802875380367,
+        "min": 0.03571428571428571,
+        "p25": 0.3235294117647059,
+        "p50": 0.45098039215686275,
+        "p75": 0.5882352941176471,
+        "p90": 0.7142857142857143,
+        "max": 1.0
+      },
+      "max_over_cap": {
+        "n": 29926,
+        "mean": 13.805804317316046,
+        "min": 0.0,
+        "p25": 5.6,
+        "p50": 10.0,
+        "p75": 19.4,
+        "p90": 34.4,
+        "max": 45.6
+      },
+      "mean_over_cap": {
+        "n": 29926,
+        "mean": 2.3639893277626505,
+        "min": 0.0,
+        "p25": 1.1219618055555556,
+        "p50": 2.019230769230769,
+        "p75": 3.2399999999999998,
+        "p90": 4.608712121212122,
+        "max": 38.6
+      },
+      "tail_bins_all_routes": {
+        "zero": 947,
+        "gt0_le10pct": 648,
+        "gt10_le25pct": 4018,
+        "gt25_le50pct": 13597,
+        "gt50_le100pct": 10716
+      },
+      "profile": "C",
+      "dimension": "L",
+      "scope": "all_observed_encounter_routes",
+      "p90_above_cap": 28443
+    },
+    {
+      "route_count": 9848,
+      "cap": 4.0,
+      "max_above_cap": 9149,
+      "mean_above_cap": 6640,
+      "max_above_but_mean_at_or_below_cap": 2509,
+      "exactly_one_exceeding_encounter": 1026,
+      "multiple_exceeding_encounters": 8123,
+      "all_encounters_above_cap": 233,
+      "tail_share_among_max_exceeding": {
+        "n": 9149,
+        "mean": 0.41009817922682373,
+        "min": 0.03571428571428571,
+        "p25": 0.25,
+        "p50": 0.391304347826087,
+        "p75": 0.5454545454545454,
+        "p90": 0.6803636363636377,
+        "max": 1.0
+      },
+      "max_over_cap": {
+        "n": 9848,
+        "mean": 2.345704711616572,
+        "min": 0.75,
+        "p25": 1.75,
+        "p50": 2.25,
+        "p75": 3.0,
+        "p90": 3.75,
+        "max": 4.0
+      },
+      "mean_over_cap": {
+        "n": 9848,
+        "mean": 1.1677471259353729,
+        "min": 0.75,
+        "p25": 0.9583333333333334,
+        "p50": 1.125,
+        "p75": 1.3214285714285714,
+        "p90": 1.5479166666666677,
+        "max": 3.625
+      },
+      "tail_bins_all_routes": {
+        "zero": 699,
+        "gt0_le10pct": 411,
+        "gt10_le25pct": 2102,
+        "gt25_le50pct": 4079,
+        "gt50_le100pct": 2557
+      },
+      "profile": "C",
+      "dimension": "A",
+      "scope": "full_network_and_movement_resolved",
+      "p90_above_cap": 8825
+    },
+    {
+      "route_count": 9848,
+      "cap": 9.0,
+      "max_above_cap": 8114,
+      "mean_above_cap": 4039,
+      "max_above_but_mean_at_or_below_cap": 4075,
+      "exactly_one_exceeding_encounter": 1760,
+      "multiple_exceeding_encounters": 6354,
+      "all_encounters_above_cap": 63,
+      "tail_share_among_max_exceeding": {
+        "n": 8114,
+        "mean": 0.2717094964738087,
+        "min": 0.01694915254237288,
+        "p25": 0.14285714285714285,
+        "p50": 0.25,
+        "p75": 0.3698830409356725,
+        "p90": 0.5,
+        "max": 1.0
+      },
+      "max_over_cap": {
+        "n": 9848,
+        "mean": 2.973440743749436,
+        "min": 0.2222222222222222,
+        "p25": 1.7777777777777777,
+        "p50": 2.111111111111111,
+        "p75": 4.0,
+        "p90": 6.222222222222222,
+        "max": 7.111111111111111
+      },
+      "mean_over_cap": {
+        "n": 9848,
+        "mean": 0.9581966405492602,
+        "min": 0.2222222222222222,
+        "p25": 0.5902777777777778,
+        "p50": 0.8958333333333334,
+        "p75": 1.2401851851851853,
+        "p90": 1.5925925925925926,
+        "max": 5.888888888888889
+      },
+      "tail_bins_all_routes": {
+        "zero": 1734,
+        "gt0_le10pct": 1279,
+        "gt10_le25pct": 3062,
+        "gt25_le50pct": 3210,
+        "gt50_le100pct": 563
+      },
+      "profile": "C",
+      "dimension": "M",
+      "scope": "full_network_and_movement_resolved",
+      "p90_above_cap": 7002
+    },
+    {
+      "route_count": 9848,
+      "cap": 2.0,
+      "max_above_cap": 7764,
+      "mean_above_cap": 4574,
+      "max_above_but_mean_at_or_below_cap": 3190,
+      "exactly_one_exceeding_encounter": 1817,
+      "multiple_exceeding_encounters": 5947,
+      "all_encounters_above_cap": 28,
+      "tail_share_among_max_exceeding": {
+        "n": 7764,
+        "mean": 0.2538451618912384,
+        "min": 0.02857142857142857,
+        "p25": 0.14285714285714285,
+        "p50": 0.22727272727272727,
+        "p75": 0.3333333333333333,
+        "p90": 0.4471264367816085,
+        "max": 1.0
+      },
+      "max_over_cap": {
+        "n": 9848,
+        "mean": 1.5811332250203087,
+        "min": 0.5,
+        "p25": 1.5,
+        "p50": 1.5,
+        "p75": 2.0,
+        "p90": 2.0,
+        "max": 2.5
+      },
+      "mean_over_cap": {
+        "n": 9848,
+        "mean": 1.01073371921399,
+        "min": 0.5,
+        "p25": 0.90625,
+        "p50": 1.0,
+        "p75": 1.1029411764705883,
+        "p90": 1.2,
+        "max": 2.0
+      },
+      "tail_bins_all_routes": {
+        "zero": 2084,
+        "gt0_le10pct": 1137,
+        "gt10_le25pct": 3427,
+        "gt25_le50pct": 2807,
+        "gt50_le100pct": 393
+      },
+      "profile": "C",
+      "dimension": "D",
+      "scope": "full_network_and_movement_resolved",
+      "p90_above_cap": 6812
+    },
+    {
+      "route_count": 9848,
+      "cap": 10.0,
+      "max_above_cap": 9266,
+      "mean_above_cap": 6915,
+      "max_above_but_mean_at_or_below_cap": 2351,
+      "exactly_one_exceeding_encounter": 1044,
+      "multiple_exceeding_encounters": 8222,
+      "all_encounters_above_cap": 221,
+      "tail_share_among_max_exceeding": {
+        "n": 9266,
+        "mean": 0.42832365866666094,
+        "min": 0.03571428571428571,
+        "p25": 0.2727272727272727,
+        "p50": 0.4117647058823529,
+        "p75": 0.5652173913043478,
+        "p90": 0.7,
+        "max": 1.0
+      },
+      "max_over_cap": {
+        "n": 9848,
+        "mean": 11.801157595450853,
+        "min": 0.0,
+        "p25": 4.4,
+        "p50": 7.7,
+        "p75": 17.3,
+        "p90": 32.3,
+        "max": 38.6
+      },
+      "mean_over_cap": {
+        "n": 9848,
+        "mean": 2.1633422155757276,
+        "min": 0.0,
+        "p25": 0.875,
+        "p50": 1.715,
+        "p75": 3.0597027972027973,
+        "p90": 4.651363636363642,
+        "max": 24.8
+      },
+      "tail_bins_all_routes": {
+        "zero": 582,
+        "gt0_le10pct": 421,
+        "gt10_le25pct": 1717,
+        "gt25_le50pct": 4241,
+        "gt50_le100pct": 2887
+      },
+      "profile": "C",
+      "dimension": "L",
+      "scope": "full_network_and_movement_resolved",
+      "p90_above_cap": 8910
+    },
+    {
+      "route_count": 29926,
+      "cap": 5.0,
+      "max_above_cap": 27181,
+      "mean_above_cap": 10942,
+      "max_above_but_mean_at_or_below_cap": 16239,
+      "exactly_one_exceeding_encounter": 3498,
+      "multiple_exceeding_encounters": 23683,
+      "all_encounters_above_cap": 172,
+      "tail_share_among_max_exceeding": {
+        "n": 27181,
+        "mean": 0.28762996033248484,
+        "min": 0.02564102564102564,
+        "p25": 0.16666666666666666,
+        "p50": 0.2692307692307692,
+        "p75": 0.375,
+        "p90": 0.5,
+        "max": 1.0
+      },
+      "max_over_cap": {
+        "n": 29926,
+        "mean": 2.0174229766758005,
+        "min": 0.6,
+        "p25": 1.6,
+        "p50": 2.0,
+        "p75": 2.6,
+        "p90": 3.2,
+        "max": 3.2
+      },
+      "mean_over_cap": {
+        "n": 29926,
+        "mean": 0.9620419462800393,
+        "min": 0.6,
+        "p25": 0.8,
+        "p50": 0.935483870967742,
+        "p75": 1.08,
+        "p90": 1.2421052631578946,
+        "max": 2.9
+      },
+      "tail_bins_all_routes": {
+        "zero": 2745,
+        "gt0_le10pct": 2468,
+        "gt10_le25pct": 10412,
+        "gt25_le50pct": 12476,
+        "gt50_le100pct": 1825
+      },
+      "profile": "M",
+      "dimension": "A",
+      "scope": "all_observed_encounter_routes",
+      "p90_above_cap": 25076
+    },
+    {
+      "route_count": 29926,
+      "cap": 16.0,
+      "max_above_cap": 19923,
+      "mean_above_cap": 1755,
+      "max_above_but_mean_at_or_below_cap": 18168,
+      "exactly_one_exceeding_encounter": 6630,
+      "multiple_exceeding_encounters": 13293,
+      "all_encounters_above_cap": 40,
+      "tail_share_among_max_exceeding": {
+        "n": 19923,
+        "mean": 0.1571998201890282,
+        "min": 0.012987012987012988,
+        "p25": 0.07692307692307693,
+        "p50": 0.125,
+        "p75": 0.2,
+        "p90": 0.29411764705882354,
+        "max": 1.0
+      },
+      "max_over_cap": {
+        "n": 29926,
+        "mean": 1.8855489373788679,
+        "min": 0.125,
+        "p25": 1.0,
+        "p50": 1.875,
+        "p75": 2.625,
+        "p90": 4.0,
+        "max": 4.0
+      },
+      "mean_over_cap": {
+        "n": 29926,
+        "mean": 0.5733870368791263,
+        "min": 0.125,
+        "p25": 0.38636363636363635,
+        "p50": 0.55625,
+        "p75": 0.7232142857142857,
+        "p90": 0.9017857142857143,
+        "max": 3.3125
+      },
+      "tail_bins_all_routes": {
+        "zero": 10003,
+        "gt0_le10pct": 7520,
+        "gt10_le25pct": 9635,
+        "gt25_le50pct": 2528,
+        "gt50_le100pct": 240
+      },
+      "profile": "M",
+      "dimension": "M",
+      "scope": "all_observed_encounter_routes",
+      "p90_above_cap": 13002
+    },
+    {
+      "route_count": 29926,
+      "cap": 3.0,
+      "max_above_cap": 11703,
+      "mean_above_cap": 41,
+      "max_above_but_mean_at_or_below_cap": 11662,
+      "exactly_one_exceeding_encounter": 7664,
+      "multiple_exceeding_encounters": 4039,
+      "all_encounters_above_cap": 1,
+      "tail_share_among_max_exceeding": {
+        "n": 11703,
+        "mean": 0.07427437096557801,
+        "min": 0.012987012987012988,
+        "p25": 0.041666666666666664,
+        "p50": 0.0625,
+        "p75": 0.09090909090909091,
+        "p90": 0.13333333333333333,
+        "max": 1.0
+      },
+      "max_over_cap": {
+        "n": 29926,
+        "mean": 1.0890529973935708,
+        "min": 0.3333333333333333,
+        "p25": 1.0,
+        "p50": 1.0,
+        "p75": 1.3333333333333333,
+        "p90": 1.3333333333333333,
+        "max": 1.6666666666666667
+      },
+      "mean_over_cap": {
+        "n": 29926,
+        "mean": 0.688234410267536,
+        "min": 0.3333333333333333,
+        "p25": 0.625,
+        "p50": 0.6875,
+        "p75": 0.75,
+        "p90": 0.8045977011494253,
+        "max": 1.3333333333333333
+      },
+      "tail_bins_all_routes": {
+        "zero": 18223,
+        "gt0_le10pct": 9493,
+        "gt10_le25pct": 2111,
+        "gt25_le50pct": 97,
+        "gt50_le100pct": 2
+      },
+      "profile": "M",
+      "dimension": "D",
+      "scope": "all_observed_encounter_routes",
+      "p90_above_cap": 2612
+    },
+    {
+      "route_count": 29926,
+      "cap": 34.0,
+      "max_above_cap": 25903,
+      "mean_above_cap": 6737,
+      "max_above_but_mean_at_or_below_cap": 19166,
+      "exactly_one_exceeding_encounter": 4293,
+      "multiple_exceeding_encounters": 21610,
+      "all_encounters_above_cap": 127,
+      "tail_share_among_max_exceeding": {
+        "n": 25903,
+        "mean": 0.24186135749340243,
+        "min": 0.027777777777777776,
+        "p25": 0.13793103448275862,
+        "p50": 0.21428571428571427,
+        "p75": 0.3157894736842105,
+        "p90": 0.42857142857142855,
+        "max": 1.0
+      },
+      "max_over_cap": {
+        "n": 29926,
+        "mean": 4.060530681563543,
+        "min": 0.0,
+        "p25": 1.6470588235294117,
+        "p50": 2.9411764705882355,
+        "p75": 5.705882352941177,
+        "p90": 10.117647058823529,
+        "max": 13.411764705882353
+      },
+      "mean_over_cap": {
+        "n": 29926,
+        "mean": 0.6952909787537207,
+        "min": 0.0,
+        "p25": 0.3299887663398693,
+        "p50": 0.5938914027149321,
+        "p75": 0.9529411764705882,
+        "p90": 1.3555035650623886,
+        "max": 11.352941176470589
+      },
+      "tail_bins_all_routes": {
+        "zero": 4023,
+        "gt0_le10pct": 3427,
+        "gt10_le25pct": 12719,
+        "gt25_le50pct": 8823,
+        "gt50_le100pct": 934
+      },
+      "profile": "M",
+      "dimension": "L",
+      "scope": "all_observed_encounter_routes",
+      "p90_above_cap": 22963
+    },
+    {
+      "route_count": 9848,
+      "cap": 5.0,
+      "max_above_cap": 8507,
+      "mean_above_cap": 3071,
+      "max_above_but_mean_at_or_below_cap": 5436,
+      "exactly_one_exceeding_encounter": 1479,
+      "multiple_exceeding_encounters": 7028,
+      "all_encounters_above_cap": 87,
+      "tail_share_among_max_exceeding": {
+        "n": 8507,
+        "mean": 0.28153715092889636,
+        "min": 0.030303030303030304,
+        "p25": 0.1547008547008547,
+        "p50": 0.25,
+        "p75": 0.3693957115009746,
+        "p90": 0.5,
+        "max": 1.0
+      },
+      "max_over_cap": {
+        "n": 9848,
+        "mean": 1.8765637692932577,
+        "min": 0.6,
+        "p25": 1.4,
+        "p50": 1.8,
+        "p75": 2.4,
+        "p90": 3.0,
+        "max": 3.2
+      },
+      "mean_over_cap": {
+        "n": 9848,
+        "mean": 0.9341977007482986,
+        "min": 0.6,
+        "p25": 0.7666666666666667,
+        "p50": 0.9,
+        "p75": 1.0571428571428572,
+        "p90": 1.2383333333333342,
+        "max": 2.9
+      },
+      "tail_bins_all_routes": {
+        "zero": 1341,
+        "gt0_le10pct": 950,
+        "gt10_le25pct": 3309,
+        "gt25_le50pct": 3702,
+        "gt50_le100pct": 546
+      },
+      "profile": "M",
+      "dimension": "A",
+      "scope": "full_network_and_movement_resolved",
+      "p90_above_cap": 7747
+    },
+    {
+      "route_count": 9848,
+      "cap": 16.0,
+      "max_above_cap": 5634,
+      "mean_above_cap": 579,
+      "max_above_but_mean_at_or_below_cap": 5055,
+      "exactly_one_exceeding_encounter": 2482,
+      "multiple_exceeding_encounters": 3152,
+      "all_encounters_above_cap": 16,
+      "tail_share_among_max_exceeding": {
+        "n": 5634,
+        "mean": 0.16112908357402012,
+        "min": 0.0196078431372549,
+        "p25": 0.08333333333333333,
+        "p50": 0.125,
+        "p75": 0.2,
+        "p90": 0.3125,
+        "max": 1.0
+      },
+      "max_over_cap": {
+        "n": 9848,
+        "mean": 1.6725604183590577,
+        "min": 0.125,
+        "p25": 1.0,
+        "p50": 1.1875,
+        "p75": 2.25,
+        "p90": 3.5,
+        "max": 4.0
+      },
+      "mean_over_cap": {
+        "n": 9848,
+        "mean": 0.5389856103089589,
+        "min": 0.125,
+        "p25": 0.33203125,
+        "p50": 0.50390625,
+        "p75": 0.6976041666666667,
+        "p90": 0.8958333333333334,
+        "max": 3.3125
+      },
+      "tail_bins_all_routes": {
+        "zero": 4214,
+        "gt0_le10pct": 2060,
+        "gt10_le25pct": 2759,
+        "gt25_le50pct": 747,
+        "gt50_le100pct": 68
+      },
+      "profile": "M",
+      "dimension": "M",
+      "scope": "full_network_and_movement_resolved",
+      "p90_above_cap": 3783
+    },
+    {
+      "route_count": 9848,
+      "cap": 3.0,
+      "max_above_cap": 3376,
+      "mean_above_cap": 20,
+      "max_above_but_mean_at_or_below_cap": 3356,
+      "exactly_one_exceeding_encounter": 2370,
+      "multiple_exceeding_encounters": 1006,
+      "all_encounters_above_cap": 0,
+      "tail_share_among_max_exceeding": {
+        "n": 3376,
+        "mean": 0.08497427469124173,
+        "min": 0.017857142857142856,
+        "p25": 0.047619047619047616,
+        "p50": 0.07142857142857142,
+        "p75": 0.10526315789473684,
+        "p90": 0.14285714285714285,
+        "max": 0.6666666666666666
+      },
+      "max_over_cap": {
+        "n": 9848,
+        "mean": 1.0540888166802058,
+        "min": 0.3333333333333333,
+        "p25": 1.0,
+        "p50": 1.0,
+        "p75": 1.3333333333333333,
+        "p90": 1.3333333333333333,
+        "max": 1.6666666666666667
+      },
+      "mean_over_cap": {
+        "n": 9848,
+        "mean": 0.6738224794759932,
+        "min": 0.3333333333333333,
+        "p25": 0.6041666666666666,
+        "p50": 0.6666666666666666,
+        "p75": 0.7352941176470589,
+        "p90": 0.7999999999999999,
+        "max": 1.3333333333333333
+      },
+      "tail_bins_all_routes": {
+        "zero": 6472,
+        "gt0_le10pct": 2498,
+        "gt10_le25pct": 843,
+        "gt25_le50pct": 34,
+        "gt50_le100pct": 1
+      },
+      "profile": "M",
+      "dimension": "D",
+      "scope": "full_network_and_movement_resolved",
+      "p90_above_cap": 1040
+    },
+    {
+      "route_count": 9848,
+      "cap": 34.0,
+      "max_above_cap": 7830,
+      "mean_above_cap": 2009,
+      "max_above_but_mean_at_or_below_cap": 5821,
+      "exactly_one_exceeding_encounter": 1749,
+      "multiple_exceeding_encounters": 6081,
+      "all_encounters_above_cap": 52,
+      "tail_share_among_max_exceeding": {
+        "n": 7830,
+        "mean": 0.23934646106673685,
+        "min": 0.027777777777777776,
+        "p25": 0.125,
+        "p50": 0.2,
+        "p75": 0.3222926267281106,
+        "p90": 0.42857142857142855,
+        "max": 1.0
+      },
+      "max_over_cap": {
+        "n": 9848,
+        "mean": 3.470928704544368,
+        "min": 0.0,
+        "p25": 1.2941176470588236,
+        "p50": 2.264705882352941,
+        "p75": 5.088235294117647,
+        "p90": 9.5,
+        "max": 11.352941176470589
+      },
+      "mean_over_cap": {
+        "n": 9848,
+        "mean": 0.6362771222281551,
+        "min": 0.0,
+        "p25": 0.25735294117647056,
+        "p50": 0.5044117647058823,
+        "p75": 0.8999125874125874,
+        "p90": 1.3680481283422474,
+        "max": 7.294117647058823
+      },
+      "tail_bins_all_routes": {
+        "zero": 2018,
+        "gt0_le10pct": 1244,
+        "gt10_le25pct": 3724,
+        "gt25_le50pct": 2558,
+        "gt50_le100pct": 304
+      },
+      "profile": "M",
+      "dimension": "L",
+      "scope": "full_network_and_movement_resolved",
+      "p90_above_cap": 6800
+    },
+    {
+      "route_count": 29926,
+      "cap": 9.0,
+      "max_above_cap": 16565,
+      "mean_above_cap": 91,
+      "max_above_but_mean_at_or_below_cap": 16474,
+      "exactly_one_exceeding_encounter": 7073,
+      "multiple_exceeding_encounters": 9492,
+      "all_encounters_above_cap": 26,
+      "tail_share_among_max_exceeding": {
+        "n": 16565,
+        "mean": 0.12557879827171817,
+        "min": 0.013157894736842105,
+        "p25": 0.0625,
+        "p50": 0.1,
+        "p75": 0.15789473684210525,
+        "p90": 0.24,
+        "max": 1.0
+      },
+      "max_over_cap": {
+        "n": 29926,
+        "mean": 1.120790542597667,
+        "min": 0.3333333333333333,
+        "p25": 0.8888888888888888,
+        "p50": 1.1111111111111112,
+        "p75": 1.4444444444444444,
+        "p90": 1.7777777777777777,
+        "max": 1.7777777777777777
+      },
+      "mean_over_cap": {
+        "n": 29926,
+        "mean": 0.5344677479333552,
+        "min": 0.3333333333333333,
+        "p25": 0.4444444444444444,
+        "p50": 0.5197132616487455,
+        "p75": 0.6000000000000001,
+        "p90": 0.6900584795321637,
+        "max": 1.6111111111111112
+      },
+      "tail_bins_all_routes": {
+        "zero": 13361,
+        "gt0_le10pct": 8477,
+        "gt10_le25pct": 6946,
+        "gt25_le50pct": 1053,
+        "gt50_le100pct": 89
+      },
+      "profile": "A",
+      "dimension": "A",
+      "scope": "all_observed_encounter_routes",
+      "p90_above_cap": 8669
+    },
+    {
+      "route_count": 29926,
+      "cap": 25.0,
+      "max_above_cap": 15381,
+      "mean_above_cap": 81,
+      "max_above_but_mean_at_or_below_cap": 15300,
+      "exactly_one_exceeding_encounter": 6425,
+      "multiple_exceeding_encounters": 8956,
+      "all_encounters_above_cap": 3,
+      "tail_share_among_max_exceeding": {
+        "n": 15381,
+        "mean": 0.11664202604153645,
+        "min": 0.013157894736842105,
+        "p25": 0.0625,
+        "p50": 0.1,
+        "p75": 0.15,
+        "p90": 0.21212121212121213,
+        "max": 1.0
+      },
+      "max_over_cap": {
+        "n": 29926,
+        "mean": 1.2067513199224753,
+        "min": 0.08,
+        "p25": 0.64,
+        "p50": 1.2,
+        "p75": 1.68,
+        "p90": 2.56,
+        "max": 2.56
+      },
+      "mean_over_cap": {
+        "n": 29926,
+        "mean": 0.3669677036026409,
+        "min": 0.08,
+        "p25": 0.24727272727272726,
+        "p50": 0.35600000000000004,
+        "p75": 0.46285714285714286,
+        "p90": 0.5771428571428572,
+        "max": 2.12
+      },
+      "tail_bins_all_routes": {
+        "zero": 14545,
+        "gt0_le10pct": 8080,
+        "gt10_le25pct": 6566,
+        "gt25_le50pct": 707,
+        "gt50_le100pct": 28
+      },
+      "profile": "A",
+      "dimension": "M",
+      "scope": "all_observed_encounter_routes",
+      "p90_above_cap": 7826
+    },
+    {
+      "route_count": 29926,
+      "cap": 3.0,
+      "max_above_cap": 11703,
+      "mean_above_cap": 41,
+      "max_above_but_mean_at_or_below_cap": 11662,
+      "exactly_one_exceeding_encounter": 7664,
+      "multiple_exceeding_encounters": 4039,
+      "all_encounters_above_cap": 1,
+      "tail_share_among_max_exceeding": {
+        "n": 11703,
+        "mean": 0.07427437096557801,
+        "min": 0.012987012987012988,
+        "p25": 0.041666666666666664,
+        "p50": 0.0625,
+        "p75": 0.09090909090909091,
+        "p90": 0.13333333333333333,
+        "max": 1.0
+      },
+      "max_over_cap": {
+        "n": 29926,
+        "mean": 1.0890529973935708,
+        "min": 0.3333333333333333,
+        "p25": 1.0,
+        "p50": 1.0,
+        "p75": 1.3333333333333333,
+        "p90": 1.3333333333333333,
+        "max": 1.6666666666666667
+      },
+      "mean_over_cap": {
+        "n": 29926,
+        "mean": 0.688234410267536,
+        "min": 0.3333333333333333,
+        "p25": 0.625,
+        "p50": 0.6875,
+        "p75": 0.75,
+        "p90": 0.8045977011494253,
+        "max": 1.3333333333333333
+      },
+      "tail_bins_all_routes": {
+        "zero": 18223,
+        "gt0_le10pct": 9493,
+        "gt10_le25pct": 2111,
+        "gt25_le50pct": 97,
+        "gt50_le100pct": 2
+      },
+      "profile": "A",
+      "dimension": "D",
+      "scope": "all_observed_encounter_routes",
+      "p90_above_cap": 2612
+    },
+    {
+      "route_count": 29926,
+      "cap": 73.0,
+      "max_above_cap": 18257,
+      "mean_above_cap": 336,
+      "max_above_but_mean_at_or_below_cap": 17921,
+      "exactly_one_exceeding_encounter": 8257,
+      "multiple_exceeding_encounters": 10000,
+      "all_encounters_above_cap": 16,
+      "tail_share_among_max_exceeding": {
+        "n": 18257,
+        "mean": 0.11751992884029006,
+        "min": 0.012987012987012988,
+        "p25": 0.0625,
+        "p50": 0.1,
+        "p75": 0.15384615384615385,
+        "p90": 0.21298701298701614,
+        "max": 1.0
+      },
+      "max_over_cap": {
+        "n": 29926,
+        "mean": 1.8912060708652119,
+        "min": 0.0,
+        "p25": 0.7671232876712328,
+        "p50": 1.36986301369863,
+        "p75": 2.6575342465753424,
+        "p90": 4.712328767123288,
+        "max": 6.2465753424657535
+      },
+      "mean_over_cap": {
+        "n": 29926,
+        "mean": 0.32383415448803426,
+        "min": 0.0,
+        "p25": 0.15369339802130896,
+        "p50": 0.2766069546891465,
+        "p75": 0.4438356164383561,
+        "p90": 0.6313304275633043,
+        "max": 5.287671232876712
+      },
+      "tail_bins_all_routes": {
+        "zero": 11669,
+        "gt0_le10pct": 9463,
+        "gt10_le25pct": 8026,
+        "gt25_le50pct": 746,
+        "gt50_le100pct": 22
+      },
+      "profile": "A",
+      "dimension": "L",
+      "scope": "all_observed_encounter_routes",
+      "p90_above_cap": 9430
+    },
+    {
+      "route_count": 9848,
+      "cap": 9.0,
+      "max_above_cap": 4605,
+      "mean_above_cap": 30,
+      "max_above_but_mean_at_or_below_cap": 4575,
+      "exactly_one_exceeding_encounter": 2325,
+      "multiple_exceeding_encounters": 2280,
+      "all_encounters_above_cap": 12,
+      "tail_share_among_max_exceeding": {
+        "n": 4605,
+        "mean": 0.13728312664955933,
+        "min": 0.01694915254237288,
+        "p25": 0.07142857142857142,
+        "p50": 0.1111111111111111,
+        "p75": 0.16666666666666666,
+        "p90": 0.25,
+        "max": 1.0
+      },
+      "max_over_cap": {
+        "n": 9848,
+        "mean": 1.042535427385143,
+        "min": 0.3333333333333333,
+        "p25": 0.7777777777777778,
+        "p50": 1.0,
+        "p75": 1.3333333333333333,
+        "p90": 1.6666666666666667,
+        "max": 1.7777777777777777
+      },
+      "mean_over_cap": {
+        "n": 9848,
+        "mean": 0.5189987226379436,
+        "min": 0.3333333333333333,
+        "p25": 0.42592592592592593,
+        "p50": 0.5,
+        "p75": 0.5873015873015873,
+        "p90": 0.6879629629629636,
+        "max": 1.6111111111111112
+      },
+      "tail_bins_all_routes": {
+        "zero": 5243,
+        "gt0_le10pct": 2108,
+        "gt10_le25pct": 2141,
+        "gt25_le50pct": 323,
+        "gt50_le100pct": 33
+      },
+      "profile": "A",
+      "dimension": "A",
+      "scope": "full_network_and_movement_resolved",
+      "p90_above_cap": 2697
+    },
+    {
+      "route_count": 9848,
+      "cap": 25.0,
+      "max_above_cap": 4154,
+      "mean_above_cap": 35,
+      "max_above_but_mean_at_or_below_cap": 4119,
+      "exactly_one_exceeding_encounter": 1978,
+      "multiple_exceeding_encounters": 2176,
+      "all_encounters_above_cap": 1,
+      "tail_share_among_max_exceeding": {
+        "n": 4154,
+        "mean": 0.12637780564380535,
+        "min": 0.017857142857142856,
+        "p25": 0.06666666666666667,
+        "p50": 0.1067629179331307,
+        "p75": 0.16666666666666666,
+        "p90": 0.23076923076923078,
+        "max": 1.0
+      },
+      "max_over_cap": {
+        "n": 9848,
+        "mean": 1.070438667749797,
+        "min": 0.08,
+        "p25": 0.64,
+        "p50": 0.76,
+        "p75": 1.44,
+        "p90": 2.24,
+        "max": 2.56
+      },
+      "mean_over_cap": {
+        "n": 9848,
+        "mean": 0.34495079059773376,
+        "min": 0.08,
+        "p25": 0.2125,
+        "p50": 0.3225,
+        "p75": 0.4464666666666667,
+        "p90": 0.5733333333333334,
+        "max": 2.12
+      },
+      "tail_bins_all_routes": {
+        "zero": 5694,
+        "gt0_le10pct": 1975,
+        "gt10_le25pct": 1931,
+        "gt25_le50pct": 230,
+        "gt50_le100pct": 18
+      },
+      "profile": "A",
+      "dimension": "M",
+      "scope": "full_network_and_movement_resolved",
+      "p90_above_cap": 2332
+    },
+    {
+      "route_count": 9848,
+      "cap": 3.0,
+      "max_above_cap": 3376,
+      "mean_above_cap": 20,
+      "max_above_but_mean_at_or_below_cap": 3356,
+      "exactly_one_exceeding_encounter": 2370,
+      "multiple_exceeding_encounters": 1006,
+      "all_encounters_above_cap": 0,
+      "tail_share_among_max_exceeding": {
+        "n": 3376,
+        "mean": 0.08497427469124173,
+        "min": 0.017857142857142856,
+        "p25": 0.047619047619047616,
+        "p50": 0.07142857142857142,
+        "p75": 0.10526315789473684,
+        "p90": 0.14285714285714285,
+        "max": 0.6666666666666666
+      },
+      "max_over_cap": {
+        "n": 9848,
+        "mean": 1.0540888166802058,
+        "min": 0.3333333333333333,
+        "p25": 1.0,
+        "p50": 1.0,
+        "p75": 1.3333333333333333,
+        "p90": 1.3333333333333333,
+        "max": 1.6666666666666667
+      },
+      "mean_over_cap": {
+        "n": 9848,
+        "mean": 0.6738224794759932,
+        "min": 0.3333333333333333,
+        "p25": 0.6041666666666666,
+        "p50": 0.6666666666666666,
+        "p75": 0.7352941176470589,
+        "p90": 0.7999999999999999,
+        "max": 1.3333333333333333
+      },
+      "tail_bins_all_routes": {
+        "zero": 6472,
+        "gt0_le10pct": 2498,
+        "gt10_le25pct": 843,
+        "gt25_le50pct": 34,
+        "gt50_le100pct": 1
+      },
+      "profile": "A",
+      "dimension": "D",
+      "scope": "full_network_and_movement_resolved",
+      "p90_above_cap": 1040
+    },
+    {
+      "route_count": 9848,
+      "cap": 73.0,
+      "max_above_cap": 5218,
+      "mean_above_cap": 142,
+      "max_above_but_mean_at_or_below_cap": 5076,
+      "exactly_one_exceeding_encounter": 2824,
+      "multiple_exceeding_encounters": 2394,
+      "all_encounters_above_cap": 11,
+      "tail_share_among_max_exceeding": {
+        "n": 5218,
+        "mean": 0.1312074925621734,
+        "min": 0.017543859649122806,
+        "p25": 0.07142857142857142,
+        "p50": 0.1111111111111111,
+        "p75": 0.16666666666666666,
+        "p90": 0.25,
+        "max": 1.0
+      },
+      "max_over_cap": {
+        "n": 9848,
+        "mean": 1.6165969308836785,
+        "min": 0.0,
+        "p25": 0.6027397260273972,
+        "p50": 1.0547945205479452,
+        "p75": 2.3698630136986303,
+        "p90": 4.424657534246576,
+        "max": 5.287671232876712
+      },
+      "mean_over_cap": {
+        "n": 9848,
+        "mean": 0.2963482487090037,
+        "min": 0.0,
+        "p25": 0.11986301369863013,
+        "p50": 0.23493150684931507,
+        "p75": 0.41913736947983526,
+        "p90": 0.6371731008717317,
+        "max": 3.3972602739726026
+      },
+      "tail_bins_all_routes": {
+        "zero": 4630,
+        "gt0_le10pct": 2372,
+        "gt10_le25pct": 2533,
+        "gt25_le50pct": 298,
+        "gt50_le100pct": 15
+      },
+      "profile": "A",
+      "dimension": "L",
+      "scope": "full_network_and_movement_resolved",
+      "p90_above_cap": 3037
+    }
+  ],
+  "joint_static_summary": [
+    {
+      "profile": "C",
+      "scope": "all_observed_encounter_routes",
+      "route_count": 29926,
+      "any_dimension_exceeds": 29102,
+      "exactly_one_exceeding_encounter_any_dimension": 1495,
+      "tail_share_among_exceeding": {
+        "n": 29102,
+        "mean": 0.49958025305969794,
+        "min": 0.04,
+        "p25": 0.3601639344262295,
+        "p50": 0.5,
+        "p75": 0.625,
+        "p90": 0.75,
+        "max": 1.0
+      }
+    },
+    {
+      "profile": "C",
+      "scope": "full_network_and_movement_resolved",
+      "route_count": 9848,
+      "any_dimension_exceeds": 9322,
+      "exactly_one_exceeding_encounter_any_dimension": 673,
+      "tail_share_among_exceeding": {
+        "n": 9322,
+        "mean": 0.4711634736259201,
+        "min": 0.04,
+        "p25": 0.3333333333333333,
+        "p50": 0.46153846153846156,
+        "p75": 0.6,
+        "p90": 0.7391304347826086,
+        "max": 1.0
+      }
+    },
+    {
+      "profile": "M",
+      "scope": "all_observed_encounter_routes",
+      "route_count": 29926,
+      "any_dimension_exceeds": 27839,
+      "exactly_one_exceeding_encounter_any_dimension": 3184,
+      "tail_share_among_exceeding": {
+        "n": 27839,
+        "mean": 0.3124111219353147,
+        "min": 0.03125,
+        "p25": 0.2,
+        "p50": 0.29411764705882354,
+        "p75": 0.4,
+        "p90": 0.5,
+        "max": 1.0
+      }
+    },
+    {
+      "profile": "M",
+      "scope": "full_network_and_movement_resolved",
+      "route_count": 9848,
+      "any_dimension_exceeds": 8768,
+      "exactly_one_exceeding_encounter_any_dimension": 1417,
+      "tail_share_among_exceeding": {
+        "n": 8768,
+        "mean": 0.3022146544235387,
+        "min": 0.03571428571428571,
+        "p25": 0.18181818181818182,
+        "p50": 0.2857142857142857,
+        "p75": 0.3888888888888889,
+        "p90": 0.5,
+        "max": 1.0
+      }
+    },
+    {
+      "profile": "A",
+      "scope": "all_observed_encounter_routes",
+      "route_count": 29926,
+      "any_dimension_exceeds": 21311,
+      "exactly_one_exceeding_encounter_any_dimension": 7511,
+      "tail_share_among_exceeding": {
+        "n": 21311,
+        "mean": 0.15277748200432184,
+        "min": 0.013888888888888888,
+        "p25": 0.08,
+        "p50": 0.125,
+        "p75": 0.2,
+        "p90": 0.2777777777777778,
+        "max": 1.0
+      }
+    },
+    {
+      "profile": "A",
+      "scope": "full_network_and_movement_resolved",
+      "route_count": 9848,
+      "any_dimension_exceeds": 6414,
+      "exactly_one_exceeding_encounter_any_dimension": 2815,
+      "tail_share_among_exceeding": {
+        "n": 6414,
+        "mean": 0.15995849417394442,
+        "min": 0.018518518518518517,
+        "p25": 0.08333333333333333,
+        "p50": 0.13333333333333333,
+        "p75": 0.2,
+        "p90": 0.29411764705882354,
+        "max": 1.0
+      }
+    }
+  ],
+  "runtime_s": 5.281651999999667,
+  "peak_working_set_mb": 467.890625
+}

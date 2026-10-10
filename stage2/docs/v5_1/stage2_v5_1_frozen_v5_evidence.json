@@ -1,0 +1,49 @@
+{
+  "base_commit": "3b581c5e6d108441ca623bcc03923f5893de7ea9",
+  "files": [
+    {
+      "path": "stage2/docs/v5/stage2_v5_rolling_origin_summary.json",
+      "sha256": "f6e335381cbd2cdd262ee325a92b32f916c0c09f105b640c0d306f53f17aae66",
+      "size_bytes": 1202
+    },
+    {
+      "path": "stage2/docs/v5/stage2_v5_fold3_tail_diagnostic.md",
+      "sha256": "17de387dcf1ac996d9cbb31a7b77acdbd52d9bc4e4566ef74aa4787b6d650237",
+      "size_bytes": 672
+    },
+    {
+      "path": "stage2/docs/v5/stage2_v5_fold3_tail_diagnostic.json",
+      "sha256": "67914a52b31d1256869e7ab7099bf1062e38cdd157576cbfff81a80b2e1581a1",
+      "size_bytes": 4592
+    },
+    {
+      "path": "stage2/docs/v5/protocols/fold_3/service_time_metrics.csv",
+      "sha256": "1754da9603fc8752699a82eec3bc2b94b45868676573501a03507e4382cf6300",
+      "size_bytes": 5620
+    },
+    {
+      "path": "stage2/docs/v5/protocols/fold_3/scenario_coverage.csv",
+      "sha256": "6941d5672cc08d19a4355eef3d650854c00349fc1107209beaeed39e725f6756",
+      "size_bytes": 3579
+    },
+    {
+      "path": "stage2/docs/v5/stage2_v5_final_verification.json",
+      "sha256": "24c3611a9e6c05cd12387599b83703072f08e94c037fc27d18b350558e7d1810",
+      "size_bytes": 3689
+    }
+  ],
+  "frozen_failure_facts": {
+    "20161026_frozen_pace_mean_max_s_per_m": 7584.0498046875,
+    "rolling_relative_degradation": 0.14968466113805468,
+    "rolling_scientific_status": "BASELINE_NOT_BEATEN",
+    "rolling_tree_aggregate_mae": 0.02982219503493256,
+    "rolling_v5_aggregate_mae": 0.03428612019312942
+  },
+  "prohibited_reinterpretations": [
+    "no_trimming_or_row_deletion",
+    "no_p50_substitution_for_frozen_mean_metric",
+    "no_rolling_status_rewrite"
+  ],
+  "schema_version": "stage2_v5_1_frozen_v5_evidence.1",
+  "status": "FROZEN_IMMUTABLE"
+}

@@ -1,0 +1,311 @@
+{
+  "status": "ANALYZED_NOT_INDEPENDENT_RERUN",
+  "original_orders": 30000,
+  "common_eligible": 28367,
+  "paired_fleet_accounting_identical": true,
+  "fleet": {
+    "h_base_exact": 12279.336388888889,
+    "h_base_15min_equivalent": 14369.5,
+    "requested_q_a": 0.5,
+    "achieved_q_a": 0.5003527719591977,
+    "av_count": 256,
+    "requested_av_vehicle_hours": 6139.668194444444,
+    "achieved_av_vehicle_hours": 6144.0,
+    "raw_hv_residual_vehicle_hours": 6135.336388888889,
+    "target_hv_vehicle_hours": 6135.336388888889,
+    "achieved_hv_vehicle_hours": 6154.377777777778,
+    "vehicle_hour_error_pct": 0.31035606985417846,
+    "selected_hv_session_count": 4188,
+    "native_benchmark_hv_count": 4188,
+    "native_benchmark_av_count": 256,
+    "hv_sampling_fraction": 0.4996472280408023,
+    "av_initial_position_rule": "FULL_S0_INITIAL_POSITION_SUPPORT_FALLBACK",
+    "hv_unit_semantics": "EFFECTIVE_HV_SERVICE_SESSION_TEMPLATE"
+  },
+  "inputs_unchanged": true,
+  "execution_code_sha": "6b46f546043ded44b798974c1527c589c051465c",
+  "runner_exit_code": 0,
+  "myopic_reused": true,
+  "native_scientific_conditions_added": 0,
+  "fallback_reasons": {},
+  "current_face_violation_epochs": 0,
+  "active_two_stage_epochs": 2588,
+  "empty_current_graph_epochs": 305,
+  "variable_quantiles": {
+    "0.5": 4995.5,
+    "0.9": 6100.3,
+    "0.95": 6371.6,
+    "1.0": 7194.0
+  },
+  "integer_variable_quantiles": {
+    "0.5": 601.0,
+    "0.9": 700.0,
+    "0.95": 712.0,
+    "1.0": 786.0
+  },
+  "timing_quantiles_s": {
+    "solver_time_s": {
+      "0.5": 0.7971599999982573,
+      "0.9": 3.3961174400006717,
+      "0.95": 3.734232139999222,
+      "0.99": 4.309915299999411,
+      "1.0": 5.033031200000551
+    },
+    "forecast_sampling_time_s": {
+      "0.5": 0.008349399999133311,
+      "0.9": 0.04378603999939515,
+      "0.95": 0.0485835200008296,
+      "0.99": 0.05957887999931695,
+      "1.0": 0.7260221000033198
+    },
+    "future_graph_time_s": {
+      "0.5": 0.18674490000194055,
+      "0.9": 1.2798195999981548,
+      "0.95": 1.4046831800005748,
+      "0.99": 1.6481890440026465,
+      "1.0": 2.1936925999980303
+    },
+    "problem_setup_time_s": {
+      "0.5": 0.06826919999730308,
+      "0.9": 0.3456931000007899,
+      "0.95": 0.3646430799970403,
+      "0.99": 0.4040246880029734,
+      "1.0": 1.1534523000009358
+    },
+    "optimization_time_s": {
+      "0.5": 0.45522989999881247,
+      "0.9": 1.689952019999328,
+      "0.95": 1.8845463000005116,
+      "0.99": 2.2137849399981495,
+      "1.0": 2.5503226000000723
+    }
+  },
+  "timing_percent": {
+    "candidate_generation": 11.478044943555316,
+    "routing_wall": 38.56082380120038,
+    "solver_pipeline": 47.459169228415384
+  },
+  "other_time_s": 204.13040309998178,
+  "component_percent": {
+    "forecast_sampling_time_s": 0.6121836068561174,
+    "future_graph_time_s": 16.372045700764517,
+    "problem_setup_time_s": 5.300191581789378,
+    "model_build_time_s": 1.3469507745781624,
+    "optimization_time_s": 22.938347851580737,
+    "recourse_recovery_time_s": 0.2495088721836495,
+    "failed_model_attempt_time_s": 0.0
+  },
+  "cache_hit_share": 0.35767286255026465,
+  "exact_cross_epoch_hit_share": 0.34737475397641854,
+  "relative_service_increase": 3.721527109400058,
+  "mean_served_wait_increase_s": 10.652902639021306,
+  "sampled_process_group_peak_mib": 1024.49609375,
+  "parent_peak_mib": 663.5546875,
+  "waiting_is_conditional_on_service": true,
+  "one_day_one_profile_one_seed": true,
+  "statistical_significance_claim": false,
+  "by_policy": [
+    {
+      "policy": "MYOPIC",
+      "reverse_route_assigned_by_type": {
+        "AV": 1947,
+        "HV": 7018
+      },
+      "av_capability_violations": 0,
+      "wait_by_vehicle": {
+        "count": {
+          "AV": 4338,
+          "HV": 14364
+        },
+        "mean": {
+          "AV": 169.00786903158138,
+          "HV": 171.30709970955166
+        },
+        "median": {
+          "AV": 178.13516049999998,
+          "HV": 186.30253
+        }
+      }
+    },
+    {
+      "policy": "SERVICE_PRESERVING_LOOKAHEAD",
+      "reverse_route_assigned_by_type": {
+        "AV": 2127,
+        "HV": 7207
+      },
+      "av_capability_violations": 0,
+      "wait_by_vehicle": {
+        "count": {
+          "AV": 4647,
+          "HV": 14751
+        },
+        "mean": {
+          "AV": 180.20245500150637,
+          "HV": 181.8123562496102
+        },
+        "median": {
+          "AV": 194.151072,
+          "HV": 202.0
+        }
+      }
+    }
+  ],
+  "hourly_timing": {
+    "0": {
+      "epochs": 120,
+      "routing_s": 12.338776599986886,
+      "candidate_s": 6.630725199993321,
+      "pipeline_s": 14.90584420000232
+    },
+    "1": {
+      "epochs": 120,
+      "routing_s": 6.665275600022142,
+      "candidate_s": 6.454827999968984,
+      "pipeline_s": 10.447087400010787
+    },
+    "2": {
+      "epochs": 120,
+      "routing_s": 6.284505299994635,
+      "candidate_s": 6.436835900014557,
+      "pipeline_s": 7.4566964999903576
+    },
+    "3": {
+      "epochs": 120,
+      "routing_s": 6.83187390002422,
+      "candidate_s": 6.466784500003996,
+      "pipeline_s": 5.585747700006323
+    },
+    "4": {
+      "epochs": 120,
+      "routing_s": 2.59709180000209,
+      "candidate_s": 6.288131999994221,
+      "pipeline_s": 3.899864599978173
+    },
+    "5": {
+      "epochs": 120,
+      "routing_s": 4.04859819997364,
+      "candidate_s": 6.379463100020075,
+      "pipeline_s": 4.824188399983541
+    },
+    "6": {
+      "epochs": 120,
+      "routing_s": 13.098821999963548,
+      "candidate_s": 6.832225300026039,
+      "pipeline_s": 14.9593313000114
+    },
+    "7": {
+      "epochs": 120,
+      "routing_s": 52.1988757999934,
+      "candidate_s": 11.453548700035753,
+      "pipeline_s": 43.803110799988644
+    },
+    "8": {
+      "epochs": 120,
+      "routing_s": 78.99272199995539,
+      "candidate_s": 14.120762400059903,
+      "pipeline_s": 82.25187670001469
+    },
+    "9": {
+      "epochs": 120,
+      "routing_s": 80.61435280001388,
+      "candidate_s": 14.64537360000395,
+      "pipeline_s": 97.11645969999881
+    },
+    "10": {
+      "epochs": 120,
+      "routing_s": 70.95774649992381,
+      "candidate_s": 13.736228100071457,
+      "pipeline_s": 85.28623070001413
+    },
+    "11": {
+      "epochs": 120,
+      "routing_s": 77.05514169990056,
+      "candidate_s": 14.239849700104969,
+      "pipeline_s": 97.78711029999613
+    },
+    "12": {
+      "epochs": 120,
+      "routing_s": 67.30032229993958,
+      "candidate_s": 13.368244200049958,
+      "pipeline_s": 91.93907799999943
+    },
+    "13": {
+      "epochs": 120,
+      "routing_s": 78.98085449989958,
+      "candidate_s": 15.848392000098102,
+      "pipeline_s": 109.10263600002872
+    },
+    "14": {
+      "epochs": 120,
+      "routing_s": 166.5042103000742,
+      "candidate_s": 42.79492079991178,
+      "pipeline_s": 231.39353759997175
+    },
+    "15": {
+      "epochs": 120,
+      "routing_s": 286.56700310010274,
+      "candidate_s": 81.0181888998959,
+      "pipeline_s": 399.20275050000055
+    },
+    "16": {
+      "epochs": 120,
+      "routing_s": 331.28917289976744,
+      "candidate_s": 97.05520950023129,
+      "pipeline_s": 384.17198480004663
+    },
+    "17": {
+      "epochs": 120,
+      "routing_s": 318.883646900038,
+      "candidate_s": 104.36146829996142,
+      "pipeline_s": 362.4273569000179
+    },
+    "18": {
+      "epochs": 120,
+      "routing_s": 285.39805879996857,
+      "candidate_s": 98.30739020005421,
+      "pipeline_s": 394.6462645999891
+    },
+    "19": {
+      "epochs": 120,
+      "routing_s": 332.21754569999393,
+      "candidate_s": 97.07690940001339,
+      "pipeline_s": 417.73833440000817
+    },
+    "20": {
+      "epochs": 120,
+      "routing_s": 229.8403869000649,
+      "candidate_s": 75.65383279995149,
+      "pipeline_s": 338.7618498000047
+    },
+    "21": {
+      "epochs": 120,
+      "routing_s": 283.65574979983285,
+      "candidate_s": 81.20367160015303,
+      "pipeline_s": 352.8468360999723
+    },
+    "22": {
+      "epochs": 120,
+      "routing_s": 210.01413319996936,
+      "candidate_s": 65.90064570003233,
+      "pipeline_s": 227.62291499999992
+    },
+    "23": {
+      "epochs": 120,
+      "routing_s": 137.72482650002348,
+      "candidate_s": 45.460782699978154,
+      "pipeline_s": 95.97269389999929
+    },
+    "24": {
+      "epochs": 13,
+      "routing_s": 6.045812100001058,
+      "candidate_s": 4.737810400005401,
+      "pipeline_s": 0.3157380999982706
+    }
+  },
+  "busy_forecast_occurrences": {
+    "busy_states": 515993,
+    "overdue_busy_states": 118243,
+    "conditional_busy_states": 515937,
+    "unsupported_busy_states_omitted": 56
+  }
+}

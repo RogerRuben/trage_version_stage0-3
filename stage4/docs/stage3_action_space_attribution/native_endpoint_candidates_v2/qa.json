@@ -1,0 +1,20 @@
+{
+  "extraction_status": "PASS",
+  "interface_application_status": "STOP_EXISTING_ENDPOINT_IDENTITY_CONFLICTS",
+  "native_endpoints_read": 88,
+  "existing_endpoint_consistent_rows": 69,
+  "existing_endpoint_conflicts": 19,
+  "explicit_hierarchy_transition_conflicts": 18,
+  "same_level_non_transition_conflicts": 1,
+  "original_unresolved_encounter_denominator": 391,
+  "encounters_involving_existing_identity_conflict_edges": 65,
+  "encounters_repaired": 0,
+  "read_only_integration_tests_passed": 3,
+  "compileall": "PASS",
+  "git_diff_check": "PASS",
+  "production_interface_changed": false,
+  "stage3_frozen_products_changed": false,
+  "routing_calls": 0,
+  "matrix_calls": 0,
+  "gpu_used": false
+}

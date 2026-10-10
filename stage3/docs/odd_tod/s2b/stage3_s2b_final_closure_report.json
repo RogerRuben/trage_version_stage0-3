@@ -1,0 +1,66 @@
+{
+  "artifact_sha256": "5e64fd583e4bc672ec29b461d85206b354daee96c5bc8d5126a5ea35cdbdd625",
+  "authorized_base": "800c9e9d0747b6fe875c00e5c1d8932626b29fc0",
+  "buffer_radius_not_pairwise_threshold": true,
+  "control_claim_boundary": "MISSING_CONTROL_EVIDENCE_IS_UNKNOWN_NOT_UNSIGNALIZED",
+  "final_product_rows": {
+    "boundary_index": 289295,
+    "complexes": 43685,
+    "membership": 59052,
+    "movement_lookup": 419907,
+    "movements": 419907
+  },
+  "human_adjudication_counts": {
+    "10_CORRECT": 7,
+    "5_CORRECT": 0,
+    "BOTH_ACCEPTABLE": 61,
+    "NEITHER": 2,
+    "UNCERTAIN": 0
+  },
+  "known_limitation": "10m can still under-consolidate very large interchange systems.",
+  "next_phase_authorized": false,
+  "phase_status": "STAGE3_S2B_INTERSECTION_COMPLEX_FROZEN",
+  "promotions": {
+    "complexes": {
+      "derived_field": "buffer_radius_m = tolerance_m = 10",
+      "final_sha256": "4c23c7a8a5f49007ce367e21d24405549a979c82bf367d086b4fcf1d281bdeed",
+      "method": "FROZEN_R10_PLUS_BUFFER_RADIUS_ALIAS",
+      "source_columns_value_identity": true,
+      "source_sha256": "4b70223a4d8e655e1a467253979250787e1ab03310df7160ef9ae4432391f8dc"
+    },
+    "membership": {
+      "content_identity": true,
+      "final_sha256": "55aefa6843aacff111dccb39dd967f4d21e2fab408b6372dfc3b9bbd4304be02",
+      "method": "BYTE_IDENTICAL_IMMUTABLE_PROMOTION",
+      "source_sha256": "55aefa6843aacff111dccb39dd967f4d21e2fab408b6372dfc3b9bbd4304be02"
+    },
+    "movement_lookup": {
+      "content_identity": true,
+      "final_sha256": "aabe997d06ffc80556ba68551b32805619f548dfe5ad83f2a5a9f043572db811",
+      "method": "HARDLINK_ALIAS_NO_DUPLICATE_PAYLOAD",
+      "same_file_identity": true,
+      "source_sha256": "aabe997d06ffc80556ba68551b32805619f548dfe5ad83f2a5a9f043572db811"
+    },
+    "movements": {
+      "content_identity": true,
+      "final_sha256": "aabe997d06ffc80556ba68551b32805619f548dfe5ad83f2a5a9f043572db811",
+      "method": "BYTE_IDENTICAL_IMMUTABLE_PROMOTION",
+      "source_sha256": "aabe997d06ffc80556ba68551b32805619f548dfe5ad83f2a5a9f043572db811"
+    }
+  },
+  "restriction_claim_boundary": "TOPOLOGICAL_MOVEMENT_NOT_LEGALLY_CERTIFIED_MOVEMENT",
+  "reverse_overlay": {
+    "av_routability_status": "AV_ROUTABILITY_VIOLATION",
+    "historical_direction_status": "HISTORICAL_DIRECTION_OVERLAY",
+    "inserted_into_av_topology": false,
+    "mapped_forward_physical_reference_count": 6388,
+    "missing_identity_count": 0,
+    "row_count": 6502,
+    "without_forward_physical_reference_count": 114
+  },
+  "s2b_complete": true,
+  "s3_authorized": false,
+  "schema_version": "stage3_s2b2_closure.1",
+  "selected_buffer_radius_m": 10,
+  "spatial_candidate_overlap_condition": "center_distance_m <= 20"
+}

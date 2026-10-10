@@ -1,0 +1,29 @@
+scenario_id,gate,unit,observability,logged_value,retained_share,lost_share,caveat
+MAIN_Q25_M_P70,nominal_nearby_av_opportunity,AV candidate-opportunity,NOT_IDENTIFIED_FROM_FROZEN_LOGS,,,,AV positions/counts were not logged for every waiting request before eligibility gates.
+MAIN_Q25_M_P70,passenger_compatible,AV candidate-opportunity,PARTIALLY_OBSERVED,621898,,,"Rejected nearby AV opportunities are logged, but the common entering denominator is absent."
+MAIN_Q25_M_P70,route_ready,AV candidate-opportunity,NOT_IDENTIFIED_FROM_FROZEN_LOGS,,,,Non-ready requests exclude AVs before the spatial query and no AV-opportunity counter is stored.
+MAIN_Q25_M_P70,evidence_complete,AV candidate-opportunity,PARTIALLY_OBSERVED,0,,,Nearby AV opportunities removed for missing exposure are logged; the entering denominator is absent.
+MAIN_Q25_M_P70,pickup_feasible_within_patience,candidate arc,NOT_IDENTIFIED_FOR_AV,2047960,,,"Patience exclusions combine HV and AV arcs, so an AV-only retained share is not identifiable."
+MAIN_Q25_M_P70,gamma_feasible,candidate arc,NOT_APPLICABLE_UNCONSTRAINED,0,,,All four anchors use UNCONSTRAINED; candidate-level Gamma attrition is not logged.
+MAIN_Q25_M_P70,selected_assignment,assignment,OBSERVED,1187,,,"Final AV assignments are directly logged, but cannot be divided by an unobserved nominal-opportunity denominator."
+MAIN_Q50_M_P70,nominal_nearby_av_opportunity,AV candidate-opportunity,NOT_IDENTIFIED_FROM_FROZEN_LOGS,,,,AV positions/counts were not logged for every waiting request before eligibility gates.
+MAIN_Q50_M_P70,passenger_compatible,AV candidate-opportunity,PARTIALLY_OBSERVED,1835602,,,"Rejected nearby AV opportunities are logged, but the common entering denominator is absent."
+MAIN_Q50_M_P70,route_ready,AV candidate-opportunity,NOT_IDENTIFIED_FROM_FROZEN_LOGS,,,,Non-ready requests exclude AVs before the spatial query and no AV-opportunity counter is stored.
+MAIN_Q50_M_P70,evidence_complete,AV candidate-opportunity,PARTIALLY_OBSERVED,0,,,Nearby AV opportunities removed for missing exposure are logged; the entering denominator is absent.
+MAIN_Q50_M_P70,pickup_feasible_within_patience,candidate arc,NOT_IDENTIFIED_FOR_AV,2653140,,,"Patience exclusions combine HV and AV arcs, so an AV-only retained share is not identifiable."
+MAIN_Q50_M_P70,gamma_feasible,candidate arc,NOT_APPLICABLE_UNCONSTRAINED,0,,,All four anchors use UNCONSTRAINED; candidate-level Gamma attrition is not logged.
+MAIN_Q50_M_P70,selected_assignment,assignment,OBSERVED,2207,,,"Final AV assignments are directly logged, but cannot be divided by an unobserved nominal-opportunity denominator."
+MAIN_Q75_M_P70,nominal_nearby_av_opportunity,AV candidate-opportunity,NOT_IDENTIFIED_FROM_FROZEN_LOGS,,,,AV positions/counts were not logged for every waiting request before eligibility gates.
+MAIN_Q75_M_P70,passenger_compatible,AV candidate-opportunity,PARTIALLY_OBSERVED,4107009,,,"Rejected nearby AV opportunities are logged, but the common entering denominator is absent."
+MAIN_Q75_M_P70,route_ready,AV candidate-opportunity,NOT_IDENTIFIED_FROM_FROZEN_LOGS,,,,Non-ready requests exclude AVs before the spatial query and no AV-opportunity counter is stored.
+MAIN_Q75_M_P70,evidence_complete,AV candidate-opportunity,PARTIALLY_OBSERVED,0,,,Nearby AV opportunities removed for missing exposure are logged; the entering denominator is absent.
+MAIN_Q75_M_P70,pickup_feasible_within_patience,candidate arc,NOT_IDENTIFIED_FOR_AV,3353235,,,"Patience exclusions combine HV and AV arcs, so an AV-only retained share is not identifiable."
+MAIN_Q75_M_P70,gamma_feasible,candidate arc,NOT_APPLICABLE_UNCONSTRAINED,0,,,All four anchors use UNCONSTRAINED; candidate-level Gamma attrition is not logged.
+MAIN_Q75_M_P70,selected_assignment,assignment,OBSERVED,3134,,,"Final AV assignments are directly logged, but cannot be divided by an unobserved nominal-opportunity denominator."
+BENCH_AV_M,nominal_nearby_av_opportunity,AV candidate-opportunity,NOT_IDENTIFIED_FROM_FROZEN_LOGS,,,,AV positions/counts were not logged for every waiting request before eligibility gates.
+BENCH_AV_M,passenger_compatible,AV candidate-opportunity,PARTIALLY_OBSERVED,0,,,"Rejected nearby AV opportunities are logged, but the common entering denominator is absent."
+BENCH_AV_M,route_ready,AV candidate-opportunity,NOT_IDENTIFIED_FROM_FROZEN_LOGS,,,,Non-ready requests exclude AVs before the spatial query and no AV-opportunity counter is stored.
+BENCH_AV_M,evidence_complete,AV candidate-opportunity,PARTIALLY_OBSERVED,0,,,Nearby AV opportunities removed for missing exposure are logged; the entering denominator is absent.
+BENCH_AV_M,pickup_feasible_within_patience,candidate arc,NOT_IDENTIFIED_FOR_AV,985131,,,"Patience exclusions combine HV and AV arcs, so an AV-only retained share is not identifiable."
+BENCH_AV_M,gamma_feasible,candidate arc,NOT_APPLICABLE_UNCONSTRAINED,0,,,All four anchors use UNCONSTRAINED; candidate-level Gamma attrition is not logged.
+BENCH_AV_M,selected_assignment,assignment,OBSERVED,4545,,,"Final AV assignments are directly logged, but cannot be divided by an unobserved nominal-opportunity denominator."

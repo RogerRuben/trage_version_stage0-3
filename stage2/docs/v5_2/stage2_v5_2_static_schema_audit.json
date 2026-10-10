@@ -1,0 +1,25 @@
+{
+  "audit_type": "bounded_frozen_schema_only",
+  "formal_static_complexity": {
+    "bridge": "AVAILABLE",
+    "canonical_highway": "AVAILABLE",
+    "ramp": "NA",
+    "road_class": "AVAILABLE",
+    "tunnel": "AVAILABLE",
+    "turn_signal_merge": "NA"
+  },
+  "movement_candidate_fields_available": [],
+  "movement_identity_joinable": true,
+  "movement_physical_semantics_available": false,
+  "na_policy": "NA_not_zero_and_no_reconstruction",
+  "route_static_fields_available": [
+    "bridge",
+    "canonical_highway",
+    "road_class",
+    "speed_limit",
+    "tunnel"
+  ],
+  "schema_version": "stage2_v5_2_static_schema_audit.1",
+  "stage0_or_stage1_rerun": false,
+  "status": "PASS"
+}

@@ -1,0 +1,401 @@
+{
+  "status": "FINITE_ROLLING_PROTOTYPE_COMPLETE",
+  "kind": "INDEPENDENT_LIMITED_ROLLING_PROTOTYPE_NOT_NATIVE_DAILY_EVALUATION",
+  "config": {
+    "version": "capability_chain_rolling_v1",
+    "history_dates": [
+      "20161010",
+      "20161017"
+    ],
+    "replay_date": "20161024",
+    "window_starts_s": [
+      27000,
+      61200
+    ],
+    "horizon_s": 1800,
+    "patience_s": 300,
+    "critical_slack_s": 30,
+    "step_s": 30,
+    "coarse_reference_update_s": 300,
+    "selection_seed": 20261008,
+    "maximum_tasks": 10,
+    "diagnostic_C_task_target": 4,
+    "candidate_site_count": 4,
+    "grid_size_degrees": 0.02,
+    "grid_origin_wgs84": [
+      108.0,
+      34.0
+    ],
+    "proxy_samples_per_history_date_window": 20,
+    "interface_snap_tolerance_m": 80.0,
+    "reposition_interval_s": 900,
+    "reposition_radius_m": 2000.0,
+    "reposition_top_k": 3,
+    "reposition_max_eta_s": 300.0,
+    "reposition_max_moves": 50,
+    "solver_decision_limit_s": 10.0,
+    "maximum_model_variables": 20000,
+    "maximum_model_nonzeros": 150000,
+    "maximum_route_queries": 4000,
+    "maximum_runtime_s": 900,
+    "maximum_rss_mib": 1536,
+    "policies": [
+      "SERVICE_PRESERVING",
+      "CHAIN_DEFER"
+    ],
+    "resource_profiles": [
+      "HV",
+      "HV",
+      "C"
+    ],
+    "supply_assumption": "THREE_SYNTHETIC_EQUAL_ADMISSION_WINDOWS_NOT_EMPIRICAL_Q10",
+    "passenger_assumption": "ALL_SELECTED_CUSTOMERS_ACCEPT_BOTH_TYPES_SMALL_PROTOTYPE_ONLY",
+    "connector_time_assumption": "HISTORICAL_M3_CUSTOMER_P50_TO_AUTO_RATIO_TRANSFER_PROXY_WINDOW_SNAPSHOT",
+    "forecast_assumption": "TWO_EARLIER_MONDAY_COHORT_SCENARIOS_SHARED_FIRST_ACTION_TWO_STAGE_RECOURSE_APPROXIMATION",
+    "new_connector_traffic_assumption": "EXPLICIT_U_NOT_NEW_M3_PREDICTION",
+    "full_day_or_native": false,
+    "parameter_search": false,
+    "model_retraining": false
+  },
+  "config_sha256": "625484826845cd75a8700a1f1e88938048a7fe14dae0a7b756eeff2e97607ee6",
+  "templates_sha256": "f0ee98eb4ad5aca69125ace8610ce4ff2c40edb6b7f5e62016ee321a432af652",
+  "time_proxy": {
+    "kind": "HISTORICAL_PREDICTION_TO_AUTO_TIME_TRANSFER_PROXY_NOT_OBSERVED_EMPTY_TIME",
+    "history_dates": [
+      "20161010",
+      "20161017"
+    ],
+    "replay_date_used": false,
+    "Test31_used": false,
+    "factors": [
+      {
+        "window_start_s": 27000,
+        "sample_count": 40,
+        "factor": 1.9649007659145712,
+        "ratio_p10": 1.52028146037292,
+        "ratio_p90": 2.379803793656474
+      },
+      {
+        "window_start_s": 61200,
+        "sample_count": 40,
+        "factor": 1.9253402443312662,
+        "ratio_p10": 1.67533681099832,
+        "ratio_p90": 2.3146864677013688
+      }
+    ],
+    "source_route_may_differ_from_auto_route": true,
+    "transfer_to_empty_route_is_model_assumption": true,
+    "new_M3_inference": false,
+    "retrained": false
+  },
+  "history_dates": [
+    "20161010",
+    "20161017"
+  ],
+  "replay_date": "20161024",
+  "Test31_read": false,
+  "frozen_baseline_modified": false,
+  "cases": [
+    {
+      "case_id": "REPLAY_20161024_0730",
+      "sample_counts": {
+        "20161024": {
+          "cell_window_orders": 36,
+          "cell_window_C_orders": 2,
+          "selected_orders": 10,
+          "selected_C_orders": 2,
+          "sampling": "STABLE_HASH_WITH_UP_TO_4_C_TASKS_REMAINDER_NON_C_DIAGNOSTIC_NOT_POPULATION_ESTIMATE"
+        },
+        "20161010": {
+          "cell_window_orders": 45,
+          "cell_window_C_orders": 4,
+          "selected_orders": 10,
+          "selected_C_orders": 4,
+          "sampling": "STABLE_HASH_WITH_UP_TO_4_C_TASKS_REMAINDER_NON_C_DIAGNOSTIC_NOT_POPULATION_ESTIMATE"
+        },
+        "20161017": {
+          "cell_window_orders": 41,
+          "cell_window_C_orders": 6,
+          "selected_orders": 10,
+          "selected_C_orders": 4,
+          "sampling": "STABLE_HASH_WITH_UP_TO_4_C_TASKS_REMAINDER_NON_C_DIAGNOSTIC_NOT_POPULATION_ESTIMATE"
+        }
+      },
+      "policies": [
+        {
+          "policy": "SERVICE_PRESERVING",
+          "actual_cohort_count": 10,
+          "realized_committed": 0,
+          "realized_completed_after_drain": 0,
+          "unserved_count": 10,
+          "served_by_profile": {},
+          "customer_pickup_empty_distance_m": 0,
+          "independent_idle_moves": 0,
+          "idle_move_distance_m": 0,
+          "mean_pickup_wait_s": null,
+          "waiting_beyond_first_epoch_count": 0,
+          "cross_window_commitment_completion_count": 0,
+          "physical_last_completion_s": 0.0,
+          "no_predicted_service_counted_as_realized": true,
+          "duplicate_realized_customer_count": 0,
+          "overlapping_resource_action_count": 0,
+          "maximum_time_conservation_error_s": 0,
+          "forecast_reference_updates": 6,
+          "runtime_s": 5.104577400023118,
+          "served_anonymous_jobs": [],
+          "maximum_model_variables": 13,
+          "maximum_model_nonzeros": 32,
+          "model_solver_total_s": 0.1747921000351198,
+          "build_and_routing_total_s": 4.9033046997501515,
+          "decision_time_p50_s": 0.003081450005993247,
+          "decision_time_p95_s": 0.004204819968435912,
+          "maximum_decision_time_s": 0.005271300033200532
+        },
+        {
+          "policy": "CHAIN_DEFER",
+          "actual_cohort_count": 10,
+          "realized_committed": 0,
+          "realized_completed_after_drain": 0,
+          "unserved_count": 10,
+          "served_by_profile": {},
+          "customer_pickup_empty_distance_m": 0,
+          "independent_idle_moves": 0,
+          "idle_move_distance_m": 0,
+          "mean_pickup_wait_s": null,
+          "waiting_beyond_first_epoch_count": 0,
+          "cross_window_commitment_completion_count": 0,
+          "physical_last_completion_s": 0.0,
+          "no_predicted_service_counted_as_realized": true,
+          "duplicate_realized_customer_count": 0,
+          "overlapping_resource_action_count": 0,
+          "maximum_time_conservation_error_s": 0,
+          "forecast_reference_updates": 6,
+          "runtime_s": 0.19657019997248426,
+          "served_anonymous_jobs": [],
+          "maximum_model_variables": 13,
+          "maximum_model_nonzeros": 32,
+          "model_solver_total_s": 0.16506240027956665,
+          "build_and_routing_total_s": 0.005459100124426186,
+          "decision_time_p50_s": 0.0029548500024247915,
+          "decision_time_p95_s": 0.0036285450332798055,
+          "maximum_decision_time_s": 0.004664699954446405
+        }
+      ],
+      "comparison": {
+        "realized_service_gain": 0,
+        "gained_jobs": [],
+        "lost_jobs": [],
+        "common_served_count": 0,
+        "paired_mean_pickup_wait_change_s": null,
+        "executed_sequences_identical": true
+      },
+      "shared_initial_layout": {
+        "H1": "S01",
+        "H2": "S02",
+        "C1": "S04"
+      },
+      "cached_sparse_connections": 221,
+      "cached_idle_move_connections": 0,
+      "shared_cache_hits": 6671,
+      "common_input_failure_reasons": {
+        "CUSTOMER_EMPTY_JOIN_TOO_FAR_FROM_SHARED_ENDPOINT": 41,
+        "CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT": 44,
+        "EDGE_WALK_INVALID_SHAPE_INDEX_OR_LENGTH": 4,
+        "EDGE_OUTSIDE_FROZEN_FULL_NETWORK": 2
+      },
+      "private_output": "stage4\\output\\capability_chain_planning\\rolling_v1\\REPLAY_20161024_0730",
+      "shared_candidate_geometry": {
+        "site_pair_count": 6,
+        "minimum_site_separation_m": 2044.5510504319902,
+        "pairs_within_existing_2km_move_radius": 0,
+        "comparison_cannot_identify_idle_relocation_effect": true
+      },
+      "historical_initial_layout": {
+        "expected_scenario_services": 2.0,
+        "model_columns": 24,
+        "model_nonzeros": 58,
+        "runtime_s": 0.008623899950180203,
+        "no_actual_replay_request_input": true
+      },
+      "scientific_classification": "CONTROL_CONTRAST_DEGENERATE_NO_EFFECTIVENESS_INFERENCE"
+    },
+    {
+      "case_id": "REPLAY_20161024_1700",
+      "sample_counts": {
+        "20161024": {
+          "cell_window_orders": 77,
+          "cell_window_C_orders": 6,
+          "selected_orders": 10,
+          "selected_C_orders": 4,
+          "sampling": "STABLE_HASH_WITH_UP_TO_4_C_TASKS_REMAINDER_NON_C_DIAGNOSTIC_NOT_POPULATION_ESTIMATE"
+        },
+        "20161010": {
+          "cell_window_orders": 97,
+          "cell_window_C_orders": 14,
+          "selected_orders": 10,
+          "selected_C_orders": 4,
+          "sampling": "STABLE_HASH_WITH_UP_TO_4_C_TASKS_REMAINDER_NON_C_DIAGNOSTIC_NOT_POPULATION_ESTIMATE"
+        },
+        "20161017": {
+          "cell_window_orders": 102,
+          "cell_window_C_orders": 7,
+          "selected_orders": 10,
+          "selected_C_orders": 4,
+          "sampling": "STABLE_HASH_WITH_UP_TO_4_C_TASKS_REMAINDER_NON_C_DIAGNOSTIC_NOT_POPULATION_ESTIMATE"
+        }
+      },
+      "policies": [
+        {
+          "policy": "SERVICE_PRESERVING",
+          "actual_cohort_count": 10,
+          "realized_committed": 2,
+          "realized_completed_after_drain": 2,
+          "unserved_count": 8,
+          "served_by_profile": {
+            "HV": 2
+          },
+          "customer_pickup_empty_distance_m": 3079.0,
+          "independent_idle_moves": 0,
+          "idle_move_distance_m": 0,
+          "mean_pickup_wait_s": 250.4976177787828,
+          "waiting_beyond_first_epoch_count": 0,
+          "cross_window_commitment_completion_count": 1,
+          "physical_last_completion_s": 2503.1771768048065,
+          "no_predicted_service_counted_as_realized": true,
+          "duplicate_realized_customer_count": 0,
+          "overlapping_resource_action_count": 0,
+          "maximum_time_conservation_error_s": 2.2737367544323206e-13,
+          "forecast_reference_updates": 6,
+          "runtime_s": 7.968465199985076,
+          "served_anonymous_jobs": [
+            "A05",
+            "A10"
+          ],
+          "maximum_model_variables": 19,
+          "maximum_model_nonzeros": 57,
+          "model_solver_total_s": 0.18931989971315488,
+          "build_and_routing_total_s": 7.750386199972127,
+          "decision_time_p50_s": 0.0034288000024389476,
+          "decision_time_p95_s": 0.00449259499728214,
+          "maximum_decision_time_s": 0.006824100040830672
+        },
+        {
+          "policy": "CHAIN_DEFER",
+          "actual_cohort_count": 10,
+          "realized_committed": 2,
+          "realized_completed_after_drain": 2,
+          "unserved_count": 8,
+          "served_by_profile": {
+            "HV": 2
+          },
+          "customer_pickup_empty_distance_m": 3079.0,
+          "independent_idle_moves": 0,
+          "idle_move_distance_m": 0,
+          "mean_pickup_wait_s": 250.4976177787828,
+          "waiting_beyond_first_epoch_count": 0,
+          "cross_window_commitment_completion_count": 1,
+          "physical_last_completion_s": 2503.1771768048065,
+          "no_predicted_service_counted_as_realized": true,
+          "duplicate_realized_customer_count": 0,
+          "overlapping_resource_action_count": 0,
+          "maximum_time_conservation_error_s": 2.2737367544323206e-13,
+          "forecast_reference_updates": 6,
+          "runtime_s": 0.22442849999060854,
+          "served_anonymous_jobs": [
+            "A05",
+            "A10"
+          ],
+          "maximum_model_variables": 19,
+          "maximum_model_nonzeros": 57,
+          "model_solver_total_s": 0.18854280014056712,
+          "build_and_routing_total_s": 0.006307399948127568,
+          "decision_time_p50_s": 0.003340449999086559,
+          "decision_time_p95_s": 0.004614295001374557,
+          "maximum_decision_time_s": 0.006153399997856468
+        }
+      ],
+      "comparison": {
+        "realized_service_gain": 0,
+        "gained_jobs": [],
+        "lost_jobs": [],
+        "common_served_count": 2,
+        "paired_mean_pickup_wait_change_s": 0.0,
+        "executed_sequences_identical": true
+      },
+      "shared_initial_layout": {
+        "H1": "S02",
+        "H2": "S04",
+        "C1": "S02"
+      },
+      "cached_sparse_connections": 264,
+      "cached_idle_move_connections": 0,
+      "shared_cache_hits": 7326,
+      "common_input_failure_reasons": {
+        "CUSTOMER_EMPTY_JOIN_TOO_FAR_FROM_SHARED_ENDPOINT": 56,
+        "CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT": 48,
+        "EDGE_OUTSIDE_FROZEN_FULL_NETWORK": 8,
+        "EDGE_WALK_INVALID_SHAPE_INDEX_OR_LENGTH": 4
+      },
+      "private_output": "stage4\\output\\capability_chain_planning\\rolling_v1\\REPLAY_20161024_1700",
+      "shared_candidate_geometry": {
+        "site_pair_count": 6,
+        "minimum_site_separation_m": 2044.5510504319902,
+        "pairs_within_existing_2km_move_radius": 0,
+        "comparison_cannot_identify_idle_relocation_effect": true
+      },
+      "historical_initial_layout": {
+        "expected_scenario_services": 2.0,
+        "model_columns": 24,
+        "model_nonzeros": 57,
+        "runtime_s": 0.015401899989228696,
+        "no_actual_replay_request_input": true
+      },
+      "scientific_classification": "CONTROL_CONTRAST_DEGENERATE_NO_EFFECTIVENESS_INFERENCE"
+    }
+  ],
+  "runtime_s": 35.71722709998721,
+  "peak_rss_mib": 533.24609375,
+  "routing": {
+    "route_requests": 485,
+    "scalar_route_calls": 485,
+    "edge_walk_calls": 485,
+    "route_cache_hits": 0,
+    "route_cache_entries": 485,
+    "route_cache_limit": 1024,
+    "bearing_cache_entries": 0,
+    "common_support_evaluations": {
+      "supported": 467,
+      "unsupported": 18
+    },
+    "common_failure_reason_counts": {
+      "EDGE_WALK_INVALID_SHAPE_INDEX_OR_LENGTH": 8,
+      "EDGE_OUTSIDE_FROZEN_FULL_NETWORK": 10
+    },
+    "columnar_evidence_mib": 89.02912616729736,
+    "traffic_policy": "EXPLICIT_U_FOR_NEW_ROUTE_WITHOUT_FROZEN_M3_FEATURE_ROWS",
+    "traffic_partition": {
+      "NC": 0.0,
+      "ML": 0.0,
+      "MR": 0.0,
+      "CG": 0.0,
+      "SC": 0.0,
+      "U": 1.0
+    },
+    "traffic_unknown_share": 1.0,
+    "dynamic_evidence_complete": false,
+    "dynamic_reason_codes": [
+      "FROZEN_M3_EXACT_INPUT_CONTRACT_UNAVAILABLE_FOR_NEW_ROUTE"
+    ],
+    "conservative_control_policy": "SIGNALIZED_CONFLICT_MOVEMENTS",
+    "traffic_outside_budget": 0.05
+  },
+  "gpu_used": false,
+  "native_runs": 0,
+  "full_day_runs": 0,
+  "training_runs": 0,
+  "runtime_comparison_caveat": "SHARED_LAZY_CACHE_ORDER_NOT_A_PAIRED_ROUTING_SPEED_BENCHMARK",
+  "calibration_scalar_route_queries": 80,
+  "total_scalar_route_queries_including_time_proxy": 565,
+  "maximum_model_variables_including_layout": 24,
+  "maximum_model_nonzeros_including_layout": 58
+}

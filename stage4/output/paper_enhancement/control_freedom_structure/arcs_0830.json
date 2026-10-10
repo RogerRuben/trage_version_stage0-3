@@ -1,0 +1,114 @@
+{
+  "epoch_id": "0830",
+  "timestamp": "2016-10-31 08:30:00+08:00",
+  "state_sha256": "20de263e3d613c19c2c47758ba3f925e9c493b3494a1df302a635a19ea099db8",
+  "exposure_state": {
+    "av_assignments": 364,
+    "static": 763.1321078431373,
+    "dynamic": 52.08526070429003,
+    "speed": 0.0
+  },
+  "gammas": {
+    "static": 2.145067625590382,
+    "dynamic": 0.14934256810554178,
+    "speed": 0.0
+  },
+  "arcs": [
+    {
+      "vehicle_id": 586,
+      "request_id": 2957,
+      "pickup_eta_s": 228.1504520128208,
+      "critical": false,
+      "carry_over": false,
+      "payload": [
+        "d6a67a3db45715be1720ec105196452d",
+        "HV_S3_00586"
+      ],
+      "vehicle_type": "HV",
+      "exposure_static": 0.0,
+      "exposure_dynamic": 0.0,
+      "exposure_speed": 0.0,
+      "operating_cost": 549.348994846149
+    },
+    {
+      "vehicle_id": 4414,
+      "request_id": 2963,
+      "pickup_eta_s": 139.5743941725492,
+      "critical": false,
+      "carry_over": false,
+      "payload": [
+        "74bad64e87b670d414b12e8adb299c07",
+        "AV_S3_0226"
+      ],
+      "vehicle_type": "AV",
+      "exposure_static": 1.4705882352941178,
+      "exposure_dynamic": 0.04895428888601416,
+      "exposure_speed": 0.0,
+      "operating_cost": 296.22757238757606
+    },
+    {
+      "vehicle_id": 4307,
+      "request_id": 2963,
+      "pickup_eta_s": 276.4646653802417,
+      "critical": false,
+      "carry_over": false,
+      "payload": [
+        "74bad64e87b670d414b12e8adb299c07",
+        "AV_S3_0119"
+      ],
+      "vehicle_type": "AV",
+      "exposure_static": 1.4705882352941178,
+      "exposure_dynamic": 0.04895428888601416,
+      "exposure_speed": 0.0,
+      "operating_cost": 433.11784359526854
+    },
+    {
+      "vehicle_id": 4263,
+      "request_id": 2963,
+      "pickup_eta_s": 268.4122964856715,
+      "critical": false,
+      "carry_over": false,
+      "payload": [
+        "74bad64e87b670d414b12e8adb299c07",
+        "AV_S3_0075"
+      ],
+      "vehicle_type": "AV",
+      "exposure_static": 1.4705882352941178,
+      "exposure_dynamic": 0.04895428888601416,
+      "exposure_speed": 0.0,
+      "operating_cost": 425.06547470069836
+    },
+    {
+      "vehicle_id": 342,
+      "request_id": 2968,
+      "pickup_eta_s": 241.57106683710438,
+      "critical": false,
+      "carry_over": false,
+      "payload": [
+        "b11b367bcdae7c90630dd676af29bc71",
+        "HV_S3_00342"
+      ],
+      "vehicle_type": "HV",
+      "exposure_static": 0.0,
+      "exposure_dynamic": 0.0,
+      "exposure_speed": 0.0,
+      "operating_cost": 742.202521781715
+    },
+    {
+      "vehicle_id": 463,
+      "request_id": 2968,
+      "pickup_eta_s": 265.72817352081483,
+      "critical": false,
+      "carry_over": false,
+      "payload": [
+        "b11b367bcdae7c90630dd676af29bc71",
+        "HV_S3_00463"
+      ],
+      "vehicle_type": "HV",
+      "exposure_static": 0.0,
+      "exposure_dynamic": 0.0,
+      "exposure_speed": 0.0,
+      "operating_cost": 766.3596284654254
+    }
+  ]
+}

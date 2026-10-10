@@ -1,0 +1,542 @@
+{
+  "status": "FULL_LOCAL_WINDOW_COMPARISON_COMPLETE",
+  "kind": "FULL_LOCAL_WINDOW_INDEPENDENT_PROTOTYPE_NOT_CITY_OR_NATIVE",
+  "config_sha256": "be4c99a1075124960e2192ac5fe5fc7b1e508e7de120d4bfed7d5786ce1f2d3b",
+  "preparation": {
+    "status": "LOCAL_INSTANCE_PREPARED_BEFORE_POLICY_EXECUTION",
+    "region_cell": "45_11",
+    "selection": "EARLIER_ALL_DEMAND_TOP_CELL_NOT_C_OR_POLICY_WINNER",
+    "history_dates": [
+      "20161010",
+      "20161017"
+    ],
+    "historical_local_all_day_orders": 1709,
+    "site_count": 12,
+    "observed_history_anchor_points": true,
+    "minimum_site_separation_m": 121.50582213781165,
+    "undirected_pairs_within_2km": 65,
+    "minimum_geometric_neighbor_count": 10,
+    "case_counts": [
+      {
+        "case_id": "LOCAL_20161024_0730",
+        "counts": {
+          "20161024": {
+            "all_local_template_orders": 12,
+            "C_customer_orders": 0,
+            "no_order_subsampling": true,
+            "no_C_stratification": true
+          },
+          "20161010": {
+            "all_local_template_orders": 15,
+            "C_customer_orders": 1,
+            "no_order_subsampling": true,
+            "no_C_stratification": true
+          },
+          "20161017": {
+            "all_local_template_orders": 14,
+            "C_customer_orders": 2,
+            "no_order_subsampling": true,
+            "no_C_stratification": true
+          }
+        },
+        "worst_case_scenario_tasks_without_prior_service": 17
+      },
+      {
+        "case_id": "LOCAL_20161024_1700",
+        "counts": {
+          "20161024": {
+            "all_local_template_orders": 16,
+            "C_customer_orders": 3,
+            "no_order_subsampling": true,
+            "no_C_stratification": true
+          },
+          "20161010": {
+            "all_local_template_orders": 21,
+            "C_customer_orders": 2,
+            "no_order_subsampling": true,
+            "no_C_stratification": true
+          },
+          "20161017": {
+            "all_local_template_orders": 26,
+            "C_customer_orders": 0,
+            "no_order_subsampling": true,
+            "no_C_stratification": true
+          }
+        },
+        "worst_case_scenario_tasks_without_prior_service": 28
+      }
+    ],
+    "templates_sha256": "f0ee98eb4ad5aca69125ace8610ce4ff2c40edb6b7f5e62016ee321a432af652",
+    "config": {
+      "version": "capability_chain_local_v2",
+      "history_dates": [
+        "20161010",
+        "20161017"
+      ],
+      "replay_date": "20161024",
+      "window_starts_s": [
+        27000,
+        61200
+      ],
+      "horizon_s": 1800,
+      "patience_s": 300,
+      "critical_slack_s": 30,
+      "step_s": 30,
+      "coarse_reference_update_s": 300,
+      "region_selection": "HIGHEST_ALL_DEMAND_HISTORY_0.02_DEGREE_CELL_NO_C_FILTER",
+      "grid_size_degrees": 0.02,
+      "grid_origin_wgs84": [
+        108.0,
+        34.0
+      ],
+      "site_subgrid_degrees": 0.005,
+      "site_selection": "ONE_OBSERVED_HISTORY_PICKUP_MEDOID_PER_OCCUPIED_SUBCELL",
+      "request_selection": "ALL_COMMON_ELIGIBLE_TEMPLATE_PICKUPS_IN_REGION_AND_WINDOW_NO_SUBSAMPLE",
+      "interface_snap_tolerance_m": 80.0,
+      "reposition_interval_s": 900,
+      "reposition_radius_m": 2000.0,
+      "reposition_top_k": 3,
+      "reposition_max_eta_s": 300.0,
+      "reposition_max_moves": 50,
+      "solver_decision_limit_s": 10.0,
+      "task_limit_per_scenario": 64,
+      "exact_chain_compression": true,
+      "prune_connection_profiles": true,
+      "maximum_model_variables": 20000,
+      "maximum_model_nonzeros": 150000,
+      "maximum_route_queries": 4000,
+      "maximum_runtime_s": 900,
+      "maximum_rss_mib": 1536,
+      "policies": [
+        "SERVICE_PRESERVING",
+        "CHAIN_DEFER"
+      ],
+      "resource_profiles": [
+        "HV",
+        "HV",
+        "C"
+      ],
+      "time_proxy_source": "stage4/docs/capability_chain_planning/rolling_v1/time_proxy.json",
+      "supply_assumption": "THREE_SYNTHETIC_EQUAL_ADMISSION_WINDOWS_NOT_EMPIRICAL_Q10",
+      "passenger_assumption": "ALL_CUSTOMERS_ACCEPT_BOTH_TYPES_LOCAL_PROTOTYPE_ONLY",
+      "connector_time_assumption": "UNCHANGED_EARLIER_HISTORY_M3_AUTO_TRANSFER_PROXY_WINDOW_SNAPSHOT",
+      "new_connector_traffic_assumption": "EXPLICIT_U_NOT_NEW_M3_PREDICTION",
+      "full_day_or_native": false,
+      "parameter_search": false,
+      "model_retraining": false
+    },
+    "actual_future_not_sent_to_control": true
+  },
+  "reused_time_proxy_path": "stage4/docs/capability_chain_planning/rolling_v1/time_proxy.json",
+  "reused_time_proxy_sha256": "a11ee3236fd806b2a0370a99f0271d1971a8a4f673c637cf115676cdf1d7c058",
+  "time_proxy_refit": false,
+  "actual_empty_time_calibration": false,
+  "frozen_native_baseline_modified": false,
+  "cases": [
+    {
+      "case_id": "LOCAL_20161024_0730",
+      "private_output": "stage4\\output\\capability_chain_planning\\local_v2\\LOCAL_20161024_0730",
+      "counts": {
+        "20161024": {
+          "all_local_template_orders": 12,
+          "C_customer_orders": 0,
+          "no_order_subsampling": true,
+          "no_C_stratification": true
+        },
+        "20161010": {
+          "all_local_template_orders": 15,
+          "C_customer_orders": 1,
+          "no_order_subsampling": true,
+          "no_C_stratification": true
+        },
+        "20161017": {
+          "all_local_template_orders": 14,
+          "C_customer_orders": 2,
+          "no_order_subsampling": true,
+          "no_C_stratification": true
+        }
+      },
+      "prepared_feasible_directed_mobility_arcs": {
+        "HV": 34,
+        "C": 18
+      },
+      "shared_initial_layout": {
+        "H1": "S04",
+        "H2": "S02",
+        "C1": "S03"
+      },
+      "layout_model": {
+        "columns": 72,
+        "nonzeros": 202,
+        "compression_statistics": {
+          "enabled": true,
+          "expanded_prefixes": 58,
+          "dominated_prefixes": 0,
+          "emitted_columns": 58,
+          "retained_columns": 58,
+          "accepted_prefix_labels": 58,
+          "labels_removed_by_new_dominance": 0,
+          "max_pareto_labels_per_state": 1,
+          "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+          "max_total_accepted_prefix_labels": 50000
+        }
+      },
+      "layout_runtime_s": 0.035424399946350604,
+      "cached_sparse_connections": 613,
+      "cached_independent_idle_connections": 42,
+      "shared_cache_hits": 15548,
+      "common_input_failure_reasons": {
+        "CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT": 136,
+        "EDGE_OUTSIDE_FROZEN_FULL_NETWORK": 10,
+        "EDGE_WALK_INVALID_SHAPE_INDEX_OR_LENGTH": 3,
+        "CUSTOMER_EMPTY_JOIN_TOO_FAR_FROM_SHARED_ENDPOINT": 53
+      },
+      "policies": [
+        {
+          "policy": "SERVICE_PRESERVING",
+          "actual_cohort_count": 12,
+          "realized_committed": 2,
+          "realized_completed_after_drain": 2,
+          "unserved_count": 10,
+          "served_by_profile": {
+            "HV": 2
+          },
+          "customer_pickup_empty_distance_m": 3495.0,
+          "independent_idle_moves": 1,
+          "idle_move_distance_m": 2466.0,
+          "mean_pickup_wait_s": 266.8416001469716,
+          "waiting_beyond_first_epoch_count": 0,
+          "cross_window_commitment_completion_count": 0,
+          "physical_last_completion_s": 1652.4225037712954,
+          "no_predicted_service_counted_as_realized": true,
+          "duplicate_realized_customer_count": 0,
+          "overlapping_resource_action_count": 0,
+          "maximum_time_conservation_error_s": 5.684341886080802e-14,
+          "forecast_reference_updates": 6,
+          "runtime_s": 23.106245000031777,
+          "served_anonymous_jobs": [
+            "A001",
+            "A006"
+          ],
+          "maximum_model_variables": 113,
+          "maximum_model_nonzeros": 415,
+          "model_solver_total_s": 0.41793969966238365,
+          "build_and_routing_total_s": 22.646173600049224,
+          "decision_time_p50_s": 0.003672349965199828,
+          "decision_time_p95_s": 0.013406069998745765,
+          "maximum_decision_time_s": 0.0438156999880448,
+          "completed_within_admission_window": 2,
+          "total_executed_empty_distance_m": 5961.0,
+          "total_executed_empty_time_s": 797.403888426515,
+          "modeled_passenger_service_time_s": 1050.6453018188477,
+          "total_resource_busy_time_s": 1848.0491902453625,
+          "post_window_committed_work_s": 0
+        },
+        {
+          "policy": "CHAIN_DEFER",
+          "actual_cohort_count": 12,
+          "realized_committed": 2,
+          "realized_completed_after_drain": 2,
+          "unserved_count": 10,
+          "served_by_profile": {
+            "HV": 2
+          },
+          "customer_pickup_empty_distance_m": 3627.0,
+          "independent_idle_moves": 1,
+          "idle_move_distance_m": 2466.0,
+          "mean_pickup_wait_s": 284.6233730976671,
+          "waiting_beyond_first_epoch_count": 0,
+          "cross_window_commitment_completion_count": 0,
+          "physical_last_completion_s": 1648.047563811862,
+          "no_predicted_service_counted_as_realized": true,
+          "duplicate_realized_customer_count": 0,
+          "overlapping_resource_action_count": 0,
+          "maximum_time_conservation_error_s": 1.1368683772161603e-13,
+          "forecast_reference_updates": 6,
+          "runtime_s": 0.9922020999947563,
+          "served_anonymous_jobs": [
+            "A001",
+            "A007"
+          ],
+          "maximum_model_variables": 113,
+          "maximum_model_nonzeros": 415,
+          "model_solver_total_s": 0.443981799937319,
+          "build_and_routing_total_s": 0.5028653996996582,
+          "decision_time_p50_s": 0.005936599976848811,
+          "decision_time_p95_s": 0.013853129991912244,
+          "maximum_decision_time_s": 0.0428906999877654,
+          "completed_within_admission_window": 2,
+          "total_executed_empty_distance_m": 6093.0,
+          "total_executed_empty_time_s": 838.967434327906,
+          "modeled_passenger_service_time_s": 734.7068159580231,
+          "total_resource_busy_time_s": 1573.674250285929,
+          "post_window_committed_work_s": 0
+        }
+      ],
+      "comparison": {
+        "realized_service_gain": 0,
+        "gained_jobs": [
+          "A007"
+        ],
+        "lost_jobs": [
+          "A006"
+        ],
+        "common_served_count": 1,
+        "paired_mean_pickup_wait_change_s": 0.0,
+        "executed_sequences_identical": false
+      },
+      "exact_representation_diagnostics": {
+        "SERVICE_PRESERVING": {
+          "total_expanded_prefixes": 1294,
+          "total_dominated_prefixes": 0,
+          "total_emitted_columns": 1294,
+          "total_retained_columns": 1294,
+          "maximum_single_decision_s": 0.0438156999880448
+        },
+        "CHAIN_DEFER": {
+          "total_expanded_prefixes": 1446,
+          "total_dominated_prefixes": 0,
+          "total_emitted_columns": 1446,
+          "total_retained_columns": 1446,
+          "maximum_single_decision_s": 0.0428906999877654
+        }
+      },
+      "first_admission_divergence": {
+        "epoch_s": 660,
+        "identical_prior_executed_events": true,
+        "baseline_current_served": 1,
+        "chain_current_served": 0,
+        "baseline_expected_plan_services": 1.0,
+        "chain_expected_plan_services": 1.5,
+        "reconstructed_from_saved_epochs_not_new_experiment": true
+      }
+    },
+    {
+      "case_id": "LOCAL_20161024_1700",
+      "private_output": "stage4\\output\\capability_chain_planning\\local_v2\\LOCAL_20161024_1700",
+      "counts": {
+        "20161024": {
+          "all_local_template_orders": 16,
+          "C_customer_orders": 3,
+          "no_order_subsampling": true,
+          "no_C_stratification": true
+        },
+        "20161010": {
+          "all_local_template_orders": 21,
+          "C_customer_orders": 2,
+          "no_order_subsampling": true,
+          "no_C_stratification": true
+        },
+        "20161017": {
+          "all_local_template_orders": 26,
+          "C_customer_orders": 0,
+          "no_order_subsampling": true,
+          "no_C_stratification": true
+        }
+      },
+      "prepared_feasible_directed_mobility_arcs": {
+        "HV": 34,
+        "C": 18
+      },
+      "shared_initial_layout": {
+        "H1": "S04",
+        "H2": "S02",
+        "C1": "S03"
+      },
+      "layout_model": {
+        "columns": 103,
+        "nonzeros": 334,
+        "compression_statistics": {
+          "enabled": true,
+          "expanded_prefixes": 89,
+          "dominated_prefixes": 0,
+          "emitted_columns": 89,
+          "retained_columns": 89,
+          "accepted_prefix_labels": 89,
+          "labels_removed_by_new_dominance": 0,
+          "max_pareto_labels_per_state": 1,
+          "emitted_columns_scope": "GENERATED_LEGAL_PREFIX_COLUMNS_BEFORE_FINAL_MASK_REPLACEMENT",
+          "max_total_accepted_prefix_labels": 50000
+        }
+      },
+      "layout_runtime_s": 0.020839500008150935,
+      "cached_sparse_connections": 1342,
+      "cached_independent_idle_connections": 48,
+      "shared_cache_hits": 34812,
+      "common_input_failure_reasons": {
+        "CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT": 241,
+        "CUSTOMER_EMPTY_JOIN_TOO_FAR_FROM_SHARED_ENDPOINT": 219
+      },
+      "policies": [
+        {
+          "policy": "SERVICE_PRESERVING",
+          "actual_cohort_count": 16,
+          "realized_committed": 3,
+          "realized_completed_after_drain": 3,
+          "unserved_count": 13,
+          "served_by_profile": {
+            "HV": 2,
+            "C": 1
+          },
+          "customer_pickup_empty_distance_m": 3114.0,
+          "independent_idle_moves": 1,
+          "idle_move_distance_m": 2466.0,
+          "mean_pickup_wait_s": 182.7008108817811,
+          "waiting_beyond_first_epoch_count": 0,
+          "cross_window_commitment_completion_count": 0,
+          "physical_last_completion_s": 1733.3627459059298,
+          "no_predicted_service_counted_as_realized": true,
+          "duplicate_realized_customer_count": 0,
+          "overlapping_resource_action_count": 0,
+          "maximum_time_conservation_error_s": 1.1368683772161603e-13,
+          "forecast_reference_updates": 6,
+          "runtime_s": 43.71716330002528,
+          "served_anonymous_jobs": [
+            "A002",
+            "A003",
+            "A004"
+          ],
+          "maximum_model_variables": 224,
+          "maximum_model_nonzeros": 885,
+          "model_solver_total_s": 0.5643691002042033,
+          "build_and_routing_total_s": 43.09677920024842,
+          "decision_time_p50_s": 0.0030319000070448965,
+          "decision_time_p95_s": 0.06440362501889467,
+          "maximum_decision_time_s": 0.08851219998905435,
+          "completed_within_admission_window": 3,
+          "total_executed_empty_distance_m": 5580.0,
+          "total_executed_empty_time_s": 815.9900009915,
+          "modeled_passenger_service_time_s": 2411.454155921936,
+          "total_resource_busy_time_s": 3227.444156913436,
+          "post_window_committed_work_s": 0
+        },
+        {
+          "policy": "CHAIN_DEFER",
+          "actual_cohort_count": 16,
+          "realized_committed": 5,
+          "realized_completed_after_drain": 5,
+          "unserved_count": 11,
+          "served_by_profile": {
+            "C": 1,
+            "HV": 4
+          },
+          "customer_pickup_empty_distance_m": 5160.0,
+          "independent_idle_moves": 1,
+          "idle_move_distance_m": 2466.0,
+          "mean_pickup_wait_s": 205.71162056217298,
+          "waiting_beyond_first_epoch_count": 1,
+          "cross_window_commitment_completion_count": 1,
+          "physical_last_completion_s": 2240.2838772856967,
+          "no_predicted_service_counted_as_realized": true,
+          "duplicate_realized_customer_count": 0,
+          "overlapping_resource_action_count": 0,
+          "maximum_time_conservation_error_s": 2.2737367544323206e-13,
+          "forecast_reference_updates": 6,
+          "runtime_s": 10.809630000032485,
+          "served_anonymous_jobs": [
+            "A003",
+            "A006",
+            "A007",
+            "A009",
+            "A013"
+          ],
+          "maximum_model_variables": 224,
+          "maximum_model_nonzeros": 885,
+          "model_solver_total_s": 1.7075273998780176,
+          "build_and_routing_total_s": 9.020472400356084,
+          "decision_time_p50_s": 0.006480749987531453,
+          "decision_time_p95_s": 0.08231473997293505,
+          "maximum_decision_time_s": 0.08816330000991002,
+          "completed_within_admission_window": 4,
+          "total_executed_empty_distance_m": 7626.0,
+          "total_executed_empty_time_s": 1159.4456711570215,
+          "modeled_passenger_service_time_s": 1411.0756043195724,
+          "total_resource_busy_time_s": 2570.521275476594,
+          "post_window_committed_work_s": 440.2838772856967
+        }
+      ],
+      "comparison": {
+        "realized_service_gain": 2,
+        "gained_jobs": [
+          "A006",
+          "A007",
+          "A009",
+          "A013"
+        ],
+        "lost_jobs": [
+          "A002",
+          "A004"
+        ],
+        "common_served_count": 1,
+        "paired_mean_pickup_wait_change_s": 0.0,
+        "executed_sequences_identical": false
+      },
+      "exact_representation_diagnostics": {
+        "SERVICE_PRESERVING": {
+          "total_expanded_prefixes": 1634,
+          "total_dominated_prefixes": 0,
+          "total_emitted_columns": 1634,
+          "total_retained_columns": 1634,
+          "maximum_single_decision_s": 0.08851219998905435
+        },
+        "CHAIN_DEFER": {
+          "total_expanded_prefixes": 4132,
+          "total_dominated_prefixes": 0,
+          "total_emitted_columns": 4132,
+          "total_retained_columns": 4132,
+          "maximum_single_decision_s": 0.08816330000991002
+        }
+      },
+      "first_admission_divergence": {
+        "epoch_s": 150,
+        "identical_prior_executed_events": true,
+        "baseline_current_served": 1,
+        "chain_current_served": 0,
+        "baseline_expected_plan_services": 3.0,
+        "chain_expected_plan_services": 3.5,
+        "reconstructed_from_saved_epochs_not_new_experiment": true
+      }
+    }
+  ],
+  "runtime_s": 135.6545031000278,
+  "peak_rss_mib": 551.0703125,
+  "routing": {
+    "route_requests": 2045,
+    "scalar_route_calls": 1810,
+    "edge_walk_calls": 1810,
+    "route_cache_hits": 234,
+    "route_cache_entries": 1024,
+    "route_cache_limit": 1024,
+    "bearing_cache_entries": 0,
+    "common_support_evaluations": {
+      "supported": 1798,
+      "unsupported": 13
+    },
+    "common_failure_reason_counts": {
+      "EDGE_OUTSIDE_FROZEN_FULL_NETWORK": 10,
+      "EDGE_WALK_INVALID_SHAPE_INDEX_OR_LENGTH": 3
+    },
+    "columnar_evidence_mib": 89.02912616729736,
+    "traffic_policy": "EXPLICIT_U_FOR_NEW_ROUTE_WITHOUT_FROZEN_M3_FEATURE_ROWS",
+    "traffic_partition": {
+      "NC": 0.0,
+      "ML": 0.0,
+      "MR": 0.0,
+      "CG": 0.0,
+      "SC": 0.0,
+      "U": 1.0
+    },
+    "traffic_unknown_share": 1.0,
+    "dynamic_evidence_complete": false,
+    "dynamic_reason_codes": [
+      "FROZEN_M3_EXACT_INPUT_CONTRACT_UNAVAILABLE_FOR_NEW_ROUTE"
+    ],
+    "conservative_control_policy": "SIGNALIZED_CONFLICT_MOVEMENTS",
+    "traffic_outside_budget": 0.05
+  },
+  "new_calibration_route_queries": 0,
+  "gpu_used": false,
+  "native_runs": 0,
+  "full_day_runs": 0,
+  "runtime_comparison_caveat": "SHARED_LAZY_CACHE_NOT_A_PAIRED_ROUTING_SPEED_COMPARISON"
+}

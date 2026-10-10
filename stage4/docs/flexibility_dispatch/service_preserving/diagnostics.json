@@ -1,0 +1,205 @@
+{
+  "status": "COMPLETE",
+  "input_attribution": {
+    "rows": [
+      {
+        "cohort": "all_test31",
+        "profile": "C",
+        "orders": 30000,
+        "input_ready": 29864,
+        "after_direction": 14613,
+        "after_movement_control": 9671,
+        "after_traffic": 5299,
+        "direction_fail_among_ready": 15251,
+        "movement_control_fail_among_ready": 10907,
+        "traffic_fail_among_ready": 12881
+      },
+      {
+        "cohort": "all_test31",
+        "profile": "M",
+        "orders": 30000,
+        "input_ready": 29864,
+        "after_direction": 14613,
+        "after_movement_control": 13987,
+        "after_traffic": 13847,
+        "direction_fail_among_ready": 15251,
+        "movement_control_fail_among_ready": 1414,
+        "traffic_fail_among_ready": 248
+      },
+      {
+        "cohort": "all_test31",
+        "profile": "A",
+        "orders": 30000,
+        "input_ready": 29864,
+        "after_direction": 14613,
+        "after_movement_control": 14613,
+        "after_traffic": 14613,
+        "direction_fail_among_ready": 15251,
+        "movement_control_fail_among_ready": 0,
+        "traffic_fail_among_ready": 0
+      },
+      {
+        "cohort": "37800",
+        "profile": "C",
+        "orders": 379,
+        "input_ready": 377,
+        "after_direction": 177,
+        "after_movement_control": 116,
+        "after_traffic": 63,
+        "direction_fail_among_ready": 200,
+        "movement_control_fail_among_ready": 141,
+        "traffic_fail_among_ready": 167
+      },
+      {
+        "cohort": "37800",
+        "profile": "M",
+        "orders": 379,
+        "input_ready": 377,
+        "after_direction": 177,
+        "after_movement_control": 170,
+        "after_traffic": 170,
+        "direction_fail_among_ready": 200,
+        "movement_control_fail_among_ready": 17,
+        "traffic_fail_among_ready": 2
+      },
+      {
+        "cohort": "37800",
+        "profile": "A",
+        "orders": 379,
+        "input_ready": 377,
+        "after_direction": 177,
+        "after_movement_control": 177,
+        "after_traffic": 177,
+        "direction_fail_among_ready": 200,
+        "movement_control_fail_among_ready": 0,
+        "traffic_fail_among_ready": 0
+      },
+      {
+        "cohort": "63000",
+        "profile": "C",
+        "orders": 419,
+        "input_ready": 416,
+        "after_direction": 213,
+        "after_movement_control": 132,
+        "after_traffic": 15,
+        "direction_fail_among_ready": 203,
+        "movement_control_fail_among_ready": 159,
+        "traffic_fail_among_ready": 373
+      },
+      {
+        "cohort": "63000",
+        "profile": "M",
+        "orders": 419,
+        "input_ready": 416,
+        "after_direction": 213,
+        "after_movement_control": 207,
+        "after_traffic": 201,
+        "direction_fail_among_ready": 203,
+        "movement_control_fail_among_ready": 18,
+        "traffic_fail_among_ready": 7
+      },
+      {
+        "cohort": "63000",
+        "profile": "A",
+        "orders": 419,
+        "input_ready": 416,
+        "after_direction": 213,
+        "after_movement_control": 213,
+        "after_traffic": 213,
+        "direction_fail_among_ready": 203,
+        "movement_control_fail_among_ready": 0,
+        "traffic_fail_among_ready": 0
+      }
+    ],
+    "sequential_order": "input -> direction -> movement/control -> traffic",
+    "independent_failure_counts_overlap": true,
+    "reverse_overlay_orders": 14837,
+    "unresolved_identity_orders": 981,
+    "reconstruction_exact": true
+  },
+  "train_remaining_time": {
+    "method": "TRAIN_EMPIRICAL_RATIO_SURVIVAL_MEDIAN",
+    "train_dates": [
+      "20161010",
+      "20161017",
+      "20161024"
+    ],
+    "training_pair_count": 3400,
+    "test31_used_for_fit": false,
+    "observed_target": "Stage1 arrival_time - departure_time (GPS observation window)",
+    "prediction_proxy": "sum of frozen M3 traversal travel-time medians, NOT joint route P50",
+    "conditioning": "R > elapsed_loaded_service_s / booked_prediction_s",
+    "aggregation": "pooled Train empirical conditional median; no clipping, bins, or tuned multiplier",
+    "unsupported_tail": "OMIT_PROSPECTIVE_BUSY_STATE_KEEP_NATIVE_JOB",
+    "ratio_quantiles": {
+      "p10": 1.05345453116071,
+      "p50": 1.5182363131068632,
+      "p90": 2.3778439216569494,
+      "p99": 3.873197574727368
+    },
+    "sources": [
+      {
+        "date": "20161010",
+        "template_count": 1062,
+        "valid_timing_pairs": 1062,
+        "order_base_directory": "stage1/input_v1/split=train/date=20161010",
+        "frozen_prediction_path": "stage3/output/odd_tod/s3/cache/m3/date=20161010.parquet"
+      },
+      {
+        "date": "20161017",
+        "template_count": 1113,
+        "valid_timing_pairs": 1113,
+        "order_base_directory": "stage1/input_v1/split=train/date=20161017",
+        "frozen_prediction_path": "stage3/output/odd_tod/s3/cache/m3/date=20161017.parquet"
+      },
+      {
+        "date": "20161024",
+        "template_count": 1225,
+        "valid_timing_pairs": 1225,
+        "order_base_directory": "stage1/input_v1/split=train/date=20161024",
+        "frozen_prediction_path": "stage3/output/odd_tod/s3/cache/m3/date=20161024.parquet"
+      }
+    ],
+    "train_timing_pairs_sha256": "9ba414f3df54c59d1326662f749fbf28898c0ba96a5d8665f5dcd3e869b826e9"
+  },
+  "retrospective_timing": {
+    "rows": [
+      {
+        "cut": 37800,
+        "active_booked_valid_predictions": 247,
+        "overdue_still_busy": 62,
+        "overdue_actual_remaining_median_s": 174.40800244400089,
+        "overdue_actual_remaining_p90_s": 437.8127018359023,
+        "train_15min_template_counts": [
+          134,
+          124,
+          160
+        ],
+        "scaled_train_mean_arrivals": 418.0,
+        "test31_actual_cohort": 379,
+        "test31_outcomes_used_for_fit": false
+      },
+      {
+        "cut": 63000,
+        "active_booked_valid_predictions": 256,
+        "overdue_still_busy": 76,
+        "overdue_actual_remaining_median_s": 184.08492831900003,
+        "overdue_actual_remaining_p90_s": 523.378617757,
+        "train_15min_template_counts": [
+          146,
+          140,
+          169
+        ],
+        "scaled_train_mean_arrivals": 455.0,
+        "test31_actual_cohort": 419,
+        "test31_outcomes_used_for_fit": false
+      }
+    ],
+    "retrospective_only": true,
+    "actual_end_never_passed_to_optimizer": true
+  },
+  "new_clustering": false,
+  "new_m3_inference": false,
+  "new_native_replays": 0,
+  "peak_rss_mib": 961.2109375
+}

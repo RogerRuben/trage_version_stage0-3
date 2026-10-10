@@ -1,0 +1,19 @@
+{
+  "version": "replay_calibration_v1",
+  "test_date": "20161031",
+  "base_config": "stage4/config/symmetric_flexibility_full_day_v1.json",
+  "acceleration_config": "stage4/config/symmetric_flexibility_acceleration_v4.json",
+  "reference_policy": "SERVICE_PRESERVING_LOOKAHEAD",
+  "requested_q_a": 0.0,
+  "passenger_acceptance_rate": 1.0,
+  "chain_sample_size": 1200,
+  "chain_sample_seed": 20261006,
+  "chain_max_gap_s": 5400,
+  "all_hv_output": "stage4/output/replay_calibration_v1/all_hv",
+  "diagnostic_output": "stage4/output/replay_calibration_v1/diagnostic",
+  "doc_output": "stage4/docs/replay_calibration_v1",
+  "parameter_search": false,
+  "change_request_times": false,
+  "change_pickup_eta_calibration": false,
+  "repositioning_enabled": false
+}

@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "dates": ["20161025", "20161026", "20161027"],
+  "budget_grid": {"start": 0, "stop": 1, "step": 0.01},
+  "budget_grid_role": "diagnostic_curve_not_policy_selection",
+  "unresolved_bound": "known_outside + unknown + mixed; conservative envelope, not imputation",
+  "retain_variability_family": true,
+  "replace_only": ["crawl_E", "crawl_Q", "crawl_C", "stop_E", "stop_Q", "stop_C"],
+  "selected_production_budget": null,
+  "selected_unknown_policy": null,
+  "continuous_duration_budget": null,
+  "training": false,
+  "dispatch": false,
+  "test31_read": false,
+  "hard_timeout_s": 1800
+}

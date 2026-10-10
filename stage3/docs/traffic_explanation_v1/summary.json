@@ -1,0 +1,47 @@
+{
+  "status": "EXPLANATION_ONLY_COMPLETE",
+  "dates": [
+    {
+      "date": "20161025",
+      "rows": 9954,
+      "source": "stage3\\output\\traffic_state_batch2\\route_overlap_date=20161025.parquet",
+      "source_sha256": "0d209a7f768f2ea72acdb8d54a38982a75e24d846f649101250e0f8017801b15",
+      "output": "stage3\\output\\traffic_explanation_v1\\date=20161025.parquet",
+      "output_sha256": "9f4d682e3d74620e4b664a33f5e8674b1e1bf0cfc1f30f119ba56962cbbf9261",
+      "unchanged_dynamic_ratio_rows": 9954,
+      "unknown_exposure_routes": 9933,
+      "mixed_exposure_routes": 9425
+    },
+    {
+      "date": "20161026",
+      "rows": 9946,
+      "source": "stage3\\output\\traffic_state_batch2\\route_overlap_date=20161026.parquet",
+      "source_sha256": "cb579ab6525b52a2e05f0edeb9e75fdd039d300e4e56cbfbd5eadd7930966a6b",
+      "output": "stage3\\output\\traffic_explanation_v1\\date=20161026.parquet",
+      "output_sha256": "f97b1896c94f84ab9778cea1516c99f2ec7d15410341e5b9261554954fcd7e0f",
+      "unchanged_dynamic_ratio_rows": 9946,
+      "unknown_exposure_routes": 9932,
+      "mixed_exposure_routes": 9420
+    },
+    {
+      "date": "20161027",
+      "rows": 9951,
+      "source": "stage3\\output\\traffic_state_batch2\\route_overlap_date=20161027.parquet",
+      "source_sha256": "e5dafac7706e9a8af1ec431f0f66e0c361e84cff0c87357bc87483848286a44e",
+      "output": "stage3\\output\\traffic_explanation_v1\\date=20161027.parquet",
+      "output_sha256": "260e299d334e3ed0f4e95425f88cee2067b6280a0ea2a85fb6fe91a802266e3e",
+      "unchanged_dynamic_ratio_rows": 9951,
+      "unknown_exposure_routes": 9937,
+      "mixed_exposure_routes": 9422
+    }
+  ],
+  "profile_sha256": "bea54c12a0c013995c3644a0bab84b35413d5df8a6785dfdd6a03fd49f32978e",
+  "training": false,
+  "dispatch": false,
+  "test31_read": false,
+  "gpu_used": false,
+  "decision_logic_modified": false,
+  "runtime_s": 0.26599999999962165,
+  "sampled_peak_rss_mb": 125.1640625,
+  "rows": 29851
+}

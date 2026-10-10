@@ -1,0 +1,295 @@
+{
+  "artifact_sha256": "2d8c3b83d5d298b522a61d7bcf48f8b271587b1470ede1dd2548a7d05d02489c",
+  "b1_execution_commit": "876f41ea0f879d57ef4e7d8e2e09113bcb855a54",
+  "config": {
+    "path": "stage2/config/stage2_v5_2.json",
+    "schema_version": "stage2_v5_2_config.3",
+    "sha256": "5e496cd79c569fe1847811fdac13434a5c83afbb90bf744e25dfb829133cf29c",
+    "status": "PASS"
+  },
+  "gates": {
+    "b0_smoke": {
+      "path": "stage2/docs/v5_2/stage2_v5_2_phase_b0_smoke.json",
+      "payload_status": "PASS",
+      "schema_version": "stage2_v5_2_phase_b0_smoke.1",
+      "sha256": "3fcdf953f07d5dd7c32d5efd4952e67bd3ced80d8275644b4d1dc3289ffccdc7",
+      "status": "PASS"
+    },
+    "metadata_audit": {
+      "path": "stage2/docs/v5_2/stage2_v5_2_input_metadata_audit.json",
+      "payload_status": "PASS",
+      "schema_version": "stage2_v5_2_phase_b0_metadata_audit.1",
+      "sha256": "ef4a697d7c4ffe0932f3f74d8ecdac066f6014b2181523c2309d2ff56b99586c",
+      "status": "PASS"
+    },
+    "performance": {
+      "path": "stage2/docs/v5_2/stage2_v5_2_performance.json",
+      "payload_status": "PASS",
+      "schema_version": "stage2_v5_2_performance.2",
+      "sha256": "e551edc3ccccb2aa97565eb45b10c2a5cb27b645ba0c7cf04ce70cfdfbfc1f6a",
+      "status": "PASS"
+    }
+  },
+  "models": {
+    "M0": {
+      "evaluation_manifest": {
+        "path": "stage2/output_v5_2/transfer_tuning/M0/validation_evaluation.json",
+        "payload_status": "PASS",
+        "schema_version": "stage2_v5_2_m0_evaluation.1",
+        "sha256": "2a9e3a662d1eb0b600bfb6d089784981724258fb2bbde20f4f78a7b505b4fc24",
+        "status": "PASS"
+      },
+      "selected_checkpoint": {
+        "path": "stage2/output_v5_2/transfer_tuning/M0/model/m0_micro_tree.joblib",
+        "schema_version": "joblib.micro_tree.1",
+        "sha256": "1c4fd6d8085c70e08ad3d52c6925257e1aa3b6eaae8825905cdd9f0027e89b6f",
+        "status": "PASS"
+      },
+      "training_manifest": {
+        "path": "stage2/output_v5_2/transfer_tuning/M0/model/model_manifest.json",
+        "payload_status": "PASS",
+        "schema_version": "stage2_v5_2_m0_training.2",
+        "sha256": "09d7d0a764101e9c55584bd962bc373246d97914a48ebc0ee0c624574904ac32",
+        "status": "PASS"
+      },
+      "training_schema_artifact": {
+        "path": "stage2/output_v5_2/transfer_tuning/M0/train_matrix_manifest.json",
+        "payload_status": "PASS",
+        "schema_version": "stage2_v5_2_m0_matrix.2",
+        "sha256": "47bff1bde05660557466f3eb7368088b3e4754abc27704594e550f035f6316e1",
+        "status": "PASS"
+      }
+    },
+    "M1": {
+      "evaluation_manifest": {
+        "path": "stage2/output_v5_2/transfer_tuning/M1/validation_evaluation.json/evaluation_manifest.json",
+        "payload_status": "PASS",
+        "schema_version": "stage2_v5_2_evaluation.2",
+        "sha256": "33fcb7cf374da407bf2856d3a677fd5bc8405296faf6aa9313ae5b779c7ffdbb",
+        "status": "PASS"
+      },
+      "selected_checkpoint": {
+        "path": "stage2/output_v5_1/fold_1/deep_model/best_model.pt",
+        "schema_version": "torch.checkpoint.1",
+        "sha256": "6a71afcfa5bf2f9532b56566969b09839df075fc6190ad8af07244a3977a87ed",
+        "status": "PASS"
+      },
+      "training_manifest": {
+        "path": "stage2/output_v5_2/transfer_tuning/M1/model_manifest.json",
+        "payload_status": "PASS",
+        "schema_version": "stage2_v5_2_training.2",
+        "sha256": "a50b3099f1a19fb9a84fbdbf18d505dc3c6a844af5e2ba2a4e74497159f9b6d4",
+        "status": "PASS"
+      }
+    },
+    "M2": {
+      "evaluation_manifest": {
+        "path": "stage2/output_v5_2/transfer_tuning/M2/validation_evaluation/evaluation_manifest.json",
+        "payload_status": "PASS",
+        "schema_version": "stage2_v5_2_evaluation.2",
+        "sha256": "f9aa5bf861602271958ec4d7c8a1f25300408c0e7330588ed0817c5e35ff3713",
+        "status": "PASS"
+      },
+      "selected_checkpoint": {
+        "path": "stage2/output_v5_2/transfer_tuning/M2/epoch_004.pt",
+        "schema_version": "torch.checkpoint.1",
+        "sha256": "e974bcef893ac8c68323fa51cea458b9b45d7b138539080c196357f05b9f6194",
+        "status": "PASS"
+      },
+      "training_manifest": {
+        "path": "stage2/output_v5_2/transfer_tuning/M2/model_manifest.json",
+        "payload_status": "PASS",
+        "schema_version": "stage2_v5_2_training.2",
+        "sha256": "bf01cb92eeb54ce319d9d0a5e2e8fc43eabef5808ada3501989c907c9365f7c9",
+        "status": "PASS"
+      }
+    },
+    "M3": {
+      "evaluation_manifest": {
+        "path": "stage2/output_v5_2/transfer_tuning/M3/validation_evaluation/evaluation_manifest.json",
+        "payload_status": "PASS",
+        "schema_version": "stage2_v5_2_evaluation.2",
+        "sha256": "32b3242c8b2de07c615a7eda75738f0c79d5f5b87ac77e6fb11ff8dbe7d2ca39",
+        "status": "PASS"
+      },
+      "selected_checkpoint": {
+        "path": "stage2/output_v5_2/transfer_tuning/M3/epoch_004.pt",
+        "schema_version": "torch.checkpoint.1",
+        "sha256": "0c0c84cbec4b1be5bcdc6624145b7d522507c5271e0a6652d7ee76a07f4a1bd8",
+        "status": "PASS"
+      },
+      "training_manifest": {
+        "path": "stage2/output_v5_2/transfer_tuning/M3/model_manifest.json",
+        "payload_status": "PASS",
+        "schema_version": "stage2_v5_2_training.2",
+        "sha256": "6091cff64dc6f7a1345068512276eb29de1670c3ccd9647fc5cada9b1bd0d91a",
+        "status": "PASS"
+      }
+    },
+    "M4_p25": {
+      "evaluation_manifest": {
+        "path": "stage2/output_v5_2/transfer_tuning/M4_p25/validation_evaluation/evaluation_manifest.json",
+        "payload_status": "PASS",
+        "schema_version": "stage2_v5_2_evaluation.2",
+        "sha256": "75aa2532e07fc6670f8cea2bc570962e734b763c6249bc16ac147387bba7a044",
+        "status": "PASS"
+      },
+      "selected_checkpoint": {
+        "path": "stage2/output_v5_2/transfer_tuning/M4_p25/epoch_004.pt",
+        "schema_version": "torch.checkpoint.1",
+        "sha256": "939dc9b41a5ff4229deab06a0b193e890d35afae4a583fc6feb1e52cb58fd565",
+        "status": "PASS"
+      },
+      "training_manifest": {
+        "path": "stage2/output_v5_2/transfer_tuning/M4_p25/model_manifest.json",
+        "payload_status": "PASS",
+        "schema_version": "stage2_v5_2_training.2",
+        "sha256": "1483007c41147beddb4f421752638f8666daf6563ac7ba93ab766e0fa6a13247",
+        "status": "PASS"
+      }
+    },
+    "M4_p50": {
+      "evaluation_manifest": {
+        "path": "stage2/output_v5_2/transfer_tuning/M4_p50/validation_evaluation/evaluation_manifest.json",
+        "payload_status": "PASS",
+        "schema_version": "stage2_v5_2_evaluation.2",
+        "sha256": "14b081ca549352ab070cf31bee643243e540d010cf746d1163d70138ac983696",
+        "status": "PASS"
+      },
+      "selected_checkpoint": {
+        "path": "stage2/output_v5_2/transfer_tuning/M4_p50/epoch_004.pt",
+        "schema_version": "torch.checkpoint.1",
+        "sha256": "e5a47b5107966377e596229ad372a2f2efad01cb678f6024e65fd5d6231498ad",
+        "status": "PASS"
+      },
+      "training_manifest": {
+        "path": "stage2/output_v5_2/transfer_tuning/M4_p50/model_manifest.json",
+        "payload_status": "PASS",
+        "schema_version": "stage2_v5_2_training.2",
+        "sha256": "9ff2ec464c8fdc2f849fe22e697ba881de1ec58e12159bb365df84d205adba49",
+        "status": "PASS"
+      }
+    },
+    "M4_p75": {
+      "evaluation_manifest": {
+        "path": "stage2/output_v5_2/transfer_tuning/M4_p75/validation_evaluation/evaluation_manifest.json",
+        "payload_status": "PASS",
+        "schema_version": "stage2_v5_2_evaluation.2",
+        "sha256": "2e8e5f1a2a84fac9b20e0b8a9f12bc2a347004abb5519d458d652fcd8bd215ea",
+        "status": "PASS"
+      },
+      "selected_checkpoint": {
+        "path": "stage2/output_v5_2/transfer_tuning/M4_p75/epoch_004.pt",
+        "schema_version": "torch.checkpoint.1",
+        "sha256": "87a34c181b5df0bca9e1300efb6268a3a718cb00732019702c9812c5381813be",
+        "status": "PASS"
+      },
+      "training_manifest": {
+        "path": "stage2/output_v5_2/transfer_tuning/M4_p75/model_manifest.json",
+        "payload_status": "PASS",
+        "schema_version": "stage2_v5_2_training.2",
+        "sha256": "173e31974759a28d75addd78646d2eecfdf089e6fed8b9043e0e28a4d69b1c3a",
+        "status": "PASS"
+      }
+    }
+  },
+  "phase_c_authorized": false,
+  "prepared_artifacts": {
+    "static_structure": {
+      "path": "stage2/output_v5_2/b0/transfer_tuning_static.json",
+      "schema_version": "stage2_v5_2_static_structure.1",
+      "sha256": "f6926a4079af527e23569e223c64d097978500990804a65b57d7f0db14e774e2",
+      "status": "PASS"
+    },
+    "temporal_audit": {
+      "path": "stage2/output_v5_2/transfer_shards/protocol=transfer_tuning/temporal_audit.json",
+      "payload_status": "PASS",
+      "schema_version": "stage2_v5_2_transfer_temporal_audit.1",
+      "sha256": "918c09c0d9ba5a61d7a576b3f15f646bf851a818ca9f1b8270dcf13b8d02e27c",
+      "status": "PASS"
+    },
+    "train_support": {
+      "path": "stage2/output_v5_2/b0/transfer_tuning_support.json",
+      "schema_version": "stage2_v5_2_train_support.1",
+      "sha256": "12303d329143440041f5271413796dfb69ee12e7dcb1023a235345f908bcfdae",
+      "status": "PASS"
+    },
+    "transfer_manifest": {
+      "path": "stage2/output_v5_2/transfer_shards/protocol=transfer_tuning/transfer_manifest.json",
+      "payload_status": "PASS",
+      "schema_version": "stage2_v5_2_transfer_manifest.2",
+      "sha256": "f25c400d395f0978cb9744404d7971718b38369100ae001fa62fb7376cea81a3",
+      "status": "PASS"
+    }
+  },
+  "protocol": {
+    "definition": {
+      "path": "stage2/v5_2/protocols.py",
+      "schema_version": "stage2_v5_2_protocols.python",
+      "sha256": "a946f647c21d5a8b4d7948c92fea9aa287dd8075f36c1851c324479805aa975d",
+      "status": "PASS"
+    },
+    "protocol_hash": "32cc07da657296d2ac37ea8f68df1f01cfc1a2e296d5412e006e6516e15d35ce",
+    "protocol_id": "transfer_tuning"
+  },
+  "schema_version": "stage2_v5_2_phase_b1_evidence_bundle.1",
+  "scope": "PHASE_B1_ONLY",
+  "status": "PASS",
+  "tau": {
+    "freeze": {
+      "path": "stage2/output_v5_2/transfer_tuning/stage2_v5_2_tau_freeze.json",
+      "payload_status": "PASS",
+      "schema_version": "stage2_v5_2_tau_freeze.1",
+      "sha256": "5900d6184d151d8093528f1fa04a1afd73a75d07fd0187da7da22abdb44296ec",
+      "status": "PASS"
+    },
+    "metrics": {
+      "path": "stage2/output_v5_2/transfer_tuning/tau_metrics.json",
+      "payload_status": "PASS",
+      "schema_version": "stage2_v5_2_tau_evaluation.2",
+      "sha256": "cbde55c13a7b6e70daf8ff5a186eba8bd7aa091911fd61ad7f6fe80fa9e1f0a4",
+      "status": "PASS"
+    },
+    "selection": {
+      "path": "stage2/output_v5_2/transfer_tuning/tau_selection.json",
+      "payload_status": "PASS",
+      "schema_version": "stage2_v5_2_tau_selection.2",
+      "sha256": "01b8e06b62e5d34cad25032da24f24d37b2791ed3111c8e62e6d4eb7b876c721",
+      "status": "PASS"
+    }
+  },
+  "test_evidence": {
+    "path": "stage2/docs/v5_2/stage2_v5_2_phase_b1_test_evidence.json",
+    "payload_status": "PASS",
+    "schema_version": "stage2_v5_2_phase_b1_test_evidence.1",
+    "sha256": "cc84844ea5480de6a874af29473a768a67297473259154f850e0d53ead6cd03a",
+    "status": "PASS"
+  },
+  "upstream": {
+    "stage1_release_manifest": {
+      "path": "stage1/docs/stage1_v3_release_manifest.json",
+      "schema_version": "stage1_v3_release_manifest.1",
+      "sha256": "29942f040b7fbd1ce5ccf9ee4586f381cb8f900c27f7aad48482936e7278f26c",
+      "status": "PASS"
+    },
+    "v5_1_feature_artifact": {
+      "path": "stage2/output_v5/protocols/fold_1/tensor_shards/feature_artifacts.json",
+      "schema_version": "stage2_v5_tensor_artifacts.2",
+      "sha256": "6842c388e870ec8b378251de41722bcac028cdb127e7278057dbdb2f91a2a0a7",
+      "status": "PASS"
+    },
+    "v5_1_source_checkpoint": {
+      "path": "stage2/output_v5_1/fold_1/deep_model/best_model.pt",
+      "schema_version": "torch.checkpoint.1",
+      "sha256": "6a71afcfa5bf2f9532b56566969b09839df075fc6190ad8af07244a3977a87ed",
+      "status": "PASS"
+    },
+    "v5_1_source_model_manifest": {
+      "path": "stage2/output_v5_1/fold_1/deep_model/model_manifest.json",
+      "payload_status": "PASS",
+      "schema_version": "stage2_v5_rc_mstnet.1",
+      "sha256": "cf6a3cfdb2e3abe34cde7408ec4e614141ce1bdc846d216fad27a41b5d29a46d",
+      "status": "PASS"
+    }
+  }
+}

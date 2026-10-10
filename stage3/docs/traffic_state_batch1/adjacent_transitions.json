@@ -1,0 +1,2854 @@
+{
+  "rows": [
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 90,
+      "date": "20161009"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 188,
+      "date": "20161009"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 164,
+      "date": "20161009"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 13,
+      "date": "20161009"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 516,
+      "date": "20161009"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 153,
+      "date": "20161009"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 847,
+      "date": "20161009"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 1286,
+      "date": "20161009"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 15,
+      "date": "20161009"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "UNKNOWN",
+      "pairs": 1768,
+      "date": "20161009"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 151,
+      "date": "20161009"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1171,
+      "date": "20161009"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 7609,
+      "date": "20161009"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 3,
+      "date": "20161009"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 7913,
+      "date": "20161009"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 16,
+      "date": "20161009"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 18,
+      "date": "20161009"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 6,
+      "date": "20161009"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 4,
+      "date": "20161009"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 50,
+      "date": "20161009"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 524,
+      "date": "20161009"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1787,
+      "date": "20161009"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 7942,
+      "date": "20161009"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 56,
+      "date": "20161009"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "UNKNOWN",
+      "pairs": 36553,
+      "date": "20161009"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 114,
+      "date": "20161010"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 160,
+      "date": "20161010"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 231,
+      "date": "20161010"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 11,
+      "date": "20161010"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 533,
+      "date": "20161010"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 165,
+      "date": "20161010"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 892,
+      "date": "20161010"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 1236,
+      "date": "20161010"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 20,
+      "date": "20161010"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "UNKNOWN",
+      "pairs": 1822,
+      "date": "20161010"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 169,
+      "date": "20161010"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1164,
+      "date": "20161010"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 7462,
+      "date": "20161010"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 5,
+      "date": "20161010"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 7864,
+      "date": "20161010"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 18,
+      "date": "20161010"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 21,
+      "date": "20161010"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 18,
+      "date": "20161010"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 7,
+      "date": "20161010"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 55,
+      "date": "20161010"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 589,
+      "date": "20161010"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1855,
+      "date": "20161010"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 7935,
+      "date": "20161010"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 78,
+      "date": "20161010"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "UNKNOWN",
+      "pairs": 36678,
+      "date": "20161010"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 132,
+      "date": "20161011"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 156,
+      "date": "20161011"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 192,
+      "date": "20161011"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 19,
+      "date": "20161011"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 538,
+      "date": "20161011"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 163,
+      "date": "20161011"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 858,
+      "date": "20161011"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 1159,
+      "date": "20161011"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 14,
+      "date": "20161011"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "UNKNOWN",
+      "pairs": 1759,
+      "date": "20161011"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 174,
+      "date": "20161011"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1131,
+      "date": "20161011"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 7645,
+      "date": "20161011"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 4,
+      "date": "20161011"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 8132,
+      "date": "20161011"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 17,
+      "date": "20161011"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 25,
+      "date": "20161011"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 8,
+      "date": "20161011"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 4,
+      "date": "20161011"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 37,
+      "date": "20161011"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 536,
+      "date": "20161011"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1772,
+      "date": "20161011"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 8184,
+      "date": "20161011"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 48,
+      "date": "20161011"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "UNKNOWN",
+      "pairs": 36743,
+      "date": "20161011"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 173,
+      "date": "20161012"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 233,
+      "date": "20161012"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 222,
+      "date": "20161012"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 23,
+      "date": "20161012"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 578,
+      "date": "20161012"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 221,
+      "date": "20161012"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1038,
+      "date": "20161012"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 1343,
+      "date": "20161012"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 21,
+      "date": "20161012"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "UNKNOWN",
+      "pairs": 1941,
+      "date": "20161012"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 192,
+      "date": "20161012"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1226,
+      "date": "20161012"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 6933,
+      "date": "20161012"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 9,
+      "date": "20161012"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 7763,
+      "date": "20161012"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 18,
+      "date": "20161012"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 31,
+      "date": "20161012"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 12,
+      "date": "20161012"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 12,
+      "date": "20161012"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 73,
+      "date": "20161012"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 634,
+      "date": "20161012"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 2014,
+      "date": "20161012"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 7755,
+      "date": "20161012"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 81,
+      "date": "20161012"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "UNKNOWN",
+      "pairs": 37366,
+      "date": "20161012"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 100,
+      "date": "20161013"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 171,
+      "date": "20161013"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 191,
+      "date": "20161013"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 15,
+      "date": "20161013"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 497,
+      "date": "20161013"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 144,
+      "date": "20161013"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 848,
+      "date": "20161013"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 1251,
+      "date": "20161013"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 19,
+      "date": "20161013"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "UNKNOWN",
+      "pairs": 1705,
+      "date": "20161013"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 185,
+      "date": "20161013"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1146,
+      "date": "20161013"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 7695,
+      "date": "20161013"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 12,
+      "date": "20161013"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 8226,
+      "date": "20161013"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 13,
+      "date": "20161013"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 23,
+      "date": "20161013"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 6,
+      "date": "20161013"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 7,
+      "date": "20161013"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 55,
+      "date": "20161013"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 519,
+      "date": "20161013"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1768,
+      "date": "20161013"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 8341,
+      "date": "20161013"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 45,
+      "date": "20161013"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "UNKNOWN",
+      "pairs": 36548,
+      "date": "20161013"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 159,
+      "date": "20161014"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 236,
+      "date": "20161014"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 231,
+      "date": "20161014"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 18,
+      "date": "20161014"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 660,
+      "date": "20161014"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 234,
+      "date": "20161014"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1099,
+      "date": "20161014"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 1383,
+      "date": "20161014"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 25,
+      "date": "20161014"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "UNKNOWN",
+      "pairs": 2146,
+      "date": "20161014"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 233,
+      "date": "20161014"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1278,
+      "date": "20161014"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 6488,
+      "date": "20161014"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 20,
+      "date": "20161014"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 7566,
+      "date": "20161014"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 26,
+      "date": "20161014"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 28,
+      "date": "20161014"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 20,
+      "date": "20161014"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 7,
+      "date": "20161014"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 95,
+      "date": "20161014"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 664,
+      "date": "20161014"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 2210,
+      "date": "20161014"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 7691,
+      "date": "20161014"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 101,
+      "date": "20161014"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "UNKNOWN",
+      "pairs": 37334,
+      "date": "20161014"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 156,
+      "date": "20161015"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 186,
+      "date": "20161015"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 199,
+      "date": "20161015"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 32,
+      "date": "20161015"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 658,
+      "date": "20161015"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 183,
+      "date": "20161015"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1030,
+      "date": "20161015"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 1268,
+      "date": "20161015"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 21,
+      "date": "20161015"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "UNKNOWN",
+      "pairs": 1880,
+      "date": "20161015"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 193,
+      "date": "20161015"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1202,
+      "date": "20161015"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 7087,
+      "date": "20161015"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 7,
+      "date": "20161015"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 7554,
+      "date": "20161015"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 26,
+      "date": "20161015"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 22,
+      "date": "20161015"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 9,
+      "date": "20161015"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 8,
+      "date": "20161015"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 89,
+      "date": "20161015"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 670,
+      "date": "20161015"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1906,
+      "date": "20161015"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 7615,
+      "date": "20161015"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 92,
+      "date": "20161015"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "UNKNOWN",
+      "pairs": 36678,
+      "date": "20161015"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 106,
+      "date": "20161016"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 139,
+      "date": "20161016"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 190,
+      "date": "20161016"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 22,
+      "date": "20161016"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 484,
+      "date": "20161016"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 154,
+      "date": "20161016"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 929,
+      "date": "20161016"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 1279,
+      "date": "20161016"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 19,
+      "date": "20161016"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "UNKNOWN",
+      "pairs": 1722,
+      "date": "20161016"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 181,
+      "date": "20161016"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1248,
+      "date": "20161016"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 7780,
+      "date": "20161016"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 3,
+      "date": "20161016"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 8127,
+      "date": "20161016"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 16,
+      "date": "20161016"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 15,
+      "date": "20161016"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 8,
+      "date": "20161016"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 4,
+      "date": "20161016"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 47,
+      "date": "20161016"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 471,
+      "date": "20161016"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1769,
+      "date": "20161016"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 8035,
+      "date": "20161016"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 42,
+      "date": "20161016"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "UNKNOWN",
+      "pairs": 36102,
+      "date": "20161016"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 92,
+      "date": "20161017"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 139,
+      "date": "20161017"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 202,
+      "date": "20161017"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 7,
+      "date": "20161017"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 484,
+      "date": "20161017"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 147,
+      "date": "20161017"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 777,
+      "date": "20161017"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 1230,
+      "date": "20161017"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 13,
+      "date": "20161017"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "UNKNOWN",
+      "pairs": 1593,
+      "date": "20161017"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 191,
+      "date": "20161017"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1162,
+      "date": "20161017"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 7924,
+      "date": "20161017"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 8,
+      "date": "20161017"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 8137,
+      "date": "20161017"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 12,
+      "date": "20161017"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 19,
+      "date": "20161017"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 8,
+      "date": "20161017"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 5,
+      "date": "20161017"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 38,
+      "date": "20161017"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 480,
+      "date": "20161017"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1669,
+      "date": "20161017"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 8205,
+      "date": "20161017"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 44,
+      "date": "20161017"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "UNKNOWN",
+      "pairs": 35155,
+      "date": "20161017"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 110,
+      "date": "20161018"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 160,
+      "date": "20161018"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 195,
+      "date": "20161018"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 10,
+      "date": "20161018"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 523,
+      "date": "20161018"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 134,
+      "date": "20161018"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 720,
+      "date": "20161018"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 1189,
+      "date": "20161018"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 13,
+      "date": "20161018"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "UNKNOWN",
+      "pairs": 1786,
+      "date": "20161018"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 174,
+      "date": "20161018"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1133,
+      "date": "20161018"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 7920,
+      "date": "20161018"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 7,
+      "date": "20161018"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 8294,
+      "date": "20161018"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 24,
+      "date": "20161018"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 25,
+      "date": "20161018"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 10,
+      "date": "20161018"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 8,
+      "date": "20161018"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 46,
+      "date": "20161018"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 523,
+      "date": "20161018"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1774,
+      "date": "20161018"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 8273,
+      "date": "20161018"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 64,
+      "date": "20161018"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "UNKNOWN",
+      "pairs": 36510,
+      "date": "20161018"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 94,
+      "date": "20161019"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 129,
+      "date": "20161019"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 176,
+      "date": "20161019"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 14,
+      "date": "20161019"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 472,
+      "date": "20161019"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 135,
+      "date": "20161019"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 836,
+      "date": "20161019"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 1181,
+      "date": "20161019"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 11,
+      "date": "20161019"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "UNKNOWN",
+      "pairs": 1718,
+      "date": "20161019"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 163,
+      "date": "20161019"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1168,
+      "date": "20161019"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 8003,
+      "date": "20161019"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 4,
+      "date": "20161019"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 8145,
+      "date": "20161019"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 15,
+      "date": "20161019"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 19,
+      "date": "20161019"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 7,
+      "date": "20161019"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 1,
+      "date": "20161019"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 32,
+      "date": "20161019"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 478,
+      "date": "20161019"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1734,
+      "date": "20161019"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 8237,
+      "date": "20161019"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 45,
+      "date": "20161019"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "UNKNOWN",
+      "pairs": 35526,
+      "date": "20161019"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 110,
+      "date": "20161020"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 164,
+      "date": "20161020"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 189,
+      "date": "20161020"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 9,
+      "date": "20161020"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 481,
+      "date": "20161020"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 150,
+      "date": "20161020"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 865,
+      "date": "20161020"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 1303,
+      "date": "20161020"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 15,
+      "date": "20161020"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "UNKNOWN",
+      "pairs": 1649,
+      "date": "20161020"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 182,
+      "date": "20161020"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1145,
+      "date": "20161020"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 8031,
+      "date": "20161020"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 2,
+      "date": "20161020"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 8173,
+      "date": "20161020"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 20,
+      "date": "20161020"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 18,
+      "date": "20161020"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 9,
+      "date": "20161020"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 2,
+      "date": "20161020"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 35,
+      "date": "20161020"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 465,
+      "date": "20161020"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1801,
+      "date": "20161020"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 8141,
+      "date": "20161020"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 55,
+      "date": "20161020"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "UNKNOWN",
+      "pairs": 36696,
+      "date": "20161020"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 150,
+      "date": "20161021"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 254,
+      "date": "20161021"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 227,
+      "date": "20161021"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 25,
+      "date": "20161021"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 640,
+      "date": "20161021"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 228,
+      "date": "20161021"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1071,
+      "date": "20161021"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 1466,
+      "date": "20161021"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 20,
+      "date": "20161021"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "UNKNOWN",
+      "pairs": 2190,
+      "date": "20161021"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 201,
+      "date": "20161021"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1309,
+      "date": "20161021"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 7083,
+      "date": "20161021"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 11,
+      "date": "20161021"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 7545,
+      "date": "20161021"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 26,
+      "date": "20161021"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 27,
+      "date": "20161021"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 11,
+      "date": "20161021"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 7,
+      "date": "20161021"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 57,
+      "date": "20161021"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 676,
+      "date": "20161021"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 2316,
+      "date": "20161021"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 7671,
+      "date": "20161021"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 65,
+      "date": "20161021"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "UNKNOWN",
+      "pairs": 38015,
+      "date": "20161021"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 176,
+      "date": "20161022"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 232,
+      "date": "20161022"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 226,
+      "date": "20161022"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 32,
+      "date": "20161022"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 748,
+      "date": "20161022"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 269,
+      "date": "20161022"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1331,
+      "date": "20161022"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 1385,
+      "date": "20161022"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 22,
+      "date": "20161022"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "UNKNOWN",
+      "pairs": 2321,
+      "date": "20161022"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 212,
+      "date": "20161022"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1441,
+      "date": "20161022"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 6072,
+      "date": "20161022"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 13,
+      "date": "20161022"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 7340,
+      "date": "20161022"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 19,
+      "date": "20161022"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 28,
+      "date": "20161022"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 12,
+      "date": "20161022"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 6,
+      "date": "20161022"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 105,
+      "date": "20161022"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 780,
+      "date": "20161022"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 2323,
+      "date": "20161022"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 7481,
+      "date": "20161022"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 107,
+      "date": "20161022"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "UNKNOWN",
+      "pairs": 38613,
+      "date": "20161022"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 100,
+      "date": "20161023"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 152,
+      "date": "20161023"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 189,
+      "date": "20161023"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 25,
+      "date": "20161023"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 488,
+      "date": "20161023"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 156,
+      "date": "20161023"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 849,
+      "date": "20161023"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 1227,
+      "date": "20161023"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 13,
+      "date": "20161023"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "UNKNOWN",
+      "pairs": 1699,
+      "date": "20161023"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 174,
+      "date": "20161023"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1172,
+      "date": "20161023"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 8066,
+      "date": "20161023"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 6,
+      "date": "20161023"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 8056,
+      "date": "20161023"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 17,
+      "date": "20161023"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 17,
+      "date": "20161023"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 6,
+      "date": "20161023"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 9,
+      "date": "20161023"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 58,
+      "date": "20161023"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 496,
+      "date": "20161023"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1701,
+      "date": "20161023"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 7939,
+      "date": "20161023"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 57,
+      "date": "20161023"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "UNKNOWN",
+      "pairs": 36458,
+      "date": "20161023"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 132,
+      "date": "20161024"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 174,
+      "date": "20161024"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 225,
+      "date": "20161024"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 25,
+      "date": "20161024"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 657,
+      "date": "20161024"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 186,
+      "date": "20161024"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 911,
+      "date": "20161024"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 1341,
+      "date": "20161024"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 17,
+      "date": "20161024"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "UNKNOWN",
+      "pairs": 1995,
+      "date": "20161024"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 186,
+      "date": "20161024"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1205,
+      "date": "20161024"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 6813,
+      "date": "20161024"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 11,
+      "date": "20161024"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 7675,
+      "date": "20161024"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 27,
+      "date": "20161024"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 24,
+      "date": "20161024"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 12,
+      "date": "20161024"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 12,
+      "date": "20161024"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 68,
+      "date": "20161024"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 661,
+      "date": "20161024"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 2095,
+      "date": "20161024"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 7637,
+      "date": "20161024"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 68,
+      "date": "20161024"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "UNKNOWN",
+      "pairs": 38290,
+      "date": "20161024"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 185,
+      "date": "20161025"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 241,
+      "date": "20161025"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 206,
+      "date": "20161025"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 28,
+      "date": "20161025"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 714,
+      "date": "20161025"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 195,
+      "date": "20161025"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1120,
+      "date": "20161025"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 1303,
+      "date": "20161025"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 34,
+      "date": "20161025"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "UNKNOWN",
+      "pairs": 2198,
+      "date": "20161025"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 201,
+      "date": "20161025"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1178,
+      "date": "20161025"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 6159,
+      "date": "20161025"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 7,
+      "date": "20161025"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 7574,
+      "date": "20161025"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 38,
+      "date": "20161025"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 39,
+      "date": "20161025"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 14,
+      "date": "20161025"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 6,
+      "date": "20161025"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 102,
+      "date": "20161025"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 747,
+      "date": "20161025"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 2210,
+      "date": "20161025"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 7471,
+      "date": "20161025"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 114,
+      "date": "20161025"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "UNKNOWN",
+      "pairs": 38377,
+      "date": "20161025"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 144,
+      "date": "20161026"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 195,
+      "date": "20161026"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 206,
+      "date": "20161026"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 21,
+      "date": "20161026"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 673,
+      "date": "20161026"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 180,
+      "date": "20161026"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 991,
+      "date": "20161026"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 1355,
+      "date": "20161026"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 19,
+      "date": "20161026"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "UNKNOWN",
+      "pairs": 2078,
+      "date": "20161026"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 182,
+      "date": "20161026"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1315,
+      "date": "20161026"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 6705,
+      "date": "20161026"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 17,
+      "date": "20161026"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 7576,
+      "date": "20161026"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 20,
+      "date": "20161026"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 22,
+      "date": "20161026"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 12,
+      "date": "20161026"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 17,
+      "date": "20161026"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 85,
+      "date": "20161026"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 714,
+      "date": "20161026"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 2085,
+      "date": "20161026"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 7672,
+      "date": "20161026"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 88,
+      "date": "20161026"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "UNKNOWN",
+      "pairs": 37950,
+      "date": "20161026"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 136,
+      "date": "20161027"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 205,
+      "date": "20161027"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 209,
+      "date": "20161027"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 24,
+      "date": "20161027"
+    },
+    {
+      "from_state": "CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 679,
+      "date": "20161027"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 167,
+      "date": "20161027"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1075,
+      "date": "20161027"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 1332,
+      "date": "20161027"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 18,
+      "date": "20161027"
+    },
+    {
+      "from_state": "MIXED_EVIDENCE",
+      "to_state": "UNKNOWN",
+      "pairs": 2174,
+      "date": "20161027"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 214,
+      "date": "20161027"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 1222,
+      "date": "20161027"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 6546,
+      "date": "20161027"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 7,
+      "date": "20161027"
+    },
+    {
+      "from_state": "NON_CONGESTED_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 7502,
+      "date": "20161027"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 22,
+      "date": "20161027"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 32,
+      "date": "20161027"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 11,
+      "date": "20161027"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 8,
+      "date": "20161027"
+    },
+    {
+      "from_state": "SEVERE_CONGESTION_PROXY",
+      "to_state": "UNKNOWN",
+      "pairs": 71,
+      "date": "20161027"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "CONGESTED_PROXY",
+      "pairs": 714,
+      "date": "20161027"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "MIXED_EVIDENCE",
+      "pairs": 2150,
+      "date": "20161027"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "NON_CONGESTED_PROXY",
+      "pairs": 7429,
+      "date": "20161027"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "SEVERE_CONGESTION_PROXY",
+      "pairs": 88,
+      "date": "20161027"
+    },
+    {
+      "from_state": "UNKNOWN",
+      "to_state": "UNKNOWN",
+      "pairs": 38053,
+      "date": "20161027"
+    }
+  ]
+}

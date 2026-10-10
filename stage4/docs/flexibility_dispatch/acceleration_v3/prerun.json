@@ -1,0 +1,480 @@
+{
+  "status": "COMPLETE",
+  "scope": "SIX_ASOF_V1_PHYSICAL_STATES_NO_NATIVE_REPLAY",
+  "states": [
+    {
+      "tick": 28800,
+      "waiting": 37,
+      "current_arcs": 25,
+      "predicted_vehicles": 478,
+      "forecast_requests": 607,
+      "future_edges": 3455,
+      "reused_raw_queries": 460,
+      "newly_resolved_raw_queries": 221,
+      "topk_arc_lookups": 701,
+      "snapshot_preparation_s": 1.3510642999972333,
+      "all_objectives_equal": true,
+      "variants": {
+        "V1_FLOW": {
+          "status": "OPTIMAL",
+          "wall_s": 0.35008859999652486,
+          "objective": [
+            0,
+            10,
+            1,
+            180.33333333333408,
+            -1185.8347519695951
+          ],
+          "variables": 3958,
+          "integer_variables": 503,
+          "nonzeros": 15214,
+          "build_s": 0.012837100002798252,
+          "optimize_s": 0.32855120000022,
+          "recovery_s": 0.004167899998719804,
+          "components": 0,
+          "pure_future_edges": 0
+        },
+        "V2_COMPRESSED": {
+          "status": "OPTIMAL",
+          "wall_s": 0.28276130000449484,
+          "objective": [
+            0,
+            10,
+            1,
+            180.33333333333408,
+            -1185.8347519695951
+          ],
+          "variables": 3503,
+          "integer_variables": 48,
+          "nonzeros": 10639,
+          "build_s": 0.01563630000600824,
+          "optimize_s": 0.26077539999823784,
+          "recovery_s": 0.002987699997902382,
+          "components": 0,
+          "pure_future_edges": 0
+        },
+        "V3_DECOMPOSED": {
+          "status": "OPTIMAL",
+          "wall_s": 0.2631104999964009,
+          "objective": [
+            0,
+            10,
+            1,
+            180.33333333333346,
+            -1185.8347519695951
+          ],
+          "variables": 3256,
+          "integer_variables": 48,
+          "nonzeros": 13106,
+          "build_s": 0.015228499993099831,
+          "optimize_s": 0.2425479000012274,
+          "recovery_s": 0.004333500008215196,
+          "components": 18,
+          "pure_future_edges": 247
+        }
+      }
+    },
+    {
+      "tick": 36000,
+      "waiting": 40,
+      "current_arcs": 39,
+      "predicted_vehicles": 570,
+      "forecast_requests": 743,
+      "future_edges": 4194,
+      "reused_raw_queries": 386,
+      "newly_resolved_raw_queries": 400,
+      "topk_arc_lookups": 786,
+      "snapshot_preparation_s": 1.5985234999970999,
+      "all_objectives_equal": true,
+      "variants": {
+        "V3_DECOMPOSED": {
+          "status": "OPTIMAL",
+          "wall_s": 0.2980476999946404,
+          "objective": [
+            0,
+            12,
+            1,
+            214.33333333333383,
+            -1852.1473368157056
+          ],
+          "variables": 3395,
+          "integer_variables": 70,
+          "nonzeros": 13721,
+          "build_s": 0.018287000006239396,
+          "optimize_s": 0.27359250000154134,
+          "recovery_s": 0.005094100008136593,
+          "components": 28,
+          "pure_future_edges": 869
+        },
+        "V2_COMPRESSED": {
+          "status": "OPTIMAL",
+          "wall_s": 0.4095503999997163,
+          "objective": [
+            0,
+            12,
+            1,
+            214.33333333333505,
+            -1852.1473368157056
+          ],
+          "variables": 4264,
+          "integer_variables": 70,
+          "nonzeros": 13003,
+          "build_s": 0.019867699993483257,
+          "optimize_s": 0.3813584000017727,
+          "recovery_s": 0.004093800002010539,
+          "components": 0,
+          "pure_future_edges": 0
+        },
+        "V1_FLOW": {
+          "status": "OPTIMAL",
+          "wall_s": 0.48513540000567446,
+          "objective": [
+            0,
+            12,
+            1,
+            214.33333333333505,
+            -1852.1473368157056
+          ],
+          "variables": 4803,
+          "integer_variables": 609,
+          "nonzeros": 18521,
+          "build_s": 0.012469299996155314,
+          "optimize_s": 0.4635312000027625,
+          "recovery_s": 0.003973800005041994,
+          "components": 0,
+          "pure_future_edges": 0
+        }
+      }
+    },
+    {
+      "tick": 43200,
+      "waiting": 58,
+      "current_arcs": 75,
+      "predicted_vehicles": 580,
+      "forecast_requests": 952,
+      "future_edges": 5420,
+      "reused_raw_queries": 472,
+      "newly_resolved_raw_queries": 632,
+      "topk_arc_lookups": 1110,
+      "snapshot_preparation_s": 1.9743069999967702,
+      "all_objectives_equal": true,
+      "variants": {
+        "V1_FLOW": {
+          "status": "OPTIMAL",
+          "wall_s": 0.6661395999981323,
+          "objective": [
+            1,
+            20,
+            4,
+            239.6666666666691,
+            -2988.0616112905145
+          ],
+          "variables": 6075,
+          "integer_variables": 655,
+          "nonzeros": 23763,
+          "build_s": 0.01578449999942677,
+          "optimize_s": 0.6384191000033752,
+          "recovery_s": 0.004760399999213405,
+          "components": 0,
+          "pure_future_edges": 0
+        },
+        "V2_COMPRESSED": {
+          "status": "OPTIMAL",
+          "wall_s": 0.5280572000046959,
+          "objective": [
+            1,
+            20,
+            4,
+            239.6666666666691,
+            -2988.0616112905145
+          ],
+          "variables": 5548,
+          "integer_variables": 128,
+          "nonzeros": 17029,
+          "build_s": 0.026763100002426654,
+          "optimize_s": 0.4914732000033837,
+          "recovery_s": 0.004598400002578273,
+          "components": 0,
+          "pure_future_edges": 0
+        },
+        "V3_DECOMPOSED": {
+          "status": "OPTIMAL",
+          "wall_s": 0.48570099999778904,
+          "objective": [
+            1,
+            20,
+            4,
+            239.66666666666856,
+            -2988.0616112905145
+          ],
+          "variables": 5185,
+          "integer_variables": 128,
+          "nonzeros": 20997,
+          "build_s": 0.023200800002086908,
+          "optimize_s": 0.4553077000018675,
+          "recovery_s": 0.005468500014103483,
+          "components": 17,
+          "pure_future_edges": 363
+        }
+      }
+    },
+    {
+      "tick": 54000,
+      "waiting": 65,
+      "current_arcs": 33,
+      "predicted_vehicles": 624,
+      "forecast_requests": 942,
+      "future_edges": 5242,
+      "reused_raw_queries": 530,
+      "newly_resolved_raw_queries": 715,
+      "topk_arc_lookups": 1245,
+      "snapshot_preparation_s": 2.201572900004976,
+      "all_objectives_equal": true,
+      "variants": {
+        "V3_DECOMPOSED": {
+          "status": "OPTIMAL",
+          "wall_s": 0.4456062999961432,
+          "objective": [
+            0,
+            8,
+            1,
+            248.6666666666682,
+            -1487.0972992600198
+          ],
+          "variables": 4626,
+          "integer_variables": 65,
+          "nonzeros": 18571,
+          "build_s": 0.02420410000922857,
+          "optimize_s": 0.41382290000183275,
+          "recovery_s": 0.006268900011491496,
+          "components": 18,
+          "pure_future_edges": 681
+        },
+        "V2_COMPRESSED": {
+          "status": "OPTIMAL",
+          "wall_s": 0.5283550999956788,
+          "objective": [
+            0,
+            8,
+            1,
+            248.66666666666936,
+            -1487.0972992600198
+          ],
+          "variables": 5307,
+          "integer_variables": 65,
+          "nonzeros": 16053,
+          "build_s": 0.02357250000932254,
+          "optimize_s": 0.4941045999948983,
+          "recovery_s": 0.004793699998117518,
+          "components": 0,
+          "pure_future_edges": 0
+        },
+        "V1_FLOW": {
+          "status": "OPTIMAL",
+          "wall_s": 0.6693173999956343,
+          "objective": [
+            0,
+            8,
+            1,
+            248.66666666666936,
+            -1487.0972992600198
+          ],
+          "variables": 5899,
+          "integer_variables": 657,
+          "nonzeros": 22735,
+          "build_s": 0.015135099994949996,
+          "optimize_s": 0.6422810000003665,
+          "recovery_s": 0.005021199998736847,
+          "components": 0,
+          "pure_future_edges": 0
+        }
+      }
+    },
+    {
+      "tick": 64800,
+      "waiting": 86,
+      "current_arcs": 40,
+      "predicted_vehicles": 655,
+      "forecast_requests": 917,
+      "future_edges": 5094,
+      "reused_raw_queries": 864,
+      "newly_resolved_raw_queries": 795,
+      "topk_arc_lookups": 1659,
+      "snapshot_preparation_s": 2.369335700001102,
+      "all_objectives_equal": true,
+      "variants": {
+        "V1_FLOW": {
+          "status": "OPTIMAL",
+          "wall_s": 0.6563968999980716,
+          "objective": [
+            0,
+            8,
+            1,
+            225.00000000000202,
+            -949.3164321736085
+          ],
+          "variables": 5789,
+          "integer_variables": 695,
+          "nonzeros": 22160,
+          "build_s": 0.014672500001324806,
+          "optimize_s": 0.630592000001343,
+          "recovery_s": 0.0048020999965956435,
+          "components": 0,
+          "pure_future_edges": 0
+        },
+        "V2_COMPRESSED": {
+          "status": "OPTIMAL",
+          "wall_s": 0.5174569999944651,
+          "objective": [
+            0,
+            8,
+            1,
+            225.00000000000202,
+            -949.3164321736085
+          ],
+          "variables": 5174,
+          "integer_variables": 80,
+          "nonzeros": 15689,
+          "build_s": 0.02312499999970896,
+          "optimize_s": 0.4841311999989557,
+          "recovery_s": 0.004564299997582566,
+          "components": 0,
+          "pure_future_edges": 0
+        },
+        "V3_DECOMPOSED": {
+          "status": "OPTIMAL",
+          "wall_s": 0.4909142000033171,
+          "objective": [
+            0,
+            8,
+            1,
+            225.00000000000142,
+            -949.3164321736085
+          ],
+          "variables": 4831,
+          "integer_variables": 80,
+          "nonzeros": 19411,
+          "build_s": 0.02263429999584332,
+          "optimize_s": 0.4607423000052222,
+          "recovery_s": 0.00565669999923557,
+          "components": 16,
+          "pure_future_edges": 343
+        }
+      }
+    },
+    {
+      "tick": 75600,
+      "waiting": 69,
+      "current_arcs": 34,
+      "predicted_vehicles": 600,
+      "forecast_requests": 783,
+      "future_edges": 4387,
+      "reused_raw_queries": 488,
+      "newly_resolved_raw_queries": 760,
+      "topk_arc_lookups": 1268,
+      "snapshot_preparation_s": 2.4114653000069666,
+      "all_objectives_equal": true,
+      "variants": {
+        "V3_DECOMPOSED": {
+          "status": "OPTIMAL",
+          "wall_s": 0.24930229999881703,
+          "objective": [
+            0,
+            10,
+            2,
+            182.66666666666683,
+            -1664.5767262088757
+          ],
+          "variables": 4066,
+          "integer_variables": 53,
+          "nonzeros": 16378,
+          "build_s": 0.01870000000053551,
+          "optimize_s": 0.22256669999478618,
+          "recovery_s": 0.00693810004304396,
+          "components": 27,
+          "pure_future_edges": 374
+        },
+        "V2_COMPRESSED": {
+          "status": "OPTIMAL",
+          "wall_s": 0.23818279999977676,
+          "objective": [
+            0,
+            10,
+            2,
+            182.66666666666748,
+            -1664.5767262088757
+          ],
+          "variables": 4440,
+          "integer_variables": 53,
+          "nonzeros": 13487,
+          "build_s": 0.01984950000041863,
+          "optimize_s": 0.20967550000204938,
+          "recovery_s": 0.004247199998644646,
+          "components": 0,
+          "pure_future_edges": 0
+        },
+        "V1_FLOW": {
+          "status": "OPTIMAL",
+          "wall_s": 0.3343945000015083,
+          "objective": [
+            0,
+            10,
+            2,
+            182.66666666666748,
+            -1664.5767262088757
+          ],
+          "variables": 5021,
+          "integer_variables": 634,
+          "nonzeros": 19116,
+          "build_s": 0.013010800001211464,
+          "optimize_s": 0.31191190000390634,
+          "recovery_s": 0.004105400003027171,
+          "components": 0,
+          "pure_future_edges": 0
+        }
+      }
+    }
+  ],
+  "routing": {
+    "V2_EAGER_1X1": {
+      "wall_s": 1.8520086999997147,
+      "exact_answers_equal": true,
+      "query_batches": 120,
+      "arc_lookups": 2400,
+      "routing_arcs": 2231,
+      "backend_queries": 2231,
+      "raw_prefetch_avoided": 0,
+      "process_group_rss_mib": 622.2890625
+    },
+    "V3_DEMAND_1X1": {
+      "wall_s": 1.8253783999971347,
+      "exact_answers_equal": true,
+      "query_batches": 120,
+      "arc_lookups": 2400,
+      "routing_arcs": 2231,
+      "backend_queries": 2231,
+      "raw_prefetch_avoided": 0,
+      "process_group_rss_mib": 622.5546875
+    },
+    "V3_GROUPED_CANDIDATE": {
+      "wall_s": 1.5175631000020076,
+      "exact_answers_equal": true,
+      "query_batches": 120,
+      "arc_lookups": 2400,
+      "routing_arcs": 2231,
+      "backend_queries": 939,
+      "raw_prefetch_avoided": 0,
+      "process_group_rss_mib": 628.8671875
+    }
+  },
+  "model_objectives_equal": true,
+  "grouped_source_enabled_by_default": false,
+  "native_scientific_conditions_added": 0,
+  "future_completion_times_used_for_prediction": false,
+  "gpu_used": false,
+  "dense_matrix": false,
+  "runtime_s": 28.405213700003515,
+  "peak_parent_rss_mib": 311.328125,
+  "source_assignments_sha256": "6fa89e2c0fd5a472cb267b156bb3cde6d3c99c1b1060c07ea7712aed2121337e",
+  "science_config_sha256": "92865914130ce9ebc23ebe5ca45a3c5d01da3dd1b2c7d4e4293462ea059d65e9"
+}

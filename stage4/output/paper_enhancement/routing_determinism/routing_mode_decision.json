@@ -1,0 +1,38 @@
+{
+  "sample_size": 60,
+  "repeats_per_scalar_or_m1_arc": 5,
+  "scalar_failure_rate": 0.0,
+  "m1_failure_rate": 0.0,
+  "mb_failure_rate": 0.0,
+  "scalar_max_within_arc_range_s": 0.0,
+  "m1_max_within_arc_range_s": 0.0,
+  "mb_max_abs_difference_vs_m1_s": 0.0,
+  "max_source_position_spread_s": 0.0,
+  "known_divergent_arc_m1_values_s": [
+    60.0
+  ],
+  "selected_routing_mode": "SINGLE_SOURCE_MATRIX",
+  "performance_status": "PASS",
+  "performance": [
+    {
+      "routing_mode": "SINGLE_SOURCE_MATRIX",
+      "arc_count": 5000,
+      "wall_time_s": 6.095713299997442,
+      "arcs_per_second": 820.2485507318886,
+      "peak_rss_mb": 225.46875,
+      "failure_count": 0,
+      "failure_rate": 0.0,
+      "cache_behavior": "DISABLED_UNIQUE_ARC_SPIKE"
+    },
+    {
+      "routing_mode": "SCALAR_ROUTE",
+      "arc_count": 5000,
+      "wall_time_s": 5.406585800003086,
+      "arcs_per_second": 924.7980490751014,
+      "peak_rss_mb": 222.5703125,
+      "failure_count": 0,
+      "failure_rate": 0.0,
+      "cache_behavior": "DISABLED_UNIQUE_ARC_SPIKE"
+    }
+  ]
+}

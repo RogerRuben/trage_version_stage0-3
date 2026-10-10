@@ -1,0 +1,200 @@
+{
+  "status": "COMPLETE",
+  "created_at": "2026-10-06T04:46:04.798659+00:00",
+  "inputs_sha256": {
+    "stage4\\config\\replay_calibration_v1.json": "43670960eb50b01cb9c4d68f9f1661b4a548aaa9a2459f8c2a736c4004bf2def",
+    "stage0\\work_v6_final\\candidate_manifests\\date=20161031.parquet": "3000abf4931845d0b28fe2ed03ad1fec5f5a62aa3fe4e1101a32b5c8f3cd2640",
+    "stage4\\input\\replay_foundation\\pickup_eta_calibration_15min.parquet": "d7bc9bedd76b6a996fd9643c24546e5eb28c36b827d16ad8e58ca097c492476b",
+    "stage4\\output\\symmetric_flexibility_v1\\accelerated_v4_full_day\\SERVICE_PRESERVING_LOOKAHEAD\\summary.json": "83b44b61f0da2fb9a612ac12f8fbf2ae712c55495f9c487d51b5b159db227506",
+    "stage4\\output\\runtime_acceleration_v2\\assets\\orders.npy": "45a5fe9a57b0af3bf6b8af1fbcc72260eecccacc77dc4889e57b5dcef8d07d2c"
+  },
+  "raw_diagnostics": {
+    "source_order_count": 105460,
+    "source_unique_driver_count": 17341,
+    "invalid_session_row_count": 69,
+    "request_before_day_count": 0,
+    "request_at_or_after_day_end_count": 11
+  },
+  "full_history_valid_orders": 105391,
+  "full_history_predecessor_count": 88054,
+  "full_history_overlap_count": 4600,
+  "full_history_session_break_count": 12246,
+  "common_order_count": 28367,
+  "common_no_predecessor_count": 4609,
+  "common_overlap_count": 1247,
+  "common_session_break_count": 3150,
+  "common_chain_candidate_count": 19353,
+  "predecessor_outside_common_share": 0.7081589417661345,
+  "historical_session_retained_mixed_hv_share": 0.1454154475270561,
+  "request_proxy_shift_s": {
+    "count": 30000,
+    "mean": 0.0,
+    "p00": 0.0,
+    "p25": 0.0,
+    "p50": 0.0,
+    "p75": 0.0,
+    "p90": 0.0,
+    "p100": 0.0
+  },
+  "sampled": 1200,
+  "sample_seed": 20261006,
+  "sample_order_ids_sha256": "974dfbe5ec3ca780e17c5628c6ce301fb6650607e35084282ae5c98584fa4807",
+  "route_success_count": 1200,
+  "route_failure_count": 0,
+  "sample_groups": [
+    {
+      "group": "ALL_SAMPLE_OK",
+      "n": 1200,
+      "raw_fits_historical_gap": 1197,
+      "corrected_fits_historical_gap": 1080,
+      "timing_idle_hold_conflict": 495,
+      "raw_timing_idle_hold_conflict": 130,
+      "beta_only_gap_conflict": 117,
+      "beta_only_patience_conflict": 448
+    },
+    {
+      "group": "MIXED_SERVED",
+      "n": 821,
+      "raw_fits_historical_gap": 820,
+      "corrected_fits_historical_gap": 751,
+      "timing_idle_hold_conflict": 309,
+      "raw_timing_idle_hold_conflict": 70,
+      "beta_only_gap_conflict": 69,
+      "beta_only_patience_conflict": 284
+    },
+    {
+      "group": "MIXED_EXPIRED",
+      "n": 379,
+      "raw_fits_historical_gap": 377,
+      "corrected_fits_historical_gap": 329,
+      "timing_idle_hold_conflict": 186,
+      "raw_timing_idle_hold_conflict": 60,
+      "beta_only_gap_conflict": 48,
+      "beta_only_patience_conflict": 164
+    }
+  ],
+  "gap_s": {
+    "count": 1200,
+    "mean": 1033.805,
+    "p00": 55.0,
+    "p25": 349.0,
+    "p50": 606.5,
+    "p75": 1307.0,
+    "p90": 2518.500000000001,
+    "p100": 5307.0
+  },
+  "empty_distance_m": {
+    "count": 1200,
+    "mean": 1975.5558333333333,
+    "p00": 3.0,
+    "p25": 777.0,
+    "p50": 1421.0,
+    "p75": 2486.25,
+    "p90": 4367.600000000002,
+    "p100": 14355.0
+  },
+  "raw_eta_s": {
+    "count": 1200,
+    "mean": 149.4675,
+    "p00": 0.0,
+    "p25": 70.0,
+    "p50": 118.5,
+    "p75": 192.25,
+    "p90": 316.0,
+    "p100": 819.0
+  },
+  "corrected_eta_s": {
+    "count": 1200,
+    "mean": 361.05229552766417,
+    "p00": 0.0,
+    "p25": 169.66496211131994,
+    "p50": 289.53302682135285,
+    "p75": 468.5621185350827,
+    "p90": 715.0730063022954,
+    "p100": 1919.846609419015
+  },
+  "beta_identified_from_actual_empty_pickup_labels": false,
+  "gap_is_idle_plus_empty_upper_budget_not_observed_pickup_time": true,
+  "source_beta_definition": "median(realized_loaded_OD_time / Valhalla_loaded_OD_time) by 15-minute bin",
+  "canonical_mixed": {
+    "cohort_groups": [
+      {
+        "group": "M_P70_AV_ELIGIBLE",
+        "orders": 16987,
+        "matched": 12188,
+        "expired": 4799,
+        "service_rate": 0.7174898451757226
+      },
+      {
+        "group": "M_P70_HV_ONLY",
+        "orders": 11380,
+        "matched": 7266,
+        "expired": 4114,
+        "service_rate": 0.6384885764499121
+      }
+    ],
+    "candidate_visits": {
+      "candidate_topk_pairs": 2225369,
+      "valid_or_arcs": 66499,
+      "patience_arc_exclusions": 1911264,
+      "hv_window_arc_exclusions": 2582,
+      "zero_eta_session_certified_prunes": 245024,
+      "candidate_partition_reconciled": true
+    },
+    "available_vehicles": {
+      "count": 2893,
+      "mean": 331.41272035948845,
+      "p00": 207.0,
+      "p25": 268.0,
+      "p50": 325.0,
+      "p75": 381.0,
+      "p90": 423.0,
+      "p100": 466.0
+    },
+    "waiting_orders": {
+      "count": 2893,
+      "mean": 41.017628759073624,
+      "p00": 0.0,
+      "p25": 7.0,
+      "p50": 44.0,
+      "p75": 63.0,
+      "p90": 78.0,
+      "p100": 119.0
+    },
+    "occupied_hours": [
+      {
+        "vehicle_type": "AV",
+        "available_hours_clipped": 6144.0,
+        "occupied_pickup_service_hours_clipped": 1023.0835405823609,
+        "occupied_share": 0.16651750334999363
+      },
+      {
+        "vehicle_type": "HV",
+        "available_hours_clipped": 6153.989444444444,
+        "occupied_pickup_service_hours_clipped": 3390.5355254787196,
+        "occupied_share": 0.5509491941913466
+      }
+    ],
+    "assigned_beta": {
+      "count": 19454,
+      "mean": 2.4211555457938028,
+      "p00": 1.3189033252684674,
+      "p25": 2.1266194340594984,
+      "p50": 2.420218158708227,
+      "p75": 2.671390810415612,
+      "p90": 2.946512972062727,
+      "p100": 3.693838257484858
+    },
+    "expiry_is_terminal_state_not_disjoint_root_cause": true
+  },
+  "runtime_s": 5.477424799988512,
+  "completed_route_stage_runtime_s": 4.320101599994814,
+  "summary_finalization_runtime_s": 1.1573254999966593,
+  "summary_finalized_from_completed_routing": true,
+  "runtime_definition": "sum of measured completed route stage and aggregation-only finalization",
+  "peak_rss_mib": 268.984375,
+  "rss_measurement": "max completed-route checkpoint observation and finalizer process lifetime peak",
+  "gpu_used": false,
+  "dense_matrix": false,
+  "frozen_beta_changed": false
+}

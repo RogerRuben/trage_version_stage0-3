@@ -1,0 +1,69 @@
+{
+  "status": "EPOCH_PREFLIGHT_COMPLETE_NOT_NATIVE_CHECKPOINT",
+  "rows": [
+    {
+      "q_A": 0.5,
+      "scenario": "ODD_Q50_M_P70_REFERENCE",
+      "checkpoint_time": "2016-10-31T10:30:00+08:00",
+      "total_fixtures": 4444,
+      "available_reconstructed": 359,
+      "available_reference": 367,
+      "waiting_reconstructed": 64,
+      "waiting_reference": 64,
+      "in_progress_assignments": 247,
+      "in_progress_pickups": 29,
+      "in_progress_services": 218,
+      "captured_arcs": 9,
+      "reference_arcs": 19,
+      "selected_count": 4,
+      "reference_selected_count": 8,
+      "selected_identity_equal": false,
+      "selected_symmetric_difference": 12,
+      "pickup_objective_s": 840.0730313426179,
+      "reference_pickup_objective_s": 1278.5862265889114,
+      "routing_arcs": 1159,
+      "routing_failures": 0,
+      "gamma_state": {
+        "av_assignments": 671,
+        "static": 1419.3982843137255,
+        "dynamic": 95.64505263388362,
+        "speed": 0.0
+      },
+      "native_checkpoint_restored": false
+    },
+    {
+      "q_A": 0.75,
+      "scenario": "MAIN_Q75_M_P70",
+      "checkpoint_time": "2016-10-31T10:30:00+08:00",
+      "total_fixtures": 2485,
+      "available_reconstructed": 389,
+      "available_reference": 396,
+      "waiting_reconstructed": 95,
+      "waiting_reference": 95,
+      "in_progress_assignments": 157,
+      "in_progress_pickups": 18,
+      "in_progress_services": 139,
+      "captured_arcs": 2,
+      "reference_arcs": 13,
+      "selected_count": 2,
+      "reference_selected_count": 7,
+      "selected_identity_equal": false,
+      "selected_symmetric_difference": 9,
+      "pickup_objective_s": 428.6589661396349,
+      "reference_pickup_objective_s": 958.3237806225172,
+      "routing_arcs": 1585,
+      "routing_failures": 0,
+      "gamma_state": {
+        "av_assignments": 918,
+        "static": 2130.2024509803923,
+        "dynamic": 158.92564021647448,
+        "speed": 0.4375
+      },
+      "native_checkpoint_restored": false
+    }
+  ],
+  "runtime_s": 25.842553399999815,
+  "peak_working_set_mib": 297.8125,
+  "routing_mode": "SINGLE_SOURCE_MATRIX",
+  "full_simulation_run": false
+}

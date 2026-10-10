@@ -1,0 +1,1240 @@
+{
+  "status": "W1_W2_SMALL_INSTANCES_COMPLETE",
+  "kind": "TRAIN_DATA_SMALL_OFFLINE_INSTANCE_NOT_CITY_REPLAY",
+  "config": {
+    "schema_version": "capability_chain_instance_v1",
+    "historical_date": "20161010",
+    "window_starts_s": [
+      27000,
+      61200
+    ],
+    "horizon_s": 1800,
+    "patience_s": 300,
+    "execution_step_s": 30,
+    "selection_seed": 20261008,
+    "maximum_tasks": 10,
+    "diagnostic_C_task_target": 4,
+    "candidate_site_count": 4,
+    "grid_size_degrees": 0.02,
+    "grid_origin_wgs84": [
+      108.0,
+      34.0
+    ],
+    "interface_snap_tolerance_m": 80.0,
+    "maximum_route_queries": 260,
+    "maximum_rss_mib": 1536,
+    "maximum_runtime_s": 900,
+    "resource_profiles": [
+      "HV",
+      "HV",
+      "C"
+    ],
+    "availability_assumption": "THREE_SYNTHETIC_EQUAL_30_MINUTE_ADMISSION_WINDOWS_NOT_EMPIRICAL_FLEET_OR_Q10",
+    "connector_time_assumption": "WINDOW_START_UNCALIBRATED_AUTO_TIME_SNAPSHOT_NOT_TEST31_FITTED_BETA",
+    "scenario_eta_multiplier": 1.0,
+    "new_connector_traffic_assumption": "EXPLICIT_U_NOT_NEW_M3_PREDICTION",
+    "information_assumption": "OFFLINE_FULLY_KNOWN_HISTORICAL_INSTANCE_NOT_ONLINE_POLICY",
+    "passenger_assumption": "ALL_SELECTED_CUSTOMERS_ACCEPT_EITHER_TYPE_FOR_THIS_SMALL_MECHANISM_INSTANCE",
+    "native_or_full_day_authorized": false
+  },
+  "sources": {
+    "templates": "stage4\\output\\symmetric_flexibility_v1\\input\\train_request_templates.parquet",
+    "templates_sha256": "f0ee98eb4ad5aca69125ace8610ce4ff2c40edb6b7f5e62016ee321a432af652",
+    "template_dates": [
+      "20161010",
+      "20161017",
+      "20161024"
+    ],
+    "reference": "stage4\\output\\paper_enhancement\\repositioning_robustness\\train_tod_demand_reference.parquet",
+    "reference_sha256": "97f9931d9a0d114059699ea92b692df80bb1d54e065c757c075d723d7291ab07",
+    "site_reference_train_dates": "20161009--20161024",
+    "no_Test31_demand_or_calibration": true,
+    "no_new_M3_inference": true,
+    "customer_service_time": "FROZEN_TRAIN_M3_PREDICTED_P50",
+    "connector_time": "UNCALIBRATED_FROZEN_ROUTING_ENGINE_AUTO_TIME_AT_WINDOW_START",
+    "Test31_fitted_S0_eta_multiplier_reused": false
+  },
+  "cases": [
+    {
+      "case_id": "TRAIN_20161010_0730",
+      "sample": {
+        "cell_window_orders": 45,
+        "cell_window_C_orders": 4,
+        "selected_orders": 10,
+        "selected_C_orders": 4,
+        "sampling": "STABLE_HASH_WITH_UP_TO_4_C_TASKS_REMAINDER_NON_C_DIAGNOSTIC_NOT_POPULATION_ESTIMATE"
+      },
+      "sites": [
+        {
+          "site_id": "S01",
+          "historical_pickups_all_train": 13376,
+          "first_C_task_count": 0,
+          "supported_first_HV_task_count": 2,
+          "is_fixed_C_hotspot": false
+        },
+        {
+          "site_id": "S02",
+          "historical_pickups_all_train": 11130,
+          "first_C_task_count": 1,
+          "supported_first_HV_task_count": 1,
+          "is_fixed_C_hotspot": false
+        },
+        {
+          "site_id": "S03",
+          "historical_pickups_all_train": 10818,
+          "first_C_task_count": 1,
+          "supported_first_HV_task_count": 3,
+          "is_fixed_C_hotspot": true
+        },
+        {
+          "site_id": "S04",
+          "historical_pickups_all_train": 10408,
+          "first_C_task_count": 0,
+          "supported_first_HV_task_count": 3,
+          "is_fixed_C_hotspot": false
+        }
+      ],
+      "connection_state_counts": {
+        "SUPPORTED_MODELED_DIRECTED_CONNECTOR_AND_JOIN": 13,
+        "TIME_IMPOSSIBLE_UNDER_SNAPSHOT": 43,
+        "COMMON_ROUTE_INPUT_UNSUPPORTED": 4,
+        "COMMON_INTERFACE_INPUT_UNSUPPORTED": 11,
+        "TIME_IMPOSSIBLE_WITH_ZERO_CONNECTOR_LOWER_BOUND": 59
+      },
+      "C_connector_failure_reason_counts": {
+        "UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 2,
+        "UTURN_OUTSIDE_RESEARCH_PROFILE": 5
+      },
+      "common_input_failure_reason_counts": {
+        "EDGE_WALK_INVALID_SHAPE_INDEX_OR_LENGTH": 4,
+        "CUSTOMER_EMPTY_JOIN_TOO_FAR_FROM_SHARED_ENDPOINT": 6,
+        "CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT": 5
+      },
+      "supported_job_to_job_connectors": 4,
+      "supported_C_job_to_job_connectors": 0,
+      "fixed_layout": {
+        "served": 4,
+        "empty_distance_m": 9115.0,
+        "served_by_profile": {
+          "C": 1,
+          "HV": 3
+        },
+        "mean_pickup_wait_s": 207.71499999999997,
+        "delayed_commit_count": 0,
+        "cross_window_completion_count": 0,
+        "selected": [
+          {
+            "resource_id": "C1",
+            "profile_id": "C",
+            "site_id": "S03",
+            "job_ids": [
+              "J06"
+            ],
+            "jobs": [
+              {
+                "job_id": "J06",
+                "origin_id": "S03",
+                "release_s": 493.0,
+                "deadline_s": 793.0,
+                "commit_s": 510.0,
+                "departure_s": 510.0,
+                "pickup_s": 671.93,
+                "finish_s": 829.657741241455,
+                "empty_time_s": 161.93,
+                "empty_distance_m": 1728.0
+              }
+            ]
+          },
+          {
+            "resource_id": "H1",
+            "profile_id": "HV",
+            "site_id": "S03",
+            "job_ids": [
+              "J05",
+              "J09"
+            ],
+            "jobs": [
+              {
+                "job_id": "J05",
+                "origin_id": "S03",
+                "release_s": 311.0,
+                "deadline_s": 611.0,
+                "commit_s": 330.0,
+                "departure_s": 330.0,
+                "pickup_s": 588.273,
+                "finish_s": 1004.3020627479553,
+                "empty_time_s": 258.273,
+                "empty_distance_m": 4188.0
+              },
+              {
+                "job_id": "J09",
+                "origin_id": "J05",
+                "release_s": 1193.0,
+                "deadline_s": 1493.0,
+                "commit_s": 1200.0,
+                "departure_s": 1200.0,
+                "pickup_s": 1333.829,
+                "finish_s": 1687.4629292526245,
+                "empty_time_s": 133.829,
+                "empty_distance_m": 1300.0
+              }
+            ]
+          },
+          {
+            "resource_id": "H2",
+            "profile_id": "HV",
+            "site_id": "S01",
+            "job_ids": [
+              "J01"
+            ],
+            "jobs": [
+              {
+                "job_id": "J01",
+                "origin_id": "S01",
+                "release_s": 47.0,
+                "deadline_s": 347.0,
+                "commit_s": 60.0,
+                "departure_s": 60.0,
+                "pickup_s": 280.828,
+                "finish_s": 719.6233797578811,
+                "empty_time_s": 220.828,
+                "empty_distance_m": 1899.0
+              }
+            ]
+          }
+        ],
+        "lp": {
+          "served_upper_bound": 4.0,
+          "served_lp_value": 4.0,
+          "gap_jobs": 0.0,
+          "rows": 13,
+          "columns": 12,
+          "nonzeros": 24,
+          "job_constraint_rows": 10,
+          "resource_equality_rows": 3,
+          "full_column_domain": true,
+          "sparse_matrix": true,
+          "nonzero_solution": [
+            {
+              "resource_id": "C1",
+              "site_id": "S03",
+              "job_ids": [
+                "J06"
+              ],
+              "weight": 1.0
+            },
+            {
+              "resource_id": "H1",
+              "site_id": "S03",
+              "job_ids": [
+                "J05",
+                "J09"
+              ],
+              "weight": 1.0
+            },
+            {
+              "resource_id": "H2",
+              "site_id": "S01",
+              "job_ids": [
+                "J01"
+              ],
+              "weight": 1.0
+            }
+          ],
+          "job_prices": {
+            "J01": 0.0,
+            "J02": 0.0,
+            "J03": 0.0,
+            "J04": 0.0,
+            "J05": 0.0,
+            "J06": 1.0,
+            "J07": 0.0,
+            "J08": 0.0,
+            "J09": 1.0,
+            "J10": 0.0
+          },
+          "resource_prices": {
+            "C1": 0.0,
+            "H1": 1.0,
+            "H2": 1.0
+          },
+          "certificate": {
+            "checked_columns": 12,
+            "minimum_dual_slack": 0.0,
+            "primal_max_violation": 0.0,
+            "dual_objective": 4.0,
+            "primal_dual_gap": 0.0
+          }
+        },
+        "enumeration": {
+          "chains_per_resource": {
+            "C1": 2,
+            "H1": 6,
+            "H2": 4
+          },
+          "per_resource_site": [
+            {
+              "resource_id": "C1",
+              "site_id": "S03",
+              "chain_count": 2,
+              "nonempty_chain_count": 1,
+              "includes_resource_idle_column": true,
+              "max_served_in_single_chain": 1
+            },
+            {
+              "resource_id": "H1",
+              "site_id": "S03",
+              "chain_count": 6,
+              "nonempty_chain_count": 5,
+              "includes_resource_idle_column": true,
+              "max_served_in_single_chain": 2
+            },
+            {
+              "resource_id": "H2",
+              "site_id": "S01",
+              "chain_count": 4,
+              "nonempty_chain_count": 3,
+              "includes_resource_idle_column": true,
+              "max_served_in_single_chain": 2
+            }
+          ],
+          "dp_states": 27,
+          "integer_mask_choices_per_resource": {
+            "C1": 2,
+            "H1": 6,
+            "H2": 4
+          },
+          "complete": true,
+          "idle_columns_per_resource": 1,
+          "max_chains_per_resource": 20000,
+          "max_dp_states": 50000
+        },
+        "runtime_s": 0.005944000033196062
+      },
+      "joint_layout": {
+        "served": 4,
+        "empty_distance_m": 5967.0,
+        "served_by_profile": {
+          "C": 1,
+          "HV": 3
+        },
+        "mean_pickup_wait_s": 170.56325,
+        "delayed_commit_count": 0,
+        "cross_window_completion_count": 1,
+        "selected": [
+          {
+            "resource_id": "C1",
+            "profile_id": "C",
+            "site_id": "S02",
+            "job_ids": [
+              "J08"
+            ],
+            "jobs": [
+              {
+                "job_id": "J08",
+                "origin_id": "S02",
+                "release_s": 1090.0,
+                "deadline_s": 1390.0,
+                "commit_s": 1110.0,
+                "departure_s": 1110.0,
+                "pickup_s": 1205.008,
+                "finish_s": 1895.2735653953553,
+                "empty_time_s": 95.008,
+                "empty_distance_m": 957.0
+              }
+            ]
+          },
+          {
+            "resource_id": "H1",
+            "profile_id": "HV",
+            "site_id": "S03",
+            "job_ids": [
+              "J06",
+              "J09"
+            ],
+            "jobs": [
+              {
+                "job_id": "J06",
+                "origin_id": "S03",
+                "release_s": 493.0,
+                "deadline_s": 793.0,
+                "commit_s": 510.0,
+                "departure_s": 510.0,
+                "pickup_s": 671.93,
+                "finish_s": 829.657741241455,
+                "empty_time_s": 161.93,
+                "empty_distance_m": 1728.0
+              },
+              {
+                "job_id": "J09",
+                "origin_id": "J06",
+                "release_s": 1193.0,
+                "deadline_s": 1493.0,
+                "commit_s": 1200.0,
+                "departure_s": 1200.0,
+                "pickup_s": 1347.487,
+                "finish_s": 1701.1209292526246,
+                "empty_time_s": 147.487,
+                "empty_distance_m": 1383.0
+              }
+            ]
+          },
+          {
+            "resource_id": "H2",
+            "profile_id": "HV",
+            "site_id": "S01",
+            "job_ids": [
+              "J01"
+            ],
+            "jobs": [
+              {
+                "job_id": "J01",
+                "origin_id": "S01",
+                "release_s": 47.0,
+                "deadline_s": 347.0,
+                "commit_s": 60.0,
+                "departure_s": 60.0,
+                "pickup_s": 280.828,
+                "finish_s": 719.6233797578811,
+                "empty_time_s": 220.828,
+                "empty_distance_m": 1899.0
+              }
+            ]
+          }
+        ],
+        "lp": {
+          "served_upper_bound": 4.0,
+          "served_lp_value": 4.0,
+          "gap_jobs": 0.0,
+          "rows": 13,
+          "columns": 13,
+          "nonzeros": 26,
+          "job_constraint_rows": 10,
+          "resource_equality_rows": 3,
+          "full_column_domain": true,
+          "sparse_matrix": true,
+          "nonzero_solution": [
+            {
+              "resource_id": "C1",
+              "site_id": "S02",
+              "job_ids": [
+                "J08"
+              ],
+              "weight": 1.0
+            },
+            {
+              "resource_id": "H1",
+              "site_id": "S03",
+              "job_ids": [
+                "J06"
+              ],
+              "weight": 1.0
+            },
+            {
+              "resource_id": "H2",
+              "site_id": "S01",
+              "job_ids": [
+                "J05",
+                "J09"
+              ],
+              "weight": 1.0
+            }
+          ],
+          "job_prices": {
+            "J01": 0.0,
+            "J02": 0.0,
+            "J03": 0.0,
+            "J04": 0.0,
+            "J05": 0.0,
+            "J06": 0.0,
+            "J07": 0.0,
+            "J08": 0.0,
+            "J09": 1.0,
+            "J10": 0.0
+          },
+          "resource_prices": {
+            "C1": 1.0,
+            "H1": 1.0,
+            "H2": 1.0
+          },
+          "certificate": {
+            "checked_columns": 13,
+            "minimum_dual_slack": 0.0,
+            "primal_max_violation": 0.0,
+            "dual_objective": 4.0,
+            "primal_dual_gap": 0.0
+          }
+        },
+        "enumeration": {
+          "chains_per_resource": {
+            "C1": 3,
+            "H1": 6,
+            "H2": 4
+          },
+          "per_resource_site": [
+            {
+              "resource_id": "C1",
+              "site_id": "S01",
+              "chain_count": 1,
+              "nonempty_chain_count": 0,
+              "includes_resource_idle_column": true,
+              "max_served_in_single_chain": 0
+            },
+            {
+              "resource_id": "C1",
+              "site_id": "S02",
+              "chain_count": 1,
+              "nonempty_chain_count": 1,
+              "includes_resource_idle_column": false,
+              "max_served_in_single_chain": 1
+            },
+            {
+              "resource_id": "C1",
+              "site_id": "S03",
+              "chain_count": 1,
+              "nonempty_chain_count": 1,
+              "includes_resource_idle_column": false,
+              "max_served_in_single_chain": 1
+            },
+            {
+              "resource_id": "C1",
+              "site_id": "S04",
+              "chain_count": 0,
+              "nonempty_chain_count": 0,
+              "includes_resource_idle_column": false,
+              "max_served_in_single_chain": 0
+            },
+            {
+              "resource_id": "H1",
+              "site_id": "S03",
+              "chain_count": 6,
+              "nonempty_chain_count": 5,
+              "includes_resource_idle_column": true,
+              "max_served_in_single_chain": 2
+            },
+            {
+              "resource_id": "H2",
+              "site_id": "S01",
+              "chain_count": 4,
+              "nonempty_chain_count": 3,
+              "includes_resource_idle_column": true,
+              "max_served_in_single_chain": 2
+            }
+          ],
+          "dp_states": 48,
+          "integer_mask_choices_per_resource": {
+            "C1": 3,
+            "H1": 6,
+            "H2": 4
+          },
+          "complete": true,
+          "idle_columns_per_resource": 1,
+          "max_chains_per_resource": 20000,
+          "max_dp_states": 50000
+        },
+        "runtime_s": 0.005700299981981516
+      },
+      "served_gain": 0,
+      "routing_and_join_runtime_s": 3.133583999995608,
+      "total_case_runtime_s": 3.3139595999964513,
+      "private_instance_path": "stage4\\output\\capability_chain_planning\\instances_v1\\TRAIN_20161010_0730",
+      "interpretation": "EXACT_ONLY_IN_THIS_SNAPSHOT_TASK_SITE_SUPPORTED_CONNECTOR_DOMAIN_NOT_CITY_OR_ONLINE_OPTIMUM",
+      "layout_comparison": {
+        "gained_jobs": [
+          "J08"
+        ],
+        "lost_jobs": [
+          "J05"
+        ],
+        "jointly_served_jobs": [
+          "J01",
+          "J06",
+          "J09"
+        ],
+        "paired_mean_pickup_wait_change_s": 4.55266666666671,
+        "empty_distance_reduction_pct": 34.53647833241909,
+        "average_wait_population_is_identical": false
+      },
+      "C_task_pair_state_counts": {
+        "TIME_IMPOSSIBLE_WITH_ZERO_CONNECTOR_LOWER_BOUND": 8,
+        "TIME_IMPOSSIBLE_UNDER_SNAPSHOT": 3,
+        "COMMON_INTERFACE_INPUT_UNSUPPORTED": 1
+      },
+      "C_task_pair_supported_but_C_incompatible_count": 0,
+      "release_ordered_C_task_pair_state_counts": {
+        "TIME_IMPOSSIBLE_WITH_ZERO_CONNECTOR_LOWER_BOUND": 2,
+        "TIME_IMPOSSIBLE_UNDER_SNAPSHOT": 3,
+        "COMMON_INTERFACE_INPUT_UNSUPPORTED": 1
+      },
+      "release_ordered_C_task_pair_count": 6
+    },
+    {
+      "case_id": "TRAIN_20161010_1700",
+      "sample": {
+        "cell_window_orders": 97,
+        "cell_window_C_orders": 14,
+        "selected_orders": 10,
+        "selected_C_orders": 4,
+        "sampling": "STABLE_HASH_WITH_UP_TO_4_C_TASKS_REMAINDER_NON_C_DIAGNOSTIC_NOT_POPULATION_ESTIMATE"
+      },
+      "sites": [
+        {
+          "site_id": "S01",
+          "historical_pickups_all_train": 13376,
+          "first_C_task_count": 1,
+          "supported_first_HV_task_count": 4,
+          "is_fixed_C_hotspot": true
+        },
+        {
+          "site_id": "S02",
+          "historical_pickups_all_train": 11130,
+          "first_C_task_count": 0,
+          "supported_first_HV_task_count": 1,
+          "is_fixed_C_hotspot": false
+        },
+        {
+          "site_id": "S03",
+          "historical_pickups_all_train": 10818,
+          "first_C_task_count": 2,
+          "supported_first_HV_task_count": 2,
+          "is_fixed_C_hotspot": false
+        },
+        {
+          "site_id": "S04",
+          "historical_pickups_all_train": 10408,
+          "first_C_task_count": 0,
+          "supported_first_HV_task_count": 1,
+          "is_fixed_C_hotspot": false
+        }
+      ],
+      "connection_state_counts": {
+        "SUPPORTED_MODELED_DIRECTED_CONNECTOR_AND_JOIN": 12,
+        "COMMON_INTERFACE_INPUT_UNSUPPORTED": 10,
+        "TIME_IMPOSSIBLE_UNDER_SNAPSHOT": 54,
+        "COMMON_ROUTE_INPUT_UNSUPPORTED": 3,
+        "TIME_IMPOSSIBLE_WITH_ZERO_CONNECTOR_LOWER_BOUND": 51
+      },
+      "C_connector_failure_reason_counts": {
+        "UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 4,
+        "UTURN_OUTSIDE_RESEARCH_PROFILE": 3,
+        "ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE": 2
+      },
+      "common_input_failure_reason_counts": {
+        "CUSTOMER_EMPTY_JOIN_TOO_FAR_FROM_SHARED_ENDPOINT": 7,
+        "CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT": 3,
+        "EDGE_OUTSIDE_FROZEN_FULL_NETWORK": 3
+      },
+      "supported_job_to_job_connectors": 2,
+      "supported_C_job_to_job_connectors": 0,
+      "fixed_layout": {
+        "served": 3,
+        "empty_distance_m": 2223.0,
+        "served_by_profile": {
+          "C": 1,
+          "HV": 2
+        },
+        "mean_pickup_wait_s": 115.80533333333335,
+        "delayed_commit_count": 0,
+        "cross_window_completion_count": 0,
+        "selected": [
+          {
+            "resource_id": "C1",
+            "profile_id": "C",
+            "site_id": "S01",
+            "job_ids": [
+              "J08"
+            ],
+            "jobs": [
+              {
+                "job_id": "J08",
+                "origin_id": "S01",
+                "release_s": 1228.0,
+                "deadline_s": 1528.0,
+                "commit_s": 1230.0,
+                "departure_s": 1230.0,
+                "pickup_s": 1360.661,
+                "finish_s": 1691.1951603755952,
+                "empty_time_s": 130.661,
+                "empty_distance_m": 826.0
+              }
+            ]
+          },
+          {
+            "resource_id": "H1",
+            "profile_id": "HV",
+            "site_id": "S01",
+            "job_ids": [
+              "J01"
+            ],
+            "jobs": [
+              {
+                "job_id": "J01",
+                "origin_id": "S01",
+                "release_s": 140.0,
+                "deadline_s": 440.0,
+                "commit_s": 150.0,
+                "departure_s": 150.0,
+                "pickup_s": 265.97,
+                "finish_s": 832.3584694576263,
+                "empty_time_s": 115.97,
+                "empty_distance_m": 609.0
+              }
+            ]
+          },
+          {
+            "resource_id": "H2",
+            "profile_id": "HV",
+            "site_id": "S02",
+            "job_ids": [
+              "J07"
+            ],
+            "jobs": [
+              {
+                "job_id": "J07",
+                "origin_id": "S02",
+                "release_s": 922.0,
+                "deadline_s": 1222.0,
+                "commit_s": 930.0,
+                "departure_s": 930.0,
+                "pickup_s": 1010.785,
+                "finish_s": 1626.9124886131287,
+                "empty_time_s": 80.785,
+                "empty_distance_m": 788.0
+              }
+            ]
+          }
+        ],
+        "lp": {
+          "served_upper_bound": 3.0,
+          "served_lp_value": 3.0,
+          "gap_jobs": 0.0,
+          "rows": 13,
+          "columns": 9,
+          "nonzeros": 15,
+          "job_constraint_rows": 10,
+          "resource_equality_rows": 3,
+          "full_column_domain": true,
+          "sparse_matrix": true,
+          "nonzero_solution": [
+            {
+              "resource_id": "C1",
+              "site_id": "S01",
+              "job_ids": [
+                "J08"
+              ],
+              "weight": 1.0
+            },
+            {
+              "resource_id": "H1",
+              "site_id": "S01",
+              "job_ids": [
+                "J01"
+              ],
+              "weight": 1.0
+            },
+            {
+              "resource_id": "H2",
+              "site_id": "S02",
+              "job_ids": [
+                "J07"
+              ],
+              "weight": 1.0
+            }
+          ],
+          "job_prices": {
+            "J01": 0.0,
+            "J02": 0.0,
+            "J03": 0.0,
+            "J04": 0.0,
+            "J05": 0.0,
+            "J06": 0.0,
+            "J07": 0.0,
+            "J08": 0.0,
+            "J09": 0.0,
+            "J10": 0.0
+          },
+          "resource_prices": {
+            "C1": 1.0,
+            "H1": 1.0,
+            "H2": 1.0
+          },
+          "certificate": {
+            "checked_columns": 9,
+            "minimum_dual_slack": 0.0,
+            "primal_max_violation": 0.0,
+            "dual_objective": 3.0,
+            "primal_dual_gap": 0.0
+          }
+        },
+        "enumeration": {
+          "chains_per_resource": {
+            "C1": 2,
+            "H1": 5,
+            "H2": 2
+          },
+          "per_resource_site": [
+            {
+              "resource_id": "C1",
+              "site_id": "S01",
+              "chain_count": 2,
+              "nonempty_chain_count": 1,
+              "includes_resource_idle_column": true,
+              "max_served_in_single_chain": 1
+            },
+            {
+              "resource_id": "H1",
+              "site_id": "S01",
+              "chain_count": 5,
+              "nonempty_chain_count": 4,
+              "includes_resource_idle_column": true,
+              "max_served_in_single_chain": 1
+            },
+            {
+              "resource_id": "H2",
+              "site_id": "S02",
+              "chain_count": 2,
+              "nonempty_chain_count": 1,
+              "includes_resource_idle_column": true,
+              "max_served_in_single_chain": 1
+            }
+          ],
+          "dp_states": 27,
+          "integer_mask_choices_per_resource": {
+            "C1": 2,
+            "H1": 5,
+            "H2": 2
+          },
+          "complete": true,
+          "idle_columns_per_resource": 1,
+          "max_chains_per_resource": 20000,
+          "max_dp_states": 50000
+        },
+        "runtime_s": 0.004387299995869398
+      },
+      "joint_layout": {
+        "served": 3,
+        "empty_distance_m": 2223.0,
+        "served_by_profile": {
+          "C": 1,
+          "HV": 2
+        },
+        "mean_pickup_wait_s": 115.80533333333335,
+        "delayed_commit_count": 0,
+        "cross_window_completion_count": 0,
+        "selected": [
+          {
+            "resource_id": "C1",
+            "profile_id": "C",
+            "site_id": "S01",
+            "job_ids": [
+              "J08"
+            ],
+            "jobs": [
+              {
+                "job_id": "J08",
+                "origin_id": "S01",
+                "release_s": 1228.0,
+                "deadline_s": 1528.0,
+                "commit_s": 1230.0,
+                "departure_s": 1230.0,
+                "pickup_s": 1360.661,
+                "finish_s": 1691.1951603755952,
+                "empty_time_s": 130.661,
+                "empty_distance_m": 826.0
+              }
+            ]
+          },
+          {
+            "resource_id": "H1",
+            "profile_id": "HV",
+            "site_id": "S01",
+            "job_ids": [
+              "J01"
+            ],
+            "jobs": [
+              {
+                "job_id": "J01",
+                "origin_id": "S01",
+                "release_s": 140.0,
+                "deadline_s": 440.0,
+                "commit_s": 150.0,
+                "departure_s": 150.0,
+                "pickup_s": 265.97,
+                "finish_s": 832.3584694576263,
+                "empty_time_s": 115.97,
+                "empty_distance_m": 609.0
+              }
+            ]
+          },
+          {
+            "resource_id": "H2",
+            "profile_id": "HV",
+            "site_id": "S02",
+            "job_ids": [
+              "J07"
+            ],
+            "jobs": [
+              {
+                "job_id": "J07",
+                "origin_id": "S02",
+                "release_s": 922.0,
+                "deadline_s": 1222.0,
+                "commit_s": 930.0,
+                "departure_s": 930.0,
+                "pickup_s": 1010.785,
+                "finish_s": 1626.9124886131287,
+                "empty_time_s": 80.785,
+                "empty_distance_m": 788.0
+              }
+            ]
+          }
+        ],
+        "lp": {
+          "served_upper_bound": 3.0,
+          "served_lp_value": 3.0,
+          "gap_jobs": 0.0,
+          "rows": 13,
+          "columns": 11,
+          "nonzeros": 19,
+          "job_constraint_rows": 10,
+          "resource_equality_rows": 3,
+          "full_column_domain": true,
+          "sparse_matrix": true,
+          "nonzero_solution": [
+            {
+              "resource_id": "C1",
+              "site_id": "S03",
+              "job_ids": [
+                "J04"
+              ],
+              "weight": 1.0
+            },
+            {
+              "resource_id": "H1",
+              "site_id": "S01",
+              "job_ids": [
+                "J01"
+              ],
+              "weight": 1.0
+            },
+            {
+              "resource_id": "H2",
+              "site_id": "S02",
+              "job_ids": [
+                "J07"
+              ],
+              "weight": 1.0
+            }
+          ],
+          "job_prices": {
+            "J01": 0.0,
+            "J02": 0.0,
+            "J03": 0.0,
+            "J04": 0.0,
+            "J05": 0.0,
+            "J06": 0.0,
+            "J07": 0.0,
+            "J08": 0.0,
+            "J09": 0.0,
+            "J10": 0.0
+          },
+          "resource_prices": {
+            "C1": 1.0,
+            "H1": 1.0,
+            "H2": 1.0
+          },
+          "certificate": {
+            "checked_columns": 11,
+            "minimum_dual_slack": 0.0,
+            "primal_max_violation": 0.0,
+            "dual_objective": 3.0,
+            "primal_dual_gap": 0.0
+          }
+        },
+        "enumeration": {
+          "chains_per_resource": {
+            "C1": 4,
+            "H1": 5,
+            "H2": 2
+          },
+          "per_resource_site": [
+            {
+              "resource_id": "C1",
+              "site_id": "S01",
+              "chain_count": 2,
+              "nonempty_chain_count": 1,
+              "includes_resource_idle_column": true,
+              "max_served_in_single_chain": 1
+            },
+            {
+              "resource_id": "C1",
+              "site_id": "S02",
+              "chain_count": 0,
+              "nonempty_chain_count": 0,
+              "includes_resource_idle_column": false,
+              "max_served_in_single_chain": 0
+            },
+            {
+              "resource_id": "C1",
+              "site_id": "S03",
+              "chain_count": 2,
+              "nonempty_chain_count": 2,
+              "includes_resource_idle_column": false,
+              "max_served_in_single_chain": 1
+            },
+            {
+              "resource_id": "C1",
+              "site_id": "S04",
+              "chain_count": 0,
+              "nonempty_chain_count": 0,
+              "includes_resource_idle_column": false,
+              "max_served_in_single_chain": 0
+            },
+            {
+              "resource_id": "H1",
+              "site_id": "S01",
+              "chain_count": 5,
+              "nonempty_chain_count": 4,
+              "includes_resource_idle_column": true,
+              "max_served_in_single_chain": 1
+            },
+            {
+              "resource_id": "H2",
+              "site_id": "S02",
+              "chain_count": 2,
+              "nonempty_chain_count": 1,
+              "includes_resource_idle_column": true,
+              "max_served_in_single_chain": 1
+            }
+          ],
+          "dp_states": 43,
+          "integer_mask_choices_per_resource": {
+            "C1": 3,
+            "H1": 5,
+            "H2": 2
+          },
+          "complete": true,
+          "idle_columns_per_resource": 1,
+          "max_chains_per_resource": 20000,
+          "max_dp_states": 50000
+        },
+        "runtime_s": 0.00374850002117455
+      },
+      "served_gain": 0,
+      "routing_and_join_runtime_s": 3.0431773999589495,
+      "total_case_runtime_s": 3.2075276999967173,
+      "private_instance_path": "stage4\\output\\capability_chain_planning\\instances_v1\\TRAIN_20161010_1700",
+      "interpretation": "EXACT_ONLY_IN_THIS_SNAPSHOT_TASK_SITE_SUPPORTED_CONNECTOR_DOMAIN_NOT_CITY_OR_ONLINE_OPTIMUM",
+      "layout_comparison": {
+        "gained_jobs": [],
+        "lost_jobs": [],
+        "jointly_served_jobs": [
+          "J01",
+          "J07",
+          "J08"
+        ],
+        "paired_mean_pickup_wait_change_s": 0.0,
+        "empty_distance_reduction_pct": 0.0,
+        "average_wait_population_is_identical": true
+      },
+      "C_task_pair_state_counts": {
+        "TIME_IMPOSSIBLE_UNDER_SNAPSHOT": 7,
+        "SUPPORTED_MODELED_DIRECTED_CONNECTOR_AND_JOIN": 1,
+        "TIME_IMPOSSIBLE_WITH_ZERO_CONNECTOR_LOWER_BOUND": 4
+      },
+      "C_task_pair_supported_but_C_incompatible_count": 1,
+      "release_ordered_C_task_pair_state_counts": {
+        "TIME_IMPOSSIBLE_UNDER_SNAPSHOT": 5,
+        "SUPPORTED_MODELED_DIRECTED_CONNECTOR_AND_JOIN": 1
+      },
+      "release_ordered_C_task_pair_count": 6
+    }
+  ],
+  "runtime_s": 6.892783600022085,
+  "peak_rss_mib": 499.7890625,
+  "routing": {
+    "route_requests": 150,
+    "scalar_route_calls": 150,
+    "edge_walk_calls": 150,
+    "route_cache_hits": 0,
+    "route_cache_entries": 150,
+    "route_cache_limit": 1024,
+    "bearing_cache_entries": 0,
+    "common_support_evaluations": {
+      "supported": 143,
+      "unsupported": 7
+    },
+    "common_failure_reason_counts": {
+      "EDGE_WALK_INVALID_SHAPE_INDEX_OR_LENGTH": 4,
+      "EDGE_OUTSIDE_FROZEN_FULL_NETWORK": 3
+    },
+    "columnar_evidence_mib": 89.02912616729736,
+    "traffic_policy": "EXPLICIT_U_FOR_NEW_ROUTE_WITHOUT_FROZEN_M3_FEATURE_ROWS",
+    "traffic_partition": {
+      "NC": 0.0,
+      "ML": 0.0,
+      "MR": 0.0,
+      "CG": 0.0,
+      "SC": 0.0,
+      "U": 1.0
+    },
+    "traffic_unknown_share": 1.0,
+    "dynamic_evidence_complete": false,
+    "dynamic_reason_codes": [
+      "FROZEN_M3_EXACT_INPUT_CONTRACT_UNAVAILABLE_FOR_NEW_ROUTE"
+    ],
+    "conservative_control_policy": "SIGNALIZED_CONFLICT_MOVEMENTS",
+    "traffic_outside_budget": 0.05
+  },
+  "extra_columnar_topology_mib": 50.67617416381836,
+  "gpu_used": false,
+  "full_day_runs": 0,
+  "new_training_runs": 0,
+  "historical_inventory": {
+    "template_count": 28335,
+    "C_task_count": 8150,
+    "date_counts": [
+      {
+        "date": "20161010",
+        "orders": 9479,
+        "C_orders": 2819
+      },
+      {
+        "date": "20161017",
+        "orders": 9392,
+        "C_orders": 2848
+      },
+      {
+        "date": "20161024",
+        "orders": 9464,
+        "C_orders": 2483
+      }
+    ],
+    "hourly_counts": [
+      {
+        "hour": 0,
+        "orders": 345,
+        "C_orders": 180
+      },
+      {
+        "hour": 1,
+        "orders": 233,
+        "C_orders": 120
+      },
+      {
+        "hour": 2,
+        "orders": 155,
+        "C_orders": 81
+      },
+      {
+        "hour": 3,
+        "orders": 99,
+        "C_orders": 47
+      },
+      {
+        "hour": 4,
+        "orders": 76,
+        "C_orders": 29
+      },
+      {
+        "hour": 5,
+        "orders": 102,
+        "C_orders": 53
+      },
+      {
+        "hour": 6,
+        "orders": 326,
+        "C_orders": 162
+      },
+      {
+        "hour": 7,
+        "orders": 928,
+        "C_orders": 165
+      },
+      {
+        "hour": 8,
+        "orders": 1443,
+        "C_orders": 297
+      },
+      {
+        "hour": 9,
+        "orders": 1640,
+        "C_orders": 434
+      },
+      {
+        "hour": 10,
+        "orders": 1516,
+        "C_orders": 415
+      },
+      {
+        "hour": 11,
+        "orders": 1664,
+        "C_orders": 459
+      },
+      {
+        "hour": 12,
+        "orders": 1648,
+        "C_orders": 669
+      },
+      {
+        "hour": 13,
+        "orders": 1753,
+        "C_orders": 671
+      },
+      {
+        "hour": 14,
+        "orders": 1987,
+        "C_orders": 494
+      },
+      {
+        "hour": 15,
+        "orders": 1884,
+        "C_orders": 384
+      },
+      {
+        "hour": 16,
+        "orders": 1866,
+        "C_orders": 392
+      },
+      {
+        "hour": 17,
+        "orders": 1667,
+        "C_orders": 131
+      },
+      {
+        "hour": 18,
+        "orders": 1868,
+        "C_orders": 70
+      },
+      {
+        "hour": 19,
+        "orders": 1877,
+        "C_orders": 419
+      },
+      {
+        "hour": 20,
+        "orders": 1574,
+        "C_orders": 680
+      },
+      {
+        "hour": 21,
+        "orders": 1698,
+        "C_orders": 797
+      },
+      {
+        "hour": 22,
+        "orders": 1338,
+        "C_orders": 654
+      },
+      {
+        "hour": 23,
+        "orders": 648,
+        "C_orders": 347
+      }
+    ],
+    "OD_flow_row_count": 7022,
+    "OD_flow_private_path": "stage4\\output\\capability_chain_planning\\instances_v1\\historical_C_HV_od_flows.parquet",
+    "demand_definition": "THREE_TRAIN_MONDAYS_COMMON_ELIGIBLE_CUSTOMER_ROUTE_TEMPLATES_NOT_ALL_16_DAYS",
+    "task_compatibility_is_not_empty_connection_compatibility": true
+  }
+}

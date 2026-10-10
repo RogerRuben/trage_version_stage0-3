@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "required_keys": 16386,
+  "valid_eta": 16386,
+  "certified_routing_failure": 0,
+  "unresolved": 0,
+  "calls_this_run": 16261,
+  "new_key_attempts_total": 16261,
+  "archive_keys": 125,
+  "stop_reason": null,
+  "runtime_s": 93.03382789999887,
+  "internally_sampled_peak_rss_mib": 248.921875,
+  "routing_mode": "SINGLE_SOURCE_MATRIX",
+  "scientific_conditions_run": 0,
+  "union_sha256": "753cb0e3775e70ae4b886d49655a788125ad25285dce93cdae42a5d17a370f95",
+  "journal_sha256": "6dec05c3d8a48f776b19fbfab11c2e404411504670da0afd9ee1ae0861f0e0f0"
+}

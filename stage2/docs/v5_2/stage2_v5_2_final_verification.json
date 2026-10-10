@@ -1,0 +1,8 @@
+{
+  "schema_version": "stage2_v5_2_deprecated_redirect.1",
+  "status": "DEPRECATED",
+  "deprecated_reason": "Phase B1 is not the final Stage 2 release gate.",
+  "replacement_path": "stage2/docs/v5_2/stage2_v5_2_phase_b1_verification.json",
+  "stage2_final_ready": false,
+  "phase_c_authorized": false
+}

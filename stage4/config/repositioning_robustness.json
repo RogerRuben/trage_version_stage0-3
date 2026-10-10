@@ -1,0 +1,26 @@
+{
+  "schema_version": "stage4_repositioning_r1_config.1",
+  "policy_name": "TRAIN_TOD_DEMAND_BALANCE",
+  "policy_version": "stage4_repositioning_r1.1",
+  "repositioning_enabled_default": false,
+  "train_dates": [
+    "20161009", "20161010", "20161011", "20161012",
+    "20161013", "20161014", "20161015", "20161016",
+    "20161017", "20161018", "20161019", "20161020",
+    "20161021", "20161022", "20161023", "20161024"
+  ],
+  "time_bin_minutes": 15,
+  "spatial_reference": "Stage1 start_node (OSM node ID) + frozen PBF WGS84",
+  "current_position_assignment": "nearest positive-demand node in current Train TOD bin",
+  "integer_quota_rule": "deterministic largest remainder; fractional remainder descending then node_id string ascending",
+  "surplus_vehicle_rule": "vehicle_id ascending; retain the first target quota at each current node",
+  "deficit_matching_rule": "nearest geographic deficit with remaining quota; squared local lon/lat distance then node_id",
+  "routing": "existing Valhalla sparse matrix adapter grouped by destination with frozen single-route fallback",
+  "normal_dispatch_precedes_repositioning": true,
+  "mid_route_diversion": false,
+  "failed_route_action": "stay at current location and remain idle",
+  "empty_route_odd_qualification": "OPERATIONAL_ABSTRACTION_NOT_ODD_CERTIFIED",
+  "full_day_runtime_guard_s": 14400,
+  "gpu_usage": "NONE_CPU_ONLY",
+  "dense_vehicle_order_matrix": false
+}

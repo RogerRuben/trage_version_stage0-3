@@ -1,0 +1,180 @@
+{
+  "status": "STOPPED",
+  "config_sha256": "53a0eae43d6c8abae1017ae54874d8224a6123d5fded574785dbfaeaa9bbd57f",
+  "code_sha": "168b5ba30054420d94318d679cf8058990e85757",
+  "baseline": "NEW_DETERMINISTIC_ROUTING_CONDITIONAL_CONTINUATION",
+  "rows": [
+    {
+      "q_A": 0.5,
+      "additional_pickup_overhead_s": 0,
+      "status": "COMPLETE",
+      "cohort_orders": 1667,
+      "matched": 1068,
+      "expired": 599,
+      "matched_AV": 141,
+      "matched_HV": 927,
+      "mean_request_to_arrival_s": 176.1571591329588,
+      "mean_request_to_service_start_s": 176.1571591329588,
+      "assignments_after_checkpoint": 1602,
+      "hours": {
+        "HV": {
+          "online_s": 1175668.0,
+          "busy_s": 785417.7490570006,
+          "available_vehicle_hours": 108.4028474841665
+        },
+        "AV": {
+          "online_s": 921600.0,
+          "busy_s": 88654.99769699998,
+          "available_vehicle_hours": 231.37361175083336
+        }
+      },
+      "pickup_time_max_error_s": 9.971472536562942e-10,
+      "service_time_max_error_s": 0.0,
+      "hv_realized_overrun_count": 76,
+      "routing_arcs": 211295,
+      "routing_failures": 0,
+      "runtime_s": 426.1087910999995,
+      "peak_rss_mib": 426.0234375,
+      "drain_end_s": 45300,
+      "checkpoint_sha256": "e8e18b904d720a1926e92a0cce6d7123e240c4b9d34916318ae8f5bfc5c554a3"
+    },
+    {
+      "q_A": 0.75,
+      "additional_pickup_overhead_s": 0,
+      "status": "COMPLETE",
+      "cohort_orders": 1667,
+      "matched": 700,
+      "expired": 967,
+      "matched_AV": 183,
+      "matched_HV": 517,
+      "mean_request_to_arrival_s": 187.48661613428575,
+      "mean_request_to_service_start_s": 187.48661613428575,
+      "assignments_after_checkpoint": 1013,
+      "hours": {
+        "HV": {
+          "online_s": 566556.0,
+          "busy_s": 419663.28152500006,
+          "available_vehicle_hours": 40.80353290972221
+        },
+        "AV": {
+          "online_s": 1382400.0,
+          "busy_s": 119156.23463199998,
+          "available_vehicle_hours": 350.9010459355556
+        }
+      },
+      "pickup_time_max_error_s": 9.971472536562942e-10,
+      "service_time_max_error_s": 0.0,
+      "hv_realized_overrun_count": 34,
+      "routing_arcs": 284024,
+      "routing_failures": 0,
+      "runtime_s": 697.0591488999999,
+      "peak_rss_mib": 426.0234375,
+      "drain_end_s": 45210,
+      "checkpoint_sha256": "942ef4043470cc992ee8d32a605e8bb77c68c953fafa87f0b844182d29ccda96"
+    },
+    {
+      "q_A": 0.5,
+      "additional_pickup_overhead_s": 60,
+      "status": "COMPLETE",
+      "cohort_orders": 1667,
+      "matched": 1034,
+      "expired": 633,
+      "matched_AV": 144,
+      "matched_HV": 890,
+      "mean_request_to_arrival_s": 176.07385561992263,
+      "mean_request_to_service_start_s": 236.07385561992265,
+      "assignments_after_checkpoint": 1552,
+      "hours": {
+        "HV": {
+          "online_s": 1175668.0,
+          "busy_s": 804340.0455969999,
+          "available_vehicle_hours": 103.14665400083335
+        },
+        "AV": {
+          "online_s": 921600.0,
+          "busy_s": 99989.24743399993,
+          "available_vehicle_hours": 228.22520904611113
+        }
+      },
+      "pickup_time_max_error_s": 9.971472536562942e-10,
+      "service_time_max_error_s": 0.0,
+      "hv_realized_overrun_count": 68,
+      "routing_arcs": 219018,
+      "routing_failures": 0,
+      "runtime_s": 427.1415051999975,
+      "peak_rss_mib": 429.70703125,
+      "drain_end_s": 45360,
+      "checkpoint_sha256": "e8e18b904d720a1926e92a0cce6d7123e240c4b9d34916318ae8f5bfc5c554a3"
+    },
+    {
+      "q_A": 0.75,
+      "additional_pickup_overhead_s": 60,
+      "status": "COMPLETE",
+      "cohort_orders": 1667,
+      "matched": 682,
+      "expired": 985,
+      "matched_AV": 181,
+      "matched_HV": 501,
+      "mean_request_to_arrival_s": 187.305411297654,
+      "mean_request_to_service_start_s": 247.305411297654,
+      "assignments_after_checkpoint": 991,
+      "hours": {
+        "HV": {
+          "online_s": 566556.0,
+          "busy_s": 429919.5627960005,
+          "available_vehicle_hours": 37.954565889999856
+        },
+        "AV": {
+          "online_s": 1382400.0,
+          "busy_s": 128680.85540999996,
+          "available_vehicle_hours": 348.2553179416667
+        }
+      },
+      "pickup_time_max_error_s": 9.971472536562942e-10,
+      "service_time_max_error_s": 0.0,
+      "hv_realized_overrun_count": 30,
+      "routing_arcs": 286434,
+      "routing_failures": 0,
+      "runtime_s": 718.7075220999977,
+      "peak_rss_mib": 429.70703125,
+      "drain_end_s": 45360,
+      "checkpoint_sha256": "942ef4043470cc992ee8d32a605e8bb77c68c953fafa87f0b844182d29ccda96"
+    },
+    {
+      "q_A": 0.5,
+      "additional_pickup_overhead_s": 120,
+      "status": "COMPLETE",
+      "cohort_orders": 1667,
+      "matched": 1017,
+      "expired": 650,
+      "matched_AV": 145,
+      "matched_HV": 872,
+      "mean_request_to_arrival_s": 178.58177211602754,
+      "mean_request_to_service_start_s": 298.58177211602754,
+      "assignments_after_checkpoint": 1513,
+      "hours": {
+        "HV": {
+          "online_s": 1175668.0,
+          "busy_s": 832712.921719,
+          "available_vehicle_hours": 95.2652995225
+        },
+        "AV": {
+          "online_s": 921600.0,
+          "busy_s": 107574.54254099994,
+          "available_vehicle_hours": 226.1181826275
+        }
+      },
+      "pickup_time_max_error_s": 9.971472536562942e-10,
+      "service_time_max_error_s": 0.0,
+      "hv_realized_overrun_count": 70,
+      "routing_arcs": 226172,
+      "routing_failures": 0,
+      "runtime_s": 1147.6254062000007,
+      "peak_rss_mib": 431.25390625,
+      "drain_end_s": 45420,
+      "checkpoint_sha256": "e8e18b904d720a1926e92a0cce6d7123e240c4b9d34916318ae8f5bfc5c554a3"
+    }
+  ],
+  "active": "q75_dwell120",
+  "error": "TimeoutError('Per-condition 30-minute budget exhausted')"
+}

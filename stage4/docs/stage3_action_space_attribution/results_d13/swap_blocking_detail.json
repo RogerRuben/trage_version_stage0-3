@@ -1,0 +1,51 @@
+[
+  {
+    "epoch_id": "0730",
+    "D4_swap_direction": "AV->HV",
+    "both_arcs_present_in_D13": true,
+    "D13_route_type": "ORIGINAL",
+    "D13_hard_state": "FEASIBLE",
+    "remaining_hard": [],
+    "remaining_unknown": []
+  },
+  {
+    "epoch_id": "0830",
+    "D4_swap_direction": "HV->AV",
+    "both_arcs_present_in_D13": false,
+    "D13_route_type": "ORIGINAL",
+    "D13_hard_state": "UNKNOWN",
+    "remaining_hard": [],
+    "remaining_unknown": [
+      "MOVEMENT_LOOKUP_UNRESOLVED"
+    ]
+  },
+  {
+    "epoch_id": "1300",
+    "D4_swap_direction": "HV->AV",
+    "both_arcs_present_in_D13": false,
+    "D13_route_type": "ORIGINAL",
+    "D13_hard_state": "UNKNOWN",
+    "remaining_hard": [],
+    "remaining_unknown": [
+      "MOVEMENT_LOOKUP_UNRESOLVED"
+    ]
+  },
+  {
+    "epoch_id": "1800",
+    "D4_swap_direction": "AV->HV",
+    "both_arcs_present_in_D13": true,
+    "D13_route_type": "ORIGINAL",
+    "D13_hard_state": "FEASIBLE",
+    "remaining_hard": [],
+    "remaining_unknown": []
+  },
+  {
+    "epoch_id": "1830",
+    "D4_swap_direction": "AV->HV",
+    "both_arcs_present_in_D13": true,
+    "D13_route_type": "ORIGINAL",
+    "D13_hard_state": "FEASIBLE",
+    "remaining_hard": [],
+    "remaining_unknown": []
+  }
+]

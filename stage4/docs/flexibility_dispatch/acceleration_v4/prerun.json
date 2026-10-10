@@ -1,0 +1,1199 @@
+{
+  "status": "COMPLETE",
+  "scope": "SIX_ASOF_V1_STATES_PLUS_FIXED_COORDINATE_CLOCK_API_DIAGNOSTIC",
+  "started_at": "2026-10-06T09:31:18.159466+08:00",
+  "finished_at": "2026-10-06T09:32:03.908409+08:00",
+  "runtime_s": 45.73500000000058,
+  "states": [
+    {
+      "tick": 28800,
+      "waiting": 37,
+      "current_arcs": 25,
+      "predicted_vehicles": 478,
+      "forecast_requests": 607,
+      "future_edges": 3455,
+      "reused_raw_queries": 460,
+      "newly_resolved_raw_queries": 221,
+      "topk_arc_lookups": 701,
+      "limited_route_batches": 20,
+      "variants": {
+        "V3_DEFAULT": {
+          "passes": [
+            {
+              "offset_s": 0,
+              "wall_s": 0.3351861000119243,
+              "raw_arcs": 395,
+              "backend_queries": 395,
+              "exact_answers_equal": true,
+              "cold_actual_state": true,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 60,
+              "wall_s": 0.3504806999990251,
+              "raw_arcs": 395,
+              "backend_queries": 395,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 900,
+              "wall_s": 0.3556137999985367,
+              "raw_arcs": 395,
+              "backend_queries": 395,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            }
+          ],
+          "wall_s": 1.041280600009486,
+          "raw_arcs": 1185,
+          "backend_queries": 1185,
+          "arc_lookups": 1200,
+          "valid_cold_arcs": 1,
+          "process_group_rss_snapshot_mib": 593.296875,
+          "diagnostics": null
+        },
+        "V4_RAW_OD": {
+          "passes": [
+            {
+              "offset_s": 0,
+              "wall_s": 0.3508832000079565,
+              "raw_arcs": 395,
+              "backend_queries": 395,
+              "exact_answers_equal": true,
+              "cold_actual_state": true,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 60,
+              "wall_s": 0.01290990000416059,
+              "raw_arcs": 0,
+              "backend_queries": 0,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 900,
+              "wall_s": 0.013139300004695542,
+              "raw_arcs": 0,
+              "backend_queries": 0,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            }
+          ],
+          "wall_s": 0.3769324000168126,
+          "raw_arcs": 395,
+          "backend_queries": 395,
+          "arc_lookups": 1200,
+          "valid_cold_arcs": 1,
+          "process_group_rss_snapshot_mib": 592.375,
+          "diagnostics": {
+            "static_matrix_certificate": {
+              "schema": "STATIC_AUTO_OD_3_8_2_V1",
+              "valhalla_version": "3.8.2",
+              "config_sha256": "f2eb80488a2ec832208b8ee1a7433aa4905e58243fe1c0d5b81d48a3368ec696",
+              "timedep_matrix_distance": 0,
+              "conservative_static_guard_m": 10.0,
+              "mutable_traffic_or_remote_tiles": false
+            },
+            "raw_od_cache_entries": 395,
+            "raw_od_memory_queries_avoided": 790,
+            "raw_od_cross_minute_reuses": 790,
+            "raw_od_beta_bin_reuses": 395,
+            "certified_eta_prunes": 0,
+            "known_eta_prunes_before_backend": 0,
+            "grouped_source_queries": 0,
+            "grouped_cell_fallback_queries": 0
+          }
+        },
+        "V4_RAW_OD_GROUPED": {
+          "passes": [
+            {
+              "offset_s": 0,
+              "wall_s": 0.288378900004318,
+              "raw_arcs": 395,
+              "backend_queries": 159,
+              "exact_answers_equal": true,
+              "cold_actual_state": true,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 60,
+              "wall_s": 0.012617599990335293,
+              "raw_arcs": 0,
+              "backend_queries": 0,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 900,
+              "wall_s": 0.011187199997948483,
+              "raw_arcs": 0,
+              "backend_queries": 0,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            }
+          ],
+          "wall_s": 0.31218369999260176,
+          "raw_arcs": 395,
+          "backend_queries": 159,
+          "arc_lookups": 1200,
+          "valid_cold_arcs": 1,
+          "process_group_rss_snapshot_mib": 595.13671875,
+          "diagnostics": {
+            "static_matrix_certificate": {
+              "schema": "STATIC_AUTO_OD_3_8_2_V1",
+              "valhalla_version": "3.8.2",
+              "config_sha256": "f2eb80488a2ec832208b8ee1a7433aa4905e58243fe1c0d5b81d48a3368ec696",
+              "timedep_matrix_distance": 0,
+              "conservative_static_guard_m": 10.0,
+              "mutable_traffic_or_remote_tiles": false
+            },
+            "raw_od_cache_entries": 395,
+            "raw_od_memory_queries_avoided": 790,
+            "raw_od_cross_minute_reuses": 790,
+            "raw_od_beta_bin_reuses": 395,
+            "certified_eta_prunes": 0,
+            "known_eta_prunes_before_backend": 0,
+            "grouped_source_queries": 178,
+            "grouped_cell_fallback_queries": 0
+          }
+        }
+      },
+      "checked_cold_valid_arcs": 1,
+      "valid_arcs_equal": true,
+      "all_objectives_equal": true,
+      "solver_check": [
+        {
+          "wall_s": 0.2657060000055935,
+          "objective": [
+            0,
+            10,
+            1,
+            180.33333333333346,
+            -1185.8347519695951
+          ],
+          "variables": 3256,
+          "nonzeros": 13106
+        },
+        {
+          "wall_s": 0.27041169999574777,
+          "objective": [
+            0,
+            10,
+            1,
+            180.33333333333346,
+            -1185.8347519695951
+          ],
+          "variables": 3256,
+          "nonzeros": 13106
+        }
+      ]
+    },
+    {
+      "tick": 36000,
+      "waiting": 40,
+      "current_arcs": 39,
+      "predicted_vehicles": 570,
+      "forecast_requests": 743,
+      "future_edges": 4194,
+      "reused_raw_queries": 386,
+      "newly_resolved_raw_queries": 400,
+      "topk_arc_lookups": 786,
+      "limited_route_batches": 20,
+      "variants": {
+        "V4_RAW_OD_GROUPED": {
+          "passes": [
+            {
+              "offset_s": 0,
+              "wall_s": 0.27056330000050366,
+              "raw_arcs": 365,
+              "backend_queries": 151,
+              "exact_answers_equal": true,
+              "cold_actual_state": true,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 60,
+              "wall_s": 0.01414939999813214,
+              "raw_arcs": 1,
+              "backend_queries": 1,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 900,
+              "wall_s": 0.014560000010533258,
+              "raw_arcs": 1,
+              "backend_queries": 1,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            }
+          ],
+          "wall_s": 0.29927270000916906,
+          "raw_arcs": 367,
+          "backend_queries": 153,
+          "arc_lookups": 1200,
+          "valid_cold_arcs": 1,
+          "process_group_rss_snapshot_mib": 610.34765625,
+          "diagnostics": {
+            "static_matrix_certificate": {
+              "schema": "STATIC_AUTO_OD_3_8_2_V1",
+              "valhalla_version": "3.8.2",
+              "config_sha256": "f2eb80488a2ec832208b8ee1a7433aa4905e58243fe1c0d5b81d48a3368ec696",
+              "timedep_matrix_distance": 0,
+              "conservative_static_guard_m": 10.0,
+              "mutable_traffic_or_remote_tiles": false
+            },
+            "raw_od_cache_entries": 367,
+            "raw_od_memory_queries_avoided": 728,
+            "raw_od_cross_minute_reuses": 728,
+            "raw_od_beta_bin_reuses": 364,
+            "certified_eta_prunes": 0,
+            "known_eta_prunes_before_backend": 0,
+            "grouped_source_queries": 163,
+            "grouped_cell_fallback_queries": 0
+          }
+        },
+        "V4_RAW_OD": {
+          "passes": [
+            {
+              "offset_s": 0,
+              "wall_s": 0.3094408999895677,
+              "raw_arcs": 365,
+              "backend_queries": 365,
+              "exact_answers_equal": true,
+              "cold_actual_state": true,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 60,
+              "wall_s": 0.01426930000889115,
+              "raw_arcs": 1,
+              "backend_queries": 1,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 900,
+              "wall_s": 0.013125700003001839,
+              "raw_arcs": 1,
+              "backend_queries": 1,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            }
+          ],
+          "wall_s": 0.3368359000014607,
+          "raw_arcs": 367,
+          "backend_queries": 367,
+          "arc_lookups": 1200,
+          "valid_cold_arcs": 1,
+          "process_group_rss_snapshot_mib": 608.1953125,
+          "diagnostics": {
+            "static_matrix_certificate": {
+              "schema": "STATIC_AUTO_OD_3_8_2_V1",
+              "valhalla_version": "3.8.2",
+              "config_sha256": "f2eb80488a2ec832208b8ee1a7433aa4905e58243fe1c0d5b81d48a3368ec696",
+              "timedep_matrix_distance": 0,
+              "conservative_static_guard_m": 10.0,
+              "mutable_traffic_or_remote_tiles": false
+            },
+            "raw_od_cache_entries": 367,
+            "raw_od_memory_queries_avoided": 728,
+            "raw_od_cross_minute_reuses": 728,
+            "raw_od_beta_bin_reuses": 364,
+            "certified_eta_prunes": 0,
+            "known_eta_prunes_before_backend": 0,
+            "grouped_source_queries": 0,
+            "grouped_cell_fallback_queries": 0
+          }
+        },
+        "V3_DEFAULT": {
+          "passes": [
+            {
+              "offset_s": 0,
+              "wall_s": 0.30682259998866357,
+              "raw_arcs": 365,
+              "backend_queries": 365,
+              "exact_answers_equal": true,
+              "cold_actual_state": true,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 60,
+              "wall_s": 0.2906496000068728,
+              "raw_arcs": 365,
+              "backend_queries": 365,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 900,
+              "wall_s": 0.3007685000047786,
+              "raw_arcs": 365,
+              "backend_queries": 365,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            }
+          ],
+          "wall_s": 0.898240700000315,
+          "raw_arcs": 1095,
+          "backend_queries": 1095,
+          "arc_lookups": 1200,
+          "valid_cold_arcs": 1,
+          "process_group_rss_snapshot_mib": 607.68359375,
+          "diagnostics": null
+        }
+      },
+      "checked_cold_valid_arcs": 1,
+      "valid_arcs_equal": true,
+      "all_objectives_equal": true,
+      "solver_check": [
+        {
+          "wall_s": 0.30002239999885205,
+          "objective": [
+            0,
+            12,
+            1,
+            214.33333333333383,
+            -1852.1473368157056
+          ],
+          "variables": 3395,
+          "nonzeros": 13721
+        },
+        {
+          "wall_s": 0.31668469999567606,
+          "objective": [
+            0,
+            12,
+            1,
+            214.33333333333383,
+            -1852.1473368157056
+          ],
+          "variables": 3395,
+          "nonzeros": 13721
+        }
+      ]
+    },
+    {
+      "tick": 43200,
+      "waiting": 58,
+      "current_arcs": 75,
+      "predicted_vehicles": 580,
+      "forecast_requests": 952,
+      "future_edges": 5420,
+      "reused_raw_queries": 472,
+      "newly_resolved_raw_queries": 632,
+      "topk_arc_lookups": 1110,
+      "limited_route_batches": 20,
+      "variants": {
+        "V3_DEFAULT": {
+          "passes": [
+            {
+              "offset_s": 0,
+              "wall_s": 0.29726389999268577,
+              "raw_arcs": 361,
+              "backend_queries": 361,
+              "exact_answers_equal": true,
+              "cold_actual_state": true,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 60,
+              "wall_s": 0.2894419999938691,
+              "raw_arcs": 361,
+              "backend_queries": 361,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 900,
+              "wall_s": 0.2828319999971427,
+              "raw_arcs": 361,
+              "backend_queries": 361,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            }
+          ],
+          "wall_s": 0.8695378999836976,
+          "raw_arcs": 1083,
+          "backend_queries": 1083,
+          "arc_lookups": 1200,
+          "valid_cold_arcs": 2,
+          "process_group_rss_snapshot_mib": 613.921875,
+          "diagnostics": null
+        },
+        "V4_RAW_OD": {
+          "passes": [
+            {
+              "offset_s": 0,
+              "wall_s": 0.28447119999327697,
+              "raw_arcs": 361,
+              "backend_queries": 361,
+              "exact_answers_equal": true,
+              "cold_actual_state": true,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 60,
+              "wall_s": 0.01213419999112375,
+              "raw_arcs": 1,
+              "backend_queries": 1,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 900,
+              "wall_s": 0.012653300000238232,
+              "raw_arcs": 1,
+              "backend_queries": 1,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            }
+          ],
+          "wall_s": 0.30925869998463895,
+          "raw_arcs": 363,
+          "backend_queries": 363,
+          "arc_lookups": 1200,
+          "valid_cold_arcs": 2,
+          "process_group_rss_snapshot_mib": 614.01171875,
+          "diagnostics": {
+            "static_matrix_certificate": {
+              "schema": "STATIC_AUTO_OD_3_8_2_V1",
+              "valhalla_version": "3.8.2",
+              "config_sha256": "f2eb80488a2ec832208b8ee1a7433aa4905e58243fe1c0d5b81d48a3368ec696",
+              "timedep_matrix_distance": 0,
+              "conservative_static_guard_m": 10.0,
+              "mutable_traffic_or_remote_tiles": false
+            },
+            "raw_od_cache_entries": 363,
+            "raw_od_memory_queries_avoided": 720,
+            "raw_od_cross_minute_reuses": 720,
+            "raw_od_beta_bin_reuses": 360,
+            "certified_eta_prunes": 0,
+            "known_eta_prunes_before_backend": 0,
+            "grouped_source_queries": 0,
+            "grouped_cell_fallback_queries": 0
+          }
+        },
+        "V4_RAW_OD_GROUPED": {
+          "passes": [
+            {
+              "offset_s": 0,
+              "wall_s": 0.23944930000288878,
+              "raw_arcs": 361,
+              "backend_queries": 132,
+              "exact_answers_equal": true,
+              "cold_actual_state": true,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 60,
+              "wall_s": 0.013009099988266826,
+              "raw_arcs": 1,
+              "backend_queries": 1,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 900,
+              "wall_s": 0.013118400005623698,
+              "raw_arcs": 1,
+              "backend_queries": 1,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            }
+          ],
+          "wall_s": 0.2655767999967793,
+          "raw_arcs": 363,
+          "backend_queries": 134,
+          "arc_lookups": 1200,
+          "valid_cold_arcs": 2,
+          "process_group_rss_snapshot_mib": 616.5390625,
+          "diagnostics": {
+            "static_matrix_certificate": {
+              "schema": "STATIC_AUTO_OD_3_8_2_V1",
+              "valhalla_version": "3.8.2",
+              "config_sha256": "f2eb80488a2ec832208b8ee1a7433aa4905e58243fe1c0d5b81d48a3368ec696",
+              "timedep_matrix_distance": 0,
+              "conservative_static_guard_m": 10.0,
+              "mutable_traffic_or_remote_tiles": false
+            },
+            "raw_od_cache_entries": 363,
+            "raw_od_memory_queries_avoided": 720,
+            "raw_od_cross_minute_reuses": 720,
+            "raw_od_beta_bin_reuses": 360,
+            "certified_eta_prunes": 0,
+            "known_eta_prunes_before_backend": 0,
+            "grouped_source_queries": 153,
+            "grouped_cell_fallback_queries": 0
+          }
+        }
+      },
+      "checked_cold_valid_arcs": 2,
+      "valid_arcs_equal": true,
+      "all_objectives_equal": true,
+      "solver_check": [
+        {
+          "wall_s": 0.49343170000065584,
+          "objective": [
+            1,
+            20,
+            4,
+            239.66666666666856,
+            -2988.0616112905145
+          ],
+          "variables": 5185,
+          "nonzeros": 20997
+        },
+        {
+          "wall_s": 0.5044476999901235,
+          "objective": [
+            1,
+            20,
+            4,
+            239.66666666666856,
+            -2988.0616112905145
+          ],
+          "variables": 5185,
+          "nonzeros": 20997
+        }
+      ]
+    },
+    {
+      "tick": 54000,
+      "waiting": 65,
+      "current_arcs": 33,
+      "predicted_vehicles": 624,
+      "forecast_requests": 942,
+      "future_edges": 5242,
+      "reused_raw_queries": 530,
+      "newly_resolved_raw_queries": 715,
+      "topk_arc_lookups": 1245,
+      "limited_route_batches": 20,
+      "variants": {
+        "V4_RAW_OD_GROUPED": {
+          "passes": [
+            {
+              "offset_s": 0,
+              "wall_s": 0.26407259999541566,
+              "raw_arcs": 361,
+              "backend_queries": 162,
+              "exact_answers_equal": true,
+              "cold_actual_state": true,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 60,
+              "wall_s": 0.016120499989483505,
+              "raw_arcs": 1,
+              "backend_queries": 1,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 900,
+              "wall_s": 0.016253599998890422,
+              "raw_arcs": 1,
+              "backend_queries": 1,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            }
+          ],
+          "wall_s": 0.2964466999837896,
+          "raw_arcs": 363,
+          "backend_queries": 164,
+          "arc_lookups": 1200,
+          "valid_cold_arcs": 0,
+          "process_group_rss_snapshot_mib": 620.703125,
+          "diagnostics": {
+            "static_matrix_certificate": {
+              "schema": "STATIC_AUTO_OD_3_8_2_V1",
+              "valhalla_version": "3.8.2",
+              "config_sha256": "f2eb80488a2ec832208b8ee1a7433aa4905e58243fe1c0d5b81d48a3368ec696",
+              "timedep_matrix_distance": 0,
+              "conservative_static_guard_m": 10.0,
+              "mutable_traffic_or_remote_tiles": false
+            },
+            "raw_od_cache_entries": 363,
+            "raw_od_memory_queries_avoided": 720,
+            "raw_od_cross_minute_reuses": 720,
+            "raw_od_beta_bin_reuses": 360,
+            "certified_eta_prunes": 0,
+            "known_eta_prunes_before_backend": 0,
+            "grouped_source_queries": 184,
+            "grouped_cell_fallback_queries": 0
+          }
+        },
+        "V4_RAW_OD": {
+          "passes": [
+            {
+              "offset_s": 0,
+              "wall_s": 0.2990041999873938,
+              "raw_arcs": 361,
+              "backend_queries": 361,
+              "exact_answers_equal": true,
+              "cold_actual_state": true,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 60,
+              "wall_s": 0.013023500010604039,
+              "raw_arcs": 1,
+              "backend_queries": 1,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 900,
+              "wall_s": 0.0124091000034241,
+              "raw_arcs": 1,
+              "backend_queries": 1,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            }
+          ],
+          "wall_s": 0.32443680000142194,
+          "raw_arcs": 363,
+          "backend_queries": 363,
+          "arc_lookups": 1200,
+          "valid_cold_arcs": 0,
+          "process_group_rss_snapshot_mib": 619.48828125,
+          "diagnostics": {
+            "static_matrix_certificate": {
+              "schema": "STATIC_AUTO_OD_3_8_2_V1",
+              "valhalla_version": "3.8.2",
+              "config_sha256": "f2eb80488a2ec832208b8ee1a7433aa4905e58243fe1c0d5b81d48a3368ec696",
+              "timedep_matrix_distance": 0,
+              "conservative_static_guard_m": 10.0,
+              "mutable_traffic_or_remote_tiles": false
+            },
+            "raw_od_cache_entries": 363,
+            "raw_od_memory_queries_avoided": 720,
+            "raw_od_cross_minute_reuses": 720,
+            "raw_od_beta_bin_reuses": 360,
+            "certified_eta_prunes": 0,
+            "known_eta_prunes_before_backend": 0,
+            "grouped_source_queries": 0,
+            "grouped_cell_fallback_queries": 0
+          }
+        },
+        "V3_DEFAULT": {
+          "passes": [
+            {
+              "offset_s": 0,
+              "wall_s": 0.27576350000163075,
+              "raw_arcs": 361,
+              "backend_queries": 361,
+              "exact_answers_equal": true,
+              "cold_actual_state": true,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 60,
+              "wall_s": 0.27871919999597594,
+              "raw_arcs": 361,
+              "backend_queries": 361,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 900,
+              "wall_s": 0.27994849999959115,
+              "raw_arcs": 361,
+              "backend_queries": 361,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            }
+          ],
+          "wall_s": 0.8344311999971978,
+          "raw_arcs": 1083,
+          "backend_queries": 1083,
+          "arc_lookups": 1200,
+          "valid_cold_arcs": 0,
+          "process_group_rss_snapshot_mib": 619.37890625,
+          "diagnostics": null
+        }
+      },
+      "checked_cold_valid_arcs": 0,
+      "valid_arcs_equal": true,
+      "all_objectives_equal": true,
+      "solver_check": [
+        {
+          "wall_s": 0.4473249000002397,
+          "objective": [
+            0,
+            8,
+            1,
+            248.6666666666682,
+            -1487.0972992600198
+          ],
+          "variables": 4626,
+          "nonzeros": 18571
+        },
+        {
+          "wall_s": 0.45267169999715406,
+          "objective": [
+            0,
+            8,
+            1,
+            248.6666666666682,
+            -1487.0972992600198
+          ],
+          "variables": 4626,
+          "nonzeros": 18571
+        }
+      ]
+    },
+    {
+      "tick": 64800,
+      "waiting": 86,
+      "current_arcs": 40,
+      "predicted_vehicles": 655,
+      "forecast_requests": 917,
+      "future_edges": 5094,
+      "reused_raw_queries": 864,
+      "newly_resolved_raw_queries": 795,
+      "topk_arc_lookups": 1659,
+      "limited_route_batches": 20,
+      "variants": {
+        "V3_DEFAULT": {
+          "passes": [
+            {
+              "offset_s": 0,
+              "wall_s": 0.3239939999912167,
+              "raw_arcs": 376,
+              "backend_queries": 376,
+              "exact_answers_equal": true,
+              "cold_actual_state": true,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 60,
+              "wall_s": 0.32384389999788254,
+              "raw_arcs": 376,
+              "backend_queries": 376,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 900,
+              "wall_s": 0.3210659000033047,
+              "raw_arcs": 376,
+              "backend_queries": 376,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            }
+          ],
+          "wall_s": 0.968903799992404,
+          "raw_arcs": 1128,
+          "backend_queries": 1128,
+          "arc_lookups": 1200,
+          "valid_cold_arcs": 0,
+          "process_group_rss_snapshot_mib": 625.81640625,
+          "diagnostics": null
+        },
+        "V4_RAW_OD": {
+          "passes": [
+            {
+              "offset_s": 0,
+              "wall_s": 0.3339641000056872,
+              "raw_arcs": 376,
+              "backend_queries": 376,
+              "exact_answers_equal": true,
+              "cold_actual_state": true,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 60,
+              "wall_s": 0.011362899997038767,
+              "raw_arcs": 0,
+              "backend_queries": 0,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 900,
+              "wall_s": 0.01077639999857638,
+              "raw_arcs": 0,
+              "backend_queries": 0,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            }
+          ],
+          "wall_s": 0.35610340000130236,
+          "raw_arcs": 376,
+          "backend_queries": 376,
+          "arc_lookups": 1200,
+          "valid_cold_arcs": 0,
+          "process_group_rss_snapshot_mib": 624.86328125,
+          "diagnostics": {
+            "static_matrix_certificate": {
+              "schema": "STATIC_AUTO_OD_3_8_2_V1",
+              "valhalla_version": "3.8.2",
+              "config_sha256": "f2eb80488a2ec832208b8ee1a7433aa4905e58243fe1c0d5b81d48a3368ec696",
+              "timedep_matrix_distance": 0,
+              "conservative_static_guard_m": 10.0,
+              "mutable_traffic_or_remote_tiles": false
+            },
+            "raw_od_cache_entries": 376,
+            "raw_od_memory_queries_avoided": 752,
+            "raw_od_cross_minute_reuses": 752,
+            "raw_od_beta_bin_reuses": 376,
+            "certified_eta_prunes": 0,
+            "known_eta_prunes_before_backend": 0,
+            "grouped_source_queries": 0,
+            "grouped_cell_fallback_queries": 0
+          }
+        },
+        "V4_RAW_OD_GROUPED": {
+          "passes": [
+            {
+              "offset_s": 0,
+              "wall_s": 0.292901000007987,
+              "raw_arcs": 376,
+              "backend_queries": 178,
+              "exact_answers_equal": true,
+              "cold_actual_state": true,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 60,
+              "wall_s": 0.01844909999636002,
+              "raw_arcs": 0,
+              "backend_queries": 0,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 900,
+              "wall_s": 0.01196019999042619,
+              "raw_arcs": 0,
+              "backend_queries": 0,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            }
+          ],
+          "wall_s": 0.32331029999477323,
+          "raw_arcs": 376,
+          "backend_queries": 178,
+          "arc_lookups": 1200,
+          "valid_cold_arcs": 0,
+          "process_group_rss_snapshot_mib": 625.77734375,
+          "diagnostics": {
+            "static_matrix_certificate": {
+              "schema": "STATIC_AUTO_OD_3_8_2_V1",
+              "valhalla_version": "3.8.2",
+              "config_sha256": "f2eb80488a2ec832208b8ee1a7433aa4905e58243fe1c0d5b81d48a3368ec696",
+              "timedep_matrix_distance": 0,
+              "conservative_static_guard_m": 10.0,
+              "mutable_traffic_or_remote_tiles": false
+            },
+            "raw_od_cache_entries": 376,
+            "raw_od_memory_queries_avoided": 752,
+            "raw_od_cross_minute_reuses": 752,
+            "raw_od_beta_bin_reuses": 376,
+            "certified_eta_prunes": 0,
+            "known_eta_prunes_before_backend": 0,
+            "grouped_source_queries": 198,
+            "grouped_cell_fallback_queries": 0
+          }
+        }
+      },
+      "checked_cold_valid_arcs": 0,
+      "valid_arcs_equal": true,
+      "all_objectives_equal": true,
+      "solver_check": [
+        {
+          "wall_s": 0.4916527000023052,
+          "objective": [
+            0,
+            8,
+            1,
+            225.00000000000142,
+            -949.3164321736085
+          ],
+          "variables": 4831,
+          "nonzeros": 19411
+        },
+        {
+          "wall_s": 0.48389649999444373,
+          "objective": [
+            0,
+            8,
+            1,
+            225.00000000000142,
+            -949.3164321736085
+          ],
+          "variables": 4831,
+          "nonzeros": 19411
+        }
+      ]
+    },
+    {
+      "tick": 75600,
+      "waiting": 69,
+      "current_arcs": 34,
+      "predicted_vehicles": 600,
+      "forecast_requests": 783,
+      "future_edges": 4387,
+      "reused_raw_queries": 488,
+      "newly_resolved_raw_queries": 760,
+      "topk_arc_lookups": 1268,
+      "limited_route_batches": 20,
+      "variants": {
+        "V4_RAW_OD_GROUPED": {
+          "passes": [
+            {
+              "offset_s": 0,
+              "wall_s": 0.2868348999909358,
+              "raw_arcs": 354,
+              "backend_queries": 144,
+              "exact_answers_equal": true,
+              "cold_actual_state": true,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 60,
+              "wall_s": 0.01872580000781454,
+              "raw_arcs": 3,
+              "backend_queries": 3,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 900,
+              "wall_s": 0.01624949999677483,
+              "raw_arcs": 3,
+              "backend_queries": 3,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            }
+          ],
+          "wall_s": 0.3218101999955252,
+          "raw_arcs": 360,
+          "backend_queries": 150,
+          "arc_lookups": 1200,
+          "valid_cold_arcs": 0,
+          "process_group_rss_snapshot_mib": 631.2265625,
+          "diagnostics": {
+            "static_matrix_certificate": {
+              "schema": "STATIC_AUTO_OD_3_8_2_V1",
+              "valhalla_version": "3.8.2",
+              "config_sha256": "f2eb80488a2ec832208b8ee1a7433aa4905e58243fe1c0d5b81d48a3368ec696",
+              "timedep_matrix_distance": 0,
+              "conservative_static_guard_m": 10.0,
+              "mutable_traffic_or_remote_tiles": false
+            },
+            "raw_od_cache_entries": 360,
+            "raw_od_memory_queries_avoided": 702,
+            "raw_od_cross_minute_reuses": 702,
+            "raw_od_beta_bin_reuses": 351,
+            "certified_eta_prunes": 0,
+            "known_eta_prunes_before_backend": 0,
+            "grouped_source_queries": 169,
+            "grouped_cell_fallback_queries": 0
+          }
+        },
+        "V4_RAW_OD": {
+          "passes": [
+            {
+              "offset_s": 0,
+              "wall_s": 0.3325553000031505,
+              "raw_arcs": 354,
+              "backend_queries": 354,
+              "exact_answers_equal": true,
+              "cold_actual_state": true,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 60,
+              "wall_s": 0.015168700003414415,
+              "raw_arcs": 3,
+              "backend_queries": 3,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 900,
+              "wall_s": 0.017077500000596046,
+              "raw_arcs": 3,
+              "backend_queries": 3,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            }
+          ],
+          "wall_s": 0.36480150000716094,
+          "raw_arcs": 360,
+          "backend_queries": 360,
+          "arc_lookups": 1200,
+          "valid_cold_arcs": 0,
+          "process_group_rss_snapshot_mib": 628.4375,
+          "diagnostics": {
+            "static_matrix_certificate": {
+              "schema": "STATIC_AUTO_OD_3_8_2_V1",
+              "valhalla_version": "3.8.2",
+              "config_sha256": "f2eb80488a2ec832208b8ee1a7433aa4905e58243fe1c0d5b81d48a3368ec696",
+              "timedep_matrix_distance": 0,
+              "conservative_static_guard_m": 10.0,
+              "mutable_traffic_or_remote_tiles": false
+            },
+            "raw_od_cache_entries": 360,
+            "raw_od_memory_queries_avoided": 702,
+            "raw_od_cross_minute_reuses": 702,
+            "raw_od_beta_bin_reuses": 351,
+            "certified_eta_prunes": 0,
+            "known_eta_prunes_before_backend": 0,
+            "grouped_source_queries": 0,
+            "grouped_cell_fallback_queries": 0
+          }
+        },
+        "V3_DEFAULT": {
+          "passes": [
+            {
+              "offset_s": 0,
+              "wall_s": 0.32861520000733435,
+              "raw_arcs": 354,
+              "backend_queries": 354,
+              "exact_answers_equal": true,
+              "cold_actual_state": true,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 60,
+              "wall_s": 0.3267934999894351,
+              "raw_arcs": 354,
+              "backend_queries": 354,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            },
+            {
+              "offset_s": 900,
+              "wall_s": 0.3199322000000393,
+              "raw_arcs": 354,
+              "backend_queries": 354,
+              "exact_answers_equal": true,
+              "cold_actual_state": false,
+              "physical_state_advanced": false
+            }
+          ],
+          "wall_s": 0.9753408999968087,
+          "raw_arcs": 1062,
+          "backend_queries": 1062,
+          "arc_lookups": 1200,
+          "valid_cold_arcs": 0,
+          "process_group_rss_snapshot_mib": 628.2109375,
+          "diagnostics": null
+        }
+      },
+      "checked_cold_valid_arcs": 0,
+      "valid_arcs_equal": true,
+      "all_objectives_equal": true,
+      "solver_check": [
+        {
+          "wall_s": 0.25219949999882374,
+          "objective": [
+            0,
+            10,
+            2,
+            182.66666666666683,
+            -1664.5767262088757
+          ],
+          "variables": 4066,
+          "nonzeros": 16378
+        },
+        {
+          "wall_s": 0.2478185000072699,
+          "objective": [
+            0,
+            10,
+            2,
+            182.66666666666683,
+            -1664.5767262088757
+          ],
+          "variables": 4066,
+          "nonzeros": 16378
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "V3_DEFAULT": {
+      "wall_s": 5.587735099979909,
+      "raw_arcs": 6636,
+      "backend_queries": 6636,
+      "arc_lookups": 7200
+    },
+    "V4_RAW_OD": {
+      "wall_s": 2.0683687000127975,
+      "raw_arcs": 2224,
+      "backend_queries": 2224,
+      "arc_lookups": 7200
+    },
+    "V4_RAW_OD_GROUPED": {
+      "wall_s": 1.8186003999726381,
+      "raw_arcs": 2224,
+      "backend_queries": 938,
+      "arc_lookups": 7200
+    }
+  },
+  "original_clock_cold_queries_are_real_state": true,
+  "shifted_clock_passes_are_not_native_replays": true,
+  "offsets_s": [
+    0,
+    60,
+    900
+  ],
+  "native_scientific_conditions_added": 0,
+  "future_completion_times_used_for_prediction": false,
+  "gpu_used": false,
+  "dense_matrix": false,
+  "protected_inputs_unchanged": true,
+  "inputs_sha256": {
+    "stage4\\config\\symmetric_flexibility_full_day_v1.json": "92865914130ce9ebc23ebe5ca45a3c5d01da3dd1b2c7d4e4293462ea059d65e9",
+    "stage4\\config\\symmetric_flexibility_acceleration_v4.json": "0dee50323154a0833546e0b5c36bb0479a042b03972543db0dbff29799173ff7",
+    "stage4\\input\\replay_foundation\\pickup_eta_calibration_15min.parquet": "d7bc9bedd76b6a996fd9643c24546e5eb28c36b827d16ad8e58ca097c492476b",
+    "stage3\\config\\stage3_av_capability_profiles.json": "bea54c12a0c013995c3644a0bab84b35413d5df8a6785dfdd6a03fd49f32978e",
+    "stage2\\output_v5_2\\development\\M3\\epoch_004.pt": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde",
+    "stage4\\output\\runtime_acceleration_v2\\assets\\manifest.json": "d0cc0e1c20bc2e484b95f2ca387af035fe05ee4cade457e9adcea2fddec61940"
+  },
+  "source_assignments_sha256": "6fa89e2c0fd5a472cb267b156bb3cde6d3c99c1b1060c07ea7712aed2121337e",
+  "peak_parent_rss_mib": 318.5234375,
+  "peak_process_group_rss_snapshot_mib": 631.26171875,
+  "query_reuse_speedup_is_not_full_day_speedup": true
+}

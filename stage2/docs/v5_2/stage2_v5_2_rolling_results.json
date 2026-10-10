@@ -1,0 +1,12 @@
+{
+  "schema_version": "stage2_v5_2_rolling_results.1",
+  "status": "NOT_RUN",
+  "result_semantics": "development / rolling backtesting",
+  "untouched_confirmatory_test": false,
+  "models": {"M0": null, "M1": null, "M2": null, "M3": null, "M4": null, "M5": null, "M6": null},
+  "rolling_dates": [],
+  "spatial_transfer_adopted": null,
+  "temporal_transfer_adopted": null,
+  "task_transfer_adopted": null,
+  "pace_p50_relative_change": null
+}

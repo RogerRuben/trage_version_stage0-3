@@ -1,0 +1,35 @@
+{
+  "status": "PASS",
+  "states": 10,
+  "routing_calls": 0,
+  "unique_cached_keys": 12352,
+  "Gamma": "OFF",
+  "cost": "OFF",
+  "runtime_s": 19.87986810000075,
+  "internally_sampled_peak_rss_mib": 266.3203125,
+  "protocol_sha256": "d16a7435878831b6ae895dd99a0edd4cb8919bbeb2b6bfce077b15aca8b32e89",
+  "code_sha256": "44949cf4a614e0cdaf569ac86256b8f59a5f5f3588aa442f816a8a317e866eda",
+  "all_MILPs_certified": true,
+  "capacity": {
+    "E_AV": 123,
+    "U_AV": 43,
+    "M_AV": 41,
+    "O_HA": 9
+  },
+  "budget_state_counts": {
+    "A1": {
+      "0": 0,
+      "0.005": 0,
+      "0.01": 0,
+      "0.02": 1,
+      "0.05": 4
+    },
+    "A2": {
+      "0": 0,
+      "0.005": 0,
+      "0.01": 0,
+      "0.02": 1,
+      "0.05": 4
+    }
+  }
+}

@@ -1,0 +1,131 @@
+{
+  "all_highway_heuristic_used": false,
+  "artifact_sha256": "f98a46c07f086fdadb16835add60db9562a981215c9ba4da80c6de9c592ebd87",
+  "auto_access_bit": 1,
+  "bridge_effective_count": 4945,
+  "directed_edge_count": 209454,
+  "duplicate_clipped_direction_count": 7834,
+  "identity_algorithm": "sha256('valhalla-3.8.2|' + uint64 GraphId)[:24]",
+  "intersection_clustering_performed": false,
+  "node_count": 89607,
+  "nonzero_layer_count": 6813,
+  "observed_mapping": {
+    "ambiguous_observed_identities": 0,
+    "by_bridge_tunnel_layer_context": {
+      "bridge": [
+        {
+          "bridge": false,
+          "mapped": 18460,
+          "total": 24772
+        },
+        {
+          "bridge": true,
+          "mapped": 418,
+          "total": 610
+        }
+      ],
+      "layer_context": [
+        {
+          "layer_context": "NONZERO",
+          "mapped": 1026,
+          "total": 1026
+        },
+        {
+          "layer_context": "ZERO_OR_UNKNOWN",
+          "mapped": 17852,
+          "total": 24356
+        }
+      ],
+      "tunnel": [
+        {
+          "mapped": 18795,
+          "total": 25257,
+          "tunnel": false
+        },
+        {
+          "mapped": 83,
+          "total": 125,
+          "tunnel": true
+        }
+      ]
+    },
+    "by_road_class": [
+      {
+        "mapped": 2489,
+        "road_class": "primary",
+        "total": 4415
+      },
+      {
+        "mapped": 2265,
+        "road_class": "residential",
+        "total": 2282
+      },
+      {
+        "mapped": 3488,
+        "road_class": "secondary",
+        "total": 5936
+      },
+      {
+        "mapped": 2956,
+        "road_class": "service_other",
+        "total": 3016
+      },
+      {
+        "mapped": 4209,
+        "road_class": "tertiary",
+        "total": 5224
+      },
+      {
+        "mapped": 557,
+        "road_class": "trunk",
+        "total": 802
+      },
+      {
+        "mapped": 2914,
+        "road_class": "unclassified",
+        "total": 3707
+      }
+    ],
+    "direction_preserved": true,
+    "geometry_only_mapping_used": false,
+    "many_to_one_full_edges": 3428,
+    "mapping_status_counts": {
+      "EXACT_VALHALLA": 18878,
+      "UNMAPPED_FULL_NETWORK_EDGE": 6504
+    },
+    "observed_directed_mapped": 18878,
+    "observed_directed_mapping_rate": 0.743755417224805,
+    "observed_directed_total": 25382,
+    "observed_segment_mapped": 18878,
+    "observed_segment_mapping_rate": 0.9939974726200506,
+    "observed_segment_total": 18992,
+    "one_to_many_observed_identities": 0,
+    "one_to_one_full_edges": 6993,
+    "one_to_one_observed_identities": 18878,
+    "unmapped_by_traversal_direction": {
+      "F": 2,
+      "R": 6502
+    },
+    "unmapped_observed_identities": 6504,
+    "unmapped_reverse_direction_count": 6502
+  },
+  "raw_feature_count": 156117,
+  "road_class_distribution": {
+    "motorway": 2884,
+    "primary": 11755,
+    "residential": 65404,
+    "secondary": 19842,
+    "service_other": 29907,
+    "tertiary": 44774,
+    "trunk": 5134,
+    "unclassified": 29754
+  },
+  "schema_version": "stage3_s2a_full_network_export.1",
+  "shortcuts_excluded": true,
+  "source": "frozen Valhalla 3.8.2 MVT directed edges; auto bit in forwardaccess",
+  "status": "PASS",
+  "tunnel_effective_count": 1532,
+  "unique_osm_way_count": 44112,
+  "web_tile_count": 154,
+  "web_tile_zoom": 12
+}

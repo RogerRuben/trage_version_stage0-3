@@ -1,0 +1,68 @@
+{
+  "artifact_sha256": "813c07467b27f8ff86d9e49e2fead13983dc1a1da5230c0d54c61773a9a700d3",
+  "count_maximum": 5899,
+  "count_minimum": 1,
+  "count_record_count": 23590,
+  "count_records_sha256": "f4d88b031f6fc807fae3204d21c3b36f9a2a3f62c7cc10e3ef2f54650b6a57c4",
+  "count_sum": 9313366,
+  "duplicate_removed_count": 0,
+  "evaluation_rows_used": 0,
+  "fit_dates": [
+    "20161009",
+    "20161010",
+    "20161011",
+    "20161012",
+    "20161013",
+    "20161014",
+    "20161015",
+    "20161016",
+    "20161017",
+    "20161018",
+    "20161019",
+    "20161020",
+    "20161021"
+  ],
+  "fit_dates_observed": [
+    "20161009",
+    "20161010",
+    "20161011",
+    "20161012",
+    "20161013",
+    "20161014",
+    "20161015",
+    "20161016",
+    "20161017",
+    "20161018",
+    "20161019",
+    "20161020",
+    "20161021"
+  ],
+  "fit_scope": "train_only",
+  "missing_edge_count": 591,
+  "positive_quantiles": {
+    "p25": 3.0,
+    "p50": 39.0,
+    "p75": 468.0,
+    "p90": 1297.1000000000022
+  },
+  "protocol_id": "development",
+  "schema_version": "stage2_v5_2_sparsity_support.1",
+  "source_inputs_sha256": "0b2b9bf8243ccf3ccabc8f922088bb222737eebabf10d07bac002d09cb237b2b",
+  "source_row_count": 9313957,
+  "status": "PASS",
+  "support_group_record_counts": {
+    "high": 5889,
+    "low": 6683,
+    "medium": 11018,
+    "unseen": 0
+  },
+  "support_group_rule": {
+    "high": "n > train_positive_p75",
+    "low": "0 < n <= train_positive_p25",
+    "medium": "train_positive_p25 < n <= train_positive_p75",
+    "unseen": "n == 0"
+  },
+  "support_kind": "spatial",
+  "target": null,
+  "unique_physical_traversal_count": 9313957
+}

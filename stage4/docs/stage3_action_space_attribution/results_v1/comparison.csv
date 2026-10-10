@@ -1,0 +1,6 @@
+﻿condition,E_AV_state_sum,U_AV_state_sum,M_AV_state_sum,O_HA_state_sum,A1_states_at_0,A1_states_at_0.005,A1_states_at_0.01,A1_states_at_0.02,A1_states_at_0.05,A2_states_at_0,A2_states_at_0.005,A2_states_at_0.01,A2_states_at_0.02,A2_states_at_0.05
+D0,48,12,12,3,0,0,0,0,1,0,0,0,0,1
+D1,115,41,39,9,0,0,0,1,4,0,0,0,1,4
+D2,52,14,13,3,0,0,0,0,1,0,0,0,0,1
+D3,139,45,44,7,0,0,0,0,4,0,0,0,0,4
+D4,509,119,113,15,0,0,1,3,6,0,0,1,4,7

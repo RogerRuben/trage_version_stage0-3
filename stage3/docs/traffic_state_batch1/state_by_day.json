@@ -1,0 +1,764 @@
+{
+  "rows": [
+    {
+      "date": "20161009",
+      "role": "train_descriptive_in_sample",
+      "state": "CONGESTED_PROXY",
+      "cells": 1086,
+      "order_cell_exposures": 5102,
+      "events": 5113
+    },
+    {
+      "date": "20161009",
+      "role": "train_descriptive_in_sample",
+      "state": "MIXED_EVIDENCE",
+      "cells": 4436,
+      "order_cell_exposures": 24760,
+      "events": 24855
+    },
+    {
+      "date": "20161009",
+      "role": "train_descriptive_in_sample",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 18767,
+      "order_cell_exposures": 98881,
+      "events": 99259
+    },
+    {
+      "date": "20161009",
+      "role": "train_descriptive_in_sample",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 106,
+      "order_cell_exposures": 443,
+      "events": 443
+    },
+    {
+      "date": "20161009",
+      "role": "train_descriptive_in_sample",
+      "state": "UNKNOWN",
+      "cells": 83812,
+      "order_cell_exposures": 133479,
+      "events": 133920
+    },
+    {
+      "date": "20161010",
+      "role": "train_descriptive_in_sample",
+      "state": "CONGESTED_PROXY",
+      "cells": 1179,
+      "order_cell_exposures": 5648,
+      "events": 5655
+    },
+    {
+      "date": "20161010",
+      "role": "train_descriptive_in_sample",
+      "state": "MIXED_EVIDENCE",
+      "cells": 4461,
+      "order_cell_exposures": 25217,
+      "events": 25331
+    },
+    {
+      "date": "20161010",
+      "role": "train_descriptive_in_sample",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 18495,
+      "order_cell_exposures": 95761,
+      "events": 96141
+    },
+    {
+      "date": "20161010",
+      "role": "train_descriptive_in_sample",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 133,
+      "order_cell_exposures": 582,
+      "events": 583
+    },
+    {
+      "date": "20161010",
+      "role": "train_descriptive_in_sample",
+      "state": "UNKNOWN",
+      "cells": 83321,
+      "order_cell_exposures": 133455,
+      "events": 133915
+    },
+    {
+      "date": "20161011",
+      "role": "train_descriptive_in_sample",
+      "state": "CONGESTED_PROXY",
+      "cells": 1170,
+      "order_cell_exposures": 5596,
+      "events": 5607
+    },
+    {
+      "date": "20161011",
+      "role": "train_descriptive_in_sample",
+      "state": "MIXED_EVIDENCE",
+      "cells": 4293,
+      "order_cell_exposures": 23780,
+      "events": 23872
+    },
+    {
+      "date": "20161011",
+      "role": "train_descriptive_in_sample",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 18947,
+      "order_cell_exposures": 98365,
+      "events": 98752
+    },
+    {
+      "date": "20161011",
+      "role": "train_descriptive_in_sample",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 100,
+      "order_cell_exposures": 474,
+      "events": 475
+    },
+    {
+      "date": "20161011",
+      "role": "train_descriptive_in_sample",
+      "state": "UNKNOWN",
+      "cells": 83749,
+      "order_cell_exposures": 134497,
+      "events": 134924
+    },
+    {
+      "date": "20161012",
+      "role": "train_descriptive_in_sample",
+      "state": "CONGESTED_PROXY",
+      "cells": 1365,
+      "order_cell_exposures": 6896,
+      "events": 6913
+    },
+    {
+      "date": "20161012",
+      "role": "train_descriptive_in_sample",
+      "state": "MIXED_EVIDENCE",
+      "cells": 4950,
+      "order_cell_exposures": 27889,
+      "events": 28013
+    },
+    {
+      "date": "20161012",
+      "role": "train_descriptive_in_sample",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 17848,
+      "order_cell_exposures": 92248,
+      "events": 92624
+    },
+    {
+      "date": "20161012",
+      "role": "train_descriptive_in_sample",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 160,
+      "order_cell_exposures": 708,
+      "events": 708
+    },
+    {
+      "date": "20161012",
+      "role": "train_descriptive_in_sample",
+      "state": "UNKNOWN",
+      "cells": 84223,
+      "order_cell_exposures": 133431,
+      "events": 133862
+    },
+    {
+      "date": "20161013",
+      "role": "train_descriptive_in_sample",
+      "state": "CONGESTED_PROXY",
+      "cells": 1074,
+      "order_cell_exposures": 5048,
+      "events": 5058
+    },
+    {
+      "date": "20161013",
+      "role": "train_descriptive_in_sample",
+      "state": "MIXED_EVIDENCE",
+      "cells": 4279,
+      "order_cell_exposures": 23838,
+      "events": 23940
+    },
+    {
+      "date": "20161013",
+      "role": "train_descriptive_in_sample",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 19167,
+      "order_cell_exposures": 98847,
+      "events": 99287
+    },
+    {
+      "date": "20161013",
+      "role": "train_descriptive_in_sample",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 115,
+      "order_cell_exposures": 573,
+      "events": 575
+    },
+    {
+      "date": "20161013",
+      "role": "train_descriptive_in_sample",
+      "state": "UNKNOWN",
+      "cells": 83793,
+      "order_cell_exposures": 133965,
+      "events": 134424
+    },
+    {
+      "date": "20161014",
+      "role": "train_descriptive_in_sample",
+      "state": "CONGESTED_PROXY",
+      "cells": 1480,
+      "order_cell_exposures": 7157,
+      "events": 7168
+    },
+    {
+      "date": "20161014",
+      "role": "train_descriptive_in_sample",
+      "state": "MIXED_EVIDENCE",
+      "cells": 5309,
+      "order_cell_exposures": 29157,
+      "events": 29282
+    },
+    {
+      "date": "20161014",
+      "role": "train_descriptive_in_sample",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 17510,
+      "order_cell_exposures": 89178,
+      "events": 89536
+    },
+    {
+      "date": "20161014",
+      "role": "train_descriptive_in_sample",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 191,
+      "order_cell_exposures": 835,
+      "events": 835
+    },
+    {
+      "date": "20161014",
+      "role": "train_descriptive_in_sample",
+      "state": "UNKNOWN",
+      "cells": 84701,
+      "order_cell_exposures": 136127,
+      "events": 136553
+    },
+    {
+      "date": "20161015",
+      "role": "train_descriptive_in_sample",
+      "state": "CONGESTED_PROXY",
+      "cells": 1400,
+      "order_cell_exposures": 6705,
+      "events": 6719
+    },
+    {
+      "date": "20161015",
+      "role": "train_descriptive_in_sample",
+      "state": "MIXED_EVIDENCE",
+      "cells": 4761,
+      "order_cell_exposures": 27201,
+      "events": 27294
+    },
+    {
+      "date": "20161015",
+      "role": "train_descriptive_in_sample",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 17874,
+      "order_cell_exposures": 94448,
+      "events": 94850
+    },
+    {
+      "date": "20161015",
+      "role": "train_descriptive_in_sample",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 171,
+      "order_cell_exposures": 750,
+      "events": 752
+    },
+    {
+      "date": "20161015",
+      "role": "train_descriptive_in_sample",
+      "state": "UNKNOWN",
+      "cells": 83529,
+      "order_cell_exposures": 133599,
+      "events": 134036
+    },
+    {
+      "date": "20161016",
+      "role": "train_descriptive_in_sample",
+      "state": "CONGESTED_PROXY",
+      "cells": 1046,
+      "order_cell_exposures": 5095,
+      "events": 5106
+    },
+    {
+      "date": "20161016",
+      "role": "train_descriptive_in_sample",
+      "state": "MIXED_EVIDENCE",
+      "cells": 4425,
+      "order_cell_exposures": 24937,
+      "events": 25044
+    },
+    {
+      "date": "20161016",
+      "role": "train_descriptive_in_sample",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 19164,
+      "order_cell_exposures": 101314,
+      "events": 101722
+    },
+    {
+      "date": "20161016",
+      "role": "train_descriptive_in_sample",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 103,
+      "order_cell_exposures": 530,
+      "events": 530
+    },
+    {
+      "date": "20161016",
+      "role": "train_descriptive_in_sample",
+      "state": "UNKNOWN",
+      "cells": 82830,
+      "order_cell_exposures": 132422,
+      "events": 132836
+    },
+    {
+      "date": "20161017",
+      "role": "train_descriptive_in_sample",
+      "state": "CONGESTED_PROXY",
+      "cells": 1031,
+      "order_cell_exposures": 4918,
+      "events": 4926
+    },
+    {
+      "date": "20161017",
+      "role": "train_descriptive_in_sample",
+      "state": "MIXED_EVIDENCE",
+      "cells": 4127,
+      "order_cell_exposures": 23201,
+      "events": 23300
+    },
+    {
+      "date": "20161017",
+      "role": "train_descriptive_in_sample",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 19504,
+      "order_cell_exposures": 102446,
+      "events": 102858
+    },
+    {
+      "date": "20161017",
+      "role": "train_descriptive_in_sample",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 85,
+      "order_cell_exposures": 386,
+      "events": 386
+    },
+    {
+      "date": "20161017",
+      "role": "train_descriptive_in_sample",
+      "state": "UNKNOWN",
+      "cells": 81782,
+      "order_cell_exposures": 129698,
+      "events": 130117
+    },
+    {
+      "date": "20161018",
+      "role": "train_descriptive_in_sample",
+      "state": "CONGESTED_PROXY",
+      "cells": 1092,
+      "order_cell_exposures": 5375,
+      "events": 5385
+    },
+    {
+      "date": "20161018",
+      "role": "train_descriptive_in_sample",
+      "state": "MIXED_EVIDENCE",
+      "cells": 4156,
+      "order_cell_exposures": 22744,
+      "events": 22849
+    },
+    {
+      "date": "20161018",
+      "role": "train_descriptive_in_sample",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 19389,
+      "order_cell_exposures": 100782,
+      "events": 101130
+    },
+    {
+      "date": "20161018",
+      "role": "train_descriptive_in_sample",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 119,
+      "order_cell_exposures": 548,
+      "events": 548
+    },
+    {
+      "date": "20161018",
+      "role": "train_descriptive_in_sample",
+      "state": "UNKNOWN",
+      "cells": 83730,
+      "order_cell_exposures": 134180,
+      "events": 134613
+    },
+    {
+      "date": "20161019",
+      "role": "train_descriptive_in_sample",
+      "state": "CONGESTED_PROXY",
+      "cells": 1001,
+      "order_cell_exposures": 4827,
+      "events": 4833
+    },
+    {
+      "date": "20161019",
+      "role": "train_descriptive_in_sample",
+      "state": "MIXED_EVIDENCE",
+      "cells": 4274,
+      "order_cell_exposures": 23940,
+      "events": 24044
+    },
+    {
+      "date": "20161019",
+      "role": "train_descriptive_in_sample",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 19573,
+      "order_cell_exposures": 103048,
+      "events": 103449
+    },
+    {
+      "date": "20161019",
+      "role": "train_descriptive_in_sample",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 86,
+      "order_cell_exposures": 410,
+      "events": 411
+    },
+    {
+      "date": "20161019",
+      "role": "train_descriptive_in_sample",
+      "state": "UNKNOWN",
+      "cells": 82531,
+      "order_cell_exposures": 131633,
+      "events": 132055
+    },
+    {
+      "date": "20161020",
+      "role": "train_descriptive_in_sample",
+      "state": "CONGESTED_PROXY",
+      "cells": 1043,
+      "order_cell_exposures": 5121,
+      "events": 5133
+    },
+    {
+      "date": "20161020",
+      "role": "train_descriptive_in_sample",
+      "state": "MIXED_EVIDENCE",
+      "cells": 4331,
+      "order_cell_exposures": 24256,
+      "events": 24362
+    },
+    {
+      "date": "20161020",
+      "role": "train_descriptive_in_sample",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 19445,
+      "order_cell_exposures": 101666,
+      "events": 102069
+    },
+    {
+      "date": "20161020",
+      "role": "train_descriptive_in_sample",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 91,
+      "order_cell_exposures": 389,
+      "events": 389
+    },
+    {
+      "date": "20161020",
+      "role": "train_descriptive_in_sample",
+      "state": "UNKNOWN",
+      "cells": 83684,
+      "order_cell_exposures": 133343,
+      "events": 133798
+    },
+    {
+      "date": "20161021",
+      "role": "train_descriptive_in_sample",
+      "state": "CONGESTED_PROXY",
+      "cells": 1433,
+      "order_cell_exposures": 6954,
+      "events": 6969
+    },
+    {
+      "date": "20161021",
+      "role": "train_descriptive_in_sample",
+      "state": "MIXED_EVIDENCE",
+      "cells": 5375,
+      "order_cell_exposures": 29397,
+      "events": 29511
+    },
+    {
+      "date": "20161021",
+      "role": "train_descriptive_in_sample",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 18094,
+      "order_cell_exposures": 94142,
+      "events": 94514
+    },
+    {
+      "date": "20161021",
+      "role": "train_descriptive_in_sample",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 139,
+      "order_cell_exposures": 601,
+      "events": 602
+    },
+    {
+      "date": "20161021",
+      "role": "train_descriptive_in_sample",
+      "state": "UNKNOWN",
+      "cells": 85557,
+      "order_cell_exposures": 136142,
+      "events": 136600
+    },
+    {
+      "date": "20161022",
+      "role": "train_descriptive_in_sample",
+      "state": "CONGESTED_PROXY",
+      "cells": 1603,
+      "order_cell_exposures": 7826,
+      "events": 7836
+    },
+    {
+      "date": "20161022",
+      "role": "train_descriptive_in_sample",
+      "state": "MIXED_EVIDENCE",
+      "cells": 5752,
+      "order_cell_exposures": 32039,
+      "events": 32171
+    },
+    {
+      "date": "20161022",
+      "role": "train_descriptive_in_sample",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 16878,
+      "order_cell_exposures": 84880,
+      "events": 85178
+    },
+    {
+      "date": "20161022",
+      "role": "train_descriptive_in_sample",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 200,
+      "order_cell_exposures": 888,
+      "events": 888
+    },
+    {
+      "date": "20161022",
+      "role": "train_descriptive_in_sample",
+      "state": "UNKNOWN",
+      "cells": 86859,
+      "order_cell_exposures": 138346,
+      "events": 138768
+    },
+    {
+      "date": "20161023",
+      "role": "train_descriptive_in_sample",
+      "state": "CONGESTED_PROXY",
+      "cells": 1046,
+      "order_cell_exposures": 5192,
+      "events": 5204
+    },
+    {
+      "date": "20161023",
+      "role": "train_descriptive_in_sample",
+      "state": "MIXED_EVIDENCE",
+      "cells": 4247,
+      "order_cell_exposures": 23703,
+      "events": 23807
+    },
+    {
+      "date": "20161023",
+      "role": "train_descriptive_in_sample",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 19153,
+      "order_cell_exposures": 99993,
+      "events": 100385
+    },
+    {
+      "date": "20161023",
+      "role": "train_descriptive_in_sample",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 116,
+      "order_cell_exposures": 550,
+      "events": 551
+    },
+    {
+      "date": "20161023",
+      "role": "train_descriptive_in_sample",
+      "state": "UNKNOWN",
+      "cells": 83642,
+      "order_cell_exposures": 131523,
+      "events": 131922
+    },
+    {
+      "date": "20161024",
+      "role": "train_descriptive_in_sample",
+      "state": "CONGESTED_PROXY",
+      "cells": 1344,
+      "order_cell_exposures": 6168,
+      "events": 6179
+    },
+    {
+      "date": "20161024",
+      "role": "train_descriptive_in_sample",
+      "state": "MIXED_EVIDENCE",
+      "cells": 4784,
+      "order_cell_exposures": 25418,
+      "events": 25524
+    },
+    {
+      "date": "20161024",
+      "role": "train_descriptive_in_sample",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 17678,
+      "order_cell_exposures": 89532,
+      "events": 89872
+    },
+    {
+      "date": "20161024",
+      "role": "train_descriptive_in_sample",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 158,
+      "order_cell_exposures": 684,
+      "events": 684
+    },
+    {
+      "date": "20161024",
+      "role": "train_descriptive_in_sample",
+      "state": "UNKNOWN",
+      "cells": 85883,
+      "order_cell_exposures": 136799,
+      "events": 137239
+    },
+    {
+      "date": "20161025",
+      "role": "validation_descriptive",
+      "state": "CONGESTED_PROXY",
+      "cells": 1535,
+      "order_cell_exposures": 7566,
+      "events": 7580
+    },
+    {
+      "date": "20161025",
+      "role": "validation_descriptive",
+      "state": "MIXED_EVIDENCE",
+      "cells": 5227,
+      "order_cell_exposures": 28760,
+      "events": 28865
+    },
+    {
+      "date": "20161025",
+      "role": "validation_descriptive",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 16892,
+      "order_cell_exposures": 84853,
+      "events": 85154
+    },
+    {
+      "date": "20161025",
+      "role": "validation_descriptive",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 217,
+      "order_cell_exposures": 966,
+      "events": 966
+    },
+    {
+      "date": "20161025",
+      "role": "validation_descriptive",
+      "state": "UNKNOWN",
+      "cells": 85859,
+      "order_cell_exposures": 137329,
+      "events": 137768
+    },
+    {
+      "date": "20161026",
+      "role": "validation_descriptive",
+      "state": "CONGESTED_PROXY",
+      "cells": 1397,
+      "order_cell_exposures": 6599,
+      "events": 6611
+    },
+    {
+      "date": "20161026",
+      "role": "validation_descriptive",
+      "state": "MIXED_EVIDENCE",
+      "cells": 5018,
+      "order_cell_exposures": 26921,
+      "events": 27034
+    },
+    {
+      "date": "20161026",
+      "role": "validation_descriptive",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 17636,
+      "order_cell_exposures": 89238,
+      "events": 89589
+    },
+    {
+      "date": "20161026",
+      "role": "validation_descriptive",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 178,
+      "order_cell_exposures": 786,
+      "events": 788
+    },
+    {
+      "date": "20161026",
+      "role": "validation_descriptive",
+      "state": "UNKNOWN",
+      "cells": 85576,
+      "order_cell_exposures": 136103,
+      "events": 136518
+    },
+    {
+      "date": "20161027",
+      "role": "validation_descriptive",
+      "state": "CONGESTED_PROXY",
+      "cells": 1403,
+      "order_cell_exposures": 6502,
+      "events": 6514
+    },
+    {
+      "date": "20161027",
+      "role": "validation_descriptive",
+      "state": "MIXED_EVIDENCE",
+      "cells": 5169,
+      "order_cell_exposures": 27455,
+      "events": 27549
+    },
+    {
+      "date": "20161027",
+      "role": "validation_descriptive",
+      "state": "NON_CONGESTED_PROXY",
+      "cells": 17258,
+      "order_cell_exposures": 87279,
+      "events": 87611
+    },
+    {
+      "date": "20161027",
+      "role": "validation_descriptive",
+      "state": "SEVERE_CONGESTION_PROXY",
+      "cells": 164,
+      "order_cell_exposures": 730,
+      "events": 731
+    },
+    {
+      "date": "20161027",
+      "role": "validation_descriptive",
+      "state": "UNKNOWN",
+      "cells": 85985,
+      "order_cell_exposures": 136467,
+      "events": 136913
+    }
+  ]
+}

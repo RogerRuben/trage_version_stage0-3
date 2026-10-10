@@ -1,0 +1,783 @@
+{
+  "status": "COMPLETE",
+  "mixed_reference": "stage4\\output\\symmetric_flexibility_v1\\accelerated_v4_full_day\\SERVICE_PRESERVING_LOOKAHEAD",
+  "all_hv_reference": "stage4\\output\\replay_calibration_v1\\all_hv\\SERVICE_PRESERVING_LOOKAHEAD",
+  "controlled_change": "fleet composition/layout/availability plus AV compatibility/acceptance; not pure ODD or policy causal attribution",
+  "gained_all_hv": 4956,
+  "lost_all_hv": 1037,
+  "common_served": 18417,
+  "matched_difference": 3919,
+  "service_rate_difference_pp": 13.815348820812911,
+  "paired_served_mean_wait_delta_s": -20.484100814682087,
+  "all_hv": {
+    "status": "COMPLETE",
+    "policy": "SERVICE_PRESERVING_LOOKAHEAD",
+    "profile": "M",
+    "source_config": "stage4\\config\\symmetric_flexibility_full_day_v1.json",
+    "administrative_timeout_s": 10800,
+    "administrative_extension": false,
+    "scientific_and_per_epoch_solver_parameters_unchanged": true,
+    "execution_pid": 28568,
+    "execution_started_at": "2026-10-06T12:47:22.713844+08:00",
+    "execution_code_sha": "41235162189b9d92e219c2bca9a8e69f135572f4",
+    "acceleration_config_sha256": "0dee50323154a0833546e0b5c36bb0479a042b03972543db0dbff29799173ff7",
+    "execution_settings": {
+      "recourse_mode": "FLOW_RELAXED",
+      "solver_backend": "SCIPY",
+      "highspy_runtime_dir": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\runtime_dependencies\\highspy_1_12_0",
+      "fast_forecast": true,
+      "lock_current_face": true,
+      "persistent_cache_size": 50000,
+      "route_workers": 2,
+      "lazy_worker_actor": true,
+      "cached_geometry": true,
+      "event_calendar": true,
+      "fast_future_graph": true,
+      "epoch_routing_queue": true,
+      "pre_route_session_certificate": true,
+      "compress_fixed_states": false,
+      "trim_flow_rows": false,
+      "offline_assets": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\runtime_acceleration_v2\\assets",
+      "disk_route_cache": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\runtime_acceleration_v4\\routing\\cache.sqlite3",
+      "disk_cache_limit_mib": 512,
+      "disk_cache_max_entries": 2000000,
+      "route_queue_chunk_size": 256,
+      "decompose_model": true,
+      "demand_routing": true,
+      "grouped_sources": true,
+      "static_raw_od": true,
+      "raw_od_cache_size": 50000,
+      "certified_eta_pruning": true
+    },
+    "optimum_equivalence_not_bitwise_trajectory_identity": true,
+    "calibration_config_sha256": "43670960eb50b01cb9c4d68f9f1661b4a548aaa9a2459f8c2a736c4004bf2def",
+    "experiment_role": "CURRENT_VERSION_ALL_HV_ABSOLUTE_REPLAY_REFERENCE",
+    "controlled_changes": {
+      "requested_q_a": 0.0,
+      "passenger_acceptance_rate": 1.0
+    },
+    "historical_driver_chain_replayed": false,
+    "request_times_changed": false,
+    "pickup_eta_calibration_changed": false,
+    "repositioning_enabled": false,
+    "original_orders": 30000,
+    "common_eligible": 28367,
+    "matched": 23373,
+    "av": 0,
+    "hv": 23373,
+    "expired": 4994,
+    "excluded_input": 1633,
+    "service_rate_common_population": 0.8239503648605774,
+    "service_rate_original_30000": 0.7791,
+    "mean_wait_s": 163.48507481568478,
+    "wait_quantiles_s": {
+      "0.5": 178.70355,
+      "0.9": 280.1314272,
+      "0.95": 290.3131582
+    },
+    "maximum_model_variables": 5561,
+    "maximum_model_nonzeros": 22484,
+    "resource_fallback_epochs": 0,
+    "current_face_violation_epochs": 0,
+    "dispatch_epochs": 2893,
+    "maximum_topk_pairs": 1687,
+    "maximum_valid_arcs": 159,
+    "routing_failures": 0,
+    "routing_arc_evaluations": 315453,
+    "solver_time_s": 862.1142051998613,
+    "runtime_s": 1393.5939999999973,
+    "peak_rss_mib": 775.80078125,
+    "gpu_used": false,
+    "dense_matrix": false,
+    "physical_reconciliation": true,
+    "inputs_sha256": {
+      "stage4\\config\\symmetric_flexibility_full_day_v1.json": "92865914130ce9ebc23ebe5ca45a3c5d01da3dd1b2c7d4e4293462ea059d65e9",
+      "stage4\\output\\symmetric_flexibility_v1\\input\\test31_research_routes.parquet": "672d635fa24690ba7082b2e925f8419e6b6d67aca2dec613ea0a87835e7e57f7",
+      "stage4\\output\\symmetric_flexibility_v1\\input\\train_request_templates.parquet": "f0ee98eb4ad5aca69125ace8610ce4ff2c40edb6b7f5e62016ee321a432af652",
+      "stage4\\docs\\flexibility_dispatch\\service_preserving\\train_remaining_time_model.json": "207dfa3385bf1d59fb380e897e876a745bd8484ee52a53e62b150baa5b33488f",
+      "stage3\\config\\stage3_av_capability_profiles.json": "bea54c12a0c013995c3644a0bab84b35413d5df8a6785dfdd6a03fd49f32978e",
+      "stage2\\output_v5_2\\development\\M3\\epoch_004.pt": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde",
+      "stage4\\config\\symmetric_flexibility_acceleration_v4.json": "0dee50323154a0833546e0b5c36bb0479a042b03972543db0dbff29799173ff7",
+      "stage4\\config\\replay_calibration_v1.json": "43670960eb50b01cb9c4d68f9f1661b4a548aaa9a2459f8c2a736c4004bf2def",
+      "stage4\\output\\runtime_acceleration_v2\\assets\\manifest.json": "d0cc0e1c20bc2e484b95f2ca387af035fe05ee4cade457e9adcea2fddec61940"
+    },
+    "train_remaining_model_refitted": false,
+    "native_start_s": 0,
+    "drain_end_s": 86790,
+    "timing_totals_s": {
+      "candidate_generation": 130.16025390080176,
+      "routing_wall": 226.238266899687,
+      "solver_pipeline": 862.1142051998613
+    },
+    "solver_pipeline_components_s": {
+      "forecast_sampling_time_s": 14.651153700397117,
+      "future_graph_time_s": 300.2324473997287,
+      "problem_setup_time_s": 25.682107099550194,
+      "model_build_time_s": 84.05265879968647,
+      "optimization_time_s": 397.0258121002844,
+      "recourse_recovery_time_s": 17.88524359719304,
+      "failed_model_attempt_time_s": 0.0
+    },
+    "arc_lookups": 1336945,
+    "arc_cache_hits": 1015161,
+    "cross_epoch_exact_cache_hits": 388504,
+    "disk_route_cache_hits": 180635,
+    "raw_lru_hits": 388504,
+    "raw_query_deduplications": 6331,
+    "epoch_route_batches": 2870,
+    "prefetched_unused_raw_arcs": 0,
+    "routing_queue_pipeline_time_s": 278.84513879957376,
+    "disk_cache_lookup_time_s": 6.734869300038554,
+    "zero_eta_session_certified_prunes": 205079,
+    "eliminated_fixed_variables": 1364237,
+    "peak_process_group_rss_mib": 1152.91015625,
+    "peak_process_group_private_committed_mib": 2454.76953125,
+    "raw_prefetch_avoided": 0,
+    "source_group_queries": 201895,
+    "group_cell_fallback_queries": 0,
+    "decomposition_components": 98313,
+    "pure_future_components": 93027,
+    "routing_v4": {
+      "static_matrix_certificate": {
+        "schema": "STATIC_AUTO_OD_3_8_2_V1",
+        "valhalla_version": "3.8.2",
+        "config_sha256": "f2eb80488a2ec832208b8ee1a7433aa4905e58243fe1c0d5b81d48a3368ec696",
+        "timedep_matrix_distance": 0,
+        "conservative_static_guard_m": 10.0,
+        "mutable_traffic_or_remote_tiles": false
+      },
+      "raw_od_cache_entries": 50000,
+      "raw_od_cache_evictions": 436738,
+      "raw_od_memory_queries_avoided": 390895,
+      "raw_od_cross_minute_reuses": 390895,
+      "raw_od_beta_bin_reuses": 45041,
+      "certified_eta_prunes": 824809,
+      "known_eta_prunes_before_backend": 824809,
+      "grouped_source_queries": 201895,
+      "grouped_cell_fallback_queries": 0,
+      "optional_disk_cache": {
+        "entry_count": 827016,
+        "dropped_optional_writes": 0,
+        "write_time_s": 63.38954549995833,
+        "read_error": null,
+        "write_error": null,
+        "close_error": null,
+        "disabled_reads": false,
+        "disabled_writes": false,
+        "closed": true,
+        "writer_alive": false
+      }
+    },
+    "execution_finished_at": "2026-10-06T13:10:36.324171+08:00"
+  },
+  "mixed": {
+    "status": "COMPLETE",
+    "policy": "SERVICE_PRESERVING_LOOKAHEAD",
+    "profile": "M",
+    "source_config": "stage4\\config\\symmetric_flexibility_full_day_v1.json",
+    "administrative_timeout_s": 10800,
+    "administrative_extension": false,
+    "scientific_and_per_epoch_solver_parameters_unchanged": true,
+    "execution_pid": 22888,
+    "execution_started_at": "2026-10-06T10:48:44.443790+08:00",
+    "execution_code_sha": "4d3d3c3cd4507e2803123e019c3d5ab060b8e71d",
+    "acceleration_config_sha256": "0dee50323154a0833546e0b5c36bb0479a042b03972543db0dbff29799173ff7",
+    "execution_settings": {
+      "recourse_mode": "FLOW_RELAXED",
+      "solver_backend": "SCIPY",
+      "highspy_runtime_dir": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\runtime_dependencies\\highspy_1_12_0",
+      "fast_forecast": true,
+      "lock_current_face": true,
+      "persistent_cache_size": 50000,
+      "route_workers": 2,
+      "lazy_worker_actor": true,
+      "cached_geometry": true,
+      "event_calendar": true,
+      "fast_future_graph": true,
+      "epoch_routing_queue": true,
+      "pre_route_session_certificate": true,
+      "compress_fixed_states": false,
+      "trim_flow_rows": false,
+      "offline_assets": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\runtime_acceleration_v2\\assets",
+      "disk_route_cache": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\runtime_acceleration_v4\\routing\\cache.sqlite3",
+      "disk_cache_limit_mib": 512,
+      "disk_cache_max_entries": 2000000,
+      "route_queue_chunk_size": 256,
+      "decompose_model": true,
+      "demand_routing": true,
+      "grouped_sources": true,
+      "static_raw_od": true,
+      "raw_od_cache_size": 50000,
+      "certified_eta_pruning": true
+    },
+    "optimum_equivalence_not_bitwise_trajectory_identity": true,
+    "original_orders": 30000,
+    "common_eligible": 28367,
+    "matched": 19454,
+    "av": 4528,
+    "hv": 14926,
+    "expired": 8913,
+    "excluded_input": 1633,
+    "service_rate_common_population": 0.6857968766524483,
+    "service_rate_original_30000": 0.6484666666666666,
+    "mean_wait_s": 180.90977379608307,
+    "wait_quantiles_s": {
+      "0.5": 199.21839549999999,
+      "0.9": 284.364016,
+      "0.95": 292.5764228
+    },
+    "maximum_model_variables": 6180,
+    "maximum_model_nonzeros": 24912,
+    "resource_fallback_epochs": 0,
+    "current_face_violation_epochs": 0,
+    "dispatch_epochs": 2893,
+    "maximum_topk_pairs": 2290,
+    "maximum_valid_arcs": 102,
+    "routing_failures": 0,
+    "routing_arc_evaluations": 511563,
+    "solver_time_s": 1027.4796220000426,
+    "runtime_s": 1679.0310000000027,
+    "peak_rss_mib": 719.0,
+    "gpu_used": false,
+    "dense_matrix": false,
+    "physical_reconciliation": true,
+    "inputs_sha256": {
+      "stage4\\config\\symmetric_flexibility_full_day_v1.json": "92865914130ce9ebc23ebe5ca45a3c5d01da3dd1b2c7d4e4293462ea059d65e9",
+      "stage4\\output\\symmetric_flexibility_v1\\input\\test31_research_routes.parquet": "672d635fa24690ba7082b2e925f8419e6b6d67aca2dec613ea0a87835e7e57f7",
+      "stage4\\output\\symmetric_flexibility_v1\\input\\train_request_templates.parquet": "f0ee98eb4ad5aca69125ace8610ce4ff2c40edb6b7f5e62016ee321a432af652",
+      "stage4\\docs\\flexibility_dispatch\\service_preserving\\train_remaining_time_model.json": "207dfa3385bf1d59fb380e897e876a745bd8484ee52a53e62b150baa5b33488f",
+      "stage3\\config\\stage3_av_capability_profiles.json": "bea54c12a0c013995c3644a0bab84b35413d5df8a6785dfdd6a03fd49f32978e",
+      "stage2\\output_v5_2\\development\\M3\\epoch_004.pt": "965fc491cd77256f7889961d89932ec6be709bab04adcca358ac1b49f47c2cde",
+      "stage4\\config\\symmetric_flexibility_acceleration_v4.json": "0dee50323154a0833546e0b5c36bb0479a042b03972543db0dbff29799173ff7",
+      "stage4\\output\\runtime_acceleration_v2\\assets\\manifest.json": "d0cc0e1c20bc2e484b95f2ca387af035fe05ee4cade457e9adcea2fddec61940"
+    },
+    "train_remaining_model_refitted": false,
+    "native_start_s": 0,
+    "drain_end_s": 86790,
+    "timing_totals_s": {
+      "candidate_generation": 185.72481070025242,
+      "routing_wall": 351.0031321995775,
+      "solver_pipeline": 1027.4796220000426
+    },
+    "solver_pipeline_components_s": {
+      "forecast_sampling_time_s": 17.596727400101372,
+      "future_graph_time_s": 249.39852830012387,
+      "problem_setup_time_s": 27.00597119946906,
+      "model_build_time_s": 88.28548950052937,
+      "optimization_time_s": 609.9563302996976,
+      "recourse_recovery_time_s": 16.132764897920424,
+      "failed_model_attempt_time_s": 0.0
+    },
+    "arc_lookups": 1980345,
+    "arc_cache_hits": 1453614,
+    "cross_epoch_exact_cache_hits": 683029,
+    "disk_route_cache_hits": 20860,
+    "raw_lru_hits": 683029,
+    "raw_query_deduplications": 15168,
+    "epoch_route_batches": 2847,
+    "prefetched_unused_raw_arcs": 0,
+    "routing_queue_pipeline_time_s": 433.58493869996164,
+    "disk_cache_lookup_time_s": 7.745279399998253,
+    "zero_eta_session_certified_prunes": 245024,
+    "eliminated_fixed_variables": 1295211,
+    "peak_process_group_rss_mib": 1112.078125,
+    "peak_process_group_private_committed_mib": 2639.875,
+    "raw_prefetch_avoided": 0,
+    "source_group_queries": 249086,
+    "group_cell_fallback_queries": 0,
+    "decomposition_components": 51863,
+    "pure_future_components": 48728,
+    "routing_v4": {
+      "static_matrix_certificate": {
+        "schema": "STATIC_AUTO_OD_3_8_2_V1",
+        "valhalla_version": "3.8.2",
+        "config_sha256": "f2eb80488a2ec832208b8ee1a7433aa4905e58243fe1c0d5b81d48a3368ec696",
+        "timedep_matrix_distance": 0,
+        "conservative_static_guard_m": 10.0,
+        "mutable_traffic_or_remote_tiles": false
+      },
+      "raw_od_cache_entries": 50000,
+      "raw_od_cache_evictions": 478258,
+      "raw_od_memory_queries_avoided": 667313,
+      "raw_od_cross_minute_reuses": 667313,
+      "raw_od_beta_bin_reuses": 61968,
+      "certified_eta_prunes": 1426871,
+      "known_eta_prunes_before_backend": 1426871,
+      "grouped_source_queries": 249086,
+      "grouped_cell_fallback_queries": 0,
+      "optional_disk_cache": {
+        "entry_count": 511563,
+        "dropped_optional_writes": 0,
+        "write_time_s": 79.94925629963109,
+        "read_error": null,
+        "write_error": null,
+        "close_error": null,
+        "disabled_reads": false,
+        "disabled_writes": false,
+        "closed": true,
+        "writer_alive": false
+      }
+    },
+    "execution_finished_at": "2026-10-06T11:16:43.497146+08:00"
+  },
+  "hourly_supply": [
+    {
+      "scenario": "MIXED",
+      "hour": 0,
+      "available_vehicle_hours": 295.0602777777778,
+      "hv_vehicle_hours": 39.06027777777778,
+      "av_vehicle_hours": 256.0
+    },
+    {
+      "scenario": "MIXED",
+      "hour": 1,
+      "available_vehicle_hours": 303.6622222222222,
+      "hv_vehicle_hours": 47.66222222222222,
+      "av_vehicle_hours": 256.0
+    },
+    {
+      "scenario": "MIXED",
+      "hour": 2,
+      "available_vehicle_hours": 287.6188888888889,
+      "hv_vehicle_hours": 31.61888888888889,
+      "av_vehicle_hours": 256.0
+    },
+    {
+      "scenario": "MIXED",
+      "hour": 3,
+      "available_vehicle_hours": 278.80361111111114,
+      "hv_vehicle_hours": 22.80361111111111,
+      "av_vehicle_hours": 256.0
+    },
+    {
+      "scenario": "MIXED",
+      "hour": 4,
+      "available_vehicle_hours": 271.5527777777778,
+      "hv_vehicle_hours": 15.552777777777777,
+      "av_vehicle_hours": 256.0
+    },
+    {
+      "scenario": "MIXED",
+      "hour": 5,
+      "available_vehicle_hours": 269.2575,
+      "hv_vehicle_hours": 13.2575,
+      "av_vehicle_hours": 256.0
+    },
+    {
+      "scenario": "MIXED",
+      "hour": 6,
+      "available_vehicle_hours": 297.0677777777778,
+      "hv_vehicle_hours": 41.06777777777778,
+      "av_vehicle_hours": 256.0
+    },
+    {
+      "scenario": "MIXED",
+      "hour": 7,
+      "available_vehicle_hours": 413.0738888888889,
+      "hv_vehicle_hours": 157.0738888888889,
+      "av_vehicle_hours": 256.0
+    },
+    {
+      "scenario": "MIXED",
+      "hour": 8,
+      "available_vehicle_hours": 531.1980555555556,
+      "hv_vehicle_hours": 275.1980555555556,
+      "av_vehicle_hours": 256.0
+    },
+    {
+      "scenario": "MIXED",
+      "hour": 9,
+      "available_vehicle_hours": 599.9488888888889,
+      "hv_vehicle_hours": 343.9488888888889,
+      "av_vehicle_hours": 256.0
+    },
+    {
+      "scenario": "MIXED",
+      "hour": 10,
+      "available_vehicle_hours": 601.7705555555556,
+      "hv_vehicle_hours": 345.7705555555556,
+      "av_vehicle_hours": 256.0
+    },
+    {
+      "scenario": "MIXED",
+      "hour": 11,
+      "available_vehicle_hours": 582.5744444444445,
+      "hv_vehicle_hours": 326.57444444444445,
+      "av_vehicle_hours": 256.0
+    },
+    {
+      "scenario": "MIXED",
+      "hour": 12,
+      "available_vehicle_hours": 583.3977777777778,
+      "hv_vehicle_hours": 327.3977777777778,
+      "av_vehicle_hours": 256.0
+    },
+    {
+      "scenario": "MIXED",
+      "hour": 13,
+      "available_vehicle_hours": 603.8313888888889,
+      "hv_vehicle_hours": 347.8313888888889,
+      "av_vehicle_hours": 256.0
+    },
+    {
+      "scenario": "MIXED",
+      "hour": 14,
+      "available_vehicle_hours": 651.2955555555556,
+      "hv_vehicle_hours": 395.29555555555555,
+      "av_vehicle_hours": 256.0
+    },
+    {
+      "scenario": "MIXED",
+      "hour": 15,
+      "available_vehicle_hours": 701.1841666666667,
+      "hv_vehicle_hours": 445.18416666666667,
+      "av_vehicle_hours": 256.0
+    },
+    {
+      "scenario": "MIXED",
+      "hour": 16,
+      "available_vehicle_hours": 702.5686111111111,
+      "hv_vehicle_hours": 446.5686111111111,
+      "av_vehicle_hours": 256.0
+    },
+    {
+      "scenario": "MIXED",
+      "hour": 17,
+      "available_vehicle_hours": 686.6616666666666,
+      "hv_vehicle_hours": 430.6616666666667,
+      "av_vehicle_hours": 256.0
+    },
+    {
+      "scenario": "MIXED",
+      "hour": 18,
+      "available_vehicle_hours": 689.9061111111112,
+      "hv_vehicle_hours": 433.9061111111111,
+      "av_vehicle_hours": 256.0
+    },
+    {
+      "scenario": "MIXED",
+      "hour": 19,
+      "available_vehicle_hours": 699.0219444444444,
+      "hv_vehicle_hours": 443.02194444444444,
+      "av_vehicle_hours": 256.0
+    },
+    {
+      "scenario": "MIXED",
+      "hour": 20,
+      "available_vehicle_hours": 649.4811111111111,
+      "hv_vehicle_hours": 393.4811111111111,
+      "av_vehicle_hours": 256.0
+    },
+    {
+      "scenario": "MIXED",
+      "hour": 21,
+      "available_vehicle_hours": 627.7169444444445,
+      "hv_vehicle_hours": 371.71694444444444,
+      "av_vehicle_hours": 256.0
+    },
+    {
+      "scenario": "MIXED",
+      "hour": 22,
+      "available_vehicle_hours": 558.2725,
+      "hv_vehicle_hours": 302.2725,
+      "av_vehicle_hours": 256.0
+    },
+    {
+      "scenario": "MIXED",
+      "hour": 23,
+      "available_vehicle_hours": 413.0627777777778,
+      "hv_vehicle_hours": 157.06277777777777,
+      "av_vehicle_hours": 256.0
+    },
+    {
+      "scenario": "ALL_HV",
+      "hour": 0,
+      "available_vehicle_hours": 78.25361111111111,
+      "hv_vehicle_hours": 78.25361111111111,
+      "av_vehicle_hours": 0.0
+    },
+    {
+      "scenario": "ALL_HV",
+      "hour": 1,
+      "available_vehicle_hours": 97.46388888888889,
+      "hv_vehicle_hours": 97.46388888888889,
+      "av_vehicle_hours": 0.0
+    },
+    {
+      "scenario": "ALL_HV",
+      "hour": 2,
+      "available_vehicle_hours": 67.12083333333334,
+      "hv_vehicle_hours": 67.12083333333334,
+      "av_vehicle_hours": 0.0
+    },
+    {
+      "scenario": "ALL_HV",
+      "hour": 3,
+      "available_vehicle_hours": 49.76694444444445,
+      "hv_vehicle_hours": 49.76694444444445,
+      "av_vehicle_hours": 0.0
+    },
+    {
+      "scenario": "ALL_HV",
+      "hour": 4,
+      "available_vehicle_hours": 33.217777777777776,
+      "hv_vehicle_hours": 33.217777777777776,
+      "av_vehicle_hours": 0.0
+    },
+    {
+      "scenario": "ALL_HV",
+      "hour": 5,
+      "available_vehicle_hours": 30.385833333333334,
+      "hv_vehicle_hours": 30.385833333333334,
+      "av_vehicle_hours": 0.0
+    },
+    {
+      "scenario": "ALL_HV",
+      "hour": 6,
+      "available_vehicle_hours": 82.36611111111111,
+      "hv_vehicle_hours": 82.36611111111111,
+      "av_vehicle_hours": 0.0
+    },
+    {
+      "scenario": "ALL_HV",
+      "hour": 7,
+      "available_vehicle_hours": 310.0852777777778,
+      "hv_vehicle_hours": 310.0852777777778,
+      "av_vehicle_hours": 0.0
+    },
+    {
+      "scenario": "ALL_HV",
+      "hour": 8,
+      "available_vehicle_hours": 565.6883333333334,
+      "hv_vehicle_hours": 565.6883333333334,
+      "av_vehicle_hours": 0.0
+    },
+    {
+      "scenario": "ALL_HV",
+      "hour": 9,
+      "available_vehicle_hours": 719.3727777777777,
+      "hv_vehicle_hours": 719.3727777777777,
+      "av_vehicle_hours": 0.0
+    },
+    {
+      "scenario": "ALL_HV",
+      "hour": 10,
+      "available_vehicle_hours": 714.6738888888889,
+      "hv_vehicle_hours": 714.6738888888889,
+      "av_vehicle_hours": 0.0
+    },
+    {
+      "scenario": "ALL_HV",
+      "hour": 11,
+      "available_vehicle_hours": 675.7563888888889,
+      "hv_vehicle_hours": 675.7563888888889,
+      "av_vehicle_hours": 0.0
+    },
+    {
+      "scenario": "ALL_HV",
+      "hour": 12,
+      "available_vehicle_hours": 668.9063888888888,
+      "hv_vehicle_hours": 668.9063888888888,
+      "av_vehicle_hours": 0.0
+    },
+    {
+      "scenario": "ALL_HV",
+      "hour": 13,
+      "available_vehicle_hours": 695.8408333333333,
+      "hv_vehicle_hours": 695.8408333333333,
+      "av_vehicle_hours": 0.0
+    },
+    {
+      "scenario": "ALL_HV",
+      "hour": 14,
+      "available_vehicle_hours": 787.3875,
+      "hv_vehicle_hours": 787.3875,
+      "av_vehicle_hours": 0.0
+    },
+    {
+      "scenario": "ALL_HV",
+      "hour": 15,
+      "available_vehicle_hours": 883.3227777777778,
+      "hv_vehicle_hours": 883.3227777777778,
+      "av_vehicle_hours": 0.0
+    },
+    {
+      "scenario": "ALL_HV",
+      "hour": 16,
+      "available_vehicle_hours": 858.9069444444444,
+      "hv_vehicle_hours": 858.9069444444444,
+      "av_vehicle_hours": 0.0
+    },
+    {
+      "scenario": "ALL_HV",
+      "hour": 17,
+      "available_vehicle_hours": 822.0180555555555,
+      "hv_vehicle_hours": 822.0180555555555,
+      "av_vehicle_hours": 0.0
+    },
+    {
+      "scenario": "ALL_HV",
+      "hour": 18,
+      "available_vehicle_hours": 845.6225,
+      "hv_vehicle_hours": 845.6225,
+      "av_vehicle_hours": 0.0
+    },
+    {
+      "scenario": "ALL_HV",
+      "hour": 19,
+      "available_vehicle_hours": 862.7077777777778,
+      "hv_vehicle_hours": 862.7077777777778,
+      "av_vehicle_hours": 0.0
+    },
+    {
+      "scenario": "ALL_HV",
+      "hour": 20,
+      "available_vehicle_hours": 777.1672222222222,
+      "hv_vehicle_hours": 777.1672222222222,
+      "av_vehicle_hours": 0.0
+    },
+    {
+      "scenario": "ALL_HV",
+      "hour": 21,
+      "available_vehicle_hours": 743.4891666666666,
+      "hv_vehicle_hours": 743.4891666666666,
+      "av_vehicle_hours": 0.0
+    },
+    {
+      "scenario": "ALL_HV",
+      "hour": 22,
+      "available_vehicle_hours": 597.5927777777778,
+      "hv_vehicle_hours": 597.5927777777778,
+      "av_vehicle_hours": 0.0
+    },
+    {
+      "scenario": "ALL_HV",
+      "hour": 23,
+      "available_vehicle_hours": 311.62055555555554,
+      "hv_vehicle_hours": 311.62055555555554,
+      "av_vehicle_hours": 0.0
+    }
+  ],
+  "additional_offline_checks": {
+    "both_common_quality_predecessor_sample": {
+      "n": 325,
+      "raw_fits_historical_gap": 324,
+      "corrected_fits_historical_gap": 293,
+      "timing_idle_hold_conflict": 126,
+      "raw_timing_idle_hold_conflict": 38,
+      "beta_only_gap_conflict": 31,
+      "beta_only_patience_conflict": 108
+    },
+    "loaded_route_distance_ratio": {
+      "count": 30000,
+      "mean": 1.008129408954301,
+      "p00": 0.10375275938189846,
+      "p25": 0.9481601663396074,
+      "p50": 0.997141667930707,
+      "p75": 1.0050173139525003,
+      "p90": 1.0957793658331438,
+      "p100": 254.6
+    },
+    "loaded_distance_order_count": 30000,
+    "loaded_distance_ratio_gt15_share": 0.0161,
+    "loaded_time_ratio": {
+      "count": 30000,
+      "mean": 2.7471117440821757,
+      "p00": 0.20495926900345077,
+      "p25": 1.9312023169057824,
+      "p50": 2.4137629875909457,
+      "p75": 3.0746290378385126,
+      "p90": 3.9835918752149544,
+      "p100": 895.3118792212953
+    },
+    "route_length_adjusted_time_ratio": {
+      "count": 30000,
+      "mean": 2.7162317467735,
+      "p00": 0.7838260477092852,
+      "p25": 2.0216562775008105,
+      "p50": 2.4829887176476713,
+      "p75": 3.0934004972846716,
+      "p90": 3.9381500582812516,
+      "p100": 41.462580012185484
+    },
+    "original_session_represented_all_hv_count": 8187,
+    "original_session_represented_all_hv_share": 0.28861000458278985,
+    "zero_pickup_predicted_end_forbidden_all_common": 1429,
+    "zero_pickup_predicted_end_forbidden_retained_session": 422,
+    "common_historical_last_order_count": 7615,
+    "zero_pickup_predicted_end_forbidden_last_order": 1402,
+    "historical_last_order_prediction_test_not_dispatch_loss_attribution": true
+  },
+  "shared_input_hashes_identical": true,
+  "shared_input_count": 8,
+  "daytime_08_to_23_hv_vehicle_hours": 11218.453333333333,
+  "daytime_08_to_23_mixed_vehicle_hours": 9468.829722222225,
+  "daytime_mixed_supply_deficit_share": 0.1559594321181923,
+  "all_hv_diagnostics": {
+    "cohort_groups": [
+      {
+        "group": "M_P70_AV_ELIGIBLE",
+        "orders": 16987,
+        "matched": 13989,
+        "expired": 2998,
+        "service_rate": 0.823512097486313
+      },
+      {
+        "group": "M_P70_HV_ONLY",
+        "orders": 11380,
+        "matched": 9384,
+        "expired": 1996,
+        "service_rate": 0.8246045694200351
+      }
+    ],
+    "candidate_visits": {
+      "candidate_topk_pairs": 1542024,
+      "valid_or_arcs": 110225,
+      "patience_arc_exclusions": 1220872,
+      "hv_window_arc_exclusions": 5848,
+      "zero_eta_session_certified_prunes": 205079,
+      "candidate_partition_reconciled": true
+    },
+    "available_vehicles": {
+      "count": 2893,
+      "mean": 291.08468717594195,
+      "p00": 0.0,
+      "p25": 61.0,
+      "p50": 370.0,
+      "p75": 450.0,
+      "p90": 494.0,
+      "p100": 531.0
+    },
+    "waiting_orders": {
+      "count": 2893,
+      "mean": 27.656757690978225,
+      "p00": 0.0,
+      "p25": 9.0,
+      "p50": 29.0,
+      "p75": 40.0,
+      "p90": 53.0,
+      "p100": 85.0
+    },
+    "occupied_hours": [
+      {
+        "vehicle_type": "HV",
+        "available_hours_clipped": 12278.734166666667,
+        "occupied_pickup_service_hours_clipped": 5357.993449012541,
+        "occupied_share": 0.43636366552816136
+      }
+    ],
+    "assigned_beta": {
+      "count": 23373,
+      "mean": 2.4525824704712518,
+      "p00": 1.3189033252684674,
+      "p25": 2.1910396418276816,
+      "p50": 2.4217409900523927,
+      "p75": 2.674095823748929,
+      "p90": 3.002326803272536,
+      "p100": 3.693838257484858
+    },
+    "expiry_is_terminal_state_not_disjoint_root_cause": true
+  },
+  "historical_service_rate_calibrated": false,
+  "no_new_timing_or_reposition_scenarios": true
+}

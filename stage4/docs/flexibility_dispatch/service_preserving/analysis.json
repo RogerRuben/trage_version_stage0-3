@@ -1,0 +1,142 @@
+{
+  "status": "COMPLETE",
+  "classification": "BOUNDED_WINDOW_IMPROVEMENT",
+  "groups": [
+    {
+      "cut": 37800,
+      "cohort": 379,
+      "matched": {
+        "MYOPIC": 267,
+        "AV_FIRST": 267,
+        "LOOKAHEAD": 264,
+        "SERVICE_PRESERVING_LOOKAHEAD": 273
+      },
+      "av_served": {
+        "MYOPIC": 46,
+        "AV_FIRST": 57,
+        "LOOKAHEAD": 47,
+        "SERVICE_PRESERVING_LOOKAHEAD": 47
+      },
+      "mean_wait_among_served_s": {
+        "MYOPIC": 178.23584310861423,
+        "AV_FIRST": 179.6412585093633,
+        "LOOKAHEAD": 185.37829979166665,
+        "SERVICE_PRESERVING_LOOKAHEAD": 183.0802247985348
+      },
+      "paired_new_vs_reference": {
+        "MYOPIC": {
+          "gained": 15,
+          "lost": 9,
+          "net": 6,
+          "common_served": 258,
+          "common_served_mean_wait_delta_s": 5.712918647286822
+        },
+        "AV_FIRST": {
+          "gained": 13,
+          "lost": 7,
+          "net": 6,
+          "common_served": 260,
+          "common_served_mean_wait_delta_s": 4.032230453846154
+        },
+        "LOOKAHEAD": {
+          "gained": 24,
+          "lost": 15,
+          "net": 9,
+          "common_served": 249,
+          "common_served_mean_wait_delta_s": -5.31213773493976
+        }
+      },
+      "decision_epochs": 41,
+      "current_face_violation_epochs": 0,
+      "busy_state_evaluations": 8001,
+      "overdue_busy_state_evaluations": 1958,
+      "conditional_busy_state_evaluations": 7969,
+      "unsupported_busy_states_omitted": 32,
+      "mean_conditional_ready_shift_s": 315.86276934488876,
+      "maximum_model_variables": 5620,
+      "maximum_model_nonzeros": 25902
+    },
+    {
+      "cut": 63000,
+      "cohort": 419,
+      "matched": {
+        "MYOPIC": 225,
+        "AV_FIRST": 226,
+        "LOOKAHEAD": 212,
+        "SERVICE_PRESERVING_LOOKAHEAD": 228
+      },
+      "av_served": {
+        "MYOPIC": 40,
+        "AV_FIRST": 46,
+        "LOOKAHEAD": 35,
+        "SERVICE_PRESERVING_LOOKAHEAD": 40
+      },
+      "mean_wait_among_served_s": {
+        "MYOPIC": 182.00346101333335,
+        "AV_FIRST": 183.76012502654868,
+        "LOOKAHEAD": 180.48990270754717,
+        "SERVICE_PRESERVING_LOOKAHEAD": 187.76810246052634
+      },
+      "paired_new_vs_reference": {
+        "MYOPIC": {
+          "gained": 11,
+          "lost": 8,
+          "net": 3,
+          "common_served": 217,
+          "common_served_mean_wait_delta_s": 2.532407400921659
+        },
+        "AV_FIRST": {
+          "gained": 10,
+          "lost": 8,
+          "net": 2,
+          "common_served": 218,
+          "common_served_mean_wait_delta_s": 0.9997373440366976
+        },
+        "LOOKAHEAD": {
+          "gained": 35,
+          "lost": 19,
+          "net": 16,
+          "common_served": 193,
+          "common_served_mean_wait_delta_s": -3.3925157616580313
+        }
+      },
+      "decision_epochs": 41,
+      "current_face_violation_epochs": 0,
+      "busy_state_evaluations": 9030,
+      "overdue_busy_state_evaluations": 3006,
+      "conditional_busy_state_evaluations": 9030,
+      "unsupported_busy_states_omitted": 0,
+      "mean_conditional_ready_shift_s": 316.2501590705896,
+      "maximum_model_variables": 6003,
+      "maximum_model_nonzeros": 27508
+    }
+  ],
+  "cohort": 798,
+  "total_matched": {
+    "MYOPIC": 492,
+    "AV_FIRST": 493,
+    "LOOKAHEAD": 476,
+    "SERVICE_PRESERVING_LOOKAHEAD": 501
+  },
+  "net_vs_myopic": 9,
+  "resources": {
+    "runtime_s": 217.25,
+    "peak_rss_mib": 618.359375,
+    "routing_failures": 0,
+    "resource_fallback_epochs": 0,
+    "dense_request_vehicle_matrix": false,
+    "gpu_used": false
+  },
+  "interpretation": {
+    "new_native_conditions": 2,
+    "reused_reference_conditions": 6,
+    "combined_objective_and_remaining_time_change_not_a_factorial_ablation": true,
+    "epoch_current_service_protection_not_window_dominance": true,
+    "no_full_day_superiority_claim": true,
+    "test31_not_used_to_fit_remaining_time_or_demand": true,
+    "no_more_experiments_automatically_started": true,
+    "gamma_cost_repositioning_still_disabled": true,
+    "statistical_fallacy_coverage": "11/11; paired exploratory windows, no significance test",
+    "conditional_model_uses_train_gps_duration_proxy_not_true_boarding_events": true
+  }
+}

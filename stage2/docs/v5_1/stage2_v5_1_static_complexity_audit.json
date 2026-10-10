@@ -1,0 +1,137 @@
+{
+  "allowlisted_finding_count": 17,
+  "blocking_finding_count": 0,
+  "findings": [
+    {
+      "blocking": false,
+      "file": "stage2/v5/ablations.py",
+      "justification": "bounded four-model by three-day development-only evaluation scan",
+      "line": 59,
+      "pattern": "partition_streaming_read"
+    },
+    {
+      "blocking": false,
+      "file": "stage2/v5/data.py",
+      "justification": "bounded one-day Stage 1 partition scan",
+      "line": 78,
+      "pattern": "partition_streaming_read"
+    },
+    {
+      "blocking": false,
+      "file": "stage2/v5/data.py",
+      "justification": "bounded one-day Stage 1 partition scan",
+      "line": 81,
+      "pattern": "partition_streaming_read"
+    },
+    {
+      "blocking": false,
+      "file": "stage2/v5/distribution_stability.py",
+      "justification": "bounded protocol-day streaming stability audit",
+      "line": 172,
+      "pattern": "partition_streaming_read"
+    },
+    {
+      "blocking": false,
+      "file": "stage2/v5/evaluate.py",
+      "justification": "bounded one-day prediction scan; the day frame is released each iteration",
+      "line": 83,
+      "pattern": "partition_streaming_read"
+    },
+    {
+      "blocking": false,
+      "file": "stage2/v5/formal_products.py",
+      "justification": "bounded protocol-day formal product export and scoring",
+      "line": 140,
+      "pattern": "partition_streaming_read"
+    },
+    {
+      "blocking": false,
+      "file": "stage2/v5/preflight.py",
+      "justification": "bounded one-partition-at-a-time dry run",
+      "line": 68,
+      "pattern": "partition_streaming_read"
+    },
+    {
+      "blocking": false,
+      "file": "stage2/v5/scenario_pipeline.py",
+      "justification": "bounded one-day/order-base partition scan and one scenario day at a time",
+      "line": 70,
+      "pattern": "partition_streaming_read"
+    },
+    {
+      "blocking": false,
+      "file": "stage2/v5/scenario_pipeline.py",
+      "justification": "bounded one-day/order-base partition scan and one scenario day at a time",
+      "line": 171,
+      "pattern": "partition_streaming_read"
+    },
+    {
+      "blocking": false,
+      "file": "stage2/v5/scenario_v5_1.py",
+      "justification": "bounded protocol-day and route-batch v5.1 scenario generation",
+      "line": 229,
+      "pattern": "partition_streaming_read"
+    },
+    {
+      "blocking": false,
+      "file": "stage2/v5/scenario_v5_1.py",
+      "justification": "bounded protocol-day and route-batch v5.1 scenario generation",
+      "line": 287,
+      "pattern": "partition_streaming_read"
+    },
+    {
+      "blocking": false,
+      "file": "stage2/v5/scenario_v5_1.py",
+      "justification": "bounded protocol-day and route-batch v5.1 scenario generation",
+      "line": 300,
+      "pattern": "partition_streaming_read"
+    },
+    {
+      "blocking": false,
+      "file": "stage2/v5/service_time_audit.py",
+      "justification": "bounded one-partition-at-a-time audit scan",
+      "line": 203,
+      "pattern": "partition_streaming_read"
+    },
+    {
+      "blocking": false,
+      "file": "stage2/v5/service_time_audit.py",
+      "justification": "bounded one-partition-at-a-time audit scan",
+      "line": 204,
+      "pattern": "partition_streaming_read"
+    },
+    {
+      "blocking": false,
+      "file": "stage2/v5/shards.py",
+      "justification": "bounded one-day-at-a-time Train-only artifact fit and shard construction",
+      "line": 120,
+      "pattern": "partition_streaming_read"
+    },
+    {
+      "blocking": false,
+      "file": "stage2/v5/state_evaluation.py",
+      "justification": "bounded three-day v4/v5 same-row evaluation scan",
+      "line": 54,
+      "pattern": "partition_streaming_read"
+    },
+    {
+      "blocking": false,
+      "file": "stage2/v5/tail_diagnostic.py",
+      "justification": "bounded two-day read-only post-evaluation diagnostic",
+      "line": 29,
+      "pattern": "partition_streaming_read"
+    }
+  ],
+  "prohibited_patterns": [
+    "groupby.apply",
+    "DataFrame.apply(axis=1)",
+    "iterrows",
+    "itertuples",
+    "concat_inside_loop",
+    "repeated_parquet_read_inside_loop"
+  ],
+  "scanned_file_count": 39,
+  "schema_version": "stage2_v5_static_complexity_audit.1",
+  "source_sha256": "587e309eb70c6db8f37f9ae8e9fa4149f65c535d0e54e8c739a96ecfab55ea7c",
+  "status": "PASS"
+}

@@ -1,0 +1,135 @@
+{
+  "schema_version": "stage2_v4.1",
+  "stage1_release": {
+    "release_tag": "stage1-v3-final",
+    "release_commit": "8bfdec5a043e3ecbdd6473ce49c735db7732e493",
+    "release_manifest_sha256": "29942f040b7fbd1ce5ccf9ee4586f381cb8f900c27f7aad48482936e7278f26c",
+    "engineering_status": "PASS",
+    "config_sha256": "f693bb01ee0c5e61cfcbc5a381c6b6ad41e541c38106d4f56e4b3d11161ad754",
+    "code_sha": "stage1-v3-content.c14bff2bb463c2ecdb6d4a6300e4d51a5fc3f6ae4dbe34013727ee16dd3f29df",
+    "model_id": "fa9cf5f2e8e79687a5fe93aa446cd9b0bd70698a60374569c1bdcdd761b240b8",
+    "model_schema_version": "stage1_v3_models.4",
+    "output_summary_schema_version": "stage1_v3_output_summary.2",
+    "output_bucket_schema_version": "stage1_v3_output_bucket.2",
+    "label_schema_version": "stage1_label_schema_v3",
+    "output_manifest_aggregate_sha256": "51ab7e24b8e0944b8fdefd803cd285fe8af2c0456b5cfcd26ac3e6b30986c1ea",
+    "model_bundle_sha256": "94b1be6ac9755c195d9f28aee3dc50c7513a523fce453f1307c4b256cad9240c",
+    "bucket_count": 196,
+    "accepted_order_count": 220000,
+    "traversal_label_count": 5775530,
+    "route_sequence_count": 15649455,
+    "stage0_release": {
+      "tag": "stage0-v6-final",
+      "commit": "729275d81ec5dc224ac0967a6e600457764607b8",
+      "source_content_hash": "a5e482f4a0d2b607",
+      "freeze_manifest_sha256": "35a0e8c83c508fa344c74b9ecc2df11f59725d393a9a71f04ee461148762d7d1"
+    },
+    "output_schema_hashes": {
+      "route_sequence_context": "7c48b3eb8f8df4fc298370b8e4bb9507b941124985aad89bd618d4270671b1ea",
+      "traversal_labels": "73a4dfb58127e0958aca7d084e96d9586a6150c4d8ac7573a87a996c377f4d88",
+      "order_labels": "5ec8a7ff3e040c3060e5890c78d0cdee46c253c3529d63a2fd9fcde10b674513"
+    },
+    "input_schema_hashes": {
+      "order_base": "104e6e125212e52816f8ab75b68269951d2a1d9d298bc88928cc48b495f413e1",
+      "link_traversals": "993962a61a43746ec744ae88cecf2ad87b78aa4ee7e892dab19e2ad3b37be085"
+    }
+  },
+  "split": {
+    "train_dates": [
+      "20161009",
+      "20161010",
+      "20161011",
+      "20161012",
+      "20161013",
+      "20161014",
+      "20161015",
+      "20161016",
+      "20161017",
+      "20161018",
+      "20161019",
+      "20161020",
+      "20161021",
+      "20161022",
+      "20161023",
+      "20161024"
+    ],
+    "validation_model_dates": ["20161025", "20161026"],
+    "calibration_dates": ["20161027"],
+    "test_dates": ["20161031"]
+  },
+  "causality": {
+    "decision_time_source": "stage0_order_departure_time",
+    "availability_operator": "<",
+    "timezone": "Asia/Shanghai",
+    "missing_availability_policy": "fail_closed"
+  },
+  "targets": {
+    "components": [
+      "crawl_time_share",
+      "stop_time_share",
+      "speed_cv_bounded",
+      "acceleration_rms_bounded"
+    ],
+    "lcs_baseline": ["lcs_raw", "lcs_pct", "lcs_tail_event"],
+    "rts": ["rts_raw", "rts_pct", "rts_tail_event"],
+    "forbidden": ["iis_raw", "iis_pct", "pmis_raw", "pmis_pct", "gns_raw", "gns_pct"]
+  },
+  "history": {
+    "windows_minutes": [5, 15, 30, 60],
+    "minimum_observations": 5,
+    "fallback_order": ["edge_time", "edge", "highway_time", "highway", "global_time", "global"]
+  },
+  "entry_time": {
+    "passes": 2,
+    "minimum_speed_mps": 1.0,
+    "maximum_speed_mps": 40.0,
+    "static_speed_kph": {
+      "motorway": 70.0,
+      "motorway_link": 45.0,
+      "trunk": 60.0,
+      "trunk_link": 40.0,
+      "primary": 45.0,
+      "primary_link": 35.0,
+      "secondary": 35.0,
+      "secondary_link": 30.0,
+      "tertiary": 30.0,
+      "tertiary_link": 25.0,
+      "residential": 22.0,
+      "service": 15.0,
+      "unclassified": 22.0,
+      "__default__": 20.0
+    }
+  },
+  "runtime": {
+    "random_seed": 20261009,
+    "parquet_compression": "zstd"
+  },
+  "baseline": {
+    "tree_max_train_rows_per_target": 500000,
+    "tree_max_iter": 80,
+    "tree_learning_rate": 0.08,
+    "tree_max_leaf_nodes": 31,
+    "tree_min_samples_leaf": 50
+  },
+  "shards": {
+    "max_seq_len": 128,
+    "overlap": 32,
+    "chunks_per_file": 1024,
+    "minimum_edge_frequency": 20
+  },
+  "deep": {
+    "python_executable": "D:/anaconda/envs/pytorch/python.exe",
+    "random_seed": 20261009,
+    "hidden_dim": 128,
+    "categorical_embedding_dim": 24,
+    "transformer_layers": 3,
+    "attention_heads": 4,
+    "dropout": 0.1,
+    "batch_size": 64,
+    "maximum_epochs": 20,
+    "early_stopping_patience": 3,
+    "learning_rate": 0.0003,
+    "weight_decay": 0.0001,
+    "gradient_clip_norm": 1.0
+  }
+}

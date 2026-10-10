@@ -1,0 +1,50 @@
+{
+  "both_common_quality_predecessor_sample": {
+    "n": 325,
+    "raw_fits_historical_gap": 324,
+    "corrected_fits_historical_gap": 293,
+    "timing_idle_hold_conflict": 126,
+    "raw_timing_idle_hold_conflict": 38,
+    "beta_only_gap_conflict": 31,
+    "beta_only_patience_conflict": 108
+  },
+  "loaded_route_distance_ratio": {
+    "count": 30000,
+    "mean": 1.008129408954301,
+    "p00": 0.10375275938189846,
+    "p25": 0.9481601663396074,
+    "p50": 0.997141667930707,
+    "p75": 1.0050173139525003,
+    "p90": 1.0957793658331438,
+    "p100": 254.6
+  },
+  "loaded_distance_order_count": 30000,
+  "loaded_distance_ratio_gt15_share": 0.0161,
+  "loaded_time_ratio": {
+    "count": 30000,
+    "mean": 2.7471117440821757,
+    "p00": 0.20495926900345077,
+    "p25": 1.9312023169057824,
+    "p50": 2.4137629875909457,
+    "p75": 3.0746290378385126,
+    "p90": 3.9835918752149544,
+    "p100": 895.3118792212953
+  },
+  "route_length_adjusted_time_ratio": {
+    "count": 30000,
+    "mean": 2.7162317467735,
+    "p00": 0.7838260477092852,
+    "p25": 2.0216562775008105,
+    "p50": 2.4829887176476713,
+    "p75": 3.0934004972846716,
+    "p90": 3.9381500582812516,
+    "p100": 41.462580012185484
+  },
+  "original_session_represented_all_hv_count": 8187,
+  "original_session_represented_all_hv_share": 0.28861000458278985,
+  "zero_pickup_predicted_end_forbidden_all_common": 1429,
+  "zero_pickup_predicted_end_forbidden_retained_session": 422,
+  "common_historical_last_order_count": 7615,
+  "zero_pickup_predicted_end_forbidden_last_order": 1402,
+  "historical_last_order_prediction_test_not_dispatch_loss_attribution": true
+}

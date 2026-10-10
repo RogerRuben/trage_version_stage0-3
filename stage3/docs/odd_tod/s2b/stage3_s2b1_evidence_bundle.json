@@ -1,0 +1,257 @@
+{
+  "artifact_sha256": "ff682f3c4358987ff48dce7243e155dfc5b48766ce43d258caf1fd0e3da4873b",
+  "config": {
+    "path": "stage3/config/stage3_s2b_intersection_complex.json",
+    "sha256": "a0fc11edb25122cc27e4031e084006da28f433bf80908b25f140fc56ada7fe90",
+    "size_bytes": 3699
+  },
+  "counts": {
+    "candidates": 58240,
+    "full_edges": 209454,
+    "full_nodes": 89607,
+    "topology_endpoint_complete_edges": 195791
+  },
+  "documents": {
+    "calibration_report": {
+      "path": "stage3/docs/odd_tod/s2b/stage3_s2b_calibration_report.md",
+      "sha256": "02d3fb77af80088fbf1d724d3395787e9b8c7d3d4bef3753a7dd2b32d09f84fe",
+      "size_bytes": 1535
+    },
+    "qa_manifest": {
+      "path": "stage3/docs/odd_tod/s2b/stage3_s2b_qa_manifest.json",
+      "sha256": "461513be8754f8ea22af45d3c058778a27f9acf6168203fd27f2d4664e5def6d",
+      "size_bytes": 1514
+    },
+    "test_evidence": {
+      "path": "stage3/docs/odd_tod/s2b/stage3_s2b_test_evidence.json",
+      "sha256": "2a92e3f54f37fbe4fff34a3b1de08ef51f692ea331dd7d525c1d2c1e3feaef5c",
+      "size_bytes": 590
+    },
+    "tolerance_comparison": {
+      "path": "stage3/docs/odd_tod/s2b/stage3_s2b_tolerance_comparison.json",
+      "sha256": "f33af62b5dfdcbcd4055d25594898570c44d5c6123c2c4a21ccca1dae9634d87",
+      "size_bytes": 10258
+    }
+  },
+  "execution_base_commit": "79276e0b133679c12e54116053c0ff6593785486",
+  "execution_commit": "PENDING_S2B1_COMMIT",
+  "inputs": {
+    "controls": {
+      "path": "stage3/output/odd_tod/s2a/stage3_control_evidence.parquet",
+      "row_count": 4081,
+      "schema": "control_evidence_type: large_string\nevidence_id: large_string\nlat: double\nlon: double\nosm_entity_type: large_string\nosm_node_id: double\nosm_way_id: double\npositive_evidence_only: bool\nraw_highway: large_string\nraw_junction: large_string\nsource: large_string\nmapped_full_network_edge_count: int64\nmapped_stage3_edge_uids: large_string\nmissing_tag_means_negative_control: bool\npoi_used: bool\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1991",
+      "schema_sha256": "730617d46d904a940e0c1b7e994b5901516e5ee1d0d8526398d6705e7107cb9b",
+      "sha256": "97c38791c0d14dd3e491de6021517917384c6f94ba6853228b8e8f71910d63b9",
+      "size_bytes": 315468
+    },
+    "edges": {
+      "path": "stage3/output/odd_tod/s2a/stage3_full_network_edges.parquet",
+      "row_count": 209454,
+      "schema": "stage3_edge_uid: large_string\nvalhalla_directed_edge_id: int64\nosm_way_id: int64\ndirection: large_string\ngeometry: large_string\ngeometry_point_count: int64\nstart_lon: double\nstart_lat: double\nend_lon: double\nend_lat: double\nlength_m: double\nauto_routable: bool\nvalhalla_access_mask: int64\nvalhalla_road_class: large_string\nvalhalla_road_class_code: int64\nvalhalla_use_code: int64\nvalhalla_speed_limit_kmh: double\nbridge_valhalla: bool\ntunnel_valhalla: bool\nroundabout_valhalla: bool\nvalhalla_layer: uint64\nmotor_vehicle_routability_source: large_string\nfrom_osm_node_id: double\nto_osm_node_id: double\nosm_highway: large_string\nosm_maxspeed_raw: large_string\nosm_layer: int64\nbridge_osm: bool\nbridge_effective: bool\nbridge_conflict: bool\ntunnel_osm: bool\ntunnel_effective: bool\ntunnel_conflict: bool\njunction_roundabout_way: bool\nmini_roundabout_node_exposure: bool\nroundabout_evidence_source: large_string\ngrade_separation_evidence: bool\nroad_class_provenance: large_string\nfrom_valhalla_node_id: double\nto_valhalla_node_id: double\nfrom_stage3_node_uid: large_string\nto_stage3_node_uid: large_string\nobserved_network_member: bool\ncanonical_edge_uid: string\ncanonical_traversal_direction: string\nmapping_status: large_string\nmapping_method: large_string\nmapping_confidence: large_string\nstage0_road_class: string\nbridge_stage0: bool\ntunnel_stage0: bool\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 6745",
+      "schema_sha256": "17c5129fa8dc0bdd3a4eeef356b6f212d746b3b30f47e82cf78f5f705ab4e099",
+      "sha256": "25ed4caf250cacbe251ae258d8e77ff2f0b286884f0376c72b9ef09e33687204",
+      "size_bytes": 19170318
+    },
+    "nodes": {
+      "path": "stage3/output/odd_tod/s2a/stage3_full_network_nodes.parquet",
+      "row_count": 89607,
+      "schema": "valhalla_node_id: int64\nstage3_node_uid: large_string\nlon: double\nlat: double\nvalhalla_node_type: int64\nvalhalla_traffic_signal: bool\nosm_node_id: double\nosm_node_mapping_status: large_string\nincident_auto_edge_count: int64\ngraph_degree_undirected_proxy: int64\nsource_provenance: large_string\nintersection_complex_id: null\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1675",
+      "schema_sha256": "9f3a60343676ca63e4f7b5531e47b5071806d717d7d288c370556251ffea6438",
+      "sha256": "158bbb8b5b2578de73e6fcc6fe4431169e8729cf8f66d553780bb4b052cd2625",
+      "size_bytes": 2730726
+    },
+    "observed_mapping": {
+      "path": "stage3/output/odd_tod/s2a/stage3_observed_full_network_mapping.parquet",
+      "row_count": 25382,
+      "schema": "canonical_edge_uid: large_string\ncanonical_traversal_direction: large_string\nobserved_valhalla_edge_id: int64\nobserved_osm_way_id: int64\nobserved_begin_osm_node_id: int64\nobserved_end_osm_node_id: int64\nmapping_status: large_string\nmapping_method: large_string\nmapping_confidence: large_string\ncandidate_count: int64\nstage3_edge_uid: large_string\nvalhalla_directed_edge_id: double\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1739",
+      "schema_sha256": "047ecf7e0bf2b116f6c99a4cff08ff9edf46247351282f1ba820cb27f68fc7dc",
+      "sha256": "1dda71f6b227e5a148c98d4ce322163ae8fe81a59b7ccb4c08dfb424ddade8c2",
+      "size_bytes": 523299
+    },
+    "restrictions": {
+      "path": "stage3/output/odd_tod/s2a/stage3_turn_restrictions.parquet",
+      "row_count": 20,
+      "schema": "restriction_id: int64\nrelation_type: large_string\nrestriction_type: large_string\nmembers: large_string\nfrom_member: large_string\nvia_members: large_string\nto_member: large_string\nfrom_stage3_edge_uids: large_string\nto_stage3_edge_uids: large_string\nmapping_status: large_string\ndirected_enforcement_certified: bool\ngeometry_guessing_used: bool\nreader: large_string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1726",
+      "schema_sha256": "94bb902a99efc066458b308e5fb902afbec753713f2f86466ad96b57804d23b3",
+      "sha256": "719e0bc3907da297df3e2f63373bedb9b4d814249c7772fd27ee47fd1733e274",
+      "size_bytes": 12129
+    },
+    "reverse_overlay": {
+      "path": "stage3/output/odd_tod/s2a/stage3_historical_direction_overlay.parquet",
+      "row_count": 6502,
+      "schema": "canonical_edge_uid: large_string\ncanonical_traversal_direction: large_string\nobserved_valhalla_edge_id: int64\nobserved_osm_way_id: int64\nobserved_begin_osm_node_id: int64\nobserved_end_osm_node_id: int64\noriginal_mapping_status: large_string\nphysical_forward_stage3_edge_uid: large_string\nphysical_forward_mapping_status: large_string\nhistorical_direction_status: large_string\nhistorical_observation_accepted: bool\nav_routability_status: large_string\ndownstream_handling: large_string\nmissing_identity: bool\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 2121",
+      "schema_sha256": "e173eb20048170d00d755dc99e0e5e2eeb06d4fa5e46d39f1c6644a786a4b7e2",
+      "sha256": "3ff51db9fd424954951ad08a27644f95875354845ad346903c0212f3a6c894c4",
+      "size_bytes": 147298
+    },
+    "s2a1_evidence": {
+      "path": "stage3/docs/odd_tod/s2a/stage3_s2a1_scientific_closure_evidence.json",
+      "sha256": "d21ab45fe128d5a389b37fd9865376f6642eec820447a63ccd3309f828413923",
+      "size_bytes": 5464
+    },
+    "s2a_evidence": {
+      "path": "stage3/docs/odd_tod/s2a/stage3_s2a_evidence_bundle.json",
+      "sha256": "a9dd342af6ca8d567fbb0ba00e0c38bd42cd970e9b9fff450b6b86fe11ff7f47",
+      "size_bytes": 11286
+    },
+    "speed_domain": {
+      "path": "stage3/output/odd_tod/s2a/stage3_speed_domain.parquet",
+      "row_count": 209454,
+      "schema": "stage3_edge_uid: large_string\nvalhalla_directed_edge_id: int64\nobserved_network_member: bool\nspeed_domain_value_kmh: double\nspeed_domain_provenance: large_string\nspeed_domain_confidence: large_string\nposted_speed_observed: bool\nhistorical_freeflow_speed_kmh: double\nhistorical_speed_support_n: int64\nroad_class_prior_kmh: double\nroad_class_context: large_string\nspeed_inference_method: large_string\nselected_freeflow_quantile: double\nspeed_compatible_C: bool\nspeed_compatible_M: bool\nspeed_compatible_A: bool\nis_verified_posted_speed_limit: bool\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 2495",
+      "schema_sha256": "546b4fb74ef1b4110aa0756f30dc53aaa6c2717f384fd442a65e2f49c81d14cd",
+      "sha256": "ae1c8e70e4dff905cb04dac5bb55e3b24a94a40e1ce6b74855ef7b9f4de3c25e",
+      "size_bytes": 3626070
+    }
+  },
+  "next_phase_authorized": false,
+  "phase_status": "STAGE3_S2B1_CALIBRATION_PACK_COMPLETE",
+  "products": {
+    "complexes_r05": {
+      "path": "stage3/output/odd_tod/s2b/calibration/complexes_r05.parquet",
+      "row_count": 51553,
+      "schema": "intersection_complex_uid: large_string\ntolerance_m: int64\nmember_node_count: int64\nmember_node_uids: large_string\ncandidate_member_count: int64\ninternal_edge_count: int64\ninternal_length_m: double\nincoming_directed_edge_count: int64\noutgoing_directed_edge_count: int64\nexternal_physical_connection_count: int64\ntopological_movement_count: int64\nsignal_evidence_present: bool\nsignal_evidence_count: int64\nsignal_state: large_string\ncontrol_conflict: bool\nroundabout_evidence_present: bool\nbridge_internal_present: bool\ntunnel_internal_present: bool\nnonzero_layer_present: bool\ngrade_separation_evidence_present: bool\nroad_class_diversity: int64\nmax_member_undirected_degree: int64\nmapping_confidence: large_string\nRED_FLAG_DISCONNECTED_MERGE: bool\nRED_FLAG_LAYER_CONFLICT: bool\nRED_FLAG_BRIDGE_SURFACE_MIX: bool\nRED_FLAG_TUNNEL_SURFACE_MIX: bool\nRED_FLAG_EXCESSIVE_INTERNAL_LENGTH: bool\nRED_FLAG_EXTREME_MEMBER_COUNT: bool\nRED_FLAG_ROUNDABOUT_MIXED_WITH_UNRELATED_JUNCTION: bool\nRED_FLAG_NO_BOUNDARY_CONNECTION: bool\nred_flag_count: int64\nred_flags_are_qa_only: bool\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 4840",
+      "schema_sha256": "47b7bdb9342e3c62f86d9cc4787e98125f61f143459a47b0ce64a7724a30197a",
+      "sha256": "3fa265aa41e26640e05abb444fcc055a469fe7ed27556660e660f8b4aebec7b1",
+      "size_bytes": 1655314
+    },
+    "complexes_r10": {
+      "path": "stage3/output/odd_tod/s2b/calibration/complexes_r10.parquet",
+      "row_count": 43685,
+      "schema": "intersection_complex_uid: large_string\ntolerance_m: int64\nmember_node_count: int64\nmember_node_uids: large_string\ncandidate_member_count: int64\ninternal_edge_count: int64\ninternal_length_m: double\nincoming_directed_edge_count: int64\noutgoing_directed_edge_count: int64\nexternal_physical_connection_count: int64\ntopological_movement_count: int64\nsignal_evidence_present: bool\nsignal_evidence_count: int64\nsignal_state: large_string\ncontrol_conflict: bool\nroundabout_evidence_present: bool\nbridge_internal_present: bool\ntunnel_internal_present: bool\nnonzero_layer_present: bool\ngrade_separation_evidence_present: bool\nroad_class_diversity: int64\nmax_member_undirected_degree: int64\nmapping_confidence: large_string\nRED_FLAG_DISCONNECTED_MERGE: bool\nRED_FLAG_LAYER_CONFLICT: bool\nRED_FLAG_BRIDGE_SURFACE_MIX: bool\nRED_FLAG_TUNNEL_SURFACE_MIX: bool\nRED_FLAG_EXCESSIVE_INTERNAL_LENGTH: bool\nRED_FLAG_EXTREME_MEMBER_COUNT: bool\nRED_FLAG_ROUNDABOUT_MIXED_WITH_UNRELATED_JUNCTION: bool\nRED_FLAG_NO_BOUNDARY_CONNECTION: bool\nred_flag_count: int64\nred_flags_are_qa_only: bool\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 4840",
+      "schema_sha256": "47b7bdb9342e3c62f86d9cc4787e98125f61f143459a47b0ce64a7724a30197a",
+      "sha256": "4b70223a4d8e655e1a467253979250787e1ab03310df7160ef9ae4432391f8dc",
+      "size_bytes": 1588470
+    },
+    "complexes_r15": {
+      "path": "stage3/output/odd_tod/s2b/calibration/complexes_r15.parquet",
+      "row_count": 40508,
+      "schema": "intersection_complex_uid: large_string\ntolerance_m: int64\nmember_node_count: int64\nmember_node_uids: large_string\ncandidate_member_count: int64\ninternal_edge_count: int64\ninternal_length_m: double\nincoming_directed_edge_count: int64\noutgoing_directed_edge_count: int64\nexternal_physical_connection_count: int64\ntopological_movement_count: int64\nsignal_evidence_present: bool\nsignal_evidence_count: int64\nsignal_state: large_string\ncontrol_conflict: bool\nroundabout_evidence_present: bool\nbridge_internal_present: bool\ntunnel_internal_present: bool\nnonzero_layer_present: bool\ngrade_separation_evidence_present: bool\nroad_class_diversity: int64\nmax_member_undirected_degree: int64\nmapping_confidence: large_string\nRED_FLAG_DISCONNECTED_MERGE: bool\nRED_FLAG_LAYER_CONFLICT: bool\nRED_FLAG_BRIDGE_SURFACE_MIX: bool\nRED_FLAG_TUNNEL_SURFACE_MIX: bool\nRED_FLAG_EXCESSIVE_INTERNAL_LENGTH: bool\nRED_FLAG_EXTREME_MEMBER_COUNT: bool\nRED_FLAG_ROUNDABOUT_MIXED_WITH_UNRELATED_JUNCTION: bool\nRED_FLAG_NO_BOUNDARY_CONNECTION: bool\nred_flag_count: int64\nred_flags_are_qa_only: bool\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 4840",
+      "schema_sha256": "47b7bdb9342e3c62f86d9cc4787e98125f61f143459a47b0ce64a7724a30197a",
+      "sha256": "f1858acc4b6b28b175eb2368db3aef9fa4005836f781ce450be1d9fe63ab2db7",
+      "size_bytes": 1574139
+    },
+    "complexes_r20": {
+      "path": "stage3/output/odd_tod/s2b/calibration/complexes_r20.parquet",
+      "row_count": 37864,
+      "schema": "intersection_complex_uid: large_string\ntolerance_m: int64\nmember_node_count: int64\nmember_node_uids: large_string\ncandidate_member_count: int64\ninternal_edge_count: int64\ninternal_length_m: double\nincoming_directed_edge_count: int64\noutgoing_directed_edge_count: int64\nexternal_physical_connection_count: int64\ntopological_movement_count: int64\nsignal_evidence_present: bool\nsignal_evidence_count: int64\nsignal_state: large_string\ncontrol_conflict: bool\nroundabout_evidence_present: bool\nbridge_internal_present: bool\ntunnel_internal_present: bool\nnonzero_layer_present: bool\ngrade_separation_evidence_present: bool\nroad_class_diversity: int64\nmax_member_undirected_degree: int64\nmapping_confidence: large_string\nRED_FLAG_DISCONNECTED_MERGE: bool\nRED_FLAG_LAYER_CONFLICT: bool\nRED_FLAG_BRIDGE_SURFACE_MIX: bool\nRED_FLAG_TUNNEL_SURFACE_MIX: bool\nRED_FLAG_EXCESSIVE_INTERNAL_LENGTH: bool\nRED_FLAG_EXTREME_MEMBER_COUNT: bool\nRED_FLAG_ROUNDABOUT_MIXED_WITH_UNRELATED_JUNCTION: bool\nRED_FLAG_NO_BOUNDARY_CONNECTION: bool\nred_flag_count: int64\nred_flags_are_qa_only: bool\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 4840",
+      "schema_sha256": "47b7bdb9342e3c62f86d9cc4787e98125f61f143459a47b0ce64a7724a30197a",
+      "sha256": "3f9dd8e94471e79b00a091fac5b376935b788bae173c9eef76ea1254ec4efc87",
+      "size_bytes": 1541549
+    },
+    "junction_candidates": {
+      "path": "stage3/output/odd_tod/s2b/calibration/junction_candidates.parquet",
+      "row_count": 58240,
+      "schema": "stage3_node_uid: large_string\nvalhalla_node_id: int64\nosm_node_id: double\nlon: double\nlat: double\nphysical_undirected_degree: int64\ndistinct_incoming_neighbor_count: int64\ndistinct_outgoing_neighbor_count: int64\nrule_a_physical_branching: bool\nrule_b_directed_merge_diverge: bool\nrule_c_signal: bool\nrule_d_roundabout: bool\nrule_e_restriction_context: bool\nrule_f_merge_diverge: bool\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1986",
+      "schema_sha256": "b00b0b1215cd4515784f26fc82c65cb84d7863ed12e8f2da2430209ea7905215",
+      "sha256": "5144201d0b557ad8aeff68d21a15be08c928319bcfcd8020e48a5098f09a4d34",
+      "size_bytes": 2065607
+    },
+    "movements_r05": {
+      "path": "stage3/output/odd_tod/s2b/calibration/movements_r05.parquet",
+      "row_count": 427910,
+      "schema": "intersection_complex_uid: large_string\ntolerance_m: int64\nincoming_stage3_edge_uid: large_string\noutgoing_stage3_edge_uid: large_string\nincoming_physical_boundary_connection_id: large_string\noutgoing_physical_boundary_connection_id: large_string\ntopological_path_exists: bool\nrestriction_evidence_present: bool\nrestriction_enforcement_certified: bool\nmovement_legality_state: large_string\nentry_bearing_deg: double\nexit_bearing_deg: double\nsigned_turn_angle_deg: double\nroute_turn_type: large_string\nturn_type_semantics: large_string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 2262",
+      "schema_sha256": "c277c3fc681da4d5438a4342987ec686a61700bed6a40c1864512d642fb623ff",
+      "sha256": "f00e53a3fb86d2a67d12d3cebe3807351ad0eaf82bc78e1d3a634a9f659b5cdb",
+      "size_bytes": 14249445
+    },
+    "movements_r10": {
+      "path": "stage3/output/odd_tod/s2b/calibration/movements_r10.parquet",
+      "row_count": 419907,
+      "schema": "intersection_complex_uid: large_string\ntolerance_m: int64\nincoming_stage3_edge_uid: large_string\noutgoing_stage3_edge_uid: large_string\nincoming_physical_boundary_connection_id: large_string\noutgoing_physical_boundary_connection_id: large_string\ntopological_path_exists: bool\nrestriction_evidence_present: bool\nrestriction_enforcement_certified: bool\nmovement_legality_state: large_string\nentry_bearing_deg: double\nexit_bearing_deg: double\nsigned_turn_angle_deg: double\nroute_turn_type: large_string\nturn_type_semantics: large_string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 2262",
+      "schema_sha256": "c277c3fc681da4d5438a4342987ec686a61700bed6a40c1864512d642fb623ff",
+      "sha256": "aabe997d06ffc80556ba68551b32805619f548dfe5ad83f2a5a9f043572db811",
+      "size_bytes": 13215206
+    },
+    "movements_r15": {
+      "path": "stage3/output/odd_tod/s2b/calibration/movements_r15.parquet",
+      "row_count": 417697,
+      "schema": "intersection_complex_uid: large_string\ntolerance_m: int64\nincoming_stage3_edge_uid: large_string\noutgoing_stage3_edge_uid: large_string\nincoming_physical_boundary_connection_id: large_string\noutgoing_physical_boundary_connection_id: large_string\ntopological_path_exists: bool\nrestriction_evidence_present: bool\nrestriction_enforcement_certified: bool\nmovement_legality_state: large_string\nentry_bearing_deg: double\nexit_bearing_deg: double\nsigned_turn_angle_deg: double\nroute_turn_type: large_string\nturn_type_semantics: large_string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 2262",
+      "schema_sha256": "c277c3fc681da4d5438a4342987ec686a61700bed6a40c1864512d642fb623ff",
+      "sha256": "d56dced7c05ae1b9bd10259da59b0cab6ccfe500828c136c9f93acad741036e8",
+      "size_bytes": 12782417
+    },
+    "movements_r20": {
+      "path": "stage3/output/odd_tod/s2b/calibration/movements_r20.parquet",
+      "row_count": 414894,
+      "schema": "intersection_complex_uid: large_string\ntolerance_m: int64\nincoming_stage3_edge_uid: large_string\noutgoing_stage3_edge_uid: large_string\nincoming_physical_boundary_connection_id: large_string\noutgoing_physical_boundary_connection_id: large_string\ntopological_path_exists: bool\nrestriction_evidence_present: bool\nrestriction_enforcement_certified: bool\nmovement_legality_state: large_string\nentry_bearing_deg: double\nexit_bearing_deg: double\nsigned_turn_angle_deg: double\nroute_turn_type: large_string\nturn_type_semantics: large_string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 2262",
+      "schema_sha256": "c277c3fc681da4d5438a4342987ec686a61700bed6a40c1864512d642fb623ff",
+      "sha256": "82d239148df42d4a9f61550024885a043285b7640a1b4aaa3c1678ebca3ced51",
+      "size_bytes": 12371811
+    },
+    "node_membership_r05": {
+      "path": "stage3/output/odd_tod/s2b/calibration/node_membership_r05.parquet",
+      "row_count": 58311,
+      "schema": "tolerance_m: int64\nintersection_complex_uid: large_string\nstage3_node_uid: large_string\ncandidate_node: bool\nmembership_source: large_string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 735",
+      "schema_sha256": "5e6858a6726bf7209349020c3689ff3724dec3969e7f632c5bff2b156e2f10f3",
+      "sha256": "7fa55492295aa08c33a16c804f2702e659a3a40e6a1a7cad7e60e21065919404",
+      "size_bytes": 1529807
+    },
+    "node_membership_r10": {
+      "path": "stage3/output/odd_tod/s2b/calibration/node_membership_r10.parquet",
+      "row_count": 59052,
+      "schema": "tolerance_m: int64\nintersection_complex_uid: large_string\nstage3_node_uid: large_string\ncandidate_node: bool\nmembership_source: large_string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 735",
+      "schema_sha256": "5e6858a6726bf7209349020c3689ff3724dec3969e7f632c5bff2b156e2f10f3",
+      "sha256": "55aefa6843aacff111dccb39dd967f4d21e2fab408b6372dfc3b9bbd4304be02",
+      "size_bytes": 1459836
+    },
+    "node_membership_r15": {
+      "path": "stage3/output/odd_tod/s2b/calibration/node_membership_r15.parquet",
+      "row_count": 60055,
+      "schema": "tolerance_m: int64\nintersection_complex_uid: large_string\nstage3_node_uid: large_string\ncandidate_node: bool\nmembership_source: large_string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 735",
+      "schema_sha256": "5e6858a6726bf7209349020c3689ff3724dec3969e7f632c5bff2b156e2f10f3",
+      "sha256": "732fe4ec8f5d2651249a82ec31a43cc94f6270ecbe0973cdd7c6456f577a7a7d",
+      "size_bytes": 1440678
+    },
+    "node_membership_r20": {
+      "path": "stage3/output/odd_tod/s2b/calibration/node_membership_r20.parquet",
+      "row_count": 61018,
+      "schema": "tolerance_m: int64\nintersection_complex_uid: large_string\nstage3_node_uid: large_string\ncandidate_node: bool\nmembership_source: large_string\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 735",
+      "schema_sha256": "5e6858a6726bf7209349020c3689ff3724dec3969e7f632c5bff2b156e2f10f3",
+      "sha256": "6726ad7cfd5c3eab1114ddc0721efa34ab5ff641079b8395b0be333d00f0001a",
+      "size_bytes": 1425511
+    },
+    "qa_sample": {
+      "path": "stage3/output/odd_tod/s2b/calibration/qa_sample.parquet",
+      "row_count": 200,
+      "schema": "qa_case_id: large_string\ntolerance_m: int64\nintersection_complex_uid: large_string\nqa_strata: large_string\nselection_rank: large_string\nred_flag_count: int64\nsampling_uses_test31: bool\nsampling_uses_av_feasibility: bool\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1121",
+      "schema_sha256": "b736a2f3f4b8e233084355be3d20ed7ee65a381e2d5eae0c577dedca7a99aa36",
+      "sha256": "7d1ea03cc1815024850851de84882eb2db691d8c707148b0b43eed451509c3e6",
+      "size_bytes": 16812
+    },
+    "qa_visual_index": {
+      "path": "stage3/output/odd_tod/s2b/calibration/qa_visualizations/qa_visual_index.parquet",
+      "row_count": 200,
+      "schema": "qa_case_id: large_string\ntolerance_m: int64\nintersection_complex_uid: large_string\npng_path: large_string\npng_size_bytes: int64\npng_sha256: large_string\nlayers_shown: large_string\nauditable_not_publication_quality: bool\n-- schema metadata --\npandas: '{\"index_columns\": [], \"column_indexes\": [], \"columns\": [{\"name\":' + 1106",
+      "schema_sha256": "412bb6bde51c04308bce8c853da92bb24218f9a11b0a4761c7496ecbd713c1d2",
+      "sha256": "eecc10b95413977f5b4af1159fdaf583cd12d1954f5f9d53078b5c220524e2b8",
+      "size_bytes": 21420
+    }
+  },
+  "recommendation": {
+    "basis": "topological correctness, consolidation gain, grade-separation/roundabout QA flags, stability, smaller-radius tie-break",
+    "forbidden_inputs_used": [],
+    "recommendation_only": true,
+    "recommended_tolerance_m": 5,
+    "tolerance_frozen": false
+  },
+  "runtime_s": 154.67597599999863,
+  "s2a1_commit": "79276e0b133679c12e54116053c0ff6593785486",
+  "s2a_commit": "4f036187e0921493894263f7999944a9193a5b2d",
+  "s2b2_authorized": false,
+  "schema_version": "stage3_s2b1_evidence_bundle.1",
+  "scope_guards": {
+    "av_profile_calibrated": false,
+    "dynamic_eqc_calibrated": false,
+    "fallback_routing_performed": false,
+    "full_network_reexported": false,
+    "speed_domain_reinferred": false,
+    "speed_method_reselected": false,
+    "speed_model_retrained": false,
+    "speed_quantile_reselected": false,
+    "stage3_edge_identity_modified": false,
+    "stage4_metric_used": false,
+    "test31_used": false,
+    "tolerance_frozen": false,
+    "weighted_risk_score_created": false
+  }
+}

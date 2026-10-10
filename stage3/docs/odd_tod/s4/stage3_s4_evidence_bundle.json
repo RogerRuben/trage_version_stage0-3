@@ -1,0 +1,33 @@
+{
+  "artifact_sha256": "0823cbf2697f329179eec582bfa6eb8c6dbef60b90de982780fdcfd9ae959112",
+  "input_manifest": {
+    "path": "stage3/output/odd_tod/s4/test31_input_manifest.json",
+    "sha256": "5560ecd9575a011166fcbd500af80d15190bd25b934ff5750c23a74a20a57e31",
+    "size_bytes": 26999
+  },
+  "next_phase_authorized": false,
+  "overall_acceptance_status": "PASS",
+  "phase_status": "STAGE3_S4_TEST31_ORIGINAL_ROUTE_SUITABILITY_COMPLETE",
+  "prediction_manifest": {
+    "path": "stage3/output/odd_tod/s4/test31_m3_predictions.json",
+    "sha256": "e60fe7107ab282a486dec72412865cbedefaedd5af294018a425bdeadfbd025d",
+    "size_bytes": 11528
+  },
+  "release_manifest": {
+    "path": "stage3/docs/odd_tod/s4/stage3_s4_release_manifest.json",
+    "sha256": "0c0d99773c88c61cb5ec2ecd08b8ab8d15e22f82733e6e2ca41c55529c52af7f",
+    "size_bytes": 26711
+  },
+  "schema_version": "stage3_s4_evidence_bundle.1",
+  "suitability_summary": {
+    "path": "stage3/output/odd_tod/s4/test31_suitability_summary.json",
+    "sha256": "00b6a9b3a6e7ebd2563632138ad44f34e5620b7bbba34c20d1b887f79b05b9b0",
+    "size_bytes": 26632
+  },
+  "test_evidence": {
+    "path": "stage3/docs/odd_tod/s4/stage3_s4_test_evidence.json",
+    "sha256": "0470d12ab712561109bdce6003aac99ef3055e2df57b634e4ee8d74d8be7447a",
+    "size_bytes": 879
+  },
+  "verification_path": "stage3/docs/odd_tod/s4/stage3_s4_evidence_verification.json"
+}
