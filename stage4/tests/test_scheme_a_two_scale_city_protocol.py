@@ -5,6 +5,8 @@ import shutil
 
 import pytest
 
+from stage4.analysis import scheme_a_two_scale_experiment as experiment
+
 from stage4.analysis.scheme_a_two_scale_check import load_protocol as load_short_protocol
 from stage4.analysis.scheme_a_two_scale_experiment import (
     CONFIG, GROUPS, PRODUCTS, COMPLETE, _group_binding,
@@ -54,3 +56,30 @@ def test_three_group_protocol_and_completed_only_resume(tmp_path):
     (tmp_path / CONFIG).write_text(json.dumps(dict(overrides, coarse_value_max_pricing_rounds=7)), encoding="utf-8")
     with pytest.raises(ValueError, match="cannot change inherited"):
         load_protocol(tmp_path)
+
+
+def test_single_group_coordinator_does_not_launch_other_groups(tmp_path, monkeypatch):
+    cfg = dict(version="scheme_a_two_scale_city_v5")
+    binding = dict(code_sha="fixed", inputs_sha256={}, config_sha256="configuration", layout_sha256="layout")
+    calls = []
+    monkeypatch.setattr(experiment, "load_protocol", lambda *args: cfg)
+    monkeypatch.setattr(experiment, "input_binding", lambda *args: binding)
+    # Avoid exceeding Windows' legacy path limit by nesting a repo-sized output
+    # path below the already long pytest temporary workspace.
+    monkeypatch.setattr(experiment, "output_root", lambda *args: Path("out"))
+
+    def fake_child(root, fleetpy, config, chosen, group, inputs):
+        calls.append(group)
+        return dict(total_runner_wall_s=0, completed_orders=1)
+
+    monkeypatch.setattr(experiment, "_run_child", fake_child)
+    state = experiment.run(tmp_path, group="CHAIN_LAYOUT_BASELINE")
+    assert calls == ["CHAIN_LAYOUT_BASELINE"]
+    assert state["group_order"] == state["completed_groups"] == calls
+    assert state["completed_group_count"] == 1
+    assert not (tmp_path / experiment.output_root(cfg) / "HOTSPOT_BASELINE").exists()
+    assert not (tmp_path / experiment.output_root(cfg) / "CHAIN_LAYOUT_JOINT").exists()
+    with pytest.raises(ValueError, match="different group selection"):
+        experiment.run(tmp_path, resume=True)
+    with pytest.raises(ValueError, match="one existing"):
+        experiment.run(tmp_path, group="NEW_STRATEGY")

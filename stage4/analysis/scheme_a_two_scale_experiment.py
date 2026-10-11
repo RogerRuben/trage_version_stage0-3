@@ -1,9 +1,10 @@
-"""Fixed three-group full-day comparison of the two-scale Scheme-A method.
+"""Fixed full-day groups of the two-scale Scheme-A method.
 
 The lightweight coordinator launches exactly one fresh child at a time so native
 state and memory are released between groups. Complete identical groups alone
 may be skipped with --resume. Failed/running output is never overwritten or
-retried. Physical execution and accounting reuse the short-check runner.
+retried. --group narrows execution to one existing group without changing its
+scientific configuration. Physical execution and accounting reuse the short-check runner.
 """
 from __future__ import annotations
 
@@ -271,8 +272,11 @@ def _run_child(root, fleetpy, config, cfg, group, binding):
     return completed_group(directory, _group_binding(binding, cfg, group))
 
 
-def run(root, fleetpy=FLEETPY, config=CONFIG, *, resume=False):
+def run(root, fleetpy=FLEETPY, config=CONFIG, *, resume=False, group=None):
     root, fleetpy, config = Path(root).resolve(), Path(fleetpy), Path(config)
+    if group is not None and group not in GROUPS:
+        raise ValueError("--group must name one existing full-day group")
+    selected = (group,) if group is not None else GROUPS
     cfg = load_protocol(root, config)
     binding = input_binding(root, cfg, config)
     directory = root / output_root(cfg)
@@ -283,6 +287,8 @@ def run(root, fleetpy=FLEETPY, config=CONFIG, *, resume=False):
     existing = {}
     if status_path.is_file():
         old = json.loads(status_path.read_text())
+        if tuple(old.get("group_order", GROUPS)) != selected:
+            raise ValueError("existing experiment has a different group selection; no implicit expansion or overwrite")
         if (old.get("pid") != os.getpid() and old.get("process_create_time") is not None
                 and _process_running(old["pid"], old["process_create_time"])):
             raise ValueError("the existing coordinator is still running; no second experiment process")
@@ -293,6 +299,8 @@ def run(root, fleetpy=FLEETPY, config=CONFIG, *, resume=False):
             launch = json.loads(receipt_path.read_text())
             if _process_running(launch["child_pid"], launch["child_create_time"]):
                 raise ValueError(f"{group} child is still running; RUNNING state is not reusable")
+        if group not in selected:
+            continue
         if (result_dir / "summary.json").is_file():
             if not resume:
                 raise ValueError("existing group output is retained; use --resume only for complete identical groups")
@@ -303,21 +311,21 @@ def run(root, fleetpy=FLEETPY, config=CONFIG, *, resume=False):
             raise ValueError(f"{group} has an incomplete prior launch/output; no automatic retry")
     import psutil
     state = dict(status="RUNNING", pid=os.getpid(), process_create_time=psutil.Process().create_time(),
-        started_utc=_utc(), execution_binding=binding, group_order=list(GROUPS),
+        started_utc=_utc(), execution_binding=binding, group_order=list(selected),
         completed_groups=list(existing), completed_group_count=len(existing),
         sequential_single_child=True, gpu_used=False, dense_matrix=False, automatic_retry=False)
     if not binding_path.exists():
         _atomic_json(binding_path, binding)
     _atomic_json(status_path, state)
     try:
-        for group in GROUPS:
+        for group in selected:
             if group in existing:
                 print(json.dumps(dict(group=group, reused_complete_group=True, new_native_run=False)), flush=True)
                 continue
             state["active_group"] = group
             _atomic_json(status_path, state)
             existing[group] = _run_child(root, fleetpy, config, cfg, group, binding)
-            state.update(completed_groups=[g for g in GROUPS if g in existing], completed_group_count=len(existing))
+            state.update(completed_groups=[g for g in selected if g in existing], completed_group_count=len(existing))
             _atomic_json(status_path, state)
             print(json.dumps(dict(group=group, status=COMPLETE,
                 total_runner_wall_s=existing[group]["total_runner_wall_s"],
@@ -327,7 +335,7 @@ def run(root, fleetpy=FLEETPY, config=CONFIG, *, resume=False):
         return state
     except Exception as error:
         state.update(status="STOPPED", error=repr(error), ended_utc=_utc(),
-            remaining_groups_not_started=[g for g in GROUPS if g not in existing and g != state.get("active_group")])
+            remaining_groups_not_started=[g for g in selected if g not in existing and g != state.get("active_group")])
         _atomic_json(status_path, state)
         raise
 
@@ -352,14 +360,16 @@ def main():
     parser.add_argument("--fleetpy-root", type=Path, default=FLEETPY)
     parser.add_argument("--config", type=Path, default=CONFIG)
     parser.add_argument("--resume", action="store_true")
+    parser.add_argument("--group", choices=GROUPS,
+        help="run only one existing group; omitted retains the original three-group order")
     parser.add_argument("--_group", choices=GROUPS, help=argparse.SUPPRESS)
     args = parser.parse_args()
     if args._group:
-        if args.resume:
+        if args.resume or args.group:
             parser.error("internal children never resume or retry an existing group")
         _child_group(args.root, args.fleetpy_root, args.config, args._group)
     else:
-        run(args.root, args.fleetpy_root, args.config, resume=args.resume)
+        run(args.root, args.fleetpy_root, args.config, resume=args.resume, group=args.group)
 
 
 if __name__ == "__main__":
