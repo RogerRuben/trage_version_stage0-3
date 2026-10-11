@@ -118,6 +118,17 @@ def test_v5_is_opt_in_and_keeps_v4_scientific_resource_conditions():
     assert old.get("current_empty_distance_mode", "LOCAL_STABLE") == "LOCAL_STABLE"
 
 
+def test_common_movement_ablation_keeps_v5_except_target_rule_and_admin_identity():
+    full = load_protocol(ROOT, Path("stage4/config/scheme_a_two_scale_city_v5.json"))
+    common = load_protocol(ROOT, Path("stage4/config/scheme_a_two_scale_city_v5_common.json"))
+    changed = {key for key in set(full) | set(common) if full.get(key) != common.get(key)}
+    assert changed == {"version", "base_config", "base_config_sha256", "idle_movement_mode"}
+    assert common["idle_movement_mode"] == "COMMON_HISTORICAL_DEFICIT"
+    assert common["current_empty_distance_mode"] == "PRIMARY_FACE_MM"
+    assert common["typed_request_diagnostics"] is True
+    assert common["max_match_wait_s"] == 300 and common["max_pickup_eta_s"] == 600
+
+
 def test_native_adapter_records_legal_AV_left_idle_when_HV_is_selected(monkeypatch):
     from stage4.dispatch import scheme_a_two_scale_native as native
     from stage4.tests.test_scheme_a_two_scale_native import fixture, Value

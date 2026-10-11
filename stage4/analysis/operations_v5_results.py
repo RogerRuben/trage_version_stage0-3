@@ -143,7 +143,7 @@ def _admission(plans, assignments, moves, expected):
 def _collect(root, version, summary, plans):
     directory = root / OUT / f"two_scale_city_{version}" / GROUP
     cfg = summary["frozen_protocol"]
-    typed = version == "v5"
+    typed = bool(cfg.get("typed_request_diagnostics", False))
     outcome = pd.read_parquet(directory / "cohort_outcomes.parquet", columns=ORDER_COLUMNS + (TYPED_COLUMNS if typed else []))
     assignments = pd.read_parquet(directory / "assignments.parquet", columns=["order_id", "native_vehicle_id",
         "vehicle_type", "simulation_time_s", "pickup_time_s", "service_end_time_s", "completed", "pickup_route_distance_m"])

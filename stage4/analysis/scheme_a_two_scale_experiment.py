@@ -53,6 +53,8 @@ _V5_FIXED = dict(version="scheme_a_two_scale_city_v5", typed_request_diagnostics
     idle_movement_mode="TYPE_CONDITIONED_HISTORICAL_DEFICIT", current_empty_distance_mode="PRIMARY_FACE_MM",
     typed_reposition_reference="stage4/output/capability_chain_planning/operations_v5_input/type_demand_reference.parquet",
     typed_reposition_manifest="stage4/output/capability_chain_planning/operations_v5_input/manifest.json")
+_V5_COMMON_FIXED = dict(version="scheme_a_two_scale_city_v5_common",
+    idle_movement_mode="COMMON_HISTORICAL_DEFICIT")
 
 
 def output_root(cfg):
@@ -66,6 +68,14 @@ def document_root(cfg):
 def load_protocol(root, path=CONFIG):
     root, path = Path(root), Path(path)
     overrides = json.loads((root / path).read_text(encoding="utf-8"))
+    if overrides.get("version") == _V5_COMMON_FIXED["version"]:
+        base_path = Path("stage4/config/scheme_a_two_scale_city_v5.json")
+        if (set(overrides) != set(_V5_COMMON_FIXED) | {"base_config", "base_config_sha256"}
+                or any(overrides.get(key) != value for key, value in _V5_COMMON_FIXED.items())
+                or Path(overrides["base_config"]) != base_path
+                or _sha(root / base_path) != overrides["base_config_sha256"]):
+            raise ValueError("v5 common-movement ablation changes only the historical target rule")
+        return dict(load_protocol(root, base_path), **overrides)
     if overrides.get("version") == _V5_FIXED["version"]:
         base_path = Path("stage4/config/scheme_a_two_scale_city_v4.json")
         if (set(overrides) != set(_V5_FIXED) | {"base_config", "base_config_sha256"}
@@ -145,9 +155,9 @@ def completed_group(directory, expected):
                 != (expected["group"], expected["layout_mode"], expected["policy"])
             or any(not (directory / product).is_file() for product in
                 PRODUCTS + (("request_decisions.parquet",) if expected.get("version") in
-                    (_V3_FIXED["version"], _V4_FIXED["version"], _V5_FIXED["version"]) else ()))):
+                    (_V3_FIXED["version"], _V4_FIXED["version"], _V5_FIXED["version"], _V5_COMMON_FIXED["version"]) else ()))):
         raise ValueError("existing group is not a complete identical full-day group; no automatic retry")
-    if expected.get("version") == _V5_FIXED["version"] and not summary.get("request_decision_diagnostics", {}).get("typed_final_candidate_counts_enabled"):
+    if expected.get("version") in (_V5_FIXED["version"], _V5_COMMON_FIXED["version"]) and not summary.get("request_decision_diagnostics", {}).get("typed_final_candidate_counts_enabled"):
         raise ValueError("completed v5 group is missing its typed final-candidate evidence")
     return summary
 
@@ -278,6 +288,8 @@ def run(root, fleetpy=FLEETPY, config=CONFIG, *, resume=False, group=None):
         raise ValueError("--group must name one existing full-day group")
     selected = (group,) if group is not None else GROUPS
     cfg = load_protocol(root, config)
+    if cfg["version"] == _V5_COMMON_FIXED["version"] and selected != ("CHAIN_LAYOUT_BASELINE",):
+        raise ValueError("common-movement ablation runs only CHAIN_LAYOUT_BASELINE; specify --group")
     binding = input_binding(root, cfg, config)
     directory = root / output_root(cfg)
     binding_path, status_path = directory / "input_binding.json", directory / "status.json"

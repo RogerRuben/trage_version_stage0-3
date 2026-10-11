@@ -1,0 +1,6 @@
+{
+  "version": "scheme_a_two_scale_city_v5_common",
+  "base_config": "stage4/config/scheme_a_two_scale_city_v5.json",
+  "base_config_sha256": "e2898c697bdce9f6203374a023ad722c1e646e9b7723c324d37e948ff8e4dcea",
+  "idle_movement_mode": "COMMON_HISTORICAL_DEFICIT"
+}

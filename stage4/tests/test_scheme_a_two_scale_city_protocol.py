@@ -83,3 +83,8 @@ def test_single_group_coordinator_does_not_launch_other_groups(tmp_path, monkeyp
         experiment.run(tmp_path, resume=True)
     with pytest.raises(ValueError, match="one existing"):
         experiment.run(tmp_path, group="NEW_STRATEGY")
+    cfg["version"] = "scheme_a_two_scale_city_v5_common"
+    with pytest.raises(ValueError, match="only CHAIN_LAYOUT_BASELINE"):
+        experiment.run(tmp_path / "unlaunched_default")
+    with pytest.raises(ValueError, match="only CHAIN_LAYOUT_BASELINE"):
+        experiment.run(tmp_path / "unlaunched_other", group="HOTSPOT_BASELINE")
