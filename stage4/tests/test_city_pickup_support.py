@@ -10,6 +10,7 @@ from stage4.tests.test_controlled_routes import encode
 from stage4.analysis.capability_chain_instances import IDENTITY_COLUMNS
 from stage4.dispatch.city_pickup_support import CityPickupSupportValidator, TEST31_IDENTITY, S2A
 from stage4.dispatch.solver import AssignmentArc
+from stage4.dispatch.request_decision_diagnostics import RequestDecisionDiagnostics
 from stage4.fleetpy_adapter.valhalla_time_adapter import PickupEstimate
 
 
@@ -72,6 +73,9 @@ def test_empty_pickup_capability_is_checked_and_hv_arc_is_preserved(supported):
     c, av = case(eta)
     _, hv = case(eta, vehicle_type="HV", vid=1, rid=101)
     c.request_meta[101] = dict(pickup_deadline_s=62400., research_route_compatible=False)
+    c.request_decisions = RequestDecisionDiagnostics()
+    for arc in (av, hv):
+        c.request_decisions.activate(arc.request_id, arc.payload[1].order_id, 61200., 62400., 62040.)
     routes = Routes(eta, compatible=False, supported=supported)
     validator = CityPickupSupportValidator(routes, geometry_timestamp=SNAPSHOT,
         routing_budget_s=10., seam_evidence=AllowedJoin())
@@ -79,6 +83,9 @@ def test_empty_pickup_capability_is_checked_and_hv_arc_is_preserved(supported):
     assert retained == [hv] and retained[0] is hv
     assert len(routes.calls) == 1 and validator.last_diagnostics["original_indices"] == [1]
     assert validator.pickup_paths == {}
+    reason = "UTURN_OUTSIDE_RESEARCH_PROFILE" if supported else "EDGE_OUTSIDE_FROZEN_FULL_NETWORK"
+    assert c.request_decisions.records[100].rejection_counts == {reason: 1}
+    assert not c.request_decisions.records[101].rejection_counts  # HV is not given C's gate.
     validator.routing_budget_s = 0.
     retained = validator(c, [av, hv], 62040.)
     assert retained == [hv] and len(routes.calls) == 1

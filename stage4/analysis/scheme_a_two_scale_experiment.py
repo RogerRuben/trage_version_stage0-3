@@ -41,11 +41,30 @@ _FIXED = dict(version="scheme_a_two_scale_city_v2", window_start_s=0,
     log_tail_kib=64, full_day=True, native_execution=True, automatic_retry=False,
     method_scope="COARSE_APPROXIMATE_SERVICE_VALUE_AND_EXACT_CURRENT_ACTION_FLOW",
     experiment_scope="FIXED_THREE_GROUP_FULL_DAY_LAYOUT_AND_CONTROL_COMPARISON")
+_V3_FIXED = dict(version="scheme_a_two_scale_city_v3",
+    idle_movement_mode="COMMON_HISTORICAL_DEFICIT", precise_request_deadline=True,
+    request_decision_diagnostics=True, coarse_nested_profile_paths=True,
+    common_movement_wall_limit_s=10.)
+
+
+def output_root(cfg):
+    return OUT if cfg["version"] == _FIXED["version"] else OUT.with_name("two_scale_city_v3")
+
+
+def document_root(cfg):
+    return DOC if cfg["version"] == _FIXED["version"] else DOC.with_name("two_scale_city_v3")
 
 
 def load_protocol(root, path=CONFIG):
     root, path = Path(root), Path(path)
     overrides = json.loads((root / path).read_text(encoding="utf-8"))
+    if overrides.get("version") == _V3_FIXED["version"]:
+        if (set(overrides) != set(_V3_FIXED) | {"base_config", "base_config_sha256"}
+                or any(overrides.get(key) != value for key, value in _V3_FIXED.items())
+                or Path(overrides["base_config"]) != CONFIG
+                or _sha(root / CONFIG) != overrides["base_config_sha256"]):
+            raise ValueError("v3 only restores the common base and fixes specified mechanism/diagnostic semantics")
+        return dict(load_protocol(root, CONFIG), **overrides)
     base_path = Path("stage4/config/scheme_a_two_scale_v2.json")
     if (Path(overrides["base_config"]) != base_path
             or _sha(root / base_path) != overrides["base_config_sha256"]):
@@ -68,7 +87,7 @@ def group_configuration(cfg, group):
         raise ValueError("only the three original full-day groups are authorized")
     layout, policy = GROUP_RULES[group]
     return dict(cfg, group=group, layout_mode=layout, policy=policy,
-        disk_route_cache=(OUT / group / "routing/cache.sqlite3").as_posix())
+        disk_route_cache=(output_root(cfg) / group / "routing/cache.sqlite3").as_posix())
 
 
 def input_binding(root, cfg, config=CONFIG):
@@ -86,7 +105,7 @@ def input_binding(root, cfg, config=CONFIG):
 def _group_binding(binding, cfg, group):
     chosen = group_configuration(cfg, group)
     return dict(binding, group=group, policy=chosen["policy"],
-        layout_mode=chosen["layout_mode"], disk_route_cache=chosen["disk_route_cache"])
+        layout_mode=chosen["layout_mode"], disk_route_cache=chosen["disk_route_cache"], version=chosen["version"])
 
 
 def completed_group(directory, expected):
@@ -100,7 +119,8 @@ def completed_group(directory, expected):
             or summary.get("layout_sha256") != expected["layout_sha256"]
             or (summary.get("group"), summary.get("layout_mode"), summary.get("policy"))
                 != (expected["group"], expected["layout_mode"], expected["policy"])
-            or any(not (directory / product).is_file() for product in PRODUCTS)):
+            or any(not (directory / product).is_file() for product in
+                PRODUCTS + (("request_decisions.parquet",) if expected.get("version") == _V3_FIXED["version"] else ()))):
         raise ValueError("existing group is not a complete identical full-day group; no automatic retry")
     return summary
 
@@ -171,8 +191,8 @@ class _BoundedLog:
 
 def _run_child(root, fleetpy, config, cfg, group, binding):
     import psutil
-    directory = root / OUT / group
-    receipt_path = root / OUT / "execution_receipts" / f"{group}.json"
+    directory = root / output_root(cfg) / group
+    receipt_path = root / output_root(cfg) / "execution_receipts" / f"{group}.json"
     command = [sys.executable, "-u", "-m", "stage4.analysis.scheme_a_two_scale_experiment",
         "--root", str(root), "--fleetpy-root", str(fleetpy), "--config", str(config), "--_group", group]
     started = perf_counter()
@@ -193,7 +213,7 @@ def _run_child(root, fleetpy, config, cfg, group, binding):
         child_created = None
     receipt.update(status="RUNNING", child_pid=child.pid, child_create_time=child_created)
     _atomic_json(receipt_path, receipt)
-    log = _BoundedLog(root / OUT / "logs" / f"{group}.log", group, cfg)
+    log = _BoundedLog(root / output_root(cfg) / "logs" / f"{group}.log", group, cfg)
     reader = threading.Thread(target=log.drain, args=(child.stdout,), daemon=True)
     reader.start()
     hard_timeout = False
@@ -229,7 +249,7 @@ def run(root, fleetpy=FLEETPY, config=CONFIG, *, resume=False):
     root, fleetpy, config = Path(root).resolve(), Path(fleetpy), Path(config)
     cfg = load_protocol(root, config)
     binding = input_binding(root, cfg, config)
-    directory = root / OUT
+    directory = root / output_root(cfg)
     binding_path, status_path = directory / "input_binding.json", directory / "status.json"
     if binding_path.exists():
         if not resume or json.loads(binding_path.read_text()) != binding:
@@ -290,12 +310,12 @@ def _child_group(root, fleetpy, config, group):
     started = perf_counter()
     root = Path(root).resolve()
     cfg = load_protocol(root, config)
-    expected = json.loads((root / OUT / "input_binding.json").read_text(encoding="utf-8"))
+    expected = json.loads((root / output_root(cfg) / "input_binding.json").read_text(encoding="utf-8"))
     if input_binding(root, cfg, config) != expected:
         raise ValueError("child code/configuration/inputs changed after coordinator preparation")
     chosen = group_configuration(cfg, group)
     return _run_native(root, fleetpy, config, chosen,
-        directory=root / OUT / group, doc_summary_path=root / DOC / f"{group.lower()}_summary.json",
+        directory=root / output_root(cfg) / group, doc_summary_path=root / document_root(cfg) / f"{group.lower()}_summary.json",
         completion_status=COMPLETE, group=group, execution_binding=_group_binding(expected, cfg, group),
         started=started)
 

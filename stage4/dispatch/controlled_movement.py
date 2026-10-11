@@ -104,6 +104,7 @@ class CommonIdleMovementManager:
         def assign(runtime, request, estimate, simulation_time):
             if self.is_interruptible(runtime,simulation_time): self.interrupt_for_assignment(runtime,simulation_time)
             old_assign(runtime,request,estimate,simulation_time)
+            self._forget_direction_evidence(int(runtime.fixture.native_id))
         control._assign=assign
         old_status=control.receive_status_update
         def status(vid, simulation_time, list_finished_vrl, force_update=True):
@@ -155,6 +156,19 @@ class CommonIdleMovementManager:
         # Physical callbacks, not this polling clock, finalize completed legs.
         return None
 
+    def _route_candidate(self, runtime, destination, simulation_time, lon, lat):
+        return self.router.route(lon, lat, float(destination.lon_wgs84),
+            float(destination.lat_wgs84), self.control._timestamp(simulation_time))
+
+    def _movement_budget_exhausted(self):
+        return False
+
+    def _remember_issued_route(self, runtime, row, result):
+        return None
+
+    def _forget_direction_evidence(self, vid):
+        return None
+
     def after_normal_dispatch(self, control, simulation_time):
         if simulation_time%900 or not 0<=simulation_time<self.day_end_s: return
         decision_started=perf_counter()
@@ -184,21 +198,24 @@ class CommonIdleMovementManager:
         started=attempts=0
         for runtime,node,lon,lat in surplus:
             if started>=self.max_moves: break
+            if self._movement_budget_exhausted(): break
             nearby=tree.query_ball_point(np.array([lon,lat])*np.array([111320*cos(radians(34.25)),110540]),self.radius)
             nearby=[i for i in nearby if deficits[int(target.iloc[i].node_id)]>0 and int(target.iloc[i].node_id)!=node]
             nearby.sort(key=lambda i:(float(np.sum((xy[i]-np.array([lon,lat])*np.array([111320*cos(radians(34.25)),110540]))**2)),str(int(target.iloc[i].node_id))))
             for i in nearby[:self.top_k]:
+                if self._movement_budget_exhausted(): break
                 dest=target.iloc[i]; attempts+=1
                 route_started=perf_counter()
-                result=self.router.route(lon,lat,float(dest.lon_wgs84),float(dest.lat_wgs84),control._timestamp(simulation_time))
+                result=self._route_candidate(runtime,dest,simulation_time,lon,lat)
                 self.routing_wall_time_s+=perf_counter()-route_started
+                if self._movement_budget_exhausted(): break
                 kind="HV" if runtime.fixture.vehicle_type=="HV" else control.config["profile_id"]
                 if not result["common_supported"]:
                     self.counts["COMMON_ROUTE_UNSUPPORTED"]+=1; continue
                 if kind not in result["compatible_profiles"]:
                     self.counts["PROFILE_REJECTED"]+=1; continue
                 duration=float(result["duration_s"]); distance=float(result["distance_m"])
-                if not np.isfinite(duration) or duration<=0 or distance<=0 or duration>self.max_eta:
+                if not np.isfinite(duration) or not np.isfinite(distance) or duration<=0 or distance<=0 or duration>self.max_eta:
                     self.counts["ETA_OR_ZERO_MOVE_REJECTED"]+=1; continue
                 if simulation_time+duration>control.fixture_windows_s[int(runtime.fixture.native_id)][1]:
                     self.counts["OPTIONAL_MOVE_CROSSES_SHIFT"]+=1; continue
@@ -212,8 +229,12 @@ class CommonIdleMovementManager:
                     actual_duration_s=None,actual_distance_m=None,traffic_unknown_share=float(result["traffic_unknown_share"]),
                     start_lon_wgs84=lon,start_lat_wgs84=lat,
                     shape_polyline6=result.get("shape_polyline6"),geometry_point_count=len(result["points"]),
+                    decision_source="COMMON_HISTORICAL_DEMAND_DEFICIT",
+                    connection_evidence_state=result.get("connection_evidence_state"),
+                    geometry_timestamp=result.get("geometry_timestamp"),
                     snap_gap_origin_m=float(result.get("snap_gap_origin_m",0.)),snap_gap_target_m=float(result.get("snap_gap_target_m",0.)))
                 self.active[int(runtime.fixture.native_id)]=len(self.rows); self.rows.append(row)
+                self._remember_issued_route(runtime,row,result)
                 leg=self.bindings.vehicle_route_leg(self.bindings.states.REPOSITION,destination,{})
                 runtime.native_vehicle.assign_vehicle_plan([leg],int(simulation_time))
                 runtime.state="NATIVE_REPOSITIONING"

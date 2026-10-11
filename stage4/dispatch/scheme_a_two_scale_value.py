@@ -87,6 +87,26 @@ class _SceneDAG:
                     departures[i,:len(order)] = depart[order]
                     self.edge_count += len(order)
             self.successors[profile], self.departures[profile] = successors,departures
+        if cfg.get("coarse_nested_profile_paths", False):
+            if np.any(self.allowed["C"] & ~self.allowed["HV"]):
+                raise ValueError("nested coarse profiles require C customer support to be a subset of HV")
+            # Independent Top3 pruning may remove a C path from the more
+            # flexible HV domain. Keep HV's own Top3 PLUS the C choices.
+            # This is at most six successors per node, not an all-pairs DAG.
+            hv = np.full((n, 6), -1, np.int32)
+            departure = np.full((n, 6), np.inf)
+            for i in range(n):
+                if i % 32 == 0:
+                    check()
+                selected = {}
+                for profile in ("HV", "C"):
+                    for successor, time_s in zip(self.successors[profile][i], self.departures[profile][i]):
+                        if successor >= 0:
+                            selected[int(successor)] = float(time_s)
+                for column, (successor, time_s) in enumerate(selected.items()):
+                    hv[i, column], departure[i, column] = successor, time_s
+            self.edge_count += int(np.count_nonzero(hv >= 0) - np.count_nonzero(self.successors["HV"] >= 0))
+            self.successors["HV"], self.departures["HV"] = hv, departure
         self.alpha = np.zeros(n)
         self.beta = {}
         self.dp_cache, self.entry_cache = {}, {}
@@ -401,5 +421,8 @@ class CoarseServiceValue:
             future_directed_road_certificate=False,actual_route_validation_unchanged=True,
             realized_targets_used=False,full_city_upper_bound_claimed=False,
             shared_future_customer_capacity=True,scenario_refresh_s=300,forecast_horizon_s=1800,
+            profile_successor_domain_nested=bool(self.cfg.get("coarse_nested_profile_paths", False)),
+            max_successors_HV=6 if self.cfg.get("coarse_nested_profile_paths", False) else 3,
+            max_successors_C=3,
             fixed_future_pickup_grid_s=300,maximum_future_services=3,future_move_variables=0,
             raw_source_orders_or_coordinates_exported=False)

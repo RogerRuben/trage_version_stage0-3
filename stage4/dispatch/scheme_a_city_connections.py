@@ -410,6 +410,8 @@ not permission to execute a scenario's hypothetical future customer path.
                     finished_s = float((pd.Timestamp(finish) - c._timestamp(0)).total_seconds())
                 break
         routed_context = self.actual_evidence._idle_context(c, runtime, now, finished_s)
+        manager = getattr(c, "repositioning_manager", None)
+        moved = (manager is not None and getattr(manager, "has_movement_since", lambda *a: False)(vid, finished_s))
         saved = getattr(c, "city_departure_contexts", {}).get(vid)
         if routed_context is None and saved is not None:
             if (_point(saved.get("point", current)) == current
@@ -419,6 +421,8 @@ not permission to execute a scenario's hypothetical future customer path.
             frame = self._empty_context_tokens(routed_context)
             result = (frame, dict(start_lon_wgs84=origin[0], start_lat_wgs84=origin[1],
                 end_lon_wgs84=origin[0], end_lat_wgs84=origin[1]), None)
+        elif moved:
+            result = (None, None, "PREVIOUS_DIRECTION_CONTEXT_UNAVAILABLE")
         elif previous is not None and runtime.native_vehicle.pos == previous.dropoff_position:
             task = self._completed_task(previous)
             frame, reason = self._body(task)

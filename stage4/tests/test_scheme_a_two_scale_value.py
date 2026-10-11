@@ -68,3 +68,30 @@ def test_coarse_dag_masks_and_predicted_time_chain_and_future_date_boundary():
                       True,"20161031","future")
     with pytest.raises(ValueError,match="earlier-history"):
         model([invalid])
+
+
+def test_nested_profile_successor_domain_prevents_false_hv_value_disadvantage():
+    def point(x):
+        return (108.95 + x/(111320*np.cos(np.deg2rad(34.25))), 34.25)
+    def historical(rid, release, duration, pickup, dropoff, c=True):
+        return ChainTask(rid, release, release+300, duration, point(pickup), point(dropoff),
+            frozenset({"HV", "C"} if c else {"HV"}), True, "20161010", str(rid))
+    tasks = [historical(-1, 1, 100, 0, 2500), historical(-2, 601, 100, 2550, 4000),
+        historical(-3, 1201, 100, 4050, 4200),
+        *[historical(-i, 601, 1000, 2470+10*i, 2470+10*i, False) for i in (4, 5, 6)]]
+    keys = {p: (p, 0, 1, 6) for p in ("HV", "C")}
+    def scene(nested):
+        return _SceneDAG(tasks, [dict(position=point(0))], 0, 1800,
+            NS(global_pace=.1, pace_by_slot={0:.1}),
+            dict(coarse_nested_profile_paths=nested), lambda: None)
+    old, new = scene(False), scene(True)
+    assert [old.price(keys[p])[0] for p in ("HV", "C")] == [2., 3.]
+    assert [new.price(keys[p])[0] for p in ("HV", "C")] == [3., 3.]
+    alpha = np.array([2., 0., 0., 0., 0., 0.])
+    old.set_prices(alpha, {})
+    new.set_prices(alpha, {})
+    assert [old.price(keys[p])[0] for p in ("HV", "C")] == [0., 1.]
+    assert [new.price(keys[p])[0] for p in ("HV", "C")] == [1., 1.]
+    assert new.successors["HV"].shape == (6, 6)
+    for hv, c in zip(new.successors["HV"], new.successors["C"]):
+        assert set(c[c >= 0]) <= set(hv[hv >= 0])

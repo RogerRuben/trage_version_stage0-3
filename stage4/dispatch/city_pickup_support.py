@@ -204,20 +204,23 @@ No Actor or data table is constructed until a candidate needs its evidence.
         target = tuple(c.routing_engine.return_position_coordinates(row["destination_position"]))
         origin = (float(row["start_lon_wgs84"]), float(row["start_lat_wgs84"]))
         key = (vid, int(row["start_time_s"]), row["shape_polyline6"])
-        routed = self._idle_routes.get(key)
+        issued_route = getattr(manager, "issued_direction_route", lambda *a: None)(vid, row)
+        routed = issued_route if issued_route is not None else self._idle_routes.get(key)
         if routed is None:
             route_started = perf_counter()
-            routed = self.router.base.route(*origin, *target, c._timestamp(row["start_time_s"]))
+            stamp = (pd.Timestamp(row["geometry_timestamp"]) if row.get("geometry_timestamp")
+                else c._timestamp(row["start_time_s"]))
+            routed = self.router.base.route(*origin, *target, stamp)
             self.departure_context_routing_time_s += perf_counter() - route_started
             self.departure_context_route_count += 1
             self._idle_routes[key] = routed
             while len(self._idle_routes) > MAX_CACHE_ENTRIES:
                 self._idle_routes.popitem(last=False)
-        else:
+        elif issued_route is None:
             self._idle_routes.move_to_end(key)
         if not routed["common_supported"] or routed.get("shape_polyline6") != row["shape_polyline6"]:
             return None  # Never replace the route that was actually issued.
-        points = routed["points"]
+        points = list(routed["points"])
         trace_shape = routed["edges"][0].get("trace_shape_polyline6") if routed["edges"] else None
         trace_points = decode_polyline6(trace_shape) if trace_shape else points
         if trace_points != points:
@@ -293,7 +296,11 @@ No Actor or data table is constructed until a candidate needs its evidence.
                 continue
             previous = completed.get(vid)
             manager = getattr(c, "repositioning_manager", None)
-            if previous is None:
+            moved = (manager is not None and getattr(manager, "has_movement_since", lambda *a: False)(
+                vid, completed_times.get(vid, -1.)))
+            if moved:
+                self._source_reasons[vid] = "PREVIOUS_DIRECTION_CONTEXT_UNAVAILABLE"
+            elif previous is None:
                 if manager is not None and vid in getattr(manager, "active", {}):
                     self._source_reasons[vid] = "PREVIOUS_DIRECTION_CONTEXT_UNAVAILABLE"
                 else:
@@ -423,6 +430,11 @@ class CityPickupSupportValidator:
     def __call__(self, c, arcs, now):
         started = perf_counter()
         counts, reasons = Counter(), Counter()
+        decisions = getattr(c, "request_decisions", None)
+        def reject(arc, codes):
+            reasons.update(codes)
+            if decisions is not None:
+                decisions.reject(arc.request_id, *codes)
         valid, indices = [], []
         route_time = seam_time = 0.0
         self.pickup_paths = {}
@@ -444,12 +456,12 @@ class CityPickupSupportValidator:
             meta = c.request_meta[int(arc.request_id)]
             remaining = float(meta["pickup_deadline_s"]) - float(now)
             if not isfinite(remaining) or remaining < 0:
-                reasons["PICKUP_DEADLINE_PASSED"] += 1
+                reject(arc, ("PICKUP_DEADLINE_PASSED",))
                 continue
             if arc.vehicle_type != "AV":
                 if (not isfinite(float(arc.pickup_eta_s)) or arc.pickup_eta_s < 0
                         or arc.pickup_eta_s > remaining):
-                    reasons["EXISTING_HV_PICKUP_ETA_INVALID_OR_LATE"] += 1
+                    reject(arc, ("EXISTING_HV_PICKUP_ETA_INVALID_OR_LATE",))
                     continue
                 valid.append(arc)
                 indices.append(index)
@@ -457,10 +469,10 @@ class CityPickupSupportValidator:
                 continue
             counts["av_pickup_arcs_examined"] += 1
             if not meta.get("research_route_compatible", False):
-                reasons["CUSTOMER_BODY_OUTSIDE_C_PROFILE"] += 1
+                reject(arc, ("CUSTOMER_BODY_OUTSIDE_C_PROFILE",))
                 continue
             if self.routing_budget_s <= 0:
-                reasons["PICKUP_SUPPORT_ROUTING_BUDGET_EXHAUSTED"] += 1
+                reject(arc, ("PICKUP_SUPPORT_ROUTING_BUDGET_EXHAUSTED",))
                 continue
             origin = tuple(map(float, c.routing_engine.return_position_coordinates(runtime.native_vehicle.pos)))
             target = (float(request.pickup_lon_wgs84), float(request.pickup_lat_wgs84))
@@ -472,7 +484,7 @@ class CityPickupSupportValidator:
                 counts["pickup_route_cache_hits"] += 1
             else:
                 if route_time >= self.routing_budget_s:
-                    reasons["PICKUP_SUPPORT_ROUTING_BUDGET_EXHAUSTED"] += 1
+                    reject(arc, ("PICKUP_SUPPORT_ROUTING_BUDGET_EXHAUSTED",))
                     continue
                 route_started = perf_counter()
                 routed = self.empty_router.route(*origin, *target, self.geometry_timestamp)
@@ -482,25 +494,25 @@ class CityPickupSupportValidator:
                 while len(self.cache) > MAX_CACHE_ENTRIES:
                     self.cache.popitem(last=False)
             if not routed["common_supported"]:
-                reasons.update(routed["reason_codes"] or ("PICKUP_COMMON_SUPPORT_UNAVAILABLE",))
+                reject(arc, routed["reason_codes"] or ("PICKUP_COMMON_SUPPORT_UNAVAILABLE",))
                 continue
             if "C" not in routed["compatible_profiles"]:
-                reasons.update(routed.get("profile_reason_codes", {}).get("C", ()) or ("EMPTY_PICKUP_OUTSIDE_C_PROFILE",))
+                reject(arc, routed.get("profile_reason_codes", {}).get("C", ()) or ("EMPTY_PICKUP_OUTSIDE_C_PROFILE",))
                 continue
             tolerance = float(getattr(self.seam_evidence, "tolerance", 80.0))
             if any(not isfinite(float(routed[name])) or float(routed[name]) > tolerance
                     for name in ("snap_gap_origin_m", "snap_gap_target_m")):
-                reasons["SNAP_GAP_EXCEEDS_COMMON_INSTANCE_TOLERANCE"] += 1
+                reject(arc, ("SNAP_GAP_EXCEEDS_COMMON_INSTANCE_TOLERANCE",))
                 continue
             raw, distance = float(routed["raw_time_s"]), float(routed["distance_m"])
             duration = raw * beta
             coincident = bool(routed.get("coincident_od", False))
             if (not all(isfinite(value) and value >= 0 for value in (raw, distance, duration))
                     or (not coincident and min(raw, distance, duration) <= 0)):
-                reasons["PICKUP_SCALAR_TIME_OR_DISTANCE_INVALID"] += 1
+                reject(arc, ("PICKUP_SCALAR_TIME_OR_DISTANCE_INVALID",))
                 continue
             if duration > remaining:
-                reasons["SCALAR_PICKUP_EXCEEDS_REMAINING_PATIENCE"] += 1
+                reject(arc, ("SCALAR_PICKUP_EXCEEDS_REMAINING_PATIENCE",))
                 continue
             staged.append((index, arc, runtime, request, routed, raw, distance, duration, cached))
         if staged:
@@ -515,10 +527,10 @@ class CityPickupSupportValidator:
             joined = self.seam_evidence.evaluate_pickup(c, runtime, request, routed, now)
             seam_time += perf_counter() - seam_started
             if not joined["supported"]:
-                reasons.update(joined.get("reason_codes") or ("PICKUP_CUSTOMER_JOIN_UNSUPPORTED",))
+                reject(arc, joined.get("reason_codes") or ("PICKUP_CUSTOMER_JOIN_UNSUPPORTED",))
                 continue
             if "C" not in joined.get("compatible_profiles", ()):
-                reasons.update(joined.get("C_reason_codes") or ("PICKUP_CUSTOMER_JOIN_OUTSIDE_C_PROFILE",))
+                reject(arc, joined.get("C_reason_codes") or ("PICKUP_CUSTOMER_JOIN_OUTSIDE_C_PROFILE",))
                 continue
             corrected = PickupEstimate(valhalla_time_s=raw, corrected_pickup_eta_s=duration,
                 route_distance_m=distance, beta=beta, time_bin_index=int(bin_index), cache_hit=cached)

@@ -1,0 +1,10 @@
+{
+  "version": "scheme_a_two_scale_city_v3",
+  "base_config": "stage4/config/scheme_a_two_scale_city_v2.json",
+  "base_config_sha256": "e405b8d90ed23d530ea2b94e79011fc10ba0e97c18cbe33af50c757038d1f93a",
+  "idle_movement_mode": "COMMON_HISTORICAL_DEFICIT",
+  "precise_request_deadline": true,
+  "request_decision_diagnostics": true,
+  "coarse_nested_profile_paths": true,
+  "common_movement_wall_limit_s": 10.0
+}

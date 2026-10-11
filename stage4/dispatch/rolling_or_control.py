@@ -38,11 +38,11 @@ class RollingRuntimeGuardExceeded(RuntimeError):
 
 
 def patience_feasible(pickup_eta_s: float, remaining_patience_s: float) -> bool:
-    return isfinite(pickup_eta_s) and pickup_eta_s <= remaining_patience_s
+    return isfinite(pickup_eta_s) and 0 <= pickup_eta_s <= remaining_patience_s
 
 
-def patience_expired(simulation_time_s: int, pickup_deadline_s: int) -> bool:
-    return int(simulation_time_s) >= int(pickup_deadline_s)
+def patience_expired(simulation_time_s: float, pickup_deadline_s: float) -> bool:
+    return float(simulation_time_s) >= float(pickup_deadline_s)
 
 
 class _RollingORFleetControlCore(_NativeFleetControlCore):
@@ -91,6 +91,9 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
             config.get("prospective_gate_logging", False)
         )
         self.repositioning_manager = repositioning_manager
+        from .request_decision_diagnostics import RequestDecisionDiagnostics
+        self.request_decisions = (RequestDecisionDiagnostics()
+            if config.get("request_decision_diagnostics", False) else None)
         from .traffic_research_policy import TrafficResearchPolicy
         self.traffic_policy = TrafficResearchPolicy.from_config(config)
 
@@ -127,12 +130,15 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
         exposure = exposure_excess(
             request.rho_static, request.rho_dynamic, request.rho_speed
         )
+        deadline = float(request.sim_time_s + self.max_pickup_wait_s)
+        if not self.config.get("precise_request_deadline", False):
+            deadline = int(deadline)  # Preserve opt-out legacy configuration.
         self.request_meta[rid] = {
             "first_attempt_time": None,
             "attempt_count": 0,
             "failed_round_count": 0,
             "carry_over_flag": False,
-            "pickup_deadline_s": int(request.sim_time_s + self.max_pickup_wait_s),
+            "pickup_deadline_s": deadline,
             "final_search_radius_m": float(self.config["search_radius_initial_m"]),
             "entered_critical": False,
             "passenger_accepts_av": acceptance.passenger_accepts_av,
@@ -147,8 +153,15 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
         research = getattr(self, "research_route_policy", None)
         if research is not None:
             self.request_meta[rid].update(research.evaluate(request))
+        if self.request_decisions is not None:
+            self.request_decisions.activate(rid, request.order_id, request.sim_time_s,
+                deadline, simulation_time)
 
     def _expire(self, rid: int, simulation_time: int) -> None:
+        if rid in self.rid_to_assigned_vid:
+            raise ValueError("committed requests cannot be patience-expired")
+        if self.request_decisions is not None:
+            self.request_decisions.finish(rid, simulation_time, "EXPIRED")
         self.expired_rids.add(rid)
         self.cancelled_rids.add(rid)
         self.demand.waiting_rq.pop(rid, None)
@@ -213,6 +226,7 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
         routing_before = self.eta_adapter.routing_time_s
         candidate_plans = []
         certified_session_prunes = 0
+        decisions = self.request_decisions
         for rid in waiting_ids:
             request = self.request_by_rid[rid]
             meta = self.request_meta[rid]
@@ -230,10 +244,18 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                 self.config["search_radius_cap_m"],
             )
             meta["final_search_radius_m"] = radius
+            if decisions is not None:
+                raw_hv = index.count_vehicle_type_within(request.pickup_lon_wgs84,
+                    request.pickup_lat_wgs84, radius, "HV")
+                raw_av = index.count_vehicle_type_within(request.pickup_lon_wgs84,
+                    request.pickup_lat_wgs84, radius, "AV")
+                decisions.round(rid, simulation_time, len(available), raw_hv, raw_av)
             # Opt-in symmetric research population: missing route support or a
             # certified common prohibition excludes BOTH HV and AV candidates.
             # Legacy sidecars have no such field and retain their frozen policy.
             if not meta.get("research_base_eligible", True):
+                if decisions is not None:
+                    decisions.reject(rid, "COMMON_ROUTE_BASE_INELIGIBLE")
                 continue
             exposure: ExposureExcess | None = meta["exposure"]
             av_ready = bool(meta.get("research_route_compatible", request.av_smoke_eligible))
@@ -295,6 +317,12 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
             )
             spatial_pairs += raw_count
             topk_pairs += len(candidates)
+            if decisions is not None:
+                decisions.candidates(rid, raw_count, len(candidates))
+                if not av_eligible and raw_av:
+                    reason = ("PASSENGER_REJECTS_AV" if not accepts else
+                        "AV_CUSTOMER_BODY_OR_EVIDENCE_INELIGIBLE")
+                    decisions.reject(rid, reason, count=raw_av)
             certified = set()
             if self.config.get("pre_route_session_certificate", False) and gate_counts is None:
                 predicted = request.predicted_service_time_s + self._pickup_overhead_s()
@@ -349,13 +377,19 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
             meta = self.request_meta[rid]
             for vehicle, _distance in candidates:
                 if vehicle.native_vehicle_id in certified:
+                    if decisions is not None:
+                        decisions.reject(rid, "PRE_ROUTE_SESSION_END")
                     continue
                 reason = eta_pruned.get(vehicle.native_vehicle_id)
                 if reason == "PATIENCE":
                     invalid_patience += 1
+                    if decisions is not None:
+                        decisions.reject(rid, "CACHED_ETA_EXCEEDS_REMAINING_PATIENCE")
                     continue
                 if reason in ("HV_SESSION_END", "HV_SESSION_EVIDENCE"):
                     invalid_hv_window += 1
+                    if decisions is not None:
+                        decisions.reject(rid, reason)
                     if reason == "HV_SESSION_END":
                         self.hv_session_end_exclusions.add((simulation_time, vehicle.native_vehicle_id, rid))
                     continue
@@ -364,12 +398,20 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                     gate_counts["gate_av_n3a_shared_topk"] += 1
                 estimate = estimates.get(vehicle.native_vehicle_id)
                 if estimate is None:
+                    if decisions is not None:
+                        decisions.reject(rid, "PICKUP_ROUTING_NO_ESTIMATE")
                     continue
+                if decisions is not None:
+                    decisions.route(rid, estimate.corrected_pickup_eta_s)
                 if gate_counts is not None and is_av:
                     gate_counts["gate_av_n3b_route_returned"] += 1
                 if not patience_feasible(estimate.corrected_pickup_eta_s, remaining):
                     invalid_patience += 1
+                    if decisions is not None:
+                        decisions.reject(rid, "PICKUP_ETA_EXCEEDS_REMAINING_PATIENCE")
                     continue
+                if decisions is not None:
+                    decisions.feasible(rid)
                 if gate_counts is not None and is_av:
                     gate_counts["gate_av_n4_pickup_within_patience"] += 1
                 runtime = by_vid[vehicle.native_vehicle_id]
@@ -379,6 +421,8 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                 if self._requires_completion_by_window_end(runtime):
                     if not isfinite(predicted):
                         invalid_hv_window += 1
+                        if decisions is not None:
+                            decisions.reject(rid, "SESSION_COMPLETION_TIME_MISSING")
                         continue
                     predicted_end = (
                         simulation_time + estimate.corrected_pickup_eta_s + predicted
@@ -387,12 +431,16 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                                   else self._fixture_seconds(runtime.fixture.availability_end_time))
                     if predicted_end > window_end:
                         invalid_hv_window += 1
+                        if decisions is not None:
+                            decisions.reject(rid, "SESSION_COMPLETION_AFTER_SHIFT")
                         self.hv_session_end_exclusions.add(
                             (simulation_time, vehicle.native_vehicle_id, rid)
                         )
                         continue
                 elif self.cost_level_enabled and not isfinite(predicted):
                     invalid_cost_evidence += 1
+                    if decisions is not None:
+                        decisions.reject(rid, "COST_TIME_EVIDENCE_MISSING")
                     continue
                 factor = self.eta_cost_av_to_hv if vehicle.vehicle_type == "AV" else 1.0
                 operating_cost = (
@@ -427,6 +475,9 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
         solver_started = time.perf_counter()
         research_solver = getattr(self, "flexibility_adapter", None)
         if research_solver is None:
+            if decisions is not None:
+                for arc in arcs:
+                    decisions.validated(arc.request_id)
             result = solve_lexicographic(
                 arcs,
                 exposure_state=self.exposure_state,
@@ -446,6 +497,8 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
             arc = arcs[arc_index]
             runtime, request, estimate = arc.payload
             self._assign(runtime, request, estimate, simulation_time)
+            if decisions is not None:
+                decisions.finish(arc.request_id, simulation_time, "ASSIGNED")
             self.assignment_rows[-1].update(
                 {
                     "dispatch_policy": "GLOBAL_SPARSE_EXACT_LEXICOGRAPHIC_OR",

@@ -227,6 +227,7 @@ def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
         from stage4.dispatch.scheme_a_city_graph import CoarseHistoricalLibrary
         from stage4.dispatch.scheme_a_two_scale_native import NativeTwoScaleAdapter
         from stage4.dispatch.scheme_a_two_scale_value import CoarseServiceValue
+        from stage4.dispatch.historical_deficit_movement import HistoricalDeficitMovementManager
         from stage4.fleetpy_adapter.mixed_fleet_adapter import create_native_vehicles
         from stage4.fleetpy_adapter.native_network import create_native_network
         from stage4.fleetpy_adapter.research_native_bridge import ResearchNativeBridge
@@ -274,15 +275,20 @@ def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
         routing = make_routing(root, cfg)
         native_cfg = native_configuration(root, cfg)
         native_cfg["scheme_a_fast_forecast_hv"] = True
+        native_cfg.update({key: cfg[key] for key in
+            ("precise_request_deadline", "request_decision_diagnostics") if key in cfg})
         control = create_rolling_or_fleet_control(bindings, vehicles, [], demand, network, routing,
             start, start + pd.Timedelta(seconds=cfg["physical_drain_limit_s"]), native_cfg)
         control.enable_event_calendar()
         reference, reference_manifest = load_train_demand_reference(root)
         empty_router = ControlledEmptyRouter(root, routing)
-        manager = SelectedMovementManager(control, reference, empty_router,
+        common_movement = cfg.get("idle_movement_mode") == "COMMON_HISTORICAL_DEFICIT"
+        manager_type = HistoricalDeficitMovementManager if common_movement else SelectedMovementManager
+        manager_kwargs = dict(wall_limit_s=cfg["common_movement_wall_limit_s"]) if common_movement else {}
+        manager = manager_type(control, reference, empty_router,
             max_moves=cfg["reposition_max_moves"], radius_m=cfg["reposition_radius_m"],
             max_eta_s=cfg["reposition_max_eta_s"], top_k=cfg["reposition_top_k"],
-            day_end_s=cfg["movement_day_end_s"])
+            day_end_s=cfg["movement_day_end_s"], **manager_kwargs)
         control.repositioning_manager = manager
         bridge.install(control)
         phases["native_environment_setup_s"] = perf_counter() - loaded
@@ -303,6 +309,8 @@ def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
         library_cfg = dict(cfg, measurement_end_s=cfg["coarse_reference_day_end_s"])
         library = CoarseHistoricalLibrary(templates, library_cfg)
         connectors = SchemeACityConnectors(control, empty_router, validator, templates, geometry_timestamp=start)
+        if common_movement:
+            manager.connectors = connectors
         provider = CoarseServiceValue(library, reference, templates, cfg)
         del templates
         remaining = TrainRemainingTime(json.loads((root / cfg["remaining_time_model"]).read_text(encoding="utf-8")))
@@ -382,6 +390,15 @@ def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
             assignments["dispatch_policy"] = "TWO_SCALE_CURRENT_ACTION_FLOW_COARSE_FUTURE"
         physics = time_chain_check(assignments)
         outcomes = outcome_table(control, assignments, cfg)
+        if control.request_decisions is not None:
+            decisions = pd.DataFrame(control.request_decisions.rows())
+            if len(decisions) != len(outcomes) or decisions.status.eq("PENDING").any():
+                raise RuntimeError("request decision diagnostics did not cover every revealed terminal request")
+            atomic_parquet(directory / "request_decisions.parquet", decisions)
+            diagnostic_fields = decisions.drop(columns=["order_id", "release_s", "deadline_s"])
+            outcomes = outcomes.merge(diagnostic_fields, on="native_request_id", validate="one_to_one")
+            summary["request_decision_diagnostics"] = control.request_decisions.summary()
+            del decisions, diagnostic_fields
         movements = pd.DataFrame(manager.rows)
         if len(movements):
             movements["destination_position"] = movements.destination_position.astype(str)
@@ -438,6 +455,9 @@ def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
                 atomic_parquet(directory / "partial_assignments.parquet", bridge.environment_assignments())
             if adapter is not None:
                 atomic_parquet(directory / "partial_solver_trace.parquet", pd.DataFrame(adapter.rows))
+            if control.request_decisions is not None:
+                atomic_parquet(directory / "partial_request_decisions.parquet",
+                    pd.DataFrame(control.request_decisions.rows()))
             atomic_parquet(directory / "partial_step_timings.parquet", pd.DataFrame(step_rows))
         if full_day and provider is not None:
             _atomic_json(directory / "coarse_refreshes.json", provider.refresh_records)

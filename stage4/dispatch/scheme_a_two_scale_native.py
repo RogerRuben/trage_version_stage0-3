@@ -48,6 +48,9 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
         super().__init__(policy, value_provider, reference, connectors, validator,
                          remaining_model, cfg)
         self.value_provider = value_provider
+        self.common_movement = cfg.get("idle_movement_mode", "VALUE_SELECTED") == "COMMON_HISTORICAL_DEFICIT"
+        if cfg.get("idle_movement_mode", "VALUE_SELECTED") not in ("VALUE_SELECTED", "COMMON_HISTORICAL_DEFICIT"):
+            raise ValueError("unknown idle movement base layer")
         self.coarse_bucket = None
         self.coarse_info = dict(available=False, status="NOT_REFRESHED", refreshed=False)
         self.timing_totals = Counter()
@@ -179,7 +182,8 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
         self._validate_control(c)
         self._sync(c)
         manager = c.repositioning_manager
-        move_epoch = now % 900 == 0 and 0 <= now < self.cfg.get("movement_day_end_s", 86400)
+        move_epoch = (not self.common_movement and now % 900 == 0
+            and 0 <= now < self.cfg.get("movement_day_end_s", 86400))
         timings = {name: 0. for name in _TIMINGS}
         move_queries = 0
         move_counts = dict.fromkeys(_MOVE_COUNTS, 0)
@@ -188,6 +192,7 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
         base = dict(simulation_time_s=now, policy=self.policy, future_chain_variables=0,
                     future_connector_queries=0, future_route_queries=0,
                     selected_multi_service_chains=0, selected_future_move_activities=0,
+                    idle_movement_mode="COMMON_HISTORICAL_DEFICIT" if self.common_movement else "VALUE_SELECTED",
                     dense_matrix=False, gpu_used=False)
 
         def fixed_wait(coarse=None, unavailable=None):
@@ -219,6 +224,9 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
             if key not in original_indices or int(arc.request_id) not in waiting_ids:
                 raise ValueError("validator introduced an unknown/nonpending current native arc")
             original_arcs[original_indices[key]] = arc
+            decisions = getattr(c, "request_decisions", None)
+            if decisions is not None:
+                decisions.validated(arc.request_id)
         states = self._current_states(c, valid, now, move_epoch)
         if not states:
             return fixed_wait()
@@ -386,6 +394,15 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
         chosen = set(result["selected_action_ids"])
         serves = [action for action in actions if action.action_id in chosen and action.kind == "SERVE"]
         moves = [action for action in actions if action.action_id in chosen and action.kind == "RELOCATE"]
+        decisions = getattr(c, "request_decisions", None)
+        if decisions is not None:
+            served_rids = {int(action.request_id) for action in serves}
+            idle_vids = {action.vehicle_id for action in actions
+                if action.action_id in chosen and action.kind == "WAIT"}
+            withheld_rids = {int(arc.request_id) for arc in valid
+                if int(arc.vehicle_id) in idle_vids and int(arc.request_id) not in served_rids}
+            for rid in withheld_rids:
+                decisions.withheld(rid)
         for action in moves:
             self.move_contexts[action.vehicle_id] = after[action.action_id].context, float(now)
         manager.queue_actions([action.payload["move"] for action in moves], now)
