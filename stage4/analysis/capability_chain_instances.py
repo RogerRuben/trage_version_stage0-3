@@ -229,6 +229,12 @@ class JoinEvidence:
             str(row.outgoing_stage3_edge_uid), str(row.internal_stage3_edge_uids))
 
     def evaluate(self, source_order, target_order, routed, tolerance):
+        typed_phases = bool(getattr(self, "typed_phase_diagnostics", False))
+        def failed(code, stage):
+            result = dict(supported=False, reason_codes=[code])
+            if typed_phases:
+                result["rejection_stage"] = stage
+            return result
         previous = self.tokens[source_order].copy() if source_order else pd.DataFrame(columns=IDENTITY_COLUMNS)
         following = self.tokens[target_order].copy() if target_order else pd.DataFrame(columns=IDENTITY_COLUMNS)
         date = (str(following.date.iloc[0]) if len(following) else str(previous.date.iloc[0])
@@ -279,21 +285,21 @@ class JoinEvidence:
             if len(previous):
                 src = self.selected.loc[source_order]
                 interfaces.append((endpoint(previous, False), endpoint(empty, True),
-                    (src.end_lon_wgs84, src.end_lat_wgs84), routed["snapped_origin"]))
+                    (src.end_lon_wgs84, src.end_lat_wgs84), routed["snapped_origin"], "DEPARTURE_JOIN"))
             if len(following):
                 dst = self.selected.loc[target_order]
                 interfaces.append((endpoint(empty, False), endpoint(following, True), routed["snapped_target"],
-                    (dst.start_lon_wgs84, dst.start_lat_wgs84)))
+                    (dst.start_lon_wgs84, dst.start_lat_wgs84), "PICKUP_CUSTOMER_JOIN"))
         elif len(previous) and len(following):
             src, dst = self.selected.loc[source_order], self.selected.loc[target_order]
             interfaces.append((endpoint(previous, False), endpoint(following, True),
-                (src.end_lon_wgs84, src.end_lat_wgs84), (dst.start_lon_wgs84, dst.start_lat_wgs84)))
-        for left, right, left_point, right_point in interfaces:
+                (src.end_lon_wgs84, src.end_lat_wgs84), (dst.start_lon_wgs84, dst.start_lat_wgs84), "COINCIDENT_CUSTOMER_JOIN"))
+        for left, right, left_point, right_point, stage in interfaces:
             if left is None or right is None:
-                return dict(supported=False, reason_codes=["JOIN_DIRECTION_GEOMETRY_MISSING"])
+                return failed("JOIN_DIRECTION_GEOMETRY_MISSING", stage)
             valid, reason = interface_supported(left, right, left_point, right_point, tolerance)
             if not valid:
-                return dict(supported=False, reason_codes=[reason])
+                return failed(reason, stage)
 
         # Only the frozen topological parse is reusable. Current stop/snap
         # geometry has just been rechecked; connector beta and original
@@ -303,6 +309,8 @@ class JoinEvidence:
             parse_key = self.router.join_parse_key(pieces,
                 {key:self.overlay_forward.get(key) for key in reverse_keys},
                 (CONTROL_POLICY, TRAFFIC_OUTSIDE_BUDGET, tuple(sorted(UNKNOWN_TRAFFIC.items()))))
+            if typed_phases:
+                parse_key = (parse_key, "TYPED_JOIN_PHASES_V1")
             cached = self.router.join_parse_get(parse_key)
             if cached is not None:
                 return cached
@@ -346,11 +354,51 @@ class JoinEvidence:
         evaluations = {k: evaluate_research_compatibility(k, actions, dict(UNKNOWN_TRAFFIC),
             conservative_control_policy=CONTROL_POLICY, outside_budget=TRAFFIC_OUTSIDE_BUDGET) for k in ("HV", "C")}
         prohibited = any(m.certified_prohibited for m in actions)
-        return finish(dict(supported=not prohibited, reason_codes=["CERTIFIED_COMMON_PROHIBITION"] if prohibited else [],
+        result = dict(supported=not prohibited, reason_codes=["CERTIFIED_COMMON_PROHIBITION"] if prohibited else [],
             compatible_profiles=[k for k, result in evaluations.items() if result.compatible],
             join_encounter_count=len(actions), join_maneuvers=[m.maneuver for m in actions],
             C_reason_codes=list(evaluations["C"].reason_codes),
-            join_bearing_fallback_count=int(summary.bearing_fallback_count.sum()) if len(summary) else 0))
+            join_bearing_fallback_count=int(summary.bearing_fallback_count.sum()) if len(summary) else 0)
+        if typed_phases:
+            resolved = [parser.virtual.get(r.canonical_edge_uid) if r.route_token_type == "HISTORICAL_REVERSE_OVERLAY"
+                        else r.resolved_stage3_edge_uid for r in joined.itertuples(index=False)]
+            phase_codes = {}
+            for record, movement in zip(added, actions):
+                value = evaluate_research_compatibility("C", (movement,), dict(UNKNOWN_TRAFFIC),
+                    conservative_control_policy=CONTROL_POLICY, outside_budget=TRAFFIC_OUTSIDE_BUDGET)
+                if value.reason_codes:
+                    phase = join_movement_phase(resolved, record, len(previous), len(empty), len(following))
+                    phase_codes.setdefault(phase, set()).update(value.reason_codes)
+            result["phase_reason_codes"] = {key: sorted(value) for key, value in sorted(phase_codes.items())}
+        return finish(result)
+
+
+def join_movement_phase(resolved_uids, record, previous_count, empty_count, following_count):
+    """Locate full movement occurrences, never infer phase from one edge UID.
+
+    Repeated indistinguishable boundary crossings remain explicitly ambiguous;
+    this diagnostic does not change legality or rerun the frozen parser.
+    """
+    pattern = [record["incoming_stage3_edge_uid"],
+        *json.loads(record["internal_stage3_edge_uids"]), record["outgoing_stage3_edge_uid"]]
+    boundaries = []
+    if previous_count and empty_count:
+        boundaries.append((previous_count, "DEPARTURE_JOIN"))
+    if empty_count and following_count:
+        boundaries.append((previous_count + empty_count, "PICKUP_CUSTOMER_JOIN"))
+    if previous_count and following_count and not empty_count:
+        boundaries.append((previous_count, "COINCIDENT_CUSTOMER_JOIN"))
+    candidates = set()
+    for start in range(len(resolved_uids) - len(pattern) + 1):
+        if list(resolved_uids[start:start + len(pattern)]) != pattern:
+            continue
+        phases = tuple(label for index, label in boundaries if start < index <= start + len(pattern) - 1)
+        if phases:
+            candidates.add(phases)
+    if len(candidates) != 1:
+        return "AMBIGUOUS_JOIN_BOUNDARY" if candidates else "JOIN_PHASE_UNRESOLVED"
+    phases = next(iter(candidates))
+    return phases[0] if len(phases) == 1 else "MULTI_INTERFACE_JOIN"
 
 
 def result_metrics(solution, horizon_s):

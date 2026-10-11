@@ -382,13 +382,20 @@ No Actor or data table is constructed until a candidate needs its evidence.
             idle_context_routing_time_s=self.departure_context_routing_time_s)
 
     def evaluate_pickup(self, c, runtime, request, routed, now):
+        self.typed_phase_diagnostics = bool(getattr(getattr(c, "request_decisions", None), "typed_candidates", False))
         del c, now
         vid = int(runtime.fixture.native_id)
         if vid in self._source_reasons:
-            return dict(supported=False, reason_codes=[self._source_reasons[vid]], compatible_profiles=[])
+            result = dict(supported=False, reason_codes=[self._source_reasons[vid]], compatible_profiles=[])
+            if self.typed_phase_diagnostics:
+                result["rejection_stage"] = "DEPARTURE_CONTEXT"
+            return result
         source, target = self._sources.get(vid), str(request.order_id)
         if target not in self.tokens or (source is not None and source not in self.tokens):
-            return dict(supported=False, reason_codes=["CURRENT_CUSTOMER_ROUTE_IDENTITY_MISSING"], compatible_profiles=[])
+            result = dict(supported=False, reason_codes=["CURRENT_CUSTOMER_ROUTE_IDENTITY_MISSING"], compatible_profiles=[])
+            if self.typed_phase_diagnostics:
+                result["rejection_stage"] = "PICKUP_CUSTOMER_IDENTITY" if target not in self.tokens else "DEPARTURE_IDENTITY"
+            return result
         result = super().evaluate(source, target, routed, self.tolerance)
         result.update(pickup_to_customer_checked=True, previous_to_pickup_checked=source is not None,
             departure_context="COLD_START_NO_PRIOR_CUSTOMER" if source is None else "ACTUAL_ROUTED_CONTEXT_OR_COMPLETED_CUSTOMER")
@@ -432,10 +439,13 @@ class CityPickupSupportValidator:
         started = perf_counter()
         counts, reasons = Counter(), Counter()
         decisions = getattr(c, "request_decisions", None)
-        def reject(arc, codes):
+        def reject(arc, codes, stage="PICKUP_ROUTE", phase_codes=None):
             reasons.update(codes)
             if decisions is not None:
-                decisions.reject(arc.request_id, *codes)
+                decisions.reject(arc.request_id, *codes, stage=None if phase_codes else stage,
+                    vehicle_type=arc.vehicle_type)
+                for phase, values in (phase_codes or {}).items():
+                    decisions.reject_stage(arc.request_id, phase, arc.vehicle_type, values)
         valid, indices = [], []
         route_time = seam_time = 0.0
         self.pickup_paths = {}
@@ -458,11 +468,11 @@ class CityPickupSupportValidator:
             wait_config = getattr(c, "config", {})
             remaining = float(meta["pickup_deadline_s"]) - float(now)
             if not isfinite(remaining) or remaining < 0:
-                reject(arc, ("PICKUP_DEADLINE_PASSED",))
+                reject(arc, ("PICKUP_DEADLINE_PASSED",), "PICKUP_TIME")
                 continue
             if arc.vehicle_type != "AV":
                 if not assignment_feasible(wait_config, now, meta["pickup_deadline_s"], arc.pickup_eta_s):
-                    reject(arc, ("EXISTING_HV_PICKUP_ETA_INVALID_OR_LATE",))
+                    reject(arc, ("EXISTING_HV_PICKUP_ETA_INVALID_OR_LATE",), "PICKUP_TIME")
                     continue
                 valid.append(arc)
                 indices.append(index)
@@ -470,7 +480,7 @@ class CityPickupSupportValidator:
                 continue
             counts["av_pickup_arcs_examined"] += 1
             if not meta.get("research_route_compatible", False):
-                reject(arc, ("CUSTOMER_BODY_OUTSIDE_C_PROFILE",))
+                reject(arc, ("CUSTOMER_BODY_OUTSIDE_C_PROFILE",), "CUSTOMER_BODY")
                 continue
             if self.routing_budget_s <= 0:
                 reject(arc, ("PICKUP_SUPPORT_ROUTING_BUDGET_EXHAUSTED",))
@@ -503,7 +513,7 @@ class CityPickupSupportValidator:
             tolerance = float(getattr(self.seam_evidence, "tolerance", 80.0))
             if any(not isfinite(float(routed[name])) or float(routed[name]) > tolerance
                     for name in ("snap_gap_origin_m", "snap_gap_target_m")):
-                reject(arc, ("SNAP_GAP_EXCEEDS_COMMON_INSTANCE_TOLERANCE",))
+                reject(arc, ("SNAP_GAP_EXCEEDS_COMMON_INSTANCE_TOLERANCE",), "PICKUP_SNAP")
                 continue
             raw, distance = float(routed["raw_time_s"]), float(routed["distance_m"])
             duration = raw * beta
@@ -516,7 +526,7 @@ class CityPickupSupportValidator:
                 code = pickup_rejection_code(wait_config)
                 if code == "PICKUP_ETA_EXCEEDS_REMAINING_PATIENCE":
                     code = "SCALAR_PICKUP_EXCEEDS_REMAINING_PATIENCE"
-                reject(arc, (code,))
+                reject(arc, (code,), "PICKUP_TIME")
                 continue
             staged.append((index, arc, runtime, request, routed, raw, distance, duration, cached))
         if staged:
@@ -531,10 +541,12 @@ class CityPickupSupportValidator:
             joined = self.seam_evidence.evaluate_pickup(c, runtime, request, routed, now)
             seam_time += perf_counter() - seam_started
             if not joined["supported"]:
-                reject(arc, joined.get("reason_codes") or ("PICKUP_CUSTOMER_JOIN_UNSUPPORTED",))
+                reject(arc, joined.get("reason_codes") or ("PICKUP_CUSTOMER_JOIN_UNSUPPORTED",),
+                    joined.get("rejection_stage", "JOIN_UNATTRIBUTED"), joined.get("phase_reason_codes"))
                 continue
             if "C" not in joined.get("compatible_profiles", ()):
-                reject(arc, joined.get("C_reason_codes") or ("PICKUP_CUSTOMER_JOIN_OUTSIDE_C_PROFILE",))
+                reject(arc, joined.get("C_reason_codes") or ("PICKUP_CUSTOMER_JOIN_OUTSIDE_C_PROFILE",),
+                    joined.get("rejection_stage", "JOIN_UNATTRIBUTED"), joined.get("phase_reason_codes"))
                 continue
             corrected = PickupEstimate(valhalla_time_s=raw, corrected_pickup_eta_s=duration,
                 route_distance_m=distance, beta=beta, time_bin_index=int(bin_index), cache_hit=cached)

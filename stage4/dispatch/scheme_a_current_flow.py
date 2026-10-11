@@ -131,7 +131,7 @@ def _check_selection(selected, vehicles, move_cap):
 
 def solve_current_flow(actions, continuation_units, *, policy="SERVICE_PRESERVING",
                        move_cap=50, time_limit_s=10., deadline_s=None,
-                       maximum_actions=20_000, backend="AUTO"):
+                       maximum_actions=20_000, backend="AUTO", empty_distance_mode="LOCAL_STABLE"):
     """Select one feasible current action per available vehicle.
 
 Input actions must ALREADY satisfy road/direction, profile, acceptance,
@@ -142,7 +142,9 @@ current actions. Current MOVE choices share one present-time capacity pool.
 Continuation deltas are bounded integer units [-9,9]: three equal historical
 scenarios, up to three service opportunities each. Future competition is only
 approximated by the value provider; never sum these as realized capacity.
-    Global secondary empty-distance optimality is deliberately removed. Equal
+    Legacy LOCAL_STABLE has no global distance guarantee. Opt-in
+    PRIMARY_FACE_MM minimizes millimetre costs on the exact primary-optimal
+    face without modifying primary weights or physical distance. Equal
     primary-value actions prefer shorter local distance in stable input order;
     this is NOT a minimum-total-distance guarantee. Physical distances, paths
     and time windows are never rounded or modified.
@@ -156,6 +158,8 @@ approximated by the value provider; never sum these as realized capacity.
         raise ValueError("current-flow time limit must be in (0,10]")
     if backend not in ("AUTO","INTEGER_REFERENCE"):
         raise ValueError("current-flow backend must be AUTO or INTEGER_REFERENCE")
+    if empty_distance_mode not in ("LOCAL_STABLE", "PRIMARY_FACE_MM"):
+        raise ValueError("unknown current empty-distance mode")
     if type(maximum_actions) is not int or maximum_actions <= 0:
         raise ValueError("maximum_actions must be positive")
     deadline = started + time_limit_s
@@ -200,7 +204,26 @@ approximated by the value provider; never sum these as realized capacity.
     def result(selected, status, reason=None, nodes=0, edges=0, augmentations=0,
                native=False, native_reason=None):
         _check_selection(selected, groups, move_cap)
-        return dict(selected_action_ids=tuple(sorted(a.action_id for a in selected)),
+        secondary = {}
+        primary_proved = native or status.startswith("OPTIMAL_PRIMARY")
+        if empty_distance_mode == "PRIMARY_FACE_MM":
+            secondary = dict(secondary_status="PRIMARY_NOT_PROVED", secondary_optimality_proved=False,
+                secondary_cost_resolution_m=.001, secondary_distance_gap_bound_m=None,
+                secondary_time_s=0.)
+            if primary_proved:
+                from .current_flow_secondary import minimize_empty_face
+                scores = _totals(selected, features)
+                ids, secondary = minimize_empty_face(original, references, selected,
+                    vehicle_nodes, request_nodes, source, sink, pool, len(graph), deadline, backend)
+                selected = [by_id[aid] for aid in ids]
+                _check_selection(selected, groups, move_cap)
+                if _totals(selected, features) != scores:
+                    raise RuntimeError("empty-distance optimization changed a primary priority")
+            secondary["secondary_wall_deadline_exceeded"] = (secondary.get("secondary_time_s", 0.) > 0
+                and perf_counter() > deadline)
+            if secondary["secondary_wall_deadline_exceeded"]:
+                status, reason = "FEASIBLE_SECONDARY_WALL_OVERRUN", "SECONDARY_STAGE_OVERRAN_SHARED_DEADLINE"
+        row = dict(selected_action_ids=tuple(sorted(a.action_id for a in selected)),
             critical_now=sum(a.critical for a in selected),
             current_served=sum(a.kind == "SERVE" for a in selected),
             carry_over_current_served=sum(a.carry_over for a in selected),
@@ -211,12 +234,14 @@ approximated by the value provider; never sum these as realized capacity.
             residual_edges=edges, augmentations=augmentations,
             future_chain_variables=0, routing_queries=0, dense_matrix=False,
             current_empty_distance_m=sum(a.empty_distance_m for a in selected),
-            distance_global_optimality_claimed=False,
+            distance_global_optimality_claimed=bool(secondary.get("secondary_optimality_proved", False)),
             native_backend_fallback_reason=native_reason,
             wall_deadline_exceeded=perf_counter() > deadline,
-            primary_optimality_proved=native or status.startswith("OPTIMAL_PRIMARY"),
+            primary_optimality_proved=primary_proved,
             native_interrupt_api_available=False,
             future_global_optimality_claimed=False, whole_day_optimality_claimed=False)
+        row.update(secondary)
+        return row
 
     if len(actions) > maximum_actions or perf_counter() >= deadline:
         return result(backup, "FEASIBLE_BACKUP_SERVICE_FIRST",
@@ -261,6 +286,11 @@ approximated by the value provider; never sum these as realized capacity.
             references[action.action_id] = _add(graph, vehicle_nodes[vid], target, 1, cost)
             incoming[target].append(cost)
     by_id = {a.action_id:a for a in actions}
+    original = None
+    if empty_distance_mode == "PRIMARY_FACE_MM":
+        distances = {ref: by_id[aid].empty_distance_m for aid, ref in references.items()}
+        original = [(u, index, edge.target, edge.capacity, edge.cost, distances.get((u, index), 0.))
+                    for u, edges in enumerate(graph) for index, edge in enumerate(edges) if edge.capacity]
 
     def chosen_from_flow():
         selected = dict(waits)

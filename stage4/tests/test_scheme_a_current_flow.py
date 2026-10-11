@@ -56,6 +56,13 @@ def test_sparse_current_flow_matches_exhaustive_lexicographic_oracle():
                 assert result["future_chain_variables"] == result["routing_queries"] == 0
                 assert result["dense_matrix"] is False
                 assert result["current_moves"] <= cap
+                for backend in ("AUTO", "INTEGER_REFERENCE"):
+                    refined = solve_current_flow(actions, values, policy=policy, move_cap=cap,
+                        backend=backend, empty_distance_mode="PRIMARY_FACE_MM")
+                    chosen = [a for a in actions if a.action_id in refined["selected_action_ids"]]
+                    assert vector(chosen, values, policy) == oracle(actions, values, policy, cap)
+                    assert refined["score_units"] == result["score_units"]
+                    assert refined["secondary_optimality_proved"]
 
 
 def test_policy_tradeoff_keeps_critical_service_but_allows_ordinary_deferral():
@@ -92,3 +99,20 @@ def test_current_schema_refuses_future_or_committed_resources_and_missing_wait()
     serve = action(1,"SERVE",7)
     with pytest.raises(ValueError):
         solve_current_flow([serve],{serve.action_id:0})
+
+
+def test_global_empty_distance_refinement_and_named_budget_fallback():
+    actions = [action(v, "WAIT") for v in range(2)] + [
+        action(0, "SERVE", 0, distance=1.), action(0, "SERVE", 1, distance=1.001),
+        action(1, "SERVE", 0, distance=1.), action(1, "SERVE", 1, distance=100.)]
+    values = {a.action_id: 0 for a in actions}
+    refined = solve_current_flow(actions, values, empty_distance_mode="PRIMARY_FACE_MM")
+    assert refined["current_served"] == 2
+    assert refined["secondary_empty_cost_mm"] == 2001
+    assert refined["current_empty_distance_m"] == pytest.approx(2.001)
+    assert refined["secondary_scope"] == "ADMITTED_PRIMARY_OPTIMAL_FACE_MM"
+    assert refined["secondary_distance_gap_bound_m"] == .002
+    expired = solve_current_flow(actions, values, empty_distance_mode="PRIMARY_FACE_MM", deadline_s=0.)
+    assert not expired["secondary_optimality_proved"]
+    assert expired["secondary_status"] == "PRIMARY_NOT_PROVED"
+    assert expired["secondary_distance_gap_bound_m"] is None

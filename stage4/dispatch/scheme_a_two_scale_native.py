@@ -48,8 +48,10 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
         super().__init__(policy, value_provider, reference, connectors, validator,
                          remaining_model, cfg)
         self.value_provider = value_provider
-        self.common_movement = cfg.get("idle_movement_mode", "VALUE_SELECTED") == "COMMON_HISTORICAL_DEFICIT"
-        if cfg.get("idle_movement_mode", "VALUE_SELECTED") not in ("VALUE_SELECTED", "COMMON_HISTORICAL_DEFICIT"):
+        self.common_movement = cfg.get("idle_movement_mode", "VALUE_SELECTED") in (
+            "COMMON_HISTORICAL_DEFICIT", "TYPE_CONDITIONED_HISTORICAL_DEFICIT")
+        if cfg.get("idle_movement_mode", "VALUE_SELECTED") not in (
+                "VALUE_SELECTED", "COMMON_HISTORICAL_DEFICIT", "TYPE_CONDITIONED_HISTORICAL_DEFICIT"):
             raise ValueError("unknown idle movement base layer")
         self.coarse_bucket = None
         self.coarse_info = dict(available=False, status="NOT_REFRESHED", refreshed=False)
@@ -65,6 +67,12 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
         self.assignment_cursor = len(c.assignment_rows)
 
     def _record(self, row):
+        if self.cfg.get("current_empty_distance_mode") == "PRIMARY_FACE_MM":
+            row.setdefault("secondary_status", "NO_CURRENT_FLOW_SOLVE")
+            row.setdefault("secondary_optimality_proved", False)
+            row.setdefault("secondary_time_s", 0.)
+            row.setdefault("secondary_wall_deadline_exceeded", False)
+            self.operation_totals["secondary_distance_optimal_decisions"] += int(row["secondary_optimality_proved"])
         self.rows.append(row)
         for name in _TIMINGS:
             self.timing_totals[name] += float(row.get(name, 0.))
@@ -192,7 +200,7 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
         base = dict(simulation_time_s=now, policy=self.policy, future_chain_variables=0,
                     future_connector_queries=0, future_route_queries=0,
                     selected_multi_service_chains=0, selected_future_move_activities=0,
-                    idle_movement_mode="COMMON_HISTORICAL_DEFICIT" if self.common_movement else "VALUE_SELECTED",
+                    idle_movement_mode=self.cfg.get("idle_movement_mode", "VALUE_SELECTED"),
                     dense_matrix=False, gpu_used=False)
 
         def fixed_wait(coarse=None, unavailable=None):
@@ -226,7 +234,7 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
             original_arcs[original_indices[key]] = arc
             decisions = getattr(c, "request_decisions", None)
             if decisions is not None:
-                decisions.validated(arc.request_id)
+                decisions.validated(arc.request_id, arc.vehicle_type, arc.pickup_eta_s)
         states = self._current_states(c, valid, now, move_epoch)
         if not states:
             return fixed_wait()
@@ -389,13 +397,27 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
         result = solve_current_flow(actions, units, policy=effective_policy,
             move_cap=50, time_limit_s=float(self.cfg.get("solver_time_limit_s", 10.)),
             deadline_s=deadline,
-            maximum_actions=int(self.cfg.get("maximum_model_variables", 20000)))
+            maximum_actions=int(self.cfg.get("maximum_model_variables", 20000)),
+            empty_distance_mode=self.cfg.get("current_empty_distance_mode", "LOCAL_STABLE"))
         timings["current_flow_time_s"] = perf_counter() - stamp
         chosen = set(result["selected_action_ids"])
         serves = [action for action in actions if action.action_id in chosen and action.kind == "SERVE"]
         moves = [action for action in actions if action.action_id in chosen and action.kind == "RELOCATE"]
         decisions = getattr(c, "request_decisions", None)
         if decisions is not None:
+            if getattr(decisions, "typed_candidates", False):
+                chosen_by_vehicle = {a.vehicle_id: a for a in actions if a.action_id in chosen}
+                HV_served = {int(a.request_id) for a in serves if original_arcs[a.payload["arc_index"]].vehicle_type == "HV"}
+                alternatives = {rid: dict(idle=0, serving_other=0, moving=0) for rid in HV_served}
+                for arc in valid:
+                    if arc.vehicle_type != "AV" or int(arc.request_id) not in HV_served:
+                        continue
+                    current = chosen_by_vehicle[int(arc.vehicle_id)]
+                    state = ("serving_other" if current.kind == "SERVE" else
+                             "moving" if current.kind == "RELOCATE" or current.vehicle_id in manager.active else "idle")
+                    alternatives[int(arc.request_id)][state] += 1
+                for rid, counts in alternatives.items():
+                    decisions.HV_alternatives(rid, **counts)
             served_rids = {int(action.request_id) for action in serves}
             idle_vids = {action.vehicle_id for action in actions
                 if action.action_id in chosen and action.kind == "WAIT"}
@@ -407,7 +429,8 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
             self.move_contexts[action.vehicle_id] = after[action.action_id].context, float(now)
         manager.queue_actions([action.payload["move"] for action in moves], now)
         timings["solve_wall_time_s"] = perf_counter() - started
-        self._record(dict(base, **timings, **move_counts, opt_status=result["opt_status"], effective_policy=effective_policy,
+        secondary = {key: value for key, value in result.items() if key.startswith("secondary_")}
+        self._record(dict(base, **timings, **move_counts, **secondary, opt_status=result["opt_status"], effective_policy=effective_policy,
             current_selected=len(serves), current_move_count=len(moves), variables=len(actions),
             nonzeros=result["residual_edges"], coarse_refreshed=bool(coarse.get("refreshed", False)),
             coarse_available=bool(coarse["available"]), coarse_status=coarse["status"],

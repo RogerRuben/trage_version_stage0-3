@@ -1,0 +1,70 @@
+{
+  "version": "type_conditioned_reference_v1",
+  "template_rows": 28335,
+  "missing_or_invalid_start_node": 0,
+  "outside_train_actual_date": 0,
+  "missing_existing_target_identity": 0,
+  "mapped_rows": 28335,
+  "mapping": "EXACT_STAGE1_START_NODE_AND_LOCAL_15_MINUTE_BIN",
+  "profiles": {
+    "C": {
+      "source_compatible_orders": 8150,
+      "mapped_compatible_orders": 8150,
+      "target_node_bins": 6719,
+      "supported_15_minute_bins": 96
+    },
+    "M": {
+      "source_compatible_orders": 23907,
+      "mapped_compatible_orders": 23907,
+      "target_node_bins": 17525,
+      "supported_15_minute_bins": 96
+    },
+    "A": {
+      "source_compatible_orders": 28335,
+      "mapped_compatible_orders": 28335,
+      "target_node_bins": 20587,
+      "supported_15_minute_bins": 96
+    }
+  },
+  "source_partition_dates": [
+    "20161010",
+    "20161017",
+    "20161024"
+  ],
+  "actual_date_cutoff": "20161024",
+  "HV_reference_train_dates": [
+    "20161009",
+    "20161010",
+    "20161011",
+    "20161012",
+    "20161013",
+    "20161014",
+    "20161015",
+    "20161016",
+    "20161017",
+    "20161018",
+    "20161019",
+    "20161020",
+    "20161021",
+    "20161022",
+    "20161023",
+    "20161024"
+  ],
+  "HV_reference_unchanged": true,
+  "source_hashes": {
+    "stage4/output/paper_enhancement/repositioning_robustness/train_tod_demand_reference.parquet": "97f9931d9a0d114059699ea92b692df80bb1d54e065c757c075d723d7291ab07",
+    "stage4/output/symmetric_flexibility_v1/input/train_request_templates.parquet": "f0ee98eb4ad5aca69125ace8610ce4ff2c40edb6b7f5e62016ee321a432af652"
+  },
+  "Stage1_source_file_count": 27,
+  "Stage1_source_digest": "266612e86ad3f44f41649a5101cf16e45c28d519818a50bb6f39064a3ea58c33",
+  "reference_sha256": "67211ec1056dadbf2efd02a4621fc50440d81fbbaf73575b2a130126b3120f51",
+  "rows": 44831,
+  "test31_included": false,
+  "no_new_inference": true,
+  "no_routing": true,
+  "no_map_matching": true,
+  "passenger_acceptance_treatment": "CONSTANT_P70_CANCELS_IN_NORMALIZED_TARGET_SHARES",
+  "empty_typed_bin_policy": "NO_TYPED_OPTIONAL_MOVE_NOT_CAPABILITY_FAILURE",
+  "runtime_s": 0.8977038999983051,
+  "peak_rss_mib": 174.9609375
+}

@@ -22,7 +22,7 @@ LAYOUTS = ("hotspot", "joint", "joint")
 
 def collect(root, version="scheme_a_two_scale_city_v2"):
     root = Path(root).resolve()
-    if version not in ("scheme_a_two_scale_city_v2", "scheme_a_two_scale_city_v3", "scheme_a_two_scale_city_v4"):
+    if version not in ("scheme_a_two_scale_city_v2", "scheme_a_two_scale_city_v3", "scheme_a_two_scale_city_v4", "scheme_a_two_scale_city_v5"):
         raise ValueError("only completed fixed two-scale city versions may be analyzed")
     out, doc = OUT.with_name(version.removeprefix("scheme_a_")), DOC.with_name(version.removeprefix("scheme_a_"))
     public, private, shared_inputs = {}, {}, None
@@ -148,6 +148,17 @@ def collect(root, version="scheme_a_two_scale_city_v2"):
                 common_movement_diagnostics=summary["idle_movement"])
         if row["completed"] != summary["completed_orders"] or row["future_connector_queries"]:
             raise ValueError("summary/product count mismatch or old future-routing path entered")
+        if cfg.get("typed_request_diagnostics"):
+            if not summary["request_decision_diagnostics"].get("typed_final_candidate_counts_enabled"):
+                raise ValueError("v5 has no final typed-candidate diagnostics")
+            row["typed_final_candidate_diagnostics"] = summary["request_decision_diagnostics"]
+            solved = trace.secondary_status.ne("NO_CURRENT_FLOW_SOLVE")
+            row.update(secondary_distance_solve_count=int(solved.sum()),
+                secondary_distance_optimal_count=int(trace.secondary_optimality_proved.fillna(False).sum()),
+                secondary_distance_statuses=trace.secondary_status.value_counts().to_dict(),
+                secondary_distance_time_s=float(trace.secondary_time_s.fillna(0).sum()),
+                secondary_distance_precision_m=.001,
+                secondary_distance_scope="ADMITTED_PRIMARY_OPTIMAL_FACE_NOT_WHOLE_CITY")
         outcome["release_hour"]=(outcome.release_s//3600).astype(int)
         row["hourly"] = [dict(hour=int(hour),requests=len(day),completed=int(day.completed.sum()),
             expired=int(day.expired.sum()),served_C=int(day.vehicle_type.eq("AV").sum()),
@@ -188,7 +199,7 @@ def collect(root, version="scheme_a_two_scale_city_v2"):
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root",type=Path,default=Path.cwd())
-    parser.add_argument("--version",choices=("scheme_a_two_scale_city_v2", "scheme_a_two_scale_city_v3", "scheme_a_two_scale_city_v4"),
+    parser.add_argument("--version",choices=("scheme_a_two_scale_city_v2", "scheme_a_two_scale_city_v3", "scheme_a_two_scale_city_v4", "scheme_a_two_scale_city_v5"),
         default="scheme_a_two_scale_city_v2")
     args=parser.parse_args()
     result=collect(args.root, args.version)

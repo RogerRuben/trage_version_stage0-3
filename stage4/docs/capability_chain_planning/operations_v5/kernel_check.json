@@ -1,0 +1,114 @@
+{
+  "status": "SYNTHETIC_KERNEL_CHECK_COMPLETE",
+  "samples": 5,
+  "runs": [
+    {
+      "seed": 20261011,
+      "actions": 800,
+      "old_runtime_s": 0.02324439999938477,
+      "new_runtime_s": 0.0131400999998732,
+      "secondary_time_s": 0.0035194000010960735,
+      "secondary_backend": "ORTOOLS_ZERO_REDUCED_COST_FACE",
+      "primary_score": [
+        14,
+        148,
+        49,
+        444
+      ],
+      "old_empty_m": 315167.0,
+      "new_empty_m": 176220.0,
+      "nodes": 351,
+      "residual_edges": 2298,
+      "wall_deadline_exceeded": false
+    },
+    {
+      "seed": 20261012,
+      "actions": 800,
+      "old_runtime_s": 0.006812499999796273,
+      "new_runtime_s": 0.031819700001506135,
+      "secondary_time_s": 0.02445349999834434,
+      "secondary_backend": "ORTOOLS_ZERO_REDUCED_COST_FACE",
+      "primary_score": [
+        14,
+        148,
+        49,
+        444
+      ],
+      "old_empty_m": 292134.0,
+      "new_empty_m": 168188.0,
+      "nodes": 351,
+      "residual_edges": 2298,
+      "wall_deadline_exceeded": false
+    },
+    {
+      "seed": 20261013,
+      "actions": 800,
+      "old_runtime_s": 0.0068232000012358185,
+      "new_runtime_s": 0.01100880000012694,
+      "secondary_time_s": 0.0032866999972611666,
+      "secondary_backend": "ORTOOLS_ZERO_REDUCED_COST_FACE",
+      "primary_score": [
+        14,
+        147,
+        48,
+        441
+      ],
+      "old_empty_m": 285341.0,
+      "new_empty_m": 164905.0,
+      "nodes": 350,
+      "residual_edges": 2296,
+      "wall_deadline_exceeded": false
+    },
+    {
+      "seed": 20261014,
+      "actions": 800,
+      "old_runtime_s": 0.00675520000004326,
+      "new_runtime_s": 0.010785200000100303,
+      "secondary_time_s": 0.003544700000929879,
+      "secondary_backend": "ORTOOLS_ZERO_REDUCED_COST_FACE",
+      "primary_score": [
+        14,
+        146,
+        48,
+        438
+      ],
+      "old_empty_m": 291758.0,
+      "new_empty_m": 133514.0,
+      "nodes": 349,
+      "residual_edges": 2294,
+      "wall_deadline_exceeded": false
+    },
+    {
+      "seed": 20261015,
+      "actions": 800,
+      "old_runtime_s": 0.0069108999996387865,
+      "new_runtime_s": 0.01050339999710559,
+      "secondary_time_s": 0.003507600002194522,
+      "secondary_backend": "ORTOOLS_ZERO_REDUCED_COST_FACE",
+      "primary_score": [
+        14,
+        148,
+        50,
+        444
+      ],
+      "old_empty_m": 270422.0,
+      "new_empty_m": 154561.0,
+      "nodes": 352,
+      "residual_edges": 2300,
+      "wall_deadline_exceeded": false
+    }
+  ],
+  "scope": "SYNTHETIC_800_ACTION_CURRENT_GRAPHS_NOT_RECORDED_CITY_ARCS",
+  "old_warm_mean_s": 0.0068254500001785345,
+  "new_warm_mean_s": 0.01602927499970974,
+  "maximum_new_runtime_s": 0.031819700001506135,
+  "peak_rss_mib": 136.5234375,
+  "total_process_body_s": 0.13855610000246088,
+  "routing_calls": 0,
+  "inference_calls": 0,
+  "native_replay": false,
+  "dense_matrix": false,
+  "GPU_used": false,
+  "operational_benefit_claimed": false,
+  "whole_day_runtime_estimated": false
+}

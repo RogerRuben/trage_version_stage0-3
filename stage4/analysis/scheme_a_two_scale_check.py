@@ -95,6 +95,12 @@ def load_frozen_layout(root, cfg):
     for relative, expected in protected.items():
         if _sha(root / relative) != expected:
             raise ValueError(f"frozen layout source changed: {relative}")
+    if cfg.get("idle_movement_mode") == "TYPE_CONDITIONED_HISTORICAL_DEFICIT":
+        from .type_conditioned_reposition_reference import REFERENCE, MANIFEST
+        if (Path(cfg["typed_reposition_reference"]) != REFERENCE
+                or Path(cfg["typed_reposition_manifest"]) != MANIFEST):
+            raise ValueError("typed targets must use the independently derived historical product")
+        protected.update({REFERENCE.as_posix(): _sha(root / REFERENCE), MANIFEST.as_posix(): _sha(root / MANIFEST)})
     return receipt, protected
 
 
@@ -282,15 +288,22 @@ def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
         native_cfg = native_configuration(root, cfg)
         native_cfg["scheme_a_fast_forecast_hv"] = True
         native_cfg.update({key: cfg[key] for key in
-            ("precise_request_deadline", "request_decision_diagnostics") if key in cfg})
+            ("precise_request_deadline", "request_decision_diagnostics", "typed_request_diagnostics") if key in cfg})
         control = create_rolling_or_fleet_control(bindings, vehicles, [], demand, network, routing,
             start, start + pd.Timedelta(seconds=cfg["physical_drain_limit_s"]), native_cfg)
         control.enable_event_calendar()
         reference, reference_manifest = load_train_demand_reference(root)
         empty_router = ControlledEmptyRouter(root, routing)
-        common_movement = cfg.get("idle_movement_mode") == "COMMON_HISTORICAL_DEFICIT"
+        typed_movement = cfg.get("idle_movement_mode") == "TYPE_CONDITIONED_HISTORICAL_DEFICIT"
+        common_movement = cfg.get("idle_movement_mode") in ("COMMON_HISTORICAL_DEFICIT", "TYPE_CONDITIONED_HISTORICAL_DEFICIT")
         manager_type = HistoricalDeficitMovementManager if common_movement else SelectedMovementManager
         manager_kwargs = dict(wall_limit_s=cfg["common_movement_wall_limit_s"]) if common_movement else {}
+        if typed_movement:
+            from .type_conditioned_reposition_reference import load as load_typed_reference
+            from stage4.dispatch.type_conditioned_movement import TypeConditionedHistoricalDeficitMovementManager
+            typed_reference, typed_manifest = load_typed_reference(root, reference, Path(cfg["source_history_templates"]))
+            manager_type = TypeConditionedHistoricalDeficitMovementManager
+            manager_kwargs.update(typed_reference=typed_reference, typed_manifest=typed_manifest)
         manager = manager_type(control, reference, empty_router,
             max_moves=cfg["reposition_max_moves"], radius_m=cfg["reposition_radius_m"],
             max_eta_s=cfg["reposition_max_eta_s"], top_k=cfg["reposition_top_k"],

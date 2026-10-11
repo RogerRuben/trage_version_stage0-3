@@ -97,7 +97,8 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
         self.repositioning_manager = repositioning_manager
         from .request_decision_diagnostics import RequestDecisionDiagnostics
         self.request_decisions = (RequestDecisionDiagnostics(deadline_semantics=(
-            "REQUEST_TO_ASSIGNMENT" if self.match_deadline_mode else "REQUEST_TO_PICKUP"))
+            "REQUEST_TO_ASSIGNMENT" if self.match_deadline_mode else "REQUEST_TO_PICKUP"),
+            typed_candidates=config.get("typed_request_diagnostics", False))
             if config.get("request_decision_diagnostics", False) else None)
         from .traffic_research_policy import TrafficResearchPolicy
         self.traffic_policy = TrafficResearchPolicy.from_config(config)
@@ -484,7 +485,7 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
         if research_solver is None:
             if decisions is not None:
                 for arc in arcs:
-                    decisions.validated(arc.request_id)
+                    decisions.validated(arc.request_id, arc.vehicle_type, arc.pickup_eta_s)
             result = solve_lexicographic(
                 arcs,
                 exposure_state=self.exposure_state,
@@ -505,7 +506,7 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
             runtime, request, estimate = arc.payload
             self._assign(runtime, request, estimate, simulation_time)
             if decisions is not None:
-                decisions.finish(arc.request_id, simulation_time, "ASSIGNED")
+                decisions.finish(arc.request_id, simulation_time, "ASSIGNED", vehicle_type=arc.vehicle_type)
             self.assignment_rows[-1].update(
                 {
                     "dispatch_policy": "GLOBAL_SPARSE_EXACT_LEXICOGRAPHIC_OR",

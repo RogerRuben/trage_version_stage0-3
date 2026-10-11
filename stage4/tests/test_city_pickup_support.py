@@ -164,6 +164,14 @@ def test_real_join_parser_catches_extra_customer_seam_action(tmp_path, maneuver)
     validator(c, [arc], 62070.)
     assert validator.seam_evidence.identity_scan_count == 1  # No per-epoch million-token scan.
     assert len(routes.calls) == (2 if maneuver == "STRAIGHT" else 1)
+    c.request_decisions = RequestDecisionDiagnostics(typed_candidates=True)
+    c.request_decisions.activate(100, "order100", 61200., 62400., 62070.)
+    c.request_decisions.round(100, 62070., 1, 0, 1)
+    validator(c, [arc], 62070.)
+    if maneuver == "UTURN":
+        typed = c.request_decisions.records[100].typed_rejections
+        assert typed == {"AV:PICKUP_CUSTOMER_JOIN:UTURN_OUTSIDE_RESEARCH_PROFILE": 1}
+    assert validator.seam_evidence.identity_scan_count == 1
     arc.payload[1].sim_time_s = 63000.
     with pytest.raises(ValueError, match="unrevealed"):
         validator(c, [arc], 62070.)

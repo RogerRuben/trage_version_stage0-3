@@ -1,0 +1,10 @@
+{
+  "version": "scheme_a_two_scale_city_v5",
+  "base_config": "stage4/config/scheme_a_two_scale_city_v4.json",
+  "base_config_sha256": "0b4b503e741522e534ddb1c77a1a8512b1ba7b7958346e99a89eef4f7aa1ce25",
+  "typed_request_diagnostics": true,
+  "idle_movement_mode": "TYPE_CONDITIONED_HISTORICAL_DEFICIT",
+  "current_empty_distance_mode": "PRIMARY_FACE_MM",
+  "typed_reposition_reference": "stage4/output/capability_chain_planning/operations_v5_input/type_demand_reference.parquet",
+  "typed_reposition_manifest": "stage4/output/capability_chain_planning/operations_v5_input/manifest.json"
+}

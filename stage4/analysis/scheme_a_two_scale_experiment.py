@@ -48,6 +48,10 @@ _V3_FIXED = dict(version="scheme_a_two_scale_city_v3",
 _V4_FIXED = dict(version="scheme_a_two_scale_city_v4",
     patience_mode="MATCH_DEADLINE_AND_PICKUP_CAP", max_match_wait_s=300,
     max_pickup_eta_s=600, post_assignment_cancellation=False, max_total_wait_s=None)
+_V5_FIXED = dict(version="scheme_a_two_scale_city_v5", typed_request_diagnostics=True,
+    idle_movement_mode="TYPE_CONDITIONED_HISTORICAL_DEFICIT", current_empty_distance_mode="PRIMARY_FACE_MM",
+    typed_reposition_reference="stage4/output/capability_chain_planning/operations_v5_input/type_demand_reference.parquet",
+    typed_reposition_manifest="stage4/output/capability_chain_planning/operations_v5_input/manifest.json")
 
 
 def output_root(cfg):
@@ -61,6 +65,14 @@ def document_root(cfg):
 def load_protocol(root, path=CONFIG):
     root, path = Path(root), Path(path)
     overrides = json.loads((root / path).read_text(encoding="utf-8"))
+    if overrides.get("version") == _V5_FIXED["version"]:
+        base_path = Path("stage4/config/scheme_a_two_scale_city_v4.json")
+        if (set(overrides) != set(_V5_FIXED) | {"base_config", "base_config_sha256"}
+                or any(overrides.get(key) != value for key, value in _V5_FIXED.items())
+                or Path(overrides["base_config"]) != base_path
+                or _sha(root / base_path) != overrides["base_config_sha256"]):
+            raise ValueError("v5 changes only typed diagnostics/targets and secondary distance optimization")
+        return dict(load_protocol(root, base_path), **overrides)
     if overrides.get("version") == _V4_FIXED["version"]:
         base_path = Path("stage4/config/scheme_a_two_scale_city_v3.json")
         if (set(overrides) != set(_V4_FIXED) | {"base_config", "base_config_sha256"}
@@ -132,8 +144,10 @@ def completed_group(directory, expected):
                 != (expected["group"], expected["layout_mode"], expected["policy"])
             or any(not (directory / product).is_file() for product in
                 PRODUCTS + (("request_decisions.parquet",) if expected.get("version") in
-                    (_V3_FIXED["version"], _V4_FIXED["version"]) else ()))):
+                    (_V3_FIXED["version"], _V4_FIXED["version"], _V5_FIXED["version"]) else ()))):
         raise ValueError("existing group is not a complete identical full-day group; no automatic retry")
+    if expected.get("version") == _V5_FIXED["version"] and not summary.get("request_decision_diagnostics", {}).get("typed_final_candidate_counts_enabled"):
+        raise ValueError("completed v5 group is missing its typed final-candidate evidence")
     return summary
 
 
