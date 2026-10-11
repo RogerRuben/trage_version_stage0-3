@@ -22,6 +22,7 @@ from .native_simulation import create_native_simulation
 from .replay_service_time_adapter import _haversine_m
 from .research_world import CommittedPlan, DecisionRequest, EpisodeSnapshot, ResearchEpisode, _seconds
 from .upstream import FleetPyCompatibilityError
+from stage4.dispatch.waiting_contract import assignment_feasible, match_deadline_mode
 
 BRIDGE_VERSION = "stage4_research_native_bridge.v1"
 
@@ -112,6 +113,7 @@ class _IndexedEpisodeLifecycle:
 
     def __init__(self, episode: ResearchEpisode):
         self.episode = episode
+        self.wait_config = {}
         self._vehicle_by_order: dict[str, str] = {}
         episode.commit_request = self.commit_request
         episode.complete_request = self.complete_request
@@ -126,8 +128,8 @@ class _IndexedEpisodeLifecycle:
         if (request is None or vehicle is None or str(vehicle_id) in e._commitments
                 or not vehicle.activation_s <= now_s < vehicle.admission_end_s):
             raise ValueError("commit requires a pending request and an open uncommitted supply slot")
-        if pickup_eta_s < 0 or now_s + pickup_eta_s > request.expires_at_s:
-            raise ValueError("pickup must fit remaining passenger patience")
+        if not assignment_feasible(self.wait_config, now_s, request.expires_at_s, pickup_eta_s):
+            raise ValueError("assignment must meet its request deadline and pickup waiting contract")
         if vehicle.vehicle_type == "AV" and (not request.av_compatible or not request.passenger_accepts_av):
             raise ValueError("AV commitment requires profile compatibility and passenger acceptance")
         request = e.requests.commit(request.order_id, now_s=now_s)
@@ -252,6 +254,11 @@ class ResearchNativeBridge:
         self._control = control
         control.sim_time = self.window_start_s
         control.max_pickup_wait_s = int(self.episode._metadata["patience_s"])
+        config = getattr(control, "config", {})
+        if match_deadline_mode(config) and config.get("max_match_wait_s") != control.max_pickup_wait_s:
+            raise ValueError("native episode and controller matching clocks differ")
+        self._lifecycle.wait_config = {key: config[key] for key in
+            ("patience_mode", "max_pickup_eta_s") if key in config}
         control.research_route_policy = NativeCommonRoutePolicy()
         if not hasattr(control, "expired_rids"):
             control.expired_rids = set()

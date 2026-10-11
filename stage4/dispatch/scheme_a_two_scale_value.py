@@ -26,6 +26,7 @@ from scipy.spatial import cKDTree
 from .flexibility_native import TrainDemandForecast
 from .scheme_a_city_adapter import sites_for
 from .scheme_a_city_graph import ChainTask, RouteState, _xy
+from .waiting_contract import match_deadline_mode
 
 
 class _ValueBudgetExpired(TimeoutError):
@@ -359,7 +360,12 @@ class CoarseServiceValue:
             for name,tasks in self.library.view(coarse).items():
                 check()
                 dag_started=perf_counter()
-                model=_SceneDAG(tasks,self.sites,coarse,coarse+1800,self.pace,self.cfg,check)
+                if match_deadline_mode(self.cfg):
+                    from .scheme_a_match_deadline_value import MatchDeadlineSceneDAG
+                    model_class = MatchDeadlineSceneDAG
+                else:
+                    model_class = _SceneDAG
+                model=model_class(tasks,self.sites,coarse,coarse+1800,self.pace,self.cfg,check)
                 self.timings["dag_build_time_s"]+=perf_counter()-dag_started
                 self.counts["forecast_nodes_built"]+=len(model.tasks)
                 self.counts["forecast_dag_arcs_built"]+=model.edge_count
@@ -414,6 +420,8 @@ class CoarseServiceValue:
                                  *model.allowed.values(),*model.successors.values(),*model.departures.values()))
         arrays+=sum(array.nbytes for model in self.models.values()
                     for pair in model.dp_cache.values() for array in pair)
+        arrays+=sum(getattr(model, "resident_extra_array_bytes", lambda: 0)() for model in self.models.values())
+        split_wait = match_deadline_mode(self.cfg)
         return dict(counts=dict(self.counts),timings_s=dict(self.timings),latest=dict(self.info),
             resident_array_mib=arrays/2**20,lookup_cache_entries=len(self.lookup_cache),
             forecast_empty_eta_model="EXISTING_TRAIN_M3_CHORD_PACE",
@@ -424,5 +432,10 @@ class CoarseServiceValue:
             profile_successor_domain_nested=bool(self.cfg.get("coarse_nested_profile_paths", False)),
             max_successors_HV=6 if self.cfg.get("coarse_nested_profile_paths", False) else 3,
             max_successors_C=3,
-            fixed_future_pickup_grid_s=300,maximum_future_services=3,future_move_variables=0,
+            fixed_future_pickup_grid_s=None if split_wait else 300,
+            fixed_future_dispatch_grid_s=300 if split_wait else None,
+            future_pickup_arrival_equals_grid_time=not split_wait,
+            future_waiting_contract="MATCH_DEADLINE_AND_PICKUP_CAP" if split_wait else "TOTAL_PICKUP_DEADLINE",
+            independent_pickup_eta_cap_s=self.cfg.get("max_pickup_eta_s") if split_wait else None,
+            maximum_future_services=3,future_move_variables=0,
             raw_source_orders_or_coordinates_exported=False)

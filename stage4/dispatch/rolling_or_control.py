@@ -31,6 +31,7 @@ from .gate_diagnostics import (
     validate_gate_counts,
 )
 from .solver import AssignmentArc, solve_lexicographic
+from .waiting_contract import match_deadline_mode, pickup_eta_limit_s, pickup_rejection_code
 
 
 class RollingRuntimeGuardExceeded(RuntimeError):
@@ -65,6 +66,9 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
         self.config = config
         self.dispatch_interval_s = int(config["dispatch_interval_s"])
         self.max_pickup_wait_s = int(config["max_pickup_wait_s"])
+        self.match_deadline_mode = match_deadline_mode(config)
+        if self.match_deadline_mode and config.get("max_match_wait_s") != self.max_pickup_wait_s:
+            raise ValueError("request source and controller must share the fixed matching deadline")
         self.matching_end_s = int(config["matching_end_s"])
         self.runtime_guard_s = float(config["benchmark_runtime_guard_s"])
         self.run_started_perf = time.perf_counter()
@@ -92,7 +96,8 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
         )
         self.repositioning_manager = repositioning_manager
         from .request_decision_diagnostics import RequestDecisionDiagnostics
-        self.request_decisions = (RequestDecisionDiagnostics()
+        self.request_decisions = (RequestDecisionDiagnostics(deadline_semantics=(
+            "REQUEST_TO_ASSIGNMENT" if self.match_deadline_mode else "REQUEST_TO_PICKUP"))
             if config.get("request_decision_diagnostics", False) else None)
         from .traffic_research_policy import TrafficResearchPolicy
         self.traffic_policy = TrafficResearchPolicy.from_config(config)
@@ -364,7 +369,9 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                         empirical = self._requires_completion_by_window_end(runtime)
                         window_end = ((self.fixture_windows_s[vehicle.native_vehicle_id][1] if calendar is not None
                                        else self._fixture_seconds(runtime.fixture.availability_end_time)) if empirical else None)
-                        row[vehicle.native_vehicle_id] = PickupEtaBudget(remaining, simulation_time, predicted, window_end)
+                        row[vehicle.native_vehicle_id] = PickupEtaBudget(
+                            pickup_eta_limit_s(self.config, remaining), simulation_time, predicted, window_end,
+                            "PICKUP_CAP" if self.match_deadline_mode else "PATIENCE")
                     budgets.append(row)
                 all_estimates = self.eta_adapter.estimate_epoch(route_batches, eta_budgets=budgets)
                 eta_certificates = self.eta_adapter.last_certified_prunes
@@ -381,10 +388,10 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                         decisions.reject(rid, "PRE_ROUTE_SESSION_END")
                     continue
                 reason = eta_pruned.get(vehicle.native_vehicle_id)
-                if reason == "PATIENCE":
+                if reason in ("PATIENCE", "PICKUP_CAP"):
                     invalid_patience += 1
                     if decisions is not None:
-                        decisions.reject(rid, "CACHED_ETA_EXCEEDS_REMAINING_PATIENCE")
+                        decisions.reject(rid, pickup_rejection_code(self.config, cached=True))
                     continue
                 if reason in ("HV_SESSION_END", "HV_SESSION_EVIDENCE"):
                     invalid_hv_window += 1
@@ -405,10 +412,10 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                     decisions.route(rid, estimate.corrected_pickup_eta_s)
                 if gate_counts is not None and is_av:
                     gate_counts["gate_av_n3b_route_returned"] += 1
-                if not patience_feasible(estimate.corrected_pickup_eta_s, remaining):
+                if not patience_feasible(estimate.corrected_pickup_eta_s, pickup_eta_limit_s(self.config, remaining)):
                     invalid_patience += 1
                     if decisions is not None:
-                        decisions.reject(rid, "PICKUP_ETA_EXCEEDS_REMAINING_PATIENCE")
+                        decisions.reject(rid, pickup_rejection_code(self.config))
                     continue
                 if decisions is not None:
                     decisions.feasible(rid)
@@ -579,7 +586,8 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                 "candidate_spatial_pairs": spatial_pairs,
                 "candidate_topk_pairs": topk_pairs,
                 "valid_or_arcs": len(arcs),
-                "patience_arc_exclusions": invalid_patience,
+                "patience_arc_exclusions": 0 if self.match_deadline_mode else invalid_patience,
+                "pickup_eta_cap_arc_exclusions": invalid_patience if self.match_deadline_mode else 0,
                 "hv_window_arc_exclusions": invalid_hv_window,
                 "cost_evidence_arc_exclusions": invalid_cost_evidence,
                 "zero_eta_session_certified_prunes": certified_session_prunes,

@@ -173,12 +173,12 @@ class _NativeFleetControlCore:
         except Exception:
             self.routing_failures += 1
             return None
-        if self._finish_committed(runtime) and (
-            not isfinite(estimate.corrected_pickup_eta_s)
-            or simulation_time + estimate.corrected_pickup_eta_s
-            > request.sim_time_s + getattr(self, "max_pickup_wait_s", 300)
-        ):
-            return None
+        if self._finish_committed(runtime):
+            from stage4.dispatch.waiting_contract import assignment_feasible
+            if not assignment_feasible(getattr(self, "config", {}), simulation_time,
+                    request.sim_time_s + getattr(self, "max_pickup_wait_s", 300),
+                    estimate.corrected_pickup_eta_s):
+                return None
         if self._requires_completion_by_window_end(runtime):
             predicted_end = simulation_time + (
                 estimate.corrected_pickup_eta_s + request.predicted_service_time_s + self._pickup_overhead_s()

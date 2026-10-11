@@ -45,19 +45,30 @@ _V3_FIXED = dict(version="scheme_a_two_scale_city_v3",
     idle_movement_mode="COMMON_HISTORICAL_DEFICIT", precise_request_deadline=True,
     request_decision_diagnostics=True, coarse_nested_profile_paths=True,
     common_movement_wall_limit_s=10.)
+_V4_FIXED = dict(version="scheme_a_two_scale_city_v4",
+    patience_mode="MATCH_DEADLINE_AND_PICKUP_CAP", max_match_wait_s=300,
+    max_pickup_eta_s=600, post_assignment_cancellation=False, max_total_wait_s=None)
 
 
 def output_root(cfg):
-    return OUT if cfg["version"] == _FIXED["version"] else OUT.with_name("two_scale_city_v3")
+    return OUT.with_name(cfg["version"].removeprefix("scheme_a_"))
 
 
 def document_root(cfg):
-    return DOC if cfg["version"] == _FIXED["version"] else DOC.with_name("two_scale_city_v3")
+    return DOC.with_name(cfg["version"].removeprefix("scheme_a_"))
 
 
 def load_protocol(root, path=CONFIG):
     root, path = Path(root), Path(path)
     overrides = json.loads((root / path).read_text(encoding="utf-8"))
+    if overrides.get("version") == _V4_FIXED["version"]:
+        base_path = Path("stage4/config/scheme_a_two_scale_city_v3.json")
+        if (set(overrides) != set(_V4_FIXED) | {"base_config", "base_config_sha256"}
+                or any(overrides.get(key) != value for key, value in _V4_FIXED.items())
+                or Path(overrides["base_config"]) != base_path
+                or _sha(root / base_path) != overrides["base_config_sha256"]):
+            raise ValueError("v4 freezes only the authorized two-clock waiting contract")
+        return dict(load_protocol(root, base_path), **overrides)
     if overrides.get("version") == _V3_FIXED["version"]:
         if (set(overrides) != set(_V3_FIXED) | {"base_config", "base_config_sha256"}
                 or any(overrides.get(key) != value for key, value in _V3_FIXED.items())
@@ -120,7 +131,8 @@ def completed_group(directory, expected):
             or (summary.get("group"), summary.get("layout_mode"), summary.get("policy"))
                 != (expected["group"], expected["layout_mode"], expected["policy"])
             or any(not (directory / product).is_file() for product in
-                PRODUCTS + (("request_decisions.parquet",) if expected.get("version") == _V3_FIXED["version"] else ()))):
+                PRODUCTS + (("request_decisions.parquet",) if expected.get("version") in
+                    (_V3_FIXED["version"], _V4_FIXED["version"]) else ()))):
         raise ValueError("existing group is not a complete identical full-day group; no automatic retry")
     return summary
 

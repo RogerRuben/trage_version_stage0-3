@@ -28,7 +28,7 @@ class BasicRequest:
         return self.rid
 
 
-def fixture(*, missing_truth=False):
+def fixture(*, missing_truth=False, waiting_config=None):
     records = [("carry", 8.), ("inside", 10.), ("later", 15.), ("excluded_future", 20.)]
     base = pd.DataFrame([dict(order_id=oid, request_time=START + pd.Timedelta(seconds=t),
         pickup_lon_wgs84=108.9, pickup_lat_wgs84=34.2, dropoff_lon_wgs84=108.91, dropoff_lat_wgs84=34.21,
@@ -61,6 +61,8 @@ def fixture(*, missing_truth=False):
         native.assign_vehicle_plan = assign
         runtimes.append(VehicleRuntime(plan, native, "AVAILABLE", 108.9, 34.2))
     c = _NativeFleetControlCore(bindings, runtimes, [], demand, network, NS(), START, START + pd.Timedelta(seconds=100))
+    if waiting_config is not None:
+        c.config = dict(profile_id="C", **waiting_config)
     bridge.install(c)
     return episode, bridge, c, network_calls
 

@@ -1,0 +1,10 @@
+{
+  "version": "scheme_a_two_scale_city_v4",
+  "base_config": "stage4/config/scheme_a_two_scale_city_v3.json",
+  "base_config_sha256": "73ba51bf0d61e67bf22bffd93bc09fa96f0cdeba8a801f50c228f6c909d6131b",
+  "patience_mode": "MATCH_DEADLINE_AND_PICKUP_CAP",
+  "max_match_wait_s": 300,
+  "max_pickup_eta_s": 600,
+  "post_assignment_cancellation": false,
+  "max_total_wait_s": null
+}

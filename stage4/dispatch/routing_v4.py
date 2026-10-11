@@ -60,12 +60,13 @@ class PickupEtaBudget:
     simulation_time_s: float
     predicted_service_with_overhead_s: float
     empirical_session_end_s: float | None = None
+    pickup_exclusion_reason: str = "PATIENCE"
 
     def rejection(self, eta):
         # Same comparison/order of additions as rolling_or_control. Do not
         # rearrange into an ETA cap: that can move floating boundary cases.
         if not isfinite(eta) or eta > self.remaining_patience_s:
-            return "PATIENCE"
+            return self.pickup_exclusion_reason
         if self.empirical_session_end_s is not None:
             predicted = self.predicted_service_with_overhead_s
             if not isfinite(predicted):

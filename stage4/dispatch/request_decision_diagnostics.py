@@ -33,8 +33,9 @@ class RequestRecord:
 
 
 class RequestDecisionDiagnostics:
-    def __init__(self):
+    def __init__(self, *, deadline_semantics="REQUEST_TO_PICKUP"):
         self.records: dict[int, RequestRecord] = {}
+        self.deadline_semantics = deadline_semantics
 
     def activate(self, rid, order_id, release_s, deadline_s, now):
         if int(rid) in self.records:
@@ -107,10 +108,14 @@ class RequestDecisionDiagnostics:
         if not row.eligible_spatial_opportunities:
             return "NO_ELIGIBLE_SPATIAL_CANDIDATE"
         if not row.returned_route_attempts and not row.patience_feasible_arc_attempts:
+            if row.rejection_counts.get("CACHED_PICKUP_ETA_EXCEEDS_INDEPENDENT_CAP", 0):
+                return "NO_PICKUP_WITHIN_INDEPENDENT_CAP"
             if row.rejection_counts.get("CACHED_ETA_EXCEEDS_REMAINING_PATIENCE", 0):
                 return "NO_PICKUP_WITHIN_REMAINING_PATIENCE"
             return "NO_RETURNED_PICKUP_ROUTE"
         if not row.patience_feasible_arc_attempts:
+            if row.rejection_counts.get("PICKUP_ETA_EXCEEDS_INDEPENDENT_CAP", 0):
+                return "NO_PICKUP_WITHIN_INDEPENDENT_CAP"
             return "NO_PICKUP_WITHIN_REMAINING_PATIENCE"
         if not row.validated_arc_attempts:
             return "NO_FINAL_VALIDATED_ARC"
@@ -125,6 +130,7 @@ class RequestDecisionDiagnostics:
             row["rejection_counts_json"] = json.dumps(dict(sorted(row.pop("rejection_counts").items())))
             row["expiry_last_reached_stage"] = self.expiry_stage(record)
             row["evidence_scope"] = "OBSERVED_CANDIDATE_ATTEMPTS_NOT_CAUSAL_DECOMPOSITION"
+            row["deadline_semantics"] = self.deadline_semantics
             yield row
 
     def summary(self):
@@ -133,5 +139,6 @@ class RequestDecisionDiagnostics:
             expiry_stage_counts=dict(Counter(self.expiry_stage(row) for row in self.records.values()
                 if row.status == "EXPIRED")),
             stores_all_arcs=False, resets_patience_on_retry=False,
+            deadline_semantics=self.deadline_semantics,
             arc_counters_count_repeated_attempts_not_unique_vehicles=True,
             categories_are_diagnostic_not_exclusive_physical_causes=True)

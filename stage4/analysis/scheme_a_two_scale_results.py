@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 
 from stage4.analysis.capability_chain_instances import atomic_json
+from stage4.dispatch.waiting_contract import match_deadline_mode
 
 
 OUT = Path("stage4/output/capability_chain_planning/two_scale_city_v2")
@@ -19,19 +20,25 @@ POLICIES = ("SERVICE_PRESERVING", "SERVICE_PRESERVING", "CHAIN_DEFER")
 LAYOUTS = ("hotspot", "joint", "joint")
 
 
-def collect(root):
+def collect(root, version="scheme_a_two_scale_city_v2"):
     root = Path(root).resolve()
+    if version not in ("scheme_a_two_scale_city_v2", "scheme_a_two_scale_city_v3", "scheme_a_two_scale_city_v4"):
+        raise ValueError("only completed fixed two-scale city versions may be analyzed")
+    out, doc = OUT.with_name(version.removeprefix("scheme_a_")), DOC.with_name(version.removeprefix("scheme_a_"))
     public, private, shared_inputs = {}, {}, None
     for group,policy,layout in zip(GROUPS,POLICIES,LAYOUTS):
-        directory = root/OUT/group
+        directory = root/out/group
         summary = json.loads((directory/"summary.json").read_text(encoding="utf-8"))
         if (summary["status"] != "TWO_SCALE_CITY_GROUP_COMPLETE" or not summary["full_day"]
+                or summary["version"] != version
                 or summary["policy"] != policy or summary["layout_mode"] != layout):
             raise ValueError("comparison requires all three completed fixed full-day groups")
         common = summary["inputs_sha256"],summary["code_sha"],summary["layout_sha256"]
         if shared_inputs is not None and common != shared_inputs:
             raise ValueError("code, input, configuration or completed layout differs across groups")
         shared_inputs = common
+        cfg = summary["frozen_protocol"]
+        split_wait = match_deadline_mode(cfg)
         outcome = pd.read_parquet(directory/"cohort_outcomes.parquet")
         assignment = pd.read_parquet(directory/"assignments.parquet")
         trace = pd.read_parquet(directory/"solver_trace.parquet")
@@ -48,8 +55,17 @@ def collect(root):
         if (not assignment.order_id.is_unique
                 or not ((outcome.matched.astype(int)+outcome.expired.astype(int))==1).all()
                 or not outcome.completed.equals(outcome.matched)
-                or not outcome.wait_s.dropna().between(0.,300.+1e-6).all()):
+                or not outcome.wait_s.dropna().between(0.,
+                    cfg["max_match_wait_s"] + cfg["max_pickup_eta_s"] + 1e-6 if split_wait else 300.+1e-6).all()):
             raise ValueError("final service, physical drain, uniqueness or patience accounting failed")
+        if split_wait and len(assignment):
+            matched_rows = outcome.loc[outcome.matched]
+            if (not matched_rows.matching_wait_s.ge(0).all()
+                    or not matched_rows.matching_wait_s.lt(cfg["max_match_wait_s"]).all()
+                    or not matched_rows.pickup_wait_s.between(0, cfg["max_pickup_eta_s"] + 1e-6).all()
+                    or not np.allclose(matched_rows.matching_wait_s + matched_rows.pickup_wait_s,
+                        matched_rows.wait_s, rtol=0., atol=1e-6)):
+                raise ValueError("matching and pickup waiting clocks are not separately conserved")
         if (summary["physical_accounting"]["duplicate_orders"]
                 or summary["physical_accounting"]["vehicle_task_overlap"]
                 or summary["physical_accounting"]["maximum_time_error_s"] > 1e-6):
@@ -108,6 +124,16 @@ def collect(root):
             physical_accounting=summary["physical_accounting"],
             future_connector_queries=summary["adapter_performance"]["future_connector_queries"],
             coarse_prices_are_approximate=True,source_code_sha=summary["code_sha"])
+        if split_wait:
+            served_rows = outcome.loc[outcome.completed]
+            row.update(waiting_contract=summary["waiting_contract"],
+                matching_wait_mean_s=float(served_rows.matching_wait_s.mean()),
+                matching_wait_p90_s=float(served_rows.matching_wait_s.quantile(.9)),
+                pickup_wait_mean_s=float(served_rows.pickup_wait_s.mean()),
+                pickup_wait_p90_s=float(served_rows.pickup_wait_s.quantile(.9)),
+                served_total_wait_over_300s_count=int(served_rows.wait_s.gt(300).sum()),
+                expired_request_diagnostics=summary["request_decision_diagnostics"],
+                common_movement_diagnostics=summary["idle_movement"])
         if row["completed"] != summary["completed_orders"] or row["future_connector_queries"]:
             raise ValueError("summary/product count mismatch or old future-routing path entered")
         outcome["release_hour"]=(outcome.release_s//3600).astype(int)
@@ -136,22 +162,24 @@ def collect(root):
             C_service_difference=public[after]["served_C"]-public[before]["served_C"],
             HV_service_difference=public[after]["served_HV"]-public[before]["served_HV"],
             total_empty_km_difference=public[after]["total_empty_km"]-public[before]["total_empty_km"])
-    result=dict(status="TWO_SCALE_THREE_GROUP_RESULTS_ANALYZED",groups=public,paired=pairs,
+    result=dict(status="TWO_SCALE_THREE_GROUP_RESULTS_ANALYZED",version=version,groups=public,paired=pairs,
         common_cohort_count=len(private[GROUPS[0]]["cohort"]),inputs_sha256=shared_inputs[0],
         code_sha=shared_inputs[1],layout_sha256=shared_inputs[2],
         test_date="20161031",profile="C",q_a=.1,passenger_acceptance=.7,
         one_day_one_seed=True,statistical_significance_claimed=False,
         predictor_decision_superiority_claimed=False,global_city_optimality_claimed=False,
         no_new_experiments=True,per_order_or_coordinate_information_exported=False)
-    atomic_json(root/DOC/"comparison.json",result)
+    atomic_json(root/doc/"comparison.json",result)
     return result
 
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root",type=Path,default=Path.cwd())
+    parser.add_argument("--version",choices=("scheme_a_two_scale_city_v2", "scheme_a_two_scale_city_v3", "scheme_a_two_scale_city_v4"),
+        default="scheme_a_two_scale_city_v2")
     args=parser.parse_args()
-    result=collect(args.root)
+    result=collect(args.root, args.version)
     print(json.dumps(dict(status=result["status"],paired=result["paired"]),ensure_ascii=False),flush=True)
 
 

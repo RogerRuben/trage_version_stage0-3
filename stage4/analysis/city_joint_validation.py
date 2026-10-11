@@ -27,6 +27,7 @@ from stage4.dispatch.remaining_time import TrainRemainingTime
 from stage4.dispatch.repositioning_policy import load_train_demand_reference
 from stage4.dispatch.rolling_or_control import create_rolling_or_fleet_control
 from stage4.dispatch.routing_v4 import StaticRawRoutingAdapter
+from stage4.dispatch.waiting_contract import match_deadline_mode
 from stage4.dispatch.runtime_assets import routing_context
 from stage4.fleetpy_adapter.mixed_fleet_adapter import VehicleFixture, create_native_vehicles
 from stage4.fleetpy_adapter.native_network import create_native_network
@@ -109,7 +110,8 @@ class CommonBodyPolicy:
 def native_configuration(root, cfg):
     source = root / "stage4/output/final_experiments" / cfg["source_scenario"] / "scenario_config.json"
     base = json.loads(source.read_text(encoding="utf-8"))["runtime_configuration"]
-    return {**base, "profile_id": cfg["profile_id"], "av_vehicle_hour_share": cfg["requested_q_a"],
+    waiting = {key: cfg[key] for key in ("patience_mode", "max_match_wait_s", "max_pickup_eta_s") if key in cfg}
+    return {**base, **waiting, "profile_id": cfg["profile_id"], "av_vehicle_hour_share": cfg["requested_q_a"],
         "passenger_acceptance_rate": cfg["passenger_acceptance_rate"],
         "passenger_acceptance_seed": cfg["passenger_acceptance_seed"],
         "gamma_static": None, "gamma_dynamic": None, "gamma_speed": None,
@@ -136,7 +138,15 @@ def outcome_table(control, assignments, cfg):
         if matched:
             a = assigned.loc[rid]
             wait = (pd.Timestamp(a.pickup_time) - request.request_time).total_seconds()
-            if wait > cfg["patience_s"] + 1e-6:
+            if match_deadline_mode(cfg):
+                matching = (pd.Timestamp(a.assignment_time) - request.request_time).total_seconds()
+                pickup = (pd.Timestamp(a.pickup_time) - pd.Timestamp(a.assignment_time)).total_seconds()
+                if (not all(isfinite(v) for v in (matching, pickup)) or matching < -1e-6
+                        or matching >= cfg["max_match_wait_s"] or pickup < -1e-6
+                        or pickup > cfg["max_pickup_eta_s"] + 1e-6):
+                    raise RuntimeError("independent matching/pickup waiting contract violated")
+                row.update(matching_wait_s=matching, pickup_wait_s=pickup, total_wait_s=wait)
+            elif wait > cfg["patience_s"] + 1e-6:
                 raise RuntimeError("original pickup patience violated")
             if a.vehicle_type == "AV" and (not row["C_compatible"] or not row["passenger_accepts_av"]):
                 raise RuntimeError("body capability or passenger acceptance violated")

@@ -258,6 +258,12 @@ def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
         phases["frozen_layout_and_episode_load_s"] = perf_counter() - loaded
         summary.update(inputs_sha256=protected, frozen_protocol=cfg,
             layout_sha256=cfg["source_layout_sha256"], layout_bins_reused=47, AV_slots_reused=851)
+        summary["waiting_contract"] = dict(
+            patience_mode=cfg.get("patience_mode", "TOTAL_PICKUP_DEADLINE"),
+            request_to_assignment_limit_s=cfg.get("max_match_wait_s"),
+            independent_pickup_eta_cap_s=cfg.get("max_pickup_eta_s"),
+            legacy_request_to_pickup_limit_s=cfg["patience_s"] if "patience_mode" not in cfg else None,
+            post_assignment_cancellation=False)
         start = pd.Timestamp("2016-10-31T00:00:00+08:00")
         loaded = perf_counter()
         bindings = load_fleetpy_bindings(Path(fleetpy))

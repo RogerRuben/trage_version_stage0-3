@@ -24,6 +24,7 @@ from stage3.odd_tod.finalization import decode_polyline6
 from stage4.analysis.capability_chain_instances import IDENTITY_COLUMNS, JoinEvidence
 from stage4.dispatch.controlled_routes import MAX_CACHE_ENTRIES, S2A
 from stage4.dispatch.controlled_movement import segment_lengths
+from stage4.dispatch.waiting_contract import assignment_feasible, pickup_rejection_code
 from stage4.fleetpy_adapter.valhalla_time_adapter import PickupEstimate, TIMEZONE
 
 
@@ -454,13 +455,13 @@ class CityPickupSupportValidator:
             if float(request.sim_time_s) > float(now):
                 raise ValueError("city pickup evidence queried an unrevealed request")
             meta = c.request_meta[int(arc.request_id)]
+            wait_config = getattr(c, "config", {})
             remaining = float(meta["pickup_deadline_s"]) - float(now)
             if not isfinite(remaining) or remaining < 0:
                 reject(arc, ("PICKUP_DEADLINE_PASSED",))
                 continue
             if arc.vehicle_type != "AV":
-                if (not isfinite(float(arc.pickup_eta_s)) or arc.pickup_eta_s < 0
-                        or arc.pickup_eta_s > remaining):
+                if not assignment_feasible(wait_config, now, meta["pickup_deadline_s"], arc.pickup_eta_s):
                     reject(arc, ("EXISTING_HV_PICKUP_ETA_INVALID_OR_LATE",))
                     continue
                 valid.append(arc)
@@ -511,8 +512,11 @@ class CityPickupSupportValidator:
                     or (not coincident and min(raw, distance, duration) <= 0)):
                 reject(arc, ("PICKUP_SCALAR_TIME_OR_DISTANCE_INVALID",))
                 continue
-            if duration > remaining:
-                reject(arc, ("SCALAR_PICKUP_EXCEEDS_REMAINING_PATIENCE",))
+            if not assignment_feasible(wait_config, now, meta["pickup_deadline_s"], duration):
+                code = pickup_rejection_code(wait_config)
+                if code == "PICKUP_ETA_EXCEEDS_REMAINING_PATIENCE":
+                    code = "SCALAR_PICKUP_EXCEEDS_REMAINING_PATIENCE"
+                reject(arc, (code,))
                 continue
             staged.append((index, arc, runtime, request, routed, raw, distance, duration, cached))
         if staged:
