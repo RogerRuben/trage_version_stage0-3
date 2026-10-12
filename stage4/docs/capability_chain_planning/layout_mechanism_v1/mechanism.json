@@ -1,0 +1,2558 @@
+{
+  "status": "LAYOUT_MECHANISM_ANALYZED_EXISTING_PRODUCTS",
+  "verification_status": "ANALYZED_NOT_NEW_CAUSAL_EXPERIMENT",
+  "analysis_source_sha256": "11ecc3a229633857b1a9a3deadbca63ab2ab4e183e4332d52b1838b99601ceac",
+  "native_producer_sha": "63b9b2fe69e9e6e66065438f0c9967adbfbffc3e",
+  "source_input_sha256": {
+    "stage4/config/scheme_a_layout_300_600_v1.json": "ed131f1888c06fcb700333c498a76292f932284e82cf581790d8353b5f1bbdc5",
+    "stage4/config/scheme_a_two_scale_city_v5_common.json": "d41b1d448d8c5342f45b40b625857fc7e018610ddf98d027bd8f00c684c9c836",
+    "stage4/input/replay_foundation/replay_fleet_template.parquet": "09fc04e8250b873274ee2e397060417edb081908c2eb4f9f24a0459328b045b0",
+    "stage4/output/paper_enhancement/repositioning_robustness/train_tod_demand_reference.parquet": "97f9931d9a0d114059699ea92b692df80bb1d54e065c757c075d723d7291ab07",
+    "stage4/output/paper_enhancement/repositioning_robustness/train_tod_demand_reference.manifest.json": "bf01340ee02b158819df46f342f3389d8c7d76b6dda0a6c33a9364c103ec605d",
+    "stage4/output/symmetric_flexibility_v1/input/train_request_templates.parquet": "f0ee98eb4ad5aca69125ace8610ce4ff2c40edb6b7f5e62016ee321a432af652",
+    "stage4/output/symmetric_flexibility_v1/input/preparation_summary.json": "916f22a9b2c8aca89254ad6874f2aabaf75be2f75bca2340d3c2582d66cb4d7e",
+    "stage3/config/stage3_av_capability_profiles.json": "bea54c12a0c013995c3644a0bab84b35413d5df8a6785dfdd6a03fd49f32978e",
+    "stage4/config/scheme_a_city_v1.json": "8022d88c8c1377fd87f925bf7f0e35584b9bb3f500bc5cb8fd9d16ea9a0ef47e",
+    "stage4/input/replay_foundation/stage4_order_replay_base.parquet": "dc590c415e08e65ef3975cb7b8122484b04dbef76788d29ee1f2c831e236c874",
+    "stage4/output/symmetric_flexibility_v1/input/test31_research_routes.parquet": "672d635fa24690ba7082b2e925f8419e6b6d67aca2dec613ea0a87835e7e57f7",
+    "stage4/docs/flexibility_dispatch/service_preserving/train_remaining_time_model.json": "207dfa3385bf1d59fb380e897e876a745bd8484ee52a53e62b150baa5b33488f",
+    "stage4/config/controlled_replay_v2.json": "2c516b377d9b6d83313016de38738c0939f1f68e58f83b8882431be0a7d338b9",
+    "stage4/config/scheme_a_layout_comparison_300_600_v1.json": "7612d3faa32637ac90d895c7859deebf818f5a5f04338766aed96e8b7e554f05",
+    "stage4/output/capability_chain_planning/layout_300_600_v1/placements.json": "4f11b259103014a0ad03cf62951893279d366abc628f977d28e42b8a9bc23826",
+    "stage4/docs/capability_chain_planning/layout_comparison_300_600_v1/comparison.json": "665b93b382fd009f4ebeb6c41148e6b25fad209f93deda2aa41aed348a1e2503",
+    "stage4/output/capability_chain_planning/layout_comparison_300_600_v1/ALL_HOT_COMMON_CONTROL/assignments.parquet": "d23c6b6304df6faacf382ab5f330ce78b6021ade69adc9058f49e1e5f9836636",
+    "stage4/output/capability_chain_planning/layout_comparison_300_600_v1/ALL_HOT_COMMON_CONTROL/empty_movements.parquet": "72f94119e94c129c29102a50d1137bdea6a3d6fe28f625b9c23f921ec5f92d5b",
+    "stage4/output/capability_chain_planning/layout_comparison_300_600_v1/ALL_HOT_COMMON_CONTROL/summary.json": "90be099b658c03cb94ec454163f6238be7303ac149158424f8d4cf7ef5e05156",
+    "stage4/output/capability_chain_planning/layout_comparison_300_600_v1/COMPATIBLE_HOT_COMMON_CONTROL/assignments.parquet": "891b5ea1e08502ce749525a218028bf18fc5239571b594f8c30cd97b812337ac",
+    "stage4/output/capability_chain_planning/layout_comparison_300_600_v1/COMPATIBLE_HOT_COMMON_CONTROL/empty_movements.parquet": "aac58a3de08f879c7c04d19ff3b1d2f956e50bcded465b057ca081b9ca7a3de3",
+    "stage4/output/capability_chain_planning/layout_comparison_300_600_v1/COMPATIBLE_HOT_COMMON_CONTROL/summary.json": "e5ebb933913aa8b5e60fd9c109742b992a6724a227ff26a9a579112a74860a48",
+    "stage4/output/capability_chain_planning/layout_comparison_300_600_v1/OPPORTUNITY_JOINT_COMMON_CONTROL/assignments.parquet": "2401f1f5f921d47356997234b15f4f647fe20ef44071223b9955e4752aef8abd",
+    "stage4/output/capability_chain_planning/layout_comparison_300_600_v1/OPPORTUNITY_JOINT_COMMON_CONTROL/empty_movements.parquet": "7729f800930cc26760301e6d3bf7f237e3120460e414a220bd23f1123c84c8b4",
+    "stage4/output/capability_chain_planning/layout_comparison_300_600_v1/OPPORTUNITY_JOINT_COMMON_CONTROL/summary.json": "c5323ee1d1924c174fbab2cef5d38fa471abf6503b50f5350d42a41527f20b51"
+  },
+  "groups": {
+    "ALL_HOT_COMMON_CONTROL": {
+      "slots": 851,
+      "served_slots": 421,
+      "unserved_slots": 430,
+      "served_slot_share": 0.49471210340775557,
+      "orders": 774,
+      "orders_per_served_slot": 1.838479809976247,
+      "loaded_h": 103.0123299307837,
+      "pre_first_idle_h": 650.9054547156873,
+      "post_first_idle_h": 429.60042852008803,
+      "pre_first_move_h": 3.0245452843127056,
+      "restricted_first_customer_span_h": 653.93,
+      "first_assignment_delay_served_only_s": {
+        "mean": 1721.874109263658,
+        "p50": 571.0,
+        "p90": 5289.0
+      },
+      "first_boarding_delay_served_only_s": {
+        "mean": 1833.637215056486,
+        "p50": 699.644984793762,
+        "p90": 5488.797296195509
+      },
+      "first_assignment_in_calendar_slots": 421,
+      "first_boarding_in_calendar_slots": 406,
+      "all_slots_retained": true,
+      "first_customer_span_includes_repositioning": true,
+      "failed_slots_are_not_zero_waits": true,
+      "survival_distribution_estimated": false,
+      "first_customer_cumulative_all_slot_rates": [
+        {
+          "delay_s": 30,
+          "assignment_share": 0.02937720329024677,
+          "boarding_within_admission_share": 0.01410105757931845
+        },
+        {
+          "delay_s": 60,
+          "assignment_share": 0.045828437132784956,
+          "boarding_within_admission_share": 0.023501762632197415
+        },
+        {
+          "delay_s": 120,
+          "assignment_share": 0.07755581668625147,
+          "boarding_within_admission_share": 0.04700352526439483
+        },
+        {
+          "delay_s": 300,
+          "assignment_share": 0.17391304347826086,
+          "boarding_within_admission_share": 0.12220916568742655
+        },
+        {
+          "delay_s": 600,
+          "assignment_share": 0.25381903642773207,
+          "boarding_within_admission_share": 0.21739130434782608
+        },
+        {
+          "delay_s": 900,
+          "assignment_share": 0.29612220916568743,
+          "boarding_within_admission_share": 0.2690951821386604
+        },
+        {
+          "delay_s": 1800,
+          "assignment_share": 0.3607520564042303,
+          "boarding_within_admission_share": 0.3419506462984724
+        },
+        {
+          "delay_s": 3600,
+          "assignment_share": 0.4218566392479436,
+          "boarding_within_admission_share": 0.40305522914218567
+        }
+      ],
+      "historical_body_C_count_3days": {
+        "mean": 22.319623971797885,
+        "p50": 16.0,
+        "p90": 55.0
+      },
+      "historical_all_count_3days": {
+        "mean": 84.10223266745005,
+        "p50": 88.0,
+        "p90": 134.0
+      },
+      "historical_body_C_predicted_h_3days": {
+        "mean": 2.6052074565589947,
+        "p50": 1.828326884139743,
+        "p90": 6.517614282241298
+      },
+      "template_HV_nearby": {
+        "mean": 78.43713278495888,
+        "p50": 81.0,
+        "p90": 114.0
+      },
+      "baseline_parked_HV_nearby": {
+        "mean": 45.60399529964747,
+        "p50": 31.0,
+        "p90": 118.0
+      },
+      "own_parked_HV_nearby": {
+        "mean": 45.60399529964747,
+        "p50": 31.0,
+        "p90": 118.0
+      },
+      "unknown_parked_HV_position_count": {
+        "mean": 0.0,
+        "p50": 0.0,
+        "p90": 0.0
+      }
+    },
+    "COMPATIBLE_HOT_COMMON_CONTROL": {
+      "slots": 851,
+      "served_slots": 524,
+      "unserved_slots": 327,
+      "served_slot_share": 0.6157461809635723,
+      "orders": 964,
+      "orders_per_served_slot": 1.8396946564885497,
+      "loaded_h": 129.87935259373398,
+      "pre_first_idle_h": 496.2324194306631,
+      "post_first_idle_h": 549.4506975052057,
+      "pre_first_move_h": 1.2578583471147013,
+      "restricted_first_customer_span_h": 497.4902777777778,
+      "first_assignment_delay_served_only_s": {
+        "mean": 1528.6526717557251,
+        "p50": 705.0,
+        "p90": 4138.299999999999
+      },
+      "first_boarding_delay_served_only_s": {
+        "mean": 1631.7772833727743,
+        "p50": 801.0997712641765,
+        "p90": 4316.448846927017
+      },
+      "first_assignment_in_calendar_slots": 524,
+      "first_boarding_in_calendar_slots": 502,
+      "all_slots_retained": true,
+      "first_customer_span_includes_repositioning": true,
+      "failed_slots_are_not_zero_waits": true,
+      "survival_distribution_estimated": false,
+      "first_customer_cumulative_all_slot_rates": [
+        {
+          "delay_s": 30,
+          "assignment_share": 0.0282021151586369,
+          "boarding_within_admission_share": 0.01762632197414806
+        },
+        {
+          "delay_s": 60,
+          "assignment_share": 0.05170387779083431,
+          "boarding_within_admission_share": 0.03290246768507638
+        },
+        {
+          "delay_s": 120,
+          "assignment_share": 0.0963572267920094,
+          "boarding_within_admission_share": 0.06110458284371328
+        },
+        {
+          "delay_s": 300,
+          "assignment_share": 0.1797884841363102,
+          "boarding_within_admission_share": 0.13748531139835488
+        },
+        {
+          "delay_s": 600,
+          "assignment_share": 0.28672150411280845,
+          "boarding_within_admission_share": 0.23854289071680376
+        },
+        {
+          "delay_s": 900,
+          "assignment_share": 0.3584018801410106,
+          "boarding_within_admission_share": 0.32314923619271446
+        },
+        {
+          "delay_s": 1800,
+          "assignment_share": 0.4606345475910693,
+          "boarding_within_admission_share": 0.4300822561692127
+        },
+        {
+          "delay_s": 3600,
+          "assignment_share": 0.5417156286721504,
+          "boarding_within_admission_share": 0.5170387779083431
+        }
+      ],
+      "historical_body_C_count_3days": {
+        "mean": 35.00352526439483,
+        "p50": 30.0,
+        "p90": 75.0
+      },
+      "historical_all_count_3days": {
+        "mean": 96.7978848413631,
+        "p50": 105.0,
+        "p90": 159.0
+      },
+      "historical_body_C_predicted_h_3days": {
+        "mean": 4.103749432666259,
+        "p50": 3.3799361729746065,
+        "p90": 8.956219773499502
+      },
+      "template_HV_nearby": {
+        "mean": 86.80023501762632,
+        "p50": 90.0,
+        "p90": 130.0
+      },
+      "baseline_parked_HV_nearby": {
+        "mean": 38.93419506462985,
+        "p50": 26.0,
+        "p90": 113.0
+      },
+      "own_parked_HV_nearby": {
+        "mean": 40.43948296122209,
+        "p50": 26.0,
+        "p90": 114.0
+      },
+      "unknown_parked_HV_position_count": {
+        "mean": 0.0,
+        "p50": 0.0,
+        "p90": 0.0
+      }
+    },
+    "OPPORTUNITY_JOINT_COMMON_CONTROL": {
+      "slots": 851,
+      "served_slots": 547,
+      "unserved_slots": 304,
+      "served_slot_share": 0.6427732079905993,
+      "orders": 992,
+      "orders_per_served_slot": 1.813528336380256,
+      "loaded_h": 135.89246140704108,
+      "pre_first_idle_h": 462.38496484649625,
+      "post_first_idle_h": 571.3302626867765,
+      "pre_first_move_h": 2.244479597948237,
+      "restricted_first_customer_span_h": 464.62944444444446,
+      "first_assignment_delay_served_only_s": {
+        "mean": 1432.835466179159,
+        "p50": 721.0,
+        "p90": 3597.000000000001
+      },
+      "first_boarding_delay_served_only_s": {
+        "mean": 1549.8343615178303,
+        "p50": 842.1078708885616,
+        "p90": 3752.868844261571
+      },
+      "first_assignment_in_calendar_slots": 547,
+      "first_boarding_in_calendar_slots": 521,
+      "all_slots_retained": true,
+      "first_customer_span_includes_repositioning": true,
+      "failed_slots_are_not_zero_waits": true,
+      "survival_distribution_estimated": false,
+      "first_customer_cumulative_all_slot_rates": [
+        {
+          "delay_s": 30,
+          "assignment_share": 0.03525264394829612,
+          "boarding_within_admission_share": 0.01527614571092832
+        },
+        {
+          "delay_s": 60,
+          "assignment_share": 0.06110458284371328,
+          "boarding_within_admission_share": 0.03525264394829612
+        },
+        {
+          "delay_s": 120,
+          "assignment_share": 0.10810810810810811,
+          "boarding_within_admission_share": 0.0681551116333725
+        },
+        {
+          "delay_s": 300,
+          "assignment_share": 0.21034077555816685,
+          "boarding_within_admission_share": 0.15158636897767333
+        },
+        {
+          "delay_s": 600,
+          "assignment_share": 0.29494712103407755,
+          "boarding_within_admission_share": 0.2596944770857814
+        },
+        {
+          "delay_s": 900,
+          "assignment_share": 0.36427732079905994,
+          "boarding_within_admission_share": 0.32784958871915393
+        },
+        {
+          "delay_s": 1800,
+          "assignment_share": 0.4806110458284371,
+          "boarding_within_admission_share": 0.44535840188014103
+        },
+        {
+          "delay_s": 3600,
+          "assignment_share": 0.5781433607520564,
+          "boarding_within_admission_share": 0.5464159811985899
+        }
+      ],
+      "historical_body_C_count_3days": {
+        "mean": 26.91304347826087,
+        "p50": 20.0,
+        "p90": 62.0
+      },
+      "historical_all_count_3days": {
+        "mean": 88.02585193889541,
+        "p50": 87.0,
+        "p90": 149.0
+      },
+      "historical_body_C_predicted_h_3days": {
+        "mean": 3.1818263906705027,
+        "p50": 2.255610223785043,
+        "p90": 7.828540567445258
+      },
+      "template_HV_nearby": {
+        "mean": 78.19271445358402,
+        "p50": 81.0,
+        "p90": 125.0
+      },
+      "baseline_parked_HV_nearby": {
+        "mean": 36.729729729729726,
+        "p50": 24.0,
+        "p90": 108.0
+      },
+      "own_parked_HV_nearby": {
+        "mean": 37.08460634547591,
+        "p50": 24.0,
+        "p90": 108.0
+      },
+      "unknown_parked_HV_position_count": {
+        "mean": 0.0,
+        "p50": 0.0,
+        "p90": 0.0
+      }
+    }
+  },
+  "paired": {
+    "ALL_HOT_COMMON_CONTROL_to_COMPATIBLE_HOT_COMMON_CONTROL": {
+      "transitions": [
+        {
+          "transition": "BOTH_SERVED",
+          "slots": 328,
+          "orders_delta": 13,
+          "loaded_delta_h": 2.7023609829070967,
+          "pre_first_idle_delta_h": -18.13692804120881,
+          "post_first_idle_delta_h": 15.954126191604473
+        },
+        {
+          "transition": "LOST_SERVICE",
+          "slots": 93,
+          "orders_delta": -153,
+          "loaded_delta_h": -19.965045408288976,
+          "pre_first_idle_delta_h": 81.84281353143287,
+          "post_first_idle_delta_h": -54.4971404697736
+        },
+        {
+          "transition": "NEITHER_SERVED",
+          "slots": 234,
+          "orders_delta": 0,
+          "loaded_delta_h": 0.0,
+          "pre_first_idle_delta_h": 0.6403819100695859,
+          "post_first_idle_delta_h": 0.0
+        },
+        {
+          "transition": "NEWLY_SERVED",
+          "slots": 196,
+          "orders_delta": 330,
+          "loaded_delta_h": 44.12970708833216,
+          "pre_first_idle_delta_h": -219.01930268531785,
+          "post_first_idle_delta_h": 158.39328326328672
+        }
+      ],
+      "activation_product_decomposition": {
+        "available": true,
+        "working_slots_before": 421,
+        "working_slots_after": 524,
+        "conditional_loaded_h_before": 0.24468486919426055,
+        "conditional_loaded_h_after": 0.24786135991170608,
+        "working_count_component_h": 25.366130798957283,
+        "conditional_intensity_component_h": 1.50089186399301,
+        "total_loaded_delta_h": 26.86702266295029,
+        "causal_component_effects_identified": false
+      },
+      "loaded_delta_h": 26.867022662950284,
+      "orders_delta": 190,
+      "birth_cells_after_layout": [
+        {
+          "birth_cell": "10890_3420",
+          "center_lon_coarse": 108.905,
+          "center_lat_coarse": 34.205,
+          "slots": 1,
+          "newly_served": 1,
+          "lost_service": 0,
+          "loaded_delta_h": 0.2702777777777778,
+          "orders_delta": 1,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10890_3421",
+          "center_lon_coarse": 108.905,
+          "center_lat_coarse": 34.215,
+          "slots": 257,
+          "newly_served": 59,
+          "lost_service": 34,
+          "loaded_delta_h": 10.88119953673747,
+          "orders_delta": 61,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10890_3422",
+          "center_lon_coarse": 108.905,
+          "center_lat_coarse": 34.225,
+          "slots": 79,
+          "newly_served": 17,
+          "lost_service": 10,
+          "loaded_delta_h": 2.7342436460468185,
+          "orders_delta": 22,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10890_3423",
+          "center_lon_coarse": 108.905,
+          "center_lat_coarse": 34.235,
+          "slots": 53,
+          "newly_served": 11,
+          "lost_service": 12,
+          "loaded_delta_h": -0.868669437750751,
+          "orders_delta": -3,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10890_3424",
+          "center_lon_coarse": 108.905,
+          "center_lat_coarse": 34.245,
+          "slots": 58,
+          "newly_served": 1,
+          "lost_service": 18,
+          "loaded_delta_h": -5.233227379817951,
+          "orders_delta": -35,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10890_3425",
+          "center_lon_coarse": 108.905,
+          "center_lat_coarse": 34.255,
+          "slots": 6,
+          "newly_served": 1,
+          "lost_service": 1,
+          "loaded_delta_h": -0.2087370746634568,
+          "orders_delta": 1,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10890_3426",
+          "center_lon_coarse": 108.905,
+          "center_lat_coarse": 34.265,
+          "slots": 10,
+          "newly_served": 1,
+          "lost_service": 0,
+          "loaded_delta_h": 0.5247255725528598,
+          "orders_delta": 3,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10890_3427",
+          "center_lon_coarse": 108.905,
+          "center_lat_coarse": 34.275,
+          "slots": 1,
+          "newly_served": 0,
+          "lost_service": 0,
+          "loaded_delta_h": 0.0,
+          "orders_delta": 0,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10891_3420",
+          "center_lon_coarse": 108.915,
+          "center_lat_coarse": 34.205,
+          "slots": 62,
+          "newly_served": 21,
+          "lost_service": 4,
+          "loaded_delta_h": 4.183110428445865,
+          "orders_delta": 28,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10892_3420",
+          "center_lon_coarse": 108.925,
+          "center_lat_coarse": 34.205,
+          "slots": 18,
+          "newly_served": 6,
+          "lost_service": 2,
+          "loaded_delta_h": -0.3726918254748399,
+          "orders_delta": 8,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10892_3422",
+          "center_lon_coarse": 108.925,
+          "center_lat_coarse": 34.225,
+          "slots": 1,
+          "newly_served": 0,
+          "lost_service": 0,
+          "loaded_delta_h": 0.0002775222668857522,
+          "orders_delta": 0,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10892_3423",
+          "center_lon_coarse": 108.925,
+          "center_lat_coarse": 34.235,
+          "slots": 1,
+          "newly_served": 0,
+          "lost_service": 0,
+          "loaded_delta_h": 0.13666666666666666,
+          "orders_delta": 0,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10892_3428",
+          "center_lon_coarse": 108.925,
+          "center_lat_coarse": 34.285000000000004,
+          "slots": 22,
+          "newly_served": 1,
+          "lost_service": 0,
+          "loaded_delta_h": -0.5517493556127737,
+          "orders_delta": -5,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10893_3420",
+          "center_lon_coarse": 108.935,
+          "center_lat_coarse": 34.205,
+          "slots": 17,
+          "newly_served": 7,
+          "lost_service": 0,
+          "loaded_delta_h": 0.806463213191343,
+          "orders_delta": 14,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10893_3421",
+          "center_lon_coarse": 108.935,
+          "center_lat_coarse": 34.215,
+          "slots": 5,
+          "newly_served": 1,
+          "lost_service": 0,
+          "loaded_delta_h": 0.059166666666666645,
+          "orders_delta": 2,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10893_3425",
+          "center_lon_coarse": 108.935,
+          "center_lat_coarse": 34.255,
+          "slots": 2,
+          "newly_served": 1,
+          "lost_service": 0,
+          "loaded_delta_h": 0.009098457968816547,
+          "orders_delta": 1,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10894_3420",
+          "center_lon_coarse": 108.94500000000001,
+          "center_lat_coarse": 34.205,
+          "slots": 84,
+          "newly_served": 26,
+          "lost_service": 0,
+          "loaded_delta_h": 6.826316262197576,
+          "orders_delta": 42,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10894_3422",
+          "center_lon_coarse": 108.94500000000001,
+          "center_lat_coarse": 34.225,
+          "slots": 30,
+          "newly_served": 11,
+          "lost_service": 0,
+          "loaded_delta_h": 1.134424710078092,
+          "orders_delta": 10,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10894_3423",
+          "center_lon_coarse": 108.94500000000001,
+          "center_lat_coarse": 34.235,
+          "slots": 1,
+          "newly_served": 1,
+          "lost_service": 0,
+          "loaded_delta_h": 0.009411079901412652,
+          "orders_delta": 1,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10894_3426",
+          "center_lon_coarse": 108.94500000000001,
+          "center_lat_coarse": 34.265,
+          "slots": 1,
+          "newly_served": 0,
+          "lost_service": 0,
+          "loaded_delta_h": -0.06166666666666667,
+          "orders_delta": 0,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10894_3428",
+          "center_lon_coarse": 108.94500000000001,
+          "center_lat_coarse": 34.285000000000004,
+          "slots": 42,
+          "newly_served": 10,
+          "lost_service": 2,
+          "loaded_delta_h": 2.7562942397772217,
+          "orders_delta": 15,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10895_3420",
+          "center_lon_coarse": 108.955,
+          "center_lat_coarse": 34.205,
+          "slots": 4,
+          "newly_served": 2,
+          "lost_service": 0,
+          "loaded_delta_h": 1.4158333333333335,
+          "orders_delta": 13,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10895_3422",
+          "center_lon_coarse": 108.955,
+          "center_lat_coarse": 34.225,
+          "slots": 3,
+          "newly_served": 0,
+          "lost_service": 0,
+          "loaded_delta_h": 0.01731996269173073,
+          "orders_delta": -2,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10895_3423",
+          "center_lon_coarse": 108.955,
+          "center_lat_coarse": 34.235,
+          "slots": 2,
+          "newly_served": 0,
+          "lost_service": 0,
+          "loaded_delta_h": 0.11722222222222221,
+          "orders_delta": 0,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10895_3426",
+          "center_lon_coarse": 108.955,
+          "center_lat_coarse": 34.265,
+          "slots": 4,
+          "newly_served": 1,
+          "lost_service": 1,
+          "loaded_delta_h": 0.553875948680268,
+          "orders_delta": 1,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10895_3427",
+          "center_lon_coarse": 108.955,
+          "center_lat_coarse": 34.275,
+          "slots": 1,
+          "newly_served": 1,
+          "lost_service": 0,
+          "loaded_delta_h": 0.19083333333333333,
+          "orders_delta": 2,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10896_3420",
+          "center_lon_coarse": 108.965,
+          "center_lat_coarse": 34.205,
+          "slots": 4,
+          "newly_served": 3,
+          "lost_service": 0,
+          "loaded_delta_h": 0.4257643770816544,
+          "orders_delta": 5,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10896_3428",
+          "center_lon_coarse": 108.965,
+          "center_lat_coarse": 34.285000000000004,
+          "slots": 17,
+          "newly_served": 3,
+          "lost_service": 1,
+          "loaded_delta_h": -0.9086653853046774,
+          "orders_delta": -1,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10897_3427",
+          "center_lon_coarse": 108.97500000000001,
+          "center_lat_coarse": 34.275,
+          "slots": 3,
+          "newly_served": 1,
+          "lost_service": 0,
+          "loaded_delta_h": 0.31805555555555554,
+          "orders_delta": 2,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10897_3428",
+          "center_lon_coarse": 108.97500000000001,
+          "center_lat_coarse": 34.285000000000004,
+          "slots": 3,
+          "newly_served": 1,
+          "lost_service": 1,
+          "loaded_delta_h": 0.5142173585004892,
+          "orders_delta": 3,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10898_3425",
+          "center_lon_coarse": 108.985,
+          "center_lat_coarse": 34.255,
+          "slots": 1,
+          "newly_served": 0,
+          "lost_service": 0,
+          "loaded_delta_h": 0.0,
+          "orders_delta": 0,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10899_3423",
+          "center_lon_coarse": 108.995,
+          "center_lat_coarse": 34.235,
+          "slots": 1,
+          "newly_served": 0,
+          "lost_service": 0,
+          "loaded_delta_h": 0.0,
+          "orders_delta": 0,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10899_3424",
+          "center_lon_coarse": 108.995,
+          "center_lat_coarse": 34.245,
+          "slots": 3,
+          "newly_served": 0,
+          "lost_service": 1,
+          "loaded_delta_h": -0.34555555555555556,
+          "orders_delta": -4,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10899_3425",
+          "center_lon_coarse": 108.995,
+          "center_lat_coarse": 34.255,
+          "slots": 2,
+          "newly_served": 0,
+          "lost_service": 1,
+          "loaded_delta_h": -0.1875,
+          "orders_delta": -1,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10899_3426",
+          "center_lon_coarse": 108.995,
+          "center_lat_coarse": 34.265,
+          "slots": 3,
+          "newly_served": 0,
+          "lost_service": 1,
+          "loaded_delta_h": -0.17805555555555555,
+          "orders_delta": -1,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10899_3427",
+          "center_lon_coarse": 108.995,
+          "center_lat_coarse": 34.275,
+          "slots": 17,
+          "newly_served": 3,
+          "lost_service": 2,
+          "loaded_delta_h": 0.5523268267965533,
+          "orders_delta": 6,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10899_3428",
+          "center_lon_coarse": 108.995,
+          "center_lat_coarse": 34.285000000000004,
+          "slots": 32,
+          "newly_served": 5,
+          "lost_service": 2,
+          "loaded_delta_h": 1.3464162008819018,
+          "orders_delta": 1,
+          "supported_for_rank": true
+        }
+      ],
+      "activation_hours": [
+        {
+          "activation_hour": 0,
+          "slots": 25,
+          "newly_served": 1,
+          "lost_service": 4,
+          "loaded_delta_h": -0.09697586901796079,
+          "orders_delta": -3
+        },
+        {
+          "activation_hour": 1,
+          "slots": 5,
+          "newly_served": 2,
+          "lost_service": 0,
+          "loaded_delta_h": 0.30037750794790147,
+          "orders_delta": 2
+        },
+        {
+          "activation_hour": 2,
+          "slots": 4,
+          "newly_served": 1,
+          "lost_service": 0,
+          "loaded_delta_h": 0.19083333333333333,
+          "orders_delta": 2
+        },
+        {
+          "activation_hour": 3,
+          "slots": 1,
+          "newly_served": 1,
+          "lost_service": 0,
+          "loaded_delta_h": 0.002483140759447653,
+          "orders_delta": 1
+        },
+        {
+          "activation_hour": 4,
+          "slots": 3,
+          "newly_served": 1,
+          "lost_service": 0,
+          "loaded_delta_h": 0.009411079901412652,
+          "orders_delta": 1
+        },
+        {
+          "activation_hour": 5,
+          "slots": 5,
+          "newly_served": 0,
+          "lost_service": 1,
+          "loaded_delta_h": -0.051111111111111114,
+          "orders_delta": -1
+        },
+        {
+          "activation_hour": 6,
+          "slots": 19,
+          "newly_served": 6,
+          "lost_service": 2,
+          "loaded_delta_h": 0.27481615816691674,
+          "orders_delta": 1
+        },
+        {
+          "activation_hour": 7,
+          "slots": 47,
+          "newly_served": 9,
+          "lost_service": 8,
+          "loaded_delta_h": 0.11215867408171298,
+          "orders_delta": 3
+        },
+        {
+          "activation_hour": 8,
+          "slots": 55,
+          "newly_served": 15,
+          "lost_service": 8,
+          "loaded_delta_h": 2.3358351302332245,
+          "orders_delta": 15
+        },
+        {
+          "activation_hour": 9,
+          "slots": 58,
+          "newly_served": 20,
+          "lost_service": 9,
+          "loaded_delta_h": 4.839567025141558,
+          "orders_delta": 27
+        },
+        {
+          "activation_hour": 10,
+          "slots": 48,
+          "newly_served": 14,
+          "lost_service": 4,
+          "loaded_delta_h": 3.0633365945811963,
+          "orders_delta": 17
+        },
+        {
+          "activation_hour": 11,
+          "slots": 49,
+          "newly_served": 15,
+          "lost_service": 3,
+          "loaded_delta_h": 4.376506682852629,
+          "orders_delta": 24
+        },
+        {
+          "activation_hour": 12,
+          "slots": 43,
+          "newly_served": 9,
+          "lost_service": 1,
+          "loaded_delta_h": 1.2906923398814716,
+          "orders_delta": 13
+        },
+        {
+          "activation_hour": 13,
+          "slots": 46,
+          "newly_served": 6,
+          "lost_service": 8,
+          "loaded_delta_h": -1.9982501273625852,
+          "orders_delta": -20
+        },
+        {
+          "activation_hour": 14,
+          "slots": 50,
+          "newly_served": 10,
+          "lost_service": 5,
+          "loaded_delta_h": 1.0001670470492376,
+          "orders_delta": 13
+        },
+        {
+          "activation_hour": 15,
+          "slots": 51,
+          "newly_served": 11,
+          "lost_service": 4,
+          "loaded_delta_h": 3.489408701454991,
+          "orders_delta": 19
+        },
+        {
+          "activation_hour": 16,
+          "slots": 46,
+          "newly_served": 10,
+          "lost_service": 4,
+          "loaded_delta_h": 1.3657373449685066,
+          "orders_delta": 10
+        },
+        {
+          "activation_hour": 17,
+          "slots": 49,
+          "newly_served": 14,
+          "lost_service": 7,
+          "loaded_delta_h": 1.7918560009984907,
+          "orders_delta": 16
+        },
+        {
+          "activation_hour": 18,
+          "slots": 51,
+          "newly_served": 14,
+          "lost_service": 4,
+          "loaded_delta_h": 1.2175849033445818,
+          "orders_delta": 16
+        },
+        {
+          "activation_hour": 19,
+          "slots": 59,
+          "newly_served": 10,
+          "lost_service": 7,
+          "loaded_delta_h": 2.9542711690595147,
+          "orders_delta": 18
+        },
+        {
+          "activation_hour": 20,
+          "slots": 51,
+          "newly_served": 9,
+          "lost_service": 11,
+          "loaded_delta_h": -0.7385799732140934,
+          "orders_delta": 2
+        },
+        {
+          "activation_hour": 21,
+          "slots": 44,
+          "newly_served": 13,
+          "lost_service": 2,
+          "loaded_delta_h": 1.7325638426927457,
+          "orders_delta": 14
+        },
+        {
+          "activation_hour": 22,
+          "slots": 27,
+          "newly_served": 4,
+          "lost_service": 0,
+          "loaded_delta_h": -0.3772793576472112,
+          "orders_delta": 1
+        },
+        {
+          "activation_hour": 23,
+          "slots": 15,
+          "newly_served": 1,
+          "lost_service": 1,
+          "loaded_delta_h": -0.21838757514562745,
+          "orders_delta": -1
+        }
+      ],
+      "transition_proxies": {
+        "NEWLY_SERVED": {
+          "slots": 196,
+          "opportunity_proxies": {
+            "historical_body_C_count_3days": {
+              "before_mean": 21.6734693877551,
+              "after_mean": 36.765306122448976
+            },
+            "historical_body_C_predicted_h_3days": {
+              "before_mean": 2.4703902639964648,
+              "after_mean": 4.354943411826735
+            },
+            "template_HV_nearby": {
+              "before_mean": 81.63775510204081,
+              "after_mean": 86.64285714285714
+            },
+            "baseline_parked_HV_nearby": {
+              "before_mean": 59.59183673469388,
+              "after_mean": 32.484693877551024
+            }
+          }
+        },
+        "LOST_SERVICE": {
+          "slots": 93,
+          "opportunity_proxies": {
+            "historical_body_C_count_3days": {
+              "before_mean": 23.129032258064516,
+              "after_mean": 36.505376344086024
+            },
+            "historical_body_C_predicted_h_3days": {
+              "before_mean": 2.8710266183919817,
+              "after_mean": 4.27416913846594
+            },
+            "template_HV_nearby": {
+              "before_mean": 75.0,
+              "after_mean": 90.80645161290323
+            },
+            "baseline_parked_HV_nearby": {
+              "before_mean": 32.82795698924731,
+              "after_mean": 49.086021505376344
+            }
+          }
+        },
+        "BOTH_SERVED": {
+          "slots": 328,
+          "opportunity_proxies": {
+            "historical_body_C_count_3days": {
+              "before_mean": 29.73170731707317,
+              "after_mean": 44.53353658536585
+            },
+            "historical_body_C_predicted_h_3days": {
+              "before_mean": 3.5070837739759004,
+              "after_mean": 5.239459763940338
+            },
+            "template_HV_nearby": {
+              "before_mean": 77.79573170731707,
+              "after_mean": 87.71036585365853
+            },
+            "baseline_parked_HV_nearby": {
+              "before_mean": 37.10670731707317,
+              "after_mean": 40.27743902439025
+            }
+          }
+        },
+        "NEITHER_SERVED": {
+          "slots": 234,
+          "opportunity_proxies": {
+            "historical_body_C_count_3days": {
+              "before_mean": 12.149572649572649,
+              "after_mean": 19.572649572649574
+            },
+            "historical_body_C_predicted_h_3days": {
+              "before_mean": 1.3483166684352474,
+              "after_mean": 2.2336808804751422
+            },
+            "template_HV_nearby": {
+              "before_mean": 78.02136752136752,
+              "after_mean": 84.06410256410257
+            },
+            "baseline_parked_HV_nearby": {
+              "before_mean": 50.876068376068375,
+              "after_mean": 38.41880341880342
+            }
+          }
+        }
+      },
+      "spatial_grouping_by_after_birth_location_not_service_location": true,
+      "local_treatment_effect_or_HV_competition_causal_component_identified": false
+    },
+    "COMPATIBLE_HOT_COMMON_CONTROL_to_OPPORTUNITY_JOINT_COMMON_CONTROL": {
+      "transitions": [
+        {
+          "transition": "BOTH_SERVED",
+          "slots": 432,
+          "orders_delta": 16,
+          "loaded_delta_h": 3.4656515506195107,
+          "pre_first_idle_delta_h": -15.205626921871797,
+          "post_first_idle_delta_h": 8.055477296438507
+        },
+        {
+          "transition": "LOST_SERVICE",
+          "slots": 92,
+          "orders_delta": -145,
+          "loaded_delta_h": -18.06005259948221,
+          "pre_first_idle_delta_h": 76.08961195080344,
+          "post_first_idle_delta_h": -52.22736190489599
+        },
+        {
+          "transition": "NEITHER_SERVED",
+          "slots": 212,
+          "orders_delta": 0,
+          "loaded_delta_h": 0.0,
+          "pre_first_idle_delta_h": -0.456856212334485,
+          "post_first_idle_delta_h": 0.0
+        },
+        {
+          "transition": "NEWLY_SERVED",
+          "slots": 115,
+          "orders_delta": 157,
+          "loaded_delta_h": 20.607509862169803,
+          "pre_first_idle_delta_h": -94.27458340076406,
+          "post_first_idle_delta_h": 66.05144979002839
+        }
+      ],
+      "activation_product_decomposition": {
+        "available": true,
+        "working_slots_before": 524,
+        "working_slots_after": 547,
+        "conditional_loaded_h_before": 0.24786135991170608,
+        "conditional_loaded_h_after": 0.2484322877642433,
+        "working_count_component_h": 5.707376948273418,
+        "conditional_intensity_component_h": 0.3057318650336889,
+        "total_loaded_delta_h": 6.013108813307099,
+        "causal_component_effects_identified": false
+      },
+      "loaded_delta_h": 6.013108813307106,
+      "orders_delta": 28,
+      "birth_cells_after_layout": [
+        {
+          "birth_cell": "10890_3421",
+          "center_lon_coarse": 108.905,
+          "center_lat_coarse": 34.215,
+          "slots": 123,
+          "newly_served": 21,
+          "lost_service": 10,
+          "loaded_delta_h": 2.840290915759178,
+          "orders_delta": 21,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10890_3422",
+          "center_lon_coarse": 108.905,
+          "center_lat_coarse": 34.225,
+          "slots": 48,
+          "newly_served": 7,
+          "lost_service": 3,
+          "loaded_delta_h": 2.656329352569986,
+          "orders_delta": 5,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10890_3423",
+          "center_lon_coarse": 108.905,
+          "center_lat_coarse": 34.235,
+          "slots": 48,
+          "newly_served": 6,
+          "lost_service": 5,
+          "loaded_delta_h": 1.0961536464106556,
+          "orders_delta": 6,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10890_3424",
+          "center_lon_coarse": 108.905,
+          "center_lat_coarse": 34.245,
+          "slots": 63,
+          "newly_served": 1,
+          "lost_service": 14,
+          "loaded_delta_h": -2.6485294980934126,
+          "orders_delta": -19,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10890_3425",
+          "center_lon_coarse": 108.905,
+          "center_lat_coarse": 34.255,
+          "slots": 20,
+          "newly_served": 2,
+          "lost_service": 5,
+          "loaded_delta_h": -1.2317375648578006,
+          "orders_delta": -4,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10890_3426",
+          "center_lon_coarse": 108.905,
+          "center_lat_coarse": 34.265,
+          "slots": 23,
+          "newly_served": 2,
+          "lost_service": 1,
+          "loaded_delta_h": 0.8004331423115292,
+          "orders_delta": 9,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10890_3427",
+          "center_lon_coarse": 108.905,
+          "center_lat_coarse": 34.275,
+          "slots": 8,
+          "newly_served": 0,
+          "lost_service": 5,
+          "loaded_delta_h": -1.7851662177852134,
+          "orders_delta": -10,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10891_3420",
+          "center_lon_coarse": 108.915,
+          "center_lat_coarse": 34.205,
+          "slots": 43,
+          "newly_served": 9,
+          "lost_service": 3,
+          "loaded_delta_h": 1.4759425145563243,
+          "orders_delta": 7,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10891_3421",
+          "center_lon_coarse": 108.915,
+          "center_lat_coarse": 34.215,
+          "slots": 1,
+          "newly_served": 0,
+          "lost_service": 0,
+          "loaded_delta_h": 0.0,
+          "orders_delta": 0,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10891_3428",
+          "center_lon_coarse": 108.915,
+          "center_lat_coarse": 34.285000000000004,
+          "slots": 3,
+          "newly_served": 1,
+          "lost_service": 0,
+          "loaded_delta_h": 0.25611111111111107,
+          "orders_delta": 2,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10892_3420",
+          "center_lon_coarse": 108.925,
+          "center_lat_coarse": 34.205,
+          "slots": 9,
+          "newly_served": 1,
+          "lost_service": 0,
+          "loaded_delta_h": -0.29499366931548543,
+          "orders_delta": -1,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10892_3422",
+          "center_lon_coarse": 108.925,
+          "center_lat_coarse": 34.225,
+          "slots": 1,
+          "newly_served": 0,
+          "lost_service": 0,
+          "loaded_delta_h": 0.0,
+          "orders_delta": 0,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10892_3423",
+          "center_lon_coarse": 108.925,
+          "center_lat_coarse": 34.235,
+          "slots": 1,
+          "newly_served": 0,
+          "lost_service": 0,
+          "loaded_delta_h": 0.12055555555555555,
+          "orders_delta": 1,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10892_3428",
+          "center_lon_coarse": 108.925,
+          "center_lat_coarse": 34.285000000000004,
+          "slots": 33,
+          "newly_served": 4,
+          "lost_service": 1,
+          "loaded_delta_h": 0.3012729413066053,
+          "orders_delta": 2,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10893_3420",
+          "center_lon_coarse": 108.935,
+          "center_lat_coarse": 34.205,
+          "slots": 26,
+          "newly_served": 2,
+          "lost_service": 0,
+          "loaded_delta_h": 0.7328133836313049,
+          "orders_delta": 4,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10893_3421",
+          "center_lon_coarse": 108.935,
+          "center_lat_coarse": 34.215,
+          "slots": 5,
+          "newly_served": 1,
+          "lost_service": 1,
+          "loaded_delta_h": -0.47281763877059896,
+          "orders_delta": -1,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10893_3425",
+          "center_lon_coarse": 108.935,
+          "center_lat_coarse": 34.255,
+          "slots": 1,
+          "newly_served": 0,
+          "lost_service": 1,
+          "loaded_delta_h": 0.0,
+          "orders_delta": -1,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10894_3420",
+          "center_lon_coarse": 108.94500000000001,
+          "center_lat_coarse": 34.205,
+          "slots": 97,
+          "newly_served": 18,
+          "lost_service": 5,
+          "loaded_delta_h": 5.795641230335599,
+          "orders_delta": 29,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10894_3422",
+          "center_lon_coarse": 108.94500000000001,
+          "center_lat_coarse": 34.225,
+          "slots": 36,
+          "newly_served": 9,
+          "lost_service": 2,
+          "loaded_delta_h": 1.521491920030799,
+          "orders_delta": 10,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10894_3426",
+          "center_lon_coarse": 108.94500000000001,
+          "center_lat_coarse": 34.265,
+          "slots": 1,
+          "newly_served": 1,
+          "lost_service": 0,
+          "loaded_delta_h": 0.09527777777777778,
+          "orders_delta": 1,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10894_3428",
+          "center_lon_coarse": 108.94500000000001,
+          "center_lat_coarse": 34.285000000000004,
+          "slots": 60,
+          "newly_served": 2,
+          "lost_service": 8,
+          "loaded_delta_h": -1.48439270464241,
+          "orders_delta": -10,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10895_3420",
+          "center_lon_coarse": 108.955,
+          "center_lat_coarse": 34.205,
+          "slots": 5,
+          "newly_served": 1,
+          "lost_service": 1,
+          "loaded_delta_h": -0.9222144529867607,
+          "orders_delta": -7,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10895_3422",
+          "center_lon_coarse": 108.955,
+          "center_lat_coarse": 34.225,
+          "slots": 3,
+          "newly_served": 0,
+          "lost_service": 0,
+          "loaded_delta_h": -0.2817644071361752,
+          "orders_delta": -2,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10895_3423",
+          "center_lon_coarse": 108.955,
+          "center_lat_coarse": 34.235,
+          "slots": 3,
+          "newly_served": 0,
+          "lost_service": 0,
+          "loaded_delta_h": 0.1436111111111111,
+          "orders_delta": 0,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10895_3426",
+          "center_lon_coarse": 108.955,
+          "center_lat_coarse": 34.265,
+          "slots": 6,
+          "newly_served": 1,
+          "lost_service": 0,
+          "loaded_delta_h": 0.29122037502301584,
+          "orders_delta": 1,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10895_3427",
+          "center_lon_coarse": 108.955,
+          "center_lat_coarse": 34.275,
+          "slots": 1,
+          "newly_served": 0,
+          "lost_service": 1,
+          "loaded_delta_h": -0.19083333333333333,
+          "orders_delta": -2,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10896_3420",
+          "center_lon_coarse": 108.965,
+          "center_lat_coarse": 34.205,
+          "slots": 19,
+          "newly_served": 4,
+          "lost_service": 3,
+          "loaded_delta_h": 0.024471729065757702,
+          "orders_delta": 3,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10896_3428",
+          "center_lon_coarse": 108.965,
+          "center_lat_coarse": 34.285000000000004,
+          "slots": 49,
+          "newly_served": 9,
+          "lost_service": 8,
+          "loaded_delta_h": 1.3112686423902826,
+          "orders_delta": 2,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10897_3427",
+          "center_lon_coarse": 108.97500000000001,
+          "center_lat_coarse": 34.275,
+          "slots": 2,
+          "newly_served": 0,
+          "lost_service": 0,
+          "loaded_delta_h": 0.0,
+          "orders_delta": 0,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10899_3423",
+          "center_lon_coarse": 108.995,
+          "center_lat_coarse": 34.235,
+          "slots": 10,
+          "newly_served": 6,
+          "lost_service": 0,
+          "loaded_delta_h": 0.47597801997094497,
+          "orders_delta": 6,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10899_3424",
+          "center_lon_coarse": 108.995,
+          "center_lat_coarse": 34.245,
+          "slots": 10,
+          "newly_served": 0,
+          "lost_service": 2,
+          "loaded_delta_h": -0.34534313699998975,
+          "orders_delta": -4,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10899_3425",
+          "center_lon_coarse": 108.995,
+          "center_lat_coarse": 34.255,
+          "slots": 14,
+          "newly_served": 2,
+          "lost_service": 3,
+          "loaded_delta_h": 0.35037029193896574,
+          "orders_delta": 0,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10899_3426",
+          "center_lon_coarse": 108.995,
+          "center_lat_coarse": 34.265,
+          "slots": 8,
+          "newly_served": 0,
+          "lost_service": 4,
+          "loaded_delta_h": -2.0594444444444444,
+          "orders_delta": -10,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10899_3427",
+          "center_lon_coarse": 108.995,
+          "center_lat_coarse": 34.275,
+          "slots": 24,
+          "newly_served": 1,
+          "lost_service": 2,
+          "loaded_delta_h": -0.2697244211062209,
+          "orders_delta": -4,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10899_3428",
+          "center_lon_coarse": 108.995,
+          "center_lat_coarse": 34.285000000000004,
+          "slots": 47,
+          "newly_served": 4,
+          "lost_service": 4,
+          "loaded_delta_h": -2.289163358077553,
+          "orders_delta": -6,
+          "supported_for_rank": true
+        }
+      ],
+      "activation_hours": [
+        {
+          "activation_hour": 0,
+          "slots": 25,
+          "newly_served": 4,
+          "lost_service": 4,
+          "loaded_delta_h": -0.36153826960669727,
+          "orders_delta": -1
+        },
+        {
+          "activation_hour": 1,
+          "slots": 5,
+          "newly_served": 0,
+          "lost_service": 1,
+          "loaded_delta_h": -0.06489016109019607,
+          "orders_delta": 0
+        },
+        {
+          "activation_hour": 2,
+          "slots": 4,
+          "newly_served": 1,
+          "lost_service": 1,
+          "loaded_delta_h": -0.13194444444444445,
+          "orders_delta": -1
+        },
+        {
+          "activation_hour": 3,
+          "slots": 1,
+          "newly_served": 0,
+          "lost_service": 0,
+          "loaded_delta_h": 0.0,
+          "orders_delta": 0
+        },
+        {
+          "activation_hour": 4,
+          "slots": 3,
+          "newly_served": 0,
+          "lost_service": 1,
+          "loaded_delta_h": -0.009411079901412652,
+          "orders_delta": -1
+        },
+        {
+          "activation_hour": 5,
+          "slots": 5,
+          "newly_served": 0,
+          "lost_service": 0,
+          "loaded_delta_h": 0.16305555555555556,
+          "orders_delta": -1
+        },
+        {
+          "activation_hour": 6,
+          "slots": 19,
+          "newly_served": 3,
+          "lost_service": 3,
+          "loaded_delta_h": 0.923623423406625,
+          "orders_delta": 7
+        },
+        {
+          "activation_hour": 7,
+          "slots": 47,
+          "newly_served": 8,
+          "lost_service": 5,
+          "loaded_delta_h": -0.2679761310001544,
+          "orders_delta": -4
+        },
+        {
+          "activation_hour": 8,
+          "slots": 55,
+          "newly_served": 13,
+          "lost_service": 5,
+          "loaded_delta_h": 2.307014515264248,
+          "orders_delta": 21
+        },
+        {
+          "activation_hour": 9,
+          "slots": 58,
+          "newly_served": 9,
+          "lost_service": 8,
+          "loaded_delta_h": 2.052254926504367,
+          "orders_delta": 4
+        },
+        {
+          "activation_hour": 10,
+          "slots": 48,
+          "newly_served": 6,
+          "lost_service": 7,
+          "loaded_delta_h": -0.0476687657282292,
+          "orders_delta": -4
+        },
+        {
+          "activation_hour": 11,
+          "slots": 49,
+          "newly_served": 4,
+          "lost_service": 7,
+          "loaded_delta_h": 0.4576705772310762,
+          "orders_delta": 6
+        },
+        {
+          "activation_hour": 12,
+          "slots": 43,
+          "newly_served": 3,
+          "lost_service": 4,
+          "loaded_delta_h": -0.32961511558735035,
+          "orders_delta": -3
+        },
+        {
+          "activation_hour": 13,
+          "slots": 46,
+          "newly_served": 10,
+          "lost_service": 5,
+          "loaded_delta_h": -0.00516994425228616,
+          "orders_delta": 6
+        },
+        {
+          "activation_hour": 14,
+          "slots": 50,
+          "newly_served": 8,
+          "lost_service": 4,
+          "loaded_delta_h": 3.0522983589718575,
+          "orders_delta": 9
+        },
+        {
+          "activation_hour": 15,
+          "slots": 51,
+          "newly_served": 7,
+          "lost_service": 6,
+          "loaded_delta_h": -1.0433825797868648,
+          "orders_delta": -3
+        },
+        {
+          "activation_hour": 16,
+          "slots": 46,
+          "newly_served": 4,
+          "lost_service": 4,
+          "loaded_delta_h": -0.26123975835469326,
+          "orders_delta": -3
+        },
+        {
+          "activation_hour": 17,
+          "slots": 49,
+          "newly_served": 6,
+          "lost_service": 6,
+          "loaded_delta_h": 0.9916639439046775,
+          "orders_delta": 3
+        },
+        {
+          "activation_hour": 18,
+          "slots": 51,
+          "newly_served": 3,
+          "lost_service": 3,
+          "loaded_delta_h": -1.0257667141244546,
+          "orders_delta": -9
+        },
+        {
+          "activation_hour": 19,
+          "slots": 59,
+          "newly_served": 9,
+          "lost_service": 5,
+          "loaded_delta_h": -0.30461833112276127,
+          "orders_delta": 0
+        },
+        {
+          "activation_hour": 20,
+          "slots": 51,
+          "newly_served": 13,
+          "lost_service": 5,
+          "loaded_delta_h": 0.5930272911210624,
+          "orders_delta": 9
+        },
+        {
+          "activation_hour": 21,
+          "slots": 44,
+          "newly_served": 3,
+          "lost_service": 2,
+          "loaded_delta_h": -0.08777832463647225,
+          "orders_delta": -1
+        },
+        {
+          "activation_hour": 22,
+          "slots": 27,
+          "newly_served": 0,
+          "lost_service": 3,
+          "loaded_delta_h": -0.2961541779941924,
+          "orders_delta": -4
+        },
+        {
+          "activation_hour": 23,
+          "slots": 15,
+          "newly_served": 1,
+          "lost_service": 3,
+          "loaded_delta_h": -0.29034598102215464,
+          "orders_delta": -2
+        }
+      ],
+      "transition_proxies": {
+        "NEWLY_SERVED": {
+          "slots": 115,
+          "opportunity_proxies": {
+            "historical_body_C_count_3days": {
+              "before_mean": 39.834782608695654,
+              "after_mean": 30.22608695652174
+            },
+            "historical_body_C_predicted_h_3days": {
+              "before_mean": 4.649177437022986,
+              "after_mean": 3.6955466801529524
+            },
+            "template_HV_nearby": {
+              "before_mean": 90.13913043478261,
+              "after_mean": 74.64347826086957
+            },
+            "baseline_parked_HV_nearby": {
+              "before_mean": 43.721739130434784,
+              "after_mean": 29.26086956521739
+            }
+          }
+        },
+        "LOST_SERVICE": {
+          "slots": 92,
+          "opportunity_proxies": {
+            "historical_body_C_count_3days": {
+              "before_mean": 33.58695652173913,
+              "after_mean": 22.119565217391305
+            },
+            "historical_body_C_predicted_h_3days": {
+              "before_mean": 3.867014043198059,
+              "after_mean": 2.449801535744534
+            },
+            "template_HV_nearby": {
+              "before_mean": 79.54347826086956,
+              "after_mean": 69.22826086956522
+            },
+            "baseline_parked_HV_nearby": {
+              "before_mean": 33.380434782608695,
+              "after_mean": 40.77173913043478
+            }
+          }
+        },
+        "BOTH_SERVED": {
+          "slots": 432,
+          "opportunity_proxies": {
+            "historical_body_C_count_3days": {
+              "before_mean": 43.34027777777778,
+              "after_mean": 34.013888888888886
+            },
+            "historical_body_C_predicted_h_3days": {
+              "before_mean": 5.130431526195021,
+              "after_mean": 4.056189958061152
+            },
+            "template_HV_nearby": {
+              "before_mean": 88.96527777777777,
+              "after_mean": 80.11574074074075
+            },
+            "baseline_parked_HV_nearby": {
+              "before_mean": 38.210648148148145,
+              "after_mean": 34.78472222222222
+            }
+          }
+        },
+        "NEITHER_SERVED": {
+          "slots": 212,
+          "opportunity_proxies": {
+            "historical_body_C_count_3days": {
+              "before_mean": 16.00943396226415,
+              "after_mean": 12.726415094339623
+            },
+            "historical_body_C_predicted_h_3days": {
+              "before_mean": 1.8185077860890206,
+              "after_mean": 1.439106542792894
+            },
+            "template_HV_nearby": {
+              "before_mean": 83.72641509433963,
+              "after_mean": 80.08962264150944
+            },
+            "baseline_parked_HV_nearby": {
+              "before_mean": 40.221698113207545,
+              "after_mean": 42.990566037735846
+            }
+          }
+        }
+      },
+      "spatial_grouping_by_after_birth_location_not_service_location": true,
+      "local_treatment_effect_or_HV_competition_causal_component_identified": false
+    },
+    "ALL_HOT_COMMON_CONTROL_to_OPPORTUNITY_JOINT_COMMON_CONTROL": {
+      "transitions": [
+        {
+          "transition": "BOTH_SERVED",
+          "slots": 345,
+          "orders_delta": -11,
+          "loaded_delta_h": 2.281465094699154,
+          "pre_first_idle_delta_h": -27.02683160597741,
+          "post_first_idle_delta_h": 24.301215369276488
+        },
+        {
+          "transition": "LOST_SERVICE",
+          "slots": 76,
+          "orders_delta": -123,
+          "loaded_delta_h": -14.235608779872925,
+          "pre_first_idle_delta_h": 60.71580411246383,
+          "post_first_idle_delta_h": -40.96203834722702
+        },
+        {
+          "transition": "NEITHER_SERVED",
+          "slots": 228,
+          "orders_delta": 0,
+          "loaded_delta_h": 0.0,
+          "pre_first_idle_delta_h": -0.4120870481830492,
+          "post_first_idle_delta_h": 0.0
+        },
+        {
+          "transition": "NEWLY_SERVED",
+          "slots": 202,
+          "orders_delta": 352,
+          "loaded_delta_h": 44.83427516143116,
+          "pre_first_idle_delta_h": -221.79737532749448,
+          "post_first_idle_delta_h": 158.39065714463902
+        }
+      ],
+      "activation_product_decomposition": {
+        "available": true,
+        "working_slots_before": 421,
+        "working_slots_after": 547,
+        "conditional_loaded_h_before": 0.24468486919426055,
+        "conditional_loaded_h_after": 0.2484322877642433,
+        "working_count_component_h": 31.066380888385744,
+        "conditional_intensity_component_h": 1.8137505878716547,
+        "total_loaded_delta_h": 32.88013147625739,
+        "causal_component_effects_identified": false
+      },
+      "loaded_delta_h": 32.88013147625739,
+      "orders_delta": 218,
+      "birth_cells_after_layout": [
+        {
+          "birth_cell": "10890_3421",
+          "center_lon_coarse": 108.905,
+          "center_lat_coarse": 34.215,
+          "slots": 123,
+          "newly_served": 33,
+          "lost_service": 7,
+          "loaded_delta_h": 7.573401717663154,
+          "orders_delta": 54,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10890_3422",
+          "center_lon_coarse": 108.905,
+          "center_lat_coarse": 34.225,
+          "slots": 48,
+          "newly_served": 17,
+          "lost_service": 1,
+          "loaded_delta_h": 6.512833941817826,
+          "orders_delta": 37,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10890_3423",
+          "center_lon_coarse": 108.905,
+          "center_lat_coarse": 34.235,
+          "slots": 48,
+          "newly_served": 7,
+          "lost_service": 8,
+          "loaded_delta_h": 1.434010806951116,
+          "orders_delta": 7,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10890_3424",
+          "center_lon_coarse": 108.905,
+          "center_lat_coarse": 34.245,
+          "slots": 63,
+          "newly_served": 1,
+          "lost_service": 11,
+          "loaded_delta_h": -2.4243657373094045,
+          "orders_delta": -19,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10890_3425",
+          "center_lon_coarse": 108.905,
+          "center_lat_coarse": 34.255,
+          "slots": 20,
+          "newly_served": 2,
+          "lost_service": 4,
+          "loaded_delta_h": -0.5868676731421207,
+          "orders_delta": -3,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10890_3426",
+          "center_lon_coarse": 108.905,
+          "center_lat_coarse": 34.265,
+          "slots": 23,
+          "newly_served": 5,
+          "lost_service": 0,
+          "loaded_delta_h": 1.7464941273852306,
+          "orders_delta": 16,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10890_3427",
+          "center_lon_coarse": 108.905,
+          "center_lat_coarse": 34.275,
+          "slots": 8,
+          "newly_served": 1,
+          "lost_service": 2,
+          "loaded_delta_h": -0.5661111111111111,
+          "orders_delta": -2,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10891_3420",
+          "center_lon_coarse": 108.915,
+          "center_lat_coarse": 34.205,
+          "slots": 43,
+          "newly_served": 10,
+          "lost_service": 2,
+          "loaded_delta_h": 2.6427024357182005,
+          "orders_delta": 19,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10891_3421",
+          "center_lon_coarse": 108.915,
+          "center_lat_coarse": 34.215,
+          "slots": 1,
+          "newly_served": 0,
+          "lost_service": 0,
+          "loaded_delta_h": 0.0,
+          "orders_delta": 0,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10891_3428",
+          "center_lon_coarse": 108.915,
+          "center_lat_coarse": 34.285000000000004,
+          "slots": 3,
+          "newly_served": 1,
+          "lost_service": 0,
+          "loaded_delta_h": 0.5605555555555555,
+          "orders_delta": 2,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10892_3420",
+          "center_lon_coarse": 108.925,
+          "center_lat_coarse": 34.205,
+          "slots": 9,
+          "newly_served": 5,
+          "lost_service": 0,
+          "loaded_delta_h": 0.9406049210106509,
+          "orders_delta": 11,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10892_3422",
+          "center_lon_coarse": 108.925,
+          "center_lat_coarse": 34.225,
+          "slots": 1,
+          "newly_served": 0,
+          "lost_service": 0,
+          "loaded_delta_h": 0.0002775222668857522,
+          "orders_delta": 0,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10892_3423",
+          "center_lon_coarse": 108.925,
+          "center_lat_coarse": 34.235,
+          "slots": 1,
+          "newly_served": 0,
+          "lost_service": 0,
+          "loaded_delta_h": 0.25722222222222224,
+          "orders_delta": 1,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10892_3428",
+          "center_lon_coarse": 108.925,
+          "center_lat_coarse": 34.285000000000004,
+          "slots": 33,
+          "newly_served": 3,
+          "lost_service": 3,
+          "loaded_delta_h": -1.682013883484944,
+          "orders_delta": -19,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10893_3420",
+          "center_lon_coarse": 108.935,
+          "center_lat_coarse": 34.205,
+          "slots": 26,
+          "newly_served": 12,
+          "lost_service": 0,
+          "loaded_delta_h": 2.6723036869884282,
+          "orders_delta": 25,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10893_3421",
+          "center_lon_coarse": 108.935,
+          "center_lat_coarse": 34.215,
+          "slots": 5,
+          "newly_served": 2,
+          "lost_service": 1,
+          "loaded_delta_h": 0.011349027896067676,
+          "orders_delta": 3,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10893_3425",
+          "center_lon_coarse": 108.935,
+          "center_lat_coarse": 34.255,
+          "slots": 1,
+          "newly_served": 0,
+          "lost_service": 1,
+          "loaded_delta_h": -0.06166666666666667,
+          "orders_delta": -1,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10894_3420",
+          "center_lon_coarse": 108.94500000000001,
+          "center_lat_coarse": 34.205,
+          "slots": 97,
+          "newly_served": 30,
+          "lost_service": 3,
+          "loaded_delta_h": 7.667878016575449,
+          "orders_delta": 43,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10894_3422",
+          "center_lon_coarse": 108.94500000000001,
+          "center_lat_coarse": 34.225,
+          "slots": 36,
+          "newly_served": 17,
+          "lost_service": 2,
+          "loaded_delta_h": 3.0152151124175686,
+          "orders_delta": 26,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10894_3426",
+          "center_lon_coarse": 108.94500000000001,
+          "center_lat_coarse": 34.265,
+          "slots": 1,
+          "newly_served": 0,
+          "lost_service": 0,
+          "loaded_delta_h": -0.027777777777777776,
+          "orders_delta": 0,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10894_3428",
+          "center_lon_coarse": 108.94500000000001,
+          "center_lat_coarse": 34.285000000000004,
+          "slots": 60,
+          "newly_served": 12,
+          "lost_service": 7,
+          "loaded_delta_h": 0.991113208810689,
+          "orders_delta": 8,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10895_3420",
+          "center_lon_coarse": 108.955,
+          "center_lat_coarse": 34.205,
+          "slots": 5,
+          "newly_served": 1,
+          "lost_service": 0,
+          "loaded_delta_h": 0.24821983671160622,
+          "orders_delta": 4,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10895_3422",
+          "center_lon_coarse": 108.955,
+          "center_lat_coarse": 34.225,
+          "slots": 3,
+          "newly_served": 0,
+          "lost_service": 0,
+          "loaded_delta_h": -0.2644444444444444,
+          "orders_delta": -4,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10895_3423",
+          "center_lon_coarse": 108.955,
+          "center_lat_coarse": 34.235,
+          "slots": 3,
+          "newly_served": 0,
+          "lost_service": 1,
+          "loaded_delta_h": 0.0952777777777778,
+          "orders_delta": -1,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10895_3426",
+          "center_lon_coarse": 108.955,
+          "center_lat_coarse": 34.265,
+          "slots": 6,
+          "newly_served": 1,
+          "lost_service": 0,
+          "loaded_delta_h": 0.6181273407677912,
+          "orders_delta": 1,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10895_3427",
+          "center_lon_coarse": 108.955,
+          "center_lat_coarse": 34.275,
+          "slots": 1,
+          "newly_served": 0,
+          "lost_service": 0,
+          "loaded_delta_h": 0.0,
+          "orders_delta": 0,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10896_3420",
+          "center_lon_coarse": 108.965,
+          "center_lat_coarse": 34.205,
+          "slots": 19,
+          "newly_served": 8,
+          "lost_service": 1,
+          "loaded_delta_h": 1.809878253999064,
+          "orders_delta": 14,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10896_3428",
+          "center_lon_coarse": 108.965,
+          "center_lat_coarse": 34.285000000000004,
+          "slots": 49,
+          "newly_served": 14,
+          "lost_service": 7,
+          "loaded_delta_h": 3.171579588347821,
+          "orders_delta": 15,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10897_3427",
+          "center_lon_coarse": 108.97500000000001,
+          "center_lat_coarse": 34.275,
+          "slots": 2,
+          "newly_served": 0,
+          "lost_service": 0,
+          "loaded_delta_h": 0.0,
+          "orders_delta": 0,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10899_3423",
+          "center_lon_coarse": 108.995,
+          "center_lat_coarse": 34.235,
+          "slots": 10,
+          "newly_served": 5,
+          "lost_service": 0,
+          "loaded_delta_h": -0.2370705314454487,
+          "orders_delta": 0,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10899_3424",
+          "center_lon_coarse": 108.995,
+          "center_lat_coarse": 34.245,
+          "slots": 10,
+          "newly_served": 1,
+          "lost_service": 2,
+          "loaded_delta_h": 0.6069444444444443,
+          "orders_delta": 1,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10899_3425",
+          "center_lon_coarse": 108.995,
+          "center_lat_coarse": 34.255,
+          "slots": 14,
+          "newly_served": 3,
+          "lost_service": 2,
+          "loaded_delta_h": -0.21997322239551276,
+          "orders_delta": 0,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10899_3426",
+          "center_lon_coarse": 108.995,
+          "center_lat_coarse": 34.265,
+          "slots": 8,
+          "newly_served": 0,
+          "lost_service": 5,
+          "loaded_delta_h": -3.353888888888889,
+          "orders_delta": -16,
+          "supported_for_rank": false
+        },
+        {
+          "birth_cell": "10899_3427",
+          "center_lon_coarse": 108.995,
+          "center_lat_coarse": 34.275,
+          "slots": 24,
+          "newly_served": 4,
+          "lost_service": 3,
+          "loaded_delta_h": 0.3392968073227691,
+          "orders_delta": 3,
+          "supported_for_rank": true
+        },
+        {
+          "birth_cell": "10899_3428",
+          "center_lon_coarse": 108.995,
+          "center_lat_coarse": 34.285000000000004,
+          "slots": 47,
+          "newly_served": 7,
+          "lost_service": 3,
+          "loaded_delta_h": -0.6109749397266124,
+          "orders_delta": -7,
+          "supported_for_rank": true
+        }
+      ],
+      "activation_hours": [
+        {
+          "activation_hour": 0,
+          "slots": 25,
+          "newly_served": 2,
+          "lost_service": 5,
+          "loaded_delta_h": -0.45851413862465806,
+          "orders_delta": -4
+        },
+        {
+          "activation_hour": 1,
+          "slots": 5,
+          "newly_served": 1,
+          "lost_service": 0,
+          "loaded_delta_h": 0.23548734685770548,
+          "orders_delta": 2
+        },
+        {
+          "activation_hour": 2,
+          "slots": 4,
+          "newly_served": 1,
+          "lost_service": 0,
+          "loaded_delta_h": 0.058888888888888886,
+          "orders_delta": 1
+        },
+        {
+          "activation_hour": 3,
+          "slots": 1,
+          "newly_served": 1,
+          "lost_service": 0,
+          "loaded_delta_h": 0.002483140759447653,
+          "orders_delta": 1
+        },
+        {
+          "activation_hour": 4,
+          "slots": 3,
+          "newly_served": 0,
+          "lost_service": 0,
+          "loaded_delta_h": 0.0,
+          "orders_delta": 0
+        },
+        {
+          "activation_hour": 5,
+          "slots": 5,
+          "newly_served": 0,
+          "lost_service": 1,
+          "loaded_delta_h": 0.11194444444444446,
+          "orders_delta": -2
+        },
+        {
+          "activation_hour": 6,
+          "slots": 19,
+          "newly_served": 6,
+          "lost_service": 2,
+          "loaded_delta_h": 1.1984395815735418,
+          "orders_delta": 8
+        },
+        {
+          "activation_hour": 7,
+          "slots": 47,
+          "newly_served": 8,
+          "lost_service": 4,
+          "loaded_delta_h": -0.1558174569184414,
+          "orders_delta": -1
+        },
+        {
+          "activation_hour": 8,
+          "slots": 55,
+          "newly_served": 18,
+          "lost_service": 3,
+          "loaded_delta_h": 4.642849645497473,
+          "orders_delta": 36
+        },
+        {
+          "activation_hour": 9,
+          "slots": 58,
+          "newly_served": 19,
+          "lost_service": 7,
+          "loaded_delta_h": 6.891821951645925,
+          "orders_delta": 31
+        },
+        {
+          "activation_hour": 10,
+          "slots": 48,
+          "newly_served": 15,
+          "lost_service": 6,
+          "loaded_delta_h": 3.0156678288529677,
+          "orders_delta": 13
+        },
+        {
+          "activation_hour": 11,
+          "slots": 49,
+          "newly_served": 12,
+          "lost_service": 3,
+          "loaded_delta_h": 4.834177260083704,
+          "orders_delta": 30
+        },
+        {
+          "activation_hour": 12,
+          "slots": 43,
+          "newly_served": 10,
+          "lost_service": 3,
+          "loaded_delta_h": 0.9610772242941208,
+          "orders_delta": 10
+        },
+        {
+          "activation_hour": 13,
+          "slots": 46,
+          "newly_served": 8,
+          "lost_service": 5,
+          "loaded_delta_h": -2.003420071614871,
+          "orders_delta": -14
+        },
+        {
+          "activation_hour": 14,
+          "slots": 50,
+          "newly_served": 13,
+          "lost_service": 4,
+          "loaded_delta_h": 4.052465406021095,
+          "orders_delta": 22
+        },
+        {
+          "activation_hour": 15,
+          "slots": 51,
+          "newly_served": 14,
+          "lost_service": 6,
+          "loaded_delta_h": 2.446026121668126,
+          "orders_delta": 16
+        },
+        {
+          "activation_hour": 16,
+          "slots": 46,
+          "newly_served": 10,
+          "lost_service": 4,
+          "loaded_delta_h": 1.1044975866138138,
+          "orders_delta": 7
+        },
+        {
+          "activation_hour": 17,
+          "slots": 49,
+          "newly_served": 12,
+          "lost_service": 5,
+          "loaded_delta_h": 2.7835199449031682,
+          "orders_delta": 19
+        },
+        {
+          "activation_hour": 18,
+          "slots": 51,
+          "newly_served": 13,
+          "lost_service": 3,
+          "loaded_delta_h": 0.19181818922012692,
+          "orders_delta": 7
+        },
+        {
+          "activation_hour": 19,
+          "slots": 59,
+          "newly_served": 12,
+          "lost_service": 5,
+          "loaded_delta_h": 2.649652837936754,
+          "orders_delta": 18
+        },
+        {
+          "activation_hour": 20,
+          "slots": 51,
+          "newly_served": 10,
+          "lost_service": 4,
+          "loaded_delta_h": -0.14555268209303088,
+          "orders_delta": 11
+        },
+        {
+          "activation_hour": 21,
+          "slots": 44,
+          "newly_served": 13,
+          "lost_service": 1,
+          "loaded_delta_h": 1.6447855180562732,
+          "orders_delta": 13
+        },
+        {
+          "activation_hour": 22,
+          "slots": 27,
+          "newly_served": 4,
+          "lost_service": 3,
+          "loaded_delta_h": -0.6734335356414036,
+          "orders_delta": -3
+        },
+        {
+          "activation_hour": 23,
+          "slots": 15,
+          "newly_served": 0,
+          "lost_service": 2,
+          "loaded_delta_h": -0.508733556167782,
+          "orders_delta": -3
+        }
+      ],
+      "transition_proxies": {
+        "NEWLY_SERVED": {
+          "slots": 202,
+          "opportunity_proxies": {
+            "historical_body_C_count_3days": {
+              "before_mean": 22.84158415841584,
+              "after_mean": 31.00990099009901
+            },
+            "historical_body_C_predicted_h_3days": {
+              "before_mean": 2.6067970127627933,
+              "after_mean": 3.7474011524498008
+            },
+            "template_HV_nearby": {
+              "before_mean": 83.14356435643565,
+              "after_mean": 79.54950495049505
+            },
+            "baseline_parked_HV_nearby": {
+              "before_mean": 60.65346534653465,
+              "after_mean": 29.247524752475247
+            }
+          }
+        },
+        "LOST_SERVICE": {
+          "slots": 76,
+          "opportunity_proxies": {
+            "historical_body_C_count_3days": {
+              "before_mean": 20.05263157894737,
+              "after_mean": 20.5
+            },
+            "historical_body_C_predicted_h_3days": {
+              "before_mean": 2.412076131369733,
+              "after_mean": 2.3209476913492844
+            },
+            "template_HV_nearby": {
+              "before_mean": 71.60526315789474,
+              "after_mean": 73.34210526315789
+            },
+            "baseline_parked_HV_nearby": {
+              "before_mean": 31.94736842105263,
+              "after_mean": 42.3421052631579
+            }
+          }
+        },
+        "BOTH_SERVED": {
+          "slots": 345,
+          "opportunity_proxies": {
+            "historical_body_C_count_3days": {
+              "before_mean": 30.08405797101449,
+              "after_mean": 34.51014492753623
+            },
+            "historical_body_C_predicted_h_3days": {
+              "before_mean": 3.576843963450579,
+              "after_mean": 4.116773615377238
+            },
+            "template_HV_nearby": {
+              "before_mean": 78.40579710144928,
+              "after_mean": 78.6231884057971
+            },
+            "baseline_parked_HV_nearby": {
+              "before_mean": 37.08985507246377,
+              "after_mean": 36.18550724637681
+            }
+          }
+        },
+        "NEITHER_SERVED": {
+          "slots": 228,
+          "opportunity_proxies": {
+            "historical_body_C_count_3days": {
+              "before_mean": 10.864035087719298,
+              "after_mean": 13.925438596491228
+            },
+            "historical_body_C_predicted_h_3days": {
+              "before_mean": 1.1979368227152227,
+              "after_mean": 1.5529837886756364
+            },
+            "template_HV_nearby": {
+              "before_mean": 76.59210526315789,
+              "after_mean": 77.95614035087719
+            },
+            "baseline_parked_HV_nearby": {
+              "before_mean": 49.70614035087719,
+              "after_mean": 42.31140350877193
+            }
+          }
+        }
+      },
+      "spatial_grouping_by_after_birth_location_not_service_location": true,
+      "local_treatment_effect_or_HV_competition_causal_component_identified": false
+    }
+  },
+  "projected_calendar_window_s": [
+    0,
+    86400.0
+  ],
+  "historical_proxy_dates": [
+    "20161010",
+    "20161017",
+    "20161024"
+  ],
+  "radius_m": 2000.0,
+  "birth_cell_grid_degrees": 0.01,
+  "historical_window": "RELEASE_FROM_ACTIVATION_MINUS_300_TO_MIN_ADMISSION_END_ACTIVATION_PLUS_1800",
+  "historical_proxy_is_body_compatibility_not_a_legal_pickup_arc": true,
+  "parked_HV_proxy_excludes_moving_and_busy_and_unknown_positions": true,
+  "baseline_HV_reference_is_all_hot_replay_not_exogenous_supply": true,
+  "own_replay_HV_states_are_endogenous_descriptive_mediators": true,
+  "per_vehicle_or_exact_coordinates_in_git": false,
+  "new_simulation": false,
+  "new_routing": false,
+  "new_inference": false,
+  "model_or_threshold_change": false,
+  "dense_matrix": false,
+  "gpu_used": false,
+  "all_slots_retained": true,
+  "independent_component_effects_identified": false,
+  "runtime_s": 12.093434200000047,
+  "peak_rss_mib": 225.71875
+}
