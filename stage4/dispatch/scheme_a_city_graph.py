@@ -422,7 +422,8 @@ _SPATIAL_ORDER_CACHE = _ExactSpatialOrderingCache()
 
 
 def _candidate_tasks(index: _TaskIndex, state: RouteState, radius: float, top_k: int,
-                     step: int, horizon: float, excluded: set[int], used: tuple[int, ...]):
+                     step: int, horizon: float, excluded: set[int], used: tuple[int, ...],
+                     *, match_deadline=False):
     """Exact old eligible Top-K using a cached complete spatial ordering.
 
     All eligibility masks and both diagnostic cardinalities remain exact. The
@@ -433,7 +434,8 @@ def _candidate_tasks(index: _TaskIndex, state: RouteState, radius: float, top_k:
     if isinstance(index, _CombinedIndex):
         # A component's first K eligible items suffice for the union's first K.
         # All spatial/eligible counts still use the complete neighborhoods.
-        parts = [_candidate_tasks(part, state, radius, top_k, step, horizon, excluded, used)
+        parts = [_candidate_tasks(part, state, radius, top_k, step, horizon, excluded, used,
+                    match_deadline=match_deadline)
                  for part in index.parts]
         here = np.asarray(_xy(state.position))
         candidates = [candidate for part in parts for candidate in part[0]]
@@ -455,7 +457,8 @@ def _candidate_tasks(index: _TaskIndex, state: RouteState, radius: float, top_k:
         eligible &= index.accepts_av[ordered]
     departures = np.ceil(np.maximum(state.ready_s, index.release_times[ordered]) / step) * step
     eligible &= departures < min(state.admission_end_s, horizon)
-    eligible &= departures <= index.deadlines[ordered]
+    eligible &= (departures < index.deadlines[ordered] if match_deadline
+                 else departures <= index.deadlines[ordered])
     if excluded or used:
         request_ids = index.request_ids[ordered]
         for rid in excluded.union(used):
@@ -575,8 +578,11 @@ def build_restricted_chains(
                 continue
             here = np.asarray(_xy(state.position))
             if len(label.request_ids) < service_cap and index.tree is not None:
+                from .waiting_contract import assignment_feasible, match_deadline_mode
+                split_wait = match_deadline_mode(cfg)
                 candidates, spatial_count, eligible_count, cache_hit = _candidate_tasks(
-                    index, state, radius, top_k, step, horizon, excluded, label.request_ids)
+                    index, state, radius, top_k, step, horizon, excluded, label.request_ids,
+                    match_deadline=split_wait)
                 diagnostics["task_spatial_candidates"] += spatial_count
                 diagnostics["task_temporal_profile_candidates"] += eligible_count
                 diagnostics["task_top_k_truncated"] += max(0, eligible_count - top_k)
@@ -600,7 +606,8 @@ def build_restricted_chains(
                     eta = float(connection["travel_time_s"])
                     distance = float(connection["empty_distance_m"])
                     pickup = depart + eta
-                    if pickup > task.deadline_s:
+                    if ((split_wait and not assignment_feasible(cfg, depart, task.deadline_s, eta))
+                            or (not split_wait and pickup > task.deadline_s)):
                         diagnostics["deadline_rejected"] += 1
                         continue
                     finish = pickup + task.service_time_s
