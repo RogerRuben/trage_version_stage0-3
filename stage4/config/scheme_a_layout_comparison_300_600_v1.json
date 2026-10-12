@@ -1,0 +1,10 @@
+{
+  "version": "scheme_a_layout_comparison_300_600_v1",
+  "base_config": "stage4/config/scheme_a_two_scale_city_v5_common.json",
+  "base_config_sha256": "d41b1d448d8c5342f45b40b625857fc7e018610ddf98d027bd8f00c684c9c836",
+  "layout_product": "PREPARED_300_600",
+  "source_layout": "stage4/output/capability_chain_planning/layout_300_600_v1/placements.json",
+  "source_layout_sha256": "4f11b259103014a0ad03cf62951893279d366abc628f977d28e42b8a9bc23826",
+  "groups": ["ALL_HOT_COMMON_CONTROL", "COMPATIBLE_HOT_COMMON_CONTROL", "OPPORTUNITY_JOINT_COMMON_CONTROL"],
+  "experiment_scope": "FIXED_THREE_PREPARED_LAYOUTS_IDENTICAL_COMMON_ONLINE_CONTROL"
+}

@@ -140,8 +140,8 @@ def _admission(plans, assignments, moves, expected):
     return result, hourly
 
 
-def _collect(root, version, summary, plans):
-    directory = root / OUT / f"two_scale_city_{version}" / GROUP
+def _collect(root, version, summary, plans, *, directory=None):
+    directory = root / OUT / f"two_scale_city_{version}" / GROUP if directory is None else Path(directory)
     cfg = summary["frozen_protocol"]
     typed = bool(cfg.get("typed_request_diagnostics", False))
     outcome = pd.read_parquet(directory / "cohort_outcomes.parquet", columns=ORDER_COLUMNS + (TYPED_COLUMNS if typed else []))

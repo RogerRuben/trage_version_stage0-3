@@ -86,12 +86,28 @@ def load_frozen_layout(root, cfg):
         raise ValueError("frozen completed layout bytes changed")
     receipt = json.loads(source.read_text(encoding="utf-8"))
     positions = receipt["placements"]
-    if (receipt["status"] != "LAYOUT_COMPLETE"
-            or len(positions["records"]) != cfg["expected_layout_bins"]
-            or len(positions["joint"]) != cfg["expected_av_slots"]
-            or set(positions["joint"]) != set(positions["hotspot"])):
-        raise ValueError("existing layout is not the complete same-slot 47-bin product")
-    protected = dict(receipt["inputs_sha256"])
+    if cfg.get("layout_product") == "PREPARED_300_600":
+        modes = ("all_hot", "compatible_hot", "opportunity_joint")
+        if (receipt["status"] != "LAYOUTS_PREPARED_300_600" or set(positions) != set(modes)
+                or len(receipt["records"]) != cfg["expected_layout_bins"]
+                or any(len(positions[mode]) != cfg["expected_av_slots"]
+                    or set(positions[mode]) != set(positions[modes[0]]) for mode in modes)
+                or receipt["binding"]["waiting_contract"] != dict(max_match_wait_s=300, max_pickup_eta_s=600)
+                or (cfg.get("max_match_wait_s"), cfg.get("max_pickup_eta_s")) != (300, 600)):
+            raise ValueError("prepared 300/600 layouts are not the complete same-slot product")
+        protected = dict(receipt["binding"]["inputs_sha256"])
+        # Reuse the existing environment sources, without another evidence tree.
+        for relative in ("stage4/config/scheme_a_city_v1.json",
+                         "stage4/input/replay_foundation/stage4_order_replay_base.parquet",
+                         cfg["source_routes"], cfg["remaining_time_model"], cfg["controlled_source_config"]):
+            protected[relative] = _sha(root / relative)
+    else:
+        if (receipt["status"] != "LAYOUT_COMPLETE"
+                or len(positions["records"]) != cfg["expected_layout_bins"]
+                or len(positions["joint"]) != cfg["expected_av_slots"]
+                or set(positions["joint"]) != set(positions["hotspot"])):
+            raise ValueError("existing layout is not the complete same-slot 47-bin product")
+        protected = dict(receipt["inputs_sha256"])
     for relative, expected in protected.items():
         if _sha(root / relative) != expected:
             raise ValueError(f"frozen layout source changed: {relative}")
@@ -261,6 +277,9 @@ def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
                 raise RuntimeError("full-day source clock differs from the frozen Test31 span")
         if apply_av_layout(episode, layout["placements"][cfg["layout_mode"]]) != cfg["expected_av_slots"]:
             raise RuntimeError("reused layout does not cover the exact original AV slots")
+        if (cfg.get("layout_product") == "PREPARED_300_600"
+                and episode.supply.inventory()["accounting"]["type_label_sha256"] != layout["type_label_sha256"]):
+            raise RuntimeError("prepared layout and native episode have different effective supply labels")
         phases["frozen_layout_and_episode_load_s"] = perf_counter() - loaded
         summary.update(inputs_sha256=protected, frozen_protocol=cfg,
             layout_sha256=cfg["source_layout_sha256"], layout_bins_reused=47, AV_slots_reused=851)

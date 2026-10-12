@@ -512,6 +512,12 @@ def plan_av_layout(episode, library, reference, connectors, cfg, guard, progress
 
 def apply_av_layout(episode, placements):
     before = episode.supply.plan()
+    if set(placements) != {p.vehicle_id for p in before if p.vehicle_type == "AV"}:
+        raise ValueError("layout keys must equal the exact original AV slot identities")
+    if any(len(row["position"]) != 2 or not all(isfinite(float(v)) for v in row["position"])
+           or not -180 <= float(row["position"][0]) <= 180
+           or not -90 <= float(row["position"][1]) <= 90 for row in placements.values()):
+        raise ValueError("layout contains an invalid WGS84 position")
     after = tuple(replace(p, initial_lon_wgs84=float(placements[p.vehicle_id]["position"][0]),
         initial_lat_wgs84=float(placements[p.vehicle_id]["position"][1])) if p.vehicle_type == "AV" else p for p in before)
     identity = lambda p: (p.vehicle_id, p.native_id, p.slot_id, p.vehicle_type, p.profile_id,

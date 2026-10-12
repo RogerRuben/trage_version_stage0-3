@@ -32,6 +32,10 @@ DOC = Path("stage4/docs/capability_chain_planning/two_scale_city_v2")
 GROUPS = ("HOTSPOT_BASELINE", "CHAIN_LAYOUT_BASELINE", "CHAIN_LAYOUT_JOINT")
 GROUP_RULES = dict(zip(GROUPS, (("hotspot", "SERVICE_PRESERVING"),
     ("joint", "SERVICE_PRESERVING"), ("joint", "CHAIN_DEFER"))))
+LAYOUT_VERSION = "scheme_a_layout_comparison_300_600_v1"
+LAYOUT_RULES = dict(zip(("ALL_HOT_COMMON_CONTROL", "COMPATIBLE_HOT_COMMON_CONTROL",
+    "OPPORTUNITY_JOINT_COMMON_CONTROL"), ((mode, "SERVICE_PRESERVING")
+    for mode in ("all_hot", "compatible_hot", "opportunity_joint"))))
 COMPLETE = "TWO_SCALE_CITY_GROUP_COMPLETE"
 PRODUCTS = ("assignments.parquet", "cohort_outcomes.parquet", "solver_trace.parquet",
     "epochs.parquet", "empty_movements.parquet", "step_timings.parquet", "coarse_refreshes.json")
@@ -55,6 +59,10 @@ _V5_FIXED = dict(version="scheme_a_two_scale_city_v5", typed_request_diagnostics
     typed_reposition_manifest="stage4/output/capability_chain_planning/operations_v5_input/manifest.json")
 _V5_COMMON_FIXED = dict(version="scheme_a_two_scale_city_v5_common",
     idle_movement_mode="COMMON_HISTORICAL_DEFICIT")
+_LAYOUT_FIXED = dict(version=LAYOUT_VERSION, layout_product="PREPARED_300_600",
+    source_layout="stage4/output/capability_chain_planning/layout_300_600_v1/placements.json",
+    source_layout_sha256="4f11b259103014a0ad03cf62951893279d366abc628f977d28e42b8a9bc23826",
+    experiment_scope="FIXED_THREE_PREPARED_LAYOUTS_IDENTICAL_COMMON_ONLINE_CONTROL")
 
 
 def output_root(cfg):
@@ -68,6 +76,15 @@ def document_root(cfg):
 def load_protocol(root, path=CONFIG):
     root, path = Path(root), Path(path)
     overrides = json.loads((root / path).read_text(encoding="utf-8"))
+    if overrides.get("version") == LAYOUT_VERSION:
+        base_path = Path("stage4/config/scheme_a_two_scale_city_v5_common.json")
+        if (set(overrides) != set(_LAYOUT_FIXED) | {"base_config", "base_config_sha256", "groups"}
+                or any(overrides.get(key) != value for key, value in _LAYOUT_FIXED.items())
+                or Path(overrides["base_config"]) != base_path
+                or _sha(root / base_path) != overrides["base_config_sha256"]
+                or tuple(overrides["groups"]) != tuple(LAYOUT_RULES)):
+            raise ValueError("layout comparison changes only prepared positions under the common control")
+        return dict(load_protocol(root, base_path), **overrides)
     if overrides.get("version") == _V5_COMMON_FIXED["version"]:
         base_path = Path("stage4/config/scheme_a_two_scale_city_v5.json")
         if (set(overrides) != set(_V5_COMMON_FIXED) | {"base_config", "base_config_sha256"}
@@ -117,9 +134,10 @@ def load_protocol(root, path=CONFIG):
 
 
 def group_configuration(cfg, group):
-    if group not in GROUP_RULES:
+    rules = LAYOUT_RULES if cfg["version"] == LAYOUT_VERSION else GROUP_RULES
+    if group not in rules:
         raise ValueError("only the three original full-day groups are authorized")
-    layout, policy = GROUP_RULES[group]
+    layout, policy = rules[group]
     return dict(cfg, group=group, layout_mode=layout, policy=policy,
         disk_route_cache=(output_root(cfg) / group / "routing/cache.sqlite3").as_posix())
 
@@ -155,9 +173,9 @@ def completed_group(directory, expected):
                 != (expected["group"], expected["layout_mode"], expected["policy"])
             or any(not (directory / product).is_file() for product in
                 PRODUCTS + (("request_decisions.parquet",) if expected.get("version") in
-                    (_V3_FIXED["version"], _V4_FIXED["version"], _V5_FIXED["version"], _V5_COMMON_FIXED["version"]) else ()))):
+                    (_V3_FIXED["version"], _V4_FIXED["version"], _V5_FIXED["version"], _V5_COMMON_FIXED["version"], LAYOUT_VERSION) else ()))):
         raise ValueError("existing group is not a complete identical full-day group; no automatic retry")
-    if expected.get("version") in (_V5_FIXED["version"], _V5_COMMON_FIXED["version"]) and not summary.get("request_decision_diagnostics", {}).get("typed_final_candidate_counts_enabled"):
+    if expected.get("version") in (_V5_FIXED["version"], _V5_COMMON_FIXED["version"], LAYOUT_VERSION) and not summary.get("request_decision_diagnostics", {}).get("typed_final_candidate_counts_enabled"):
         raise ValueError("completed v5 group is missing its typed final-candidate evidence")
     return summary
 
@@ -284,10 +302,13 @@ def _run_child(root, fleetpy, config, cfg, group, binding):
 
 def run(root, fleetpy=FLEETPY, config=CONFIG, *, resume=False, group=None):
     root, fleetpy, config = Path(root).resolve(), Path(fleetpy), Path(config)
-    if group is not None and group not in GROUPS:
+    if group is not None and group not in (*GROUPS, *LAYOUT_RULES):
         raise ValueError("--group must name one existing full-day group")
-    selected = (group,) if group is not None else GROUPS
     cfg = load_protocol(root, config)
+    groups = tuple(LAYOUT_RULES) if cfg["version"] == LAYOUT_VERSION else GROUPS
+    if group is not None and group not in groups:
+        raise ValueError("--group must name one existing full-day group of this protocol")
+    selected = (group,) if group is not None else groups
     if cfg["version"] == _V5_COMMON_FIXED["version"] and selected != ("CHAIN_LAYOUT_BASELINE",):
         raise ValueError("common-movement ablation runs only CHAIN_LAYOUT_BASELINE; specify --group")
     binding = input_binding(root, cfg, config)
@@ -299,12 +320,12 @@ def run(root, fleetpy=FLEETPY, config=CONFIG, *, resume=False, group=None):
     existing = {}
     if status_path.is_file():
         old = json.loads(status_path.read_text())
-        if tuple(old.get("group_order", GROUPS)) != selected:
+        if tuple(old.get("group_order", groups)) != selected:
             raise ValueError("existing experiment has a different group selection; no implicit expansion or overwrite")
         if (old.get("pid") != os.getpid() and old.get("process_create_time") is not None
                 and _process_running(old["pid"], old["process_create_time"])):
             raise ValueError("the existing coordinator is still running; no second experiment process")
-    for group in GROUPS:
+    for group in groups:
         result_dir = directory / group
         receipt_path = directory / "execution_receipts" / f"{group}.json"
         if receipt_path.is_file():
@@ -372,9 +393,9 @@ def main():
     parser.add_argument("--fleetpy-root", type=Path, default=FLEETPY)
     parser.add_argument("--config", type=Path, default=CONFIG)
     parser.add_argument("--resume", action="store_true")
-    parser.add_argument("--group", choices=GROUPS,
+    parser.add_argument("--group", choices=(*GROUPS, *LAYOUT_RULES),
         help="run only one existing group; omitted retains the original three-group order")
-    parser.add_argument("--_group", choices=GROUPS, help=argparse.SUPPRESS)
+    parser.add_argument("--_group", choices=(*GROUPS, *LAYOUT_RULES), help=argparse.SUPPRESS)
     args = parser.parse_args()
     if args._group:
         if args.resume or args.group:
