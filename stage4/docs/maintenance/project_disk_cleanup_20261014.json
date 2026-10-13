@@ -1,0 +1,406 @@
+{
+  "client_date": "2026-10-14",
+  "worktree": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla",
+  "apply": true,
+  "planned_file_count": 51,
+  "planned_bytes": 5254449695,
+  "deleted_file_count": 51,
+  "deleted_bytes": 5254449695,
+  "free_before_bytes": 1639116800,
+  "free_after_bytes": 6893621248,
+  "protected_file_count": 45,
+  "protected_changed": [],
+  "category_totals": [
+    {
+      "category": "completed_group_raw_route_cache",
+      "files": 27,
+      "bytes": 181997568
+    },
+    {
+      "category": "legacy_oracle_features",
+      "files": 19,
+      "bytes": 3448371348
+    },
+    {
+      "category": "m0_work_matrix",
+      "files": 5,
+      "bytes": 1624080779
+    }
+  ],
+  "deletions": [
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage2\\output_v4\\route_conditioned_dataset\\oracle_timing\\day=20161009.parquet",
+      "relative": "stage2/output_v4/route_conditioned_dataset/oracle_timing/day=20161009.parquet",
+      "category": "legacy_oracle_features",
+      "bytes": 179425154,
+      "modified_utc": "2026-07-30T19:00:44.3601775Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage2\\output_v4\\route_conditioned_dataset\\oracle_timing\\day=20161010.parquet",
+      "relative": "stage2/output_v4/route_conditioned_dataset/oracle_timing/day=20161010.parquet",
+      "category": "legacy_oracle_features",
+      "bytes": 181569468,
+      "modified_utc": "2026-07-30T19:06:24.7965477Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage2\\output_v4\\route_conditioned_dataset\\oracle_timing\\day=20161011.parquet",
+      "relative": "stage2/output_v4/route_conditioned_dataset/oracle_timing/day=20161011.parquet",
+      "category": "legacy_oracle_features",
+      "bytes": 182300250,
+      "modified_utc": "2026-07-30T19:12:36.1045093Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage2\\output_v4\\route_conditioned_dataset\\oracle_timing\\day=20161012.parquet",
+      "relative": "stage2/output_v4/route_conditioned_dataset/oracle_timing/day=20161012.parquet",
+      "category": "legacy_oracle_features",
+      "bytes": 181450184,
+      "modified_utc": "2026-07-30T19:18:58.4346631Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage2\\output_v4\\route_conditioned_dataset\\oracle_timing\\day=20161013.parquet",
+      "relative": "stage2/output_v4/route_conditioned_dataset/oracle_timing/day=20161013.parquet",
+      "category": "legacy_oracle_features",
+      "bytes": 180964435,
+      "modified_utc": "2026-07-30T19:25:30.0275215Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage2\\output_v4\\route_conditioned_dataset\\oracle_timing\\day=20161014.parquet",
+      "relative": "stage2/output_v4/route_conditioned_dataset/oracle_timing/day=20161014.parquet",
+      "category": "legacy_oracle_features",
+      "bytes": 180826224,
+      "modified_utc": "2026-07-30T19:32:01.7641861Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage2\\output_v4\\route_conditioned_dataset\\oracle_timing\\day=20161015.parquet",
+      "relative": "stage2/output_v4/route_conditioned_dataset/oracle_timing/day=20161015.parquet",
+      "category": "legacy_oracle_features",
+      "bytes": 185427022,
+      "modified_utc": "2026-07-30T19:37:56.3687593Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage2\\output_v4\\route_conditioned_dataset\\oracle_timing\\day=20161016.parquet",
+      "relative": "stage2/output_v4/route_conditioned_dataset/oracle_timing/day=20161016.parquet",
+      "category": "legacy_oracle_features",
+      "bytes": 184669594,
+      "modified_utc": "2026-07-30T19:44:00.7514080Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage2\\output_v4\\route_conditioned_dataset\\oracle_timing\\day=20161017.parquet",
+      "relative": "stage2/output_v4/route_conditioned_dataset/oracle_timing/day=20161017.parquet",
+      "category": "legacy_oracle_features",
+      "bytes": 181050469,
+      "modified_utc": "2026-07-30T19:50:34.7239784Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage2\\output_v4\\route_conditioned_dataset\\oracle_timing\\day=20161018.parquet",
+      "relative": "stage2/output_v4/route_conditioned_dataset/oracle_timing/day=20161018.parquet",
+      "category": "legacy_oracle_features",
+      "bytes": 181428362,
+      "modified_utc": "2026-07-30T19:57:08.4995086Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage2\\output_v4\\route_conditioned_dataset\\oracle_timing\\day=20161019.parquet",
+      "relative": "stage2/output_v4/route_conditioned_dataset/oracle_timing/day=20161019.parquet",
+      "category": "legacy_oracle_features",
+      "bytes": 181889335,
+      "modified_utc": "2026-07-30T20:03:45.0218435Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage2\\output_v4\\route_conditioned_dataset\\oracle_timing\\day=20161020.parquet",
+      "relative": "stage2/output_v4/route_conditioned_dataset/oracle_timing/day=20161020.parquet",
+      "category": "legacy_oracle_features",
+      "bytes": 183018219,
+      "modified_utc": "2026-07-30T20:10:25.0515692Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage2\\output_v4\\route_conditioned_dataset\\oracle_timing\\day=20161021.parquet",
+      "relative": "stage2/output_v4/route_conditioned_dataset/oracle_timing/day=20161021.parquet",
+      "category": "legacy_oracle_features",
+      "bytes": 184234495,
+      "modified_utc": "2026-07-30T20:17:04.0474381Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage2\\output_v4\\route_conditioned_dataset\\oracle_timing\\day=20161022.parquet",
+      "relative": "stage2/output_v4/route_conditioned_dataset/oracle_timing/day=20161022.parquet",
+      "category": "legacy_oracle_features",
+      "bytes": 183674402,
+      "modified_utc": "2026-07-30T20:23:18.9545307Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage2\\output_v4\\route_conditioned_dataset\\oracle_timing\\day=20161023.parquet",
+      "relative": "stage2/output_v4/route_conditioned_dataset/oracle_timing/day=20161023.parquet",
+      "category": "legacy_oracle_features",
+      "bytes": 181058527,
+      "modified_utc": "2026-07-30T20:29:30.8823795Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage2\\output_v4\\route_conditioned_dataset\\oracle_timing\\day=20161024.parquet",
+      "relative": "stage2/output_v4/route_conditioned_dataset/oracle_timing/day=20161024.parquet",
+      "category": "legacy_oracle_features",
+      "bytes": 178133047,
+      "modified_utc": "2026-07-30T20:36:10.2906444Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage2\\output_v4\\route_conditioned_dataset\\oracle_timing\\day=20161025.parquet",
+      "relative": "stage2/output_v4/route_conditioned_dataset/oracle_timing/day=20161025.parquet",
+      "category": "legacy_oracle_features",
+      "bytes": 179318546,
+      "modified_utc": "2026-07-30T20:42:59.6621801Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage2\\output_v4\\route_conditioned_dataset\\oracle_timing\\day=20161026.parquet",
+      "relative": "stage2/output_v4/route_conditioned_dataset/oracle_timing/day=20161026.parquet",
+      "category": "legacy_oracle_features",
+      "bytes": 179749135,
+      "modified_utc": "2026-07-30T20:49:46.0550620Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage2\\output_v4\\route_conditioned_dataset\\oracle_timing\\day=20161027.parquet",
+      "relative": "stage2/output_v4/route_conditioned_dataset/oracle_timing/day=20161027.parquet",
+      "category": "legacy_oracle_features",
+      "bytes": 178184480,
+      "modified_utc": "2026-07-30T21:02:41.3501699Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage2\\output_v5_2\\development\\M0\\train_matrix.npz",
+      "relative": "stage2/output_v5_2/development/M0/train_matrix.npz",
+      "category": "m0_work_matrix",
+      "bytes": 758769833,
+      "modified_utc": "2026-08-09T10:40:27.8660280Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage2\\output_v5_2\\development\\M0\\validation_matrix.npz",
+      "relative": "stage2/output_v5_2/development/M0/validation_matrix.npz",
+      "category": "m0_work_matrix",
+      "bytes": 119732066,
+      "modified_utc": "2026-08-09T10:41:51.7622685Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage2\\output_v5_2\\development\\M0\\evaluation_matrix.npz",
+      "relative": "stage2/output_v5_2/development/M0/evaluation_matrix.npz",
+      "category": "m0_work_matrix",
+      "bytes": 177738917,
+      "modified_utc": "2026-08-09T10:42:43.4660156Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage2\\output_v5_2\\transfer_tuning\\M0\\train_matrix.npz",
+      "relative": "stage2/output_v5_2/transfer_tuning/M0/train_matrix.npz",
+      "category": "m0_work_matrix",
+      "bytes": 471630371,
+      "modified_utc": "2026-08-09T03:03:43.9195783Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage2\\output_v5_2\\transfer_tuning\\M0\\validation_matrix.npz",
+      "relative": "stage2/output_v5_2/transfer_tuning/M0/validation_matrix.npz",
+      "category": "m0_work_matrix",
+      "bytes": 96209592,
+      "modified_utc": "2026-08-09T03:04:13.6042772Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\capability_chain_planning\\layout_comparison_300_600_v1\\ALL_HOT_COMMON_CONTROL\\routing\\cache.sqlite3",
+      "relative": "stage4/output/capability_chain_planning/layout_comparison_300_600_v1/ALL_HOT_COMMON_CONTROL/routing/cache.sqlite3",
+      "category": "completed_group_raw_route_cache",
+      "bytes": 20578304,
+      "modified_utc": "2026-10-12T02:18:02.5027664Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\capability_chain_planning\\layout_comparison_300_600_v1\\ALL_HOT_COMMON_CONTROL\\routing\\cache.sqlite3-wal",
+      "relative": "stage4/output/capability_chain_planning/layout_comparison_300_600_v1/ALL_HOT_COMMON_CONTROL/routing/cache.sqlite3-wal",
+      "category": "completed_group_raw_route_cache",
+      "bytes": 0,
+      "modified_utc": "2026-10-13T16:32:31.3809653Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\capability_chain_planning\\layout_comparison_300_600_v1\\ALL_HOT_COMMON_CONTROL\\routing\\cache.sqlite3-shm",
+      "relative": "stage4/output/capability_chain_planning/layout_comparison_300_600_v1/ALL_HOT_COMMON_CONTROL/routing/cache.sqlite3-shm",
+      "category": "completed_group_raw_route_cache",
+      "bytes": 32768,
+      "modified_utc": "2026-10-13T16:32:31.3821216Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\capability_chain_planning\\layout_comparison_300_600_v1\\COMPATIBLE_HOT_COMMON_CONTROL\\routing\\cache.sqlite3",
+      "relative": "stage4/output/capability_chain_planning/layout_comparison_300_600_v1/COMPATIBLE_HOT_COMMON_CONTROL/routing/cache.sqlite3",
+      "category": "completed_group_raw_route_cache",
+      "bytes": 20332544,
+      "modified_utc": "2026-10-12T03:22:20.1569328Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\capability_chain_planning\\layout_comparison_300_600_v1\\COMPATIBLE_HOT_COMMON_CONTROL\\routing\\cache.sqlite3-wal",
+      "relative": "stage4/output/capability_chain_planning/layout_comparison_300_600_v1/COMPATIBLE_HOT_COMMON_CONTROL/routing/cache.sqlite3-wal",
+      "category": "completed_group_raw_route_cache",
+      "bytes": 0,
+      "modified_utc": "2026-10-13T16:32:31.3890970Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\capability_chain_planning\\layout_comparison_300_600_v1\\COMPATIBLE_HOT_COMMON_CONTROL\\routing\\cache.sqlite3-shm",
+      "relative": "stage4/output/capability_chain_planning/layout_comparison_300_600_v1/COMPATIBLE_HOT_COMMON_CONTROL/routing/cache.sqlite3-shm",
+      "category": "completed_group_raw_route_cache",
+      "bytes": 32768,
+      "modified_utc": "2026-10-13T16:32:31.3901078Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\capability_chain_planning\\layout_comparison_300_600_v1\\OPPORTUNITY_JOINT_COMMON_CONTROL\\routing\\cache.sqlite3",
+      "relative": "stage4/output/capability_chain_planning/layout_comparison_300_600_v1/OPPORTUNITY_JOINT_COMMON_CONTROL/routing/cache.sqlite3",
+      "category": "completed_group_raw_route_cache",
+      "bytes": 20660224,
+      "modified_utc": "2026-10-12T04:00:35.6654214Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\capability_chain_planning\\layout_comparison_300_600_v1\\OPPORTUNITY_JOINT_COMMON_CONTROL\\routing\\cache.sqlite3-wal",
+      "relative": "stage4/output/capability_chain_planning/layout_comparison_300_600_v1/OPPORTUNITY_JOINT_COMMON_CONTROL/routing/cache.sqlite3-wal",
+      "category": "completed_group_raw_route_cache",
+      "bytes": 0,
+      "modified_utc": "2026-10-13T16:32:31.3941604Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\capability_chain_planning\\layout_comparison_300_600_v1\\OPPORTUNITY_JOINT_COMMON_CONTROL\\routing\\cache.sqlite3-shm",
+      "relative": "stage4/output/capability_chain_planning/layout_comparison_300_600_v1/OPPORTUNITY_JOINT_COMMON_CONTROL/routing/cache.sqlite3-shm",
+      "category": "completed_group_raw_route_cache",
+      "bytes": 32768,
+      "modified_utc": "2026-10-13T16:32:31.3951598Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\capability_chain_planning\\layout_confirmation_v1\\Q05_REFERENCE_LABELS\\native\\COMPATIBLE_HOT_COMMON_CONTROL\\routing\\cache.sqlite3",
+      "relative": "stage4/output/capability_chain_planning/layout_confirmation_v1/Q05_REFERENCE_LABELS/native/COMPATIBLE_HOT_COMMON_CONTROL/routing/cache.sqlite3",
+      "category": "completed_group_raw_route_cache",
+      "bytes": 20713472,
+      "modified_utc": "2026-10-13T11:00:06.0509627Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\capability_chain_planning\\layout_confirmation_v1\\Q05_REFERENCE_LABELS\\native\\COMPATIBLE_HOT_COMMON_CONTROL\\routing\\cache.sqlite3-wal",
+      "relative": "stage4/output/capability_chain_planning/layout_confirmation_v1/Q05_REFERENCE_LABELS/native/COMPATIBLE_HOT_COMMON_CONTROL/routing/cache.sqlite3-wal",
+      "category": "completed_group_raw_route_cache",
+      "bytes": 0,
+      "modified_utc": "2026-10-13T16:32:31.3996169Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\capability_chain_planning\\layout_confirmation_v1\\Q05_REFERENCE_LABELS\\native\\COMPATIBLE_HOT_COMMON_CONTROL\\routing\\cache.sqlite3-shm",
+      "relative": "stage4/output/capability_chain_planning/layout_confirmation_v1/Q05_REFERENCE_LABELS/native/COMPATIBLE_HOT_COMMON_CONTROL/routing/cache.sqlite3-shm",
+      "category": "completed_group_raw_route_cache",
+      "bytes": 32768,
+      "modified_utc": "2026-10-13T16:32:31.4005967Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\capability_chain_planning\\layout_confirmation_v1\\Q05_REFERENCE_LABELS\\native\\OPPORTUNITY_JOINT_COMMON_CONTROL\\routing\\cache.sqlite3",
+      "relative": "stage4/output/capability_chain_planning/layout_confirmation_v1/Q05_REFERENCE_LABELS/native/OPPORTUNITY_JOINT_COMMON_CONTROL/routing/cache.sqlite3",
+      "category": "completed_group_raw_route_cache",
+      "bytes": 20660224,
+      "modified_utc": "2026-10-13T11:46:05.9831101Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\capability_chain_planning\\layout_confirmation_v1\\Q05_REFERENCE_LABELS\\native\\OPPORTUNITY_JOINT_COMMON_CONTROL\\routing\\cache.sqlite3-wal",
+      "relative": "stage4/output/capability_chain_planning/layout_confirmation_v1/Q05_REFERENCE_LABELS/native/OPPORTUNITY_JOINT_COMMON_CONTROL/routing/cache.sqlite3-wal",
+      "category": "completed_group_raw_route_cache",
+      "bytes": 0,
+      "modified_utc": "2026-10-13T16:32:31.4045668Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\capability_chain_planning\\layout_confirmation_v1\\Q05_REFERENCE_LABELS\\native\\OPPORTUNITY_JOINT_COMMON_CONTROL\\routing\\cache.sqlite3-shm",
+      "relative": "stage4/output/capability_chain_planning/layout_confirmation_v1/Q05_REFERENCE_LABELS/native/OPPORTUNITY_JOINT_COMMON_CONTROL/routing/cache.sqlite3-shm",
+      "category": "completed_group_raw_route_cache",
+      "bytes": 32768,
+      "modified_utc": "2026-10-13T16:32:31.4045668Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\capability_chain_planning\\layout_confirmation_v1\\Q10_LABEL_SEED2\\native\\COMPATIBLE_HOT_COMMON_CONTROL\\routing\\cache.sqlite3",
+      "relative": "stage4/output/capability_chain_planning/layout_confirmation_v1/Q10_LABEL_SEED2/native/COMPATIBLE_HOT_COMMON_CONTROL/routing/cache.sqlite3",
+      "category": "completed_group_raw_route_cache",
+      "bytes": 20271104,
+      "modified_utc": "2026-10-13T08:15:57.5752800Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\capability_chain_planning\\layout_confirmation_v1\\Q10_LABEL_SEED2\\native\\COMPATIBLE_HOT_COMMON_CONTROL\\routing\\cache.sqlite3-wal",
+      "relative": "stage4/output/capability_chain_planning/layout_confirmation_v1/Q10_LABEL_SEED2/native/COMPATIBLE_HOT_COMMON_CONTROL/routing/cache.sqlite3-wal",
+      "category": "completed_group_raw_route_cache",
+      "bytes": 0,
+      "modified_utc": "2026-10-13T16:32:31.4098997Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\capability_chain_planning\\layout_confirmation_v1\\Q10_LABEL_SEED2\\native\\COMPATIBLE_HOT_COMMON_CONTROL\\routing\\cache.sqlite3-shm",
+      "relative": "stage4/output/capability_chain_planning/layout_confirmation_v1/Q10_LABEL_SEED2/native/COMPATIBLE_HOT_COMMON_CONTROL/routing/cache.sqlite3-shm",
+      "category": "completed_group_raw_route_cache",
+      "bytes": 32768,
+      "modified_utc": "2026-10-13T16:32:31.4098997Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\capability_chain_planning\\layout_confirmation_v1\\Q10_LABEL_SEED2\\native\\OPPORTUNITY_JOINT_COMMON_CONTROL\\routing\\cache.sqlite3",
+      "relative": "stage4/output/capability_chain_planning/layout_confirmation_v1/Q10_LABEL_SEED2/native/OPPORTUNITY_JOINT_COMMON_CONTROL/routing/cache.sqlite3",
+      "category": "completed_group_raw_route_cache",
+      "bytes": 20426752,
+      "modified_utc": "2026-10-13T10:11:02.1729607Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\capability_chain_planning\\layout_confirmation_v1\\Q10_LABEL_SEED2\\native\\OPPORTUNITY_JOINT_COMMON_CONTROL\\routing\\cache.sqlite3-wal",
+      "relative": "stage4/output/capability_chain_planning/layout_confirmation_v1/Q10_LABEL_SEED2/native/OPPORTUNITY_JOINT_COMMON_CONTROL/routing/cache.sqlite3-wal",
+      "category": "completed_group_raw_route_cache",
+      "bytes": 0,
+      "modified_utc": "2026-10-13T15:35:37.9483444Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\capability_chain_planning\\layout_confirmation_v1\\Q10_LABEL_SEED2\\native\\OPPORTUNITY_JOINT_COMMON_CONTROL\\routing\\cache.sqlite3-shm",
+      "relative": "stage4/output/capability_chain_planning/layout_confirmation_v1/Q10_LABEL_SEED2/native/OPPORTUNITY_JOINT_COMMON_CONTROL/routing/cache.sqlite3-shm",
+      "category": "completed_group_raw_route_cache",
+      "bytes": 32768,
+      "modified_utc": "2026-10-13T16:32:31.4159510Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\capability_chain_planning\\layout_confirmation_v1\\Q20_REFERENCE_LABELS\\native\\COMPATIBLE_HOT_COMMON_CONTROL\\routing\\cache.sqlite3",
+      "relative": "stage4/output/capability_chain_planning/layout_confirmation_v1/Q20_REFERENCE_LABELS/native/COMPATIBLE_HOT_COMMON_CONTROL/routing/cache.sqlite3",
+      "category": "completed_group_raw_route_cache",
+      "bytes": 18788352,
+      "modified_utc": "2026-10-13T13:00:20.9594909Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\capability_chain_planning\\layout_confirmation_v1\\Q20_REFERENCE_LABELS\\native\\COMPATIBLE_HOT_COMMON_CONTROL\\routing\\cache.sqlite3-wal",
+      "relative": "stage4/output/capability_chain_planning/layout_confirmation_v1/Q20_REFERENCE_LABELS/native/COMPATIBLE_HOT_COMMON_CONTROL/routing/cache.sqlite3-wal",
+      "category": "completed_group_raw_route_cache",
+      "bytes": 0,
+      "modified_utc": "2026-10-13T16:32:31.4206597Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\capability_chain_planning\\layout_confirmation_v1\\Q20_REFERENCE_LABELS\\native\\COMPATIBLE_HOT_COMMON_CONTROL\\routing\\cache.sqlite3-shm",
+      "relative": "stage4/output/capability_chain_planning/layout_confirmation_v1/Q20_REFERENCE_LABELS/native/COMPATIBLE_HOT_COMMON_CONTROL/routing/cache.sqlite3-shm",
+      "category": "completed_group_raw_route_cache",
+      "bytes": 32768,
+      "modified_utc": "2026-10-13T16:32:31.4218407Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\capability_chain_planning\\layout_confirmation_v1\\Q20_REFERENCE_LABELS\\native\\OPPORTUNITY_JOINT_COMMON_CONTROL\\routing\\cache.sqlite3",
+      "relative": "stage4/output/capability_chain_planning/layout_confirmation_v1/Q20_REFERENCE_LABELS/native/OPPORTUNITY_JOINT_COMMON_CONTROL/routing/cache.sqlite3",
+      "category": "completed_group_raw_route_cache",
+      "bytes": 19271680,
+      "modified_utc": "2026-10-13T14:15:16.5745189Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\capability_chain_planning\\layout_confirmation_v1\\Q20_REFERENCE_LABELS\\native\\OPPORTUNITY_JOINT_COMMON_CONTROL\\routing\\cache.sqlite3-wal",
+      "relative": "stage4/output/capability_chain_planning/layout_confirmation_v1/Q20_REFERENCE_LABELS/native/OPPORTUNITY_JOINT_COMMON_CONTROL/routing/cache.sqlite3-wal",
+      "category": "completed_group_raw_route_cache",
+      "bytes": 0,
+      "modified_utc": "2026-10-13T16:32:31.4259856Z"
+    },
+    {
+      "path": "D:\\pycodes\\didi_xian_raw\\.worktrees\\stage0-v6-valhalla\\stage4\\output\\capability_chain_planning\\layout_confirmation_v1\\Q20_REFERENCE_LABELS\\native\\OPPORTUNITY_JOINT_COMMON_CONTROL\\routing\\cache.sqlite3-shm",
+      "relative": "stage4/output/capability_chain_planning/layout_confirmation_v1/Q20_REFERENCE_LABELS/native/OPPORTUNITY_JOINT_COMMON_CONTROL/routing/cache.sqlite3-shm",
+      "category": "completed_group_raw_route_cache",
+      "bytes": 32768,
+      "modified_utc": "2026-10-13T16:32:31.4280275Z"
+    }
+  ],
+  "errors": [],
+  "planned_files": null,
+  "recovery": "Regenerate derived features/matrices/routes from retained source data and frozen code; no local copy of deleted binary caches.",
+  "experiments_run": 0,
+  "models_changed": 0,
+  "acl_changed": false,
+  "source_commit": "54f543719543e168b28e7ed89a6480c75c437913",
+  "binary_backup_created": false,
+  "retained": [
+    "Stage0/Stage1 raw and accepted products",
+    "Stage2 revealed_route_proxy all dates, causal history store, all transfer shards, checkpoints, feature artifacts, matrix manifests and evaluation outputs",
+    "Stage2 oracle_timing day=20161031.parquet",
+    "Stage3 network, CDF/profiles and M3 prediction caches",
+    "Stage4 layout placements, execution receipts, event products, reports and failed attempts",
+    "Stage4 shared runtime_acceleration preprocessing/caches"
+  ],
+  "historical_replay_note": "Old oracle-timing historical diagnostics, including frozen_state_prediction_ablation Train reference construction, require regeneration of the deleted 09–27 derived files first. Existing diagnostic outputs are retained. This cleanup does not claim cold replay of those historical pipelines."
+}
