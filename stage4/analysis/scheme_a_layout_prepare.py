@@ -1,4 +1,4 @@
-"""Prepare three integer AV birth layouts; never launch a native experiment.
+"""Prepare integer AV birth layouts; never launch a native experiment.
 
 Only predetermined supply and earlier-history templates/reference are read.
 The existing 300/600 sparse time oracle and Train-M3 chord pace are reused.
@@ -24,6 +24,8 @@ from .capability_chain_instances import atomic_json
 from .c_operations_diagnostic import START, sha
 from .scheme_a_city_experiment import load_history_templates
 from .scheme_a_two_scale_experiment import load_protocol as load_runtime_protocol
+from .scheme_a_layout_confirmation import (VERSION as CONFIRMATION_VERSION, condition_configuration,
+    preparation_document_root, preparation_output_root)
 from stage4.dispatch.coarse_layout import compatible_head_weights, integer_quotas, solve_placement
 from stage4.dispatch.controlled_fleet import FLEET_REL, build_controlled_fleet
 from stage4.dispatch.flexibility_native import TrainDemandForecast
@@ -38,8 +40,13 @@ DOC = Path("stage4/docs/capability_chain_planning/layout_300_600_v1")
 MODES = ("all_hot", "compatible_hot", "opportunity_joint")
 
 
-def load_config(root, path=CONFIG):
+def load_config(root, path=CONFIG, *, condition=None):
     overrides = json.loads((root / path).read_text(encoding="utf-8"))
+    if overrides.get("version") == CONFIRMATION_VERSION:
+        chosen = condition_configuration(root, path, condition)
+        return dict(load_runtime_protocol(root, Path(chosen["base_config"])), **chosen, native_execution=False)
+    if condition is not None:
+        raise ValueError("a condition selector belongs only to the six-case design")
     required = dict(version="scheme_a_layout_300_600_v1",
         base_config="stage4/config/scheme_a_two_scale_city_v5_common.json",
         layout_method="SHARED_SCENARIO_SPARSE_LP_INTEGER_PLACEMENT_RECOVERY", layout_bin_wall_limit_s=30.,
@@ -65,16 +72,20 @@ def _allocate(rows, sites, counts):
     return {str(row["vehicle_id"]): dict(site) for row, site in zip(rows, choices)}
 
 
-def prepare(root, config=CONFIG, *, resume=False):
+def prepare(root, config=CONFIG, *, resume=False, condition=None):
     started = perf_counter()
     root = Path(root).resolve()
-    cfg = load_config(root, config)
+    cfg = load_config(root, config, condition=condition)
+    modes = tuple(cfg["layout_generators"])
     source_paths = (Path(config), Path(cfg["base_config"]), FLEET_REL, REFERENCE_REL, REFERENCE_MANIFEST_REL,
         Path(cfg["source_history_templates"]), Path(cfg["source_history_manifest"]), Path(cfg["frozen_profile_config"]))
     inputs = {path.as_posix(): sha(root / path) for path in source_paths}
     code = subprocess.check_output(["git", "-c", f"safe.directory={root.as_posix()}", "rev-parse", "HEAD"], text=True).strip()
     binding = dict(code_sha=code, inputs_sha256=inputs, waiting_contract=dict(max_match_wait_s=300, max_pickup_eta_s=600))
-    directory = root / OUT
+    if condition is not None:
+        binding["confirmation_condition"] = condition
+    directory = root / (preparation_output_root(cfg) if condition is not None else OUT)
+    doc_directory = root / (preparation_document_root(cfg) if condition is not None else DOC)
     checkpoint_path = directory / "checkpoint.json"
     if (directory / "placements.json").exists():
         raise ValueError("completed layouts retained; no overwrite or new preparation")
@@ -99,7 +110,8 @@ def prepare(root, config=CONFIG, *, resume=False):
     pace = TrainDemandForecast(templates, dict(cfg, forecast_horizon_s=1800, fast_forecast=True), 86434)
     del templates
     fleet = build_controlled_fleet(root, benchmark_start=START,
-        simulation_end=START + pd.Timedelta(seconds=cfg["physical_drain_limit_s"]), requested_q_a=.1, seed=cfg["supply_seed"])
+        simulation_end=START + pd.Timedelta(seconds=cfg["physical_drain_limit_s"]),
+        requested_q_a=cfg["requested_q_a"], seed=cfg["supply_seed"])
     labels = fleet.accounting["type_label_sha256"]
     slots = [dict(vehicle_id=str(row.vehicle_id), native_id=int(row.native_id),
         profile_id="C" if row.vehicle_type == "AV" else "HV", vehicle_type=row.vehicle_type,
@@ -110,7 +122,7 @@ def prepare(root, config=CONFIG, *, resume=False):
     del fleet
     av = [row for row in slots if row["vehicle_type"] == "AV"]
     bins = sorted({int(row["activation_s"] // 1800) * 1800 for row in av})
-    maps, records = {mode: {} for mode in MODES}, []
+    maps, records = {mode: {} for mode in modes}, []
     if checkpoint_path.exists():
         prior = json.loads(checkpoint_path.read_text(encoding="utf-8"))
         if prior["binding"] != binding or prior["type_label_sha256"] != labels:
@@ -142,10 +154,11 @@ def prepare(root, config=CONFIG, *, resume=False):
         for group, rows in groups.items():
             score = compatible_head_weights(models, library.weights, group, len(sites))
             head_counts[group] = integer_quotas(score if score.sum() > 0 else all_weights, len(rows), ids)
-            maps["all_hot"].update(_allocate(rows, sites, integer_quotas(all_weights, len(rows), ids)))
+            if "all_hot" in maps:
+                maps["all_hot"].update(_allocate(rows, sites, integer_quotas(all_weights, len(rows), ids)))
             maps["compatible_hot"].update(_allocate(rows, sites, head_counts[group]))
         generic_short = _allocate(short, sites, integer_quotas(all_weights, len(short), ids))
-        for mode in MODES:
+        for mode in modes:
             maps[mode].update(generic_short)
         fresh_ids = {row["native_id"] for row in fresh}
         fixed_supply = Counter()
@@ -175,12 +188,14 @@ def prepare(root, config=CONFIG, *, resume=False):
         del models
         gc.collect()
     expected = {row["vehicle_id"] for row in av}
-    if any(set(value) != expected for value in maps.values()) or len(av) != 851:
+    if (any(set(value) != expected for value in maps.values())
+            or (condition is None and len(av) != 851)):
         raise RuntimeError("new layouts do not cover every original AV slot exactly once")
     if any(sha(root / path) != digest for path, digest in inputs.items()):
         raise RuntimeError("a frozen preparation source changed")
     check()
     payload = dict(status="LAYOUTS_PREPARED_300_600", binding=binding, type_label_sha256=labels,
+        supply_contract=dict(requested_q_a=cfg["requested_q_a"], supply_seed=cfg["supply_seed"]),
         placements=maps, records=records, native_execution=False, target_day_requests_loaded=False,
         current_runtime_control="COMMON_HISTORICAL_DEFICIT_AND_PRIMARY_FACE_MM",
         preparation_supply_positions_not_observed_midday_locations=True, no_future_road_certificates=True,
@@ -193,8 +208,8 @@ def prepare(root, config=CONFIG, *, resume=False):
     summary.update(AV_slots_per_layout={mode: len(values) for mode, values in maps.items()},
         placements_file_sha256=sha(directory / "placements.json"),
         pairwise_equal_slot_counts={f"{a}_vs_{b}": sum(maps[a][key]["site_id"] == maps[b][key]["site_id"] for key in expected)
-            for a, b in (("all_hot", "compatible_hot"), ("compatible_hot", "opportunity_joint"), ("all_hot", "opportunity_joint"))})
-    atomic_json(root / DOC / "preparation_summary.json", summary)
+            for index, a in enumerate(modes) for b in modes[index + 1:]})
+    atomic_json(doc_directory / "preparation_summary.json", summary)
     atomic_json(directory / "status.json", dict(status, status=payload["status"], bins_complete=len(records),
         runtime_s=payload["runtime_s"], peak_rss_mib=payload["peak_rss_mib"]))
     return summary
@@ -205,8 +220,9 @@ def main():
     parser.add_argument("--root", type=Path, default=Path.cwd())
     parser.add_argument("--config", type=Path, default=CONFIG)
     parser.add_argument("--resume", action="store_true")
+    parser.add_argument("--condition", help="explicit pair from the six-case confirmation design")
     args = parser.parse_args()
-    summary = prepare(args.root, args.config, resume=args.resume)
+    summary = prepare(args.root, args.config, resume=args.resume, condition=args.condition)
     print(json.dumps({key: summary[key] for key in ("status", "runtime_s", "peak_rss_mib", "AV_slots_per_layout", "pairwise_equal_slot_counts")}), flush=True)
 
 

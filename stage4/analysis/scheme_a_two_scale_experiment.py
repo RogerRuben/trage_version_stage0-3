@@ -24,6 +24,8 @@ from .scheme_a_two_scale_check import (
     FLEETPY, _atomic_json, _run_native, _sha, load_frozen_layout,
     load_protocol as load_check_protocol,
 )
+from .scheme_a_layout_confirmation import (VERSION as CONFIRMATION_VERSION, condition_configuration,
+    experiment_document_root, experiment_output_root)
 
 
 CONFIG = Path("stage4/config/scheme_a_two_scale_city_v2.json")
@@ -66,16 +68,33 @@ _LAYOUT_FIXED = dict(version=LAYOUT_VERSION, layout_product="PREPARED_300_600",
 
 
 def output_root(cfg):
+    if cfg["version"] == CONFIRMATION_VERSION:
+        return experiment_output_root(cfg)
     return OUT.with_name(cfg["version"].removeprefix("scheme_a_"))
 
 
 def document_root(cfg):
+    if cfg["version"] == CONFIRMATION_VERSION:
+        return experiment_document_root(cfg)
     return DOC.with_name(cfg["version"].removeprefix("scheme_a_"))
 
 
-def load_protocol(root, path=CONFIG):
+def load_protocol(root, path=CONFIG, *, condition=None):
     root, path = Path(root), Path(path)
     overrides = json.loads((root / path).read_text(encoding="utf-8"))
+    if overrides.get("version") == CONFIRMATION_VERSION:
+        chosen = condition_configuration(root, path, condition)
+        cfg = dict(load_protocol(root, Path(chosen["base_config"])), **chosen)
+        source = root / cfg["source_layout"]
+        receipt = json.loads(source.read_text(encoding="utf-8"))
+        if (receipt.get("binding", {}).get("confirmation_condition") != condition
+                or receipt.get("supply_contract") != dict(requested_q_a=cfg["requested_q_a"], supply_seed=cfg["supply_seed"])):
+            raise ValueError("prepared pair has a different q/label seed/condition")
+        cfg.update(source_layout_sha256=_sha(source), expected_layout_bins=len(receipt["records"]),
+            expected_av_slots=len(receipt["placements"][cfg["layout_generators"][0]]))
+        return cfg
+    if condition is not None:
+        raise ValueError("a condition selector belongs only to the six-case design")
     if overrides.get("version") == LAYOUT_VERSION:
         base_path = Path("stage4/config/scheme_a_two_scale_city_v5_common.json")
         if (set(overrides) != set(_LAYOUT_FIXED) | {"base_config", "base_config_sha256", "groups"}
@@ -134,12 +153,18 @@ def load_protocol(root, path=CONFIG):
 
 
 def group_configuration(cfg, group):
-    rules = LAYOUT_RULES if cfg["version"] == LAYOUT_VERSION else GROUP_RULES
-    if group not in rules:
-        raise ValueError("only the three original full-day groups are authorized")
+    rules = LAYOUT_RULES if cfg["version"] in (LAYOUT_VERSION, CONFIRMATION_VERSION) else GROUP_RULES
+    if group not in protocol_groups(cfg):
+        raise ValueError("the group is not part of this fixed protocol")
     layout, policy = rules[group]
     return dict(cfg, group=group, layout_mode=layout, policy=policy,
         disk_route_cache=(output_root(cfg) / group / "routing/cache.sqlite3").as_posix())
+
+
+def protocol_groups(cfg):
+    if cfg["version"] == CONFIRMATION_VERSION:
+        return tuple(cfg["groups"])
+    return tuple(LAYOUT_RULES) if cfg["version"] == LAYOUT_VERSION else GROUPS
 
 
 def input_binding(root, cfg, config=CONFIG):
@@ -173,9 +198,9 @@ def completed_group(directory, expected):
                 != (expected["group"], expected["layout_mode"], expected["policy"])
             or any(not (directory / product).is_file() for product in
                 PRODUCTS + (("request_decisions.parquet",) if expected.get("version") in
-                    (_V3_FIXED["version"], _V4_FIXED["version"], _V5_FIXED["version"], _V5_COMMON_FIXED["version"], LAYOUT_VERSION) else ()))):
+                    (_V3_FIXED["version"], _V4_FIXED["version"], _V5_FIXED["version"], _V5_COMMON_FIXED["version"], LAYOUT_VERSION, CONFIRMATION_VERSION) else ()))):
         raise ValueError("existing group is not a complete identical full-day group; no automatic retry")
-    if expected.get("version") in (_V5_FIXED["version"], _V5_COMMON_FIXED["version"], LAYOUT_VERSION) and not summary.get("request_decision_diagnostics", {}).get("typed_final_candidate_counts_enabled"):
+    if expected.get("version") in (_V5_FIXED["version"], _V5_COMMON_FIXED["version"], LAYOUT_VERSION, CONFIRMATION_VERSION) and not summary.get("request_decision_diagnostics", {}).get("typed_final_candidate_counts_enabled"):
         raise ValueError("completed v5 group is missing its typed final-candidate evidence")
     return summary
 
@@ -250,6 +275,8 @@ def _run_child(root, fleetpy, config, cfg, group, binding):
     receipt_path = root / output_root(cfg) / "execution_receipts" / f"{group}.json"
     command = [sys.executable, "-u", "-m", "stage4.analysis.scheme_a_two_scale_experiment",
         "--root", str(root), "--fleetpy-root", str(fleetpy), "--config", str(config), "--_group", group]
+    if cfg.get("confirmation_condition") is not None:
+        command.extend(["--condition", cfg["confirmation_condition"]])
     started = perf_counter()
     receipt = dict(status="LAUNCHING", group=group, child_pid=None, child_create_time=None, parent_pid=os.getpid(),
         started_utc=_utc(), command=command, execution_binding=_group_binding(binding, cfg, group),
@@ -300,12 +327,12 @@ def _run_child(root, fleetpy, config, cfg, group, binding):
     return completed_group(directory, _group_binding(binding, cfg, group))
 
 
-def run(root, fleetpy=FLEETPY, config=CONFIG, *, resume=False, group=None):
+def run(root, fleetpy=FLEETPY, config=CONFIG, *, resume=False, group=None, condition=None):
     root, fleetpy, config = Path(root).resolve(), Path(fleetpy), Path(config)
     if group is not None and group not in (*GROUPS, *LAYOUT_RULES):
         raise ValueError("--group must name one existing full-day group")
-    cfg = load_protocol(root, config)
-    groups = tuple(LAYOUT_RULES) if cfg["version"] == LAYOUT_VERSION else GROUPS
+    cfg = load_protocol(root, config, condition=condition)
+    groups = protocol_groups(cfg)
     if group is not None and group not in groups:
         raise ValueError("--group must name one existing full-day group of this protocol")
     selected = (group,) if group is not None else groups
@@ -373,10 +400,10 @@ def run(root, fleetpy=FLEETPY, config=CONFIG, *, resume=False, group=None):
         raise
 
 
-def _child_group(root, fleetpy, config, group):
+def _child_group(root, fleetpy, config, group, *, condition=None):
     started = perf_counter()
     root = Path(root).resolve()
-    cfg = load_protocol(root, config)
+    cfg = load_protocol(root, config, condition=condition)
     expected = json.loads((root / output_root(cfg) / "input_binding.json").read_text(encoding="utf-8"))
     if input_binding(root, cfg, config) != expected:
         raise ValueError("child code/configuration/inputs changed after coordinator preparation")
@@ -393,6 +420,7 @@ def main():
     parser.add_argument("--fleetpy-root", type=Path, default=FLEETPY)
     parser.add_argument("--config", type=Path, default=CONFIG)
     parser.add_argument("--resume", action="store_true")
+    parser.add_argument("--condition", help="explicit pair from the six-case confirmation design")
     parser.add_argument("--group", choices=(*GROUPS, *LAYOUT_RULES),
         help="run only one existing group; omitted retains the original three-group order")
     parser.add_argument("--_group", choices=(*GROUPS, *LAYOUT_RULES), help=argparse.SUPPRESS)
@@ -400,9 +428,9 @@ def main():
     if args._group:
         if args.resume or args.group:
             parser.error("internal children never resume or retry an existing group")
-        _child_group(args.root, args.fleetpy_root, args.config, args._group)
+        _child_group(args.root, args.fleetpy_root, args.config, args._group, condition=args.condition)
     else:
-        run(args.root, args.fleetpy_root, args.config, resume=args.resume, group=args.group)
+        run(args.root, args.fleetpy_root, args.config, resume=args.resume, group=args.group, condition=args.condition)
 
 
 if __name__ == "__main__":

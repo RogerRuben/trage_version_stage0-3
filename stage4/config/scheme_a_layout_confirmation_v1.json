@@ -1,0 +1,22 @@
+{
+  "version": "scheme_a_layout_confirmation_v1",
+  "base_config": "stage4/config/scheme_a_two_scale_city_v5_common.json",
+  "base_config_sha256": "d41b1d448d8c5342f45b40b625857fc7e018610ddf98d027bd8f00c684c9c836",
+  "conditions": [
+    {"condition_id": "Q10_LABEL_SEED2", "requested_q_a": 0.1, "supply_seed": 20261013},
+    {"condition_id": "Q05_REFERENCE_LABELS", "requested_q_a": 0.05, "supply_seed": 20260824},
+    {"condition_id": "Q20_REFERENCE_LABELS", "requested_q_a": 0.2, "supply_seed": 20260824}
+  ],
+  "groups": ["COMPATIBLE_HOT_COMMON_CONTROL", "OPPORTUNITY_JOINT_COMMON_CONTROL"],
+  "layout_generators": ["compatible_hot", "opportunity_joint"],
+  "layout_method": "SHARED_SCENARIO_SPARSE_LP_INTEGER_PLACEMENT_RECOVERY",
+  "layout_bin_wall_limit_s": 30.0,
+  "layout_preparation_timeout_s": 900,
+  "layout_preparation_rss_mib": 512,
+  "planned_native_groups": 6,
+  "automatic_retry": false,
+  "parameter_search": false,
+  "model_refit": false,
+  "dense_matrix": false,
+  "gpu_used": false
+}

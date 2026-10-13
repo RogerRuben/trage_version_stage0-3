@@ -87,7 +87,7 @@ def load_frozen_layout(root, cfg):
     receipt = json.loads(source.read_text(encoding="utf-8"))
     positions = receipt["placements"]
     if cfg.get("layout_product") == "PREPARED_300_600":
-        modes = ("all_hot", "compatible_hot", "opportunity_joint")
+        modes = tuple(cfg.get("layout_generators", ("all_hot", "compatible_hot", "opportunity_joint")))
         if (receipt["status"] != "LAYOUTS_PREPARED_300_600" or set(positions) != set(modes)
                 or len(receipt["records"]) != cfg["expected_layout_bins"]
                 or any(len(positions[mode]) != cfg["expected_av_slots"]
@@ -95,6 +95,10 @@ def load_frozen_layout(root, cfg):
                 or receipt["binding"]["waiting_contract"] != dict(max_match_wait_s=300, max_pickup_eta_s=600)
                 or (cfg.get("max_match_wait_s"), cfg.get("max_pickup_eta_s")) != (300, 600)):
             raise ValueError("prepared 300/600 layouts are not the complete same-slot product")
+        if cfg.get("confirmation_condition") is not None and (
+                receipt["binding"].get("confirmation_condition") != cfg["confirmation_condition"]
+                or receipt.get("supply_contract") != dict(requested_q_a=cfg["requested_q_a"], supply_seed=cfg["supply_seed"])):
+            raise ValueError("prepared supply does not match the selected confirmation condition")
         protected = dict(receipt["binding"]["inputs_sha256"])
         # Reuse the existing environment sources, without another evidence tree.
         for relative in ("stage4/config/scheme_a_city_v1.json",
@@ -268,7 +272,8 @@ def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
                           cfg["source_layout"]: _sha(root / cfg["source_layout"])})
         if execution_binding is not None and protected != execution_binding["inputs_sha256"]:
             raise RuntimeError("source inputs changed after sequential experiment preparation")
-        episode = load_research_episode(root, profile_id=cfg["profile_id"], requested_q_a=cfg["requested_q_a"])
+        episode = load_research_episode(root, profile_id=cfg["profile_id"], requested_q_a=cfg["requested_q_a"],
+            supply_seed=cfg["supply_seed"])
         if full_day:
             # Derive the original source's 33-second tail, not a hard truncation
             # at midnight or a cold-start window masquerading as a full day.
@@ -282,7 +287,8 @@ def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
             raise RuntimeError("prepared layout and native episode have different effective supply labels")
         phases["frozen_layout_and_episode_load_s"] = perf_counter() - loaded
         summary.update(inputs_sha256=protected, frozen_protocol=cfg,
-            layout_sha256=cfg["source_layout_sha256"], layout_bins_reused=47, AV_slots_reused=851)
+            layout_sha256=cfg["source_layout_sha256"], layout_bins_reused=cfg["expected_layout_bins"],
+            AV_slots_reused=cfg["expected_av_slots"])
         summary["waiting_contract"] = dict(
             patience_mode=cfg.get("patience_mode", "TOTAL_PICKUP_DEADLINE"),
             request_to_assignment_limit_s=cfg.get("max_match_wait_s"),

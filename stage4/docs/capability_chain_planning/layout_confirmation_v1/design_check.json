@@ -1,0 +1,221 @@
+{
+  "status": "SIX_CASE_DESIGN_AND_SUPPLY_CHECK_COMPLETE_NOT_EXECUTED",
+  "origin_skill": "academic-research-suite",
+  "inputs_sha256": {
+    "stage4/config/scheme_a_layout_confirmation_v1.json": "2cf5a70e138941d1de5eba35ce1dc69889ed77adf22ccf7c41b0534b6774e38b",
+    "stage4/input/replay_foundation/replay_fleet_template.parquet": "09fc04e8250b873274ee2e397060417edb081908c2eb4f9f24a0459328b045b0",
+    "stage4/docs/capability_chain_planning/layout_comparison_300_600_v1/comparison.json": "665b93b382fd009f4ebeb6c41148e6b25fad209f93deda2aa41aed348a1e2503"
+  },
+  "existing_reference_is_not_a_new_run": true,
+  "existing_reference_fleet_and_labels_reproduced": true,
+  "conditions": {
+    "Q10_REFERENCE_EXISTING_NOT_RERUN": {
+      "seed": 20260824,
+      "requested_q_a": 0.1,
+      "q_a_realized": 0.10000478921969946,
+      "q_a_error_pp": 0.0004789219699458114,
+      "h_base_day_exact": 12278.734166666667,
+      "achieved_av_vehicle_hours": 1227.9322222222222,
+      "achieved_hv_vehicle_hours": 11050.801944444445,
+      "slot_count": 8435,
+      "av_count": 851,
+      "selected_hv_session_count": 7584,
+      "type_label_sha256": "571f2e830b1569651ff8f416735225addb9ce7a1441f2aec6cf4d8ed0e7b4d46",
+      "total_supply_error_nanoseconds": 0,
+      "expected_layout_bins": 47,
+      "intersection_with_existing_q10_AV_slots": 851,
+      "physical_windows_and_initial_template_positions_unchanged": true
+    },
+    "Q10_LABEL_SEED2": {
+      "seed": 20261013,
+      "requested_q_a": 0.1,
+      "q_a_realized": 0.09914257131508963,
+      "q_a_error_pp": -0.08574286849103718,
+      "h_base_day_exact": 12278.734166666667,
+      "achieved_av_vehicle_hours": 1217.3452777777777,
+      "achieved_hv_vehicle_hours": 11061.388888888889,
+      "slot_count": 8435,
+      "av_count": 838,
+      "selected_hv_session_count": 7597,
+      "type_label_sha256": "b2fe58c8630b234c4e887578a1f7ef8ff31ee6b62d0257714312a3d32da52947",
+      "total_supply_error_nanoseconds": 0,
+      "expected_layout_bins": 48,
+      "intersection_with_existing_q10_AV_slots": 80,
+      "physical_windows_and_initial_template_positions_unchanged": true
+    },
+    "Q05_REFERENCE_LABELS": {
+      "seed": 20260824,
+      "requested_q_a": 0.05,
+      "q_a_realized": 0.04907479718265385,
+      "q_a_error_pp": -0.0925202817346156,
+      "h_base_day_exact": 12278.734166666667,
+      "achieved_av_vehicle_hours": 602.5763888888889,
+      "achieved_hv_vehicle_hours": 11676.157777777778,
+      "slot_count": 8435,
+      "av_count": 421,
+      "selected_hv_session_count": 8014,
+      "type_label_sha256": "316571023c147f3c3c873692a58b2b8939b10cd5430e959462b797d9bc2bf28f",
+      "total_supply_error_nanoseconds": 0,
+      "expected_layout_bins": 43,
+      "intersection_with_existing_q10_AV_slots": 421,
+      "physical_windows_and_initial_template_positions_unchanged": true
+    },
+    "Q20_REFERENCE_LABELS": {
+      "seed": 20260824,
+      "requested_q_a": 0.2,
+      "q_a_realized": 0.19945638623670106,
+      "q_a_error_pp": -0.05436137632989502,
+      "h_base_day_exact": 12278.734166666667,
+      "achieved_av_vehicle_hours": 2449.0719444444444,
+      "achieved_hv_vehicle_hours": 9829.662222222221,
+      "slot_count": 8435,
+      "av_count": 1707,
+      "selected_hv_session_count": 6728,
+      "type_label_sha256": "88bdeddef8445335434ed1cb854e1ea15a7da42c9b755951cd1c06b98b323063",
+      "total_supply_error_nanoseconds": 0,
+      "expected_layout_bins": 48,
+      "intersection_with_existing_q10_AV_slots": 851,
+      "physical_windows_and_initial_template_positions_unchanged": true
+    }
+  },
+  "scale_AV_label_sets_nested": true,
+  "planned_native_groups": 6,
+  "commands_in_condition_order": [
+    {
+      "condition_id": "Q10_LABEL_SEED2",
+      "prepare": [
+        "D:/anaconda/envs/stage0-valhalla/python.exe",
+        "-u",
+        "-m",
+        "stage4.analysis.scheme_a_layout_prepare",
+        "--root",
+        ".",
+        "--config",
+        "stage4/config/scheme_a_layout_confirmation_v1.json",
+        "--condition",
+        "Q10_LABEL_SEED2"
+      ],
+      "native_pair": [
+        "D:/anaconda/envs/stage0-valhalla/python.exe",
+        "-u",
+        "-m",
+        "stage4.analysis.scheme_a_two_scale_experiment",
+        "--root",
+        ".",
+        "--config",
+        "stage4/config/scheme_a_layout_confirmation_v1.json",
+        "--condition",
+        "Q10_LABEL_SEED2"
+      ],
+      "analyze": [
+        "D:/anaconda/envs/stage0-valhalla/python.exe",
+        "-m",
+        "stage4.analysis.scheme_a_layout_results",
+        "--root",
+        ".",
+        "--config",
+        "stage4/config/scheme_a_layout_confirmation_v1.json",
+        "--condition",
+        "Q10_LABEL_SEED2"
+      ],
+      "group_order": [
+        "COMPATIBLE_HOT_COMMON_CONTROL",
+        "OPPORTUNITY_JOINT_COMMON_CONTROL"
+      ]
+    },
+    {
+      "condition_id": "Q05_REFERENCE_LABELS",
+      "prepare": [
+        "D:/anaconda/envs/stage0-valhalla/python.exe",
+        "-u",
+        "-m",
+        "stage4.analysis.scheme_a_layout_prepare",
+        "--root",
+        ".",
+        "--config",
+        "stage4/config/scheme_a_layout_confirmation_v1.json",
+        "--condition",
+        "Q05_REFERENCE_LABELS"
+      ],
+      "native_pair": [
+        "D:/anaconda/envs/stage0-valhalla/python.exe",
+        "-u",
+        "-m",
+        "stage4.analysis.scheme_a_two_scale_experiment",
+        "--root",
+        ".",
+        "--config",
+        "stage4/config/scheme_a_layout_confirmation_v1.json",
+        "--condition",
+        "Q05_REFERENCE_LABELS"
+      ],
+      "analyze": [
+        "D:/anaconda/envs/stage0-valhalla/python.exe",
+        "-m",
+        "stage4.analysis.scheme_a_layout_results",
+        "--root",
+        ".",
+        "--config",
+        "stage4/config/scheme_a_layout_confirmation_v1.json",
+        "--condition",
+        "Q05_REFERENCE_LABELS"
+      ],
+      "group_order": [
+        "COMPATIBLE_HOT_COMMON_CONTROL",
+        "OPPORTUNITY_JOINT_COMMON_CONTROL"
+      ]
+    },
+    {
+      "condition_id": "Q20_REFERENCE_LABELS",
+      "prepare": [
+        "D:/anaconda/envs/stage0-valhalla/python.exe",
+        "-u",
+        "-m",
+        "stage4.analysis.scheme_a_layout_prepare",
+        "--root",
+        ".",
+        "--config",
+        "stage4/config/scheme_a_layout_confirmation_v1.json",
+        "--condition",
+        "Q20_REFERENCE_LABELS"
+      ],
+      "native_pair": [
+        "D:/anaconda/envs/stage0-valhalla/python.exe",
+        "-u",
+        "-m",
+        "stage4.analysis.scheme_a_two_scale_experiment",
+        "--root",
+        ".",
+        "--config",
+        "stage4/config/scheme_a_layout_confirmation_v1.json",
+        "--condition",
+        "Q20_REFERENCE_LABELS"
+      ],
+      "analyze": [
+        "D:/anaconda/envs/stage0-valhalla/python.exe",
+        "-m",
+        "stage4.analysis.scheme_a_layout_results",
+        "--root",
+        ".",
+        "--config",
+        "stage4/config/scheme_a_layout_confirmation_v1.json",
+        "--condition",
+        "Q20_REFERENCE_LABELS"
+      ],
+      "group_order": [
+        "COMPATIBLE_HOT_COMMON_CONTROL",
+        "OPPORTUNITY_JOINT_COMMON_CONTROL"
+      ]
+    }
+  ],
+  "primary_metric": "C_WINDOW_LOADED_HOURS_PER_C_ADMISSION_HOUR",
+  "native_simulation_started": false,
+  "layout_optimization_started": false,
+  "routing_started": false,
+  "inference_started": false,
+  "gpu_used": false,
+  "dense_matrix": false,
+  "individual_identifiers_exported": false,
+  "runtime_s": 2.6025203999997757,
+  "peak_rss_mib": 185.5859375
+}

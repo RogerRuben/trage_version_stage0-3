@@ -502,16 +502,20 @@ def episode_from_frames(request_frame: pd.DataFrame, routes: pd.DataFrame, fleet
     return ResearchEpisode(feed, ControlledSupply(fleet, start, profile_id), lookup, metadata=meta)
 
 
-def load_research_episode(root: str | Path, *, profile_id: str = "C", requested_q_a: float = .1) -> ResearchEpisode:
+def load_research_episode(root: str | Path, *, profile_id: str = "C", requested_q_a: float = .1,
+                          supply_seed: int | None = None) -> ResearchEpisode:
     """Dry-load existing citywide common demand and actual controlled supply.
 
     The explicit C/M/A decision profile changes compatibility labels only.
     It never filters demand or changes common slot labeling for the same q/seed.
+    An explicit supply seed changes only the existing common-window labels;
+    omitting it retains the frozen controlled environment's original seed.
     The existing M controlled runner remains untouched and is not launched.
     """
     root = Path(root).resolve()
     cfg = json.loads((root / BASE_CONFIG_REL).read_text(encoding="utf-8"))
     controlled = json.loads((root / CONTROLLED_CONFIG_REL).read_text(encoding="utf-8"))
+    label_seed = int(controlled["supply_seed"] if supply_seed is None else supply_seed)
     scenario_path = root / "stage4/output/final_experiments" / cfg["source_scenario"] / "scenario_config.json"
     runtime = json.loads(scenario_path.read_text(encoding="utf-8"))["runtime_configuration"]
     start = pd.Timestamp(runtime["benchmark_start_time"]).tz_convert(TIMEZONE)
@@ -527,7 +531,7 @@ def load_research_episode(root: str | Path, *, profile_id: str = "C", requested_
     routes = _read_projection(route_path, ROUTE_COLUMNS)
     fleet = build_controlled_fleet(root, benchmark_start=start,
                                    simulation_end=start + pd.Timedelta(seconds=cfg["physical_drain_limit_s"]),
-                                   requested_q_a=requested_q_a, seed=controlled["supply_seed"])
+                                   requested_q_a=requested_q_a, seed=label_seed)
     episode = episode_from_frames(base, routes, fleet, benchmark_start=start, profile_id=profile_id,
                                   patience_s=cfg["patience_s"], passenger_acceptance_rate=.7,
                                   acceptance_seed=runtime["passenger_acceptance_seed"], metadata={
@@ -535,7 +539,7 @@ def load_research_episode(root: str | Path, *, profile_id: str = "C", requested_
                                       "source_population": "TEST31_30000_REPLAY_COMMON_POPULATION_CITYWIDE",
                                       "entire_raw_test31_population": False,
                                       "source_config_version": cfg["version"], "controlled_config_version": controlled["version"],
-                                      "requested_q_a": float(requested_q_a), "supply_seed": int(controlled["supply_seed"]),
+                                      "requested_q_a": float(requested_q_a), "supply_seed": label_seed,
                                       "source_paths": {"requests": str(request_path), "routes": str(route_path),
                                                        "fleet_template": str(root / FLEET_REL)},
                                       "decision_read_columns": {"requests": list(DECISION_BASE_COLUMNS), "routes": list(ROUTE_COLUMNS)},
