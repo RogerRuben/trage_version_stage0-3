@@ -1,0 +1,881 @@
+{
+  "status": "SIX_NATIVE_CASES_COMPLETE_AND_ANALYZED",
+  "origin_skill": "academic-research-suite",
+  "verification_status": "ANALYZED_COMPLETED_EXECUTIONS_NOT_REPRODUCTION_RERUN",
+  "new_completed_native_cases": 6,
+  "existing_reference_cases_reused": 2,
+  "conditions": {
+    "Q10_REFERENCE_EXISTING_NOT_RERUN": {
+      "supply": {
+        "requested_q_a": 0.1,
+        "q_a_realized": 0.10000478921969946,
+        "achieved_av_vehicle_hours": 1227.9322222222222,
+        "achieved_hv_vehicle_hours": 11050.801944444445,
+        "h_base_day_exact": 12278.734166666667,
+        "av_count": 851,
+        "seed": 20260824,
+        "type_label_sha256": "571f2e830b1569651ff8f416735225addb9ce7a1441f2aec6cf4d8ed0e7b4d46"
+      },
+      "groups": {
+        "COMPATIBLE_HOT_COMMON_CONTROL": {
+          "C_loaded_h": 129.87935259373398,
+          "C_admission_h": 1227.9322222222222,
+          "C_loaded_utilization": 0.10577078298237651,
+          "completed_orders": 27634,
+          "expired_orders": 733,
+          "served_C": 964,
+          "served_HV": 26670,
+          "total_empty_km": 36495.402154013194,
+          "runtime_s": 3855.337670699999,
+          "setup_time_s": 40.48897449999913,
+          "peak_rss_mib": 1363.1875,
+          "current_flow_status": {
+            "OPTIMAL_PRIMARY_CURRENT_FLOW_APPROXIMATE_FUTURE": 2628,
+            "FIXED_CURRENT_WAIT": 264
+          },
+          "physical_accounting": {
+            "duplicate_orders": 0,
+            "vehicle_task_overlap": 0,
+            "maximum_time_error_s": 1.0006147022068035e-09
+          },
+          "first_customer": {
+            "slots": 851,
+            "served_slots": 524,
+            "never_served_slots": 327,
+            "first_assignment_delay_served_only_s": {
+              "mean": 1528.6526717557251,
+              "p50": 705.0,
+              "p90": 4138.299999999999
+            },
+            "first_boarding_delay_served_only_s": {
+              "mean": 1631.7772833727743,
+              "p50": 801.0997712641765,
+              "p90": 4316.448846927017
+            },
+            "pre_first_idle_h": 496.2324194306631,
+            "post_first_idle_h": 549.4506975052057,
+            "curves_all_template_C_slots": [
+              {
+                "delay_s": 30,
+                "assignment_share": 0.0282021151586369,
+                "boarding_share": 0.01762632197414806
+              },
+              {
+                "delay_s": 60,
+                "assignment_share": 0.05170387779083431,
+                "boarding_share": 0.03290246768507638
+              },
+              {
+                "delay_s": 120,
+                "assignment_share": 0.0963572267920094,
+                "boarding_share": 0.06110458284371328
+              },
+              {
+                "delay_s": 300,
+                "assignment_share": 0.1797884841363102,
+                "boarding_share": 0.13748531139835488
+              },
+              {
+                "delay_s": 600,
+                "assignment_share": 0.28672150411280845,
+                "boarding_share": 0.23854289071680376
+              },
+              {
+                "delay_s": 900,
+                "assignment_share": 0.3584018801410106,
+                "boarding_share": 0.32314923619271446
+              },
+              {
+                "delay_s": 1800,
+                "assignment_share": 0.4606345475910693,
+                "boarding_share": 0.4300822561692127
+              },
+              {
+                "delay_s": 3600,
+                "assignment_share": 0.5417156286721504,
+                "boarding_share": 0.5170387779083431
+              }
+            ],
+            "unsuccessful_slots_retained": true,
+            "vehicle_activation_clock_not_passenger_wait": true,
+            "conditional_sample_composition_changes": true
+          }
+        },
+        "OPPORTUNITY_JOINT_COMMON_CONTROL": {
+          "C_loaded_h": 135.89246140704108,
+          "C_admission_h": 1227.9322222222222,
+          "C_loaded_utilization": 0.11066772167694469,
+          "completed_orders": 27679,
+          "expired_orders": 688,
+          "served_C": 992,
+          "served_HV": 26687,
+          "total_empty_km": 36518.95510618434,
+          "runtime_s": 2293.1729906,
+          "setup_time_s": 40.16904169999907,
+          "peak_rss_mib": 1370.92578125,
+          "current_flow_status": {
+            "OPTIMAL_PRIMARY_CURRENT_FLOW_APPROXIMATE_FUTURE": 2628,
+            "FIXED_CURRENT_WAIT": 264
+          },
+          "physical_accounting": {
+            "duplicate_orders": 0,
+            "vehicle_task_overlap": 0,
+            "maximum_time_error_s": 1.000444171950221e-09
+          },
+          "first_customer": {
+            "slots": 851,
+            "served_slots": 547,
+            "never_served_slots": 304,
+            "first_assignment_delay_served_only_s": {
+              "mean": 1432.835466179159,
+              "p50": 721.0,
+              "p90": 3597.000000000001
+            },
+            "first_boarding_delay_served_only_s": {
+              "mean": 1549.8343615178303,
+              "p50": 842.1078708885616,
+              "p90": 3752.868844261571
+            },
+            "pre_first_idle_h": 462.38496484649625,
+            "post_first_idle_h": 571.3302626867765,
+            "curves_all_template_C_slots": [
+              {
+                "delay_s": 30,
+                "assignment_share": 0.03525264394829612,
+                "boarding_share": 0.01527614571092832
+              },
+              {
+                "delay_s": 60,
+                "assignment_share": 0.06110458284371328,
+                "boarding_share": 0.03525264394829612
+              },
+              {
+                "delay_s": 120,
+                "assignment_share": 0.10810810810810811,
+                "boarding_share": 0.0681551116333725
+              },
+              {
+                "delay_s": 300,
+                "assignment_share": 0.21034077555816685,
+                "boarding_share": 0.15158636897767333
+              },
+              {
+                "delay_s": 600,
+                "assignment_share": 0.29494712103407755,
+                "boarding_share": 0.2596944770857814
+              },
+              {
+                "delay_s": 900,
+                "assignment_share": 0.36427732079905994,
+                "boarding_share": 0.32784958871915393
+              },
+              {
+                "delay_s": 1800,
+                "assignment_share": 0.4806110458284371,
+                "boarding_share": 0.44535840188014103
+              },
+              {
+                "delay_s": 3600,
+                "assignment_share": 0.5781433607520564,
+                "boarding_share": 0.5464159811985899
+              }
+            ],
+            "unsuccessful_slots_retained": true,
+            "vehicle_activation_clock_not_passenger_wait": true,
+            "conditional_sample_composition_changes": true
+          }
+        }
+      },
+      "joint_minus_compatible": {
+        "C_loaded_utilization_pp": 0.4896938694568184,
+        "C_loaded_h": 6.013108813307099,
+        "served_C": 28,
+        "completed_orders": 45,
+        "total_empty_km": 23.55295217114326,
+        "newly_served_slots": 115,
+        "lost_service_slots": 92,
+        "both_served_slots": 432,
+        "neither_served_slots": 212,
+        "pre_first_idle_h": -33.84745458416687,
+        "post_first_idle_h": 21.879565181570893,
+        "activation_product_decomposition": {
+          "available": true,
+          "working_slots_before": 524,
+          "working_slots_after": 547,
+          "conditional_loaded_h_before": 0.24786135991170608,
+          "conditional_loaded_h_after": 0.2484322877642433,
+          "working_count_component_h": 5.707376948273418,
+          "conditional_intensity_component_h": 0.3057318650336889,
+          "total_loaded_delta_h": 6.013108813307099,
+          "causal_component_effects_identified": false
+        }
+      },
+      "native_producer_sha": "63b9b2fe69e9e6e66065438f0c9967adbfbffc3e",
+      "existing_reference": true
+    },
+    "Q10_LABEL_SEED2": {
+      "supply": {
+        "requested_q_a": 0.1,
+        "q_a_realized": 0.09914257131508963,
+        "achieved_av_vehicle_hours": 1217.3452777777777,
+        "achieved_hv_vehicle_hours": 11061.388888888889,
+        "h_base_day_exact": 12278.734166666667,
+        "av_count": 838,
+        "seed": 20261013,
+        "type_label_sha256": "b2fe58c8630b234c4e887578a1f7ef8ff31ee6b62d0257714312a3d32da52947"
+      },
+      "groups": {
+        "COMPATIBLE_HOT_COMMON_CONTROL": {
+          "C_loaded_h": 118.5443324138746,
+          "C_admission_h": 1217.3452777777777,
+          "C_loaded_utilization": 0.09737938330058112,
+          "completed_orders": 27666,
+          "expired_orders": 701,
+          "served_C": 888,
+          "served_HV": 26778,
+          "total_empty_km": 36072.27504955821,
+          "runtime_s": 3554.485856200001,
+          "setup_time_s": 69.93018469999879,
+          "peak_rss_mib": 1360.09375,
+          "current_flow_status": {
+            "OPTIMAL_PRIMARY_CURRENT_FLOW_APPROXIMATE_FUTURE": 2638,
+            "FIXED_CURRENT_WAIT": 254
+          },
+          "physical_accounting": {
+            "duplicate_orders": 0,
+            "vehicle_task_overlap": 0,
+            "maximum_time_error_s": 1.000444171950221e-09
+          },
+          "first_customer": {
+            "slots": 838,
+            "served_slots": 508,
+            "never_served_slots": 330,
+            "first_assignment_delay_served_only_s": {
+              "mean": 1557.4015748031495,
+              "p50": 804.0,
+              "p90": 4039.3
+            },
+            "first_boarding_delay_served_only_s": {
+              "mean": 1657.2435377911875,
+              "p50": 952.1639966307848,
+              "p90": 4123.172453699461
+            },
+            "pre_first_idle_h": 519.7282444075889,
+            "post_first_idle_h": 532.2309116833222,
+            "curves_all_template_C_slots": [
+              {
+                "delay_s": 30,
+                "assignment_share": 0.03341288782816229,
+                "boarding_share": 0.016706443914081145
+              },
+              {
+                "delay_s": 60,
+                "assignment_share": 0.0513126491646778,
+                "boarding_share": 0.03341288782816229
+              },
+              {
+                "delay_s": 120,
+                "assignment_share": 0.10501193317422435,
+                "boarding_share": 0.07517899761336516
+              },
+              {
+                "delay_s": 300,
+                "assignment_share": 0.18377088305489261,
+                "boarding_share": 0.1324582338902148
+              },
+              {
+                "delay_s": 600,
+                "assignment_share": 0.256563245823389,
+                "boarding_share": 0.23031026252983294
+              },
+              {
+                "delay_s": 900,
+                "assignment_share": 0.3221957040572792,
+                "boarding_share": 0.2840095465393795
+              },
+              {
+                "delay_s": 1800,
+                "assignment_share": 0.42601431980906923,
+                "boarding_share": 0.4021479713603819
+              },
+              {
+                "delay_s": 3600,
+                "assignment_share": 0.5298329355608592,
+                "boarding_share": 0.5011933174224343
+              }
+            ],
+            "unsuccessful_slots_retained": true,
+            "vehicle_activation_clock_not_passenger_wait": true,
+            "conditional_sample_composition_changes": true
+          }
+        },
+        "OPPORTUNITY_JOINT_COMMON_CONTROL": {
+          "C_loaded_h": 132.02394890674265,
+          "C_admission_h": 1217.3452777777777,
+          "C_loaded_utilization": 0.10845234406112608,
+          "completed_orders": 27671,
+          "expired_orders": 696,
+          "served_C": 987,
+          "served_HV": 26684,
+          "total_empty_km": 35967.76600898316,
+          "runtime_s": 3353.9110833000013,
+          "setup_time_s": 64.07428240000081,
+          "peak_rss_mib": 1364.98828125,
+          "current_flow_status": {
+            "OPTIMAL_PRIMARY_CURRENT_FLOW_APPROXIMATE_FUTURE": 2628,
+            "FIXED_CURRENT_WAIT": 264
+          },
+          "physical_accounting": {
+            "duplicate_orders": 0,
+            "vehicle_task_overlap": 0,
+            "maximum_time_error_s": 1.000444171950221e-09
+          },
+          "first_customer": {
+            "slots": 838,
+            "served_slots": 542,
+            "never_served_slots": 296,
+            "first_assignment_delay_served_only_s": {
+              "mean": 1351.328413284133,
+              "p50": 650.0,
+              "p90": 3338.4000000000015
+            },
+            "first_boarding_delay_served_only_s": {
+              "mean": 1466.188331460272,
+              "p50": 790.3052133135825,
+              "p90": 3481.1895854369545
+            },
+            "pre_first_idle_h": 479.5918353270574,
+            "post_first_idle_h": 549.9898470846659,
+            "curves_all_template_C_slots": [
+              {
+                "delay_s": 30,
+                "assignment_share": 0.03818615751789976,
+                "boarding_share": 0.016706443914081145
+              },
+              {
+                "delay_s": 60,
+                "assignment_share": 0.06443914081145585,
+                "boarding_share": 0.03341288782816229
+              },
+              {
+                "delay_s": 120,
+                "assignment_share": 0.12052505966587113,
+                "boarding_share": 0.07875894988066826
+              },
+              {
+                "delay_s": 300,
+                "assignment_share": 0.21957040572792363,
+                "boarding_share": 0.15393794749403342
+              },
+              {
+                "delay_s": 600,
+                "assignment_share": 0.31145584725536996,
+                "boarding_share": 0.26730310262529833
+              },
+              {
+                "delay_s": 900,
+                "assignment_share": 0.3818615751789976,
+                "boarding_share": 0.3412887828162291
+              },
+              {
+                "delay_s": 1800,
+                "assignment_share": 0.5035799522673031,
+                "boarding_share": 0.46897374701670647
+              },
+              {
+                "delay_s": 3600,
+                "assignment_share": 0.594272076372315,
+                "boarding_share": 0.5608591885441527
+              }
+            ],
+            "unsuccessful_slots_retained": true,
+            "vehicle_activation_clock_not_passenger_wait": true,
+            "conditional_sample_composition_changes": true
+          }
+        }
+      },
+      "joint_minus_compatible": {
+        "C_loaded_utilization_pp": 1.1072960760544968,
+        "C_loaded_h": 13.479616492868047,
+        "served_C": 99,
+        "completed_orders": 5,
+        "total_empty_km": -104.50904057504522,
+        "newly_served_slots": 119,
+        "lost_service_slots": 85,
+        "both_served_slots": 423,
+        "neither_served_slots": 211,
+        "pre_first_idle_h": -40.13640908053155,
+        "post_first_idle_h": 17.758935401343745,
+        "activation_product_decomposition": {
+          "available": true,
+          "working_slots_before": 508,
+          "working_slots_after": 542,
+          "conditional_loaded_h_before": 0.23335498506668229,
+          "conditional_loaded_h_after": 0.24358662159915617,
+          "working_count_component_h": 8.108007313319254,
+          "conditional_intensity_component_h": 5.37160917954879,
+          "total_loaded_delta_h": 13.479616492868047,
+          "causal_component_effects_identified": false
+        }
+      },
+      "native_producer_sha": "c712e78cdd1ebea8df251988ff71b9308dce300c",
+      "existing_reference": false
+    },
+    "Q05_REFERENCE_LABELS": {
+      "supply": {
+        "requested_q_a": 0.05,
+        "q_a_realized": 0.04907479718265385,
+        "achieved_av_vehicle_hours": 602.5763888888889,
+        "achieved_hv_vehicle_hours": 11676.157777777778,
+        "h_base_day_exact": 12278.734166666667,
+        "av_count": 421,
+        "seed": 20260824,
+        "type_label_sha256": "316571023c147f3c3c873692a58b2b8939b10cd5430e959462b797d9bc2bf28f"
+      },
+      "groups": {
+        "COMPATIBLE_HOT_COMMON_CONTROL": {
+          "C_loaded_h": 69.32149425624915,
+          "C_admission_h": 602.5763888888889,
+          "C_loaded_utilization": 0.11504183624597938,
+          "completed_orders": 27667,
+          "expired_orders": 700,
+          "served_C": 509,
+          "served_HV": 27158,
+          "total_empty_km": 35548.98173157942,
+          "runtime_s": 2785.0339900000035,
+          "setup_time_s": 63.345281500001875,
+          "peak_rss_mib": 1357.5625,
+          "current_flow_status": {
+            "OPTIMAL_PRIMARY_CURRENT_FLOW_APPROXIMATE_FUTURE": 2634,
+            "FIXED_CURRENT_WAIT": 258
+          },
+          "physical_accounting": {
+            "duplicate_orders": 0,
+            "vehicle_task_overlap": 0,
+            "maximum_time_error_s": 1.000444171950221e-09
+          },
+          "first_customer": {
+            "slots": 421,
+            "served_slots": 285,
+            "never_served_slots": 136,
+            "first_assignment_delay_served_only_s": {
+              "mean": 1299.0245614035089,
+              "p50": 604.0,
+              "p90": 2973.4
+            },
+            "first_boarding_delay_served_only_s": {
+              "mean": 1399.9440837101313,
+              "p50": 742.418954257846,
+              "p90": 2989.23522523133
+            },
+            "pre_first_idle_h": 210.9876027624637,
+            "post_first_idle_h": 296.0172036804181,
+            "curves_all_template_C_slots": [
+              {
+                "delay_s": 30,
+                "assignment_share": 0.04513064133016627,
+                "boarding_share": 0.023752969121140142
+              },
+              {
+                "delay_s": 60,
+                "assignment_share": 0.0688836104513064,
+                "boarding_share": 0.052256532066508314
+              },
+              {
+                "delay_s": 120,
+                "assignment_share": 0.10926365795724466,
+                "boarding_share": 0.07600950118764846
+              },
+              {
+                "delay_s": 300,
+                "assignment_share": 0.20902612826603326,
+                "boarding_share": 0.15201900237529692
+              },
+              {
+                "delay_s": 600,
+                "assignment_share": 0.33729216152019004,
+                "boarding_share": 0.27315914489311166
+              },
+              {
+                "delay_s": 900,
+                "assignment_share": 0.4085510688836104,
+                "boarding_share": 0.36342042755344417
+              },
+              {
+                "delay_s": 1800,
+                "assignment_share": 0.5344418052256532,
+                "boarding_share": 0.505938242280285
+              },
+              {
+                "delay_s": 3600,
+                "assignment_share": 0.6175771971496437,
+                "boarding_share": 0.5914489311163895
+              }
+            ],
+            "unsuccessful_slots_retained": true,
+            "vehicle_activation_clock_not_passenger_wait": true,
+            "conditional_sample_composition_changes": true
+          }
+        },
+        "OPPORTUNITY_JOINT_COMMON_CONTROL": {
+          "C_loaded_h": 71.67338625443087,
+          "C_admission_h": 602.5763888888889,
+          "C_loaded_utilization": 0.11894489657417852,
+          "completed_orders": 27678,
+          "expired_orders": 689,
+          "served_C": 500,
+          "served_HV": 27178,
+          "total_empty_km": 35642.24833128267,
+          "runtime_s": 2729.4606837999963,
+          "setup_time_s": 60.46023469999636,
+          "peak_rss_mib": 1358.12890625,
+          "current_flow_status": {
+            "OPTIMAL_PRIMARY_CURRENT_FLOW_APPROXIMATE_FUTURE": 2630,
+            "FIXED_CURRENT_WAIT": 262
+          },
+          "physical_accounting": {
+            "duplicate_orders": 0,
+            "vehicle_task_overlap": 0,
+            "maximum_time_error_s": 1.000444171950221e-09
+          },
+          "first_customer": {
+            "slots": 421,
+            "served_slots": 282,
+            "never_served_slots": 139,
+            "first_assignment_delay_served_only_s": {
+              "mean": 1330.4078014184397,
+              "p50": 633.0,
+              "p90": 3743.100000000001
+            },
+            "first_boarding_delay_served_only_s": {
+              "mean": 1440.4806516696358,
+              "p50": 844.7089968138885,
+              "p90": 3857.098172250246
+            },
+            "pre_first_idle_h": 238.81961860449752,
+            "post_first_idle_h": 264.4927044069013,
+            "curves_all_template_C_slots": [
+              {
+                "delay_s": 30,
+                "assignment_share": 0.04513064133016627,
+                "boarding_share": 0.021377672209026127
+              },
+              {
+                "delay_s": 60,
+                "assignment_share": 0.07600950118764846,
+                "boarding_share": 0.0498812351543943
+              },
+              {
+                "delay_s": 120,
+                "assignment_share": 0.12114014251781473,
+                "boarding_share": 0.07838479809976247
+              },
+              {
+                "delay_s": 300,
+                "assignment_share": 0.2161520190023753,
+                "boarding_share": 0.166270783847981
+              },
+              {
+                "delay_s": 600,
+                "assignment_share": 0.32779097387173395,
+                "boarding_share": 0.27790973871733965
+              },
+              {
+                "delay_s": 900,
+                "assignment_share": 0.4085510688836104,
+                "boarding_share": 0.34679334916864607
+              },
+              {
+                "delay_s": 1800,
+                "assignment_share": 0.5201900237529691,
+                "boarding_share": 0.49643705463182897
+              },
+              {
+                "delay_s": 3600,
+                "assignment_share": 0.5985748218527316,
+                "boarding_share": 0.5653206650831354
+              }
+            ],
+            "unsuccessful_slots_retained": true,
+            "vehicle_activation_clock_not_passenger_wait": true,
+            "conditional_sample_composition_changes": true
+          }
+        }
+      },
+      "joint_minus_compatible": {
+        "C_loaded_utilization_pp": 0.39030603281991344,
+        "C_loaded_h": 2.3518919981817135,
+        "served_C": -9,
+        "completed_orders": 11,
+        "total_empty_km": 93.26659970325272,
+        "newly_served_slots": 40,
+        "lost_service_slots": 43,
+        "both_served_slots": 242,
+        "neither_served_slots": 96,
+        "pre_first_idle_h": 27.832015842033815,
+        "post_first_idle_h": -31.524499273516817,
+        "activation_product_decomposition": {
+          "available": true,
+          "working_slots_before": 285,
+          "working_slots_after": 282,
+          "conditional_loaded_h_before": 0.24323331317982158,
+          "conditional_loaded_h_after": 0.25416094416464846,
+          "working_count_component_h": -0.7460913860167051,
+          "conditional_intensity_component_h": 3.097983384198421,
+          "total_loaded_delta_h": 2.3518919981817135,
+          "causal_component_effects_identified": false
+        }
+      },
+      "native_producer_sha": "c712e78cdd1ebea8df251988ff71b9308dce300c",
+      "existing_reference": false
+    },
+    "Q20_REFERENCE_LABELS": {
+      "supply": {
+        "requested_q_a": 0.2,
+        "q_a_realized": 0.19945638623670106,
+        "achieved_av_vehicle_hours": 2449.0719444444444,
+        "achieved_hv_vehicle_hours": 9829.662222222221,
+        "h_base_day_exact": 12278.734166666667,
+        "av_count": 1707,
+        "seed": 20260824,
+        "type_label_sha256": "88bdeddef8445335434ed1cb854e1ea15a7da42c9b755951cd1c06b98b323063"
+      },
+      "groups": {
+        "COMPATIBLE_HOT_COMMON_CONTROL": {
+          "C_loaded_h": 221.2020406944842,
+          "C_admission_h": 2449.0719444444444,
+          "C_loaded_utilization": 0.09032076056249233,
+          "completed_orders": 27551,
+          "expired_orders": 816,
+          "served_C": 1687,
+          "served_HV": 25864,
+          "total_empty_km": 38782.23702889919,
+          "runtime_s": 4253.642590800002,
+          "setup_time_s": 61.93873980000353,
+          "peak_rss_mib": 1367.90234375,
+          "current_flow_status": {
+            "OPTIMAL_PRIMARY_CURRENT_FLOW_APPROXIMATE_FUTURE": 2630,
+            "FIXED_CURRENT_WAIT": 262
+          },
+          "physical_accounting": {
+            "duplicate_orders": 0,
+            "vehicle_task_overlap": 0,
+            "maximum_time_error_s": 9.999894245993346e-10
+          },
+          "first_customer": {
+            "slots": 1707,
+            "served_slots": 962,
+            "never_served_slots": 745,
+            "first_assignment_delay_served_only_s": {
+              "mean": 1759.472972972973,
+              "p50": 740.5,
+              "p90": 4748.099999999999
+            },
+            "first_boarding_delay_served_only_s": {
+              "mean": 1867.7772852362941,
+              "p50": 909.0958599649566,
+              "p90": 4991.321572271792
+            },
+            "pre_first_idle_h": 1175.0034188533791,
+            "post_first_idle_h": 960.2301665930057,
+            "curves_all_template_C_slots": [
+              {
+                "delay_s": 30,
+                "assignment_share": 0.025190392501464556,
+                "boarding_share": 0.011130638547158758
+              },
+              {
+                "delay_s": 60,
+                "assignment_share": 0.04452255418863503,
+                "boarding_share": 0.022261277094317515
+              },
+              {
+                "delay_s": 120,
+                "assignment_share": 0.08142940831868775,
+                "boarding_share": 0.04452255418863503
+              },
+              {
+                "delay_s": 300,
+                "assignment_share": 0.1698886936145284,
+                "boarding_share": 0.11892208553016989
+              },
+              {
+                "delay_s": 600,
+                "assignment_share": 0.25717633274751023,
+                "boarding_share": 0.2179261862917399
+              },
+              {
+                "delay_s": 900,
+                "assignment_share": 0.3022847100175747,
+                "boarding_share": 0.268306971294669
+              },
+              {
+                "delay_s": 1800,
+                "assignment_share": 0.38488576449912126,
+                "boarding_share": 0.3596953719976567
+              },
+              {
+                "delay_s": 3600,
+                "assignment_share": 0.47451669595782076,
+                "boarding_share": 0.44932630345635616
+              }
+            ],
+            "unsuccessful_slots_retained": true,
+            "vehicle_activation_clock_not_passenger_wait": true,
+            "conditional_sample_composition_changes": true
+          }
+        },
+        "OPPORTUNITY_JOINT_COMMON_CONTROL": {
+          "C_loaded_h": 245.15390820385682,
+          "C_admission_h": 2449.0719444444444,
+          "C_loaded_utilization": 0.10010073765287787,
+          "completed_orders": 27536,
+          "expired_orders": 831,
+          "served_C": 1852,
+          "served_HV": 25684,
+          "total_empty_km": 38473.40567909333,
+          "runtime_s": 4492.802086900003,
+          "setup_time_s": 63.86726850000559,
+          "peak_rss_mib": 1365.4140625,
+          "current_flow_status": {
+            "OPTIMAL_PRIMARY_CURRENT_FLOW_APPROXIMATE_FUTURE": 2632,
+            "FIXED_CURRENT_WAIT": 260
+          },
+          "physical_accounting": {
+            "duplicate_orders": 0,
+            "vehicle_task_overlap": 0,
+            "maximum_time_error_s": 1.000444171950221e-09
+          },
+          "first_customer": {
+            "slots": 1707,
+            "served_slots": 1058,
+            "never_served_slots": 649,
+            "first_assignment_delay_served_only_s": {
+              "mean": 1633.093572778828,
+              "p50": 706.5,
+              "p90": 4665.6
+            },
+            "first_boarding_delay_served_only_s": {
+              "mean": 1743.5335345745275,
+              "p50": 831.8334444237998,
+              "p90": 4688.098650774865
+            },
+            "pre_first_idle_h": 1053.8146135133939,
+            "post_first_idle_h": 1049.948612658626,
+            "curves_all_template_C_slots": [
+              {
+                "delay_s": 30,
+                "assignment_share": 0.021675454012888107,
+                "boarding_share": 0.009373169302870533
+              },
+              {
+                "delay_s": 60,
+                "assignment_share": 0.04569420035149385,
+                "boarding_share": 0.022847100175746926
+              },
+              {
+                "delay_s": 120,
+                "assignment_share": 0.08963093145869948,
+                "boarding_share": 0.054481546572934976
+              },
+              {
+                "delay_s": 300,
+                "assignment_share": 0.18629173989455183,
+                "boarding_share": 0.13122437024018746
+              },
+              {
+                "delay_s": 600,
+                "assignment_share": 0.28822495606326887,
+                "boarding_share": 0.23784417106033978
+              },
+              {
+                "delay_s": 900,
+                "assignment_share": 0.34973637961335674,
+                "boarding_share": 0.31400117164616287
+              },
+              {
+                "delay_s": 1800,
+                "assignment_share": 0.450497949619215,
+                "boarding_share": 0.4188635032220269
+              },
+              {
+                "delay_s": 3600,
+                "assignment_share": 0.5325131810193322,
+                "boarding_share": 0.5014645577035736
+              }
+            ],
+            "unsuccessful_slots_retained": true,
+            "vehicle_activation_clock_not_passenger_wait": true,
+            "conditional_sample_composition_changes": true
+          }
+        }
+      },
+      "joint_minus_compatible": {
+        "C_loaded_utilization_pp": 0.9779977090385541,
+        "C_loaded_h": 23.95186750937262,
+        "served_C": 165,
+        "completed_orders": -15,
+        "total_empty_km": -308.831349805856,
+        "newly_served_slots": 278,
+        "lost_service_slots": 182,
+        "both_served_slots": 780,
+        "neither_served_slots": 467,
+        "pre_first_idle_h": -121.18880533998501,
+        "post_first_idle_h": 89.71844606562026,
+        "activation_product_decomposition": {
+          "available": true,
+          "working_slots_before": 962,
+          "working_slots_after": 1058,
+          "conditional_loaded_h_before": 0.22993975124166757,
+          "conditional_loaded_h_after": 0.23171446900175502,
+          "working_count_component_h": 22.159402571684286,
+          "conditional_intensity_component_h": 1.7924649376883208,
+          "total_loaded_delta_h": 23.95186750937262,
+          "causal_component_effects_identified": false
+        }
+      },
+      "native_producer_sha": "c712e78cdd1ebea8df251988ff71b9308dce300c",
+      "existing_reference": false
+    }
+  },
+  "source_products_sha256": {
+    "stage4/docs/capability_chain_planning/layout_comparison_300_600_v1/comparison.json": "665b93b382fd009f4ebeb6c41148e6b25fad209f93deda2aa41aed348a1e2503",
+    "stage4/output/capability_chain_planning/layout_comparison_300_600_v1/COMPATIBLE_HOT_COMMON_CONTROL/summary.json": "e5ebb933913aa8b5e60fd9c109742b992a6724a227ff26a9a579112a74860a48",
+    "stage4/output/capability_chain_planning/layout_comparison_300_600_v1/COMPATIBLE_HOT_COMMON_CONTROL/assignments.parquet": "891b5ea1e08502ce749525a218028bf18fc5239571b594f8c30cd97b812337ac",
+    "stage4/output/capability_chain_planning/layout_comparison_300_600_v1/COMPATIBLE_HOT_COMMON_CONTROL/empty_movements.parquet": "aac58a3de08f879c7c04d19ff3b1d2f956e50bcded465b057ca081b9ca7a3de3",
+    "stage4/output/capability_chain_planning/layout_comparison_300_600_v1/OPPORTUNITY_JOINT_COMMON_CONTROL/summary.json": "c5323ee1d1924c174fbab2cef5d38fa471abf6503b50f5350d42a41527f20b51",
+    "stage4/output/capability_chain_planning/layout_comparison_300_600_v1/OPPORTUNITY_JOINT_COMMON_CONTROL/assignments.parquet": "2401f1f5f921d47356997234b15f4f647fe20ef44071223b9955e4752aef8abd",
+    "stage4/output/capability_chain_planning/layout_comparison_300_600_v1/OPPORTUNITY_JOINT_COMMON_CONTROL/empty_movements.parquet": "7729f800930cc26760301e6d3bf7f237e3120460e414a220bd23f1123c84c8b4",
+    "stage4/docs/capability_chain_planning/layout_confirmation_v1/Q10_LABEL_SEED2/native/comparison.json": "8a6e5906d77f840ebd278b1c7b56fba11f88f3dd86759156e909e82f7d836937",
+    "stage4/output/capability_chain_planning/layout_confirmation_v1/Q10_LABEL_SEED2/native/COMPATIBLE_HOT_COMMON_CONTROL/summary.json": "d7edd81a60b5b5ce84a10dd8151f246a0ba55cdc70e86e74d8def81d144ffda4",
+    "stage4/output/capability_chain_planning/layout_confirmation_v1/Q10_LABEL_SEED2/native/COMPATIBLE_HOT_COMMON_CONTROL/assignments.parquet": "ef9f57d6ab17c80263a81f7520190299554043e8030255eb608e7c1788a833c5",
+    "stage4/output/capability_chain_planning/layout_confirmation_v1/Q10_LABEL_SEED2/native/COMPATIBLE_HOT_COMMON_CONTROL/empty_movements.parquet": "85d15f07208ae5200048fade842cb992ff965489412f2b6dc7947a434ae9358c",
+    "stage4/output/capability_chain_planning/layout_confirmation_v1/Q10_LABEL_SEED2/native/OPPORTUNITY_JOINT_COMMON_CONTROL/summary.json": "d98cfa3b5921c95d78e7d282b817459615de20b450e2dbad2ef927633e6be910",
+    "stage4/output/capability_chain_planning/layout_confirmation_v1/Q10_LABEL_SEED2/native/OPPORTUNITY_JOINT_COMMON_CONTROL/assignments.parquet": "7cc664afde6afe57da291e3809c3be84b5a01f4373c95e8da0219658503ad47b",
+    "stage4/output/capability_chain_planning/layout_confirmation_v1/Q10_LABEL_SEED2/native/OPPORTUNITY_JOINT_COMMON_CONTROL/empty_movements.parquet": "56f36b421262e4da3034e2ea9d34923169775ff5dea01ec6d59a72631ce5f06b",
+    "stage4/docs/capability_chain_planning/layout_confirmation_v1/Q05_REFERENCE_LABELS/native/comparison.json": "d545f8c7b000ff17dd50cbd9ad8060d9917b42f01daa531c72f7186e0fffe869",
+    "stage4/output/capability_chain_planning/layout_confirmation_v1/Q05_REFERENCE_LABELS/native/COMPATIBLE_HOT_COMMON_CONTROL/summary.json": "19535a29a16c8932afd67f118ea9f3446207d9d4e98233875ef99e0a6289a429",
+    "stage4/output/capability_chain_planning/layout_confirmation_v1/Q05_REFERENCE_LABELS/native/COMPATIBLE_HOT_COMMON_CONTROL/assignments.parquet": "03b2d83b5c79fbf9b624c12b743a4d16ef247aabf4b34eac88768f47318bfbfe",
+    "stage4/output/capability_chain_planning/layout_confirmation_v1/Q05_REFERENCE_LABELS/native/COMPATIBLE_HOT_COMMON_CONTROL/empty_movements.parquet": "6bf746d2a37663f2334ad0c0d549285573538e3fa9b001183c15d4dabd0e7b50",
+    "stage4/output/capability_chain_planning/layout_confirmation_v1/Q05_REFERENCE_LABELS/native/OPPORTUNITY_JOINT_COMMON_CONTROL/summary.json": "360828dc94ab5c8eff471c075659eaf742bf76a60da2f0821f00cbfff17c48ae",
+    "stage4/output/capability_chain_planning/layout_confirmation_v1/Q05_REFERENCE_LABELS/native/OPPORTUNITY_JOINT_COMMON_CONTROL/assignments.parquet": "f288f9b99ff4de747126fa62c126668f739b75d31135c2e40805582212405a4f",
+    "stage4/output/capability_chain_planning/layout_confirmation_v1/Q05_REFERENCE_LABELS/native/OPPORTUNITY_JOINT_COMMON_CONTROL/empty_movements.parquet": "72eb9fe3f5d512a34d4a0c0c81ef24598deb6051d5487c83b11e1c5377bd09bf",
+    "stage4/docs/capability_chain_planning/layout_confirmation_v1/Q20_REFERENCE_LABELS/native/comparison.json": "d2ede9762761c1b8ecd4400e5f7bc06a53328eefed03feed6b7e8b557d93ecbb",
+    "stage4/output/capability_chain_planning/layout_confirmation_v1/Q20_REFERENCE_LABELS/native/COMPATIBLE_HOT_COMMON_CONTROL/summary.json": "50420efbbb1ae322d6ae6fae049d3208cea7a7222e66332a9fe5c632ebd15daa",
+    "stage4/output/capability_chain_planning/layout_confirmation_v1/Q20_REFERENCE_LABELS/native/COMPATIBLE_HOT_COMMON_CONTROL/assignments.parquet": "b42fc42d4a885ed80078f5262438edae941780d1414097d9e222b2e959075c01",
+    "stage4/output/capability_chain_planning/layout_confirmation_v1/Q20_REFERENCE_LABELS/native/COMPATIBLE_HOT_COMMON_CONTROL/empty_movements.parquet": "7f8f66144b188ca74cc88595fd67fe88c4ab2b644bfe251290f34e3394264f60",
+    "stage4/output/capability_chain_planning/layout_confirmation_v1/Q20_REFERENCE_LABELS/native/OPPORTUNITY_JOINT_COMMON_CONTROL/summary.json": "b4836d66edc3adb240def640f11b2d72fa0a1a2a2f922484733621f4ae702981",
+    "stage4/output/capability_chain_planning/layout_confirmation_v1/Q20_REFERENCE_LABELS/native/OPPORTUNITY_JOINT_COMMON_CONTROL/assignments.parquet": "a2dac4846a9b613699b33b4d70e24aae082cc37f25c17638f0be0f04b8dbefc4",
+    "stage4/output/capability_chain_planning/layout_confirmation_v1/Q20_REFERENCE_LABELS/native/OPPORTUNITY_JOINT_COMMON_CONTROL/empty_movements.parquet": "0715cc963719a420e3572079b3b72472ce38fd7a41c49e1812bc2f6e1e9b6383"
+  },
+  "analysis_source_sha256": "a5fad4869fddb1cc25f4ffd2b9d201da5bb74cb60c9457b2afd004926e3b0c6d",
+  "simulation_invoked": false,
+  "routing_invoked": false,
+  "inference_invoked": false,
+  "dense_matrix": false,
+  "gpu_used": false,
+  "raw_identifiers_or_coordinates_exported": false,
+  "multiday_generalization_or_significance_claimed": false,
+  "runtime_s": 6.653045300001395,
+  "peak_rss_mib": 192.58203125
+}
