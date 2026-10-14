@@ -4,6 +4,8 @@
 
 状态：METHOD_DESIGN_COMPLETE；本文不表示新增算法已经实现或运行。学术研究技能用于问题、方法和证据边界整理；推导与检查在同一上下文完成，不称独立同行评审。
 
+2026-10-15研究方向更新：作者明确要求整体算法创新，不再将有效界补强、单点整数恢复或延迟路线验证作为主创新。主设计转至[能力瓶颈驱动的多车联动滚动优化](D:/pycodes/didi_xian_raw/.worktrees/stage0-v6-valhalla/stage4/docs/capability_chain_planning/bottleneck_joint_control_v1/algorithm_design.md)。本文、代码及12例结果保留为既有基础/基准；不删除或改写其冻结结果。新设计尚未实现，本轮未启动实验。
+
 2026-10-14执行更新：独立有限原型与固定12例已完成，见[实际结果报告](D:/pycodes/didi_xian_raw/.worktrees/stage0-v6-valhalla/stage4/docs/capability_chain_planning/competitive_chain_algorithm_v1/results/report.md)。以下保留88d146c中的执行前设计，文中“拟补强／未运行”描述其原始阶段；新增实现没有接入城市控制，12例没有出现额外恢复收益。
 
 [有限计算验证计划](D:/pycodes/didi_xian_raw/.worktrees/stage0-v6-valhalla/stage4/docs/capability_chain_planning/competitive_chain_algorithm_v1/bounded_validation_plan.md)
