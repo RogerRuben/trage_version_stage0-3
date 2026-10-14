@@ -4,6 +4,8 @@
 
 状态：METHOD_DESIGN_COMPLETE；本文不表示新增算法已经实现或运行。学术研究技能用于问题、方法和证据边界整理；推导与检查在同一上下文完成，不称独立同行评审。
 
+2026-10-14执行更新：独立有限原型与固定12例已完成，见[实际结果报告](D:/pycodes/didi_xian_raw/.worktrees/stage0-v6-valhalla/stage4/docs/capability_chain_planning/competitive_chain_algorithm_v1/results/report.md)。以下保留88d146c中的执行前设计，文中“拟补强／未运行”描述其原始阶段；新增实现没有接入城市控制，12例没有出现额外恢复收益。
+
 [有限计算验证计划](D:/pycodes/didi_xian_raw/.worktrees/stage0-v6-valhalla/stage4/docs/capability_chain_planning/competitive_chain_algorithm_v1/bounded_validation_plan.md)
 
 ## 1. 主问题不退成上线位置案例

@@ -1,0 +1,381 @@
+{
+  "status": "TWELVE_INSTANCES_COMPLETED",
+  "started_at": "2026-10-14T19:39:21+08:00",
+  "pid": 34968,
+  "code_sha": "9cfc432845aadc18bc50383f869c3f4e0c925bdd",
+  "config_sha256": "2e318300d8155d7480bf8b8b11ad59234de5209566ba1cbf8c1a97bb4b2de5c9",
+  "inputs": {
+    "stage4/config/competitive_chain_benchmark_v1.json": "2e318300d8155d7480bf8b8b11ad59234de5209566ba1cbf8c1a97bb4b2de5c9",
+    "stage4/config/scheme_a_two_scale_city_v5_common.json": "d41b1d448d8c5342f45b40b625857fc7e018610ddf98d027bd8f00c684c9c836",
+    "stage4/config/scheme_a_two_scale_city_v5.json": "e2898c697bdce9f6203374a023ad722c1e646e9b7723c324d37e948ff8e4dcea",
+    "stage4/config/scheme_a_two_scale_city_v4.json": "0b4b503e741522e534ddb1c77a1a8512b1ba7b7958346e99a89eef4f7aa1ce25",
+    "stage4/config/scheme_a_two_scale_city_v3.json": "73ba51bf0d61e67bf22bffd93bc09fa96f0cdeba8a801f50c228f6c909d6131b",
+    "stage4/config/scheme_a_two_scale_city_v2.json": "e405b8d90ed23d530ea2b94e79011fc10ba0e97c18cbe33af50c757038d1f93a",
+    "stage4/config/scheme_a_two_scale_v2.json": "24c6d0d36583635e091416b9edc9ad90d3e9a0f7ca57980b7b045106b6fb6855",
+    "stage4/config/scheme_a_city_v1.json": "8022d88c8c1377fd87f925bf7f0e35584b9bb3f500bc5cb8fd9d16ea9a0ef47e",
+    "stage4/output/symmetric_flexibility_v1/input/train_request_templates.parquet": "f0ee98eb4ad5aca69125ace8610ce4ff2c40edb6b7f5e62016ee321a432af652",
+    "stage4/output/symmetric_flexibility_v1/input/preparation_summary.json": "916f22a9b2c8aca89254ad6874f2aabaf75be2f75bca2340d3c2582d66cb4d7e",
+    "stage4/output/paper_enhancement/repositioning_robustness/train_tod_demand_reference.parquet": "97f9931d9a0d114059699ea92b692df80bb1d54e065c757c075d723d7291ab07",
+    "stage4/output/paper_enhancement/repositioning_robustness/train_tod_demand_reference.manifest.json": "bf01340ee02b158819df46f342f3389d8c7d76b6dda0a6c33a9364c103ec605d",
+    "stage3/config/stage3_av_capability_profiles.json": "bea54c12a0c013995c3644a0bab84b35413d5df8a6785dfdd6a03fd49f32978e"
+  },
+  "expected_instances": 12,
+  "current_city_controller_modified": false,
+  "native_simulation": false,
+  "routing_queries": 0,
+  "new_M3_inference": false,
+  "gpu_used": false,
+  "threads": 1,
+  "results_analysis_is_descriptive": true,
+  "history_template_counts": {
+    "20161010": 9479,
+    "20161017": 9392,
+    "20161024": 9464
+  },
+  "sampling": "EXISTING_FROZEN_POISSON_LIBRARY_THEN_HASH_PREFIX_20261014",
+  "common_build_charged_to_each_method_but_actual_batch_counted_once": true,
+  "integer_recovery_uses_bounded_complete_catalogue": true,
+  "completed_instances": 12,
+  "completed_method_rows": 48,
+  "cases": [
+    {
+      "case_id": "H0730_SMALL",
+      "input_sha256": "45f64541d8af6749f5ca53c566bc3996645abc1ddb18cf88fd82db04dd64d19a",
+      "now_s": 27000,
+      "scale": "SMALL",
+      "task_counts": {
+        "TRAIN_DAY_20161010": 12,
+        "TRAIN_DAY_20161017": 12,
+        "TRAIN_DAY_20161024": 12
+      },
+      "c_eligible_counts": {
+        "TRAIN_DAY_20161010": 2,
+        "TRAIN_DAY_20161017": 0,
+        "TRAIN_DAY_20161024": 0
+      },
+      "sites": 4,
+      "hv": 3,
+      "c": 1,
+      "common_build_s": 0.006641500003752299,
+      "catalogue": {
+        "variables": 19,
+        "nonzeros": 48,
+        "path_columns": 15,
+        "complete_declared_domain": true,
+        "domain": "C_TOP3_HV_TOP6_MAX3_MATCH_300_PICKUP_600"
+      },
+      "runtime_s": 0.09794630000396864
+    },
+    {
+      "case_id": "H0730_MEDIUM",
+      "input_sha256": "f612483adf79cfc685523a2d13b193fa2e3f2a7544d2b62ade4d597beea5717a",
+      "now_s": 27000,
+      "scale": "MEDIUM",
+      "task_counts": {
+        "TRAIN_DAY_20161010": 24,
+        "TRAIN_DAY_20161017": 24,
+        "TRAIN_DAY_20161024": 24
+      },
+      "c_eligible_counts": {
+        "TRAIN_DAY_20161010": 2,
+        "TRAIN_DAY_20161017": 0,
+        "TRAIN_DAY_20161024": 0
+      },
+      "sites": 6,
+      "hv": 4,
+      "c": 2,
+      "common_build_s": 0.009790700001758523,
+      "catalogue": {
+        "variables": 48,
+        "nonzeros": 119,
+        "path_columns": 42,
+        "complete_declared_domain": true,
+        "domain": "C_TOP3_HV_TOP6_MAX3_MATCH_300_PICKUP_600"
+      },
+      "runtime_s": 0.18974540000635898
+    },
+    {
+      "case_id": "H0730_LARGE",
+      "input_sha256": "d7c2fd085d2ed3b2853416c11d66617fcb8a64483a9d4d02d51714c366bba4e1",
+      "now_s": 27000,
+      "scale": "LARGE",
+      "task_counts": {
+        "TRAIN_DAY_20161010": 36,
+        "TRAIN_DAY_20161017": 36,
+        "TRAIN_DAY_20161024": 36
+      },
+      "c_eligible_counts": {
+        "TRAIN_DAY_20161010": 4,
+        "TRAIN_DAY_20161017": 2,
+        "TRAIN_DAY_20161024": 0
+      },
+      "sites": 8,
+      "hv": 6,
+      "c": 2,
+      "common_build_s": 0.018769000002066605,
+      "catalogue": {
+        "variables": 118,
+        "nonzeros": 288,
+        "path_columns": 110,
+        "complete_declared_domain": true,
+        "domain": "C_TOP3_HV_TOP6_MAX3_MATCH_300_PICKUP_600"
+      },
+      "runtime_s": 0.24643900000228314
+    },
+    {
+      "case_id": "H0830_SMALL",
+      "input_sha256": "cf8579387894738263e3366215bcb7ca9774b35c65e465c67e84b3caffd76dd0",
+      "now_s": 30600,
+      "scale": "SMALL",
+      "task_counts": {
+        "TRAIN_DAY_20161010": 12,
+        "TRAIN_DAY_20161017": 12,
+        "TRAIN_DAY_20161024": 12
+      },
+      "c_eligible_counts": {
+        "TRAIN_DAY_20161010": 0,
+        "TRAIN_DAY_20161017": 1,
+        "TRAIN_DAY_20161024": 1
+      },
+      "sites": 4,
+      "hv": 3,
+      "c": 1,
+      "common_build_s": 0.005709400000341702,
+      "catalogue": {
+        "variables": 12,
+        "nonzeros": 33,
+        "path_columns": 8,
+        "complete_declared_domain": true,
+        "domain": "C_TOP3_HV_TOP6_MAX3_MATCH_300_PICKUP_600"
+      },
+      "runtime_s": 0.06024509999406291
+    },
+    {
+      "case_id": "H0830_MEDIUM",
+      "input_sha256": "b7615a106b932ba6a9f388ba4188e550ef0d0c2f33d214cb2f0e1572ec62cd0d",
+      "now_s": 30600,
+      "scale": "MEDIUM",
+      "task_counts": {
+        "TRAIN_DAY_20161010": 24,
+        "TRAIN_DAY_20161017": 24,
+        "TRAIN_DAY_20161024": 24
+      },
+      "c_eligible_counts": {
+        "TRAIN_DAY_20161010": 2,
+        "TRAIN_DAY_20161017": 3,
+        "TRAIN_DAY_20161024": 1
+      },
+      "sites": 6,
+      "hv": 4,
+      "c": 2,
+      "common_build_s": 0.010771199995360803,
+      "catalogue": {
+        "variables": 43,
+        "nonzeros": 101,
+        "path_columns": 37,
+        "complete_declared_domain": true,
+        "domain": "C_TOP3_HV_TOP6_MAX3_MATCH_300_PICKUP_600"
+      },
+      "runtime_s": 0.08985720000055153
+    },
+    {
+      "case_id": "H0830_LARGE",
+      "input_sha256": "7d19f626152e8c5dea4a00a2d93baf58d4d05c2d83ebb3ecba69031e09a4ab2d",
+      "now_s": 30600,
+      "scale": "LARGE",
+      "task_counts": {
+        "TRAIN_DAY_20161010": 36,
+        "TRAIN_DAY_20161017": 36,
+        "TRAIN_DAY_20161024": 36
+      },
+      "c_eligible_counts": {
+        "TRAIN_DAY_20161010": 2,
+        "TRAIN_DAY_20161017": 4,
+        "TRAIN_DAY_20161024": 2
+      },
+      "sites": 8,
+      "hv": 6,
+      "c": 2,
+      "common_build_s": 0.016502400001627393,
+      "catalogue": {
+        "variables": 93,
+        "nonzeros": 219,
+        "path_columns": 85,
+        "complete_declared_domain": true,
+        "domain": "C_TOP3_HV_TOP6_MAX3_MATCH_300_PICKUP_600"
+      },
+      "runtime_s": 0.21840489999885904
+    },
+    {
+      "case_id": "H1700_SMALL",
+      "input_sha256": "daa9a08240ab7fb3e853a3cf281f417d0b8900ce9e472b034c824a7c25f20414",
+      "now_s": 61200,
+      "scale": "SMALL",
+      "task_counts": {
+        "TRAIN_DAY_20161010": 12,
+        "TRAIN_DAY_20161017": 12,
+        "TRAIN_DAY_20161024": 12
+      },
+      "c_eligible_counts": {
+        "TRAIN_DAY_20161010": 1,
+        "TRAIN_DAY_20161017": 0,
+        "TRAIN_DAY_20161024": 1
+      },
+      "sites": 4,
+      "hv": 3,
+      "c": 1,
+      "common_build_s": 0.00738689999707276,
+      "catalogue": {
+        "variables": 13,
+        "nonzeros": 34,
+        "path_columns": 9,
+        "complete_declared_domain": true,
+        "domain": "C_TOP3_HV_TOP6_MAX3_MATCH_300_PICKUP_600"
+      },
+      "runtime_s": 0.05904900000314228
+    },
+    {
+      "case_id": "H1700_MEDIUM",
+      "input_sha256": "1fc28d27800ef5c968233f51c3e665618622e858f23a1491d9a6a395ed2e0259",
+      "now_s": 61200,
+      "scale": "MEDIUM",
+      "task_counts": {
+        "TRAIN_DAY_20161010": 24,
+        "TRAIN_DAY_20161017": 24,
+        "TRAIN_DAY_20161024": 24
+      },
+      "c_eligible_counts": {
+        "TRAIN_DAY_20161010": 2,
+        "TRAIN_DAY_20161017": 0,
+        "TRAIN_DAY_20161024": 1
+      },
+      "sites": 6,
+      "hv": 4,
+      "c": 2,
+      "common_build_s": 0.00947489999816753,
+      "catalogue": {
+        "variables": 36,
+        "nonzeros": 88,
+        "path_columns": 30,
+        "complete_declared_domain": true,
+        "domain": "C_TOP3_HV_TOP6_MAX3_MATCH_300_PICKUP_600"
+      },
+      "runtime_s": 0.2140958999953
+    },
+    {
+      "case_id": "H1700_LARGE",
+      "input_sha256": "d68cc80fdb940c501ffcd480b99bbd65d5a00bc60e7bb0d7d6c28228cb055614",
+      "now_s": 61200,
+      "scale": "LARGE",
+      "task_counts": {
+        "TRAIN_DAY_20161010": 36,
+        "TRAIN_DAY_20161017": 36,
+        "TRAIN_DAY_20161024": 36
+      },
+      "c_eligible_counts": {
+        "TRAIN_DAY_20161010": 3,
+        "TRAIN_DAY_20161017": 1,
+        "TRAIN_DAY_20161024": 2
+      },
+      "sites": 8,
+      "hv": 6,
+      "c": 2,
+      "common_build_s": 0.02132339999661781,
+      "catalogue": {
+        "variables": 65,
+        "nonzeros": 158,
+        "path_columns": 57,
+        "complete_declared_domain": true,
+        "domain": "C_TOP3_HV_TOP6_MAX3_MATCH_300_PICKUP_600"
+      },
+      "runtime_s": 0.2300152000025264
+    },
+    {
+      "case_id": "H1800_SMALL",
+      "input_sha256": "f4b3aadd5c4f7dcd7c28c54218ddf2a1e9fc8720ff2bfe69b06be618a6a16628",
+      "now_s": 64800,
+      "scale": "SMALL",
+      "task_counts": {
+        "TRAIN_DAY_20161010": 12,
+        "TRAIN_DAY_20161017": 12,
+        "TRAIN_DAY_20161024": 12
+      },
+      "c_eligible_counts": {
+        "TRAIN_DAY_20161010": 0,
+        "TRAIN_DAY_20161017": 0,
+        "TRAIN_DAY_20161024": 0
+      },
+      "sites": 4,
+      "hv": 3,
+      "c": 1,
+      "common_build_s": 0.005207599999266677,
+      "catalogue": {
+        "variables": 15,
+        "nonzeros": 40,
+        "path_columns": 11,
+        "complete_declared_domain": true,
+        "domain": "C_TOP3_HV_TOP6_MAX3_MATCH_300_PICKUP_600"
+      },
+      "runtime_s": 0.06095679999998538
+    },
+    {
+      "case_id": "H1800_MEDIUM",
+      "input_sha256": "7fed6b03d75dd2554236f251fd1fb5e503e2a62db2d4457346b6967330918dc5",
+      "now_s": 64800,
+      "scale": "MEDIUM",
+      "task_counts": {
+        "TRAIN_DAY_20161010": 24,
+        "TRAIN_DAY_20161017": 24,
+        "TRAIN_DAY_20161024": 24
+      },
+      "c_eligible_counts": {
+        "TRAIN_DAY_20161010": 0,
+        "TRAIN_DAY_20161017": 0,
+        "TRAIN_DAY_20161024": 0
+      },
+      "sites": 6,
+      "hv": 4,
+      "c": 2,
+      "common_build_s": 0.012676099999225698,
+      "catalogue": {
+        "variables": 50,
+        "nonzeros": 131,
+        "path_columns": 44,
+        "complete_declared_domain": true,
+        "domain": "C_TOP3_HV_TOP6_MAX3_MATCH_300_PICKUP_600"
+      },
+      "runtime_s": 0.26636259999941103
+    },
+    {
+      "case_id": "H1800_LARGE",
+      "input_sha256": "2ff0cb46011828b537f808c1d7a35ffe8462d9ba4428fe306a5c06cb9b76a153",
+      "now_s": 64800,
+      "scale": "LARGE",
+      "task_counts": {
+        "TRAIN_DAY_20161010": 36,
+        "TRAIN_DAY_20161017": 36,
+        "TRAIN_DAY_20161024": 36
+      },
+      "c_eligible_counts": {
+        "TRAIN_DAY_20161010": 0,
+        "TRAIN_DAY_20161017": 0,
+        "TRAIN_DAY_20161024": 0
+      },
+      "sites": 8,
+      "hv": 6,
+      "c": 2,
+      "common_build_s": 0.015499799999815878,
+      "catalogue": {
+        "variables": 96,
+        "nonzeros": 245,
+        "path_columns": 88,
+        "complete_declared_domain": true,
+        "domain": "C_TOP3_HV_TOP6_MAX3_MATCH_300_PICKUP_600"
+      },
+      "runtime_s": 0.2287780999977258
+    }
+  ],
+  "peak_rss_mib": 185.35546875,
+  "finished_at": "2026-10-14T19:39:25+08:00",
+  "processing_runtime_s": 6.015005499997642
+}

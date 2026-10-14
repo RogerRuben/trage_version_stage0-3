@@ -2,6 +2,8 @@
 
 日期：2026-10-14，Asia/Singapore。状态：PLAN_ONLY_NOT_EXECUTED。
 
+执行更新：作者随后授权完整实现和固定比较；12/12已完成，见[结果报告](D:/pycodes/didi_xian_raw/.worktrees/stage0-v6-valhalla/stage4/docs/capability_chain_planning/competitive_chain_algorithm_v1/results/report.md)。下文保留执行前已提交的范围和上限，“本轮仅制定计划”是原始阶段记录，不是当前未完成状态。
+
 [统一模型与算法规格](D:/pycodes/didi_xian_raw/.worktrees/stage0-v6-valhalla/stage4/docs/capability_chain_planning/competitive_chain_algorithm_v1/method_and_algorithm.md)
 
 ## 1. 这批只回答什么
