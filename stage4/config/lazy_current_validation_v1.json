@@ -1,0 +1,18 @@
+{
+  "version": "lazy_current_validation_v1",
+  "source_native": "stage4/output/capability_chain_planning/layout_confirmation_v1/Q10_LABEL_SEED2/native/COMPATIBLE_HOT_COMMON_CONTROL",
+  "anchors_s": [27000, 30600, 61200, 64800],
+  "maximum_waiting_requests": 24,
+  "selection_seed": 20261014,
+  "current_top_k": 20,
+  "modes": ["EAGER", "LAZY_CERTIFIED"],
+  "mode_time_limit_s": 10,
+  "batch_time_limit_s": 600,
+  "maximum_rss_mib": 768,
+  "minimum_initial_available_ram_mib": 1536,
+  "minimum_remaining_ram_mib": 512,
+  "route_workers": 1,
+  "unknown_distance_lower_m": 0.0,
+  "native_replay": false,
+  "gpu_used": false
+}
