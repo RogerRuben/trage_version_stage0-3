@@ -47,3 +47,7 @@
 正式对照：`python -B -u -m stage4.analysis.lazy_current_validation_benchmark --root .`。
 
 私有紧凑子图与查询结果在 `stage4/output/capability_chain_planning/lazy_current_validation_v1/run_001/`。公开 `summary.json`、`results.csv`、结果说明在本目录。代码和计划先提交，正式结果记录该提交 SHA；最后统一提交并推送。完成后停止，不追加全天实验或挑选更多子图。
+
+## 执行后附记（不修改执行前范围）
+
+2026-10-14：唯一正式代码74fcb60902e40a700eaa484f304cce35676fa853，四图完成；范围与阈值未变。结果见[报告](D:/pycodes/didi_xian_raw/.worktrees/stage0-v6-valhalla/stage4/docs/capability_chain_planning/lazy_current_validation_v1/report.md)。该附记是结果导航，不把执行前计划改写为事后推荐。
