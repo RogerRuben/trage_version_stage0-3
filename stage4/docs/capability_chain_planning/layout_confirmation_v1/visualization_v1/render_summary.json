@@ -1,0 +1,107 @@
+{
+  "status": "D1_D2_D3_COMPLETE",
+  "figures": {
+    "D1": {
+      "files": [
+        "stage4/docs/capability_chain_planning/layout_confirmation_v1/visualization_v1/d1_network_deployment.pdf",
+        "stage4/docs/capability_chain_planning/layout_confirmation_v1/visualization_v1/d1_network_deployment.png"
+      ],
+      "crs": "EPSG:32649",
+      "projected_extent_km": [
+        291.858749407944,
+        3785.804248258255,
+        316.9273273218419,
+        3814.640342318602
+      ],
+      "background_directed_edges": 55070,
+      "change_identity_keys": 3884,
+      "reference_condition": "Q10_REFERENCE_EXISTING_NOT_RERUN"
+    },
+    "D2": {
+      "files": [
+        "stage4/docs/capability_chain_planning/layout_confirmation_v1/visualization_v1/d2_service_conversion.pdf",
+        "stage4/docs/capability_chain_planning/layout_confirmation_v1/visualization_v1/d2_service_conversion.png"
+      ],
+      "matrix_population": 28367,
+      "no_causal_component_claim": true
+    },
+    "D3": {
+      "files": [
+        "stage4/docs/capability_chain_planning/layout_confirmation_v1/visualization_v1/d3_operational_tradeoffs.pdf",
+        "stage4/docs/capability_chain_planning/layout_confirmation_v1/visualization_v1/d3_operational_tradeoffs.png"
+      ],
+      "all_four_conditions": true,
+      "fabricated_error_bars": false
+    }
+  },
+  "font_family": "Microsoft YaHei",
+  "renderer_sha256": "39d18753162571ff3b1cf79abed229f6ced989ef6fd6d76f212a277214e0e9c0",
+  "runtime_s": 39.28832229999898,
+  "peak_rss_mib": 290.48828125,
+  "new_experiment": false,
+  "external_map_requests": false,
+  "gpu_used": false,
+  "coordinates_in_public_tables": false,
+  "files": {
+    "stage4/docs/capability_chain_planning/layout_confirmation_v1/visualization_v1/d1_network_deployment.pdf": {
+      "sha256": "786a89ce15a6993970bdeb8c7f9de3027def7e277ddc0b41feaad1b8984e1e8a",
+      "bytes": 984307
+    },
+    "stage4/docs/capability_chain_planning/layout_confirmation_v1/visualization_v1/d1_network_deployment.png": {
+      "sha256": "e11c9c29cd1c352fe0e6db510c721647831f39d17ee691abc04e64da6a7f00c6",
+      "bytes": 1488176,
+      "width": 2070,
+      "height": 2640,
+      "dpi": [
+        299.9994,
+        299.9994
+      ]
+    },
+    "stage4/docs/capability_chain_planning/layout_confirmation_v1/visualization_v1/d2_service_conversion.pdf": {
+      "sha256": "8e93f2207e470f45ea924163343c8339ad3e1f741a594e67bc133ec14e1ec076",
+      "bytes": 55623
+    },
+    "stage4/docs/capability_chain_planning/layout_confirmation_v1/visualization_v1/d2_service_conversion.png": {
+      "sha256": "0bf1035f347dd9e8b71e256eef2bc065c32a633f313dba876af159b98ad9742d",
+      "bytes": 233951,
+      "width": 2070,
+      "height": 1560,
+      "dpi": [
+        299.9994,
+        299.9994
+      ]
+    },
+    "stage4/docs/capability_chain_planning/layout_confirmation_v1/visualization_v1/d3_operational_tradeoffs.pdf": {
+      "sha256": "c894765d98c1dcea7aabbd13ac31b90ae59ceaf453f21246973b14699bc53d73",
+      "bytes": 52682
+    },
+    "stage4/docs/capability_chain_planning/layout_confirmation_v1/visualization_v1/d3_operational_tradeoffs.png": {
+      "sha256": "2c9a67abb6fd04925562dc91bd145a278aff5978e3353739754e319fad57cb93",
+      "bytes": 149399,
+      "width": 2070,
+      "height": 1140,
+      "dpi": [
+        299.9994,
+        299.9994
+      ]
+    }
+  },
+  "numeric_checks": {
+    "matrix_marginals": true,
+    "direction_keys_and_edge_deltas": true,
+    "source_inputs_unchanged": true
+  },
+  "visual_check": {
+    "status": "PASS",
+    "method": "Inline assistant inspection of three final Poppler-rendered PDF pages; not an independent review",
+    "refinement_cycles": 1,
+    "initial_issues_fixed": [
+      "D1 footer overlap",
+      "D3 edge-near numeric annotations"
+    ],
+    "pdf_pages_per_figure": 1,
+    "remaining_issues": [],
+    "pdf_fonts_embedded": true,
+    "font_check_method": "Bundled pypdf: all FontDescriptors contain embedded font streams"
+  }
+}

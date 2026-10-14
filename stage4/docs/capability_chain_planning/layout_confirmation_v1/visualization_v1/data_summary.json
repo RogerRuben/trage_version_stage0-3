@@ -1,0 +1,70 @@
+{
+  "status": "FIGURE_DATA_COMPLETE_NOT_NEW_EXPERIMENT",
+  "source_files_sha256": {
+    "stage4/output/capability_chain_planning/layout_confirmation_v1/Q05_REFERENCE_LABELS/native/COMPATIBLE_HOT_COMMON_CONTROL/cohort_outcomes.parquet": "bc026ae2343129b61358634cb54ba12692fc9805db806fe8a59997a6f9d68561",
+    "stage4/output/capability_chain_planning/layout_confirmation_v1/Q05_REFERENCE_LABELS/native/OPPORTUNITY_JOINT_COMMON_CONTROL/cohort_outcomes.parquet": "304f90cbf44f716e8fd9886bed2716c3c515f4b9c1d14435c6857f526fd648fc",
+    "stage4/output/capability_chain_planning/layout_comparison_300_600_v1/COMPATIBLE_HOT_COMMON_CONTROL/cohort_outcomes.parquet": "37fc6d985d87c121a967fa2daab0ec6f04e47f5c4d235f0759bbe29a35339afb",
+    "stage4/output/capability_chain_planning/layout_comparison_300_600_v1/OPPORTUNITY_JOINT_COMMON_CONTROL/cohort_outcomes.parquet": "51e288de23143697259ae3bed2596383a99fff020cb8644404fdf5bb38072648",
+    "stage4/output/capability_chain_planning/layout_confirmation_v1/Q10_LABEL_SEED2/native/COMPATIBLE_HOT_COMMON_CONTROL/cohort_outcomes.parquet": "e435ee84df8f0a547015562e00adb56a73bde68f9e2c82ab38d7e017778473a9",
+    "stage4/output/capability_chain_planning/layout_confirmation_v1/Q10_LABEL_SEED2/native/OPPORTUNITY_JOINT_COMMON_CONTROL/cohort_outcomes.parquet": "682dc66787a503086183b71316c67f7cc29130ea12fb2224b2c963f560c99768",
+    "stage4/output/capability_chain_planning/layout_confirmation_v1/Q20_REFERENCE_LABELS/native/COMPATIBLE_HOT_COMMON_CONTROL/cohort_outcomes.parquet": "a8c84392349557cc9bf8d871babf73262e20894eb2de86971bfd02665307d925",
+    "stage4/output/capability_chain_planning/layout_confirmation_v1/Q20_REFERENCE_LABELS/native/OPPORTUNITY_JOINT_COMMON_CONTROL/cohort_outcomes.parquet": "a83827de93aad8d0735b2f4e69d5412a04d50ad92834dd4c86a8b762c7afc645",
+    "stage4/docs/capability_chain_planning/layout_confirmation_v1/six_case_results.json": "5d219e7fb1190041c81b8510ebb620eacfcb54d9e1cf94296a08f7524f3a181e",
+    "stage4/docs/capability_chain_planning/layout_confirmation_v1/visualization_design_v1.md": "0a56b63981e038049ebe19a7b3c2d2f5d666f0a868a84f41214df9a5bd7330a2",
+    "stage3/output/odd_tod/s4/test31_route_identity_resolution.parquet": "3148f868b45a2ec5be33c7cb63a3d28598a3cb445626b2f17618c5cbbc7d512c",
+    "stage3/output/odd_tod/s2a/stage3_full_network_edges.parquet": "25ed4caf250cacbe251ae258d8e77ff2f0b286884f0376c72b9ef09e33687204",
+    "stage4/input/replay_foundation/stage4_order_replay_base.parquet": "dc590c415e08e65ef3975cb7b8122484b04dbef76788d29ee1f2c831e236c874",
+    "stage4/output/symmetric_flexibility_v1/input/test31_research_routes.parquet": "672d635fa24690ba7082b2e925f8419e6b6d67aca2dec613ea0a87835e7e57f7",
+    "stage4/input/replay_foundation/replay_fleet_template.parquet": "09fc04e8250b873274ee2e397060417edb081908c2eb4f9f24a0459328b045b0",
+    "stage4/output/capability_chain_planning/layout_300_600_v1/placements.json": "4f11b259103014a0ad03cf62951893279d366abc628f977d28e42b8a9bc23826"
+  },
+  "data_script_sha256": "d7a58e0d31c1d0005edd93af5cd7aee17387c5dad7934a1302187860a8c0a927",
+  "spatial": {
+    "cohort_token_type_counts": {
+      "FULL_NETWORK_EDGE": 1864778,
+      "HISTORICAL_REVERSE_OVERLAY": 76218
+    },
+    "skipped_tokens": {},
+    "cohort_orders_without_identity": 0,
+    "C_orders_union": 1517,
+    "C_orders_without_bound_identity": 0,
+    "cohort_orders_without_original_reference": 0,
+    "C_orders_without_original_reference": 0,
+    "order_edge_pairs": 45783,
+    "per_order_per_directed_identity_deduplicated": true,
+    "condition": "Q10_REFERENCE_EXISTING_NOT_RERUN",
+    "cohort_orders": 28367,
+    "coordinates_missing": 0,
+    "service_changes": {
+      "LOSS": 65,
+      "GAIN": 110
+    },
+    "changes_missing_coordinates": {},
+    "C_hours_H": 1227.9322222222222,
+    "C_hours_J": 1227.9322222222222,
+    "location_delta_sum_h": 3.200217868482014e-14,
+    "saved_location_keys": 57,
+    "directed_coverage_keys": 4903,
+    "missing_coverage_geometry_keys": 0,
+    "changed_keys": 3884,
+    "cohort_geometry_uids": 8107,
+    "cohort_geometry_uids_missing": 0,
+    "wgs84_extent": [
+      108.74977827072144,
+      34.20544930169491,
+      108.99836540222168,
+      34.44411424646329
+    ],
+    "extent_uses_common_routes_and_both_layouts": true
+  },
+  "source_population": 28367,
+  "producer_commits_are_preserved": true,
+  "simulation_invoked": false,
+  "inference_invoked": false,
+  "routing_invoked": false,
+  "gpu_used": false,
+  "dense_fleet_time_edge_array": false,
+  "raw_coordinates_exported_to_git": false,
+  "runtime_s": 55.1253727000003,
+  "peak_rss_mib": 248.41796875
+}
