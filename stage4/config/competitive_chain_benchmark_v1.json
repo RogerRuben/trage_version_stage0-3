@@ -1,0 +1,27 @@
+{
+  "version": "competitive_chain_benchmark_v1",
+  "base_config": "stage4/config/scheme_a_two_scale_city_v5_common.json",
+  "base_config_sha256": "d41b1d448d8c5342f45b40b625857fc7e018610ddf98d027bd8f00c684c9c836",
+  "anchors_s": [27000, 30600, 61200, 64800],
+  "selection_seed": 20261014,
+  "scales": [
+    {"name": "SMALL", "tasks_per_scene": 12, "hv": 3, "c": 1, "sites": 4},
+    {"name": "MEDIUM", "tasks_per_scene": 24, "hv": 4, "c": 2, "sites": 6},
+    {"name": "LARGE", "tasks_per_scene": 36, "hv": 6, "c": 2, "sites": 8}
+  ],
+  "method_wall_limit_s": 30,
+  "integer_evaluation_limit_s": 10,
+  "exact_reference_limit_s": 30,
+  "batch_wall_limit_s": 1800,
+  "maximum_rss_mib": 512,
+  "minimum_initial_available_ram_mib": 1536,
+  "maximum_variables": 20000,
+  "maximum_nonzeros": 150000,
+  "maximum_pricing_rounds": 6,
+  "maximum_exchanges": 8,
+  "new_method_lp_reserved_limit_s": 18,
+  "gpu_used": false,
+  "new_routing": false,
+  "new_inference": false,
+  "native_simulation": false
+}
