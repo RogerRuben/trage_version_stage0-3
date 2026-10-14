@@ -247,3 +247,36 @@ def test_unavailable_price_and_optional_route_budget_cutoff_keep_validated_curre
     assert row["current_flow_fallback_reason"] == "CURRENT_WALL_DEADLINE"
     assert row["adapter_wall_deadline_exceeded"] and row["current_selected"] == 1
     assert c.repositioning_manager.queued[-1][0] == []
+
+
+def test_opt_in_joint_mode_keeps_neutral_moves_and_does_not_use_private_values(monkeypatch):
+    c,cfg=fixture()
+    c.repositioning_manager.active.clear()
+    cfg.update(current_decision_mode="BOTTLENECK_JOINT",idle_movement_mode="VALUE_SELECTED")
+    value=Value()
+    value.library=NS(view=lambda now:{"HISTORY":()},weights={"HISTORY":1})
+    value.pace=NS(global_pace=.01,pace_by_slot={})
+    value.value=lambda *args:pytest.fail("private vehicle values cannot gate joint actions")
+    value.refresh=lambda *args:pytest.fail("old independent-price LP must not be required")
+    sites=[dict(site_id="site",node_id=1,position=(108.901,34.2))]
+    routed=[]
+    def connector(state,target,now,profile):
+        routed.append(profile)
+        return dict(supported=True,travel_time_s=100.,empty_distance_m=100.,
+            routed={"supported":True},arrival_context={"kind":"EMPTY_ARRIVAL","point":target["position"]})
+    monkeypatch.setattr(native,"sites_for",lambda *args:sites)
+    from stage4.dispatch import bottleneck_native
+    monkeypatch.setattr(bottleneck_native,"predicted_vehicle_states",lambda *args:())
+    adapter=native.NativeTwoScaleAdapter("SERVICE_PRESERVING",value,None,connector,
+        lambda control,arcs,now:arcs,None,cfg)
+    arc=AssignmentArc(1,11,60.,False,True,
+        (c.runtime_by_vid[1],c.request_by_rid[11],NS(route_distance_m=400.)),"AV")
+    result=adapter.solve(c,[arc],[11],900.)
+    assert result.selected_indices==(0,)
+    row=adapter.rows[-1]
+    assert len(routed)==2
+    assert row["current_move_upper_screened_count"]==row["current_move_arrival_screened_count"]==0
+    assert row["effective_policy"]=="BOTTLENECK_JOINT"
+    assert row["joint_control"]["same_first_action_across_scenarios"]
+    assert row["joint_control"]["generated_continuation_columns"]>0
+    assert row["future_connector_queries"]==0

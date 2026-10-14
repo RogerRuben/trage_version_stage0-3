@@ -1,9 +1,9 @@
-"""Opt-in native two-scale control: exact current execution, coarse future value.
+"""Native two-scale control with an independent opt-in joint-fleet branch.
 
-No hypothetical connector or service-chain builder is called here. Current
-customer pickup paths and current selected idle moves retain their original
-physical/directional validators. BUSY and not-yet-online states are only a
-five-minute aggregate supply input, never executable current actions.
+The default retains private coarse future values and creates no chain columns.
+BOTTLENECK_JOINT builds shared prediction-only continuations instead. Both
+branches preserve physical current pickup/move validators; committed/unborn
+resources never become executable current SERVEs.
 """
 from __future__ import annotations
 
@@ -48,6 +48,13 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
         super().__init__(policy, value_provider, reference, connectors, validator,
                          remaining_model, cfg)
         self.value_provider = value_provider
+        self.joint_mode = cfg.get("current_decision_mode", "INDEPENDENT_VALUE") == "BOTTLENECK_JOINT"
+        if cfg.get("current_decision_mode", "INDEPENDENT_VALUE") not in ("INDEPENDENT_VALUE","BOTTLENECK_JOINT"):
+            raise ValueError("unknown current joint decision switch")
+        if self.joint_mode and cfg.get("idle_movement_mode","VALUE_SELECTED") != "VALUE_SELECTED":
+            raise ValueError("joint moves cannot also use an external historical deficit controller")
+        if self.joint_mode and any(not hasattr(value_provider,k) for k in ("library","pace")):
+            raise ValueError("joint control requires existing history and prediction-only pace inputs")
         self.common_movement = cfg.get("idle_movement_mode", "VALUE_SELECTED") in (
             "COMMON_HISTORICAL_DEFICIT", "TYPE_CONDITIONED_HISTORICAL_DEFICIT")
         if cfg.get("idle_movement_mode", "VALUE_SELECTED") not in (
@@ -81,14 +88,18 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
         for name in _MOVE_COUNTS:
             self.operation_totals[name] += int(row.get(name, 0))
         self.operation_totals["optional_move_budget_cutoffs"] += int(row.get("optional_move_budget_cutoff", False))
-        self.operation_totals["future_chain_variables"] += 0
+        # Maximum active neighborhood columns per decision, not the generated
+        # all-root column pool and not a count of realized future services.
+        self.operation_totals["future_chain_variables"] += int(row.get("future_chain_variables",0))
         self.operation_totals["future_connector_queries"] += 0
 
     def progress_summary(self):
         return dict(decisions_recorded=len(self.rows), timings_s=dict(self.timing_totals),
                     operations=dict(self.operation_totals), timing_components_are_nested=True,
                     adapter_wall_time_field="solve_wall_time_s",
-                    pre_adapter_candidate_routing_is_outside_this_timer=True, future_chain_variables=0,
+                    pre_adapter_candidate_routing_is_outside_this_timer=True,
+                    current_decision_mode="BOTTLENECK_JOINT" if self.joint_mode else "INDEPENDENT_VALUE",
+                    future_chain_variables=self.operation_totals["future_chain_variables"],
                     future_connector_queries=0)
 
     @staticmethod
@@ -111,7 +122,7 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
         # At other epochs only vehicles with an actual SERVE choice need flow
         # columns; all other native idle vehicles keep their fixed WAIT.
         calendar = getattr(c, "event_calendar", None)
-        ids = (calendar.active_ids(now) if calendar is not None else sorted(c.runtime_by_vid)) if move_epoch else (
+        ids = (calendar.active_ids(now) if calendar is not None else sorted(c.runtime_by_vid)) if move_epoch or self.joint_mode else (
             sorted({int(arc.vehicle_id) for arc in valid}))
         result = {}
         serving = {int(arc.vehicle_id) for arc in valid}
@@ -141,6 +152,14 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
         bucket = int(now // 300)
         if self.coarse_bucket == bucket:
             return dict(self.coarse_info, refreshed=False)
+        if self.joint_mode:
+            # No private-vehicle value is used to accept/reject a coalition.
+            # The joint bridge constructs shared integer scene plans instead.
+            scenes=self.value_provider.library.view(now)
+            self.coarse_bucket=bucket
+            self.coarse_info=dict(available=True,status="JOINT_HISTORY_INPUTS_READY",refreshed=True,
+                                  scenario_count=len(scenes),supply_state_count=0)
+            return dict(self.coarse_info)
         busy = Counter()
         vehicles = predicted_vehicle_states(c, now, self.cfg.get("planning_horizon_s", 1800),
                                            self.last_assignments, self.remaining_model, busy)
@@ -285,7 +304,7 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
         effective_policy = self.policy
         unavailable = None
         stamp = perf_counter()
-        if coarse["available"]:
+        if coarse["available"] and not self.joint_mode:
             try:
                 baseline = {}
                 for vid, state in states.items():
@@ -301,7 +320,7 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
                 units = dict.fromkeys(units, 0)
                 unavailable = str(error)
                 effective_policy = "SERVICE_PRESERVING"
-        else:
+        elif not coarse["available"]:
             unavailable = coarse["status"]
             effective_policy = "SERVICE_PRESERVING"
         timings["value_lookup_time_s"] = perf_counter() - stamp
@@ -326,7 +345,7 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
                                         state.profile_id, site.get("context"), float(now), 1)
                 stamp = perf_counter()
                 try:
-                    upper = self._value_units(optimistic)
+                    upper = 0 if self.joint_mode else self._value_units(optimistic)
                 except TimeoutError as error:
                     unavailable = str(error)
                     move_skip_reason = "COARSE_VALUE_LOOKUP_TIME_LIMIT"
@@ -334,7 +353,7 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
                     break
                 finally:
                     timings["value_lookup_time_s"] += perf_counter() - stamp
-                if upper <= baseline[vid]:
+                if not self.joint_mode and upper <= baseline[vid]:
                     move_counts["current_move_upper_screened_count"] += 1
                     continue
                 if perf_counter() >= deadline:
@@ -363,7 +382,7 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
                     state.admission_end_s, state.profile_id, link["arrival_context"], float(now), 1)
                 stamp = perf_counter()
                 try:
-                    actual = self._value_units(arrival)
+                    actual = 0 if self.joint_mode else self._value_units(arrival)
                 except TimeoutError as error:
                     unavailable = str(error)
                     move_skip_reason = "COARSE_VALUE_LOOKUP_TIME_LIMIT"
@@ -373,7 +392,7 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
                     timings["value_lookup_time_s"] += perf_counter() - stamp
                 if actual > upper:
                     raise ValueError("coarse MOVE value violates its monotone-ready upper-bound contract")
-                if actual <= baseline[vid]:
+                if not self.joint_mode and actual <= baseline[vid]:
                     move_counts["current_move_arrival_screened_count"] += 1
                     continue
                 aid = f"V{vid}:MOVE:{site['site_id']}"
@@ -383,7 +402,7 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
                     empty_distance_m=float(link["empty_distance_m"]),
                     payload=dict(move=move, relocation_slot_s=int(now))))
                 after[aid] = arrival
-                units[aid] = actual - baseline[vid]
+                units[aid] = 0 if self.joint_mode else actual - baseline[vid]
         if unavailable is not None or move_budget_cutoff:
             # Time/value degradation is explicit. No speculative or late MOVE
             # executes, but all physically validated current SERVEs remain.
@@ -399,6 +418,14 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
             deadline_s=deadline,
             maximum_actions=int(self.cfg.get("maximum_model_variables", 20000)),
             empty_distance_mode=self.cfg.get("current_empty_distance_mode", "LOCAL_STABLE"))
+        if self.joint_mode:
+            from .bottleneck_native import solve_joint_current
+            result=solve_joint_current(c,actions,after,result,now,self.cfg,self.value_provider,
+                self.last_assignments,self.remaining_model,self._task,self._moving_wait,waiting_ids,deadline)
+            effective_policy=("SERVICE_PRESERVING_JOINT_BUDGET_FALLBACK"
+                if result["joint_control"].get("resource_fallback") else "BOTTLENECK_JOINT")
+            base["future_chain_variables"]=int(result.get("future_chain_variables",0))
+            base["joint_control"]=result["joint_control"]
         timings["current_flow_time_s"] = perf_counter() - stamp
         chosen = set(result["selected_action_ids"])
         serves = [action for action in actions if action.action_id in chosen and action.kind == "SERVE"]
@@ -437,7 +464,8 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
             coarse_supply_state_count=coarse.get("supply_state_count", 0),
             continuation_delta_units_selected=sum(units[action.action_id] for action in [*serves, *moves]),
             continuation_value_unavailable_reason=unavailable,
-            resource_fallback=result["opt_status"].startswith("FEASIBLE") or unavailable is not None,
+            resource_fallback=(result["opt_status"].startswith("FEASIBLE") or unavailable is not None
+                or result.get("joint_control",{}).get("resource_fallback",False)),
             current_flow_fallback_reason=result["fallback_reason"],
             current_move_connector_queries=move_queries,
             optional_move_budget_cutoff=move_budget_cutoff, optional_move_skip_reason=move_skip_reason,
