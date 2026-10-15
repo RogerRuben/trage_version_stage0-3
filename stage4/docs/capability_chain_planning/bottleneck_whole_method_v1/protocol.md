@@ -107,3 +107,5 @@ python -m stage4.analysis.bottleneck_whole_method analyze
 覆盖共同当前动作、共享请求容量、跨情景闭合、联合改善、原待单时钟、便宜初始化不耗深搜索标签、上线布局接入、两种原生开关及默认只准备配置。改动文件编译检查和Git diff check通过。学术研究技能仅用于明确比较对象、控制信息集及约束结论，没有扩展数据实验或附加审计阶段。
 
 本阶段交付：**整体算法可以独立切换、部署与运营均已接入，整套比较的准备/执行/分析入口已齐备。** 尚无新城市运行结果，不能宣称提高了实际服务率或运行速度。下一次应集中执行并解释这一次完整比较，而不是继续补散碎提速试验。
+
+执行更新（2026-10-15）：布局47批完成，原参考组全天完成；用户随后要求停止第二组、先诊断搜索开销，第三组未启动。三组比较尚未完成。详见[中止与搜索开销诊断](D:/pycodes/didi_xian_raw/.worktrees/stage0-v6-valhalla/stage4/docs/capability_chain_planning/bottleneck_whole_method_v1/search_cost_diagnosis.md)；本页以上保留准备阶段的原方案与预算，不代表新的重跑授权。
