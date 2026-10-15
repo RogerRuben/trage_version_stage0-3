@@ -28,7 +28,7 @@
 | 调位准备合计 | 2.128 s | 1.237 s |
 | 其中重复调位查询 | 0.162 s | 0.00254 s |
 | 原稀疏接驾候选构造/路由 | 4.368 s | 3.623 s |
-| 进程峰值 | 约 528 MiB | 约 549 MiB |
+| 进程峰值 | 约 545 MiB | 约 549 MiB |
 
 路线校验计时两侧均带 cProfile，其他部分为墙钟计时。这些小状态不是全天收益或繁忙时段统计分布；候选路由计时差也不能单独归因于代码，原生引擎与机器负担会波动。
 
@@ -41,3 +41,5 @@
 新能力已接入现有 `SchemeACityConnectors` / `CityPickupSupportValidator` / V3 原生执行链路，不需要为每个实验另选一套策略。独立参考结果和 47 批布局仍保留，不重算。
 
 原生性能接入检查入口：`python -B -u -m stage4.analysis.base_cost_benchmark --native-prefix`。它只运行瓶颈主方法的 00:00—00:40，完整输入/供给/预测范围不裁剪，结果写入独立 `base_cost_optimization/native_prefix/`，不覆盖原预跑或正式实验。该前缀不排空任务、不比较服务率，完成即停止；全天速度仍须与局部计时区分。
+
+该接入检查已在 `a0085eda9cc16a6c7c6e59f9ecf5793bc9efceb2` 下完成。81 步合计 83.158 秒，含初始化总计 254.941 秒，峰值 843.30 MiB；没有处理异常、资源回退、调位预算截断或超过 10 秒的完整步/适配器决策。222 条派单记录的车辆、请求、订单、派单时刻、接驾 ETA 和预测服务时间与旧 V3 同前缀逐项一致；模型加载数、求解次数和搜索标签数也一致。详细结果见[性能说明](D:/pycodes/didi_xian_raw/.worktrees/stage0-v6-valhalla/stage4/docs/capability_chain_planning/base_cost_optimization/performance.md)。
