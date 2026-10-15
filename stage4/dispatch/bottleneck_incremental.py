@@ -351,14 +351,16 @@ def execute_incremental(actions,roots,selected,scenes,pending,pace,library,now,c
         seeds=memory.frontier(p,initial,dirty,check)
     with timed("search_total_time_s"):
         search=incremental_search
+        search_options={}
         if memory.efficient:
             from .bottleneck_efficient import efficient_search
             search=efficient_search
+            search_options["first_current_improvement"]=cfg.get("joint_acceptance_rule","FIRST_CURRENT_IMPROVEMENT")=="FIRST_CURRENT_IMPROVEMENT"
         plan,info=search(p,initial,seeds,
             strategy=cfg.get("joint_neighborhood_strategy","BOTTLENECK_CLOSURE"),
             deadline=deadline,check=check,
             maximum_coalition=int(cfg.get("joint_maximum_coalition",6)),
-            maximum_partial_states=int(cfg.get("joint_maximum_partial_states",128)))
+            maximum_partial_states=int(cfg.get("joint_maximum_partial_states",128)),**search_options)
     deferred=info.pop("_deferred_seeds")
     with timed("plan_retention_time_s"):
         memory.save(p,initial,plan,deferred,now)

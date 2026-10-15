@@ -102,6 +102,7 @@ def test_batched_closure_retains_neutral_combinations_and_avoids_full_scans_per_
     assert original(best)["score"][0]==12 and set(best.action_ids)=={"H","C1M","C2M"}
     assert len(calls)==2  # Initial index and final independent verification only.
     assert info["search_work"]["groups_merged"]>0
+    assert info["stop_reason"]=="FIRST_CURRENT_ACTION_IMPROVEMENT"
     assert info["search_work"]["persistent_model_loads"]<info["search_work"]["solver_calls"]
 
 

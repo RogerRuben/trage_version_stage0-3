@@ -11,6 +11,7 @@
   "retained_reference_receipt": "stage4/output/capability_chain_planning/bottleneck_whole_method_v1/native/receipts/INDEPENDENT_REFERENCE.json",
   "retained_reference_receipt_sha256": "7d100894e0c20d47a66f8d9e18aa50b7c8ff02822e718a99e08173f95be2e129",
   "joint_execution_mode": "INCREMENTAL_V3",
+  "joint_acceptance_rule": "FIRST_CURRENT_IMPROVEMENT",
   "groups": ["INDEPENDENT_REFERENCE", "SPATIAL_SHARED_PLAN", "BOTTLENECK_SHARED_PLAN"],
   "default_action": "prepare",
   "automatic_retry": false,

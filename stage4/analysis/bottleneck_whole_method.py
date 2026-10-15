@@ -98,6 +98,8 @@ def assemble(base,declared,seed,root):
             retained_reference_summary=declared["retained_reference_summary"],
             retained_reference_receipt=declared["retained_reference_receipt"],
             method_scope="INCREMENTAL_SHARED_PLAN_WITH_RETAINED_INDEPENDENT_REFERENCE")
+        if declared["version"]==V3:
+            cfg["joint_acceptance_rule"]=declared.get("joint_acceptance_rule","FIRST_CURRENT_IMPROVEMENT")
     cfg["source_layout_sha256"]=_sha(root/cfg["source_layout"]) if (root/cfg["source_layout"]).is_file() else None
     return cfg
 
@@ -118,6 +120,8 @@ def load(root,config=CONFIG):
     if declared["version"] in (V2,V3):
         if declared.get("joint_execution_mode")!=("INCREMENTAL_V3" if declared["version"]==V3 else "INCREMENTAL_V2"):
             raise ValueError("V2 must explicitly enable incremental execution")
+        if declared["version"]==V3 and declared.get("joint_acceptance_rule")!="FIRST_CURRENT_IMPROVEMENT":
+            raise ValueError("V3 freezes first-current-improvement execution, not parameter search")
         for key in ("reuse_layout","retained_reference_summary","retained_reference_receipt"):
             if _sha(root/declared[key])!=declared[key+"_sha256"]:
                 raise ValueError("a retained V1 product differs; no implicit reconstruction")

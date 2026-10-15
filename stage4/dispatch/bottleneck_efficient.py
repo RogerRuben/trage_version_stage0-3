@@ -157,7 +157,7 @@ def coalesce(groups,maximum,counts):
 
 
 def efficient_search(p,initial,seeds,*,strategy,deadline,check,
-                     maximum_coalition=6,maximum_partial_states=128):
+                     maximum_coalition=6,maximum_partial_states=128,first_current_improvement=True):
     if strategy not in ("SPATIAL_JOINT","BOTTLENECK_CLOSURE"):
         raise ValueError("unknown efficient strategy")
     if not 1<=maximum_coalition<=6 or not 1<=maximum_partial_states<=128:
@@ -199,6 +199,9 @@ def efficient_search(p,initial,seeds,*,strategy,deadline,check,
             trace.append(result)
             if result["improved"]:
                 accepted+=1; future_only+=not result["current_root_changed"]
+                if first_current_improvement and result["current_root_changed"]:
+                    return True
+        return False
     groups=[]
     try:
         if not mutable: stopped="NO_CURRENT_ACTION_CHOICE"
@@ -221,6 +224,22 @@ def efficient_search(p,initial,seeds,*,strategy,deadline,check,
                     groups.append((group,targets)); partial+=1
                 # Collect the entire bounded spatial frontier before pricing.
             else:
+                if rid in current_support:
+                    # Cheap direct-current closure before deep future pricing.
+                    # Last-chance requests need no fictitious future pickup.
+                    direct=[]
+                    ranked=sorted(current_support[rid],key=lambda a:(p.actions[a].empty_distance_m,
+                        p.actions[a].vehicle_id,a))
+                    for aid in ranked:
+                        if partial>=maximum_partial_states: break
+                        c=p.register(p.empty(sid,p.actions[aid])); a=p.actions[aid]
+                        closed=index.close(Coalition(frozenset((a.vehicle_id,)),(c,)),maximum_coalition)
+                        if closed is None: continue
+                        state,displaced=closed; targets=target_map(); targets[sid].add(rid)
+                        for s,ids in displaced.items(): targets[s].update(ids)
+                        direct.append((state.vehicles,targets)); partial+=1
+                    if flush(direct):
+                        stopped="FIRST_CURRENT_ACTION_IMPROVEMENT"; break
                 queue=deque((iter(supported(sid,rid)),)); visited=set()
                 while queue and partial<maximum_partial_states:
                     check(); generator=queue.popleft()
@@ -238,11 +257,14 @@ def efficient_search(p,initial,seeds,*,strategy,deadline,check,
                     if len(state.vehicles)<maximum_coalition and not w.columns_closed:
                         queue.append(iter(expand(state,displaced)))
                     if w.columns_closed: break
-                flush(groups); groups=[]
+                improved=flush(groups); groups=[]
+                if improved:
+                    stopped="FIRST_CURRENT_ACTION_IMPROVEMENT"; break
             if partial>=maximum_partial_states or w.columns_closed:
                 stopped="LABEL_CAP_FLUSHED" if w.columns_closed else "PARTIAL_STATE_CAP"; break
             unprocessed=tuple(seeds[n+1:])
-        flush(groups); groups=[]
+        if flush(groups): stopped="FIRST_CURRENT_ACTION_IMPROVEMENT"
+        groups=[]
     except JointBudgetStop as error:
         stopped=type(error).__name__
     plan=index.materialize(); checked=p.evaluate(plan)
@@ -255,6 +277,7 @@ def efficient_search(p,initial,seeds,*,strategy,deadline,check,
         shared_customer_capacity=True,whole_day_optimality_claimed=False,full_domain_optimality_proved=False,
         dense_matrix=False,gpu_used=False,wall_overrun=perf_counter()>deadline,
         search_work={**w.counts,**{k:v for k,v in w.metrics.items() if not k.endswith("_s")},
-            "solver_calls":w.metrics["solver_calls"]},integer_solve_time_s=w.metrics["solver_wall_time_s"],
+            "solver_calls":w.metrics["solver_calls"],
+            "first_current_improvement_stops":int(stopped=="FIRST_CURRENT_ACTION_IMPROVEMENT")},integer_solve_time_s=w.metrics["solver_wall_time_s"],
         integer_model_build_time_s=w.metrics["model_build_time_s"],block_processing_time_s=w.block_wall_s,
         _deferred_seeds=unprocessed)
