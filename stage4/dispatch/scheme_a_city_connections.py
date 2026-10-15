@@ -41,6 +41,7 @@ GEOMETRY_ROWGROUP_CACHE_BYTES = 64 * 2**20
 CERTIFICATE_CACHE_BYTES = 32 * 2**20
 CERTIFICATE_CACHE_ENTRIES = 50000
 JOIN_STATIC_CACHE_BYTES = 16 * 2**20
+EVIDENCE_INDEX_BYTES = 32 * 2**20
 
 
 def _value(obj, name, default=None):
@@ -96,6 +97,43 @@ selected evidence or Python geometry objects.
         self.join_static_bytes = 0
         self.join_static_hits, self.join_static_misses = 0, 0
         self.join_parse_hits, self.join_parse_misses = 0, 0
+        self.join_result_hits, self.join_result_misses = 0, 0
+        self.classification_hits, self.classification_misses = 0, 0
+        self.evidence_indexes = {}
+        self.evidence_index_bytes = 0
+        from .frozen_evidence_index import FrozenColumnIndex
+        for name, column in (("_boundary", "stage3_edge_uid"),
+                ("_movements", "intersection_complex_uid"), ("_controls", "intersection_complex_uid")):
+            table = getattr(self.base, name, None)
+            if table is not None:
+                # Arrow take() on many string chunks otherwise repeatedly
+                # combines whole source columns. Compact ONCE, then release
+                # the previous buffers through the existing owner.
+                table = table.combine_chunks()
+                index = FrozenColumnIndex(table, column)
+                if self.evidence_index_bytes + index.nbytes <= EVIDENCE_INDEX_BYTES:
+                    setattr(self.base,name,table)
+                    self.evidence_indexes[name] = index
+                    self.evidence_index_bytes += index.nbytes
+
+    def route_evidence_inputs(self, uids):
+        key = "TABLES", tuple(sorted(uids))
+        cached = self.join_static_cache.get(key)
+        if cached is not None:
+            self.join_static_cache.move_to_end(key)
+            return cached[0]
+        def select(name, column, values):
+            index = self.evidence_indexes.get(name)
+            return index.select(values) if index is not None else _select(getattr(self, name), column, values)
+        boundary = select("_boundary", "stage3_edge_uid", uids).to_pandas()
+        cids = set(boundary.intersection_complex_uid.astype(str))
+        movements = select("_movements", "intersection_complex_uid", cids)
+        movements = _select(_select(movements, "incoming_stage3_edge_uid", uids),
+            "outgoing_stage3_edge_uid", uids).to_pandas()
+        controls = select("_controls", "intersection_complex_uid", cids).to_pandas()
+        result = boundary, movements, controls
+        self._remember_join_data(key, result)
+        return result
 
     def prepare_geometry(self, uids):
         wanted = {str(uid) for uid in uids if uid is not None}
@@ -155,12 +193,7 @@ selected evidence or Python geometry objects.
         if cached is None:
             self.join_static_misses += 1
             geometry = self.small_geometry(uids)
-            boundary = _select(self._boundary, "stage3_edge_uid", uids).to_pandas()
-            cids = set(boundary.intersection_complex_uid.astype(str))
-            movements = _select(self._movements, "intersection_complex_uid", cids)
-            movements = _select(_select(movements, "incoming_stage3_edge_uid", uids),
-                                "outgoing_stage3_edge_uid", uids).to_pandas()
-            controls = _select(self._controls, "intersection_complex_uid", cids).to_pandas()
+            boundary, movements, controls = self.route_evidence_inputs(uids)
             bearings = {}
             for uid, record in geometry.items():
                 points = record["geometry"]
@@ -192,7 +225,7 @@ selected evidence or Python geometry objects.
     @staticmethod
     def join_parse_key(pieces, overlay, policy):
         columns = ["date", "canonical_edge_uid", "route_token_type", "resolved_stage3_edge_uid"]
-        sequence = tuple((label, tuple(frame[columns].itertuples(index=False, name=None)))
+        sequence = tuple((label, tuple(zip(*(frame[column].to_numpy(copy=False) for column in columns))))
                          for label, frame in pieces)
         return "PARSE", hashlib.sha256(repr((sequence, tuple(sorted(overlay.items())), policy))
                                      .encode("utf-8")).digest()
@@ -207,6 +240,30 @@ selected evidence or Python geometry objects.
         return deepcopy(cached[0])
 
     def join_parse_put(self, key, result):
+        self._remember_join_data(key, deepcopy(result))
+
+    def join_result_get(self, key):
+        cached = self.join_static_cache.get(key)
+        if cached is None:
+            self.join_result_misses += 1
+            return None
+        self.join_result_hits += 1
+        self.join_static_cache.move_to_end(key)
+        return deepcopy(cached[0])
+
+    def join_result_put(self, key, result):
+        self._remember_join_data(key, deepcopy(result))
+
+    def classification_get(self, key):
+        cached = self.join_static_cache.get(key)
+        if cached is None:
+            self.classification_misses += 1
+            return None
+        self.classification_hits += 1
+        self.join_static_cache.move_to_end(key)
+        return deepcopy(cached[0])
+
+    def classification_put(self, key, result):
         self._remember_join_data(key, deepcopy(result))
 
 
@@ -246,7 +303,14 @@ not permission to execute a scenario's hypothetical future customer path.
             # The scalar router's unknown-turn bearing fallback shares this
             # bounded geometry access, not another full-parquet per-edge scan.
             self.router._bearings_for = self.join_router._bearings_for
-        self.route_cache = OrderedDict()
+            self.router.static_evidence_provider = self.join_router
+        # Same Actor AND exact geometry snapshot: do not keep separate pickup
+        # and MOVE copies of an identical full route. Both already use a
+        # 1024-entry OD LRU; time-specific beta/admission stay outside it.
+        self.shared_current_route_cache = bool(
+            getattr(current_validator, "empty_router", None) is empty_router
+            and getattr(current_validator, "geometry_timestamp", None) == self.geometry_timestamp)
+        self.route_cache = current_validator.cache if self.shared_current_route_cache else OrderedDict()
         self.body_cache = OrderedDict()
         self.native_context_cache = OrderedDict()
         self.native_signature_cache = OrderedDict()
@@ -607,13 +671,17 @@ not permission to execute a scenario's hypothetical future customer path.
             if identity in seen:
                 return 0
             seen.add(identity)
+            if isinstance(value,pd.DataFrame):
+                # DataFrame.__sizeof__ ALSO scans deep column memory. Do it
+                # only once, retaining the previous conservative double-data
+                # allowance rather than quietly increasing the cache budget.
+                usage = int(value.memory_usage(index=True,deep=True).sum())
+                return object.__sizeof__(value) + 2*usage + 4128
             count = sys.getsizeof(value)
             if isinstance(value, dict):
                 count += sum(size(k) + size(v) for k, v in value.items())
             elif isinstance(value, (tuple, list, set, frozenset)):
                 count += sum(map(size, value))
-            elif isinstance(value, pd.DataFrame):
-                count += int(value.memory_usage(index=True, deep=True).sum()) + 4096
             elif isinstance(value, np.ndarray):
                 count += value.nbytes
             elif hasattr(value, "__dict__"):
@@ -629,6 +697,9 @@ not permission to execute a scenario's hypothetical future customer path.
         if byte_count > CERTIFICATE_CACHE_BYTES:
             self.counts["certificate_too_large_not_cached"] += 1
             return
+        old = self.certificate_cache.pop(key, None)
+        if old is not None:
+            self.certificate_bytes -= old[1]
         while self.certificate_cache and (len(self.certificate_cache) >= CERTIFICATE_CACHE_ENTRIES
                 or self.certificate_bytes + byte_count > CERTIFICATE_CACHE_BYTES):
             _, (_, old_bytes) = self.certificate_cache.popitem(last=False)
@@ -699,7 +770,8 @@ not permission to execute a scenario's hypothetical future customer path.
                 previous_context=_value(origin_state, "context") if not edges else None,
                 directional_evidence="FULL_SELECTED_EMPTY_ROUTE_NOT_FABRICATED_CUSTOMER")
         certificate.update(supported=True, compatible_profiles=(profile,), arrival_context=arrival,
-            connection_evidence_state="C_DIRECTED_SEAM_CERTIFIED" if profile == "C" else "HV_AUTO_ROUTABLE")
+            connection_evidence_state="C_DIRECTED_SEAM_CERTIFIED" if profile == "C" else "HV_AUTO_ROUTABLE",
+            seam=join)
         # Keep only scalar/static support in the LRU. A full current executable
         # route is returned separately and never copied into this certificate.
         route = dict(route, seam=join)
@@ -858,13 +930,19 @@ This branch is enabled explicitly by the parent protocol, never for site MOVE.
             require_geometry = bool(site and target.get("require_geometry", False))
             target_key = (("SITE", str(target["site_id"]), target_point) if site else
                 ("CUSTOMER", *identity, target_point, _point(_value(target, "dropoff"))))
-            key = (self._certificate_key("AUTO_OD" if fast_hv else "TYPED_SCALAR",
-                profile, origin, source_key, target_key) if not require_geometry else None)
-            if key is not None and key in self.certificate_cache:
+            key = self._certificate_key("AUTO_OD" if fast_hv else "TYPED_SCALAR",
+                profile, origin, source_key, target_key)
+            cached_route = self.route_cache.get((*origin, *target_point)) if require_geometry else None
+            if key is not None and key in self.certificate_cache and (not require_geometry or cached_route is not None):
                 certificate, _ = self.certificate_cache[key]
                 self.certificate_cache.move_to_end(key)
                 self.counts["certificate_cache_hits"] += 1
-                route = None
+                route = dict(cached_route) if require_geometry else None
+                if require_geometry and "seam" in certificate:
+                    route["seam"] = deepcopy(certificate["seam"])
+                if require_geometry:
+                    self.route_cache.move_to_end((*origin, *target_point))
+                    self.counts["current_move_certificate_reuses"] += 1
             else:
                 self.counts["certificate_cache_misses" if key is not None else "certificate_cache_bypassed"] += 1
                 certificate, route = (self._hv_auto_od_certificate(origin, target_point, stamp)
@@ -903,6 +981,7 @@ This branch is enabled explicitly by the parent protocol, never for site MOVE.
         return dict(counts=dict(self.counts), rejection_reason_counts=dict(self.reasons),
             timings_s=dict(self.timings), route_cache_entries=len(self.route_cache),
             route_cache_limit=ROUTE_CACHE_LIMIT, body_view_cache_entries=len(self.body_cache),
+            shared_pickup_and_move_route_cache=self.shared_current_route_cache,
             body_view_cache_limit=BODY_CACHE_LIMIT, native_context_cache_entries=len(self.native_context_cache),
             train_identity_arrow_mib=identity_bytes / 2**20, train_overlay_arrow_mib=overlay_bytes / 2**20,
             shared_geometry_arrow_mib=features.nbytes / 2**20 if features is not None else 0.,
@@ -926,6 +1005,12 @@ This branch is enabled explicitly by the parent protocol, never for site MOVE.
             join_static_cache_misses=getattr(self.join_router, "join_static_misses", 0),
             join_parse_cache_hits=getattr(self.join_router, "join_parse_hits", 0),
             join_parse_cache_misses=getattr(self.join_router, "join_parse_misses", 0),
+            exact_join_result_cache_hits=getattr(self.join_router, "join_result_hits", 0),
+            exact_join_result_cache_misses=getattr(self.join_router, "join_result_misses", 0),
+            route_classification_cache_hits=getattr(self.join_router, "classification_hits", 0),
+            route_classification_cache_misses=getattr(self.join_router, "classification_misses", 0),
+            frozen_evidence_index_mib=getattr(self.join_router, "evidence_index_bytes", 0)/2**20,
+            frozen_evidence_index_limit_mib=EVIDENCE_INDEX_BYTES/2**20,
             geometry_timestamp=self.geometry_timestamp.isoformat(),
             eta_beta_time="ACTUAL_OR_PREDICTED_CONNECTOR_DEPARTURE",
             traffic_policy="EXPLICIT_U_FOR_NEW_EMPTY_CONNECTOR_NO_M3_FABRICATION",

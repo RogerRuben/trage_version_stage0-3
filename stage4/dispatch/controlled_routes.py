@@ -220,12 +220,23 @@ class ControlledEmptyRouter:
 
     def _classify(self, records, local) -> dict[str, Any]:
         uids = {edge["stage3_edge_uid"] for edge in records}
-        boundary = _select(self._boundary, "stage3_edge_uid", uids).to_pandas()
+        provider = getattr(self, "static_evidence_provider", None)
+        key = ("ROUTE_CLASSIFICATION", local.strftime("%Y%m%d"),
+            tuple((edge["route_sequence"],edge["stage3_edge_uid"]) for edge in records),
+            CONTROL_POLICY,TRAFFIC_OUTSIDE_BUDGET,tuple(sorted(UNKNOWN_TRAFFIC.items())))
+        if provider is not None:
+            cached = provider.classification_get(key)
+            if cached is not None:
+                return cached
+            boundary, movements, controls = provider.route_evidence_inputs(uids)
+        else:
+            boundary = _select(self._boundary, "stage3_edge_uid", uids).to_pandas()
+            cids = set(boundary.intersection_complex_uid.astype(str))
+            movements = _select(self._movements, "intersection_complex_uid", cids)
+            movements = _select(movements, "incoming_stage3_edge_uid", uids)
+            movements = _select(movements, "outgoing_stage3_edge_uid", uids).to_pandas()
+            controls = _select(self._controls, "intersection_complex_uid", cids).to_pandas()
         cids = set(boundary.intersection_complex_uid.astype(str))
-        movements = _select(self._movements, "intersection_complex_uid", cids)
-        movements = _select(movements, "incoming_stage3_edge_uid", uids)
-        movements = _select(movements, "outgoing_stage3_edge_uid", uids).to_pandas()
-        controls = _select(self._controls, "intersection_complex_uid", cids).to_pandas()
         if set(controls.intersection_complex_uid.astype(str)) != cids or controls.intersection_complex_uid.duplicated().any():
             raise Stage3S2AError("ROUTE_COMPLEX_CONTROL_IDENTITY_INCOMPLETE")
         typed = pd.DataFrame(dict(date=local.strftime("%Y%m%d"), order_id="EMPTY_ROUTE",
@@ -262,7 +273,7 @@ class ControlledEmptyRouter:
             raise Stage3S2AError("A_HV_RESEARCH_COMPATIBILITY_MISMATCH")
         reasons = ("CERTIFIED_COMMON_PROHIBITION",) if prohibited else ()
         small_summary = summary.iloc[0].to_dict() if len(summary) else {}
-        return dict(common_supported=not prohibited,
+        result = dict(common_supported=not prohibited,
             compatible_profiles=frozenset(k for k, value in evaluations.items() if value.compatible),
             reason_codes=reasons, reasons=reasons,
             profile_reason_codes={k: value.reason_codes for k, value in evaluations.items()},
@@ -270,6 +281,9 @@ class ControlledEmptyRouter:
             encounter_count=int(small_summary.get("encounter_count", 0)),
             control_assumption_count=int(small_summary.get("control_assumption_count", 0)),
             bearing_fallback_count=int(small_summary.get("bearing_fallback_count", 0)))
+        if provider is not None:
+            provider.classification_put(key, result)
+        return result
 
     def route(self, origin_lon, origin_lat, dest_lon, dest_lat, timestamp) -> dict[str, Any]:
         self.route_request_count += 1

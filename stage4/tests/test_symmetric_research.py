@@ -29,6 +29,10 @@ def test_reverse_role_and_bearing_preserve_unsignalized_left_not_forward_movemen
         dict(date="20161031", order_id="o", route_sequence=1, canonical_edge_uid="g",
         route_token_type="FULL_NETWORK_EDGE", resolved_stage3_edge_uid="g")])
     identity, classified, _, encounters = parser.parse(source)
+    light_identity, light_classified, _, light_encounters = parser.parse(source, classify=False)
+    pd.testing.assert_frame_equal(identity,light_identity)
+    pd.testing.assert_frame_equal(encounters,light_encounters)
+    assert light_classified == {}
     assert identity.loc["o", "direction_supported"]
     assert source.iloc[0].route_token_type == "HISTORICAL_REVERSE_OVERLAY"
     assert encounters.iloc[0].incoming_stage3_edge_uid == "RESEARCH_REVERSE:c:R"

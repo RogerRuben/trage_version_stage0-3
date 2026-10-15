@@ -217,7 +217,8 @@ def test_scalar_certificate_retains_static_rejection_not_deadline_and_move_gets_
     assert first["arrival_context"]["edge_uids"] == cached["arrival_context"]["edge_uids"] == ("EMPTY",)
     assert first["routed"] is cached["routed"] is None and len(calls) == 1
     executed = con(origin, dict(site, require_geometry=True), 62100., "C")
-    assert executed["routed"]["points"] == [ORIGIN, PICKUP] and len(calls) == 2
+    assert executed["routed"]["points"] == [ORIGIN, PICKUP] and len(calls) == 1
+    assert executed["routed"]["seam"]["supported"]
     assert executed["routed"]["departure_s"] == 62100.
     rejected_site = dict(site_id="Sbad", position=(108.902, 34.2))
     assert con(origin, rejected_site, 62100., "C")["reason_codes"] == ["STATIC_MAPPING_UNSUPPORTED"]
@@ -239,6 +240,7 @@ def test_scalar_certificate_retains_static_rejection_not_deadline_and_move_gets_
     assert accepted["connection_evidence_state"] == "HV_STATIC_AUTO_OD_ROUTABLE"
     assert len(matrix_calls) == 1 and len(route.calls) == 2
     metrics = con.diagnostics()
-    assert metrics["counts"]["certificate_cache_hits"] == 3
+    assert metrics["counts"]["certificate_cache_hits"] == 4
+    assert metrics["counts"]["current_move_certificate_reuses"] == 1
     assert metrics["certificate_cache_entries"] == 3
     assert 0 < metrics["certificate_cache_mib"] < metrics["certificate_cache_byte_limit_mib"] == 32.

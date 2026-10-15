@@ -439,6 +439,8 @@ def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
                     maximum_complete_step_wall_s=max(r["step_wall_s"] for r in step_rows),
                     peak_rss_mib=max(peak_rss,psutil.Process().memory_info().peak_wset/2**20),
                     adapter_performance=adapter.progress_summary(),actual_routing=routing.diagnostics(),
+                    current_pickup=validator.diagnostics(),connector=connectors.diagnostics(),
+                    physical_empty_routes=empty_router.diagnostics(),
                     partial_result_not_a_complete_service_result=True,physical_drain_performed=False,
                     scientific_service_comparison_performed=False,full_day_runtime_extrapolation_verified=False)
                 hard_stop.publish(summary); _atomic_json(doc_summary_path,summary)

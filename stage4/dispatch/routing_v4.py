@@ -111,6 +111,22 @@ class StaticRawRoutingAdapter(DemandRoutingAdapter):
     def _raw_key(self, vehicle, lon, lat, local):
         return self._normal_key(super()._raw_key(vehicle, lon, lat, local))
 
+    def _batch_rows(self, candidates, lon, lat, local, bin_index, beta):
+        # Targets, time and beta are common to the sparse batch, not per arc.
+        # Retain the precise raw key AND the original rounded-alias precedence.
+        minute = local.strftime("%Y-%m-%dT%H:%M")
+        target = float(lon).hex(), float(lat).hex()
+        rounded = round(float(lon),7), round(float(lat),7)
+        suffix = minute,int(bin_index),float(beta).hex()
+        result = []
+        for vehicle in candidates:
+            origin = float(vehicle.lon_wgs84).hex(),float(vehicle.lat_wgs84).hex()
+            key = (round(vehicle.lon_wgs84,7),round(vehicle.lat_wgs84,7),*rounded,minute,int(bin_index))
+            raw = self._normal_key((self.routing_mode,*origin,*target,minute))
+            exact = self.routing_mode,*origin,*target,*suffix
+            result.append((vehicle,key,raw,exact))
+        return result
+
     def _remember_raw(self, key, raw, distance, minute, bin_index):
         if not self.raw_od_cache_size:
             return

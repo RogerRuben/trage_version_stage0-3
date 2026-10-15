@@ -36,7 +36,8 @@ class HistoricalResearchParser:
         self.classifier = classifier
         self.virtual = {}
         extra = []
-        grouped = {uid: g for uid, g in boundary.groupby("stage3_edge_uid", sort=False)}
+        grouped = ({uid: g for uid, g in boundary.groupby("stage3_edge_uid", sort=False)}
+            if len(overlay) else {})
         for r in overlay.itertuples(index=False):
             forward = r.physical_forward_stage3_edge_uid
             if pd.isna(forward) or forward not in classifier.bearings:
@@ -62,7 +63,7 @@ class HistoricalResearchParser:
         self.lookup = pd.DataFrame(columns=[
             "intersection_complex_uid", "incoming_stage3_edge_uid", "outgoing_stage3_edge_uid"])
 
-    def parse(self, frame):
+    def parse(self, frame, *, classify=True):
         work = frame.copy()
         reverse = work.route_token_type.eq("HISTORICAL_REVERSE_OVERLAY")
         virtual = work.canonical_edge_uid.map(self.virtual)
@@ -79,7 +80,11 @@ class HistoricalResearchParser:
                 unresolved_token_count=("unresolved", "sum"), unsupported_reverse_token_count=("unsupported_reverse", "sum"))
         encounters = parse_route_complex_encounters(work, self.boundary, self.lookup,
             roles_cache=self.roles, movement_pairs_cache=self.movement_pairs)
-        classified, summary = self.classifier.summarize(encounters)
+        # JoinEvidence only needs identity plus the encounter DIFFERENCE. It
+        # classifies the added cross-part movements itself, not all complete
+        # previous/empty/following routes for a second time.
+        classified, summary = (self.classifier.summarize(encounters) if classify
+            else ({}, pd.DataFrame(columns=["order_id"])))
         return identity, classified, summary, encounters
 
 

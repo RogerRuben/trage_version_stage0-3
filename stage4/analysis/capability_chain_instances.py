@@ -230,19 +230,44 @@ class JoinEvidence:
 
     def evaluate(self, source_order, target_order, routed, tolerance):
         typed_phases = bool(getattr(self, "typed_phase_diagnostics", False))
+        result_key = None
+        def complete(result):
+            if result_key is not None:
+                self.router.join_result_put(result_key, result)
+            return result
         def failed(code, stage):
             result = dict(supported=False, reason_codes=[code])
             if typed_phases:
                 result["rejection_stage"] = stage
-            return result
-        previous = self.tokens[source_order].copy() if source_order else pd.DataFrame(columns=IDENTITY_COLUMNS)
-        following = self.tokens[target_order].copy() if target_order else pd.DataFrame(columns=IDENTITY_COLUMNS)
+            return complete(result)
+        previous = self.tokens[source_order] if source_order else pd.DataFrame(columns=IDENTITY_COLUMNS)
+        following = self.tokens[target_order] if target_order else pd.DataFrame(columns=IDENTITY_COLUMNS)
         date = (str(following.date.iloc[0]) if len(following) else str(previous.date.iloc[0])
                 if len(previous) else getattr(self, "simulation_date", "MODEL_CONNECTION"))
         empty = pd.DataFrame([dict(date=date, order_id="EMPTY",
             route_sequence=i, canonical_edge_uid=None, route_token_type="FULL_NETWORK_EDGE",
             resolved_stage3_edge_uid=e["stage3_edge_uid"]) for i, e in enumerate(routed["edges"])], columns=IDENTITY_COLUMNS)
         pieces = [("PREVIOUS", previous), ("EMPTY", empty), ("FOLLOWING", following)]
+        # Exact static inputs, including stop geometry, reverse identity and
+        # diagnostic mode. Admission/reveal guards and time-specific beta are
+        # still evaluated by the caller on EVERY query. Unlike the topology-only
+        # parse cache below, this key may reuse an interface result only when
+        # both physical stops, the snapped endpoints and tolerance are identical.
+        if hasattr(self.router, "join_result_get"):
+            reverse = {str(r.canonical_edge_uid) for _, frame in pieces
+                for r in frame.loc[frame.route_token_type.eq("HISTORICAL_REVERSE_OVERLAY")].itertuples(index=False)}
+            signature = self.router.join_parse_key(pieces,
+                {key:self.overlay_forward.get(key) for key in reverse},
+                (CONTROL_POLICY, TRAFFIC_OUTSIDE_BUDGET, tuple(sorted(UNKNOWN_TRAFFIC.items()))))
+            coords = tuple(tuple(self.selected.loc[order, ["start_lon_wgs84", "start_lat_wgs84",
+                "end_lon_wgs84", "end_lat_wgs84"]]) if order else ()
+                for order in (source_order,target_order))
+            result_key = ("JOIN_RESULT",signature,coords,
+                tuple(routed["snapped_origin"]) if len(empty) else (),
+                tuple(routed["snapped_target"]) if len(empty) else (),float(tolerance),typed_phases)
+            cached_result = self.router.join_result_get(result_key)
+            if cached_result is not None:
+                return cached_result
         joined = pd.concat([p for _, p in pieces], ignore_index=True)
         uids = set(joined.loc[joined.route_token_type.eq("FULL_NETWORK_EDGE"), "resolved_stage3_edge_uid"].dropna())
         reverse_keys = set(joined.loc[joined.route_token_type.eq("HISTORICAL_REVERSE_OVERLAY"), "canonical_edge_uid"])
@@ -313,12 +338,12 @@ class JoinEvidence:
                 parse_key = (parse_key, "TYPED_JOIN_PHASES_V1")
             cached = self.router.join_parse_get(parse_key)
             if cached is not None:
-                return cached
+                return complete(cached)
 
         def finish(result):
             if parse_key is not None:
                 self.router.join_parse_put(parse_key, result)
-            return result
+            return complete(result)
 
         groups = []
         for label, frame in [("JOINT", joined), *pieces]:
@@ -330,7 +355,7 @@ class JoinEvidence:
         if not groups:
             return finish(dict(supported=True, reason_codes=[], compatible_profiles=["HV", "C"],
                 join_encounter_count=0, join_maneuvers=[], C_reason_codes=[], join_bearing_fallback_count=0))
-        identity, _, _, encounters = parser.parse(pd.concat(groups, ignore_index=True))
+        identity, _, _, encounters = parser.parse(pd.concat(groups, ignore_index=True), classify=False)
         if not identity.direction_supported.all():
             return finish(dict(supported=False, reason_codes=["JOIN_DIRECTION_UNSUPPORTED"]))
         individual = Counter(self._signature(r) for r in encounters.loc[~encounters.order_id.eq("JOINT")].itertuples(index=False)) if len(encounters) else Counter()

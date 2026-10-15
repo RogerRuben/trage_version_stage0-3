@@ -76,6 +76,11 @@ class DemandRoutingAdapter(ArcDeterministicValhallaAdapter):
     def _raw_answers_before_disk(self, needed):
         return {}
 
+    def _batch_rows(self, candidates, lon, lat, local, bin_index, beta):
+        return [(v,self._matrix_key(v,lon,lat,local,bin_index),
+            self._raw_key(v,lon,lat,local),self._persistent_key(v,lon,lat,local,bin_index,beta))
+            for v in candidates]
+
     def _evaluate(self, payloads):
         if self.grouped_sources:
             by_source = defaultdict(list)
@@ -133,11 +138,8 @@ class DemandRoutingAdapter(ArcDeterministicValhallaAdapter):
             bin_index, beta = self.beta_for(local)
             minute = local.strftime("%Y-%m-%dT%H:%M")
             rows, misses = [], []
-            for vehicle in candidates:
-                key = self._matrix_key(vehicle, lon, lat, local, bin_index)
-                raw_key = self._raw_key(vehicle, lon, lat, local)
-                exact = self._persistent_key(vehicle, lon, lat, local, bin_index, beta)
-                row = (vehicle, key, raw_key, exact)
+            for row in self._batch_rows(candidates,lon,lat,local,bin_index,beta):
+                vehicle, key, raw_key, exact = row
                 rows.append(row)
                 if key not in self.cache and exact not in self._persistent_cache:
                     all_missing.add(raw_key)

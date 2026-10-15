@@ -116,7 +116,8 @@ def test_snapshot_geometry_cached_but_now_beta_and_original_deadline_are_recheck
 
 
 @pytest.mark.parametrize("maneuver", ["STRAIGHT", "UTURN"])
-def test_real_join_parser_catches_extra_customer_seam_action(tmp_path, maneuver):
+@pytest.mark.parametrize("indexed", [False, True])
+def test_real_join_parser_catches_extra_customer_seam_action(tmp_path, maneuver, indexed):
     eta = ETA()
     outgoing_point = (108.902, 34.2) if maneuver == "STRAIGHT" else ORIGIN
     c, arc = case(eta, dropoff=outgoing_point)
@@ -140,6 +141,9 @@ def test_real_join_parser_catches_extra_customer_seam_action(tmp_path, maneuver)
         dict(stage3_edge_uid="outgoing", geometry=json.dumps([PICKUP, outgoing_point]),
             from_stage3_node_uid="junction", to_stage3_node_uid="next")]), geometry)
     validator = CityPickupSupportValidator(routes, geometry_timestamp=SNAPSHOT, routing_budget_s=10.)
+    if indexed:
+        from stage4.dispatch.scheme_a_city_connections import _IndexedJoinRouter
+        validator.seam_evidence.router = _IndexedJoinRouter(validator.seam_evidence.router)
     prepared = validator.prepare_private_identity_store(["order100"])
     assert prepared["stored_order_count"] == prepared["stored_token_count"] == 1
     if maneuver == "STRAIGHT":
@@ -171,7 +175,26 @@ def test_real_join_parser_catches_extra_customer_seam_action(tmp_path, maneuver)
     if maneuver == "UTURN":
         typed = c.request_decisions.records[100].typed_rejections
         assert typed == {"AV:PICKUP_CUSTOMER_JOIN:UTURN_OUTSIDE_RESEARCH_PROFILE": 1}
+        if indexed:
+            router = validator.seam_evidence.router
+            assert router.join_result_hits >= 1
+            before = router.join_result_misses
+            arc.payload[1].pickup_lon_wgs84 += .01
+            validator(c, [arc], 62070.)
+            assert router.join_result_misses > before
+            assert "CUSTOMER_EMPTY_JOIN_TOO_FAR_FROM_SHARED_ENDPOINT" in validator.last_diagnostics["rejection_reason_counts"]
     assert validator.seam_evidence.identity_scan_count == 1
     arc.payload[1].sim_time_s = 63000.
     with pytest.raises(ValueError, match="unrevealed"):
         validator(c, [arc], 62070.)
+
+
+def test_compact_frozen_index_preserves_duplicate_memberships_and_checks_hash_collisions(monkeypatch):
+    from stage4.dispatch import frozen_evidence_index as index
+    monkeypatch.setattr(index, "_hash", lambda value: 1)
+    table = pa.table(dict(uid=["b","a","b","c"], row=[0,1,2,3]))
+    lookup = index.FrozenColumnIndex(table,"uid")
+    assert lookup.select(["b","b","a","missing"]).to_pydict() == dict(uid=["b","a","b"],row=[0,1,2])
+    assert lookup.select(["missing"]).schema == table.schema
+    assert len(lookup.select(["missing"])) == 0
+    assert lookup.nbytes < 1024
