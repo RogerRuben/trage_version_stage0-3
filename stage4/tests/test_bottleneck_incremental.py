@@ -5,13 +5,13 @@ from types import SimpleNamespace as NS
 
 import pytest
 
-from stage4.dispatch.bottleneck_joint import JointProblem,JointBudgetStop,JointLabelStop,solve_block
+from stage4.dispatch.bottleneck_joint import JointProblem,JointBudgetStop,JointLabelStop,seed_plan,solve_block
 from stage4.dispatch.bottleneck_scene import PredictionSceneOracle
 from stage4.dispatch.bottleneck_topology import ForecastTopology
 from stage4.dispatch.bottleneck_incremental import RollingJointMemory,BlockWorkspace,incremental_search
 from stage4.dispatch.scheme_a_city_graph import ChainTask,RouteState
 from stage4.dispatch.scheme_a_city_master import CurrentAction,ServiceChain
-from stage4.tests.test_bottleneck_joint import complementary,populate
+from stage4.tests.test_bottleneck_joint import SuppliedOracle,complementary,populate
 
 
 PACE=NS(global_pace=.01,pace_by_slot={})
@@ -160,3 +160,29 @@ def test_lazy_closure_keeps_neutral_partial_coalitions_and_can_change_current_ro
     assert info["search_work"]["fixed_only_blocks_skipped"]>0
     assert any(not r["improved"] for r in info["neighborhoods"])
     assert any(r["coalition_size"]==3 and r["improved"] for r in info["neighborhoods"])
+
+
+@pytest.mark.parametrize("maximum",(1,6))
+def test_spatial_group_adds_outside_owner_and_mutable_resource_without_double_eviction(monkeypatch,maximum):
+    owner,active=maximum+1,maximum+2
+    actions=[CurrentAction(f"W{v}",v,"WAIT",None) for v in range(1,active+1)]
+    actions.append(CurrentAction("M",active,"RELOCATE",None,empty_distance_m=10.,
+        payload={"relocation_slot_s":0}))
+    q=SuppliedOracle(actions,{("S",f"W{owner}"):[(-1,)]})
+    q.nearby_resources=lambda sid,rid,limit,check,eligible_vehicles=None: (
+        (active,) if eligible_vehicles is not None else tuple(range(1,maximum+1)))
+    p=JointProblem(actions,q,{"S":1})
+    initial,_=seed_plan(p,tuple(f"W{v}" for v in range(1,active+1)))
+    assert p.evaluate(initial)["owners"]["S",-1]==owner
+    populate(p); groups=[]
+    original=BlockWorkspace.populate
+    def record(workspace,problem,plan,vehicles,targets,check):
+        groups.append(frozenset(vehicles))
+        return original(workspace,problem,plan,vehicles,targets,check)
+    monkeypatch.setattr(BlockWorkspace,"populate",record)
+    result,_=incremental_search(p,initial,(("S",-1),),strategy="SPATIAL_JOINT",
+        deadline=perf_counter()+5,check=lambda:None,maximum_coalition=maximum)
+    assert groups and all(len(group)<=maximum and active in group for group in groups)
+    if maximum>1:
+        assert all(owner in group and maximum not in group for group in groups)
+    assert p.evaluate(result)["score"]>=p.evaluate(initial)["score"]

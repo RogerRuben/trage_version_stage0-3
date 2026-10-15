@@ -240,7 +240,13 @@ def incremental_search(p,initial,seeds,*,strategy,deadline,check,
                     active=p.oracle.nearby_resources(sid,rid,1,check,eligible_vehicles=mutable)
                     if active:
                         if len(group)>=maximum_coalition:
-                            group.remove(nearby[-1])
+                            # Adding an outside owner may already have removed
+                            # the original farthest neighbor. Evict only a
+                            # member still present, retaining the owner when
+                            # the declared coalition size can hold both.
+                            evict=next((v for v in reversed(nearby)
+                                if v in group and v!=owner),min(group))
+                            group.remove(evict)
                         group.add(active[0])
                 if group:
                     targets=defaultdict(set); targets[sid].add(rid)
