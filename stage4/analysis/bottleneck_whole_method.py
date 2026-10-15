@@ -29,6 +29,7 @@ ARMS=("INDEPENDENT_REFERENCE","SPATIAL_SHARED_PLAN","BOTTLENECK_SHARED_PLAN")
 MODES=("reference","spatial_joint","bottleneck_joint")
 COMPLETE="WHOLE_METHOD_NATIVE_GROUP_COMPLETE"
 V2="bottleneck_whole_method_v2"
+V3="bottleneck_whole_method_v3"
 
 
 def output_root(cfg):
@@ -92,8 +93,8 @@ def assemble(base,declared,seed,root):
         raise ValueError("whole-method comparison changed the inherited scientific/resource conditions")
     if cfg["expected_av_slots"]!=851 or cfg["expected_layout_bins"]!=47:
         raise ValueError("the original q10 seed layout is not the complete 851-slot/47-bin product")
-    if declared["version"]==V2:
-        cfg.update(source_layout=declared["reuse_layout"],joint_execution_mode="INCREMENTAL_V2",
+    if declared["version"] in (V2,V3):
+        cfg.update(source_layout=declared["reuse_layout"],joint_execution_mode=declared.get("joint_execution_mode","INCREMENTAL_V2"),
             retained_reference_summary=declared["retained_reference_summary"],
             retained_reference_receipt=declared["retained_reference_receipt"],
             method_scope="INCREMENTAL_SHARED_PLAN_WITH_RETAINED_INDEPENDENT_REFERENCE")
@@ -104,7 +105,7 @@ def assemble(base,declared,seed,root):
 def load(root,config=CONFIG):
     from .scheme_a_two_scale_experiment import load_protocol
     declared=json.loads((root/config).read_text(encoding="utf-8"))
-    if (declared["version"] not in ("bottleneck_whole_method_v1",V2)
+    if (declared["version"] not in ("bottleneck_whole_method_v1",V2,V3)
             or declared["base_config"]!=BASE.as_posix() or declared["groups"]!=list(ARMS)
             or declared["default_action"]!="prepare"
             or any(declared[k] is not False for k in ("automatic_retry","parameter_search","model_refit","dense_matrix","gpu_used"))
@@ -114,14 +115,14 @@ def load(root,config=CONFIG):
     seed=json.loads((root/declared["seed_layout"]).read_text(encoding="utf-8"))
     if seed["status"]!="LAYOUTS_PREPARED_300_600":
         raise ValueError("only the completed original layout may initialize all arms")
-    if declared["version"]==V2:
-        if declared.get("joint_execution_mode")!="INCREMENTAL_V2":
+    if declared["version"] in (V2,V3):
+        if declared.get("joint_execution_mode")!=("INCREMENTAL_V3" if declared["version"]==V3 else "INCREMENTAL_V2"):
             raise ValueError("V2 must explicitly enable incremental execution")
         for key in ("reuse_layout","retained_reference_summary","retained_reference_receipt"):
             if _sha(root/declared[key])!=declared[key+"_sha256"]:
                 raise ValueError("a retained V1 product differs; no implicit reconstruction")
     cfg=assemble(load_protocol(root,BASE),declared,seed,root)
-    if cfg["version"]==V2:
+    if cfg["version"] in (V2,V3):
         retained_reference(root,cfg)
     return cfg,declared,seed
 
@@ -134,8 +135,8 @@ def group_config(cfg,group):
         current_decision_mode="INDEPENDENT_VALUE" if i==0 else "BOTTLENECK_JOINT",
         joint_neighborhood_strategy=None if i==0 else "SPATIAL_JOINT" if i==1 else "BOTTLENECK_CLOSURE",
         disk_route_cache=(output_root(cfg)/"native"/group/"routing/cache.sqlite3").as_posix())
-    if cfg["version"]==V2:
-        chosen["joint_execution_mode"]="REBUILD_V1" if i==0 else "INCREMENTAL_V2"
+    if cfg["version"] in (V2,V3):
+        chosen["joint_execution_mode"]="REBUILD_V1" if i==0 else cfg["joint_execution_mode"]
     return chosen
 
 
@@ -194,7 +195,7 @@ def _layouts(root,config=CONFIG,*,resume=False):
     from stage4.dispatch.scheme_a_city_adapter import sites_for
     from stage4.dispatch.bottleneck_layout import solve_birth_batch
     cfg,declared,seed=load(root,config)
-    if cfg["version"]==V2:
+    if cfg["version"] in (V2,V3):
         raise ValueError("V2 retains the complete V1 layouts; it does not run layout production")
     directory=root/output_root(cfg)/"layout"; checkpoint=directory/"checkpoint.json"
     if (directory/"placements.json").exists():
@@ -295,7 +296,7 @@ def binding_for(root,config,cfg):
         layout_sha256=cfg["source_layout_sha256"],
         current_decision_mode=cfg["current_decision_mode"],
         joint_neighborhood_strategy=cfg["joint_neighborhood_strategy"])
-    if cfg["version"]==V2:
+    if cfg["version"] in (V2,V3):
         bound["joint_execution_mode"]=cfg["joint_execution_mode"]
     return bound
 
@@ -443,7 +444,7 @@ def analyze(root,config=CONFIG):
         mode=group_config(cfg,group)["layout_mode"]
         row["retained_layout_solver_time_s"]=sum(
             r["methods"].get(mode,{}).get("runtime_s",0.) for r in layout["records"])
-        row["incremental_layout_solver_time_s"]=0. if cfg["version"]==V2 else row["retained_layout_solver_time_s"]
+        row["incremental_layout_solver_time_s"]=0. if cfg["version"] in (V2,V3) else row["retained_layout_solver_time_s"]
         row["result_retained_not_rerun"]=bool(group==ARMS[0] and cfg.get("retained_reference_summary"))
         if group!=ARMS[0] and "secondary_distance" in row:
             row["secondary_distance"]["scope"]="JOINT_PLAN_NOT_CURRENT_MAXIMUM_SERVICE_PRIMARY_FACE"
@@ -462,7 +463,7 @@ def analyze(root,config=CONFIG):
         deployment_vs_online_effect_separately_identified=False,
         retained_reference=bool(cfg.get("retained_reference_summary")),
         new_native_run_count=2 if cfg.get("retained_reference_summary") else 3,
-        layouts_reused_from_v1=cfg["version"]==V2,
+        layouts_reused_from_v1=cfg["version"] in (V2,V3),
         runtime_differences_scope="NATIVE_ONLY_OFFLINE_INCREMENTAL_LAYOUT_TIME_REPORTED_SEPARATELY",
         reference_offline_layout_is_retained_not_newly_recomputed=True,analysis_code_sha=code_sha(root),
         raw_identifiers_or_coordinates_exported=False,runtime_s=perf_counter()-started,peak_rss_mib=_peak())

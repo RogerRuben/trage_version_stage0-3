@@ -58,14 +58,14 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
         if self.joint_mode and cfg.get("joint_neighborhood_strategy","BOTTLENECK_CLOSURE") not in ("BOTTLENECK_CLOSURE","SPATIAL_JOINT"):
             raise ValueError("unknown joint neighborhood strategy")
         self.joint_execution_mode=cfg.get("joint_execution_mode","REBUILD_V1")
-        if self.joint_execution_mode not in ("REBUILD_V1","INCREMENTAL_V2"):
+        if self.joint_execution_mode not in ("REBUILD_V1","INCREMENTAL_V2","INCREMENTAL_V3"):
             raise ValueError("unknown joint execution mode")
         self.joint_memory=None
-        if self.joint_mode and self.joint_execution_mode=="INCREMENTAL_V2":
+        if self.joint_mode and self.joint_execution_mode in ("INCREMENTAL_V2","INCREMENTAL_V3"):
             if not 1<=int(cfg.get("joint_maximum_labels",50000))<=50000:
                 raise ValueError("incremental execution cannot increase the label allowance")
             from .bottleneck_incremental import RollingJointMemory
-            self.joint_memory=RollingJointMemory()
+            self.joint_memory=RollingJointMemory(efficient=self.joint_execution_mode=="INCREMENTAL_V3")
         self.common_movement = cfg.get("idle_movement_mode", "VALUE_SELECTED") in (
             "COMMON_HISTORICAL_DEFICIT", "TYPE_CONDITIONED_HISTORICAL_DEFICIT")
         if cfg.get("idle_movement_mode", "VALUE_SELECTED") not in (

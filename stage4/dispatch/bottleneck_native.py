@@ -23,13 +23,14 @@ def solve_joint_current(c, actions, after, baseline, now, cfg, provider,
     current_actions=list(actions); roots=dict(after)
     original_ids=set(roots); vids={a.vehicle_id for a in actions}
     started=perf_counter(); peak=0.
+    process=psutil.Process() if cfg.get("joint_execution_mode")=="INCREMENTAL_V3" else None
     if execution_state is not None:
         execution_state.last_attempt_timings={}
     def check():
         nonlocal peak
         if perf_counter()>=deadline:
             raise JointBudgetStop("one shared native joint decision deadline exhausted")
-        peak=max(peak,psutil.Process().memory_info().rss/2**20)
+        peak=max(peak,(process if process is not None else psutil.Process()).memory_info().rss/2**20)
         if peak>min(1536.,float(cfg.get("maximum_rss_mib",1536))):
             raise JointBudgetStop("joint scratch exceeds the original process RAM cap")
     try:
@@ -52,7 +53,7 @@ def solve_joint_current(c, actions, after, baseline, now, cfg, provider,
             if c.request_by_rid[int(rid)].sim_time_s<=now<c.request_meta[int(rid)]["pickup_deadline_s"])
         scenes=provider.library.view(now)
         state_build_time=perf_counter()-started
-        if cfg.get("joint_execution_mode","REBUILD_V1")=="INCREMENTAL_V2":
+        if cfg.get("joint_execution_mode","REBUILD_V1") in ("INCREMENTAL_V2","INCREMENTAL_V3"):
             if execution_state is None:
                 raise ValueError("incremental native execution needs a persistent adapter state")
             from .bottleneck_incremental import execute_incremental
@@ -99,7 +100,7 @@ def solve_joint_current(c, actions, after, baseline, now, cfg, provider,
             current_served=checked["current_served"],
             carry_over_current_served=sum(a.carry_over for a in chosen),
             current_moves=checked["current_moves"],opt_status=info["status"],
-            backend="JOINT_"+("INCREMENTAL_V2_" if execution_state is not None else "")
+            backend="JOINT_"+((cfg.get("joint_execution_mode")+"_") if execution_state is not None else "")
                 +info["neighborhood_strategy"]+"_SPARSE_MILP",primary_optimality_proved=False,
             secondary_status="JOINT_PLANNING_NOT_OLD_CURRENT_PRIMARY_FACE",
             secondary_optimality_proved=False,secondary_time_s=0.,

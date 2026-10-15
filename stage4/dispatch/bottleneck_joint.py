@@ -259,11 +259,11 @@ def close_coalition(problem, plan, coalition, maximum=6):
 
 
 def solve_block(problem, plan, vehicles, deadline, check=lambda:None, *,
-                skip_constant_stages=False,metrics=None):
+                skip_constant_stages=False,metrics=None,plan_index=None,persistent=False,fixed_objectives=None):
     """Sparse integral block; outside plans/capacity remain in every row."""
     check()
     built_started=perf_counter()
-    base = problem.evaluate(plan)
+    base = problem.evaluate(plan) if plan_index is None else plan_index.view()
     vehicles = frozenset(vehicles)
     action_ids = [a for v in sorted(vehicles) for a in problem.by_vehicle[v]]
     paths = [c for sid in sorted(problem.weights) for aid in action_ids
@@ -282,10 +282,18 @@ def solve_block(problem, plan, vehicles, deadline, check=lambda:None, *,
         for i,v in entries:
             ridxs.append(j); cidxs.append(i); data.append(v)
         lower.append(lo); upper.append(hi)
-    outside = [problem.actions[a] for v,a in base["chosen"].items() if v not in vehicles]
-    outside_current = {a.request_id for a in outside if a.kind == "SERVE"}
-    out_moves = sum(a.kind=="RELOCATE" for a in outside)
-    out_critical = sum(a.critical for a in outside)
+    if plan_index is None:
+        outside = [problem.actions[a] for v,a in base["chosen"].items() if v not in vehicles]
+        outside_current = {a.request_id for a in outside if a.kind == "SERVE"}
+        out_moves = sum(a.kind=="RELOCATE" for a in outside)
+        out_critical = sum(a.critical for a in outside)
+    else:
+        outside=None
+        outside_current={a.request_id for a in (problem.actions[aid] for aid in action_ids)
+            if a.request_id is not None and any(base["owners"].get((s,a.request_id)) not in (None,*vehicles)
+                for s in problem.weights)}
+        out_moves=plan_index.moves-sum(plan_index.contributions[v][4] for v in vehicles)
+        out_critical=plan_index.critical-sum(plan_index.contributions[v][3] for v in vehicles)
     current_rows, future_rows = defaultdict(list),defaultdict(list)
     objectives = [np.zeros(n) for _ in range(3)]
     for aid,i in xcol.items():
@@ -316,19 +324,38 @@ def solve_block(problem, plan, vehicles, deadline, check=lambda:None, *,
         0,problem.move_cap-out_moves)
     row([(xcol[a],1) for a in action_ids if problem.actions[a].critical],
         problem.protected_critical-out_critical,problem.protected_critical-out_critical)
-    best,proved,stages = plan,True,0
+    best,proved,stages = (plan if plan_index is None else None),True,0
     best_score=base["score"]
     receipt=numerical._solver_options_receipt()
+    session=None; matrix=None; matrix_rows=matrix_entries=0
+    if persistent:
+        from .persistent_city_milp import BundledIntegerSession
+        session=BundledIntegerSession(dict(receipt,options=dict(receipt["options"],parallel="off")))
+        class Rows:
+            pass
+        session_rows=Rows(); session_rows.columns=n
+        session_rows.lower=lower; session_rows.upper=upper
     maximum_lattice_error=0.
     build_wall=perf_counter()-built_started
     if metrics is not None:
         metrics["model_build_time_s"]+=build_wall
     solver_wall=0.; solver_calls=0; constant_stages=0
-    for objective in objectives:
+    recorded_loads=recorded_warms=recorded_runs=0
+    def remaining():
+        check(); value=deadline-perf_counter()
+        if value<=0: raise JointBudgetStop("persistent block deadline exhausted")
+        return value
+    for objective_index,objective in enumerate(objectives):
         check()
         seconds = deadline-perf_counter()
         if seconds <= 0:
             raise JointBudgetStop("shared joint solve deadline exhausted")
+        if fixed_objectives is not None and objective_index in fixed_objectives:
+            optimum=fixed_objectives[objective_index]
+            row([(i,int(v)) for i,v in enumerate(objective) if v],optimum,optimum)
+            stages+=1
+            if metrics is not None: metrics["capacity_bound_stages_skipped"]+=1
+            continue
         if skip_constant_stages and not np.any(objective):
             # All feasible integer witnesses have exactly the same zero value.
             stages+=1; constant_stages+=1
@@ -338,7 +365,15 @@ def solve_block(problem, plan, vehicles, deadline, check=lambda:None, *,
         if np.sum(np.abs(objective)) >= 2**50:
             raise ValueError("joint integer objective exceeds safe numerical range")
         stamp=perf_counter()
-        matrix = coo_matrix((data,(ridxs,cidxs)),shape=(len(lower),n)).tocsc()
+        if not persistent or matrix is None:
+            matrix = coo_matrix((data,(ridxs,cidxs)),shape=(len(lower),n)).tocsc()
+        elif len(lower)>matrix_rows:
+            from scipy.sparse import vstack
+            extra=coo_matrix((data[matrix_entries:],
+                ([j-matrix_rows for j in ridxs[matrix_entries:]],cidxs[matrix_entries:])),
+                shape=(len(lower)-matrix_rows,n)).tocsc()
+            matrix=vstack((matrix,extra),format="csc")
+        matrix_rows=len(lower); matrix_entries=len(data)
         divisor=gcd(*(abs(int(v)) for v in objective if v)) or 1
         primitive=objective/divisor
         total=float(np.sum(np.abs(primitive)))
@@ -353,15 +388,24 @@ def solve_block(problem, plan, vehicles, deadline, check=lambda:None, *,
         if metrics is not None:
             metrics["solver_calls"]+=1
         try:
-            with warnings.catch_warnings(record=True) as caught:
-                result = milp(-primitive,integrality=np.ones(n,np.int8),
-                    bounds=Bounds(np.zeros(n),np.ones(n)),
-                    constraints=LinearConstraint(matrix,np.asarray(lower),np.asarray(upper)),
-                    options=dict(receipt["options"],time_limit=seconds,mip_rel_gap=0.,presolve=True))
+            caught=[]
+            if session is not None:
+                result=session.solve(-primitive,session_rows,matrix,remaining)
+            else:
+                with warnings.catch_warnings(record=True) as caught:
+                    result = milp(-primitive,integrality=np.ones(n,np.int8),
+                        bounds=Bounds(np.zeros(n),np.ones(n)),
+                        constraints=LinearConstraint(matrix,np.asarray(lower),np.asarray(upper)),
+                        options=dict(receipt["options"],time_limit=seconds,mip_rel_gap=0.,presolve=True))
         finally:
             elapsed=perf_counter()-stamp; solver_wall+=elapsed
             if metrics is not None:
                 metrics["solver_wall_time_s"]+=elapsed
+                if session is not None:
+                    metrics["persistent_model_loads"]+=session.model_loads-recorded_loads
+                    metrics["persistent_warm_starts"]+=session.warm_starts-recorded_warms
+                    metrics["persistent_solver_runs"]+=session.runs-recorded_runs
+                    recorded_loads,recorded_warms,recorded_runs=session.model_loads,session.warm_starts,session.runs
         solver_calls+=1
         if any("Unrecognized options" not in str(w.message) for w in caught):
             raise RuntimeError("unexpected warning in sparse joint solver")
@@ -380,11 +424,17 @@ def solve_block(problem, plan, vehicles, deadline, check=lambda:None, *,
             raise RuntimeError("joint integer witness violates an exact sparse row")
         selected = tuple(aid for aid,i in xcol.items() if binary[i])
         continued = tuple(c for j,c in enumerate(paths,len(action_ids)) if binary[j])
-        candidate = JointPlan(tuple(sorted((*selected,*(a.action_id for a in outside)))),
-            tuple(c for c in plan.chains if c.vehicle_id not in vehicles)+continued)
-        checked = problem.evaluate(candidate)
-        if checked["score"] > best_score:
-            best,best_score = candidate,checked["score"]
+        if plan_index is None:
+            candidate = JointPlan(tuple(sorted((*selected,*(a.action_id for a in outside)))),
+                tuple(c for c in plan.chains if c.vehicle_id not in vehicles)+continued)
+            candidate_score=problem.evaluate(candidate)["score"]
+        else:
+            candidate=plan_index.propose(vehicles,selected,continued)
+            candidate_score=candidate.score
+        if candidate_score > best_score:
+            best,best_score = candidate,candidate_score
+        if session is not None:
+            session.accept_certified_binary(binary)
         if (result.status != 0 or getattr(result,"mip_gap",0.) not in (0.,None)
                 or lattice_error>=.25):
             proved = False; break
@@ -396,7 +446,8 @@ def solve_block(problem, plan, vehicles, deadline, check=lambda:None, *,
         future_chain_variables=len(paths),current_action_variables=len(action_ids),
         integer_objective_lattice_error_bound=maximum_lattice_error,
         restricted_pool_optimality_proved=proved and stages==3,
-        full_domain_optimality_proved=False)
+        full_domain_optimality_proved=False,
+        persistent_session=session.diagnostics() if session is not None else None)
 
 
 def populate_block(problem,plan,vehicles,targets,check):

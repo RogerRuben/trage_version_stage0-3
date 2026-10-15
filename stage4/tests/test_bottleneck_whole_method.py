@@ -99,13 +99,15 @@ def test_protocol_preparation_is_metadata_only_and_arms_share_conditions(tmp_pat
                 pytest.fail("duplicate execution acquired the lock")
 
 
-def test_v2_retains_reference_without_relabeling_or_launching_it(tmp_path,monkeypatch):
+@pytest.mark.parametrize("version",(protocol.V2,protocol.V3))
+def test_incremental_retains_reference_without_relabeling_or_launching_it(tmp_path,monkeypatch,version):
     base=dict(test_date="20161031",profile_id="C",requested_q_a=.1,supply_seed=20260824,
         passenger_acceptance_rate=.7,solver_time_limit_s=10.,full_day=True,
         max_match_wait_s=300,max_pickup_eta_s=600,maximum_rss_mib=1536,
         minimum_initial_available_ram_mib=1536,scenario_timeout_s=10800)
     seed=dict(records=[{}]*47,placements={"opportunity_joint":{str(i):{} for i in range(851)}})
-    declared=dict(version=protocol.V2,reuse_layout="retained/layout.json",
+    mode="INCREMENTAL_V3" if version==protocol.V3 else "INCREMENTAL_V2"
+    declared=dict(version=version,joint_execution_mode=mode,reuse_layout="retained/layout.json",
         retained_reference_summary="retained/summary.json",retained_reference_receipt="retained/receipt.json",
         seed_layout_sha256="seed")
     source=tmp_path/"retained"; source.mkdir(); (source/"layout.json").write_text("{}",encoding="utf-8")
@@ -120,8 +122,8 @@ def test_v2_retains_reference_without_relabeling_or_launching_it(tmp_path,monkey
     (source/"receipt.json").write_text(json.dumps(dict(status="COMPLETE",exit_code=0,parent_hard_timeout=False)),encoding="utf-8")
     assert protocol.retained_reference(tmp_path,cfg)["execution_binding"]["code_sha"]=="old-code"
     assert protocol.source_directory(tmp_path,cfg,protocol.ARMS[0])==source
-    assert protocol.output_root(cfg).name==protocol.V2
-    assert protocol.group_config(cfg,protocol.ARMS[1])["joint_execution_mode"]=="INCREMENTAL_V2"
+    assert protocol.output_root(cfg).name==version
+    assert protocol.group_config(cfg,protocol.ARMS[1])["joint_execution_mode"]==mode
     config=tmp_path/"config.json"; config.write_text("{}",encoding="utf-8")
     monkeypatch.setattr(protocol,"load",lambda *args:(cfg,declared,seed))
     monkeypatch.setattr(protocol,"code_sha",lambda *args:"new-code")

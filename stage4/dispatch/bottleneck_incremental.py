@@ -23,7 +23,8 @@ def domains(problem):
 
 class RollingJointMemory:
     """One selected plan and one forecast snapshot, not all previous column pools."""
-    def __init__(self):
+    def __init__(self,efficient=False):
+        self.efficient=efficient
         self.topology=ForecastTopology()
         self.paths={}; self.domains={}; self.task_keys=frozenset(); self.owners={}
         self.deferred=(); self.touched=set(); self.last_now=None
@@ -73,9 +74,11 @@ class RollingJointMemory:
     def frontier(self,problem,plan,dirty,check):
         oracle=problem.oracle; base=problem.evaluate(plan); current=domains(problem)
         live=frozenset((sid,rid) for sid,tasks in oracle.tasks.items() for rid in tasks)
-        candidates=set(live-self.task_keys)|(set(self.deferred)&set(live))
+        candidates=set(live-self.task_keys)
+        if not self.efficient: candidates|=set(self.deferred)&set(live)
         candidates.update(k for k in self.owners if k in live and k not in base["owners"])
-        changed={v for v,d in current.items() if self.domains.get(v)!=d}|dirty|self.touched
+        changed={v for v,d in current.items() if self.domains.get(v)!=d}|dirty
+        if not self.efficient: changed|=self.touched
         for sid,tasks in oracle.tasks.items():
             candidates.update((sid,r) for r,t in tasks.items() if t.source_kind=="ACTUAL_PENDING")
             for v in sorted(changed & problem.by_vehicle.keys()):
@@ -89,7 +92,7 @@ class RollingJointMemory:
         relevant=list(oracle.seeds(base["owners"],check,candidates=candidates))
         valid=set(relevant)
         pending=[k for k in relevant if oracle.tasks[k[0]][k[1]].source_kind=="ACTUAL_PENDING"]
-        tail=[k for k in self.deferred if k in valid and k not in pending]
+        tail=[] if self.efficient else [k for k in self.deferred if k in valid and k not in pending]
         seen=set(pending)|set(tail)
         tail.extend(k for k in relevant if k not in seen)
         return tuple((*pending,*tail))
@@ -98,7 +101,7 @@ class RollingJointMemory:
         checked=problem.evaluate(plan)
         before={(c.scenario_id,c.vehicle_id):c.request_ids for c in initial.chains}
         after={(c.scenario_id,c.vehicle_id):c.request_ids for c in plan.chains}
-        self.touched={v for (s,v),path in after.items() if before.get((s,v))!=path}
+        self.touched=set() if self.efficient else {v for (s,v),path in after.items() if before.get((s,v))!=path}
         self.paths=after; self.domains=domains(problem)
         self.task_keys=frozenset((s,r) for s,tasks in problem.oracle.tasks.items() for r in tasks)
         self.owners={k:v for k,v in checked["owners"].items() if k in self.task_keys}
@@ -323,7 +326,7 @@ def execute_incremental(actions,roots,selected,scenes,pending,pace,library,now,c
         oracle=PredictionSceneOracle(actions,roots,scenes,pending,pace,now,check=check,
             maximum_labels=int(cfg.get("joint_maximum_labels",50000)),
             maximum_columns=int(cfg.get("maximum_model_variables",20000)),
-            topology=memory.topology,forecast_snapshot=snapshot)
+            topology=memory.topology,forecast_snapshot=snapshot,efficient=memory.efficient)
         p=JointProblem(actions,oracle,library.weights,[t.request_id for t in pending],move_cap=50,
             maximum_columns=int(cfg.get("maximum_model_variables",20000)),
             maximum_nonzeros=int(cfg.get("maximum_model_nonzeros",150000)))
@@ -333,7 +336,11 @@ def execute_incremental(actions,roots,selected,scenes,pending,pace,library,now,c
     with timed("frontier_build_time_s"):
         seeds=memory.frontier(p,initial,dirty,check)
     with timed("search_total_time_s"):
-        plan,info=incremental_search(p,initial,seeds,
+        search=incremental_search
+        if memory.efficient:
+            from .bottleneck_efficient import efficient_search
+            search=efficient_search
+        plan,info=search(p,initial,seeds,
             strategy=cfg.get("joint_neighborhood_strategy","BOTTLENECK_CLOSURE"),
             deadline=deadline,check=check,
             maximum_coalition=int(cfg.get("joint_maximum_coalition",6)),
@@ -356,5 +363,6 @@ def execute_incremental(actions,roots,selected,scenes,pending,pace,library,now,c
         topology_work={k:v-graph_before[k] for k,v in memory.topology.counts.items()},
         topology_cached_references=memory.topology.references,
         warm_state_persisted=True,wall_overrun=perf_counter()>deadline,
+        batch_root_queries=oracle.batch_queries,batch_query_reuses=oracle.batch_reuses,
         phase_timers_are_nested=True)
     return p,oracle,initial,plan,info

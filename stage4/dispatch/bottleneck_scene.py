@@ -23,7 +23,8 @@ from .scheme_a_city_master import ServiceChain
 
 class PredictionSceneOracle:
     def __init__(self, actions, roots, scenes, pending, pace, now, *, check=lambda:None,
-                 maximum_labels=50000,maximum_columns=20000,topology=None,forecast_snapshot=None):
+                 maximum_labels=50000,maximum_columns=20000,topology=None,forecast_snapshot=None,
+                 efficient=False):
         self.actions={a.action_id:a for a in actions}
         self.roots=dict(roots)
         if self.actions.keys()!=self.roots.keys():
@@ -36,6 +37,11 @@ class PredictionSceneOracle:
         self.topology=topology; self.predecessors=OrderedDict(); self.reachable=OrderedDict()
         self.predecessor_refs=0; self.reachable_refs=0
         self.query_wall_time_s=0.; self.query_calls=0; self.target_pruned_nodes=0
+        self.efficient=efficient; self.xy={}; self.distances=OrderedDict()
+        self.support_cache=OrderedDict(); self.neighbor_cache=OrderedDict()
+        self.catalogs=OrderedDict(); self.catalog_refs=0; self.many_label_exhausted=False
+        self.batch_queries=0; self.batch_reuses=0
+        self.possible_cache=OrderedDict(); self.possible_refs=0
         if topology is not None:
             topology.bind(scenes if forecast_snapshot is None else forecast_snapshot,pace,now,check)
         pending=tuple(pending)
@@ -121,6 +127,9 @@ class PredictionSceneOracle:
     def nearby_resources(self,sid,rid,maximum,check,*,eligible_vehicles=None):
         """Ordinary proximity grouping, including vehicles unable to serve the seed."""
         check()
+        cache_key=sid,rid,maximum,None if eligible_vehicles is None else tuple(sorted(eligible_vehicles))
+        if self.efficient and cache_key in self.neighbor_cache:
+            return self.neighbor_cache[cache_key]
         point=_xy(self.tasks[sid][rid].pickup)
         ids=self.root_tree.query_ball_point(point,2000) if self.root_tree else ()
         ranked=sorted((float(np.linalg.norm(self.root_points[i]-point)),
@@ -133,7 +142,56 @@ class PredictionSceneOracle:
                 result.append(vid)
             if len(result)>=maximum:
                 break
-        return tuple(result)
+        result=tuple(result)
+        if self.efficient:
+            self.neighbor_cache[cache_key]=result
+            while len(self.neighbor_cache)>128: self.neighbor_cache.popitem(last=False)
+        return result
+
+    def _checks(self,check):
+        check()
+        if not self.efficient or check is not self.check:
+            self.check()
+
+    def possible(self,sid,aid,check=lambda:None):
+        """Forbidden-independent SUPerset of this root's depth-three task domain."""
+        key=sid,aid
+        if key in self.possible_cache:
+            self.possible_cache.move_to_end(key); return self.possible_cache[key]
+        state=self.roots[aid]
+        frontier=set()
+        for t in self._near(sid,state.position):
+            if not self._allowed(t,state.profile_id): continue
+            ready=ceil(state.ready_s/300)*300 if t.source_kind=="FORECAST" else state.ready_s
+            if self._leg(t,ready,state.position,state.admission_end_s) is not None:
+                frontier.add(t.request_id)
+        found=set(frontier)
+        for _ in range(2):
+            added=set()
+            for i,rid in enumerate(sorted(frontier)):
+                if i%32==0: check()
+                added.update(t.request_id for t in self._following(sid,self.tasks[sid][rid],state.profile_id))
+            frontier=added-found; found.update(added)
+        result=frozenset(found)
+        if len(result)<=20000:
+            self.possible_cache[key]=result; self.possible_refs+=len(result)
+            while len(self.possible_cache)>128 or self.possible_refs>20000:
+                self.possible_refs-=len(self.possible_cache.popitem(last=False)[1])
+        return result
+
+    def local_forbidden(self,sid,aid,forbidden,check):
+        return frozenset(forbidden)&self.possible(sid,aid,check) if self.efficient else frozenset(forbidden)
+
+    def _distance(self,position,pickup):
+        key=position,pickup
+        if key in self.distances:
+            self.distances.move_to_end(key); return self.distances[key]
+        for point in key:
+            if point not in self.xy: self.xy[point]=np.asarray(_xy(point))
+        value=float(np.linalg.norm(self.xy[position]-self.xy[pickup]))
+        self.distances[key]=value
+        while len(self.distances)>20000: self.distances.popitem(last=False)
+        return value
 
     def _allowed(self,task,profile):
         return profile in task.compatible_profiles and (profile=="HV" or task.passenger_accepts_av)
@@ -144,7 +202,8 @@ class PredictionSceneOracle:
         horizon=self.horizon if horizon is None else horizon
         if not max(ready,task.release_s)<=dispatch<min(task.deadline_s,end,horizon):
             return None
-        distance=float(np.linalg.norm(np.asarray(_xy(position))-np.asarray(_xy(task.pickup))))
+        distance=(self._distance(position,task.pickup) if self.efficient else
+            float(np.linalg.norm(np.asarray(_xy(position))-np.asarray(_xy(task.pickup)))))
         if distance>2000:
             return None
         pace=float(self.pace.pace_by_slot.get(int(dispatch//1800),self.pace.global_pace))
@@ -228,7 +287,7 @@ class PredictionSceneOracle:
                     previous=[]
                     for i,t in enumerate(candidates):
                         if i%32==0:
-                            check(); self.check()
+                            self._checks(check)
                         if (t.request_id in self.tasks[sid] and t.request_id!=target
                                 and self._allowed(t,profile)
                                 and any(n.request_id==target for n in self._following(sid,t,profile))):
@@ -270,6 +329,9 @@ class PredictionSceneOracle:
 
     def supports(self,sid,rid,check=lambda:None):
         check()
+        key=sid,rid
+        if self.efficient and key in self.support_cache:
+            self.support_cache.move_to_end(key); return self.support_cache[key]
         task=self.tasks[sid][rid]
         candidates=self.root_tree.query_ball_point(_xy(task.pickup),2000) if self.root_tree else ()
         result=[]
@@ -278,7 +340,11 @@ class PredictionSceneOracle:
             if (self.actions[aid].request_id!=rid and self._allowed(task,state.profile_id)
                     and self._leg(task,state.ready_s,state.position,state.admission_end_s) is not None):
                 result.append(aid)
-        return tuple(sorted(result,key=lambda a:(self.actions[a].vehicle_id,a)))
+        result=tuple(sorted(result,key=lambda a:(self.actions[a].vehicle_id,a)))
+        if self.efficient:
+            self.support_cache[key]=result
+            while len(self.support_cache)>128: self.support_cache.popitem(last=False)
+        return result
 
     def seeds(self,owners,check=lambda:None,*,candidates=None):
         # Known waiting requests first, then history; no AV utilization bonus.
@@ -308,7 +374,7 @@ class PredictionSceneOracle:
     def _query(self,sid,aid,*,required=None,forbidden=frozenset(),check=lambda:None):
         check()
         action,state=self.actions[aid],self.roots[aid]
-        forbidden=frozenset(forbidden)|({action.request_id} if action.request_id is not None else set())
+        forbidden=self.local_forbidden(sid,aid,forbidden,check)|({action.request_id} if action.request_id is not None else set())
         if required in forbidden:
             return ()
         if self.topology is not None and required is not None and required not in self.tasks[sid]:
@@ -316,6 +382,11 @@ class PredictionSceneOracle:
         if self.topology is not None and required is not None and not self._allowed(self.tasks[sid][required],state.profile_id):
             return ()
         key=sid,aid,required,forbidden
+        catalog_key=sid,aid,forbidden
+        if self.efficient and catalog_key in self.catalogs:
+            self.catalogs.move_to_end(catalog_key); self.batch_reuses+=1
+            path=self.catalogs[catalog_key].get(required)
+            return (self._remember_path(sid,aid,path),) if path else ()
         if key in self.cache:
             self.cache.move_to_end(key); return self.cache[key]
         memo={}
@@ -330,7 +401,7 @@ class PredictionSceneOracle:
                 cls=JointLabelStop if self.topology is not None else JointBudgetStop
                 raise cls("joint planning label budget exhausted")
             if self.labels%64==0:
-                check(); self.check()
+                self._checks(check)
             memo_key=leg,depth,used,found
             if memo_key in memo:
                 return memo[memo_key]
@@ -376,6 +447,64 @@ class PredictionSceneOracle:
         while len(self.cache)>128:
             self.cache.popitem(last=False)
         return result
+
+    def query_many(self,sid,aid,targets,forbidden=frozenset(),check=lambda:None):
+        """One exact depth-three enumeration for all targets, bounded best-path map.
+
+        The map stores only the best path per encountered request, NOT all paths.
+        A label-limited map supplies legal columns but is never cached as complete.
+        """
+        if not self.efficient:
+            return {r:self.query(sid,aid,required=r,forbidden=forbidden,check=check)
+                    for r in (*sorted(targets),None)}
+        started=perf_counter(); self.batch_queries+=1; self.many_label_exhausted=False
+        action,state=self.actions[aid],self.roots[aid]
+        try:
+            check()
+            forbidden=self.local_forbidden(sid,aid,forbidden,check)|({action.request_id} if action.request_id is not None else set())
+            key=sid,aid,forbidden
+            if key in self.catalogs:
+                self.catalogs.move_to_end(key); self.batch_reuses+=1
+                best=self.catalogs[key]
+            else:
+                best={}; ranks={}
+                def visit(node,leg,path,used,distance):
+                    self.labels+=1
+                    if self.labels>self.maximum_labels:
+                        raise JointLabelStop("joint batch label budget exhausted")
+                    if self.labels%64==0: self._checks(check)
+                    path=(*path,leg); ids=(*used,node.request_id); distance+=leg[4]
+                    rank=-len(path),distance,ids
+                    for target in (None,*ids):
+                        if target not in ranks or rank<ranks[target]:
+                            best[target]=path; ranks[target]=rank
+                    if len(path)>=3 or leg[3]>=min(state.admission_end_s,self.horizon): return
+                    for target in self._following(sid,node,state.profile_id):
+                        if target.request_id in ids or target.request_id in forbidden: continue
+                        ready=leg[3]
+                        if target.source_kind=="FORECAST":
+                            ready=ceil((ready-(self.now//300)*300)/300)*300+(self.now//300)*300
+                        following=self._leg(target,ready,node.dropoff,state.admission_end_s)
+                        if following is not None: visit(target,following,path,ids,distance)
+                try:
+                    for node in self._near(sid,state.position):
+                        if node.request_id in forbidden or not self._allowed(node,state.profile_id): continue
+                        ready=ceil(state.ready_s/300)*300 if node.source_kind=="FORECAST" else state.ready_s
+                        leg=self._leg(node,ready,state.position,state.admission_end_s)
+                        if leg is not None: visit(node,leg,(),(),0.)
+                except JointLabelStop:
+                    self.many_label_exhausted=True
+                if not self.many_label_exhausted and len(best)<=20000:
+                    self.catalogs[key]=best; self.catalog_refs+=len(best)
+                    while len(self.catalogs)>128 or self.catalog_refs>20000:
+                        self.catalog_refs-=len(self.catalogs.popitem(last=False)[1])
+            answer={}
+            for target in (*sorted(set(targets)),None):
+                path=best.get(target)
+                answer[target]=(self._remember_path(sid,aid,path),) if path else ()
+            return answer
+        finally:
+            self.query_wall_time_s+=perf_counter()-started
 
     @staticmethod
     def _rank(path):

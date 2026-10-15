@@ -250,7 +250,7 @@ def test_unavailable_price_and_optional_route_budget_cutoff_keep_validated_curre
 
 
 @pytest.mark.parametrize("strategy",("BOTTLENECK_CLOSURE","SPATIAL_JOINT"))
-@pytest.mark.parametrize("execution",("REBUILD_V1","INCREMENTAL_V2"))
+@pytest.mark.parametrize("execution",("REBUILD_V1","INCREMENTAL_V2","INCREMENTAL_V3"))
 def test_opt_in_joint_mode_keeps_neutral_moves_and_does_not_use_private_values(monkeypatch,tmp_path,strategy,execution):
     c,cfg=fixture()
     c.repositioning_manager.active.clear()
@@ -284,7 +284,7 @@ def test_opt_in_joint_mode_keeps_neutral_moves_and_does_not_use_private_values(m
     assert row["joint_control"]["generated_continuation_columns"]>0
     assert row["future_connector_queries"]==0
     assert adapter.progress_summary()["operations"]["joint_decisions"]==1
-    if execution=="INCREMENTAL_V2":
+    if execution in ("INCREMENTAL_V2","INCREMENTAL_V3"):
         state=adapter.joint_memory
         assert state is not None and state.last_now==900.
         assert row["joint_control"]["execution_mode"]==execution

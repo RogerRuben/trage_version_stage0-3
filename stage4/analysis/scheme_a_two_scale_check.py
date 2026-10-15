@@ -219,6 +219,10 @@ def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
         raise ValueError("existing native output is retained; no implicit retry or overwrite")
     resources = _resource_guard(root, cfg, started, initial=True)
     full_day = bool(cfg["full_day"])
+    diagnostic_stop=cfg.get("diagnostic_stop_tick_s")
+    if diagnostic_stop is not None and (diagnostic_stop!=2400 or cfg.get("window_start_s")!=0
+            or cfg.get("joint_execution_mode")!="INCREMENTAL_V3" or not full_day):
+        raise ValueError("only the explicit V3 midnight-to-00:40 performance prefix is supported")
     summary = dict(status="RUNNING", version=cfg["version"], pid=os.getpid(),
         policy=cfg["policy"], layout_mode=cfg["layout_mode"], window_start_s=cfg["window_start_s"],
         measurement_end_s=cfg["measurement_end_s"], admission_end_s=cfg["admission_end_s"],
@@ -423,6 +427,24 @@ def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
                     atomic_parquet(directory / "partial_solver_trace.parquet", pd.DataFrame(adapter.rows))
                     _atomic_json(directory / "coarse_refreshes.json", provider.refresh_records)
                 print(json.dumps(durable), flush=True)
+            if diagnostic_stop is not None and tick>=diagnostic_stop:
+                # Full-day inputs/horizon stay intact; this is NOT a drained
+                # service result and cannot satisfy whole-method completion.
+                atomic_parquet(directory / "partial_assignments.parquet",bridge.environment_assignments())
+                summary.update(status="JOINT_PERFORMANCE_PREFIX_COMPLETE",full_day=False,
+                    full_day_protocol_inputs=True,prefix_stop_tick_s=tick,
+                    setup_time_s=setup_s,simulation_loop_wall_s=perf_counter()-simulation_started,
+                    total_runner_wall_s=perf_counter()-started,step_count=len(step_rows),
+                    sum_complete_step_wall_s=sum(r["step_wall_s"] for r in step_rows),
+                    maximum_complete_step_wall_s=max(r["step_wall_s"] for r in step_rows),
+                    peak_rss_mib=max(peak_rss,psutil.Process().memory_info().peak_wset/2**20),
+                    adapter_performance=adapter.progress_summary(),actual_routing=routing.diagnostics(),
+                    partial_result_not_a_complete_service_result=True,physical_drain_performed=False,
+                    scientific_service_comparison_performed=False,full_day_runtime_extrapolation_verified=False)
+                hard_stop.publish(summary); _atomic_json(doc_summary_path,summary)
+                print(json.dumps(dict(status=summary["status"],total_runner_wall_s=summary["total_runner_wall_s"],
+                    sum_complete_step_wall_s=summary["sum_complete_step_wall_s"],peak_rss_mib=summary["peak_rss_mib"])),flush=True)
+                return summary
             if (tick >= cfg["admission_end_s"]
                     and not (set(control.rid_to_assigned_vid) - control.completed_rids)
                     and not manager.active):
@@ -439,7 +461,7 @@ def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
             # Do not export the shared control's legacy generic policy label
             # as a claim of exact city-chain/global lexicographic optimization.
             assignments["dispatch_policy"] = ("JOINT_"+
-                ("INCREMENTAL_V2_" if cfg.get("joint_execution_mode")=="INCREMENTAL_V2" else "")+
+                ((cfg["joint_execution_mode"]+"_") if cfg.get("joint_execution_mode") in ("INCREMENTAL_V2","INCREMENTAL_V3") else "")+
                 cfg.get("joint_neighborhood_strategy","BOTTLENECK_CLOSURE")
                 if cfg.get("current_decision_mode")=="BOTTLENECK_JOINT"
                 else "TWO_SCALE_CURRENT_ACTION_FLOW_COARSE_FUTURE")

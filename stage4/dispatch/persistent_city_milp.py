@@ -98,6 +98,7 @@ class BundledIntegerSession:
 
     def diagnostics(self):
         return dict(backend="SCIPY_BUNDLED_HIGHS_PERSISTENT", highs_version=self.h.version(),
+            threads_option=self.h.getOptionValue("threads")[1],parallel_option=self.h.getOptionValue("parallel")[1],
             model_loads=self.model_loads, incremental_exact_rows=self.incremental_rows,
             certified_binary_warm_starts=self.warm_starts, solver_runs=self.runs,
             last_run_status=self.last_run_status, last_model_status=self.last_model_status,
