@@ -34,6 +34,23 @@ def test_indexed_patch_preserves_shared_capacity_and_persistent_exact_tiers():
     assert info["persistent_session"]["parallel_option"]=="off"
 
 
+@pytest.mark.parametrize("critical",(False,True))
+def test_carry_upper_bound_cannot_override_improved_preceding_service_tier(critical):
+    actions=[CurrentAction("SERVE",1,"SERVE",11,critical=critical,carry_over=True),
+        CurrentAction("WAIT",1,"WAIT",None)]
+    q=SuppliedOracle(actions,{("S","SERVE"):[(-1,)],("S","WAIT"):[(-2,-3,-4)]})
+    from stage4.dispatch.bottleneck_joint import seed_plan
+    p=JointProblem(actions,q,{"S":1},(11,)); initial,_=seed_plan(p,("SERVE",)); populate(p)
+    expected,_=solve_block(p,initial,{1},perf_counter()+5,skip_constant_stages=True)
+    index=PlanIndex(p,initial); w=EfficientWorkspace(p,index,lambda:None)
+    w.evaluate({1},{"S":{-2}},perf_counter()+5)
+    actual=p.evaluate(index.materialize())
+    assert actual["score"]==p.evaluate(expected)["score"]
+    assert actual["critical"]==int(critical)
+    if not critical:
+        assert actual["score"][:2]==(3,0) and set(index.chosen.values())=={"WAIT"}
+
+
 @pytest.mark.parametrize("now",(0.,60.,330.))
 def test_batched_catalog_equals_single_target_queries_and_reuses_irrelevant_forbidden(now):
     point=(108.9,34.2); actions=[CurrentAction("W",1,"WAIT",None)]

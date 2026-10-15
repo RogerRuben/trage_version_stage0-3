@@ -118,7 +118,10 @@ class EfficientWorkspace:
                 if local_upper==sum(i.contributions[v][0] for v in vehicles):
                     fixed[0]=local_upper
         carry_upper=sum(max(int(p.actions[a].carry_over) for a in ids) for ids in p.by_vehicle.values())
-        if i.score[1]==carry_upper:
+        # Attaining a carry upper bound in the old incumbent does NOT prove it
+        # remains feasible after a better service tier. Only fix the lower tier
+        # when the preceding tier is already fixed at this same witness.
+        if 0 in fixed and i.score[1]==carry_upper:
             fixed[1]=sum(i.contributions[v][1] for v in vehicles)
         try:
             patch,info=solve_block(p,None,vehicles,deadline,self.check,skip_constant_stages=True,
