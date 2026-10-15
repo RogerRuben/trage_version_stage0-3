@@ -1,0 +1,171 @@
+{
+  "status": "V2_SEARCH_COST_STOPPED_BY_USER_AND_ANALYZED",
+  "run_code_sha": "fba25dc84db5739b8419d5160da68a5f661c03ef",
+  "stop_time": "2026-10-15T19:53:03.8006865+08:00",
+  "stopped_pids": [
+    20996,
+    15692
+  ],
+  "bottleneck_group_started": false,
+  "retained_reference_rerun": false,
+  "layouts_rerun": false,
+  "complete_service_comparison": false,
+  "end_tick_s": 2400,
+  "last_durable_progress": {
+    "tick": 2400,
+    "runtime_s": 516.5501135000013,
+    "simulation_loop_wall_s": 444.3145255999989,
+    "measured_step_count": 81,
+    "last_step_wall_s": 5.727495099999942,
+    "matched": 222,
+    "completed": 154,
+    "expired": 1,
+    "rss_mib": 824.8671875,
+    "available_ram_mib": 4774.9765625,
+    "free_disk_mib": 11595.61328125
+  },
+  "same_simulation_prefix": {
+    "independent_reference": {
+      "steps": 81,
+      "last_tick_s": 2400,
+      "step_sum_s": 16.86835909997535,
+      "step_median_s": 0.12455649999901652,
+      "step_p90_s": 0.5187488999981724,
+      "step_max_s": 0.8303024999986519,
+      "step_over_10s_count": 0,
+      "candidate_routing_s": 1.7823551000074076,
+      "candidate_generation_s": 0.2106792999911704
+    },
+    "v1_spatial_partial": {
+      "steps": 81,
+      "last_tick_s": 2400,
+      "step_sum_s": 306.42529870000726,
+      "step_median_s": 4.216742799999338,
+      "step_p90_s": 4.855666700001166,
+      "step_max_s": 7.049853399999847,
+      "step_over_10s_count": 0,
+      "candidate_routing_s": 3.681954500010761,
+      "candidate_generation_s": 0.3767182999945362
+    },
+    "v2_spatial_stopped": {
+      "steps": 81,
+      "last_tick_s": 2400,
+      "step_sum_s": 443.8962407000072,
+      "step_median_s": 5.995478199998615,
+      "step_p90_s": 8.265308699999878,
+      "step_max_s": 10.171560500006308,
+      "step_over_10s_count": 2,
+      "candidate_routing_s": 4.270242099970346,
+      "candidate_generation_s": 0.42298700003448175
+    }
+  },
+  "joint_trace": {
+    "v1_spatial_partial": {
+      "joint_entries": 72,
+      "evaluated_plan_entries": 72,
+      "resource_fallbacks": 0,
+      "statuses": {
+        "JOINT_FEASIBLE_IMPROVED": 72
+      },
+      "stop_reasons": {
+        "JointBudgetStop": 71,
+        "PARTIAL_STATE_CAP": 1
+      },
+      "totals": {
+        "neighborhoods_evaluated": 4641.0,
+        "restricted_pool_proved_count": 2162.0,
+        "partial_states": 4641.0,
+        "accepted_coalitions": 1901.0,
+        "planning_labels": 3590992.0
+      },
+      "phase_timings_s": {},
+      "search_work": {},
+      "mean_planning_resources": 171.63888888888889,
+      "mean_foreground_resources": 24.666666666666668,
+      "seed_limited_count": 0,
+      "current_action_changed_decisions": null,
+      "adapter_wall_overrun_count": 0,
+      "pool_columns_max": 2010,
+      "model_variables_max": 413,
+      "model_nonzeros_max": 1282
+    },
+    "v2_spatial_stopped": {
+      "joint_entries": 72,
+      "evaluated_plan_entries": 72,
+      "resource_fallbacks": 0,
+      "statuses": {
+        "JOINT_FEASIBLE_IMPROVED": 72
+      },
+      "stop_reasons": {
+        "PARTIAL_STATE_CAP": 68,
+        "JointBudgetStop": 2,
+        "None": 2
+      },
+      "totals": {
+        "neighborhoods_evaluated": 7357.0,
+        "restricted_pool_proved_count": 110.0,
+        "partial_states": 9179.0,
+        "accepted_coalitions": 1926.0,
+        "future_only_accepted_coalitions": 1658.0,
+        "planning_labels": 1409861.0,
+        "frontier_seed_count": 17168.0,
+        "deferred_seed_count": 8050.0,
+        "warm_greedy_seed_queries": 4816.0,
+        "warm_restored_continuations": 18175.0,
+        "warm_repaired_continuations": 4042.0,
+        "actual_query_calls": 982104.0,
+        "target_pruned_nodes": 7819953.0,
+        "changed_current_action_count": 240.0
+      },
+      "phase_timings_s": {
+        "forecast_setup_time_s": 0.20456240000203252,
+        "warm_plan_repair_time_s": 3.959787599989795,
+        "frontier_build_time_s": 3.1880340999996406,
+        "search_total_time_s": 412.2369875000222,
+        "plan_retention_time_s": 0.1442719000260695,
+        "column_query_time_s": 115.51947449634463,
+        "integer_solve_time_s": 180.07833430004393,
+        "integer_model_build_time_s": 20.585906900363625,
+        "block_processing_time_s": 243.75613459976012,
+        "search_other_time_s": 96.05327180327004,
+        "supply_state_build_time_s": 0.3385264000389725
+      },
+      "search_work": {
+        "fixed_only_blocks_skipped": 1821,
+        "query_reuses": 402437,
+        "duplicate_blocks_skipped": 592,
+        "solver_calls": 19106,
+        "constant_objective_stages_skipped": 1187
+      },
+      "mean_planning_resources": 171.80555555555554,
+      "mean_foreground_resources": 25.51388888888889,
+      "seed_limited_count": 0,
+      "current_action_changed_decisions": 68,
+      "adapter_wall_overrun_count": 2,
+      "pool_columns_max": 3214,
+      "model_variables_max": 597,
+      "model_nonzeros_max": 1935
+    }
+  },
+  "coarse_refresh_epochs": {
+    "decisions": 8,
+    "solver_calls": 1826,
+    "joint_wall_time_s": 44.011273600001005,
+    "partial_states": 1000,
+    "future_only_accepted": 273
+  },
+  "other_fine_epochs": {
+    "decisions": 64,
+    "solver_calls": 17280,
+    "joint_wall_time_s": 376.41095900002256,
+    "partial_states": 8179,
+    "future_only_accepted": 1385
+  },
+  "v2_over_v1_step_time_ratio": 1.4486279121965875,
+  "v2_over_reference_step_time_ratio": 26.315318405846355,
+  "native_outputs_not_overwritten": true,
+  "analysis_invoked_simulation": false,
+  "analysis_invoked_routing": false,
+  "analysis_invoked_inference": false,
+  "timing_scope": "OBSERVED_SAME_TIMESTAMPS_DIFFERENT_POLICY_TRAJECTORIES_NOT_EQUIVALENT_CODE_BENCHMARK"
+}

@@ -9,6 +9,8 @@
 
 2026-10-15执行更新：用户随后授权下一步，首次V2城市运行在210秒仿真时刻因空间邻域的重复删除错误停止，未形成有效的速度或服务结果。错误已修复，相关构造检查24项通过；失败现场保留，未自动重跑。详见[本次执行与修复说明](D:/pycodes/didi_xian_raw/.worktrees/stage0-v6-valhalla/stage4/docs/capability_chain_planning/bottleneck_whole_method_v2/execution_note_20261015.md)。下文“本轮未执行”指原代码交付轮次，不代表此后没有尝试执行。
 
+随后用户允许修复后原条件运行两组；修复版空间组运行至00:40后，因未实现整体提速，按用户明确指令停止本组及后续队列。最新状态为**STOPPED_BY_USER_AND_SEARCH_COST_ANALYZED**，瓶颈组未启动。见[实测搜索开销诊断](D:/pycodes/didi_xian_raw/.worktrees/stage0-v6-valhalla/stage4/docs/capability_chain_planning/bottleneck_whole_method_v2/search_cost_diagnosis.md)。本页代码交付结论不等于城市效率验收通过。
+
 ## 1. 这次改了什么
 
 V1每30秒重新建立整队未来问题，丢掉上一轮已经找到的可行计划，再重复搜索相似链、求解相似小邻域。V2保留共同计划的结构，以变化驱动修补和局部搜索。
