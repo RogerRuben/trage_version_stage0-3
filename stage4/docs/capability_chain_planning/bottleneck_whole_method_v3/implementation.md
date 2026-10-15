@@ -2,7 +2,7 @@
 
 日期：2026-10-15，Asia/Singapore。基线：`8ba01fefda566f568e3e73723b60369c31f5401e`。
 
-状态：**IMPLEMENTED_FOCUSED_CHECKS_PASS_NATIVE_PREFIX_PENDING**。旧V1/V2及已完成参考、47批布局和停止现场保留；V3是独立执行版本，不声明有限预算下城市结果与V2相同。
+状态：**IMPLEMENTED_39_CHECKS_AND_TWO_NATIVE_PREFIXES_PASS**。执行提交`ca19f69bec9847721098a17fa2ae9c2c36dcbc5b`。旧V1/V2及已完成参考、47批布局和停止现场保留；V3是独立执行版本，不声明有限预算下城市结果与V2相同。实测与条件性全天预算见[性能与耗时估计](D:/pycodes/didi_xian_raw/.worktrees/stage0-v6-valhalla/stage4/docs/capability_chain_planning/bottleneck_whole_method_v3/performance_and_estimate.md)。
 
 ## 已完成的集中改动
 
@@ -34,4 +34,4 @@ python -m stage4.analysis.bottleneck_v3_preflight --execute
 
 仅顺序运行两组00:00–00:40前缀，保留完整全天输入、供给窗口和预测范围，独立写入V3的`preflight/`，不污染未来完整实验的`native/`。每组诊断行政上限600秒，原决策/资源门槛不放宽。前缀不排空全部承诺，不能当最终服务比较；不会自动重试或接着跑全天。
 
-人工小样例已经观察到调用次数下降，但不足以推算全天。原生前缀及结合历史完整运行成本的条件性耗时估计将在独立结果说明中给出；当前不作30分钟承诺。
+两段原生前缀均已通过，计算耗时分别65.05秒/87.70秒，峰值约869 MiB。它们不是全天运行，不能推断服务质量排名或直接乘36；结合已完成参考组件的估计及压力风险已写入性能报告，不作30分钟承诺。
