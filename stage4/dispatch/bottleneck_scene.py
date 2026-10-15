@@ -64,6 +64,64 @@ class PredictionSceneOracle:
     def accepts(self,c):
         return self.registered.get(c.chain_id)==c
 
+    def _remember_path(self,sid,aid,path):
+        digest=hashlib.sha256(repr((sid,aid,path)).encode()).hexdigest()[:24]
+        c=ServiceChain(f"{sid}|{aid}|{digest}",sid,self.actions[aid].vehicle_id,aid,
+            tuple(l[0] for l in path),sum(l[4] for l in path),dict(legs=path,
+                support="EARLIER_HISTORY_M3_CHORD_PACE_NOT_DIRECTED_ROUTE_CERTIFICATE"))
+        if len(self.registered)>=self.maximum_columns and c.chain_id not in self.registered:
+            raise JointBudgetStop("joint oracle column memory cap exhausted")
+        self.registered[c.chain_id]=c
+        return c
+
+    def seed(self,sid,aid,forbidden,check):
+        """Cheap disjoint witness; deliberately consumes NO deep-search labels."""
+        state=self.roots[aid]
+        forbidden=set(forbidden)
+        if self.actions[aid].request_id is not None:
+            forbidden.add(self.actions[aid].request_id)
+        position,ready=state.position,state.ready_s
+        path=[]
+        for _ in range(3):
+            check()
+            choices=[]
+            for t in self._near(sid,position):
+                if t.request_id in forbidden or not self._allowed(t,state.profile_id):
+                    continue
+                adjusted=ceil(ready/300)*300 if t.source_kind=="FORECAST" else ready
+                leg=self._leg(t,adjusted,position,state.admission_end_s)
+                if leg is not None:
+                    choices.append((leg[1],leg[4],t.request_id,t,leg))
+            if not choices:
+                break
+            _,_,_,task,leg=min(choices,key=lambda x:x[:3])
+            # After the first task preserve the SAME sparse successor domain.
+            if path and task not in self._following(sid,self.tasks[sid][path[-1][0]],state.profile_id):
+                eligible=set(t.request_id for t in self._following(
+                    sid,self.tasks[sid][path[-1][0]],state.profile_id))
+                choices=[c for c in choices if c[2] in eligible]
+                if not choices:
+                    break
+                _,_,_,task,leg=min(choices,key=lambda x:x[:3])
+            path.append(leg); forbidden.add(task.request_id)
+            position,ready=task.dropoff,leg[3]
+        return (self._remember_path(sid,aid,tuple(path)),) if path else ()
+
+    def nearby_resources(self,sid,rid,maximum,check):
+        """Ordinary proximity grouping, including vehicles unable to serve the seed."""
+        check()
+        point=_xy(self.tasks[sid][rid].pickup)
+        ids=self.root_tree.query_ball_point(point,2000) if self.root_tree else ()
+        ranked=sorted((float(np.linalg.norm(self.root_points[i]-point)),
+            self.actions[self.aids[i]].vehicle_id,self.aids[i]) for i in ids)
+        result=[]
+        for _,vid,_ in ranked:
+            if vid not in result:
+                result.append(vid)
+            if len(result)>=maximum:
+                break
+        return tuple(result)
+
     def _allowed(self,task,profile):
         return profile in task.compatible_profiles and (profile=="HV" or task.passenger_accepts_av)
 
@@ -192,15 +250,7 @@ class PredictionSceneOracle:
                 best=candidate
         result=()
         if best is not None:
-            rid_tuple=tuple(l[0] for l in best)
-            digest=hashlib.sha256(repr((sid,aid,best)).encode()).hexdigest()[:24]
-            c=ServiceChain(f"{sid}|{aid}|{digest}",sid,action.vehicle_id,aid,rid_tuple,
-                sum(l[4] for l in best),dict(legs=best,
-                    support="EARLIER_HISTORY_M3_CHORD_PACE_NOT_DIRECTED_ROUTE_CERTIFICATE"))
-            if len(self.registered)>=self.maximum_columns and c.chain_id not in self.registered:
-                raise JointBudgetStop("joint oracle column memory cap exhausted")
-            self.registered[c.chain_id]=c
-            result=(c,)
+            result=(self._remember_path(sid,aid,best),)
         self.cache[key]=result
         while len(self.cache)>128:
             self.cache.popitem(last=False)

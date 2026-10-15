@@ -1,0 +1,14 @@
+{
+  "version": "bottleneck_whole_method_v1",
+  "base_config": "stage4/config/scheme_a_two_scale_city_v5_common.json",
+  "base_config_sha256": "d41b1d448d8c5342f45b40b625857fc7e018610ddf98d027bd8f00c684c9c836",
+  "seed_layout": "stage4/output/capability_chain_planning/layout_300_600_v1/placements.json",
+  "seed_layout_sha256": "4f11b259103014a0ad03cf62951893279d366abc628f977d28e42b8a9bc23826",
+  "groups": ["INDEPENDENT_REFERENCE", "SPATIAL_SHARED_PLAN", "BOTTLENECK_SHARED_PLAN"],
+  "default_action": "prepare",
+  "automatic_retry": false,
+  "parameter_search": false,
+  "model_refit": false,
+  "dense_matrix": false,
+  "gpu_used": false
+}

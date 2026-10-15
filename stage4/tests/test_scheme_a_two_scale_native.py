@@ -249,10 +249,12 @@ def test_unavailable_price_and_optional_route_budget_cutoff_keep_validated_curre
     assert c.repositioning_manager.queued[-1][0] == []
 
 
-def test_opt_in_joint_mode_keeps_neutral_moves_and_does_not_use_private_values(monkeypatch):
+@pytest.mark.parametrize("strategy",("BOTTLENECK_CLOSURE","SPATIAL_JOINT"))
+def test_opt_in_joint_mode_keeps_neutral_moves_and_does_not_use_private_values(monkeypatch,strategy):
     c,cfg=fixture()
     c.repositioning_manager.active.clear()
-    cfg.update(current_decision_mode="BOTTLENECK_JOINT",idle_movement_mode="VALUE_SELECTED")
+    cfg.update(current_decision_mode="BOTTLENECK_JOINT",idle_movement_mode="VALUE_SELECTED",
+               joint_neighborhood_strategy=strategy)
     value=Value()
     value.library=NS(view=lambda now:{"HISTORY":()},weights={"HISTORY":1})
     value.pace=NS(global_pace=.01,pace_by_slot={})
@@ -276,7 +278,8 @@ def test_opt_in_joint_mode_keeps_neutral_moves_and_does_not_use_private_values(m
     row=adapter.rows[-1]
     assert len(routed)==2
     assert row["current_move_upper_screened_count"]==row["current_move_arrival_screened_count"]==0
-    assert row["effective_policy"]=="BOTTLENECK_JOINT"
+    assert row["effective_policy"]==strategy
     assert row["joint_control"]["same_first_action_across_scenarios"]
     assert row["joint_control"]["generated_continuation_columns"]>0
     assert row["future_connector_queries"]==0
+    assert adapter.progress_summary()["operations"]["joint_decisions"]==1

@@ -177,7 +177,7 @@ class JointProblem:
             owners=owners,chosen=chosen,chains={(c.scenario_id,c.vehicle_id):c for c in plan.chains})
 
 
-def seed_plan(problem, selected, check=lambda:None):
+def seed_plan(problem, selected, check=lambda:None, *, seed_deadline=None):
     """Integral common-customer incumbent, never a sum of private vehicle values."""
     selected = tuple(selected)
     selected_map = {problem.actions[a].vehicle_id:a for a in selected}
@@ -196,7 +196,15 @@ def seed_plan(problem, selected, check=lambda:None):
             if not limited:
                 try:
                     check()
-                    alternatives = problem.offer(sid,aid,forbidden=frozenset(occupied),check=check)
+                    if seed_deadline is not None and perf_counter()>=seed_deadline:
+                        raise JointBudgetStop("initial witness budget reserved for coalition search")
+                    seeder=getattr(problem.oracle,"seed",None)
+                    if seeder is None:
+                        alternatives = problem.offer(sid,aid,forbidden=frozenset(occupied),check=check)
+                    else:
+                        alternatives=seeder(sid,aid,frozenset(occupied),check)
+                        for column in alternatives:
+                            problem.register(column)
                 except JointBudgetStop:
                     limited = True
             chain = min((terminal,*alternatives),key=lambda c:(-len(c.request_ids),
@@ -356,6 +364,66 @@ def solve_block(problem, plan, vehicles, deadline, check=lambda:None):
         full_domain_optimality_proved=False)
 
 
+def populate_block(problem,plan,vehicles,targets,check):
+    base=problem.evaluate(plan)
+    outside={s:frozenset(r for (scene,r),owner in base["owners"].items()
+        if scene==s and owner not in vehicles) for s in problem.weights}
+    for v in sorted(vehicles):
+        for aid in problem.by_vehicle[v]:
+            for s in sorted(problem.weights):
+                problem.register(problem.empty(s,problem.actions[aid]))
+                problem.offer(s,aid,forbidden=outside[s],check=check)
+                for wanted in sorted(targets.get(s,())):
+                    problem.offer(s,aid,required=wanted,forbidden=outside[s],check=check)
+
+
+def spatial_improve(problem,initial,*,deadline,check,maximum_coalition=6,maximum_partial_states=128):
+    """Same model/oracle/budget, ordinary spatial groups instead of displacement closure."""
+    if not 1<=maximum_coalition<=6 or not 1<=maximum_partial_states<=512:
+        raise ValueError("coalition/search memory cap exceeds the opt-in design")
+    best,trace=initial,[]
+    accepted=0; stopped=None
+    try:
+        for sid,rid in problem.oracle.seeds(problem.evaluate(best)["owners"],check):
+            check()
+            owners=problem.evaluate(best)["owners"]
+            nearby=problem.oracle.nearby_resources(sid,rid,maximum_coalition,check)
+            group=set(nearby)
+            owner=owners.get((sid,rid))
+            if owner is not None:
+                if len(group)>=maximum_coalition and owner not in group:
+                    group.remove(nearby[-1])
+                group.add(owner)
+            if not group:
+                continue
+            targets=defaultdict(set)
+            targets[sid].add(rid)
+            for c in best.chains:
+                if c.vehicle_id in group:
+                    targets[c.scenario_id].update(c.request_ids)
+            populate_block(problem,best,group,targets,check)
+            candidate,info=solve_block(problem,best,group,deadline,check)
+            old,new=problem.evaluate(best)["score"],problem.evaluate(candidate)["score"]
+            trace.append(dict(coalition_size=len(group),before=list(old),after=list(new),
+                              improved=new>old,**info))
+            check()
+            if new>old:
+                best=candidate; accepted+=1
+            if len(trace)>=maximum_partial_states:
+                stopped="PARTIAL_STATE_CAP"; break
+    except JointBudgetStop as error:
+        stopped=type(error).__name__
+    result=problem.evaluate(best)
+    return best,dict(status="JOINT_FEASIBLE_IMPROVED" if accepted else "JOINT_FEASIBLE_INCUMBENT",
+        neighborhood_strategy="SPATIAL_JOINT",score=list(result["score"]),
+        expected_future_served=result["expected_future_served"],
+        accepted_coalitions=accepted,partial_states=len(trace),neighborhoods=trace,
+        stop_reason=stopped,pool_columns=len(problem.columns),
+        same_first_action_across_scenarios=True,shared_customer_capacity=True,
+        whole_day_optimality_claimed=False,full_domain_optimality_proved=False,
+        dense_matrix=False,gpu_used=False,wall_overrun=perf_counter()>deadline)
+
+
 def improve(problem, initial, *, deadline, check=lambda:None, maximum_coalition=6,
             maximum_partial_states=128):
     """Bottleneck-guided multi-resource search; neutral branches stay alive."""
@@ -394,17 +462,7 @@ def improve(problem, initial, *, deadline, check=lambda:None, maximum_coalition=
                     target[s].update(orders)
                 for c in state.hints:
                     target[c.scenario_id].update(c.request_ids)
-                state_base=problem.evaluate(best)
-                outside_by_scene={s:frozenset(r for (scene,r),owner in state_base["owners"].items()
-                    if scene==s and owner not in state.vehicles) for s in problem.weights}
-                for v in sorted(state.vehicles):
-                    for aid in problem.by_vehicle[v]:
-                        for s in sorted(problem.weights):
-                            problem.register(problem.empty(s,problem.actions[aid]))
-                            outside=outside_by_scene[s]
-                            problem.offer(s,aid,forbidden=outside,check=check)
-                            for wanted in sorted(target[s]):
-                                problem.offer(s,aid,required=wanted,forbidden=outside,check=check)
+                populate_block(problem,best,state.vehicles,target,check)
                 candidate,diagnostic = solve_block(problem,best,state.vehicles,deadline,check)
                 old_score,new_score = problem.evaluate(best)["score"],problem.evaluate(candidate)["score"]
                 records.append(dict(coalition_size=len(state.vehicles),before=list(old_score),
@@ -431,6 +489,7 @@ def improve(problem, initial, *, deadline, check=lambda:None, maximum_coalition=
         stopped=type(error).__name__
     checked=problem.evaluate(best)
     return best,dict(status="JOINT_FEASIBLE_IMPROVED" if accepted else "JOINT_FEASIBLE_INCUMBENT",
+        neighborhood_strategy="BOTTLENECK_CLOSURE",
         score=list(checked["score"]),expected_future_served=checked["expected_future_served"],
         accepted_coalitions=accepted,partial_states=partial,neighborhoods=records,
         stop_reason=stopped,pool_columns=len(problem.columns),

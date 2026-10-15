@@ -5,7 +5,7 @@ from time import perf_counter
 
 import psutil
 
-from .bottleneck_joint import JointBudgetStop, JointProblem, seed_plan, improve
+from .bottleneck_joint import JointBudgetStop, JointProblem, seed_plan, improve, spatial_improve
 from .bottleneck_scene import PredictionSceneOracle
 from .flexibility_native import predicted_vehicle_states
 from .scheme_a_city_graph import RouteState
@@ -56,8 +56,10 @@ def solve_joint_current(c, actions, after, baseline, now, cfg, provider,
             [t.request_id for t in pending],move_cap=50,
             maximum_columns=int(cfg.get("maximum_model_variables",20000)),
             maximum_nonzeros=int(cfg.get("maximum_model_nonzeros",150000)))
-        initial,seed_limited=seed_plan(problem,initial_ids,check)
-        plan,info=improve(problem,initial,deadline=deadline,check=check,
+        initial,seed_limited=seed_plan(problem,initial_ids,check,
+                                     seed_deadline=perf_counter()+max(0.,deadline-perf_counter())*.25)
+        search=spatial_improve if cfg.get("joint_neighborhood_strategy")=="SPATIAL_JOINT" else improve
+        plan,info=search(problem,initial,deadline=deadline,check=check,
             maximum_coalition=int(cfg.get("joint_maximum_coalition",6)),
             maximum_partial_states=int(cfg.get("joint_maximum_partial_states",128)))
         checked=problem.evaluate(plan)
@@ -84,7 +86,7 @@ def solve_joint_current(c, actions, after, baseline, now, cfg, provider,
             current_served=checked["current_served"],
             carry_over_current_served=sum(a.carry_over for a in chosen),
             current_moves=checked["current_moves"],opt_status=info["status"],
-            backend="JOINT_BOTTLENECK_SPARSE_MILP",primary_optimality_proved=False,
+            backend="JOINT_"+info["neighborhood_strategy"]+"_SPARSE_MILP",primary_optimality_proved=False,
             secondary_status="JOINT_PLANNING_NOT_OLD_CURRENT_PRIMARY_FACE",
             secondary_optimality_proved=False,secondary_time_s=0.,
             future_chain_variables=info["max_joint_future_variables"],joint_control=info,

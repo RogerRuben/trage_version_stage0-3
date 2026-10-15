@@ -55,6 +55,8 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
             raise ValueError("joint moves cannot also use an external historical deficit controller")
         if self.joint_mode and any(not hasattr(value_provider,k) for k in ("library","pace")):
             raise ValueError("joint control requires existing history and prediction-only pace inputs")
+        if self.joint_mode and cfg.get("joint_neighborhood_strategy","BOTTLENECK_CLOSURE") not in ("BOTTLENECK_CLOSURE","SPATIAL_JOINT"):
+            raise ValueError("unknown joint neighborhood strategy")
         self.common_movement = cfg.get("idle_movement_mode", "VALUE_SELECTED") in (
             "COMMON_HISTORICAL_DEFICIT", "TYPE_CONDITIONED_HISTORICAL_DEFICIT")
         if cfg.get("idle_movement_mode", "VALUE_SELECTED") not in (
@@ -92,6 +94,14 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
         # all-root column pool and not a count of realized future services.
         self.operation_totals["future_chain_variables"] += int(row.get("future_chain_variables",0))
         self.operation_totals["future_connector_queries"] += 0
+        joint=row.get("joint_control")
+        if joint is not None:
+            self.operation_totals["joint_decisions"]+=1
+            self.operation_totals["joint_resource_fallbacks"]+=int(joint.get("resource_fallback",False))
+            self.operation_totals["joint_accepted_coalitions"]+=int(joint.get("accepted_coalitions",0))
+            self.operation_totals["joint_planning_labels"]+=int(joint.get("planning_labels",0))
+            for name in ("max_joint_variables","max_joint_nonzeros"):
+                self.operation_totals[name]=max(self.operation_totals[name],int(joint.get(name,0)))
 
     def progress_summary(self):
         return dict(decisions_recorded=len(self.rows), timings_s=dict(self.timing_totals),
@@ -99,6 +109,8 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
                     adapter_wall_time_field="solve_wall_time_s",
                     pre_adapter_candidate_routing_is_outside_this_timer=True,
                     current_decision_mode="BOTTLENECK_JOINT" if self.joint_mode else "INDEPENDENT_VALUE",
+                    joint_neighborhood_strategy=self.cfg.get("joint_neighborhood_strategy","BOTTLENECK_CLOSURE")
+                        if self.joint_mode else None,
                     future_chain_variables=self.operation_totals["future_chain_variables"],
                     future_connector_queries=0)
 
@@ -423,7 +435,8 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
             result=solve_joint_current(c,actions,after,result,now,self.cfg,self.value_provider,
                 self.last_assignments,self.remaining_model,self._task,self._moving_wait,waiting_ids,deadline)
             effective_policy=("SERVICE_PRESERVING_JOINT_BUDGET_FALLBACK"
-                if result["joint_control"].get("resource_fallback") else "BOTTLENECK_JOINT")
+                if result["joint_control"].get("resource_fallback") else
+                self.cfg.get("joint_neighborhood_strategy","BOTTLENECK_CLOSURE"))
             base["future_chain_variables"]=int(result.get("future_chain_variables",0))
             base["joint_control"]=result["joint_control"]
         timings["current_flow_time_s"] = perf_counter() - stamp

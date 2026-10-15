@@ -195,6 +195,13 @@ def _timing_delta(after, before):
             for key, value in after.items()}
 
 
+def _planning_diagnostics(provider,cfg):
+    if cfg.get("current_decision_mode")=="BOTTLENECK_JOINT":
+        return dict(status="JOINT_HISTORY_INPUTS_NOT_PRIVATE_VALUE_PRICES",
+            private_value_lp_used=False,history=provider.library.diagnostics())
+    return provider.diagnostics()
+
+
 def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
                 completion_status, group=None, execution_binding=None, started=None):
     """Shared physical execution after the calling CLI validates its protocol.
@@ -409,7 +416,7 @@ def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
             if not full_day or tick % progress_interval == 0:
                 hard_stop.publish(summary)
                 _atomic_json(directory / "progress.json", dict(durable,
-                    performance=adapter.progress_summary(), coarse_value=provider.diagnostics()))
+                    performance=adapter.progress_summary(), coarse_value=_planning_diagnostics(provider,cfg)))
             if tick % progress_interval == 0:
                 atomic_parquet(directory / "partial_step_timings.parquet", pd.DataFrame(step_rows))
                 if full_day:
@@ -431,7 +438,9 @@ def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
         if len(assignments):
             # Do not export the shared control's legacy generic policy label
             # as a claim of exact city-chain/global lexicographic optimization.
-            assignments["dispatch_policy"] = "TWO_SCALE_CURRENT_ACTION_FLOW_COARSE_FUTURE"
+            assignments["dispatch_policy"] = ("JOINT_"+cfg.get("joint_neighborhood_strategy","BOTTLENECK_CLOSURE")
+                if cfg.get("current_decision_mode")=="BOTTLENECK_JOINT"
+                else "TWO_SCALE_CURRENT_ACTION_FLOW_COARSE_FUTURE")
         physics = time_chain_check(assignments)
         outcomes = outcome_table(control, assignments, cfg)
         if control.request_decisions is not None:
@@ -461,6 +470,9 @@ def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
                 all_pricing_closed_count=sum(bool(record.get("all_pricing_closed", False))
                     for record in provider.refresh_records),
                 final_snapshot_is_not_an_all_day_convergence_certificate=True)
+            if cfg.get("current_decision_mode")=="BOTTLENECK_JOINT":
+                summary["coarse_refresh_summary"].update(private_value_lp_used=False,
+                    status="PRICING_NOT_APPLICABLE_TO_JOINT_PLANNER")
         summary.update(status=completion_status, native_execution_performed=True,
             drain_end_s=tick, setup_time_s=setup_s, simulation_loop_wall_s=simulation_loop_s,
             total_runner_wall_s=perf_counter() - started,
@@ -473,7 +485,7 @@ def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
             committed_HV_orders=int(assignments.vehicle_type.eq("HV").sum()) if len(assignments) else 0,
             all_day_supply=episode.supply.inventory(), physical_accounting=physics,
             execution_bridge=bridge_diagnostics, current_pickup=validator.diagnostics(),
-            adapter_performance=adapter.progress_summary(), coarse_value=provider.diagnostics(),
+            adapter_performance=adapter.progress_summary(), coarse_value=_planning_diagnostics(provider,cfg),
             connector=connectors.diagnostics(), actual_routing=routing.diagnostics(),
             idle_movement=manager.summary(),
             truth_access="ENVIRONMENT_ONLY_AFTER_IRREVERSIBLE_COMMITMENT",
