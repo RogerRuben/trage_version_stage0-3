@@ -1,0 +1,233 @@
+{
+  "kind": "BOUNDED_SYNTHETIC_CODE_DIAGNOSTICS_NOT_CITY_BENCHMARK",
+  "policy_implementation_changed": false,
+  "city_simulation_invoked": false,
+  "routing_invoked": false,
+  "inference_invoked": false,
+  "dense_matrix": false,
+  "gpu_used": false,
+  "cache_hit_cost": {
+    "deadline_only": {
+      "queries": 15000,
+      "median_5000_queries_s": 0.008260599999630358,
+      "sum_s": 0.024577900003350805,
+      "new_deep_labels": 0,
+      "guard_counts": {
+        "calls": 15000
+      }
+    },
+    "native_style_rss_guard": {
+      "queries": 15000,
+      "median_5000_queries_s": 0.0753465999951004,
+      "sum_s": 0.2198734999910812,
+      "new_deep_labels": 0,
+      "guard_counts": {
+        "calls": 15000,
+        "rss_reads": 15000
+      }
+    },
+    "same_rss_check_reused_process": {
+      "queries": 15000,
+      "median_5000_queries_s": 0.03699559999949997,
+      "sum_s": 0.11071390000142856,
+      "new_deep_labels": 0,
+      "guard_counts": {
+        "calls": 15000,
+        "rss_reads": 15000
+      }
+    }
+  },
+  "full_plan_evaluation_scaling": {
+    "6": {
+      "evaluations": 900,
+      "median_300_evaluations_s": 0.014468399996985681,
+      "median_single_evaluation_us": 48.22799998995227,
+      "scenarios": 3,
+      "selected_chains": 18,
+      "selected_request_visits": 54
+    },
+    "60": {
+      "evaluations": 900,
+      "median_300_evaluations_s": 0.12504030000127386,
+      "median_single_evaluation_us": 416.80100000424625,
+      "scenarios": 3,
+      "selected_chains": 180,
+      "selected_request_visits": 540
+    },
+    "170": {
+      "evaluations": 900,
+      "median_300_evaluations_s": 0.39268209999863757,
+      "median_single_evaluation_us": 1308.940333328792,
+      "scenarios": 3,
+      "selected_chains": 510,
+      "selected_request_visits": 1530
+    }
+  },
+  "profiles": {
+    "SPATIAL_JOINT": {
+      "profiled_s": 1.3549634000009974,
+      "resources": 24,
+      "scenarios": 3,
+      "seeds": 18,
+      "score_before": [
+        72,
+        0,
+        -1821915
+      ],
+      "score_after": [
+        72,
+        0,
+        -1821915
+      ],
+      "partial_states": 3,
+      "neighborhoods": 3,
+      "search_work": {
+        "duplicate_blocks_skipped": 2,
+        "label_budget_flushes": 1,
+        "solver_calls": 2,
+        "constant_objective_stages_skipped": 1
+      },
+      "accepted_coalitions": 0,
+      "stop_reason": "LABEL_CAP_FLUSHED",
+      "labels": 50001,
+      "oracle_query_calls": 1549,
+      "guard_counts": {
+        "calls": 3664,
+        "rss_reads": 3664
+      },
+      "setup_guard_counts": {
+        "calls": 345,
+        "rss_reads": 345
+      },
+      "core_operations": {
+        "full_plan_evaluate": {
+          "calls": 16,
+          "inclusive_s": 0.004053200020280201
+        },
+        "populate": {
+          "calls": 3,
+          "inclusive_s": 1.2557253000049968
+        },
+        "solve_block": {
+          "calls": 1,
+          "inclusive_s": 0.09495740000420483
+        },
+        "close_coalition": {
+          "calls": 0,
+          "inclusive_s": 0.0
+        },
+        "scipy_milp": {
+          "calls": 2,
+          "inclusive_s": 0.08859189999930095
+        },
+        "oracle_query": {
+          "calls": 1549,
+          "inclusive_s": 1.2343079998536268
+        },
+        "leg_validation": {
+          "calls": 70485,
+          "inclusive_s": 0.5866710000045714
+        },
+        "path_ranking": {
+          "calls": 73496,
+          "inclusive_s": 0.14066180006193463
+        },
+        "coordinate_projection": {
+          "calls": 139839,
+          "inclusive_s": 0.06925699993007584
+        },
+        "resource_guard": {
+          "calls": 3664,
+          "inclusive_s": 0.09467870018124813
+        }
+      },
+      "timers_are_nested_do_not_sum": true,
+      "explicit_solver_counter_agrees": true
+    },
+    "BOTTLENECK_CLOSURE": {
+      "profiled_s": 1.8385447000036947,
+      "resources": 24,
+      "scenarios": 3,
+      "seeds": 18,
+      "score_before": [
+        72,
+        0,
+        -1821915
+      ],
+      "score_after": [
+        72,
+        0,
+        -1821915
+      ],
+      "partial_states": 19,
+      "neighborhoods": 19,
+      "search_work": {
+        "query_reuses": 860,
+        "duplicate_blocks_skipped": 6,
+        "label_budget_flushes": 1,
+        "solver_calls": 26,
+        "constant_objective_stages_skipped": 13
+      },
+      "accepted_coalitions": 0,
+      "stop_reason": "LABEL_CAP_FLUSHED",
+      "labels": 50001,
+      "oracle_query_calls": 1948,
+      "guard_counts": {
+        "calls": 4123,
+        "rss_reads": 4123
+      },
+      "setup_guard_counts": {
+        "calls": 345,
+        "rss_reads": 345
+      },
+      "core_operations": {
+        "full_plan_evaluate": {
+          "calls": 116,
+          "inclusive_s": 0.02514170004724292
+        },
+        "populate": {
+          "calls": 19,
+          "inclusive_s": 1.3221931000080076
+        },
+        "solve_block": {
+          "calls": 13,
+          "inclusive_s": 0.47068479999143165
+        },
+        "close_coalition": {
+          "calls": 19,
+          "inclusive_s": 0.005479200015543029
+        },
+        "scipy_milp": {
+          "calls": 26,
+          "inclusive_s": 0.4201221999755944
+        },
+        "oracle_query": {
+          "calls": 1948,
+          "inclusive_s": 1.3105585999583127
+        },
+        "leg_validation": {
+          "calls": 65825,
+          "inclusive_s": 0.5839803011913318
+        },
+        "path_ranking": {
+          "calls": 77348,
+          "inclusive_s": 0.16434319949621568
+        },
+        "coordinate_projection": {
+          "calls": 130525,
+          "inclusive_s": 0.07000590132520301
+        },
+        "resource_guard": {
+          "calls": 4123,
+          "inclusive_s": 0.11904630011849804
+        }
+      },
+      "timers_are_nested_do_not_sum": true,
+      "explicit_solver_counter_agrees": true
+    }
+  },
+  "runtime_s": 5.311744500002533,
+  "peak_rss_mib": 123.57421875,
+  "timings_include_instrumentation_overhead": true,
+  "city_speedup_inference_permitted": false
+}

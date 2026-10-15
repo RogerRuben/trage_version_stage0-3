@@ -11,6 +11,8 @@
 
 随后用户允许修复后原条件运行两组；修复版空间组运行至00:40后，因未实现整体提速，按用户明确指令停止本组及后续队列。最新状态为**STOPPED_BY_USER_AND_SEARCH_COST_ANALYZED**，瓶颈组未启动。见[实测搜索开销诊断](D:/pycodes/didi_xian_raw/.worktrees/stage0-v6-valhalla/stage4/docs/capability_chain_planning/bottleneck_whole_method_v2/search_cost_diagnosis.md)。本页代码交付结论不等于城市效率验收通过。
 
+用户随后要求端到端检查算法效率，已完成[全面效率检查](D:/pycodes/didi_xian_raw/.worktrees/stage0-v6-valhalla/stage4/docs/capability_chain_planning/bottleneck_efficiency_review_20261015/efficiency_review.md)。它进一步定位了迟到去重、全队扫描、查询交叉展开及旧持久求解未接入等问题，并给出集中修复顺序；仅新增秒级合成诊断工具，没有修改生产算法或重启城市实验。V2仍不能作为已恢复工程可用性的版本使用。
+
 ## 1. 这次改了什么
 
 V1每30秒重新建立整队未来问题，丢掉上一轮已经找到的可行计划，再重复搜索相似链、求解相似小邻域。V2保留共同计划的结构，以变化驱动修补和局部搜索。
