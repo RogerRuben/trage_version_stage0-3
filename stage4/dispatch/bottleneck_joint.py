@@ -30,6 +30,10 @@ class JointSizeStop(JointBudgetStop):
     pass
 
 
+class JointLabelStop(JointBudgetStop):
+    """Column generation ended; already legal columns may still be solved."""
+
+
 @dataclass(frozen=True)
 class JointPlan:
     action_ids: tuple[str, ...]
@@ -95,6 +99,8 @@ class JointProblem:
         self.move_cap, self.oracle = move_cap, oracle
         self.column_cap, self.nonzero_cap = min(20000,maximum_columns), min(150000,maximum_nonzeros)
         self.pool, self.columns, self.entry_count = defaultdict(dict), {}, len(actions)
+        self.pool_versions = defaultdict(int)
+        self.vehicle_pool_versions = defaultdict(int)
         self.protected_critical = None
 
     @staticmethod
@@ -123,6 +129,8 @@ class JointProblem:
             raise JointSizeStop("bounded sparse joint column pool exhausted")
         self.columns[chain.chain_id] = chain
         self.pool[chain.scenario_id,chain.action_id][chain.chain_id] = chain
+        self.pool_versions[chain.scenario_id,chain.action_id] += 1
+        self.vehicle_pool_versions[chain.vehicle_id] += 1
         self.entry_count += len(chain.request_ids)+1
         return chain
 
@@ -250,9 +258,11 @@ def close_coalition(problem, plan, coalition, maximum=6):
     return Coalition(frozenset(vehicles),coalition.hints),displaced
 
 
-def solve_block(problem, plan, vehicles, deadline, check=lambda:None):
+def solve_block(problem, plan, vehicles, deadline, check=lambda:None, *,
+                skip_constant_stages=False,metrics=None):
     """Sparse integral block; outside plans/capacity remain in every row."""
     check()
+    built_started=perf_counter()
     base = problem.evaluate(plan)
     vehicles = frozenset(vehicles)
     action_ids = [a for v in sorted(vehicles) for a in problem.by_vehicle[v]]
@@ -310,13 +320,24 @@ def solve_block(problem, plan, vehicles, deadline, check=lambda:None):
     best_score=base["score"]
     receipt=numerical._solver_options_receipt()
     maximum_lattice_error=0.
+    build_wall=perf_counter()-built_started
+    if metrics is not None:
+        metrics["model_build_time_s"]+=build_wall
+    solver_wall=0.; solver_calls=0; constant_stages=0
     for objective in objectives:
         check()
         seconds = deadline-perf_counter()
         if seconds <= 0:
             raise JointBudgetStop("shared joint solve deadline exhausted")
+        if skip_constant_stages and not np.any(objective):
+            # All feasible integer witnesses have exactly the same zero value.
+            stages+=1; constant_stages+=1
+            if metrics is not None:
+                metrics["constant_objective_stages_skipped"]+=1
+            continue
         if np.sum(np.abs(objective)) >= 2**50:
             raise ValueError("joint integer objective exceeds safe numerical range")
+        stamp=perf_counter()
         matrix = coo_matrix((data,(ridxs,cidxs)),shape=(len(lower),n)).tocsc()
         divisor=gcd(*(abs(int(v)) for v in objective if v)) or 1
         primitive=objective/divisor
@@ -325,11 +346,23 @@ def solve_block(problem, plan, vehicles, deadline, check=lambda:None):
             +numerical.NUMERICAL_TOLERANCE*len(lower)*float(np.max(np.abs(primitive),initial=0))
             +64*np.finfo(float).eps*max(1.,total))
         maximum_lattice_error=max(maximum_lattice_error,lattice_error)
-        with warnings.catch_warnings(record=True) as caught:
-            result = milp(-primitive,integrality=np.ones(n,np.int8),
-                bounds=Bounds(np.zeros(n),np.ones(n)),
-                constraints=LinearConstraint(matrix,np.asarray(lower),np.asarray(upper)),
-                options=dict(receipt["options"],time_limit=seconds,mip_rel_gap=0.,presolve=True))
+        elapsed=perf_counter()-stamp; build_wall+=elapsed
+        if metrics is not None:
+            metrics["model_build_time_s"]+=elapsed
+        stamp=perf_counter()
+        if metrics is not None:
+            metrics["solver_calls"]+=1
+        try:
+            with warnings.catch_warnings(record=True) as caught:
+                result = milp(-primitive,integrality=np.ones(n,np.int8),
+                    bounds=Bounds(np.zeros(n),np.ones(n)),
+                    constraints=LinearConstraint(matrix,np.asarray(lower),np.asarray(upper)),
+                    options=dict(receipt["options"],time_limit=seconds,mip_rel_gap=0.,presolve=True))
+        finally:
+            elapsed=perf_counter()-stamp; solver_wall+=elapsed
+            if metrics is not None:
+                metrics["solver_wall_time_s"]+=elapsed
+        solver_calls+=1
         if any("Unrecognized options" not in str(w.message) for w in caught):
             raise RuntimeError("unexpected warning in sparse joint solver")
         stages += 1
@@ -358,6 +391,8 @@ def solve_block(problem, plan, vehicles, deadline, check=lambda:None):
         optimum = int(round(float(objective@binary)))
         row([(i,int(v)) for i,v in enumerate(objective) if v],optimum,optimum)
     return best,dict(variables=n,nonzeros=len(data),stages=stages,
+        solver_calls=solver_calls,solver_wall_time_s=solver_wall,model_build_time_s=build_wall,
+        constant_objective_stages_skipped=constant_stages,
         future_chain_variables=len(paths),current_action_variables=len(action_ids),
         integer_objective_lattice_error_bound=maximum_lattice_error,
         restricted_pool_optimality_proved=proved and stages==3,

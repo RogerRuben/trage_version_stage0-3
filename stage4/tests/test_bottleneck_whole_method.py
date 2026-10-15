@@ -97,3 +97,41 @@ def test_protocol_preparation_is_metadata_only_and_arms_share_conditions(tmp_pat
         with pytest.raises(RuntimeError,match="lock"):
             with protocol.execution_lock(tmp_path):
                 pytest.fail("duplicate execution acquired the lock")
+
+
+def test_v2_retains_reference_without_relabeling_or_launching_it(tmp_path,monkeypatch):
+    base=dict(test_date="20161031",profile_id="C",requested_q_a=.1,supply_seed=20260824,
+        passenger_acceptance_rate=.7,solver_time_limit_s=10.,full_day=True,
+        max_match_wait_s=300,max_pickup_eta_s=600,maximum_rss_mib=1536,
+        minimum_initial_available_ram_mib=1536,scenario_timeout_s=10800)
+    seed=dict(records=[{}]*47,placements={"opportunity_joint":{str(i):{} for i in range(851)}})
+    declared=dict(version=protocol.V2,reuse_layout="retained/layout.json",
+        retained_reference_summary="retained/summary.json",retained_reference_receipt="retained/receipt.json",
+        seed_layout_sha256="seed")
+    source=tmp_path/"retained"; source.mkdir(); (source/"layout.json").write_text("{}",encoding="utf-8")
+    cfg=protocol.assemble(base,declared,seed,tmp_path)
+    old=protocol.group_config(cfg,protocol.ARMS[0])
+    for k in ("joint_execution_mode","retained_reference_summary","retained_reference_receipt"):
+        old.pop(k,None)
+    old.update(version="bottleneck_whole_method_v1",process_group_memory_limit_mib=1536)
+    summary=dict(status=protocol.COMPLETE,group=protocol.ARMS[0],full_day=True,frozen_protocol=old,
+                 execution_binding={"code_sha":"old-code"})
+    (source/"summary.json").write_text(json.dumps(summary),encoding="utf-8")
+    (source/"receipt.json").write_text(json.dumps(dict(status="COMPLETE",exit_code=0,parent_hard_timeout=False)),encoding="utf-8")
+    assert protocol.retained_reference(tmp_path,cfg)["execution_binding"]["code_sha"]=="old-code"
+    assert protocol.source_directory(tmp_path,cfg,protocol.ARMS[0])==source
+    assert protocol.output_root(cfg).name==protocol.V2
+    assert protocol.group_config(cfg,protocol.ARMS[1])["joint_execution_mode"]=="INCREMENTAL_V2"
+    config=tmp_path/"config.json"; config.write_text("{}",encoding="utf-8")
+    monkeypatch.setattr(protocol,"load",lambda *args:(cfg,declared,seed))
+    monkeypatch.setattr(protocol,"code_sha",lambda *args:"new-code")
+    prepared=protocol.prepare(tmp_path,Path("config.json"))
+    assert prepared["reference_retained"] and prepared["native_group_count"]==2
+    assert not prepared["simulation_started"] and not prepared["layouts_recomputed"]
+    assert not (tmp_path/protocol.output_root(cfg)/"native").exists()
+    with pytest.raises(ValueError,match="no reference worker"):
+        protocol.worker(tmp_path,Path("config.json"),protocol.ARMS[0],tmp_path)
+    old["max_match_wait_s"]=301
+    (source/"summary.json").write_text(json.dumps(summary),encoding="utf-8")
+    with pytest.raises(ValueError,match="different physical/scientific"):
+        protocol.retained_reference(tmp_path,cfg)

@@ -1,0 +1,21 @@
+{
+  "version": "bottleneck_whole_method_v2",
+  "base_config": "stage4/config/scheme_a_two_scale_city_v5_common.json",
+  "base_config_sha256": "d41b1d448d8c5342f45b40b625857fc7e018610ddf98d027bd8f00c684c9c836",
+  "seed_layout": "stage4/output/capability_chain_planning/layout_300_600_v1/placements.json",
+  "seed_layout_sha256": "4f11b259103014a0ad03cf62951893279d366abc628f977d28e42b8a9bc23826",
+  "reuse_layout": "stage4/output/capability_chain_planning/bottleneck_whole_method_v1/layout/placements.json",
+  "reuse_layout_sha256": "7a35721741c0204dc00c0e8f7f6c09bc96157aa299c0ca510cb58122a449b9a5",
+  "retained_reference_summary": "stage4/output/capability_chain_planning/bottleneck_whole_method_v1/native/INDEPENDENT_REFERENCE/summary.json",
+  "retained_reference_summary_sha256": "fff13559685c8daba273898d462583efe3669d28315022128105a99ad76b8b4f",
+  "retained_reference_receipt": "stage4/output/capability_chain_planning/bottleneck_whole_method_v1/native/receipts/INDEPENDENT_REFERENCE.json",
+  "retained_reference_receipt_sha256": "7d100894e0c20d47a66f8d9e18aa50b7c8ff02822e718a99e08173f95be2e129",
+  "joint_execution_mode": "INCREMENTAL_V2",
+  "groups": ["INDEPENDENT_REFERENCE", "SPATIAL_SHARED_PLAN", "BOTTLENECK_SHARED_PLAN"],
+  "default_action": "prepare",
+  "automatic_retry": false,
+  "parameter_search": false,
+  "model_refit": false,
+  "dense_matrix": false,
+  "gpu_used": false
+}

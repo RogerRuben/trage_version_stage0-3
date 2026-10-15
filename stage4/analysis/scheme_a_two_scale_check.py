@@ -438,7 +438,9 @@ def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
         if len(assignments):
             # Do not export the shared control's legacy generic policy label
             # as a claim of exact city-chain/global lexicographic optimization.
-            assignments["dispatch_policy"] = ("JOINT_"+cfg.get("joint_neighborhood_strategy","BOTTLENECK_CLOSURE")
+            assignments["dispatch_policy"] = ("JOINT_"+
+                ("INCREMENTAL_V2_" if cfg.get("joint_execution_mode")=="INCREMENTAL_V2" else "")+
+                cfg.get("joint_neighborhood_strategy","BOTTLENECK_CLOSURE")
                 if cfg.get("current_decision_mode")=="BOTTLENECK_JOINT"
                 else "TWO_SCALE_CURRENT_ACTION_FLOW_COARSE_FUTURE")
         physics = time_chain_check(assignments)

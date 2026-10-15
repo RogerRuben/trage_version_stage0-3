@@ -1,0 +1,14 @@
+{
+  "description": "Native adapter override only. No simulation launch, v1 resume or new experiment authorization.",
+  "current_decision_mode": "BOTTLENECK_JOINT",
+  "joint_execution_mode": "INCREMENTAL_V2",
+  "joint_neighborhood_strategy": "BOTTLENECK_CLOSURE",
+  "idle_movement_mode": "VALUE_SELECTED",
+  "joint_maximum_coalition": 6,
+  "joint_maximum_partial_states": 128,
+  "joint_maximum_labels": 50000,
+  "solver_time_limit_s": 10,
+  "maximum_model_variables": 20000,
+  "maximum_model_nonzeros": 150000,
+  "maximum_rss_mib": 1536
+}

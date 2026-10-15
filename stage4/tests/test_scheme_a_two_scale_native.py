@@ -250,11 +250,12 @@ def test_unavailable_price_and_optional_route_budget_cutoff_keep_validated_curre
 
 
 @pytest.mark.parametrize("strategy",("BOTTLENECK_CLOSURE","SPATIAL_JOINT"))
-def test_opt_in_joint_mode_keeps_neutral_moves_and_does_not_use_private_values(monkeypatch,strategy):
+@pytest.mark.parametrize("execution",("REBUILD_V1","INCREMENTAL_V2"))
+def test_opt_in_joint_mode_keeps_neutral_moves_and_does_not_use_private_values(monkeypatch,tmp_path,strategy,execution):
     c,cfg=fixture()
     c.repositioning_manager.active.clear()
     cfg.update(current_decision_mode="BOTTLENECK_JOINT",idle_movement_mode="VALUE_SELECTED",
-               joint_neighborhood_strategy=strategy)
+               joint_neighborhood_strategy=strategy,joint_execution_mode=execution)
     value=Value()
     value.library=NS(view=lambda now:{"HISTORY":()},weights={"HISTORY":1})
     value.pace=NS(global_pace=.01,pace_by_slot={})
@@ -283,3 +284,13 @@ def test_opt_in_joint_mode_keeps_neutral_moves_and_does_not_use_private_values(m
     assert row["joint_control"]["generated_continuation_columns"]>0
     assert row["future_connector_queries"]==0
     assert adapter.progress_summary()["operations"]["joint_decisions"]==1
+    if execution=="INCREMENTAL_V2":
+        state=adapter.joint_memory
+        assert state is not None and state.last_now==900.
+        assert row["joint_control"]["execution_mode"]==execution
+        assert "integer_solve_time_s" in row["joint_control"]["phase_timings_s"]
+        adapter.solve(c,[arc],[11],930.)
+        assert adapter.joint_memory is state and state.last_now==930.
+        assert adapter.progress_summary()["joint_execution_mode"]==execution
+        import pandas as pd
+        pd.DataFrame(adapter.rows).to_parquet(tmp_path/"incremental_trace.parquet",index=False)

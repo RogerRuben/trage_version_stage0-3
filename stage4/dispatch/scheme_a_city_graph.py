@@ -212,6 +212,15 @@ class CoarseHistoricalLibrary:
             future_target_orders_used=False, realized_service_duration_used=False,
             source_order_identities_are_private=True)
 
+    def coarse_snapshot(self,now):
+        """Immutable predicted tasks of ONE current snapshot, including clipped past nodes.
+
+        Consumers still filter their fine view by release time. This never
+        exposes unreleased target-day observations or a new random sample.
+        """
+        self.view(now)
+        return self._snapshot
+
 
 class _TaskIndex:
     def __init__(self, tasks: Sequence[ChainTask]):

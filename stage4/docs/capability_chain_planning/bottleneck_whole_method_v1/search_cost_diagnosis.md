@@ -118,3 +118,5 @@
 - [第二组部分求解摘要](D:/pycodes/didi_xian_raw/.worktrees/stage0-v6-valhalla/stage4/output/capability_chain_planning/bottleneck_whole_method_v1/native/SPATIAL_SHARED_PLAN/partial_solver_trace.parquet)
 
 所有统计均从现有产物只读汇总，未重新模拟或进行性能试跑。同前缀计时仅是单日、单种子的观测比较；不作显著性、总体推广或因果效益结论，也不把未排空的订单视为最终失败。
+
+后续代码交付：[增量联合执行V2说明](D:/pycodes/didi_xian_raw/.worktrees/stage0-v6-valhalla/stage4/docs/capability_chain_planning/bottleneck_whole_method_v2/implementation.md)。仅实现并做构造检查，未重跑本报告中的城市比较；本页诊断数据不变。

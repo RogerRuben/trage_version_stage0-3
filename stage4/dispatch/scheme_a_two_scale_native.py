@@ -57,6 +57,15 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
             raise ValueError("joint control requires existing history and prediction-only pace inputs")
         if self.joint_mode and cfg.get("joint_neighborhood_strategy","BOTTLENECK_CLOSURE") not in ("BOTTLENECK_CLOSURE","SPATIAL_JOINT"):
             raise ValueError("unknown joint neighborhood strategy")
+        self.joint_execution_mode=cfg.get("joint_execution_mode","REBUILD_V1")
+        if self.joint_execution_mode not in ("REBUILD_V1","INCREMENTAL_V2"):
+            raise ValueError("unknown joint execution mode")
+        self.joint_memory=None
+        if self.joint_mode and self.joint_execution_mode=="INCREMENTAL_V2":
+            if not 1<=int(cfg.get("joint_maximum_labels",50000))<=50000:
+                raise ValueError("incremental execution cannot increase the label allowance")
+            from .bottleneck_incremental import RollingJointMemory
+            self.joint_memory=RollingJointMemory()
         self.common_movement = cfg.get("idle_movement_mode", "VALUE_SELECTED") in (
             "COMMON_HISTORICAL_DEFICIT", "TYPE_CONDITIONED_HISTORICAL_DEFICIT")
         if cfg.get("idle_movement_mode", "VALUE_SELECTED") not in (
@@ -66,6 +75,7 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
         self.coarse_info = dict(available=False, status="NOT_REFRESHED", refreshed=False)
         self.timing_totals = Counter()
         self.operation_totals = Counter()
+        self.joint_timing_totals=Counter()
 
     def _sync(self, c):
         # Store only booked, decision-time fields. Never read realized/service_end.
@@ -102,10 +112,23 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
             self.operation_totals["joint_planning_labels"]+=int(joint.get("planning_labels",0))
             for name in ("max_joint_variables","max_joint_nonzeros"):
                 self.operation_totals[name]=max(self.operation_totals[name],int(joint.get(name,0)))
+            for name,value in joint.get("phase_timings_s",{}).items():
+                self.joint_timing_totals[name]+=float(value)
+            for name,value in joint.get("search_work",{}).items():
+                self.operation_totals["incremental_"+name]+=int(value)
+            for name,value in joint.get("topology_work",{}).items():
+                self.operation_totals["incremental_topology_"+name]+=int(value)
+            if "current_action_changed" in joint:
+                self.operation_totals["joint_current_action_change_measured_decisions"]+=1
+                self.operation_totals["joint_current_action_changed_decisions"]+=int(joint["current_action_changed"])
+            if "future_only_accepted_coalitions" in joint:
+                self.operation_totals["joint_future_only_accepted_coalitions"]+=int(joint["future_only_accepted_coalitions"])
 
     def progress_summary(self):
         return dict(decisions_recorded=len(self.rows), timings_s=dict(self.timing_totals),
                     operations=dict(self.operation_totals), timing_components_are_nested=True,
+                    joint_timings_s=dict(self.joint_timing_totals),
+                    joint_execution_mode=self.joint_execution_mode if self.joint_mode else None,
                     adapter_wall_time_field="solve_wall_time_s",
                     pre_adapter_candidate_routing_is_outside_this_timer=True,
                     current_decision_mode="BOTTLENECK_JOINT" if self.joint_mode else "INDEPENDENT_VALUE",
@@ -433,7 +456,8 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
         if self.joint_mode:
             from .bottleneck_native import solve_joint_current
             result=solve_joint_current(c,actions,after,result,now,self.cfg,self.value_provider,
-                self.last_assignments,self.remaining_model,self._task,self._moving_wait,waiting_ids,deadline)
+                self.last_assignments,self.remaining_model,self._task,self._moving_wait,waiting_ids,deadline,
+                execution_state=self.joint_memory)
             effective_policy=("SERVICE_PRESERVING_JOINT_BUDGET_FALLBACK"
                 if result["joint_control"].get("resource_fallback") else
                 self.cfg.get("joint_neighborhood_strategy","BOTTLENECK_CLOSURE"))

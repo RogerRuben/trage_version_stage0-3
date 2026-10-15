@@ -28,12 +28,33 @@ DOC=Path("stage4/docs/capability_chain_planning/bottleneck_whole_method_v1")
 ARMS=("INDEPENDENT_REFERENCE","SPATIAL_SHARED_PLAN","BOTTLENECK_SHARED_PLAN")
 MODES=("reference","spatial_joint","bottleneck_joint")
 COMPLETE="WHOLE_METHOD_NATIVE_GROUP_COMPLETE"
+V2="bottleneck_whole_method_v2"
+
+
+def output_root(cfg):
+    return OUT.with_name(cfg["version"])
+
+
+def document_root(cfg):
+    return DOC.with_name(cfg["version"])
+
+
+def source_directory(root,cfg,group):
+    if group==ARMS[0] and cfg.get("retained_reference_summary"):
+        return (root/cfg["retained_reference_summary"]).parent
+    return root/output_root(cfg)/"native"/group
+
+
+def receipt_path(root,cfg,group):
+    if group==ARMS[0] and cfg.get("retained_reference_receipt"):
+        return root/cfg["retained_reference_receipt"]
+    return root/output_root(cfg)/"native/receipts"/f"{group}.json"
 
 
 @contextmanager
-def execution_lock(root):
+def execution_lock(root,relative=OUT):
     """One layout/coordinator at a time; a crash leaves an explicit stop marker."""
-    path=root/OUT/"execution.lock"
+    path=root/relative/"execution.lock"
     path.parent.mkdir(parents=True,exist_ok=True)
     try:
         fd=os.open(path,os.O_CREAT|os.O_EXCL|os.O_WRONLY)
@@ -71,6 +92,11 @@ def assemble(base,declared,seed,root):
         raise ValueError("whole-method comparison changed the inherited scientific/resource conditions")
     if cfg["expected_av_slots"]!=851 or cfg["expected_layout_bins"]!=47:
         raise ValueError("the original q10 seed layout is not the complete 851-slot/47-bin product")
+    if declared["version"]==V2:
+        cfg.update(source_layout=declared["reuse_layout"],joint_execution_mode="INCREMENTAL_V2",
+            retained_reference_summary=declared["retained_reference_summary"],
+            retained_reference_receipt=declared["retained_reference_receipt"],
+            method_scope="INCREMENTAL_SHARED_PLAN_WITH_RETAINED_INDEPENDENT_REFERENCE")
     cfg["source_layout_sha256"]=_sha(root/cfg["source_layout"]) if (root/cfg["source_layout"]).is_file() else None
     return cfg
 
@@ -78,7 +104,7 @@ def assemble(base,declared,seed,root):
 def load(root,config=CONFIG):
     from .scheme_a_two_scale_experiment import load_protocol
     declared=json.loads((root/config).read_text(encoding="utf-8"))
-    if (declared["version"]!="bottleneck_whole_method_v1"
+    if (declared["version"] not in ("bottleneck_whole_method_v1",V2)
             or declared["base_config"]!=BASE.as_posix() or declared["groups"]!=list(ARMS)
             or declared["default_action"]!="prepare"
             or any(declared[k] is not False for k in ("automatic_retry","parameter_search","model_refit","dense_matrix","gpu_used"))
@@ -88,34 +114,70 @@ def load(root,config=CONFIG):
     seed=json.loads((root/declared["seed_layout"]).read_text(encoding="utf-8"))
     if seed["status"]!="LAYOUTS_PREPARED_300_600":
         raise ValueError("only the completed original layout may initialize all arms")
-    return assemble(load_protocol(root,BASE),declared,seed,root),declared,seed
+    if declared["version"]==V2:
+        if declared.get("joint_execution_mode")!="INCREMENTAL_V2":
+            raise ValueError("V2 must explicitly enable incremental execution")
+        for key in ("reuse_layout","retained_reference_summary","retained_reference_receipt"):
+            if _sha(root/declared[key])!=declared[key+"_sha256"]:
+                raise ValueError("a retained V1 product differs; no implicit reconstruction")
+    cfg=assemble(load_protocol(root,BASE),declared,seed,root)
+    if cfg["version"]==V2:
+        retained_reference(root,cfg)
+    return cfg,declared,seed
 
 
 def group_config(cfg,group):
     if group not in ARMS:
         raise ValueError("unknown whole-method arm")
     i=ARMS.index(group)
-    return dict(cfg,group=group,layout_mode=MODES[i],policy="SERVICE_PRESERVING",
+    chosen=dict(cfg,group=group,layout_mode=MODES[i],policy="SERVICE_PRESERVING",
         current_decision_mode="INDEPENDENT_VALUE" if i==0 else "BOTTLENECK_JOINT",
         joint_neighborhood_strategy=None if i==0 else "SPATIAL_JOINT" if i==1 else "BOTTLENECK_CLOSURE",
-        disk_route_cache=(OUT/"native"/group/"routing/cache.sqlite3").as_posix())
+        disk_route_cache=(output_root(cfg)/"native"/group/"routing/cache.sqlite3").as_posix())
+    if cfg["version"]==V2:
+        chosen["joint_execution_mode"]="REBUILD_V1" if i==0 else "INCREMENTAL_V2"
+    return chosen
+
+
+def retained_reference(root,cfg):
+    """Validate old-result provenance; never copy it into a new-run directory."""
+    summary=json.loads((root/cfg["retained_reference_summary"]).read_text(encoding="utf-8"))
+    receipt=json.loads((root/cfg["retained_reference_receipt"]).read_text(encoding="utf-8"))
+    if (summary.get("status")!=COMPLETE or not summary.get("full_day")
+            or summary.get("group")!=ARMS[0] or receipt.get("status")!="COMPLETE"
+            or receipt.get("exit_code")!=0 or receipt.get("parent_hard_timeout")):
+        raise ValueError("retained reference must be a complete clean original run")
+    expected=dict(group_config(cfg,ARMS[0]),process_group_memory_limit_mib=cfg["maximum_rss_mib"])
+    old=summary["frozen_protocol"]
+    administrative={"version","method_scope","experiment_scope","base_config","disk_route_cache"}
+    if any(expected.get(k)!=v for k,v in old.items() if k not in administrative):
+        raise ValueError("retained reference has different physical/scientific settings")
+    if old.get("current_decision_mode","INDEPENDENT_VALUE")!="INDEPENDENT_VALUE":
+        raise ValueError("retained result is not the independent reference")
+    return summary
 
 
 def prepare(root,config=CONFIG):
     cfg,declared,seed=load(root,config)
     configs={g:group_config(cfg,g) for g in ARMS}
     for group,chosen in configs.items():
-        _atomic_json(root/OUT/"setup"/f"{group}.json",chosen)
+        _atomic_json(root/output_root(cfg)/"setup"/f"{group}.json",chosen)
     result=dict(status="PREPARED_NOT_EXECUTED",code_sha=code_sha(root),
         config_sha256=_sha(root/config),seed_layout_sha256=declared["seed_layout_sha256"],
-        groups=list(ARMS),native_group_count=3,layout_optimization_started=False,
+        groups=list(ARMS),native_group_count=2 if cfg.get("retained_reference_summary") else 3,layout_optimization_started=False,
         simulation_started=False,routing_started=False,inference_started=False,
         methods={g:{"layout_mode":c["layout_mode"],"current_decision_mode":c["current_decision_mode"],
-                    "joint_neighborhood_strategy":c["joint_neighborhood_strategy"]} for g,c in configs.items()},
+                    "joint_neighborhood_strategy":c["joint_neighborhood_strategy"],
+                    "joint_execution_mode":c.get("joint_execution_mode","REBUILD_V1")} for g,c in configs.items()},
         new_layouts_produced=False,expected_av_slots=cfg["expected_av_slots"],
         expected_layout_bins=cfg["expected_layout_bins"],
-        reference_results_are_new_runs_not_mislabeled_old_common_control=True)
-    _atomic_json(root/OUT/"setup/prepared.json",result)
+        reference_results_are_new_runs_not_mislabeled_old_common_control=not bool(cfg.get("retained_reference_summary")),
+        reference_retained=bool(cfg.get("retained_reference_summary")),
+        retained_reference_source=cfg.get("retained_reference_summary"),
+        reference_execution="RETAINED_COMPLETED_V1" if cfg.get("retained_reference_summary") else "NEW_RUN",
+        new_native_jobs=list(ARMS[1:] if cfg.get("retained_reference_summary") else ARMS),
+        layouts_recomputed=False)
+    _atomic_json(root/output_root(cfg)/"setup/prepared.json",result)
     return result
 
 
@@ -132,7 +194,9 @@ def _layouts(root,config=CONFIG,*,resume=False):
     from stage4.dispatch.scheme_a_city_adapter import sites_for
     from stage4.dispatch.bottleneck_layout import solve_birth_batch
     cfg,declared,seed=load(root,config)
-    directory=root/OUT/"layout"; checkpoint=directory/"checkpoint.json"
+    if cfg["version"]==V2:
+        raise ValueError("V2 retains the complete V1 layouts; it does not run layout production")
+    directory=root/output_root(cfg)/"layout"; checkpoint=directory/"checkpoint.json"
     if (directory/"placements.json").exists():
         raise ValueError("completed new layout retained; no overwrite/recomputation")
     if checkpoint.exists() and not resume:
@@ -209,7 +273,8 @@ def _layouts(root,config=CONFIG,*,resume=False):
 
 
 def layouts(root,config=CONFIG,*,resume=False):
-    with execution_lock(root):
+    cfg,_,_=load(root,config)
+    with execution_lock(root,output_root(cfg)):
         return _layouts(root,config,resume=resume)
 
 
@@ -220,16 +285,25 @@ def binding_for(root,config,cfg):
     _,protected=load_frozen_layout(root,cfg)
     protected.update({config.as_posix():_sha(root/config),cfg["base_config"]:_sha(root/cfg["base_config"]),
                       cfg["source_layout"]:_sha(root/cfg["source_layout"])})
-    return dict(code_sha=code_sha(root),inputs_sha256=protected,group=cfg["group"],
+    if cfg["group"]==ARMS[0] and cfg.get("retained_reference_summary"):
+        old=retained_reference(root,cfg)["execution_binding"]
+        if any(_sha(root/p)!=h for p,h in old["inputs_sha256"].items()):
+            raise ValueError("a retained reference input changed")
+        return old
+    bound=dict(code_sha=code_sha(root),inputs_sha256=protected,group=cfg["group"],
         layout_mode=cfg["layout_mode"],policy=cfg["policy"],version=cfg["version"],
         layout_sha256=cfg["source_layout_sha256"],
         current_decision_mode=cfg["current_decision_mode"],
         joint_neighborhood_strategy=cfg["joint_neighborhood_strategy"])
+    if cfg["version"]==V2:
+        bound["joint_execution_mode"]=cfg["joint_execution_mode"]
+    return bound
 
 
-def completed(root,group,binding):
+def completed(root,group,binding,*,cfg=None):
     from .scheme_a_two_scale_experiment import PRODUCTS
-    path=root/OUT/"native"/group
+    cfg={"version":"bottleneck_whole_method_v1"} if cfg is None else cfg
+    path=source_directory(root,cfg,group)
     summary=json.loads((path/"summary.json").read_text(encoding="utf-8"))
     if (summary.get("status")!=COMPLETE or summary.get("execution_binding")!=binding
             or not summary.get("full_day")
@@ -241,9 +315,11 @@ def completed(root,group,binding):
 def worker(root,config,group,fleetpy):
     from .scheme_a_two_scale_check import _run_native
     cfg,_,_=load(root,config); cfg=group_config(cfg,group)
+    if group==ARMS[0] and cfg.get("retained_reference_summary"):
+        raise ValueError("V2 reuses the completed reference; no reference worker is launched")
     bound=binding_for(root,config,cfg)
-    return _run_native(root,fleetpy,config,cfg,directory=root/OUT/"native"/group,
-        doc_summary_path=root/DOC/f"{group}_summary.json",completion_status=COMPLETE,
+    return _run_native(root,fleetpy,config,cfg,directory=root/output_root(cfg)/"native"/group,
+        doc_summary_path=root/document_root(cfg)/f"{group}_summary.json",completion_status=COMPLETE,
         group=group,execution_binding=bound)
 
 
@@ -257,20 +333,23 @@ def _run(root,config=CONFIG,*,resume=False,fleetpy=FLEETPY):
     from .scheme_a_two_scale_experiment import _BoundedLog
     cfg,_,_=load(root,config)
     common_binding={g:binding_for(root,config,group_config(cfg,g)) for g in ARMS}
-    directory=root/OUT/"native"
+    directory=root/output_root(cfg)/"native"
     stamp=directory/"comparison_binding.json"
     if stamp.exists() and (not resume or json.loads(stamp.read_text(encoding="utf-8"))!=common_binding):
         raise ValueError("existing comparison retained; only explicit identical --resume is allowed")
     # Validate all existing states BEFORE launching any new child.
     done=[]
     for group in ARMS:
+        if group==ARMS[0] and cfg.get("retained_reference_summary"):
+            completed(root,group,common_binding[group],cfg=cfg); done.append(group)
+            continue
         path=directory/group
         receipt=directory/"receipts"/f"{group}.json"
         log_path=directory/"logs"/f"{group}.log"
         if (path.exists() and any(path.iterdir())) or receipt.exists() or log_path.exists():
             if not resume:
                 raise ValueError("existing native group retained")
-            completed(root,group,common_binding[group])
+            completed(root,group,common_binding[group],cfg=cfg)
             recorded=json.loads(receipt.read_text(encoding="utf-8"))
             if recorded.get("status")!="COMPLETE" or recorded["exit_code"]!=0 or recorded["parent_hard_timeout"]:
                 raise ValueError("unfinished/failed child retained; no automatic retry")
@@ -313,13 +392,14 @@ def _run(root,config=CONFIG,*,resume=False,fleetpy=FLEETPY):
                  log_statistics=log.stats,log_capture_error=log.error,automatic_retry=False))
         if not clean:
             raise RuntimeError("native child/log failed; remaining groups not started, no retry")
-        completed(root,group,common_binding[group]); done.append(group)
+        completed(root,group,common_binding[group],cfg=cfg); done.append(group)
     _atomic_json(directory/"status.json",dict(status="WHOLE_METHOD_COMPARISON_COMPLETE",groups=done))
     return dict(status="WHOLE_METHOD_COMPARISON_COMPLETE",groups=done)
 
 
 def run(root,config=CONFIG,*,resume=False,fleetpy=FLEETPY):
-    with execution_lock(root):
+    cfg,_,_=load(root,config)
+    with execution_lock(root,output_root(cfg)):
         return _run(root,config,resume=resume,fleetpy=fleetpy)
 
 
@@ -332,13 +412,14 @@ def analyze(root,config=CONFIG):
     from stage4.dispatch.controlled_fleet import build_controlled_fleet
     started=perf_counter()
     cfg,_,_=load(root,config)
-    directory=root/OUT/"native"
+    directory=root/output_root(cfg)/"native"
     state=json.loads((directory/"status.json").read_text(encoding="utf-8"))
     binding=json.loads((directory/"comparison_binding.json").read_text(encoding="utf-8"))
     expected={g:dict(binding_for(root,config,group_config(cfg,g)),code_sha=binding[g]["code_sha"]) for g in ARMS}
     if state!={"status":"WHOLE_METHOD_COMPARISON_COMPLETE","groups":list(ARMS)} or binding!=expected:
         raise ValueError("requires the complete unchanged three-arm comparison")
-    if len({b["code_sha"] for b in binding.values()})!=1:
+    fresh=ARMS[1:] if cfg.get("retained_reference_summary") else ARMS
+    if len({binding[g]["code_sha"] for g in fresh})!=1:
         raise ValueError("the three native arms used different code")
     layout=json.loads((root/cfg["source_layout"]).read_text(encoding="utf-8"))
     fleet=build_controlled_fleet(root,benchmark_start=START,
@@ -350,18 +431,20 @@ def analyze(root,config=CONFIG):
     del fleet
     public,private,receipts={},{},{}
     for group in ARMS:
-        summary=completed(root,group,binding[group])
-        receipt=json.loads((directory/"receipts"/f"{group}.json").read_text(encoding="utf-8"))
+        summary=completed(root,group,binding[group],cfg=cfg)
+        receipt=json.loads(receipt_path(root,cfg,group).read_text(encoding="utf-8"))
         if receipt["status"]!="COMPLETE" or receipt["exit_code"]!=0 or receipt["parent_hard_timeout"]:
             raise ValueError("an unfinished/failed arm is not a scientific result")
         if summary["all_day_supply"]["accounting"]["type_label_sha256"]!=label:
             raise ValueError("comparison supply labels differ")
-        row,private[group]=_collect(root,group,summary,plans,directory=directory/group)
+        row,private[group]=_collect(root,group,summary,plans,directory=source_directory(root,cfg,group))
         row["method"]=group_config(cfg,group)["current_decision_mode"]
         row["joint_control_operations"]=summary["adapter_performance"]["operations"]
         mode=group_config(cfg,group)["layout_mode"]
-        row["incremental_layout_solver_time_s"]=sum(
+        row["retained_layout_solver_time_s"]=sum(
             r["methods"].get(mode,{}).get("runtime_s",0.) for r in layout["records"])
+        row["incremental_layout_solver_time_s"]=0. if cfg["version"]==V2 else row["retained_layout_solver_time_s"]
+        row["result_retained_not_rerun"]=bool(group==ARMS[0] and cfg.get("retained_reference_summary"))
         if group!=ARMS[0] and "secondary_distance" in row:
             row["secondary_distance"]["scope"]="JOINT_PLAN_NOT_CURRENT_MAXIMUM_SERVICE_PRIMARY_FACE"
         public[group]=row
@@ -377,10 +460,13 @@ def analyze(root,config=CONFIG):
         analysis_invoked_simulation=False,analysis_invoked_routing=False,analysis_invoked_inference=False,
         one_day_one_seed=True,statistical_significance_claimed=False,full_city_optimality_claimed=False,
         deployment_vs_online_effect_separately_identified=False,
+        retained_reference=bool(cfg.get("retained_reference_summary")),
+        new_native_run_count=2 if cfg.get("retained_reference_summary") else 3,
+        layouts_reused_from_v1=cfg["version"]==V2,
         runtime_differences_scope="NATIVE_ONLY_OFFLINE_INCREMENTAL_LAYOUT_TIME_REPORTED_SEPARATELY",
         reference_offline_layout_is_retained_not_newly_recomputed=True,analysis_code_sha=code_sha(root),
         raw_identifiers_or_coordinates_exported=False,runtime_s=perf_counter()-started,peak_rss_mib=_peak())
-    _atomic_json(root/DOC/"comparison.json",result)
+    _atomic_json(root/document_root(cfg)/"comparison.json",result)
     return result
 
 
