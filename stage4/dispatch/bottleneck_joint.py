@@ -327,6 +327,10 @@ def solve_block(problem, plan, vehicles, deadline, check=lambda:None, *,
     best,proved,stages = (plan if plan_index is None else None),True,0
     best_score=base["score"]
     receipt=numerical._solver_options_receipt()
+    witness=np.zeros(n)
+    for aid,col in xcol.items(): witness[col]=int(base["chosen"][problem.actions[aid].vehicle_id]==aid)
+    for col,c in enumerate(paths,len(action_ids)):
+        witness[col]=int(base["chains"].get((c.scenario_id,c.vehicle_id))==c)
     session=None; matrix=None; matrix_rows=matrix_entries=0
     if persistent:
         from .persistent_city_milp import BundledIntegerSession
@@ -384,6 +388,12 @@ def solve_block(problem, plan, vehicles, deadline, check=lambda:None, *,
         elapsed=perf_counter()-stamp; build_wall+=elapsed
         if metrics is not None:
             metrics["model_build_time_s"]+=elapsed
+        lhs_witness=matrix@witness
+        if np.any(lhs_witness<lower) or np.any(lhs_witness>upper):
+            bad=np.flatnonzero((lhs_witness<lower)|(lhs_witness>upper))
+            raise RuntimeError(f"known joint witness violates block rows at stage {objective_index}: {bad[:10].tolist()}")
+        if session is not None and session.binary is None:
+            session.accept_certified_binary(witness)
         stamp=perf_counter()
         if metrics is not None:
             metrics["solver_calls"]+=1
@@ -413,7 +423,14 @@ def solve_block(problem, plan, vehicles, deadline, check=lambda:None, *,
         if result.x is None:
             if result.status == 1:
                 proved = False; break
-            raise RuntimeError(f"feasible joint block rejected by solver: {result.message}")
+            error=RuntimeError(f"feasible joint block rejected by solver: {result.message}")
+            if persistent:
+                csr=matrix.tocsr()
+                error.joint_diagnostic=dict(stage=objective_index,objective=primitive.tolist(),
+                    columns=n,lower=list(lower),upper=list(upper),indptr=csr.indptr.tolist(),
+                    indices=csr.indices.tolist(),data=csr.data.tolist(),witness=witness.tolist(),
+                    verified_witness_feasible=True,session=session.diagnostics(),options=receipt["options"])
+            raise error
         raw = np.asarray(result.x)
         if (not np.all(np.isfinite(raw))
                 or np.max(np.abs(raw-np.rint(raw)),initial=0) > numerical.NUMERICAL_TOLERANCE):
@@ -435,6 +452,7 @@ def solve_block(problem, plan, vehicles, deadline, check=lambda:None, *,
             best,best_score = candidate,candidate_score
         if session is not None:
             session.accept_certified_binary(binary)
+        witness=binary
         if (result.status != 0 or getattr(result,"mip_gap",0.) not in (0.,None)
                 or lattice_error>=.25):
             proved = False; break

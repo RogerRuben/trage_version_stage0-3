@@ -524,6 +524,8 @@ def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
             maximum_step_wall_s=summary["maximum_complete_step_wall_s"], completed_orders=summary["completed_orders"])), flush=True)
         return summary
     except Exception as error:
+        if getattr(error,"joint_diagnostic",None) is not None:
+            _atomic_json(directory / "failed_joint_block.json",error.joint_diagnostic)
         summary.update(status="STOPPED", error=repr(error), runtime_s=perf_counter() - started,
             setup_phases_s=phases, last_tick_s=tick, partial_result_not_a_complete_service_result=True)
         if control is not None:
