@@ -28,6 +28,7 @@ class RollingJointMemory:
         self.topology=ForecastTopology()
         self.paths={}; self.domains={}; self.task_keys=frozenset(); self.owners={}
         self.deferred=(); self.touched=set(); self.last_now=None
+        self.last_forecast_signature=None
 
     def initial(self,problem,selected,check,seed_deadline):
         oracle=problem.oracle
@@ -74,6 +75,16 @@ class RollingJointMemory:
     def frontier(self,problem,plan,dirty,check):
         oracle=problem.oracle; base=problem.evaluate(plan); current=domains(problem)
         live=frozenset((sid,rid) for sid,tasks in oracle.tasks.items() for rid in tasks)
+        actual={}
+        for sid in sorted(oracle.tasks):
+            for rid,t in oracle.tasks[sid].items():
+                if t.source_kind=="ACTUAL_PENDING": actual.setdefault(rid,(sid,rid))
+        actual_seeds=tuple(sorted(actual.values(),key=lambda k:(oracle.tasks[k[0]][k[1]].deadline_s,k)))
+        if (self.efficient and self.last_now is not None
+                and self.topology.signature is self.last_forecast_signature):
+            # Fine epochs are rooted in REAL requests, not a fresh sweep of
+            # unchanged forecast demand. Future displacement expansion remains.
+            return actual_seeds
         candidates=set(live-self.task_keys)
         if not self.efficient: candidates|=set(self.deferred)&set(live)
         candidates.update(k for k in self.owners if k in live and k not in base["owners"])
@@ -91,10 +102,12 @@ class RollingJointMemory:
                 oracle.tasks[k[0]][k[1]].deadline_s,k)))
         relevant=list(oracle.seeds(base["owners"],check,candidates=candidates))
         valid=set(relevant)
-        pending=[k for k in relevant if oracle.tasks[k[0]][k[1]].source_kind=="ACTUAL_PENDING"]
+        pending=list(actual_seeds) if self.efficient else [k for k in relevant
+            if oracle.tasks[k[0]][k[1]].source_kind=="ACTUAL_PENDING"]
         tail=[] if self.efficient else [k for k in self.deferred if k in valid and k not in pending]
         seen=set(pending)|set(tail)
-        tail.extend(k for k in relevant if k not in seen)
+        tail.extend(k for k in relevant if k not in seen
+            and (not self.efficient or k[1] not in actual))
         return tuple((*pending,*tail))
 
     def save(self,problem,initial,plan,deferred,now):
@@ -107,6 +120,7 @@ class RollingJointMemory:
         self.owners={k:v for k,v in checked["owners"].items() if k in self.task_keys}
         self.deferred=tuple(dict.fromkeys(k for k in deferred if k in self.task_keys))
         self.last_now=float(now)
+        self.last_forecast_signature=self.topology.signature
 
 
 class BlockWorkspace:

@@ -120,6 +120,42 @@ def test_efficient_frontier_does_not_reactivate_own_future_rearrangement_or_back
     assert memory.frontier(p,initial,set(),lambda:None)==()
 
 
+def test_real_current_request_can_seed_a_critical_swap_without_future_pickup_support():
+    from stage4.dispatch.bottleneck_joint import seed_plan
+    point=(108.9,34.2)
+    actions=[CurrentAction("HW",1,"WAIT",None),CurrentAction("HS",1,"SERVE",11,True,True),
+        CurrentAction("CW",2,"WAIT",None),CurrentAction("CS",2,"SERVE",11,True,True)]
+    roots={a.action_id:RouteState(point,900. if a.kind=="SERVE" else 30.,1800.,
+        "HV" if a.vehicle_id==1 else "C") for a in actions}
+    pending=ChainTask(11,0.,30.,900.,point,point,{"C","HV"},source_date="20161031",source_kind="ACTUAL_PENDING")
+    tasks=tuple(ChainTask(-j,float(t),float(t+300),30.,point,point,{"HV"},source_date="20161010")
+        for j,t in ((1,300),(2,600)))
+    q=PredictionSceneOracle(actions,roots,{"S":tasks},(pending,),NS(global_pace=.01,pace_by_slot={}),0.,
+        topology=ForecastTopology(),forecast_snapshot={"S":tasks},efficient=True)
+    p=JointProblem(actions,q,{"S":1},(11,)); initial,_=seed_plan(p,("HS","CW"))
+    assert q.supports("S",11)==()
+    best,_=efficient_search(p,initial,(("S",11),),strategy="BOTTLENECK_CLOSURE",deadline=perf_counter()+5,check=lambda:None)
+    checked=p.evaluate(best)
+    assert checked["critical"]==1 and checked["score"][0]==3 and set(best.action_ids)=={"HW","CS"}
+
+
+def test_fine_epoch_uses_one_real_request_seed_even_when_already_owned_by_C():
+    point=(108.9,34.2); memory=RollingJointMemory(efficient=True)
+    actions=[CurrentAction("S",1,"SERVE",11),CurrentAction("W",1,"WAIT",None)]
+    pending=ChainTask(11,0.,300.,60.,point,point,{"HV","C"},source_date="20161031",source_kind="ACTUAL_PENDING")
+    future=ChainTask(-1,600.,900.,30.,point,point,{"HV"},source_date="20161010")
+    snapshot={s:(future,) for s in ("A","B")}; pace=NS(global_pace=.01,pace_by_slot={})
+    def problem(now):
+        roots={"S":RouteState(point,120.,1800.,"C"),"W":RouteState(point,now+30,1800.,"C")}
+        q=PredictionSceneOracle(actions,roots,snapshot,(pending,),pace,now,topology=memory.topology,
+            forecast_snapshot=snapshot,efficient=True)
+        return JointProblem(actions,q,{"A":Fraction(1,2),"B":Fraction(1,2)},(11,))
+    p=problem(0.); initial,_,_=memory.initial(p,("S",),lambda:None,perf_counter()+5)
+    memory.save(p,initial,initial,(("A",-1),),0.)
+    p=problem(30.); repaired,_,dirty=memory.initial(p,("S",),lambda:None,perf_counter()+5)
+    assert memory.frontier(p,repaired,dirty,lambda:None)==(("A",11),)
+
+
 def test_performance_prefix_preserves_full_day_prediction_inputs_and_isolates_outputs(monkeypatch,tmp_path):
     from stage4.analysis import bottleneck_v3_preflight as prefix
     from stage4.analysis import bottleneck_whole_method as protocol

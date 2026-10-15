@@ -68,6 +68,9 @@ class EfficientWorkspace:
     def evaluate(self,vehicles,targets,deadline):
         self.check(); started=perf_counter(); p=self.p; i=self.index
         vehicles=frozenset(vehicles); footprint=self.footprint(vehicles)
+        targets={s:set(ids) for s,ids in targets.items()}
+        actual={r for ids in targets.values() for r in ids if r in p.current_ids}
+        for s in p.weights: targets.setdefault(s,set()).update(actual)
         wanted=frozenset((s,r) for s,ids in targets.items() for r in ids)
         signature=self.signature(vehicles,footprint)
         previous=self.visits.get(vehicles)
@@ -162,8 +165,19 @@ def efficient_search(p,initial,seeds,*,strategy,deadline,check,
     index=PlanIndex(p,initial); w=EfficientWorkspace(p,index,check)
     mutable={v for v,ids in p.by_vehicle.items() if len(ids)>1}
     trace=[]; partial=0; accepted=0; future_only=0; stopped=None; unprocessed=()
+    current_support=defaultdict(list)
+    for a in p.actions.values():
+        if a.kind=="SERVE": current_support[a.request_id].append(a.action_id)
     def target_map(): return defaultdict(set)
     def supported(sid,rid,state=None):
+        # A last-chance current request need not fit any FUTURE continuation.
+        # Its already validated current SERVE roots must still seed a swap.
+        for aid in sorted(current_support.get(rid,())):
+            v=p.actions[aid].vehicle_id
+            if state is not None and v in state.vehicles: continue
+            c=p.register(p.empty(sid,p.actions[aid]))
+            yield Coalition(frozenset((v,)),(c,)) if state is None else Coalition(
+                state.vehicles|{v},(*state.hints,c))
         for aid in p.oracle.supports(sid,rid,check):
             check()
             if w.columns_closed: return
