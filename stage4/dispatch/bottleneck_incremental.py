@@ -4,6 +4,7 @@ Retained identities are repaired against NEW decision-time states. No previous
 travel time, physical current action or optimality certificate crosses epochs.
 """
 from collections import Counter,OrderedDict,defaultdict,deque
+from copy import copy
 from contextlib import contextmanager
 from math import ceil
 from time import perf_counter
@@ -23,12 +24,26 @@ def domains(problem):
 
 class RollingJointMemory:
     """One selected plan and one forecast snapshot, not all previous column pools."""
-    def __init__(self,efficient=False):
+    def __init__(self,efficient=False,exact_warm_reuse=False):
         self.efficient=efficient
+        self.exact_warm_reuse=exact_warm_reuse
         self.topology=ForecastTopology()
         self.paths={}; self.domains={}; self.task_keys=frozenset(); self.owners={}
         self.deferred=(); self.touched=set(); self.last_now=None
         self.last_forecast_signature=None
+        self.retained_forecast={}
+
+    def fork(self):
+        # Selected paths/domains are replaced, never mutated, by save(). Only
+        # bounded immutable-history topology caches are shared across probes.
+        return copy(self)
+
+    def adopt(self,other):
+        self.__dict__.update(other.__dict__)
+
+    @staticmethod
+    def _forecast_root(state):
+        return (state.position,ceil(state.ready_s/300),state.admission_end_s,state.profile_id)
 
     def initial(self,problem,selected,check,seed_deadline):
         oracle=problem.oracle
@@ -44,7 +59,21 @@ class RollingJointMemory:
             for v,aid in sorted(chosen.items()):
                 check()
                 old=self.paths.get((sid,v),())
-                c=oracle.repair(sid,aid,old,frozenset(occupied),check) if old else None
+                cached=self.retained_forecast.get((sid,v))
+                reusable=(self.exact_warm_reuse and cached is not None
+                    and self.last_forecast_signature is self.topology.signature
+                    and cached[0]==self._forecast_root(oracle.roots[aid])
+                    and all(rid in oracle.tasks[sid] and rid not in occupied for rid in old)
+                    and problem.actions[aid].request_id not in old)
+                if reusable:
+                    # FORECAST-only paths have fixed release-grid departures.
+                    # Equal root-ready bins preserve exact proxy leg timing;
+                    # actual-pending and physical road paths never use this.
+                    c=oracle._remember_path(sid,aid,cached[1])
+                    counts["warm_exact_reused_continuations"]+=1
+                else:
+                    c=oracle.repair(sid,aid,old,frozenset(occupied),check) if old else None
+                    if old: counts["warm_retime_calls"]+=1
                 if c is not None:
                     c=problem.register(c); chains[sid,v]=c; occupied.update(c.request_ids)
                     counts["warm_restored_continuations"]+=1
@@ -81,7 +110,8 @@ class RollingJointMemory:
                 if t.source_kind=="ACTUAL_PENDING": actual.setdefault(rid,(sid,rid))
         actual_seeds=tuple(sorted(actual.values(),key=lambda k:(oracle.tasks[k[0]][k[1]].deadline_s,k)))
         if (self.efficient and self.last_now is not None
-                and self.topology.signature is self.last_forecast_signature):
+                and self.topology.signature is self.last_forecast_signature
+                and (oracle.now>self.last_now or current==self.domains)):
             # Fine epochs are rooted in REAL requests, not a fresh sweep of
             # unchanged forecast demand. Future displacement expansion remains.
             return actual_seeds
@@ -121,6 +151,14 @@ class RollingJointMemory:
         self.deferred=tuple(dict.fromkeys(k for k in deferred if k in self.task_keys))
         self.last_now=float(now)
         self.last_forecast_signature=self.topology.signature
+        self.retained_forecast={}
+        if self.exact_warm_reuse:
+            for c in plan.chains:
+                legs=c.payload.get("legs") if isinstance(c.payload,dict) else None
+                if legs and all(problem.oracle.tasks[c.scenario_id][rid].source_kind=="FORECAST"
+                                for rid in c.request_ids):
+                    self.retained_forecast[c.scenario_id,c.vehicle_id]=(
+                        self._forecast_root(problem.oracle.roots[c.action_id]),legs)
 
 
 class BlockWorkspace:
@@ -348,7 +386,7 @@ def execute_incremental(actions,roots,selected,scenes,pending,pace,library,now,c
         initial,warm,dirty=memory.initial(p,selected,check,
             perf_counter()+max(0.,deadline-perf_counter())*.25)
     with timed("frontier_build_time_s"):
-        seeds=memory.frontier(p,initial,dirty,check)
+        seeds=() if cfg.get("joint_no_deep_search",False) else memory.frontier(p,initial,dirty,check)
     with timed("search_total_time_s"):
         search=incremental_search
         search_options={}

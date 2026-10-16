@@ -158,7 +158,7 @@ def coalesce(groups,maximum,counts):
 
 def efficient_search(p,initial,seeds,*,strategy,deadline,check,
                      maximum_coalition=6,maximum_partial_states=128,first_current_improvement=True):
-    if strategy not in ("SPATIAL_JOINT","BOTTLENECK_CLOSURE"):
+    if strategy not in ("SPATIAL_JOINT","BOTTLENECK_CLOSURE","ADAPTIVE_SHARED"):
         raise ValueError("unknown efficient strategy")
     if not 1<=maximum_coalition<=6 or not 1<=maximum_partial_states<=128:
         raise ValueError("V3 cannot enlarge search/resource limits")
@@ -207,7 +207,20 @@ def efficient_search(p,initial,seeds,*,strategy,deadline,check,
         if not mutable: stopped="NO_CURRENT_ACTION_CHOICE"
         for n,(sid,rid) in enumerate(seeds if mutable else ()):
             check(); unprocessed=tuple(seeds[n:])
-            if strategy=="SPATIAL_JOINT":
+            mode=strategy
+            if mode=="ADAPTIVE_SHARED":
+                options=current_support.get(rid,())
+                profiles={p.oracle.roots[a].profile_id for a in options}
+                contested=profiles=={"HV","C"}
+                uncovered=bool(options) and (sid,rid) not in index.owners
+                mode="BOTTLENECK_CLOSURE" if contested or uncovered else "SPATIAL_JOINT"
+                w.counts["adaptive_bottleneck_seeds" if mode=="BOTTLENECK_CLOSURE"
+                         else "adaptive_spatial_seeds"]+=1
+                if mode=="BOTTLENECK_CLOSURE" and groups:
+                    improved=flush(groups); groups=[]
+                    if improved:
+                        stopped="FIRST_CURRENT_ACTION_IMPROVEMENT"; break
+            if mode=="SPATIAL_JOINT":
                 near=p.oracle.nearby_resources(sid,rid,maximum_coalition,check)
                 group=set(near); owner=index.owners.get((sid,rid))
                 if owner is not None and owner not in group:

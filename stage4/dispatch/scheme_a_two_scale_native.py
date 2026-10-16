@@ -34,7 +34,7 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
     """Reuse native current-action identities, not the old future search."""
 
     def __init__(self, policy, value_provider, reference, connectors, validator,
-                 remaining_model, cfg):
+                 remaining_model, cfg, *, typed_reference=None):
         if policy not in ("SERVICE_PRESERVING", "CHAIN_DEFER"):
             raise ValueError("unknown two-scale current policy")
         fixed = {"coarse_reference_update_s": 300, "rolling_step_s": 30,
@@ -55,7 +55,7 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
             raise ValueError("joint moves cannot also use an external historical deficit controller")
         if self.joint_mode and any(not hasattr(value_provider,k) for k in ("library","pace")):
             raise ValueError("joint control requires existing history and prediction-only pace inputs")
-        if self.joint_mode and cfg.get("joint_neighborhood_strategy","BOTTLENECK_CLOSURE") not in ("BOTTLENECK_CLOSURE","SPATIAL_JOINT"):
+        if self.joint_mode and cfg.get("joint_neighborhood_strategy","BOTTLENECK_CLOSURE") not in ("BOTTLENECK_CLOSURE","SPATIAL_JOINT","ADAPTIVE_SHARED"):
             raise ValueError("unknown joint neighborhood strategy")
         self.joint_execution_mode=cfg.get("joint_execution_mode","REBUILD_V1")
         if self.joint_execution_mode not in ("REBUILD_V1","INCREMENTAL_V2","INCREMENTAL_V3"):
@@ -65,7 +65,24 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
             if not 1<=int(cfg.get("joint_maximum_labels",50000))<=50000:
                 raise ValueError("incremental execution cannot increase the label allowance")
             from .bottleneck_incremental import RollingJointMemory
-            self.joint_memory=RollingJointMemory(efficient=self.joint_execution_mode=="INCREMENTAL_V3")
+            self.joint_memory=RollingJointMemory(efficient=self.joint_execution_mode=="INCREMENTAL_V3",
+                exact_warm_reuse=cfg.get("joint_exact_warm_reuse",False))
+        self.lazy_moves=cfg.get("joint_move_validation_mode","EAGER_ALL")=="LAZY_SELECTED_V4"
+        if cfg.get("joint_move_validation_mode","EAGER_ALL") not in ("EAGER_ALL","LAZY_SELECTED_V4"):
+            raise ValueError("unknown current move validation mode")
+        if (self.lazy_moves or cfg.get("joint_neighborhood_strategy")=="ADAPTIVE_SHARED"
+                or cfg.get("joint_exact_warm_reuse",False)) and (
+                not self.joint_mode or self.joint_execution_mode!="INCREMENTAL_V3"):
+            raise ValueError("V4 opt-ins require the incremental joint foundation")
+        self.profile_references={}
+        target_mode=cfg.get("joint_move_target_mode","COMMON_HISTORY")
+        if target_mode not in ("COMMON_HISTORY","PROFILE_HISTORY"):
+            raise ValueError("unknown joint movement target source")
+        if target_mode=="PROFILE_HISTORY":
+            if not self.lazy_moves or typed_reference is None:
+                raise ValueError("profile-history moves need the verified historical target product")
+            self.profile_references={str(profile):frame for profile,frame
+                in typed_reference.groupby("profile_id",sort=True)}
         self.common_movement = cfg.get("idle_movement_mode", "VALUE_SELECTED") in (
             "COMMON_HISTORICAL_DEFICIT", "TYPE_CONDITIONED_HISTORICAL_DEFICIT")
         if cfg.get("idle_movement_mode", "VALUE_SELECTED") not in (
@@ -118,6 +135,11 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
                 self.operation_totals["incremental_"+name]+=int(value)
             for name,value in joint.get("topology_work",{}).items():
                 self.operation_totals["incremental_topology_"+name]+=int(value)
+            for name,value in joint.get("lazy_moves",{}).items():
+                if type(value) is int:
+                    self.operation_totals["lazy_move_"+name]+=value
+            for name in ("warm_exact_reused_continuations","warm_retime_calls"):
+                self.operation_totals[name]+=int(joint.get(name,0))
             if "current_action_changed" in joint:
                 self.operation_totals["joint_current_action_change_measured_decisions"]+=1
                 self.operation_totals["joint_current_action_changed_decisions"]+=int(joint["current_action_changed"])
@@ -129,6 +151,8 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
                     operations=dict(self.operation_totals), timing_components_are_nested=True,
                     joint_timings_s=dict(self.joint_timing_totals),
                     joint_execution_mode=self.joint_execution_mode if self.joint_mode else None,
+                    joint_move_validation_mode=self.cfg.get("joint_move_validation_mode","EAGER_ALL"),
+                    joint_move_target_mode=self.cfg.get("joint_move_target_mode","COMMON_HISTORY"),
                     adapter_wall_time_field="solve_wall_time_s",
                     pre_adapter_candidate_routing_is_outside_this_timer=True,
                     current_decision_mode="BOTTLENECK_JOINT" if self.joint_mode else "INDEPENDENT_VALUE",
@@ -314,10 +338,19 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
         proposals = []
         stamp = perf_counter()
         if move_epoch and any(vid not in manager.active for vid in states):
-            sites = sites_for(self.reference, now, self.cfg)
+            sites_by_profile={}
             for vid, state in states.items():
                 if vid in manager.active:
                     continue  # WAIT continues the live leg; no MOVE cancels it.
+                if state.profile_id not in sites_by_profile:
+                    reference=self.profile_references.get(state.profile_id,self.reference)
+                    if state.profile_id=="C" and self.cfg.get("joint_move_target_mode")=="PROFILE_HISTORY":
+                        reference=self.profile_references.get("C")
+                        if reference is None or not reference.time_bin_index.eq(int(now//900)%96).any():
+                            sites_by_profile["C"]=[]
+                            continue  # No observed C target is not a capability prohibition.
+                    sites_by_profile[state.profile_id]=sites_for(reference,now,self.cfg)
+                sites=sites_by_profile[state.profile_id]
                 near = sorted((float(np.linalg.norm(_xy(state.position) - _xy(site["position"]))),
                                str(site["site_id"]), site) for site in sites)
                 for _, _, site in [item for item in near if 1. < item[0] <= 2000.][:3]:
@@ -366,6 +399,14 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
                 move_counts["current_move_budget_skipped_count"] = len(proposals)
             else:
                 move_counts["current_move_value_unavailable_skipped_count"] = len(proposals)
+        elif self.lazy_moves:
+            for vid,state,site in proposals:
+                aid=f"V{vid}:MOVE:{site['site_id']}"
+                actions.append(CurrentAction(aid,vid,"RELOCATE",None,payload=dict(
+                    optimistic_move=True,source_state=state,target_site=site,relocation_slot_s=int(now))))
+                after[aid]=RouteState(tuple(site["position"]),float(now),state.admission_end_s,
+                    state.profile_id,site.get("context"),float(now),1)
+                units[aid]=0
         else:
             # The provider's fixed-price root value is monotone nonincreasing
             # in ready time. Zero-time arrival at the target is an optimistic
@@ -448,22 +489,63 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
         if not any(action.kind != "WAIT" for action in actions):
             return fixed_wait(coarse, unavailable)
         stamp = perf_counter()
-        result = solve_current_flow(actions, units, policy=effective_policy,
+        flow_actions=[a for a in actions if a.kind!="RELOCATE"] if self.lazy_moves else actions
+        result = solve_current_flow(flow_actions, units, policy=effective_policy,
             move_cap=50, time_limit_s=float(self.cfg.get("solver_time_limit_s", 10.)),
             deadline_s=deadline,
             maximum_actions=int(self.cfg.get("maximum_model_variables", 20000)),
             empty_distance_mode=self.cfg.get("current_empty_distance_mode", "LOCAL_STABLE"))
         if self.joint_mode:
             from .bottleneck_native import solve_joint_current
-            result=solve_joint_current(c,actions,after,result,now,self.cfg,self.value_provider,
-                self.last_assignments,self.remaining_model,self._task,self._moving_wait,waiting_ids,deadline,
-                execution_state=self.joint_memory)
+            lazy_route_wall=0.
+            if self.lazy_moves and any(a.kind=="RELOCATE" for a in actions):
+                from .bottleneck_lazy_moves import solve_lazy_moves
+                def planner(options,roots,baseline,end,memory,label_cap):
+                    config=dict(self.cfg,joint_maximum_labels=label_cap,joint_no_deep_search=label_cap<=0)
+                    return solve_joint_current(c,options,roots,baseline,now,config,self.value_provider,
+                        self.last_assignments,self.remaining_model,self._task,self._moving_wait,waiting_ids,end,
+                        execution_state=memory)
+                def certify(action):
+                    nonlocal lazy_route_wall,move_queries
+                    state=action.payload["source_state"]; site=action.payload["target_site"]
+                    origin=RouteState(state.position,float(now),state.admission_end_s,state.profile_id,state.context)
+                    entered=perf_counter()
+                    link=self.connectors(origin,dict(site,require_geometry=True),now,state.profile_id)
+                    elapsed=perf_counter()-entered; lazy_route_wall+=elapsed
+                    timings["current_move_time_s"]+=elapsed; move_queries+=1
+                    move_counts["current_move_routed_count"]+=1
+                    if (not link["supported"] or not isfinite(float(link["travel_time_s"]))
+                            or not 0<float(link["travel_time_s"])<=300.
+                            or now+float(link["travel_time_s"])>state.admission_end_s):
+                        return None
+                    if link.get("routed") is None:
+                        raise ValueError("certified lazy MOVE has no executable route")
+                    distance=float(link["empty_distance_m"])
+                    if not isfinite(distance) or distance<0:
+                        raise ValueError("certified lazy MOVE has invalid physical distance")
+                    move=dict(native_vehicle_id=action.vehicle_id,position=site["position"],
+                        site_id=site["site_id"],node_id=site["node_id"],routed=link["routed"])
+                    exact=CurrentAction(action.action_id,action.vehicle_id,"RELOCATE",None,
+                        empty_distance_m=distance,payload=dict(move=move,relocation_slot_s=int(now)))
+                    root=RouteState(tuple(site["position"]),now+float(link["travel_time_s"]),
+                        state.admission_end_s,state.profile_id,link["arrival_context"],float(now),1)
+                    return exact,root
+                result,actions,after,lazy=solve_lazy_moves(actions,after,result,planner=planner,
+                    certify=certify,deadline=deadline,memory=self.joint_memory,
+                    maximum_labels=int(self.cfg.get("joint_maximum_labels",50000)))
+                move_counts["current_move_budget_skipped_count"]+=lazy["budget_skipped_selected"]
+                move_budget_cutoff=bool(lazy["budget_skipped_selected"])
+                move_skip_reason="LAZY_SELECTED_CERTIFICATION_BUDGET" if move_budget_cutoff else None
+            else:
+                result=solve_joint_current(c,actions,after,result,now,self.cfg,self.value_provider,
+                    self.last_assignments,self.remaining_model,self._task,self._moving_wait,waiting_ids,deadline,
+                    execution_state=self.joint_memory)
             effective_policy=("SERVICE_PRESERVING_JOINT_BUDGET_FALLBACK"
                 if result["joint_control"].get("resource_fallback") else
                 self.cfg.get("joint_neighborhood_strategy","BOTTLENECK_CLOSURE"))
             base["future_chain_variables"]=int(result.get("future_chain_variables",0))
             base["joint_control"]=result["joint_control"]
-        timings["current_flow_time_s"] = perf_counter() - stamp
+        timings["current_flow_time_s"] = perf_counter() - stamp - (lazy_route_wall if self.joint_mode else 0.)
         chosen = set(result["selected_action_ids"])
         serves = [action for action in actions if action.action_id in chosen and action.kind == "SERVE"]
         moves = [action for action in actions if action.action_id in chosen and action.kind == "RELOCATE"]

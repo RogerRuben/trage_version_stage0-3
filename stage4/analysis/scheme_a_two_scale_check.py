@@ -115,7 +115,8 @@ def load_frozen_layout(root, cfg):
     for relative, expected in protected.items():
         if _sha(root / relative) != expected:
             raise ValueError(f"frozen layout source changed: {relative}")
-    if cfg.get("idle_movement_mode") == "TYPE_CONDITIONED_HISTORICAL_DEFICIT":
+    if (cfg.get("idle_movement_mode") == "TYPE_CONDITIONED_HISTORICAL_DEFICIT"
+            or cfg.get("joint_move_target_mode")=="PROFILE_HISTORY"):
         from .type_conditioned_reposition_reference import REFERENCE, MANIFEST
         if (Path(cfg["typed_reposition_reference"]) != REFERENCE
                 or Path(cfg["typed_reposition_manifest"]) != MANIFEST):
@@ -334,10 +335,12 @@ def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
         common_movement = cfg.get("idle_movement_mode") in ("COMMON_HISTORICAL_DEFICIT", "TYPE_CONDITIONED_HISTORICAL_DEFICIT")
         manager_type = HistoricalDeficitMovementManager if common_movement else SelectedMovementManager
         manager_kwargs = dict(wall_limit_s=cfg["common_movement_wall_limit_s"]) if common_movement else {}
-        if typed_movement:
+        typed_reference=None
+        if typed_movement or cfg.get("joint_move_target_mode")=="PROFILE_HISTORY":
             from .type_conditioned_reposition_reference import load as load_typed_reference
-            from stage4.dispatch.type_conditioned_movement import TypeConditionedHistoricalDeficitMovementManager
             typed_reference, typed_manifest = load_typed_reference(root, reference, Path(cfg["source_history_templates"]))
+        if typed_movement:
+            from stage4.dispatch.type_conditioned_movement import TypeConditionedHistoricalDeficitMovementManager
             manager_type = TypeConditionedHistoricalDeficitMovementManager
             manager_kwargs.update(typed_reference=typed_reference, typed_manifest=typed_manifest)
         manager = manager_type(control, reference, empty_router,
@@ -369,7 +372,8 @@ def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
         provider = CoarseServiceValue(library, reference, templates, cfg)
         del templates
         remaining = TrainRemainingTime(json.loads((root / cfg["remaining_time_model"]).read_text(encoding="utf-8")))
-        adapter = NativeTwoScaleAdapter(cfg["policy"], provider, reference, connectors, validator, remaining, cfg)
+        adapter = NativeTwoScaleAdapter(cfg["policy"], provider, reference, connectors, validator, remaining, cfg,
+            typed_reference=typed_reference)
         control.flexibility_adapter = adapter
         simulation = bridge.create_simulation(simulation_end_s=cfg["physical_drain_limit_s"],
             time_step_s=cfg["rolling_step_s"], vehicles=vehicles,
