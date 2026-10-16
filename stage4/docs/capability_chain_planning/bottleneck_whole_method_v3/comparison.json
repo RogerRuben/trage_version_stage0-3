@@ -1,0 +1,3229 @@
+{
+  "status": "WHOLE_METHOD_COMPARISON_ANALYZED",
+  "groups": {
+    "INDEPENDENT_REFERENCE": {
+      "completed": 27644,
+      "expired": 723,
+      "service_rate": 0.9745126379243487,
+      "served_C": 1057,
+      "served_HV": 26587,
+      "C_body_compatible_orders": 9275,
+      "C_after_passenger_acceptance_orders": 6534,
+      "C_eligible_served_by_HV": 5367,
+      "C_eligible_expired": 110,
+      "pickup_empty_km": 35484.509,
+      "idle_empty_km": 766.2730719786782,
+      "actual_idle_moves": 581,
+      "C_pickup_empty_km": 1122.979,
+      "HV_pickup_empty_km": 34361.53,
+      "admission_state": {
+        "AV": {
+          "admission_hours": 1227.9322222222222,
+          "PICKUP_hours": 55.57901911295384,
+          "LOADED_hours": 141.09928179699685,
+          "MOVE_hours": 2.2181988120139526,
+          "idle_hours": 1029.035722500257,
+          "idle_share": 0.8380232262640548,
+          "customer_busy_share": 0.1601703232072668,
+          "day_slots": 851,
+          "never_served_slots": 283,
+          "fully_idle_slots": 274,
+          "slots_with_idle_gap_over_300s": 736,
+          "full_committed_customer_hours": 228.86960362639664,
+          "loaded_share": 0.11490803746614422,
+          "calendar_customer_after_admission_hours": 32.09163612038447,
+          "customer_outside_calendar_hours": 0.09966659606146601,
+          "full_movement_hours": 2.2181988120139526,
+          "full_movement_km": 45.28792244539473,
+          "partition_error_s": 1.862645149230957e-09
+        },
+        "HV": {
+          "admission_hours": 11050.801944444445,
+          "PICKUP_hours": 1749.675231532889,
+          "LOADED_hours": 4048.999632803042,
+          "MOVE_hours": 33.720022441224074,
+          "idle_hours": 5218.407057667291,
+          "idle_share": 0.4722197614165671,
+          "customer_busy_share": 0.5247288742923396,
+          "day_slots": 7582,
+          "never_served_slots": 230,
+          "fully_idle_slots": 229,
+          "slots_with_idle_gap_over_300s": 4849,
+          "full_committed_customer_hours": 7084.028488140957,
+          "loaded_share": 0.36639871505783256,
+          "calendar_customer_after_admission_hours": 1272.4799663403298,
+          "customer_outside_calendar_hours": 12.873657464695473,
+          "full_movement_hours": 33.720022441224074,
+          "full_movement_km": 720.9851495332834,
+          "partition_error_s": 7.450580596923828e-09
+        }
+      },
+      "runtime_s": 3326.029144699998,
+      "setup_time_s": 72.85834609999802,
+      "simulation_loop_wall_s": 3224.7316521999965,
+      "peak_rss_mib": 1364.99609375,
+      "candidate_generation_time_s": 120.27459229995657,
+      "candidate_routing_time_s": 844.2433864999366,
+      "adapter_timings_s": {
+        "validator_time_s": 1417.5249151000935,
+        "current_move_time_s": 169.29988979986229,
+        "coarse_time_s": 298.39969470000506,
+        "value_lookup_time_s": 40.91655949921187,
+        "current_flow_time_s": 20.52634800006126,
+        "solve_wall_time_s": 1963.5620009999875
+      },
+      "timing_components_are_nested_do_not_sum": true,
+      "idle_movement_timings": {
+        "routing_wall_time_s": 0.0,
+        "total_decision_time_s": 0.08493479999378906
+      },
+      "actual_routing": {
+        "static_matrix_certificate": {
+          "schema": "STATIC_AUTO_OD_3_8_2_V1",
+          "valhalla_version": "3.8.2",
+          "config_sha256": "f2eb80488a2ec832208b8ee1a7433aa4905e58243fe1c0d5b81d48a3368ec696",
+          "timedep_matrix_distance": 0,
+          "conservative_static_guard_m": 10.0,
+          "mutable_traffic_or_remote_tiles": false
+        },
+        "raw_od_cache_entries": 20000,
+        "raw_od_cache_evictions": 411515,
+        "raw_od_memory_queries_avoided": 86706,
+        "raw_od_cross_minute_reuses": 86706,
+        "raw_od_beta_bin_reuses": 17274,
+        "certified_eta_prunes": 184530,
+        "known_eta_prunes_before_backend": 184530,
+        "grouped_source_queries": 256959,
+        "grouped_cell_fallback_queries": 0,
+        "optional_disk_cache": {
+          "entry_count": 413660,
+          "dropped_optional_writes": 0,
+          "write_time_s": 104.58228090006014,
+          "read_error": null,
+          "write_error": null,
+          "close_error": null,
+          "disabled_reads": false,
+          "disabled_writes": false,
+          "closed": false,
+          "writer_alive": true
+        }
+      },
+      "idle_movement": {
+        "counts": {
+          "MODEL_SELECTED_QUEUED": 581,
+          "STARTED": 581,
+          "INTERRUPTED_BY_CUSTOMER": 54,
+          "COMPLETED": 527
+        },
+        "movement_rows": 581,
+        "empty_time_s": 129377.5965116569,
+        "empty_distance_m": 766273.0719786782,
+        "empty_after_shift_time_s": 0.0,
+        "traffic_unknown_share": 1.0,
+        "routing_wall_time_s": 0.0,
+        "total_decision_time_s": 0.08493479999378906,
+        "dynamic_new_route_prediction_fabricated": false,
+        "geometry_endpoint_connectors_reported": true,
+        "control_mode": "MASTER_SELECTED_ONLY",
+        "automatic_historical_deficit_rule_active": false,
+        "selected_queue_pending": 0
+      },
+      "request_decision_diagnostics": {
+        "request_count": 28367,
+        "terminal_states": {
+          "ASSIGNED": 27644,
+          "EXPIRED": 723
+        },
+        "expiry_stage_counts": {
+          "NO_PICKUP_WITHIN_INDEPENDENT_CAP": 448,
+          "VALID_ARCS_NOT_SELECTED": 273,
+          "NO_FINAL_VALIDATED_ARC": 1,
+          "NO_NEARBY_AVAILABLE_VEHICLE": 1
+        },
+        "stores_all_arcs": false,
+        "resets_patience_on_retry": false,
+        "deadline_semantics": "REQUEST_TO_ASSIGNMENT",
+        "arc_counters_count_repeated_attempts_not_unique_vehicles": true,
+        "categories_are_diagnostic_not_exclusive_physical_causes": true,
+        "typed_final_candidate_counts_enabled": true,
+        "typed_final_AV_arc_attempts": 3636,
+        "typed_final_HV_arc_attempts": 338777,
+        "HV_assigned_with_final_AV_same_epoch": 996,
+        "HV_assigned_without_final_AV_same_epoch": 25591,
+        "HV_assigned_with_unoccupied_valid_AV": 954,
+        "AV_alternatives_selected_for_other_requests": 64,
+        "typed_final_scope": "PRE_JOINT_ASSIGNMENT_GRAPH",
+        "typed_rejection_reason_limit_per_request": 64
+      },
+      "maximum_current_actions": 807,
+      "maximum_current_residual_edges": 2588,
+      "decision_count": 2892,
+      "current_flow_status": {
+        "OPTIMAL_PRIMARY_CURRENT_FLOW_APPROXIMATE_FUTURE": 2639,
+        "FIXED_CURRENT_WAIT": 253
+      },
+      "adapter_wall_overrun_count": 0,
+      "explicit_fallback_decisions": 0,
+      "physical_accounting": {
+        "duplicate_orders": 0,
+        "vehicle_task_overlap": 0,
+        "maximum_time_error_s": 1.000444171950221e-09
+      },
+      "source_code_sha": "ea149c2c5620a4d17cddea5ee7a08734512c8267",
+      "waiting_contract": {
+        "patience_mode": "MATCH_DEADLINE_AND_PICKUP_CAP",
+        "request_to_assignment_limit_s": 300,
+        "independent_pickup_eta_cap_s": 600,
+        "legacy_request_to_pickup_limit_s": null,
+        "post_assignment_cancellation": false
+      },
+      "future_connector_queries": 0,
+      "total_empty_km": 36250.782071978676,
+      "matching_wait_s": {
+        "mean": 19.062255824048616,
+        "p90": 28.0,
+        "max": 299.0
+      },
+      "pickup_wait_s": {
+        "mean": 249.18268404608594,
+        "p90": 495.4611474,
+        "max": 599.893285
+      },
+      "wait_s": {
+        "mean": 268.24493987013454,
+        "p90": 518.7359834,
+        "max": 888.45838
+      },
+      "hourly": [
+        {
+          "hour": 0,
+          "requests": 341,
+          "completed": 341,
+          "expired": 0,
+          "served_C": 13,
+          "served_HV": 328,
+          "C_state": {
+            "admission_hours": 8.776944444444444,
+            "PICKUP_hours": 0.7910693750913903,
+            "LOADED_hours": 0.8461020668712694,
+            "MOVE_hours": 0.0,
+            "idle_hours": 7.1397730024817845,
+            "idle_share": 0.8134690891203097,
+            "customer_busy_share": 0.18653091087969031
+          },
+          "HV_state": {
+            "admission_hours": 69.47666666666667,
+            "PICKUP_hours": 18.276586150771006,
+            "LOADED_hours": 26.88390775710448,
+            "MOVE_hours": 0.5589470414565234,
+            "idle_hours": 23.757225717334638,
+            "idle_share": 0.34194538766974003,
+            "customer_busy_share": 0.6500095078617592
+          }
+        },
+        {
+          "hour": 1,
+          "requests": 225,
+          "completed": 225,
+          "expired": 0,
+          "served_C": 10,
+          "served_HV": 215,
+          "C_state": {
+            "admission_hours": 9.959722222222222,
+            "PICKUP_hours": 0.5869611321253898,
+            "LOADED_hours": 1.1078679299741692,
+            "MOVE_hours": 0.05637267835347959,
+            "idle_hours": 8.208520481769185,
+            "idle_share": 0.8241716283466479,
+            "customer_busy_share": 0.17016830633268473
+          },
+          "HV_state": {
+            "admission_hours": 87.50416666666666,
+            "PICKUP_hours": 12.669742237395734,
+            "LOADED_hours": 23.826106479638934,
+            "MOVE_hours": 1.046298619518462,
+            "idle_hours": 49.96201933011353,
+            "idle_share": 0.570967317709978,
+            "customer_busy_share": 0.4170755531683406
+          }
+        },
+        {
+          "hour": 2,
+          "requests": 156,
+          "completed": 156,
+          "expired": 0,
+          "served_C": 5,
+          "served_HV": 151,
+          "C_state": {
+            "admission_hours": 7.156944444444444,
+            "PICKUP_hours": 0.27342609144908314,
+            "LOADED_hours": 0.295,
+            "MOVE_hours": 0.023220337480602718,
+            "idle_hours": 6.565298015514759,
+            "idle_share": 0.9173325385543617,
+            "customer_busy_share": 0.07942301297173295
+          },
+          "HV_state": {
+            "admission_hours": 59.96388888888889,
+            "PICKUP_hours": 10.138458961480472,
+            "LOADED_hours": 15.912709132773859,
+            "MOVE_hours": 1.0501356945753175,
+            "idle_hours": 32.86258510005924,
+            "idle_share": 0.5480395903099703,
+            "customer_busy_share": 0.4344476080016473
+          }
+        },
+        {
+          "hour": 3,
+          "requests": 121,
+          "completed": 121,
+          "expired": 0,
+          "served_C": 3,
+          "served_HV": 118,
+          "C_state": {
+            "admission_hours": 4.831666666666667,
+            "PICKUP_hours": 0.13743485299179964,
+            "LOADED_hours": 0.2594275852038921,
+            "MOVE_hours": 0.0,
+            "idle_hours": 4.434804228470975,
+            "idle_share": 0.9178622066514608,
+            "customer_busy_share": 0.08213779334853917
+          },
+          "HV_state": {
+            "admission_hours": 44.93527777777778,
+            "PICKUP_hours": 8.145299506017864,
+            "LOADED_hours": 13.109369387196267,
+            "MOVE_hours": 0.40057669487751607,
+            "idle_hours": 23.280032189686136,
+            "idle_share": 0.5180791872438142,
+            "customer_busy_share": 0.47300628691618735
+          }
+        },
+        {
+          "hour": 4,
+          "requests": 79,
+          "completed": 79,
+          "expired": 0,
+          "served_C": 0,
+          "served_HV": 79,
+          "C_state": {
+            "admission_hours": 2.0305555555555554,
+            "PICKUP_hours": 0.0,
+            "LOADED_hours": 0.0,
+            "MOVE_hours": 0.0,
+            "idle_hours": 2.0305555555555554,
+            "idle_share": 1.0,
+            "customer_busy_share": 0.0
+          },
+          "HV_state": {
+            "admission_hours": 31.18722222222222,
+            "PICKUP_hours": 5.608995020263254,
+            "LOADED_hours": 7.339947267454295,
+            "MOVE_hours": 0.35882528293265803,
+            "idle_hours": 17.879454651572015,
+            "idle_share": 0.5732942332655757,
+            "customer_busy_share": 0.41520024436452946
+          }
+        },
+        {
+          "hour": 5,
+          "requests": 104,
+          "completed": 103,
+          "expired": 1,
+          "served_C": 2,
+          "served_HV": 101,
+          "C_state": {
+            "admission_hours": 2.4391666666666665,
+            "PICKUP_hours": 0.19175534639057634,
+            "LOADED_hours": 0.14157798694275697,
+            "MOVE_hours": 0.0,
+            "idle_hours": 2.1058333333333334,
+            "idle_share": 0.8633413050905364,
+            "customer_busy_share": 0.1366586949094636
+          },
+          "HV_state": {
+            "admission_hours": 27.946666666666665,
+            "PICKUP_hours": 6.808839500613524,
+            "LOADED_hours": 10.841376427650596,
+            "MOVE_hours": 0.14562058855116042,
+            "idle_hours": 10.150830149851386,
+            "idle_share": 0.36322149868265935,
+            "customer_busy_share": 0.6315678409445653
+          }
+        },
+        {
+          "hour": 6,
+          "requests": 329,
+          "completed": 325,
+          "expired": 4,
+          "served_C": 13,
+          "served_HV": 312,
+          "C_state": {
+            "admission_hours": 6.334722222222222,
+            "PICKUP_hours": 0.5733735089624811,
+            "LOADED_hours": 1.1971631997002674,
+            "MOVE_hours": 0.1120725701004388,
+            "idle_hours": 4.452112943459035,
+            "idle_share": 0.7028110763627505,
+            "customer_busy_share": 0.2794971344523523
+          },
+          "HV_state": {
+            "admission_hours": 76.03138888888888,
+            "PICKUP_hours": 17.879713935567114,
+            "LOADED_hours": 29.77424674917228,
+            "MOVE_hours": 0.32213310210222923,
+            "idle_hours": 28.05529510204727,
+            "idle_share": 0.3689962200091708,
+            "customer_busy_share": 0.6267669364080691
+          }
+        },
+        {
+          "hour": 7,
+          "requests": 854,
+          "completed": 831,
+          "expired": 23,
+          "served_C": 18,
+          "served_HV": 813,
+          "C_state": {
+            "admission_hours": 30.948611111111113,
+            "PICKUP_hours": 1.4068607137479183,
+            "LOADED_hours": 3.2029901220876216,
+            "MOVE_hours": 0.0,
+            "idle_hours": 26.33876027527557,
+            "idle_share": 0.851048216048037,
+            "customer_busy_share": 0.14895178395196287
+          },
+          "HV_state": {
+            "admission_hours": 279.13666666666666,
+            "PICKUP_hours": 64.53700251437708,
+            "LOADED_hours": 121.98649123045128,
+            "MOVE_hours": 0.28487304225092885,
+            "idle_hours": 92.3282998795873,
+            "idle_share": 0.33076378313939636,
+            "customer_busy_share": 0.6682156664411519
+          }
+        },
+        {
+          "hour": 8,
+          "requests": 1397,
+          "completed": 1376,
+          "expired": 21,
+          "served_C": 39,
+          "served_HV": 1337,
+          "C_state": {
+            "admission_hours": 60.77638888888889,
+            "PICKUP_hours": 1.8949961103732766,
+            "LOADED_hours": 4.306525533695377,
+            "MOVE_hours": 0.0,
+            "idle_hours": 54.574867244820254,
+            "idle_share": 0.8979616631154868,
+            "customer_busy_share": 0.1020383368845136
+          },
+          "HV_state": {
+            "admission_hours": 504.91194444444443,
+            "PICKUP_hours": 92.42959612983012,
+            "LOADED_hours": 239.30278053107088,
+            "MOVE_hours": 0.8793488352814236,
+            "idle_hours": 172.30021894826183,
+            "idle_share": 0.34124805492142607,
+            "customer_busy_share": 0.6570103565799117
+          }
+        },
+        {
+          "hour": 9,
+          "requests": 1674,
+          "completed": 1619,
+          "expired": 55,
+          "served_C": 75,
+          "served_HV": 1544,
+          "C_state": {
+            "admission_hours": 74.1475,
+            "PICKUP_hours": 3.082208845032882,
+            "LOADED_hours": 11.450349180660378,
+            "MOVE_hours": 0.0,
+            "idle_hours": 59.61494197430676,
+            "idle_share": 0.8040047469477293,
+            "customer_busy_share": 0.19599525305227095
+          },
+          "HV_state": {
+            "admission_hours": 645.2252777777778,
+            "PICKUP_hours": 85.20142583259765,
+            "LOADED_hours": 230.56026149609707,
+            "MOVE_hours": 1.5488013418702,
+            "idle_hours": 327.91478910721275,
+            "idle_share": 0.5082175178204192,
+            "customer_busy_share": 0.48938207817308466
+          }
+        },
+        {
+          "hour": 10,
+          "requests": 1516,
+          "completed": 1476,
+          "expired": 40,
+          "served_C": 60,
+          "served_HV": 1416,
+          "C_state": {
+            "admission_hours": 75.12527777777778,
+            "PICKUP_hours": 3.4956277450121425,
+            "LOADED_hours": 8.58411451119851,
+            "MOVE_hours": 0.1107213526187742,
+            "idle_hours": 62.93481416894836,
+            "idle_share": 0.8377315336538378,
+            "customer_busy_share": 0.16079464347463443
+          },
+          "HV_state": {
+            "admission_hours": 639.5486111111111,
+            "PICKUP_hours": 80.2995159906818,
+            "LOADED_hours": 208.86668704443943,
+            "MOVE_hours": 0.8328792050616802,
+            "idle_hours": 349.5495288709283,
+            "idle_share": 0.5465566225898657,
+            "customer_busy_share": 0.4521410851518265
+          }
+        },
+        {
+          "hour": 11,
+          "requests": 1577,
+          "completed": 1548,
+          "expired": 29,
+          "served_C": 69,
+          "served_HV": 1479,
+          "C_state": {
+            "admission_hours": 67.24805555555555,
+            "PICKUP_hours": 3.607740191985738,
+            "LOADED_hours": 8.757653110450907,
+            "MOVE_hours": 0.008758719423215856,
+            "idle_hours": 54.87390353369569,
+            "idle_share": 0.815992419117052,
+            "customer_busy_share": 0.18387733593607383
+          },
+          "HV_state": {
+            "admission_hours": 608.5083333333333,
+            "PICKUP_hours": 88.36999962745438,
+            "LOADED_hours": 211.00946035094464,
+            "MOVE_hours": 2.5456635251676443,
+            "idle_hours": 306.58320982976653,
+            "idle_share": 0.5038274630527106,
+            "customer_busy_share": 0.4919890880350567
+          }
+        },
+        {
+          "hour": 12,
+          "requests": 1525,
+          "completed": 1495,
+          "expired": 30,
+          "served_C": 76,
+          "served_HV": 1419,
+          "C_state": {
+            "admission_hours": 64.47555555555556,
+            "PICKUP_hours": 3.6140449694092824,
+            "LOADED_hours": 9.43076138641771,
+            "MOVE_hours": 0.4373819705555555,
+            "idle_hours": 50.99336722917301,
+            "idle_share": 0.7908945768638538,
+            "customer_busy_share": 0.20232173640732568
+          },
+          "HV_state": {
+            "admission_hours": 604.4308333333333,
+            "PICKUP_hours": 84.55621985691462,
+            "LOADED_hours": 202.09436313248426,
+            "MOVE_hours": 2.762753909702262,
+            "idle_hours": 315.0174964342322,
+            "idle_share": 0.5211803883282463,
+            "customer_busy_share": 0.4742487761727337
+          }
+        },
+        {
+          "hour": 13,
+          "requests": 1646,
+          "completed": 1597,
+          "expired": 49,
+          "served_C": 83,
+          "served_HV": 1514,
+          "C_state": {
+            "admission_hours": 67.73472222222222,
+            "PICKUP_hours": 3.3559580514918768,
+            "LOADED_hours": 11.360923978460026,
+            "MOVE_hours": 0.2073459025366881,
+            "idle_hours": 52.81049428973363,
+            "idle_share": 0.7796665071789091,
+            "customer_busy_share": 0.21727234639966722
+          },
+          "HV_state": {
+            "admission_hours": 628.1061111111111,
+            "PICKUP_hours": 85.41093178413897,
+            "LOADED_hours": 201.45022963267314,
+            "MOVE_hours": 3.077281429195094,
+            "idle_hours": 338.1676682651037,
+            "idle_share": 0.5383925777555161,
+            "customer_busy_share": 0.4567081203992087
+          }
+        },
+        {
+          "hour": 14,
+          "requests": 1768,
+          "completed": 1724,
+          "expired": 44,
+          "served_C": 67,
+          "served_HV": 1657,
+          "C_state": {
+            "admission_hours": 74.78694444444444,
+            "PICKUP_hours": 4.361070813697558,
+            "LOADED_hours": 10.600840980073983,
+            "MOVE_hours": 0.15040399432033358,
+            "idle_hours": 59.67462865635258,
+            "idle_share": 0.7979284231980079,
+            "customer_busy_share": 0.20006047719847694
+          },
+          "HV_state": {
+            "admission_hours": 712.6005555555555,
+            "PICKUP_hours": 101.74649332860473,
+            "LOADED_hours": 270.35113306594013,
+            "MOVE_hours": 0.875198597464991,
+            "idle_hours": 339.62773056354547,
+            "idle_share": 0.4766032357338901,
+            "customer_busy_share": 0.5221685886905479
+          }
+        },
+        {
+          "hour": 15,
+          "requests": 1928,
+          "completed": 1878,
+          "expired": 50,
+          "served_C": 62,
+          "served_HV": 1816,
+          "C_state": {
+            "admission_hours": 81.18555555555555,
+            "PICKUP_hours": 3.5253143048475066,
+            "LOADED_hours": 9.114451774894283,
+            "MOVE_hours": 0.14676245090796633,
+            "idle_hours": 68.39902702490578,
+            "idle_share": 0.8425024200037665,
+            "customer_busy_share": 0.15568983907602077
+          },
+          "HV_state": {
+            "admission_hours": 802.1372222222222,
+            "PICKUP_hours": 114.22837099835188,
+            "LOADED_hours": 310.4345879541528,
+            "MOVE_hours": 0.6829330336176807,
+            "idle_hours": 376.79133023610007,
+            "idle_share": 0.4697342546855589,
+            "customer_busy_share": 0.5294143535391965
+          }
+        },
+        {
+          "hour": 16,
+          "requests": 1860,
+          "completed": 1809,
+          "expired": 51,
+          "served_C": 57,
+          "served_HV": 1752,
+          "C_state": {
+            "admission_hours": 85.17333333333333,
+            "PICKUP_hours": 3.884779660278762,
+            "LOADED_hours": 8.81407939119673,
+            "MOVE_hours": 0.0,
+            "idle_hours": 72.47447428185784,
+            "idle_share": 0.8509056936661455,
+            "customer_busy_share": 0.1490943063338544
+          },
+          "HV_state": {
+            "admission_hours": 773.7336111111111,
+            "PICKUP_hours": 140.06029796393915,
+            "LOADED_hours": 280.57503425543126,
+            "MOVE_hours": 0.07921907230323187,
+            "idle_hours": 353.0190598194374,
+            "idle_share": 0.456254006223781,
+            "customer_busy_share": 0.5436436083154278
+          }
+        },
+        {
+          "hour": 17,
+          "requests": 1740,
+          "completed": 1674,
+          "expired": 66,
+          "served_C": 30,
+          "served_HV": 1644,
+          "C_state": {
+            "admission_hours": 88.4025,
+            "PICKUP_hours": 2.170936242344588,
+            "LOADED_hours": 5.949417160396398,
+            "MOVE_hours": 0.0,
+            "idle_hours": 80.28214659725903,
+            "idle_share": 0.9081433963661552,
+            "customer_busy_share": 0.09185660363384504
+          },
+          "HV_state": {
+            "admission_hours": 733.6155555555556,
+            "PICKUP_hours": 142.68136896100415,
+            "LOADED_hours": 292.410231566747,
+            "MOVE_hours": 0.19783108548211303,
+            "idle_hours": 298.326123942322,
+            "idle_share": 0.4066518514815356,
+            "customer_busy_share": 0.5930784826369487
+          }
+        },
+        {
+          "hour": 18,
+          "requests": 1669,
+          "completed": 1597,
+          "expired": 72,
+          "served_C": 21,
+          "served_HV": 1576,
+          "C_state": {
+            "admission_hours": 92.5111111111111,
+            "PICKUP_hours": 1.0119646554971344,
+            "LOADED_hours": 2.043218523099689,
+            "MOVE_hours": 0.0,
+            "idle_hours": 89.45592793251429,
+            "idle_share": 0.9669749596356336,
+            "customer_busy_share": 0.033025040364366334
+          },
+          "HV_state": {
+            "admission_hours": 753.1113888888889,
+            "PICKUP_hours": 139.7871341173135,
+            "LOADED_hours": 351.8368461354821,
+            "MOVE_hours": 1.2634401302918317,
+            "idle_hours": 260.2239685058021,
+            "idle_share": 0.34553184607887333,
+            "customer_busy_share": 0.6527905267481328
+          }
+        },
+        {
+          "hour": 19,
+          "requests": 2011,
+          "completed": 1974,
+          "expired": 37,
+          "served_C": 74,
+          "served_HV": 1900,
+          "C_state": {
+            "admission_hours": 84.03833333333333,
+            "PICKUP_hours": 3.160778061879646,
+            "LOADED_hours": 9.928650679029307,
+            "MOVE_hours": 0.06393328943155212,
+            "idle_hours": 70.88497130299282,
+            "idle_share": 0.8434837828331454,
+            "customer_busy_share": 0.15575545375216412
+          },
+          "HV_state": {
+            "admission_hours": 778.6694444444445,
+            "PICKUP_hours": 134.85958764749327,
+            "LOADED_hours": 323.15604862149826,
+            "MOVE_hours": 2.761933958994519,
+            "idle_hours": 317.8918742164591,
+            "idle_share": 0.4082500944200587,
+            "customer_busy_share": 0.5882029140051475
+          }
+        },
+        {
+          "hour": 20,
+          "requests": 1724,
+          "completed": 1679,
+          "expired": 45,
+          "served_C": 94,
+          "served_HV": 1585,
+          "C_state": {
+            "admission_hours": 81.635,
+            "PICKUP_hours": 5.041618269435854,
+            "LOADED_hours": 11.976380786057963,
+            "MOVE_hours": 0.1678134432482289,
+            "idle_hours": 64.44918750125797,
+            "idle_share": 0.7894798493447415,
+            "customer_busy_share": 0.2084644950755658
+          },
+          "HV_state": {
+            "admission_hours": 695.5322222222222,
+            "PICKUP_hours": 87.07280038076738,
+            "LOADED_hours": 207.33269316172905,
+            "MOVE_hours": 3.549121076667527,
+            "idle_hours": 397.57760760305786,
+            "idle_share": 0.5716163750585117,
+            "customer_busy_share": 0.42328088352524096
+          }
+        },
+        {
+          "hour": 21,
+          "requests": 1828,
+          "completed": 1793,
+          "expired": 35,
+          "served_C": 92,
+          "served_HV": 1701,
+          "C_state": {
+            "admission_hours": 74.7238888888889,
+            "PICKUP_hours": 4.99439264421992,
+            "LOADED_hours": 11.376677235298096,
+            "MOVE_hours": 0.32434373351499135,
+            "idle_hours": 58.02847527585588,
+            "idle_share": 0.7765719388901406,
+            "customer_busy_share": 0.21908749829470292
+          },
+          "HV_state": {
+            "admission_hours": 668.7652777777778,
+            "PICKUP_hours": 102.20071440512254,
+            "LOADED_hours": 221.9298961847249,
+            "MOVE_hours": 2.7546624906142947,
+            "idle_hours": 341.88000469731554,
+            "idle_share": 0.5112107581801189,
+            "customer_busy_share": 0.48467021443890207
+          }
+        },
+        {
+          "hour": 22,
+          "requests": 1416,
+          "completed": 1379,
+          "expired": 37,
+          "served_C": 62,
+          "served_HV": 1317,
+          "C_state": {
+            "admission_hours": 55.15638888888889,
+            "PICKUP_hours": 3.1689065852587617,
+            "LOADED_hours": 7.457344214943632,
+            "MOVE_hours": 0.12955225737163953,
+            "idle_hours": 44.40058583131488,
+            "idle_share": 0.8049944299428069,
+            "customer_busy_share": 0.19265675317520695
+          },
+          "HV_state": {
+            "admission_hours": 542.4363888888889,
+            "PICKUP_hours": 79.13646840884202,
+            "LOADED_hours": 167.64789363764092,
+            "MOVE_hours": 3.654169294139384,
+            "idle_hours": 291.9978575482663,
+            "idle_share": 0.5383080182846626,
+            "customer_busy_share": 0.4549553958796697
+          }
+        },
+        {
+          "hour": 23,
+          "requests": 877,
+          "completed": 845,
+          "expired": 32,
+          "served_C": 32,
+          "served_HV": 813,
+          "C_state": {
+            "admission_hours": 28.333333333333332,
+            "PICKUP_hours": 1.2478009414302829,
+            "LOADED_hours": 2.8977644603439128,
+            "MOVE_hours": 0.27951611215048616,
+            "idle_hours": 23.90825181940865,
+            "idle_share": 0.8438206524497172,
+            "customer_busy_share": 0.14631407300379515
+          },
+          "HV_state": {
+            "admission_hours": 283.2872222222222,
+            "PICKUP_hours": 47.569668273342785,
+            "LOADED_hours": 80.36733160054783,
+            "MOVE_hours": 2.087375389105404,
+            "idle_hours": 153.26284695922624,
+            "idle_share": 0.5410157428103146,
+            "customer_busy_share": 0.45161585076199284
+          }
+        },
+        {
+          "hour": 24,
+          "requests": 2,
+          "completed": 0,
+          "expired": 2,
+          "served_C": 0,
+          "served_HV": 0,
+          "C_state": null,
+          "HV_state": null
+        }
+      ],
+      "typed_final_candidate_diagnostics": {
+        "eligible_orders": 6534,
+        "eligible_served_C": 1057,
+        "eligible_served_HV": 5367,
+        "eligible_expired": 110,
+        "HV_with_final_C_count": 996,
+        "HV_with_final_C_share": 0.18557853549468978,
+        "exclusive_final_HV_categories": {
+          "NO_FINAL_C_CANDIDATE": 4371,
+          "FINAL_C_LEFT_UNOCCUPIED": 954,
+          "FINAL_C_ALL_SERVING_OTHER_REQUESTS": 37,
+          "FINAL_C_MOVING_OR_MIXED_COMMITTED": 5
+        },
+        "lifetime_rejection_witnesses": {
+          "ELIGIBLE_HV_NO_FINAL_C": {
+            "request_count": 4371,
+            "reason_request_counts": {
+              "AV:COINCIDENT_CUSTOMER_JOIN:CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT": 2,
+              "AV:DEPARTURE_CONTEXT:PREVIOUS_DIRECTION_CONTEXT_UNAVAILABLE": 94,
+              "AV:DEPARTURE_JOIN:CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT": 700,
+              "AV:DEPARTURE_JOIN:CUSTOMER_EMPTY_JOIN_TOO_FAR_FROM_SHARED_ENDPOINT": 531,
+              "AV:DEPARTURE_JOIN:ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE": 9,
+              "AV:DEPARTURE_JOIN:UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 11,
+              "AV:DEPARTURE_JOIN:UTURN_OUTSIDE_RESEARCH_PROFILE": 302,
+              "AV:OTHER_TEXT_REASON": 6,
+              "AV:PICKUP_CUSTOMER_JOIN:CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT": 345,
+              "AV:PICKUP_CUSTOMER_JOIN:CUSTOMER_EMPTY_JOIN_TOO_FAR_FROM_SHARED_ENDPOINT": 191,
+              "AV:PICKUP_CUSTOMER_JOIN:ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE": 4,
+              "AV:PICKUP_CUSTOMER_JOIN:UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 1,
+              "AV:PICKUP_CUSTOMER_JOIN:UTURN_OUTSIDE_RESEARCH_PROFILE": 209,
+              "AV:PICKUP_ROUTE:EDGE_OUTSIDE_FROZEN_FULL_NETWORK": 60,
+              "AV:PICKUP_ROUTE:EDGE_WALK_INVALID_SHAPE_INDEX_OR_LENGTH": 119,
+              "AV:PICKUP_ROUTE:EMPTY_ROUTE_EXCEPTION": 32,
+              "AV:PICKUP_ROUTE:ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE": 649,
+              "AV:PICKUP_ROUTE:SCALAR_EMPTY_ROUTE_TIME_OR_DISTANCE_INVALID": 21,
+              "AV:PICKUP_ROUTE:UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 1224,
+              "AV:PICKUP_ROUTE:UTURN_OUTSIDE_RESEARCH_PROFILE": 1980,
+              "AV:PICKUP_TIME:PICKUP_ETA_EXCEEDS_INDEPENDENT_CAP": 9
+            },
+            "reason_attempt_counts": {
+              "AV:COINCIDENT_CUSTOMER_JOIN:CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT": 2,
+              "AV:DEPARTURE_CONTEXT:PREVIOUS_DIRECTION_CONTEXT_UNAVAILABLE": 101,
+              "AV:DEPARTURE_JOIN:CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT": 959,
+              "AV:DEPARTURE_JOIN:CUSTOMER_EMPTY_JOIN_TOO_FAR_FROM_SHARED_ENDPOINT": 691,
+              "AV:DEPARTURE_JOIN:ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE": 9,
+              "AV:DEPARTURE_JOIN:UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 11,
+              "AV:DEPARTURE_JOIN:UTURN_OUTSIDE_RESEARCH_PROFILE": 400,
+              "AV:OTHER_TEXT_REASON": 6,
+              "AV:PICKUP_CUSTOMER_JOIN:CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT": 680,
+              "AV:PICKUP_CUSTOMER_JOIN:CUSTOMER_EMPTY_JOIN_TOO_FAR_FROM_SHARED_ENDPOINT": 342,
+              "AV:PICKUP_CUSTOMER_JOIN:ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE": 15,
+              "AV:PICKUP_CUSTOMER_JOIN:UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 1,
+              "AV:PICKUP_CUSTOMER_JOIN:UTURN_OUTSIDE_RESEARCH_PROFILE": 443,
+              "AV:PICKUP_ROUTE:EDGE_OUTSIDE_FROZEN_FULL_NETWORK": 88,
+              "AV:PICKUP_ROUTE:EDGE_WALK_INVALID_SHAPE_INDEX_OR_LENGTH": 394,
+              "AV:PICKUP_ROUTE:EMPTY_ROUTE_EXCEPTION": 44,
+              "AV:PICKUP_ROUTE:ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE": 1168,
+              "AV:PICKUP_ROUTE:SCALAR_EMPTY_ROUTE_TIME_OR_DISTANCE_INVALID": 34,
+              "AV:PICKUP_ROUTE:UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 2107,
+              "AV:PICKUP_ROUTE:UTURN_OUTSIDE_RESEARCH_PROFILE": 4781,
+              "AV:PICKUP_TIME:PICKUP_ETA_EXCEEDS_INDEPENDENT_CAP": 15
+            },
+            "phase_request_counts": {
+              "COINCIDENT_CUSTOMER_JOIN": 2,
+              "DEPARTURE_CONTEXT": 94,
+              "DEPARTURE_JOIN": 1263,
+              "OTHER_TEXT_REASON": 6,
+              "PICKUP_CUSTOMER_JOIN": 750,
+              "PICKUP_ROUTE": 2973,
+              "PICKUP_TIME": 9
+            }
+          },
+          "ELIGIBLE_EXPIRED": {
+            "request_count": 110,
+            "reason_request_counts": {
+              "AV:PICKUP_CUSTOMER_JOIN:CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT": 1,
+              "AV:PICKUP_ROUTE:ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE": 2,
+              "AV:PICKUP_ROUTE:UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 3,
+              "AV:PICKUP_ROUTE:UTURN_OUTSIDE_RESEARCH_PROFILE": 2
+            },
+            "reason_attempt_counts": {
+              "AV:PICKUP_CUSTOMER_JOIN:CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT": 10,
+              "AV:PICKUP_ROUTE:ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE": 5,
+              "AV:PICKUP_ROUTE:UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 21,
+              "AV:PICKUP_ROUTE:UTURN_OUTSIDE_RESEARCH_PROFILE": 5
+            },
+            "phase_request_counts": {
+              "PICKUP_CUSTOMER_JOIN": 1,
+              "PICKUP_ROUTE": 3
+            }
+          }
+        },
+        "final_scope": "ADMITTED_TOPK_GRAPH_AT_ASSIGNMENT_NOT_ALL_POSSIBLE_VEHICLES",
+        "rejection_witnesses_are_nonexclusive_not_counterfactual_causes": true
+      },
+      "secondary_distance": {
+        "solve_count": 2639,
+        "optimal_count": 2639,
+        "statuses": {
+          "OPTIMAL_PRIMARY_FACE_MM": 2639,
+          "NO_CURRENT_FLOW_SOLVE": 253
+        },
+        "time_s": 7.686568100012664,
+        "deadline_exceeded_count": 0,
+        "scope": "ADMITTED_PRIMARY_OPTIMAL_CURRENT_GRAPH_MM_NOT_WHOLE_DAY"
+      },
+      "source_products_sha256": {
+        "summary.json": "fff13559685c8daba273898d462583efe3669d28315022128105a99ad76b8b4f",
+        "assignments.parquet": "ce4f7c4084a3083746030a509a2a74b0afd2ec62f585e7364fa2b6828ae635a4",
+        "cohort_outcomes.parquet": "ca28c0140727aad4a3a2fd742d5d2b18a893db5628a085bd3efe94ec47fc81e7",
+        "empty_movements.parquet": "1b4873ebf140958a54995fdad90bcbcbf9c4beee7ccefe5586149573c652e2da",
+        "solver_trace.parquet": "ea450168a3290258070d1440c582a41aeccff92875ccc48d9d006c9cad23369d"
+      },
+      "method": "INDEPENDENT_VALUE",
+      "joint_control_operations": {
+        "secondary_distance_optimal_decisions": 2639,
+        "coarse_refreshes": 289,
+        "current_move_connector_queries": 5561,
+        "current_move_proposed_count": 55730,
+        "current_move_upper_screened_count": 50169,
+        "current_move_routed_count": 5561,
+        "current_move_arrival_screened_count": 0,
+        "current_move_budget_skipped_count": 0,
+        "current_move_value_unavailable_skipped_count": 0,
+        "optional_move_budget_cutoffs": 0,
+        "future_chain_variables": 0,
+        "future_connector_queries": 0
+      },
+      "retained_layout_solver_time_s": 0.0,
+      "incremental_layout_solver_time_s": 0.0,
+      "result_retained_not_rerun": true
+    },
+    "SPATIAL_SHARED_PLAN": {
+      "completed": 27634,
+      "expired": 733,
+      "service_rate": 0.9741601156273134,
+      "served_C": 865,
+      "served_HV": 26769,
+      "C_body_compatible_orders": 9275,
+      "C_after_passenger_acceptance_orders": 6534,
+      "C_eligible_served_by_HV": 5553,
+      "C_eligible_expired": 116,
+      "pickup_empty_km": 29545.458,
+      "idle_empty_km": 36.641512733626165,
+      "actual_idle_moves": 30,
+      "C_pickup_empty_km": 629.351,
+      "HV_pickup_empty_km": 28916.107,
+      "admission_state": {
+        "AV": {
+          "admission_hours": 1227.9322222222222,
+          "PICKUP_hours": 31.48095575315344,
+          "LOADED_hours": 122.48717378666217,
+          "MOVE_hours": 0.06580292784796862,
+          "idle_hours": 1073.898289754558,
+          "idle_share": 0.874558277989558,
+          "customer_busy_share": 0.1253881336065726,
+          "day_slots": 851,
+          "never_served_slots": 335,
+          "fully_idle_slots": 335,
+          "slots_with_idle_gap_over_300s": 742,
+          "full_committed_customer_hours": 167.49318928703048,
+          "loaded_share": 0.09975076113321125,
+          "calendar_customer_after_admission_hours": 13.012446764183697,
+          "customer_outside_calendar_hours": 0.5126129830311725,
+          "full_movement_hours": 0.06580292784796862,
+          "full_movement_km": 1.592,
+          "partition_error_s": 2.3283064365386963e-09
+        },
+        "HV": {
+          "admission_hours": 11050.801944444445,
+          "PICKUP_hours": 1541.8681718001,
+          "LOADED_hours": 4666.777341532242,
+          "MOVE_hours": 1.3486330513353924,
+          "idle_hours": 4840.8077980607495,
+          "idle_share": 0.43805036253449126,
+          "customer_busy_share": 0.5618275980824727,
+          "day_slots": 7582,
+          "never_served_slots": 612,
+          "fully_idle_slots": 612,
+          "slots_with_idle_gap_over_300s": 4788,
+          "full_committed_customer_hours": 6858.584565679406,
+          "loaded_share": 0.42230214286650614,
+          "calendar_customer_after_admission_hours": 635.913989790709,
+          "customer_outside_calendar_hours": 14.025062556355778,
+          "full_movement_hours": 1.3486330513353924,
+          "full_movement_km": 35.049512733626166,
+          "partition_error_s": 6.332993507385254e-08
+        }
+      },
+      "runtime_s": 6049.761260599999,
+      "setup_time_s": 69.90406519999999,
+      "simulation_loop_wall_s": 5952.5285346,
+      "peak_rss_mib": 1358.6171875,
+      "candidate_generation_time_s": 100.98311799998032,
+      "candidate_routing_time_s": 864.1540205000077,
+      "adapter_timings_s": {
+        "validator_time_s": 1287.7599328000242,
+        "current_move_time_s": 577.3524878998646,
+        "coarse_time_s": 17.32924460000129,
+        "value_lookup_time_s": 0.0403713999988895,
+        "current_flow_time_s": 2761.938360399988,
+        "solve_wall_time_s": 4674.963605999985
+      },
+      "timing_components_are_nested_do_not_sum": true,
+      "idle_movement_timings": {
+        "routing_wall_time_s": 0.0,
+        "total_decision_time_s": 0.007859499999653963
+      },
+      "actual_routing": {
+        "static_matrix_certificate": {
+          "schema": "STATIC_AUTO_OD_3_8_2_V1",
+          "valhalla_version": "3.8.2",
+          "config_sha256": "f2eb80488a2ec832208b8ee1a7433aa4905e58243fe1c0d5b81d48a3368ec696",
+          "timedep_matrix_distance": 0,
+          "conservative_static_guard_m": 10.0,
+          "mutable_traffic_or_remote_tiles": false
+        },
+        "raw_od_cache_entries": 20000,
+        "raw_od_cache_evictions": 404912,
+        "raw_od_memory_queries_avoided": 100581,
+        "raw_od_cross_minute_reuses": 100581,
+        "raw_od_beta_bin_reuses": 18247,
+        "certified_eta_prunes": 199095,
+        "known_eta_prunes_before_backend": 199095,
+        "grouped_source_queries": 248447,
+        "grouped_cell_fallback_queries": 0,
+        "optional_disk_cache": {
+          "entry_count": 407406,
+          "dropped_optional_writes": 0,
+          "write_time_s": 72.1577422000289,
+          "read_error": null,
+          "write_error": null,
+          "close_error": null,
+          "disabled_reads": false,
+          "disabled_writes": false,
+          "closed": false,
+          "writer_alive": true
+        }
+      },
+      "idle_movement": {
+        "counts": {
+          "MODEL_SELECTED_QUEUED": 30,
+          "STARTED": 30,
+          "COMPLETED": 20,
+          "INTERRUPTED_BY_CUSTOMER": 10
+        },
+        "movement_rows": 30,
+        "empty_time_s": 5091.9695250601,
+        "empty_distance_m": 36641.512733626165,
+        "empty_after_shift_time_s": 0.0,
+        "traffic_unknown_share": 1.0,
+        "routing_wall_time_s": 0.0,
+        "total_decision_time_s": 0.007859499999653963,
+        "dynamic_new_route_prediction_fabricated": false,
+        "geometry_endpoint_connectors_reported": true,
+        "control_mode": "MASTER_SELECTED_ONLY",
+        "automatic_historical_deficit_rule_active": false,
+        "selected_queue_pending": 0
+      },
+      "request_decision_diagnostics": {
+        "request_count": 28367,
+        "terminal_states": {
+          "ASSIGNED": 27634,
+          "EXPIRED": 733
+        },
+        "expiry_stage_counts": {
+          "VALID_ARC_WITH_IDLE_OPPORTUNITY_WITHHELD": 67,
+          "VALID_ARCS_NOT_SELECTED": 240,
+          "NO_PICKUP_WITHIN_INDEPENDENT_CAP": 422,
+          "NO_FINAL_VALIDATED_ARC": 3,
+          "NO_NEARBY_AVAILABLE_VEHICLE": 1
+        },
+        "stores_all_arcs": false,
+        "resets_patience_on_retry": false,
+        "deadline_semantics": "REQUEST_TO_ASSIGNMENT",
+        "arc_counters_count_repeated_attempts_not_unique_vehicles": true,
+        "categories_are_diagnostic_not_exclusive_physical_causes": true,
+        "typed_final_candidate_counts_enabled": true,
+        "typed_final_AV_arc_attempts": 4868,
+        "typed_final_HV_arc_attempts": 315542,
+        "HV_assigned_with_final_AV_same_epoch": 1561,
+        "HV_assigned_without_final_AV_same_epoch": 25208,
+        "HV_assigned_with_unoccupied_valid_AV": 1515,
+        "AV_alternatives_selected_for_other_requests": 78,
+        "typed_final_scope": "PRE_JOINT_ASSIGNMENT_GRAPH",
+        "typed_rejection_reason_limit_per_request": 64
+      },
+      "maximum_current_actions": 923,
+      "maximum_current_residual_edges": 2766,
+      "decision_count": 2892,
+      "current_flow_status": {
+        "JOINT_FEASIBLE_IMPROVED": 2702,
+        "FIXED_CURRENT_WAIT": 109,
+        "FEASIBLE_BACKUP_SERVICE_FIRST": 40,
+        "JOINT_FEASIBLE_INCUMBENT": 39,
+        "OPTIMAL_PRIMARY_CURRENT_FLOW_APPROXIMATE_FUTURE": 2
+      },
+      "adapter_wall_overrun_count": 50,
+      "explicit_fallback_decisions": 42,
+      "physical_accounting": {
+        "duplicate_orders": 0,
+        "vehicle_task_overlap": 0,
+        "maximum_time_error_s": 1.0006147022068035e-09
+      },
+      "source_code_sha": "4dd6426611aedf758290aff380b8f9a870767e45",
+      "waiting_contract": {
+        "patience_mode": "MATCH_DEADLINE_AND_PICKUP_CAP",
+        "request_to_assignment_limit_s": 300,
+        "independent_pickup_eta_cap_s": 600,
+        "legacy_request_to_pickup_limit_s": null,
+        "post_assignment_cancellation": false
+      },
+      "future_connector_queries": 0,
+      "total_empty_km": 29582.099512733625,
+      "matching_wait_s": {
+        "mean": 21.627126004197727,
+        "p90": 36.0,
+        "max": 299.0
+      },
+      "pickup_wait_s": {
+        "mean": 211.87724924332343,
+        "p90": 445.271654,
+        "max": 599.871776
+      },
+      "wait_s": {
+        "mean": 233.50437524752115,
+        "p90": 472.3768291,
+        "max": 889.232735
+      },
+      "hourly": [
+        {
+          "hour": 0,
+          "requests": 341,
+          "completed": 340,
+          "expired": 1,
+          "served_C": 13,
+          "served_HV": 327,
+          "C_state": {
+            "admission_hours": 8.776944444444444,
+            "PICKUP_hours": 0.3191469307483829,
+            "LOADED_hours": 0.8504334488027522,
+            "MOVE_hours": 0.0,
+            "idle_hours": 7.607364064893309,
+            "idle_share": 0.8667440147360798,
+            "customer_busy_share": 0.1332559852639202
+          },
+          "HV_state": {
+            "admission_hours": 69.47666666666667,
+            "PICKUP_hours": 15.124498956021075,
+            "LOADED_hours": 28.710305787254388,
+            "MOVE_hours": 0.06453199266820332,
+            "idle_hours": 25.577329930723,
+            "idle_share": 0.36814273277440385,
+            "customer_busy_share": 0.6309284375081629
+          }
+        },
+        {
+          "hour": 1,
+          "requests": 225,
+          "completed": 225,
+          "expired": 0,
+          "served_C": 7,
+          "served_HV": 218,
+          "C_state": {
+            "admission_hours": 9.959722222222222,
+            "PICKUP_hours": 0.3310510917155328,
+            "LOADED_hours": 0.6984751200668308,
+            "MOVE_hours": 0.0,
+            "idle_hours": 8.930196010439857,
+            "idle_share": 0.8966310315878814,
+            "customer_busy_share": 0.10336896841211851
+          },
+          "HV_state": {
+            "admission_hours": 87.50416666666666,
+            "PICKUP_hours": 13.368702115019575,
+            "LOADED_hours": 28.070258656301412,
+            "MOVE_hours": 0.1113563047745572,
+            "idle_hours": 45.95384959057114,
+            "idle_share": 0.525161844756777,
+            "customer_busy_share": 0.4735655723592703
+          }
+        },
+        {
+          "hour": 2,
+          "requests": 156,
+          "completed": 156,
+          "expired": 0,
+          "served_C": 3,
+          "served_HV": 153,
+          "C_state": {
+            "admission_hours": 7.156944444444444,
+            "PICKUP_hours": 0.14219600340552663,
+            "LOADED_hours": 0.34138888888888913,
+            "MOVE_hours": 0.0,
+            "idle_hours": 6.673359552150029,
+            "idle_share": 0.9324313754217002,
+            "customer_busy_share": 0.06756862457829989
+          },
+          "HV_state": {
+            "admission_hours": 59.96388888888889,
+            "PICKUP_hours": 8.902229849151327,
+            "LOADED_hours": 16.511321557707518,
+            "MOVE_hours": 0.075,
+            "idle_hours": 34.47533748203004,
+            "idle_share": 0.5749349837184794,
+            "customer_busy_share": 0.42381426351365103
+          }
+        },
+        {
+          "hour": 3,
+          "requests": 121,
+          "completed": 121,
+          "expired": 0,
+          "served_C": 1,
+          "served_HV": 120,
+          "C_state": {
+            "admission_hours": 4.831666666666667,
+            "PICKUP_hours": 0.07816114195168766,
+            "LOADED_hours": 0.063505524714979,
+            "MOVE_hours": 0.0,
+            "idle_hours": 4.69,
+            "idle_share": 0.970679544670576,
+            "customer_busy_share": 0.029320455329423938
+          },
+          "HV_state": {
+            "admission_hours": 44.93527777777778,
+            "PICKUP_hours": 8.516409480018122,
+            "LOADED_hours": 13.264740891262809,
+            "MOVE_hours": 0.1887975479999098,
+            "idle_hours": 22.965329858496936,
+            "idle_share": 0.5110757292314809,
+            "customer_busy_share": 0.48472272674038186
+          }
+        },
+        {
+          "hour": 4,
+          "requests": 79,
+          "completed": 79,
+          "expired": 0,
+          "served_C": 2,
+          "served_HV": 77,
+          "C_state": {
+            "admission_hours": 2.0305555555555554,
+            "PICKUP_hours": 0.11006349472110843,
+            "LOADED_hours": 0.22121669750724324,
+            "MOVE_hours": 0.0,
+            "idle_hours": 1.699275363327204,
+            "idle_share": 0.8368524361118925,
+            "customer_busy_share": 0.16314756388810753
+          },
+          "HV_state": {
+            "admission_hours": 31.18722222222222,
+            "PICKUP_hours": 5.126405650598619,
+            "LOADED_hours": 7.7684510506921205,
+            "MOVE_hours": 0.1397869812373296,
+            "idle_hours": 18.152578539694154,
+            "idle_share": 0.582051790645198,
+            "customer_busy_share": 0.4134660217383068
+          }
+        },
+        {
+          "hour": 5,
+          "requests": 104,
+          "completed": 102,
+          "expired": 2,
+          "served_C": 3,
+          "served_HV": 99,
+          "C_state": {
+            "admission_hours": 2.4391666666666665,
+            "PICKUP_hours": 0.16172476753851797,
+            "LOADED_hours": 0.20824465360942365,
+            "MOVE_hours": 0.0,
+            "idle_hours": 2.069197245518725,
+            "idle_share": 0.8483213852485377,
+            "customer_busy_share": 0.15167861475146224
+          },
+          "HV_state": {
+            "admission_hours": 27.946666666666665,
+            "PICKUP_hours": 6.345613136215425,
+            "LOADED_hours": 10.940157724530906,
+            "MOVE_hours": 0.1824468927679724,
+            "idle_hours": 10.478448913152368,
+            "idle_share": 0.37494449832367727,
+            "customer_busy_share": 0.6185271061812857
+          }
+        },
+        {
+          "hour": 6,
+          "requests": 329,
+          "completed": 326,
+          "expired": 3,
+          "served_C": 15,
+          "served_HV": 311,
+          "C_state": {
+            "admission_hours": 6.334722222222222,
+            "PICKUP_hours": 0.5189375336747485,
+            "LOADED_hours": 1.5328555843124467,
+            "MOVE_hours": 0.0,
+            "idle_hours": 4.282929104235027,
+            "idle_share": 0.676103695472313,
+            "customer_busy_share": 0.32389630452768703
+          },
+          "HV_state": {
+            "admission_hours": 76.03138888888888,
+            "PICKUP_hours": 17.149242975746542,
+            "LOADED_hours": 30.923442565351674,
+            "MOVE_hours": 0.0734674378428786,
+            "idle_hours": 27.885235909947802,
+            "idle_share": 0.3667595228425836,
+            "customer_busy_share": 0.6322741994276984
+          }
+        },
+        {
+          "hour": 7,
+          "requests": 854,
+          "completed": 829,
+          "expired": 25,
+          "served_C": 14,
+          "served_HV": 815,
+          "C_state": {
+            "admission_hours": 30.948611111111113,
+            "PICKUP_hours": 0.776776954678362,
+            "LOADED_hours": 2.2607858960999114,
+            "MOVE_hours": 0.0,
+            "idle_hours": 27.91104826033284,
+            "idle_share": 0.9018514000556318,
+            "customer_busy_share": 0.09814859994436823
+          },
+          "HV_state": {
+            "admission_hours": 279.13666666666666,
+            "PICKUP_hours": 56.9886461417858,
+            "LOADED_hours": 134.3819193970782,
+            "MOVE_hours": 0.08057478076614037,
+            "idle_hours": 87.68552634703664,
+            "idle_share": 0.31413116518922624,
+            "customer_busy_share": 0.6855801777105505
+          }
+        },
+        {
+          "hour": 8,
+          "requests": 1397,
+          "completed": 1375,
+          "expired": 22,
+          "served_C": 31,
+          "served_HV": 1344,
+          "C_state": {
+            "admission_hours": 60.77638888888889,
+            "PICKUP_hours": 0.8812338591865267,
+            "LOADED_hours": 4.3740402250073815,
+            "MOVE_hours": 0.0,
+            "idle_hours": 55.52111480469499,
+            "idle_share": 0.9135309915532893,
+            "customer_busy_share": 0.08646900844671071
+          },
+          "HV_state": {
+            "admission_hours": 504.91194444444443,
+            "PICKUP_hours": 80.98193471518672,
+            "LOADED_hours": 260.1635280592895,
+            "MOVE_hours": 0.016666666666666666,
+            "idle_hours": 163.749815003302,
+            "idle_share": 0.32431360914520696,
+            "customer_busy_share": 0.6756533817987593
+          }
+        },
+        {
+          "hour": 9,
+          "requests": 1674,
+          "completed": 1617,
+          "expired": 57,
+          "served_C": 55,
+          "served_HV": 1562,
+          "C_state": {
+            "admission_hours": 74.1475,
+            "PICKUP_hours": 1.2861395449109365,
+            "LOADED_hours": 8.822080240714866,
+            "MOVE_hours": 0.0,
+            "idle_hours": 64.03928021437422,
+            "idle_share": 0.8636741658771263,
+            "customer_busy_share": 0.13632583412287402
+          },
+          "HV_state": {
+            "admission_hours": 645.2252777777778,
+            "PICKUP_hours": 71.36206639058909,
+            "LOADED_hours": 279.25736548490045,
+            "MOVE_hours": 0.0,
+            "idle_hours": 294.6058459022883,
+            "idle_share": 0.4565937759241875,
+            "customer_busy_share": 0.5434062240758126
+          }
+        },
+        {
+          "hour": 10,
+          "requests": 1516,
+          "completed": 1483,
+          "expired": 33,
+          "served_C": 48,
+          "served_HV": 1435,
+          "C_state": {
+            "admission_hours": 75.12527777777778,
+            "PICKUP_hours": 1.2384616473677368,
+            "LOADED_hours": 6.921241956939047,
+            "MOVE_hours": 0.0,
+            "idle_hours": 66.96557417347098,
+            "idle_share": 0.8913853785879717,
+            "customer_busy_share": 0.10861462141202814
+          },
+          "HV_state": {
+            "admission_hours": 639.5486111111111,
+            "PICKUP_hours": 63.03075551588806,
+            "LOADED_hours": 258.3527350725159,
+            "MOVE_hours": 0.0,
+            "idle_hours": 318.1651205227076,
+            "idle_share": 0.4974838737745794,
+            "customer_busy_share": 0.5025161262254213
+          }
+        },
+        {
+          "hour": 11,
+          "requests": 1577,
+          "completed": 1551,
+          "expired": 26,
+          "served_C": 58,
+          "served_HV": 1493,
+          "C_state": {
+            "admission_hours": 67.24805555555555,
+            "PICKUP_hours": 1.7798298546784848,
+            "LOADED_hours": 7.2303044691625855,
+            "MOVE_hours": 0.0,
+            "idle_hours": 58.237921231714495,
+            "idle_share": 0.8660164334952773,
+            "customer_busy_share": 0.1339835665047228
+          },
+          "HV_state": {
+            "admission_hours": 608.5083333333333,
+            "PICKUP_hours": 69.03575841506483,
+            "LOADED_hours": 252.7335993643445,
+            "MOVE_hours": 0.0,
+            "idle_hours": 286.7389755539242,
+            "idle_share": 0.4712161852956123,
+            "customer_busy_share": 0.5287838147043881
+          }
+        },
+        {
+          "hour": 12,
+          "requests": 1525,
+          "completed": 1497,
+          "expired": 28,
+          "served_C": 49,
+          "served_HV": 1448,
+          "C_state": {
+            "admission_hours": 64.47555555555556,
+            "PICKUP_hours": 1.1543177865470675,
+            "LOADED_hours": 7.222245583081173,
+            "MOVE_hours": 0.0,
+            "idle_hours": 56.09899218592735,
+            "idle_share": 0.8700815635095922,
+            "customer_busy_share": 0.12991843649040835
+          },
+          "HV_state": {
+            "admission_hours": 604.4308333333333,
+            "PICKUP_hours": 63.4074332590884,
+            "LOADED_hours": 239.07300262974857,
+            "MOVE_hours": 0.0,
+            "idle_hours": 301.9503974444965,
+            "idle_share": 0.4995615392075407,
+            "customer_busy_share": 0.5004384607924595
+          }
+        },
+        {
+          "hour": 13,
+          "requests": 1646,
+          "completed": 1594,
+          "expired": 52,
+          "served_C": 60,
+          "served_HV": 1534,
+          "C_state": {
+            "admission_hours": 67.73472222222222,
+            "PICKUP_hours": 1.2888800214171674,
+            "LOADED_hours": 8.208320531205883,
+            "MOVE_hours": 0.0,
+            "idle_hours": 58.23752166959917,
+            "idle_share": 0.8597882999879309,
+            "customer_busy_share": 0.1402117000120691
+          },
+          "HV_state": {
+            "admission_hours": 628.1061111111111,
+            "PICKUP_hours": 68.43455127884877,
+            "LOADED_hours": 229.876209290524,
+            "MOVE_hours": 0.0,
+            "idle_hours": 329.7953505417387,
+            "idle_share": 0.5250631138715324,
+            "customer_busy_share": 0.47493688612846824
+          }
+        },
+        {
+          "hour": 14,
+          "requests": 1768,
+          "completed": 1722,
+          "expired": 46,
+          "served_C": 44,
+          "served_HV": 1678,
+          "C_state": {
+            "admission_hours": 74.78694444444444,
+            "PICKUP_hours": 1.683663632950706,
+            "LOADED_hours": 7.185364942340323,
+            "MOVE_hours": 0.0,
+            "idle_hours": 65.91791586915338,
+            "idle_share": 0.8814094005153609,
+            "customer_busy_share": 0.1185905994846386
+          },
+          "HV_state": {
+            "admission_hours": 712.6005555555555,
+            "PICKUP_hours": 96.14296238622211,
+            "LOADED_hours": 307.4974282474539,
+            "MOVE_hours": 0.0,
+            "idle_hours": 308.96016492187897,
+            "idle_share": 0.43356711205621834,
+            "customer_busy_share": 0.566432887943781
+          }
+        },
+        {
+          "hour": 15,
+          "requests": 1928,
+          "completed": 1878,
+          "expired": 50,
+          "served_C": 52,
+          "served_HV": 1826,
+          "C_state": {
+            "admission_hours": 81.18555555555555,
+            "PICKUP_hours": 2.2145540070892435,
+            "LOADED_hours": 8.628605393302951,
+            "MOVE_hours": 0.0,
+            "idle_hours": 70.34239615516336,
+            "idle_share": 0.866439795525299,
+            "customer_busy_share": 0.13356020447470096
+          },
+          "HV_state": {
+            "admission_hours": 802.1372222222222,
+            "PICKUP_hours": 108.23928895981088,
+            "LOADED_hours": 353.8038309417216,
+            "MOVE_hours": 0.0,
+            "idle_hours": 340.0941023206897,
+            "idle_share": 0.4239849403553433,
+            "customer_busy_share": 0.5760150596446566
+          }
+        },
+        {
+          "hour": 16,
+          "requests": 1860,
+          "completed": 1808,
+          "expired": 52,
+          "served_C": 56,
+          "served_HV": 1752,
+          "C_state": {
+            "admission_hours": 85.17333333333333,
+            "PICKUP_hours": 3.818088697673025,
+            "LOADED_hours": 9.02374626500225,
+            "MOVE_hours": 0.0,
+            "idle_hours": 72.33149837065807,
+            "idle_share": 0.8492270472447331,
+            "customer_busy_share": 0.150772952755267
+          },
+          "HV_state": {
+            "admission_hours": 773.7336111111111,
+            "PICKUP_hours": 129.84324490810485,
+            "LOADED_hours": 334.3395951730528,
+            "MOVE_hours": 0.0,
+            "idle_hours": 309.5507710299532,
+            "idle_share": 0.4000740908559296,
+            "customer_busy_share": 0.5999259091440701
+          }
+        },
+        {
+          "hour": 17,
+          "requests": 1740,
+          "completed": 1681,
+          "expired": 59,
+          "served_C": 25,
+          "served_HV": 1656,
+          "C_state": {
+            "admission_hours": 88.4025,
+            "PICKUP_hours": 1.5420225547087405,
+            "LOADED_hours": 3.9732881720597146,
+            "MOVE_hours": 0.0,
+            "idle_hours": 82.88718927323153,
+            "idle_share": 0.9376113715475413,
+            "customer_busy_share": 0.06238862845245842
+          },
+          "HV_state": {
+            "admission_hours": 733.6155555555556,
+            "PICKUP_hours": 131.01892763204145,
+            "LOADED_hours": 329.1268708136713,
+            "MOVE_hours": 0.1716538236926236,
+            "idle_hours": 273.2981032861504,
+            "idle_share": 0.3725358618918407,
+            "customer_busy_share": 0.627230154760352
+          }
+        },
+        {
+          "hour": 18,
+          "requests": 1669,
+          "completed": 1599,
+          "expired": 70,
+          "served_C": 15,
+          "served_HV": 1584,
+          "C_state": {
+            "admission_hours": 92.5111111111111,
+            "PICKUP_hours": 0.6200561463597518,
+            "LOADED_hours": 1.483032723655225,
+            "MOVE_hours": 0.0,
+            "idle_hours": 90.40802224109613,
+            "idle_share": 0.9772666348424996,
+            "customer_busy_share": 0.022733365157500348
+          },
+          "HV_state": {
+            "admission_hours": 753.1113888888889,
+            "PICKUP_hours": 130.03821301294548,
+            "LOADED_hours": 384.74875482664197,
+            "MOVE_hours": 0.03911987055908766,
+            "idle_hours": 238.2853011787433,
+            "idle_share": 0.3164011389208974,
+            "customer_busy_share": 0.683546916743729
+          }
+        },
+        {
+          "hour": 19,
+          "requests": 2011,
+          "completed": 1973,
+          "expired": 38,
+          "served_C": 68,
+          "served_HV": 1905,
+          "C_state": {
+            "admission_hours": 84.03833333333333,
+            "PICKUP_hours": 1.2984402999904099,
+            "LOADED_hours": 10.044024810792884,
+            "MOVE_hours": 0.0,
+            "idle_hours": 72.69586822255005,
+            "idle_share": 0.8650322458705358,
+            "customer_busy_share": 0.13496775412946424
+          },
+          "HV_state": {
+            "admission_hours": 778.6694444444445,
+            "PICKUP_hours": 114.560413333675,
+            "LOADED_hours": 368.9869325606465,
+            "MOVE_hours": 0.03444239012928948,
+            "idle_hours": 295.0876561599935,
+            "idle_share": 0.3789639599516185,
+            "customer_busy_share": 0.6209918076846035
+          }
+        },
+        {
+          "hour": 20,
+          "requests": 1724,
+          "completed": 1677,
+          "expired": 47,
+          "served_C": 84,
+          "served_HV": 1593,
+          "C_state": {
+            "admission_hours": 81.635,
+            "PICKUP_hours": 2.8918273563794155,
+            "LOADED_hours": 11.801557520579804,
+            "MOVE_hours": 0.0,
+            "idle_hours": 66.94161512304076,
+            "idle_share": 0.8200112099349637,
+            "customer_busy_share": 0.17998879006503607
+          },
+          "HV_state": {
+            "admission_hours": 695.5322222222222,
+            "PICKUP_hours": 68.92617296767452,
+            "LOADED_hours": 245.86835362255823,
+            "MOVE_hours": 0.0,
+            "idle_hours": 380.737695631989,
+            "idle_share": 0.5474048267893813,
+            "customer_busy_share": 0.452595173210618
+          }
+        },
+        {
+          "hour": 21,
+          "requests": 1828,
+          "completed": 1783,
+          "expired": 45,
+          "served_C": 79,
+          "served_HV": 1704,
+          "C_state": {
+            "admission_hours": 74.7238888888889,
+            "PICKUP_hours": 3.592172934075004,
+            "LOADED_hours": 11.242652373539633,
+            "MOVE_hours": 0.0,
+            "idle_hours": 59.88906358127425,
+            "idle_share": 0.8014714500516245,
+            "customer_busy_share": 0.19852854994837546
+          },
+          "HV_state": {
+            "admission_hours": 668.7652777777778,
+            "PICKUP_hours": 94.46336847188554,
+            "LOADED_hours": 256.13532431149537,
+            "MOVE_hours": 0.0,
+            "idle_hours": 318.16658499439643,
+            "idle_share": 0.4757522490575821,
+            "customer_busy_share": 0.5242477509424173
+          }
+        },
+        {
+          "hour": 22,
+          "requests": 1416,
+          "completed": 1375,
+          "expired": 41,
+          "served_C": 53,
+          "served_HV": 1322,
+          "C_state": {
+            "admission_hours": 55.15638888888889,
+            "PICKUP_hours": 2.568857822328266,
+            "LOADED_hours": 7.43357456831462,
+            "MOVE_hours": 0.0,
+            "idle_hours": 45.153956498246025,
+            "idle_share": 0.8186532405014313,
+            "customer_busy_share": 0.18134675949856915
+          },
+          "HV_state": {
+            "admission_hours": 542.4363888888889,
+            "PICKUP_hours": 74.58310350400713,
+            "LOADED_hours": 200.3741446784323,
+            "MOVE_hours": 0.02207640452558634,
+            "idle_hours": 267.4570643019236,
+            "idle_share": 0.49306622818903234,
+            "customer_busy_share": 0.5068930732056047
+          }
+        },
+        {
+          "hour": 23,
+          "requests": 877,
+          "completed": 843,
+          "expired": 34,
+          "served_C": 30,
+          "served_HV": 813,
+          "C_state": {
+            "admission_hours": 28.333333333333332,
+            "PICKUP_hours": 1.184351669057101,
+            "LOADED_hours": 2.716188196961282,
+            "MOVE_hours": 0.06580292784796862,
+            "idle_hours": 24.366990539466983,
+            "idle_share": 0.860011430804717,
+            "customer_busy_share": 0.13766611291829586
+          },
+          "HV_state": {
+            "admission_hours": 283.2872222222222,
+            "PICKUP_hours": 46.27822874451584,
+            "LOADED_hours": 95.86906882506821,
+            "MOVE_hours": 0.14871195770514734,
+            "idle_hours": 140.99121269493307,
+            "idle_share": 0.4976970425596313,
+            "customer_busy_share": 0.5017780062740628
+          }
+        },
+        {
+          "hour": 24,
+          "requests": 2,
+          "completed": 0,
+          "expired": 2,
+          "served_C": 0,
+          "served_HV": 0,
+          "C_state": null,
+          "HV_state": null
+        }
+      ],
+      "typed_final_candidate_diagnostics": {
+        "eligible_orders": 6534,
+        "eligible_served_C": 865,
+        "eligible_served_HV": 5553,
+        "eligible_expired": 116,
+        "HV_with_final_C_count": 1561,
+        "HV_with_final_C_share": 0.28110931028273006,
+        "exclusive_final_HV_categories": {
+          "NO_FINAL_C_CANDIDATE": 3992,
+          "FINAL_C_LEFT_UNOCCUPIED": 1515,
+          "FINAL_C_ALL_SERVING_OTHER_REQUESTS": 46,
+          "FINAL_C_MOVING_OR_MIXED_COMMITTED": 0
+        },
+        "lifetime_rejection_witnesses": {
+          "ELIGIBLE_HV_NO_FINAL_C": {
+            "request_count": 3992,
+            "reason_request_counts": {
+              "AV:COINCIDENT_CUSTOMER_JOIN:CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT": 2,
+              "AV:COINCIDENT_CUSTOMER_JOIN:CUSTOMER_EMPTY_JOIN_TOO_FAR_FROM_SHARED_ENDPOINT": 1,
+              "AV:COINCIDENT_CUSTOMER_JOIN:UTURN_OUTSIDE_RESEARCH_PROFILE": 1,
+              "AV:DEPARTURE_CONTEXT:PREVIOUS_DIRECTION_CONTEXT_UNAVAILABLE": 1,
+              "AV:DEPARTURE_JOIN:CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT": 799,
+              "AV:DEPARTURE_JOIN:CUSTOMER_EMPTY_JOIN_TOO_FAR_FROM_SHARED_ENDPOINT": 490,
+              "AV:DEPARTURE_JOIN:ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE": 13,
+              "AV:DEPARTURE_JOIN:UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 33,
+              "AV:DEPARTURE_JOIN:UTURN_OUTSIDE_RESEARCH_PROFILE": 383,
+              "AV:OTHER_TEXT_REASON": 11,
+              "AV:PICKUP_CUSTOMER_JOIN:CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT": 376,
+              "AV:PICKUP_CUSTOMER_JOIN:CUSTOMER_EMPTY_JOIN_TOO_FAR_FROM_SHARED_ENDPOINT": 206,
+              "AV:PICKUP_CUSTOMER_JOIN:ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE": 4,
+              "AV:PICKUP_CUSTOMER_JOIN:UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 1,
+              "AV:PICKUP_CUSTOMER_JOIN:UTURN_OUTSIDE_RESEARCH_PROFILE": 239,
+              "AV:PICKUP_ROUTE:EDGE_OUTSIDE_FROZEN_FULL_NETWORK": 63,
+              "AV:PICKUP_ROUTE:EDGE_WALK_INVALID_SHAPE_INDEX_OR_LENGTH": 109,
+              "AV:PICKUP_ROUTE:EMPTY_ROUTE_EXCEPTION": 22,
+              "AV:PICKUP_ROUTE:ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE": 547,
+              "AV:PICKUP_ROUTE:SCALAR_EMPTY_ROUTE_TIME_OR_DISTANCE_INVALID": 12,
+              "AV:PICKUP_ROUTE:UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 1279,
+              "AV:PICKUP_ROUTE:UTURN_OUTSIDE_RESEARCH_PROFILE": 2028,
+              "AV:PICKUP_TIME:PICKUP_ETA_EXCEEDS_INDEPENDENT_CAP": 9
+            },
+            "reason_attempt_counts": {
+              "AV:COINCIDENT_CUSTOMER_JOIN:CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT": 3,
+              "AV:COINCIDENT_CUSTOMER_JOIN:CUSTOMER_EMPTY_JOIN_TOO_FAR_FROM_SHARED_ENDPOINT": 1,
+              "AV:COINCIDENT_CUSTOMER_JOIN:UTURN_OUTSIDE_RESEARCH_PROFILE": 1,
+              "AV:DEPARTURE_CONTEXT:PREVIOUS_DIRECTION_CONTEXT_UNAVAILABLE": 1,
+              "AV:DEPARTURE_JOIN:CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT": 1178,
+              "AV:DEPARTURE_JOIN:CUSTOMER_EMPTY_JOIN_TOO_FAR_FROM_SHARED_ENDPOINT": 677,
+              "AV:DEPARTURE_JOIN:ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE": 15,
+              "AV:DEPARTURE_JOIN:UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 35,
+              "AV:DEPARTURE_JOIN:UTURN_OUTSIDE_RESEARCH_PROFILE": 519,
+              "AV:OTHER_TEXT_REASON": 16,
+              "AV:PICKUP_CUSTOMER_JOIN:CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT": 887,
+              "AV:PICKUP_CUSTOMER_JOIN:CUSTOMER_EMPTY_JOIN_TOO_FAR_FROM_SHARED_ENDPOINT": 473,
+              "AV:PICKUP_CUSTOMER_JOIN:ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE": 8,
+              "AV:PICKUP_CUSTOMER_JOIN:UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 1,
+              "AV:PICKUP_CUSTOMER_JOIN:UTURN_OUTSIDE_RESEARCH_PROFILE": 532,
+              "AV:PICKUP_ROUTE:EDGE_OUTSIDE_FROZEN_FULL_NETWORK": 102,
+              "AV:PICKUP_ROUTE:EDGE_WALK_INVALID_SHAPE_INDEX_OR_LENGTH": 464,
+              "AV:PICKUP_ROUTE:EMPTY_ROUTE_EXCEPTION": 27,
+              "AV:PICKUP_ROUTE:ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE": 1171,
+              "AV:PICKUP_ROUTE:SCALAR_EMPTY_ROUTE_TIME_OR_DISTANCE_INVALID": 20,
+              "AV:PICKUP_ROUTE:UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 2729,
+              "AV:PICKUP_ROUTE:UTURN_OUTSIDE_RESEARCH_PROFILE": 5737,
+              "AV:PICKUP_TIME:PICKUP_ETA_EXCEEDS_INDEPENDENT_CAP": 21
+            },
+            "phase_request_counts": {
+              "COINCIDENT_CUSTOMER_JOIN": 4,
+              "DEPARTURE_CONTEXT": 1,
+              "DEPARTURE_JOIN": 1352,
+              "OTHER_TEXT_REASON": 11,
+              "PICKUP_CUSTOMER_JOIN": 825,
+              "PICKUP_ROUTE": 2914,
+              "PICKUP_TIME": 9
+            }
+          },
+          "ELIGIBLE_EXPIRED": {
+            "request_count": 116,
+            "reason_request_counts": {
+              "AV:PICKUP_CUSTOMER_JOIN:CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT": 1,
+              "AV:PICKUP_ROUTE:EDGE_OUTSIDE_FROZEN_FULL_NETWORK": 1,
+              "AV:PICKUP_ROUTE:ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE": 2,
+              "AV:PICKUP_ROUTE:UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 5,
+              "AV:PICKUP_ROUTE:UTURN_OUTSIDE_RESEARCH_PROFILE": 5
+            },
+            "reason_attempt_counts": {
+              "AV:PICKUP_CUSTOMER_JOIN:CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT": 10,
+              "AV:PICKUP_ROUTE:EDGE_OUTSIDE_FROZEN_FULL_NETWORK": 1,
+              "AV:PICKUP_ROUTE:ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE": 6,
+              "AV:PICKUP_ROUTE:UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 38,
+              "AV:PICKUP_ROUTE:UTURN_OUTSIDE_RESEARCH_PROFILE": 63
+            },
+            "phase_request_counts": {
+              "PICKUP_CUSTOMER_JOIN": 1,
+              "PICKUP_ROUTE": 7
+            }
+          }
+        },
+        "final_scope": "ADMITTED_TOPK_GRAPH_AT_ASSIGNMENT_NOT_ALL_POSSIBLE_VEHICLES",
+        "rejection_witnesses_are_nonexclusive_not_counterfactual_causes": true
+      },
+      "secondary_distance": {
+        "solve_count": 2783,
+        "optimal_count": 2,
+        "statuses": {
+          "JOINT_PLANNING_NOT_OLD_CURRENT_PRIMARY_FACE": 2741,
+          "NO_CURRENT_FLOW_SOLVE": 109,
+          "PRIMARY_NOT_PROVED": 40,
+          "OPTIMAL_PRIMARY_FACE_MM": 2
+        },
+        "time_s": 0.012045299999954295,
+        "deadline_exceeded_count": 0,
+        "scope": "JOINT_PLAN_NOT_CURRENT_MAXIMUM_SERVICE_PRIMARY_FACE"
+      },
+      "source_products_sha256": {
+        "summary.json": "ada516b54ab280020ee9e82e2c43657c7b427a394351d39715d0d470e53e57b5",
+        "assignments.parquet": "95445b7bad57aefed8ac3c756caf199499570f81b3ffca445332fbfd1a8b9aab",
+        "cohort_outcomes.parquet": "f3767342a5b3001e167882b7f5c4b349e682d53007bb08d9d2596dc2892a6da6",
+        "empty_movements.parquet": "7757440abf0df33b7c15895f7342187cbdca0bd4e956c1db8c334ba837cfb7cd",
+        "solver_trace.parquet": "4dda9fec243218a6d790f17e6eadf2e51b18b952a754c1e45d57d37be58f7bdc"
+      },
+      "method": "BOTTLENECK_JOINT",
+      "joint_control_operations": {
+        "secondary_distance_optimal_decisions": 2,
+        "coarse_refreshes": 289,
+        "current_move_connector_queries": 43389,
+        "current_move_proposed_count": 50957,
+        "current_move_upper_screened_count": 0,
+        "current_move_routed_count": 43389,
+        "current_move_arrival_screened_count": 0,
+        "current_move_budget_skipped_count": 7568,
+        "current_move_value_unavailable_skipped_count": 0,
+        "optional_move_budget_cutoffs": 40,
+        "future_chain_variables": 190994,
+        "future_connector_queries": 0,
+        "joint_decisions": 2783,
+        "joint_resource_fallbacks": 42,
+        "joint_accepted_coalitions": 9006,
+        "joint_planning_labels": 9145380,
+        "max_joint_variables": 260,
+        "max_joint_nonzeros": 875,
+        "incremental_groups_merged": 16756,
+        "incremental_batch_root_queries": 293787,
+        "incremental_fixed_only_blocks_skipped": 470,
+        "incremental_solver_calls": 26884,
+        "incremental_persistent_model_loads": 11103,
+        "incremental_persistent_warm_starts": 26884,
+        "incremental_persistent_solver_runs": 26884,
+        "incremental_first_current_improvement_stops": 2570,
+        "incremental_topology_snapshot_rebuilds": 288,
+        "incremental_topology_successor_builds": 2633578,
+        "incremental_topology_successor_reuses": 449911,
+        "joint_current_action_change_measured_decisions": 2741,
+        "joint_current_action_changed_decisions": 2570,
+        "joint_future_only_accepted_coalitions": 6436,
+        "incremental_constant_objective_stages_skipped": 6410,
+        "incremental_topology_snapshot_reuses": 2453,
+        "incremental_capacity_bound_stages_skipped": 15
+      },
+      "retained_layout_solver_time_s": 445.567804899998,
+      "incremental_layout_solver_time_s": 0.0,
+      "result_retained_not_rerun": false
+    },
+    "BOTTLENECK_SHARED_PLAN": {
+      "completed": 27652,
+      "expired": 715,
+      "service_rate": 0.974794655761977,
+      "served_C": 838,
+      "served_HV": 26814,
+      "C_body_compatible_orders": 9275,
+      "C_after_passenger_acceptance_orders": 6534,
+      "C_eligible_served_by_HV": 5583,
+      "C_eligible_expired": 113,
+      "pickup_empty_km": 29787.214,
+      "idle_empty_km": 19.1465191403335,
+      "actual_idle_moves": 18,
+      "C_pickup_empty_km": 613.914,
+      "HV_pickup_empty_km": 29173.3,
+      "admission_state": {
+        "AV": {
+          "admission_hours": 1227.9322222222222,
+          "PICKUP_hours": 30.29408933352882,
+          "LOADED_hours": 119.67128188953738,
+          "MOVE_hours": 0.12486907747508319,
+          "idle_hours": 1077.8419819216797,
+          "idle_share": 0.8777699309584692,
+          "customer_busy_share": 0.12212837851234966,
+          "day_slots": 851,
+          "never_served_slots": 340,
+          "fully_idle_slots": 339,
+          "slots_with_idle_gap_over_300s": 748,
+          "full_committed_customer_hours": 162.56947454733316,
+          "loaded_share": 0.09745756298581774,
+          "calendar_customer_after_admission_hours": 11.84767589642579,
+          "customer_outside_calendar_hours": 0.7564274278411499,
+          "full_movement_hours": 0.12486907747508319,
+          "full_movement_km": 2.963,
+          "partition_error_s": 4.190951585769653e-09
+        },
+        "HV": {
+          "admission_hours": 11050.801944444445,
+          "PICKUP_hours": 1553.3588067275819,
+          "LOADED_hours": 4689.8013246794635,
+          "MOVE_hours": 0.6687698444916986,
+          "idle_hours": 4806.973043192892,
+          "idle_share": 0.4349886159718477,
+          "customer_busy_share": 0.5649508662623042,
+          "day_slots": 7582,
+          "never_served_slots": 611,
+          "fully_idle_slots": 611,
+          "slots_with_idle_gap_over_300s": 4840,
+          "full_committed_customer_hours": 6877.142789573395,
+          "loaded_share": 0.4243856100449942,
+          "calendar_customer_after_admission_hours": 620.1101589084882,
+          "customer_outside_calendar_hours": 13.872499257862154,
+          "full_movement_hours": 0.6687698444916986,
+          "full_movement_km": 16.183519140333495,
+          "partition_error_s": 5.587935447692871e-08
+        }
+      },
+      "runtime_s": 7506.5337156,
+      "setup_time_s": 70.4092286999994,
+      "simulation_loop_wall_s": 7368.460172700001,
+      "peak_rss_mib": 1130.46484375,
+      "candidate_generation_time_s": 120.27710850007861,
+      "candidate_routing_time_s": 955.9521640999483,
+      "adapter_timings_s": {
+        "validator_time_s": 1406.8054254000108,
+        "current_move_time_s": 582.5194415002406,
+        "coarse_time_s": 19.590224499992473,
+        "value_lookup_time_s": 0.04259489977721387,
+        "current_flow_time_s": 3878.093948400002,
+        "solve_wall_time_s": 5922.298239999965
+      },
+      "timing_components_are_nested_do_not_sum": true,
+      "idle_movement_timings": {
+        "routing_wall_time_s": 0.0,
+        "total_decision_time_s": 0.005228700006227882
+      },
+      "actual_routing": {
+        "static_matrix_certificate": {
+          "schema": "STATIC_AUTO_OD_3_8_2_V1",
+          "valhalla_version": "3.8.2",
+          "config_sha256": "f2eb80488a2ec832208b8ee1a7433aa4905e58243fe1c0d5b81d48a3368ec696",
+          "timedep_matrix_distance": 0,
+          "conservative_static_guard_m": 10.0,
+          "mutable_traffic_or_remote_tiles": false
+        },
+        "raw_od_cache_entries": 20000,
+        "raw_od_cache_evictions": 400240,
+        "raw_od_memory_queries_avoided": 92652,
+        "raw_od_cross_minute_reuses": 92652,
+        "raw_od_beta_bin_reuses": 16968,
+        "certified_eta_prunes": 193040,
+        "known_eta_prunes_before_backend": 193040,
+        "grouped_source_queries": 246201,
+        "grouped_cell_fallback_queries": 0,
+        "optional_disk_cache": {
+          "entry_count": 403867,
+          "dropped_optional_writes": 0,
+          "write_time_s": 78.40732939995632,
+          "read_error": null,
+          "write_error": null,
+          "close_error": null,
+          "disabled_reads": false,
+          "disabled_writes": false,
+          "closed": false,
+          "writer_alive": true
+        }
+      },
+      "idle_movement": {
+        "counts": {
+          "MODEL_SELECTED_QUEUED": 18,
+          "STARTED": 18,
+          "COMPLETED": 9,
+          "INTERRUPTED_BY_CUSTOMER": 9
+        },
+        "movement_rows": 18,
+        "empty_time_s": 2857.1001190804145,
+        "empty_distance_m": 19146.519140333497,
+        "empty_after_shift_time_s": 0.0,
+        "traffic_unknown_share": 1.0,
+        "routing_wall_time_s": 0.0,
+        "total_decision_time_s": 0.005228700006227882,
+        "dynamic_new_route_prediction_fabricated": false,
+        "geometry_endpoint_connectors_reported": true,
+        "control_mode": "MASTER_SELECTED_ONLY",
+        "automatic_historical_deficit_rule_active": false,
+        "selected_queue_pending": 0
+      },
+      "request_decision_diagnostics": {
+        "request_count": 28367,
+        "terminal_states": {
+          "ASSIGNED": 27652,
+          "EXPIRED": 715
+        },
+        "expiry_stage_counts": {
+          "VALID_ARC_WITH_IDLE_OPPORTUNITY_WITHHELD": 35,
+          "NO_PICKUP_WITHIN_INDEPENDENT_CAP": 431,
+          "VALID_ARCS_NOT_SELECTED": 247,
+          "NO_FINAL_VALIDATED_ARC": 1,
+          "NO_NEARBY_AVAILABLE_VEHICLE": 1
+        },
+        "stores_all_arcs": false,
+        "resets_patience_on_retry": false,
+        "deadline_semantics": "REQUEST_TO_ASSIGNMENT",
+        "arc_counters_count_repeated_attempts_not_unique_vehicles": true,
+        "categories_are_diagnostic_not_exclusive_physical_causes": true,
+        "typed_final_candidate_counts_enabled": true,
+        "typed_final_AV_arc_attempts": 4440,
+        "typed_final_HV_arc_attempts": 313404,
+        "HV_assigned_with_final_AV_same_epoch": 1524,
+        "HV_assigned_without_final_AV_same_epoch": 25290,
+        "HV_assigned_with_unoccupied_valid_AV": 1477,
+        "AV_alternatives_selected_for_other_requests": 80,
+        "typed_final_scope": "PRE_JOINT_ASSIGNMENT_GRAPH",
+        "typed_rejection_reason_limit_per_request": 64
+      },
+      "maximum_current_actions": 879,
+      "maximum_current_residual_edges": 2744,
+      "decision_count": 2892,
+      "current_flow_status": {
+        "JOINT_FEASIBLE_IMPROVED": 2591,
+        "FIXED_CURRENT_WAIT": 150,
+        "JOINT_FEASIBLE_INCUMBENT": 107,
+        "FEASIBLE_BACKUP_SERVICE_FIRST": 42,
+        "OPTIMAL_PRIMARY_CURRENT_FLOW_APPROXIMATE_FUTURE": 2
+      },
+      "adapter_wall_overrun_count": 62,
+      "explicit_fallback_decisions": 44,
+      "physical_accounting": {
+        "duplicate_orders": 0,
+        "vehicle_task_overlap": 0,
+        "maximum_time_error_s": 1.000444171950221e-09
+      },
+      "source_code_sha": "4dd6426611aedf758290aff380b8f9a870767e45",
+      "waiting_contract": {
+        "patience_mode": "MATCH_DEADLINE_AND_PICKUP_CAP",
+        "request_to_assignment_limit_s": 300,
+        "independent_pickup_eta_cap_s": 600,
+        "legacy_request_to_pickup_limit_s": null,
+        "post_assignment_cancellation": false
+      },
+      "future_connector_queries": 0,
+      "total_empty_km": 29806.360519140333,
+      "matching_wait_s": {
+        "mean": 20.842796181108056,
+        "p90": 29.0,
+        "max": 299.0
+      },
+      "pickup_wait_s": {
+        "mean": 212.86359534351945,
+        "p90": 446.363506,
+        "max": 599.871776
+      },
+      "wait_s": {
+        "mean": 233.7063915246275,
+        "p90": 473.8445412,
+        "max": 888.45838
+      },
+      "hourly": [
+        {
+          "hour": 0,
+          "requests": 341,
+          "completed": 339,
+          "expired": 2,
+          "served_C": 9,
+          "served_HV": 330,
+          "C_state": {
+            "admission_hours": 8.776944444444444,
+            "PICKUP_hours": 0.5566765519040782,
+            "LOADED_hours": 0.7890445599138636,
+            "MOVE_hours": 0.05836886629963835,
+            "idle_hours": 7.3728544663268645,
+            "idle_share": 0.8400251947582591,
+            "customer_busy_share": 0.15332455620927904
+          },
+          "HV_state": {
+            "admission_hours": 69.47666666666667,
+            "PICKUP_hours": 16.11058888574315,
+            "LOADED_hours": 28.188946943118008,
+            "MOVE_hours": 0.0,
+            "idle_hours": 25.1771308378055,
+            "idle_share": 0.3623825385665044,
+            "customer_busy_share": 0.6376174614334956
+          }
+        },
+        {
+          "hour": 1,
+          "requests": 225,
+          "completed": 225,
+          "expired": 0,
+          "served_C": 8,
+          "served_HV": 217,
+          "C_state": {
+            "admission_hours": 9.959722222222222,
+            "PICKUP_hours": 0.46970323850845525,
+            "LOADED_hours": 0.5912528978446085,
+            "MOVE_hours": 0.0,
+            "idle_hours": 8.898766085869157,
+            "idle_share": 0.8934753286606879,
+            "customer_busy_share": 0.10652467133931195
+          },
+          "HV_state": {
+            "admission_hours": 87.50416666666666,
+            "PICKUP_hours": 13.117309744448246,
+            "LOADED_hours": 28.041518218075083,
+            "MOVE_hours": 0.09166666666666666,
+            "idle_hours": 46.25367203747666,
+            "idle_share": 0.5285882238462167,
+            "customer_busy_share": 0.4703642069904099
+          }
+        },
+        {
+          "hour": 2,
+          "requests": 156,
+          "completed": 156,
+          "expired": 0,
+          "served_C": 1,
+          "served_HV": 155,
+          "C_state": {
+            "admission_hours": 7.156944444444444,
+            "PICKUP_hours": 0.09997797921296271,
+            "LOADED_hours": 0.08055555555555556,
+            "MOVE_hours": 0.0,
+            "idle_hours": 6.976410909675926,
+            "idle_share": 0.9747750543308106,
+            "customer_busy_share": 0.025224945669189435
+          },
+          "HV_state": {
+            "admission_hours": 59.96388888888889,
+            "PICKUP_hours": 9.64202692227575,
+            "LOADED_hours": 17.38342924357371,
+            "MOVE_hours": 0.05,
+            "idle_hours": 32.88843272303942,
+            "idle_share": 0.548470643456441,
+            "customer_busy_share": 0.4506955213649792
+          }
+        },
+        {
+          "hour": 3,
+          "requests": 121,
+          "completed": 121,
+          "expired": 0,
+          "served_C": 2,
+          "served_HV": 119,
+          "C_state": {
+            "admission_hours": 4.831666666666667,
+            "PICKUP_hours": 0.048826669132100604,
+            "LOADED_hours": 0.061372029648336546,
+            "MOVE_hours": 0.0,
+            "idle_hours": 4.7214679678862295,
+            "idle_share": 0.9771924045297474,
+            "customer_busy_share": 0.0228075954702526
+          },
+          "HV_state": {
+            "admission_hours": 44.93527777777778,
+            "PICKUP_hours": 8.353933146005758,
+            "LOADED_hours": 13.987839285184066,
+            "MOVE_hours": 0.06859756990549158,
+            "idle_hours": 22.52490777668246,
+            "idle_share": 0.5012744749921607,
+            "customer_busy_share": 0.4971989389200725
+          }
+        },
+        {
+          "hour": 4,
+          "requests": 79,
+          "completed": 79,
+          "expired": 0,
+          "served_C": 0,
+          "served_HV": 79,
+          "C_state": {
+            "admission_hours": 2.0305555555555554,
+            "PICKUP_hours": 0.0,
+            "LOADED_hours": 0.0,
+            "MOVE_hours": 0.0,
+            "idle_hours": 2.0305555555555554,
+            "idle_share": 1.0,
+            "customer_busy_share": 0.0
+          },
+          "HV_state": {
+            "admission_hours": 31.18722222222222,
+            "PICKUP_hours": 6.014772349233939,
+            "LOADED_hours": 7.836677382297563,
+            "MOVE_hours": 0.1397869812373296,
+            "idle_hours": 17.19598550945339,
+            "idle_share": 0.5513791958426011,
+            "customer_busy_share": 0.4441386165409036
+          }
+        },
+        {
+          "hour": 5,
+          "requests": 104,
+          "completed": 101,
+          "expired": 3,
+          "served_C": 3,
+          "served_HV": 98,
+          "C_state": {
+            "admission_hours": 2.4391666666666665,
+            "PICKUP_hours": 0.16996942114794164,
+            "LOADED_hours": 0.075,
+            "MOVE_hours": 0.0,
+            "idle_hours": 2.194197245518725,
+            "idle_share": 0.8995683958395866,
+            "customer_busy_share": 0.10043160416041337
+          },
+          "HV_state": {
+            "admission_hours": 27.946666666666665,
+            "PICKUP_hours": 6.708141569726597,
+            "LOADED_hours": 10.597283780034688,
+            "MOVE_hours": 0.05,
+            "idle_hours": 10.591241316905386,
+            "idle_share": 0.3789804860533893,
+            "customer_busy_share": 0.6192303918092062
+          }
+        },
+        {
+          "hour": 6,
+          "requests": 329,
+          "completed": 325,
+          "expired": 4,
+          "served_C": 11,
+          "served_HV": 314,
+          "C_state": {
+            "admission_hours": 6.334722222222222,
+            "PICKUP_hours": 0.336409313404931,
+            "LOADED_hours": 1.3980404347578113,
+            "MOVE_hours": 0.06650021117544484,
+            "idle_hours": 4.533772262884035,
+            "idle_share": 0.7157018261952435,
+            "customer_busy_share": 0.27380044259530245
+          },
+          "HV_state": {
+            "admission_hours": 76.03138888888888,
+            "PICKUP_hours": 17.981142649518663,
+            "LOADED_hours": 30.633983248466564,
+            "MOVE_hours": 0.0,
+            "idle_hours": 27.41626299090366,
+            "idle_share": 0.3605913740569618,
+            "customer_busy_share": 0.6394086259430382
+          }
+        },
+        {
+          "hour": 7,
+          "requests": 854,
+          "completed": 831,
+          "expired": 23,
+          "served_C": 14,
+          "served_HV": 817,
+          "C_state": {
+            "admission_hours": 30.948611111111113,
+            "PICKUP_hours": 1.009224851373008,
+            "LOADED_hours": 2.2391143372992297,
+            "MOVE_hours": 0.0,
+            "idle_hours": 27.70027192243887,
+            "idle_share": 0.8950408734980023,
+            "customer_busy_share": 0.10495912650199754
+          },
+          "HV_state": {
+            "admission_hours": 279.13666666666666,
+            "PICKUP_hours": 57.29534026755854,
+            "LOADED_hours": 135.5618095617129,
+            "MOVE_hours": 0.059639758414045396,
+            "idle_hours": 86.21987707898127,
+            "idle_share": 0.30888051400979666,
+            "customer_busy_share": 0.690905828074437
+          }
+        },
+        {
+          "hour": 8,
+          "requests": 1397,
+          "completed": 1374,
+          "expired": 23,
+          "served_C": 30,
+          "served_HV": 1344,
+          "C_state": {
+            "admission_hours": 60.77638888888889,
+            "PICKUP_hours": 0.925588053817828,
+            "LOADED_hours": 4.576140491553278,
+            "MOVE_hours": 0.0,
+            "idle_hours": 55.274660343517795,
+            "idle_share": 0.9094758894703446,
+            "customer_busy_share": 0.09052411052965552
+          },
+          "HV_state": {
+            "admission_hours": 504.91194444444443,
+            "PICKUP_hours": 80.7794710933818,
+            "LOADED_hours": 259.8562378101449,
+            "MOVE_hours": 0.16667058638286614,
+            "idle_hours": 164.10956495453553,
+            "idle_share": 0.325026109523128,
+            "customer_busy_share": 0.6746437921533601
+          }
+        },
+        {
+          "hour": 9,
+          "requests": 1674,
+          "completed": 1633,
+          "expired": 41,
+          "served_C": 59,
+          "served_HV": 1574,
+          "C_state": {
+            "admission_hours": 74.1475,
+            "PICKUP_hours": 1.8732563398785178,
+            "LOADED_hours": 9.049940116653008,
+            "MOVE_hours": 0.0,
+            "idle_hours": 63.22430354346845,
+            "idle_share": 0.8526828759360525,
+            "customer_busy_share": 0.1473171240639472
+          },
+          "HV_state": {
+            "admission_hours": 645.2252777777778,
+            "PICKUP_hours": 72.4942384067813,
+            "LOADED_hours": 281.1874256932536,
+            "MOVE_hours": 0.0,
+            "idle_hours": 291.5436136777426,
+            "idle_share": 0.45184778668599096,
+            "customer_busy_share": 0.5481522133140087
+          }
+        },
+        {
+          "hour": 10,
+          "requests": 1516,
+          "completed": 1482,
+          "expired": 34,
+          "served_C": 48,
+          "served_HV": 1434,
+          "C_state": {
+            "admission_hours": 75.12527777777778,
+            "PICKUP_hours": 1.1533231707714184,
+            "LOADED_hours": 6.359764359520599,
+            "MOVE_hours": 0.0,
+            "idle_hours": 67.61219024748574,
+            "idle_share": 0.899992549078941,
+            "customer_busy_share": 0.10000745092105877
+          },
+          "HV_state": {
+            "admission_hours": 639.5486111111111,
+            "PICKUP_hours": 63.83431186674779,
+            "LOADED_hours": 258.0788584059619,
+            "MOVE_hours": 0.0,
+            "idle_hours": 317.63544083840134,
+            "idle_share": 0.4966556651363244,
+            "customer_busy_share": 0.5033443348636755
+          }
+        },
+        {
+          "hour": 11,
+          "requests": 1577,
+          "completed": 1550,
+          "expired": 27,
+          "served_C": 60,
+          "served_HV": 1490,
+          "C_state": {
+            "admission_hours": 67.24805555555555,
+            "PICKUP_hours": 2.020963705739274,
+            "LOADED_hours": 8.421929816433561,
+            "MOVE_hours": 0.0,
+            "idle_hours": 56.80516203338272,
+            "idle_share": 0.844710847980643,
+            "customer_busy_share": 0.15528915201935706
+          },
+          "HV_state": {
+            "admission_hours": 608.5083333333333,
+            "PICKUP_hours": 70.03243338495739,
+            "LOADED_hours": 255.44275468996977,
+            "MOVE_hours": 0.0,
+            "idle_hours": 283.03314525840636,
+            "idle_share": 0.4651261613920484,
+            "customer_busy_share": 0.534873838607952
+          }
+        },
+        {
+          "hour": 12,
+          "requests": 1525,
+          "completed": 1497,
+          "expired": 28,
+          "served_C": 46,
+          "served_HV": 1451,
+          "C_state": {
+            "admission_hours": 64.47555555555556,
+            "PICKUP_hours": 0.946439724603794,
+            "LOADED_hours": 7.375095955963506,
+            "MOVE_hours": 0.0,
+            "idle_hours": 56.15401987498825,
+            "idle_share": 0.8709350294252676,
+            "customer_busy_share": 0.12906497057473237
+          },
+          "HV_state": {
+            "admission_hours": 604.4308333333333,
+            "PICKUP_hours": 64.71893455271702,
+            "LOADED_hours": 242.15280243824455,
+            "MOVE_hours": 0.008333333333333333,
+            "idle_hours": 297.55076300903806,
+            "idle_share": 0.49228256832646367,
+            "customer_busy_share": 0.5077036445983671
+          }
+        },
+        {
+          "hour": 13,
+          "requests": 1646,
+          "completed": 1593,
+          "expired": 53,
+          "served_C": 57,
+          "served_HV": 1536,
+          "C_state": {
+            "admission_hours": 67.73472222222222,
+            "PICKUP_hours": 1.062443437015356,
+            "LOADED_hours": 7.86604828947458,
+            "MOVE_hours": 0.0,
+            "idle_hours": 58.806230495732294,
+            "idle_share": 0.8681844195478121,
+            "customer_busy_share": 0.13181558045218794
+          },
+          "HV_state": {
+            "admission_hours": 628.1061111111111,
+            "PICKUP_hours": 66.95427247970868,
+            "LOADED_hours": 233.3678801805798,
+            "MOVE_hours": 0.0,
+            "idle_hours": 327.7839584508225,
+            "idle_share": 0.5218608013078828,
+            "customer_busy_share": 0.47813919869211696
+          }
+        },
+        {
+          "hour": 14,
+          "requests": 1768,
+          "completed": 1722,
+          "expired": 46,
+          "served_C": 44,
+          "served_HV": 1678,
+          "C_state": {
+            "admission_hours": 74.78694444444444,
+            "PICKUP_hours": 1.678481834377441,
+            "LOADED_hours": 7.604723421203257,
+            "MOVE_hours": 0.0,
+            "idle_hours": 65.50373918886373,
+            "idle_share": 0.8758713125059314,
+            "customer_busy_share": 0.12412868749406838
+          },
+          "HV_state": {
+            "admission_hours": 712.6005555555555,
+            "PICKUP_hours": 93.07063363329183,
+            "LOADED_hours": 303.84908714179363,
+            "MOVE_hours": 0.0,
+            "idle_hours": 315.6808347804704,
+            "idle_share": 0.4429983001267242,
+            "customer_busy_share": 0.5570016998732763
+          }
+        },
+        {
+          "hour": 15,
+          "requests": 1928,
+          "completed": 1880,
+          "expired": 48,
+          "served_C": 48,
+          "served_HV": 1832,
+          "C_state": {
+            "admission_hours": 81.18555555555555,
+            "PICKUP_hours": 1.6312400505287243,
+            "LOADED_hours": 7.3507907583968635,
+            "MOVE_hours": 0.0,
+            "idle_hours": 72.20352474662995,
+            "idle_share": 0.8893641763308602,
+            "customer_busy_share": 0.11063582366913968
+          },
+          "HV_state": {
+            "admission_hours": 802.1372222222222,
+            "PICKUP_hours": 108.78840001103653,
+            "LOADED_hours": 357.13837007606475,
+            "MOVE_hours": 0.0,
+            "idle_hours": 336.2104521351206,
+            "idle_share": 0.4191433121675753,
+            "customer_busy_share": 0.5808566878324243
+          }
+        },
+        {
+          "hour": 16,
+          "requests": 1860,
+          "completed": 1808,
+          "expired": 52,
+          "served_C": 61,
+          "served_HV": 1747,
+          "C_state": {
+            "admission_hours": 85.17333333333333,
+            "PICKUP_hours": 3.616319124797513,
+            "LOADED_hours": 9.189086557384615,
+            "MOVE_hours": 0.0,
+            "idle_hours": 72.36792765115122,
+            "idle_share": 0.8496547548272295,
+            "customer_busy_share": 0.15034524517277076
+          },
+          "HV_state": {
+            "admission_hours": 773.7336111111111,
+            "PICKUP_hours": 130.0294943146407,
+            "LOADED_hours": 328.52287042553434,
+            "MOVE_hours": 0.03407494855196597,
+            "idle_hours": 315.1471714223847,
+            "idle_share": 0.4073070717062702,
+            "customer_busy_share": 0.5926488886552004
+          }
+        },
+        {
+          "hour": 17,
+          "requests": 1740,
+          "completed": 1673,
+          "expired": 67,
+          "served_C": 25,
+          "served_HV": 1648,
+          "C_state": {
+            "admission_hours": 88.4025,
+            "PICKUP_hours": 1.3344856565748664,
+            "LOADED_hours": 4.882754770050019,
+            "MOVE_hours": 0.0,
+            "idle_hours": 82.18525957337509,
+            "idle_share": 0.929671214879388,
+            "customer_busy_share": 0.0703287851206118
+          },
+          "HV_state": {
+            "admission_hours": 733.6155555555556,
+            "PICKUP_hours": 134.5092690793689,
+            "LOADED_hours": 330.5107825272605,
+            "MOVE_hours": 0.0,
+            "idle_hours": 268.5955039489261,
+            "idle_share": 0.36612569337563033,
+            "customer_busy_share": 0.6338743066243695
+          }
+        },
+        {
+          "hour": 18,
+          "requests": 1669,
+          "completed": 1598,
+          "expired": 71,
+          "served_C": 11,
+          "served_HV": 1587,
+          "C_state": {
+            "admission_hours": 92.5111111111111,
+            "PICKUP_hours": 0.530020146362262,
+            "LOADED_hours": 1.2902947032967191,
+            "MOVE_hours": 0.0,
+            "idle_hours": 90.69079626145214,
+            "idle_share": 0.9803232841137031,
+            "customer_busy_share": 0.01967671588629694
+          },
+          "HV_state": {
+            "admission_hours": 753.1113888888889,
+            "PICKUP_hours": 130.2982041256216,
+            "LOADED_hours": 390.7723760605237,
+            "MOVE_hours": 0.0,
+            "idle_hours": 232.0408087027444,
+            "idle_share": 0.3081095467764581,
+            "customer_busy_share": 0.6918904532235429
+          }
+        },
+        {
+          "hour": 19,
+          "requests": 2011,
+          "completed": 1972,
+          "expired": 39,
+          "served_C": 68,
+          "served_HV": 1904,
+          "C_state": {
+            "admission_hours": 84.03833333333333,
+            "PICKUP_hours": 1.4158079519572615,
+            "LOADED_hours": 9.662135091739971,
+            "MOVE_hours": 0.0,
+            "idle_hours": 72.9603902896361,
+            "idle_share": 0.8681798816766486,
+            "customer_busy_share": 0.13182011832335125
+          },
+          "HV_state": {
+            "admission_hours": 778.6694444444445,
+            "PICKUP_hours": 115.28762181945503,
+            "LOADED_hours": 368.3104765049987,
+            "MOVE_hours": 0.0,
+            "idle_hours": 295.0713461199906,
+            "idle_share": 0.37894301391332297,
+            "customer_busy_share": 0.6210569860866768
+          }
+        },
+        {
+          "hour": 20,
+          "requests": 1724,
+          "completed": 1680,
+          "expired": 44,
+          "served_C": 73,
+          "served_HV": 1607,
+          "C_state": {
+            "admission_hours": 81.635,
+            "PICKUP_hours": 2.300414525322885,
+            "LOADED_hours": 10.440577471780319,
+            "MOVE_hours": 0.0,
+            "idle_hours": 68.89400800289681,
+            "idle_share": 0.843927335124601,
+            "customer_busy_share": 0.1560726648753991
+          },
+          "HV_state": {
+            "admission_hours": 695.5322222222222,
+            "PICKUP_hours": 70.9567625035642,
+            "LOADED_hours": 251.94956951680024,
+            "MOVE_hours": 0.0,
+            "idle_hours": 372.6258902018575,
+            "idle_share": 0.5357420954723269,
+            "customer_busy_share": 0.4642579045276726
+          }
+        },
+        {
+          "hour": 21,
+          "requests": 1828,
+          "completed": 1784,
+          "expired": 44,
+          "served_C": 77,
+          "served_HV": 1707,
+          "C_state": {
+            "admission_hours": 74.7238888888889,
+            "PICKUP_hours": 3.439600125055472,
+            "LOADED_hours": 11.02551624739172,
+            "MOVE_hours": 0.0,
+            "idle_hours": 60.25877251644169,
+            "idle_share": 0.806419117265749,
+            "customer_busy_share": 0.19358088273425086
+          },
+          "HV_state": {
+            "admission_hours": 668.7652777777778,
+            "PICKUP_hours": 93.59987111799323,
+            "LOADED_hours": 255.27177504384548,
+            "MOVE_hours": 0.0,
+            "idle_hours": 319.89363161593917,
+            "idle_share": 0.47833468968201387,
+            "customer_busy_share": 0.5216653103179862
+          }
+        },
+        {
+          "hour": 22,
+          "requests": 1416,
+          "completed": 1373,
+          "expired": 43,
+          "served_C": 51,
+          "served_HV": 1322,
+          "C_state": {
+            "admission_hours": 55.15638888888889,
+            "PICKUP_hours": 2.6784720334284753,
+            "LOADED_hours": 6.597579292011922,
+            "MOVE_hours": 0.0,
+            "idle_hours": 45.880337563448485,
+            "idle_share": 0.831822722402535,
+            "customer_busy_share": 0.16817727759746492
+          },
+          "HV_state": {
+            "admission_hours": 542.4363888888889,
+            "PICKUP_hours": 77.27567917715247,
+            "LOADED_hours": 204.80496059009806,
+            "MOVE_hours": 0.0,
+            "idle_hours": 260.35574912163804,
+            "idle_share": 0.4799747112374656,
+            "customer_busy_share": 0.5200252887625338
+          }
+        },
+        {
+          "hour": 23,
+          "requests": 877,
+          "completed": 855,
+          "expired": 22,
+          "served_C": 32,
+          "served_HV": 823,
+          "C_state": {
+            "admission_hours": 28.333333333333332,
+            "PICKUP_hours": 0.9964454286142508,
+            "LOADED_hours": 2.7445247316640113,
+            "MOVE_hours": 0.0,
+            "idle_hours": 24.59236317305507,
+            "idle_share": 0.8679657590490025,
+            "customer_busy_share": 0.13203424095099747
+          },
+          "HV_state": {
+            "admission_hours": 283.2872222222222,
+            "PICKUP_hours": 45.50595362665719,
+            "LOADED_hours": 96.35360991192626,
+            "MOVE_hours": 0.0,
+            "idle_hours": 141.42765868363887,
+            "idle_share": 0.4992376908997934,
+            "customer_busy_share": 0.5007623091002069
+          }
+        },
+        {
+          "hour": 24,
+          "requests": 2,
+          "completed": 1,
+          "expired": 1,
+          "served_C": 0,
+          "served_HV": 1,
+          "C_state": null,
+          "HV_state": null
+        }
+      ],
+      "typed_final_candidate_diagnostics": {
+        "eligible_orders": 6534,
+        "eligible_served_C": 838,
+        "eligible_served_HV": 5583,
+        "eligible_expired": 113,
+        "HV_with_final_C_count": 1524,
+        "HV_with_final_C_share": 0.2729715206878023,
+        "exclusive_final_HV_categories": {
+          "NO_FINAL_C_CANDIDATE": 4059,
+          "FINAL_C_LEFT_UNOCCUPIED": 1477,
+          "FINAL_C_ALL_SERVING_OTHER_REQUESTS": 47,
+          "FINAL_C_MOVING_OR_MIXED_COMMITTED": 0
+        },
+        "lifetime_rejection_witnesses": {
+          "ELIGIBLE_HV_NO_FINAL_C": {
+            "request_count": 4059,
+            "reason_request_counts": {
+              "AV:COINCIDENT_CUSTOMER_JOIN:CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT": 2,
+              "AV:COINCIDENT_CUSTOMER_JOIN:CUSTOMER_EMPTY_JOIN_TOO_FAR_FROM_SHARED_ENDPOINT": 1,
+              "AV:COINCIDENT_CUSTOMER_JOIN:UTURN_OUTSIDE_RESEARCH_PROFILE": 1,
+              "AV:DEPARTURE_CONTEXT:PREVIOUS_DIRECTION_CONTEXT_UNAVAILABLE": 1,
+              "AV:DEPARTURE_JOIN:CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT": 755,
+              "AV:DEPARTURE_JOIN:CUSTOMER_EMPTY_JOIN_TOO_FAR_FROM_SHARED_ENDPOINT": 429,
+              "AV:DEPARTURE_JOIN:ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE": 9,
+              "AV:DEPARTURE_JOIN:UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 8,
+              "AV:DEPARTURE_JOIN:UTURN_OUTSIDE_RESEARCH_PROFILE": 343,
+              "AV:OTHER_TEXT_REASON": 2,
+              "AV:PICKUP_CUSTOMER_JOIN:CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT": 371,
+              "AV:PICKUP_CUSTOMER_JOIN:CUSTOMER_EMPTY_JOIN_TOO_FAR_FROM_SHARED_ENDPOINT": 200,
+              "AV:PICKUP_CUSTOMER_JOIN:ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE": 5,
+              "AV:PICKUP_CUSTOMER_JOIN:UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 1,
+              "AV:PICKUP_CUSTOMER_JOIN:UTURN_OUTSIDE_RESEARCH_PROFILE": 208,
+              "AV:PICKUP_ROUTE:EDGE_OUTSIDE_FROZEN_FULL_NETWORK": 41,
+              "AV:PICKUP_ROUTE:EDGE_WALK_INVALID_SHAPE_INDEX_OR_LENGTH": 112,
+              "AV:PICKUP_ROUTE:EMPTY_ROUTE_EXCEPTION": 55,
+              "AV:PICKUP_ROUTE:ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE": 590,
+              "AV:PICKUP_ROUTE:SCALAR_EMPTY_ROUTE_TIME_OR_DISTANCE_INVALID": 13,
+              "AV:PICKUP_ROUTE:UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 1237,
+              "AV:PICKUP_ROUTE:UTURN_OUTSIDE_RESEARCH_PROFILE": 2029,
+              "AV:PICKUP_TIME:PICKUP_ETA_EXCEEDS_INDEPENDENT_CAP": 8
+            },
+            "reason_attempt_counts": {
+              "AV:COINCIDENT_CUSTOMER_JOIN:CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT": 2,
+              "AV:COINCIDENT_CUSTOMER_JOIN:CUSTOMER_EMPTY_JOIN_TOO_FAR_FROM_SHARED_ENDPOINT": 1,
+              "AV:COINCIDENT_CUSTOMER_JOIN:UTURN_OUTSIDE_RESEARCH_PROFILE": 1,
+              "AV:DEPARTURE_CONTEXT:PREVIOUS_DIRECTION_CONTEXT_UNAVAILABLE": 1,
+              "AV:DEPARTURE_JOIN:CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT": 1165,
+              "AV:DEPARTURE_JOIN:CUSTOMER_EMPTY_JOIN_TOO_FAR_FROM_SHARED_ENDPOINT": 566,
+              "AV:DEPARTURE_JOIN:ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE": 10,
+              "AV:DEPARTURE_JOIN:UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 9,
+              "AV:DEPARTURE_JOIN:UTURN_OUTSIDE_RESEARCH_PROFILE": 444,
+              "AV:OTHER_TEXT_REASON": 2,
+              "AV:PICKUP_CUSTOMER_JOIN:CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT": 856,
+              "AV:PICKUP_CUSTOMER_JOIN:CUSTOMER_EMPTY_JOIN_TOO_FAR_FROM_SHARED_ENDPOINT": 414,
+              "AV:PICKUP_CUSTOMER_JOIN:ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE": 16,
+              "AV:PICKUP_CUSTOMER_JOIN:UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 1,
+              "AV:PICKUP_CUSTOMER_JOIN:UTURN_OUTSIDE_RESEARCH_PROFILE": 449,
+              "AV:PICKUP_ROUTE:EDGE_OUTSIDE_FROZEN_FULL_NETWORK": 67,
+              "AV:PICKUP_ROUTE:EDGE_WALK_INVALID_SHAPE_INDEX_OR_LENGTH": 404,
+              "AV:PICKUP_ROUTE:EMPTY_ROUTE_EXCEPTION": 62,
+              "AV:PICKUP_ROUTE:ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE": 1322,
+              "AV:PICKUP_ROUTE:SCALAR_EMPTY_ROUTE_TIME_OR_DISTANCE_INVALID": 15,
+              "AV:PICKUP_ROUTE:UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 2488,
+              "AV:PICKUP_ROUTE:UTURN_OUTSIDE_RESEARCH_PROFILE": 5200,
+              "AV:PICKUP_TIME:PICKUP_ETA_EXCEEDS_INDEPENDENT_CAP": 13
+            },
+            "phase_request_counts": {
+              "COINCIDENT_CUSTOMER_JOIN": 4,
+              "DEPARTURE_CONTEXT": 1,
+              "DEPARTURE_JOIN": 1257,
+              "OTHER_TEXT_REASON": 2,
+              "PICKUP_CUSTOMER_JOIN": 783,
+              "PICKUP_ROUTE": 2877,
+              "PICKUP_TIME": 8
+            }
+          },
+          "ELIGIBLE_EXPIRED": {
+            "request_count": 113,
+            "reason_request_counts": {
+              "AV:DEPARTURE_JOIN:UTURN_OUTSIDE_RESEARCH_PROFILE": 1,
+              "AV:PICKUP_ROUTE:ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE": 1,
+              "AV:PICKUP_ROUTE:UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 3,
+              "AV:PICKUP_ROUTE:UTURN_OUTSIDE_RESEARCH_PROFILE": 2,
+              "AV:PICKUP_TIME:PICKUP_ETA_EXCEEDS_INDEPENDENT_CAP": 1
+            },
+            "reason_attempt_counts": {
+              "AV:DEPARTURE_JOIN:UTURN_OUTSIDE_RESEARCH_PROFILE": 10,
+              "AV:PICKUP_ROUTE:ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE": 4,
+              "AV:PICKUP_ROUTE:UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 44,
+              "AV:PICKUP_ROUTE:UTURN_OUTSIDE_RESEARCH_PROFILE": 34,
+              "AV:PICKUP_TIME:PICKUP_ETA_EXCEEDS_INDEPENDENT_CAP": 9
+            },
+            "phase_request_counts": {
+              "DEPARTURE_JOIN": 1,
+              "PICKUP_ROUTE": 5,
+              "PICKUP_TIME": 1
+            }
+          }
+        },
+        "final_scope": "ADMITTED_TOPK_GRAPH_AT_ASSIGNMENT_NOT_ALL_POSSIBLE_VEHICLES",
+        "rejection_witnesses_are_nonexclusive_not_counterfactual_causes": true
+      },
+      "secondary_distance": {
+        "solve_count": 2742,
+        "optimal_count": 2,
+        "statuses": {
+          "JOINT_PLANNING_NOT_OLD_CURRENT_PRIMARY_FACE": 2698,
+          "NO_CURRENT_FLOW_SOLVE": 150,
+          "PRIMARY_NOT_PROVED": 42,
+          "OPTIMAL_PRIMARY_FACE_MM": 2
+        },
+        "time_s": 0.008060899999691173,
+        "deadline_exceeded_count": 0,
+        "scope": "JOINT_PLAN_NOT_CURRENT_MAXIMUM_SERVICE_PRIMARY_FACE"
+      },
+      "source_products_sha256": {
+        "summary.json": "4084609a89d9cff6c0c119a514f53bd1929e42bbda3a675525f075fb96ff06e9",
+        "assignments.parquet": "abf416d8dc1c488a9b587f7bb0b82b966864f320ac230233152b15000bf04918",
+        "cohort_outcomes.parquet": "40c36e5ef80e911a329c5bd5aa66d40bd5502e0ba3f5cff26663611bd5b5ec2a",
+        "empty_movements.parquet": "abe4333392f0d4e68c75515bd902b10510cbfa0f678143f30c352b26c47c592a",
+        "solver_trace.parquet": "4e7eb643bc70535be03c79a6851897ce2aa28d1fa824bdf73f40f50d21e7730b"
+      },
+      "method": "BOTTLENECK_JOINT",
+      "joint_control_operations": {
+        "secondary_distance_optimal_decisions": 2,
+        "coarse_refreshes": 289,
+        "current_move_connector_queries": 41844,
+        "current_move_proposed_count": 50984,
+        "current_move_upper_screened_count": 0,
+        "current_move_routed_count": 41844,
+        "current_move_arrival_screened_count": 0,
+        "current_move_budget_skipped_count": 9140,
+        "current_move_value_unavailable_skipped_count": 0,
+        "optional_move_budget_cutoffs": 42,
+        "future_chain_variables": 321939,
+        "future_connector_queries": 0,
+        "joint_decisions": 2742,
+        "joint_resource_fallbacks": 44,
+        "joint_accepted_coalitions": 11124,
+        "joint_planning_labels": 40611450,
+        "max_joint_variables": 447,
+        "max_joint_nonzeros": 1868,
+        "incremental_batch_root_queries": 763854,
+        "incremental_groups_merged": 169273,
+        "incremental_solver_calls": 52205,
+        "incremental_persistent_model_loads": 21837,
+        "incremental_persistent_warm_starts": 52205,
+        "incremental_persistent_solver_runs": 52201,
+        "incremental_first_current_improvement_stops": 2020,
+        "incremental_topology_snapshot_rebuilds": 287,
+        "incremental_topology_successor_builds": 2626916,
+        "incremental_topology_successor_reuses": 354272,
+        "joint_current_action_change_measured_decisions": 2698,
+        "joint_current_action_changed_decisions": 2020,
+        "joint_future_only_accepted_coalitions": 9104,
+        "incremental_constant_objective_stages_skipped": 13275,
+        "incremental_topology_snapshot_reuses": 2411,
+        "incremental_fixed_only_blocks_skipped": 18614,
+        "incremental_early_blocks_skipped": 50,
+        "incremental_capacity_bound_stages_skipped": 27,
+        "incremental_unchanged_column_blocks_skipped": 12,
+        "incremental_label_budget_flushes": 250
+      },
+      "retained_layout_solver_time_s": 179.12917639999432,
+      "incremental_layout_solver_time_s": 0.0,
+      "result_retained_not_rerun": false
+    }
+  },
+  "comparisons": {
+    "INDEPENDENT_REFERENCE_to_SPATIAL_SHARED_PLAN": {
+      "before": "INDEPENDENT_REFERENCE",
+      "after": "SPATIAL_SHARED_PLAN",
+      "difference_after_minus_before": {
+        "completed": -10,
+        "expired": 10,
+        "service_rate": -0.000352522297035307,
+        "served_C": -192,
+        "served_HV": 182,
+        "pickup_empty_km": -5939.0509999999995,
+        "idle_empty_km": -729.631559245052,
+        "total_empty_km": -6668.682559245051,
+        "actual_idle_moves": -551,
+        "runtime_s": 2723.732115900001,
+        "total_empty_relative_change": -0.1839596879869757,
+        "wait_s_mean": -34.74056462261339,
+        "matching_wait_s_mean": 2.5648701801491107,
+        "pickup_wait_s_mean": -37.305434802762505,
+        "C_LOADED_hours": -18.61210801033468,
+        "C_PICKUP_hours": -24.098063359800395,
+        "C_MOVE_hours": -2.152395884165984,
+        "C_idle_hours": 44.862567254300984,
+        "C_loaded_share": -0.01515727633293297,
+        "C_idle_share": 0.0365350517255032
+      },
+      "paired": {
+        "shared_served": 27528,
+        "before_only_served": 116,
+        "after_only_served": 106,
+        "HV_to_C": 433,
+        "C_to_HV": 627,
+        "shared_served_total_wait_difference_mean_s": -34.8962039768236,
+        "shared_served_pickup_distance_difference_km": -5919.262
+      }
+    },
+    "INDEPENDENT_REFERENCE_to_BOTTLENECK_SHARED_PLAN": {
+      "before": "INDEPENDENT_REFERENCE",
+      "after": "BOTTLENECK_SHARED_PLAN",
+      "difference_after_minus_before": {
+        "completed": 8,
+        "expired": -8,
+        "service_rate": 0.0002820178376282678,
+        "served_C": -219,
+        "served_HV": 227,
+        "pickup_empty_km": -5697.294999999998,
+        "idle_empty_km": -747.1265528383448,
+        "total_empty_km": -6444.421552838343,
+        "actual_idle_moves": -563,
+        "runtime_s": 4180.504570900001,
+        "total_empty_relative_change": -0.17777331093278081,
+        "wait_s_mean": -34.53854834550705,
+        "matching_wait_s_mean": 1.78054035705944,
+        "pickup_wait_s_mean": -36.31908870256649,
+        "C_LOADED_hours": -21.427999907459466,
+        "C_PICKUP_hours": -25.284929779425017,
+        "C_MOVE_hours": -2.0933297345388695,
+        "C_idle_hours": 48.80625942142274,
+        "C_loaded_share": -0.01745047448032648,
+        "C_idle_share": 0.039746704694414436
+      },
+      "paired": {
+        "shared_served": 27524,
+        "before_only_served": 120,
+        "after_only_served": 128,
+        "HV_to_C": 409,
+        "C_to_HV": 630,
+        "shared_served_total_wait_difference_mean_s": -34.97306819590176,
+        "shared_served_pickup_distance_difference_km": -5729.678
+      }
+    },
+    "SPATIAL_SHARED_PLAN_to_BOTTLENECK_SHARED_PLAN": {
+      "before": "SPATIAL_SHARED_PLAN",
+      "after": "BOTTLENECK_SHARED_PLAN",
+      "difference_after_minus_before": {
+        "completed": 18,
+        "expired": -18,
+        "service_rate": 0.0006345401346635748,
+        "served_C": -27,
+        "served_HV": 45,
+        "pickup_empty_km": 241.75600000000122,
+        "idle_empty_km": -17.494993593292666,
+        "total_empty_km": 224.26100640670847,
+        "actual_idle_moves": -12,
+        "runtime_s": 1456.7724550000003,
+        "total_empty_relative_change": 0.007580969914261049,
+        "wait_s_mean": 0.2020162771063383,
+        "matching_wait_s_mean": -0.7843298230896707,
+        "pickup_wait_s_mean": 0.9863461001960161,
+        "C_LOADED_hours": -2.8158918971247857,
+        "C_PICKUP_hours": -1.1868664196246215,
+        "C_MOVE_hours": 0.05906614962711457,
+        "C_idle_hours": 3.9436921671217533,
+        "C_loaded_share": -0.0022931981473935104,
+        "C_idle_share": 0.0032116529689112383
+      },
+      "paired": {
+        "shared_served": 27551,
+        "before_only_served": 83,
+        "after_only_served": 101,
+        "HV_to_C": 264,
+        "C_to_HV": 288,
+        "shared_served_total_wait_difference_mean_s": 0.035360543029291404,
+        "shared_served_pickup_distance_difference_km": 185.008
+      }
+    }
+  },
+  "test_date": "20161031",
+  "profile_id": "C",
+  "requested_AV_baseline_hour_ratio": 0.1,
+  "passenger_acceptance_rate": 0.7,
+  "request_to_assignment_limit_s": 300,
+  "independent_pickup_eta_cap_s": 600,
+  "common_requests": 28367,
+  "execution_binding": {
+    "INDEPENDENT_REFERENCE": {
+      "code_sha": "ea149c2c5620a4d17cddea5ee7a08734512c8267",
+      "inputs_sha256": {
+        "stage4/config/bottleneck_whole_method_v1.json": "4db3c41b178a11375136409db16a3f586e7efaadc86d48d3d8b77e0169ef5d09",
+        "stage4/config/scheme_a_two_scale_city_v5_common.json": "d41b1d448d8c5342f45b40b625857fc7e018610ddf98d027bd8f00c684c9c836",
+        "stage4/output/capability_chain_planning/layout_300_600_v1/placements.json": "4f11b259103014a0ad03cf62951893279d366abc628f977d28e42b8a9bc23826",
+        "stage4/input/replay_foundation/replay_fleet_template.parquet": "09fc04e8250b873274ee2e397060417edb081908c2eb4f9f24a0459328b045b0",
+        "stage4/output/paper_enhancement/repositioning_robustness/train_tod_demand_reference.parquet": "97f9931d9a0d114059699ea92b692df80bb1d54e065c757c075d723d7291ab07",
+        "stage4/output/paper_enhancement/repositioning_robustness/train_tod_demand_reference.manifest.json": "bf01340ee02b158819df46f342f3389d8c7d76b6dda0a6c33a9364c103ec605d",
+        "stage4/output/symmetric_flexibility_v1/input/train_request_templates.parquet": "f0ee98eb4ad5aca69125ace8610ce4ff2c40edb6b7f5e62016ee321a432af652",
+        "stage4/output/symmetric_flexibility_v1/input/preparation_summary.json": "916f22a9b2c8aca89254ad6874f2aabaf75be2f75bca2340d3c2582d66cb4d7e",
+        "stage3/config/stage3_av_capability_profiles.json": "bea54c12a0c013995c3644a0bab84b35413d5df8a6785dfdd6a03fd49f32978e",
+        "stage4/config/scheme_a_city_v1.json": "8022d88c8c1377fd87f925bf7f0e35584b9bb3f500bc5cb8fd9d16ea9a0ef47e",
+        "stage4/input/replay_foundation/stage4_order_replay_base.parquet": "dc590c415e08e65ef3975cb7b8122484b04dbef76788d29ee1f2c831e236c874",
+        "stage4/output/symmetric_flexibility_v1/input/test31_research_routes.parquet": "672d635fa24690ba7082b2e925f8419e6b6d67aca2dec613ea0a87835e7e57f7",
+        "stage4/docs/flexibility_dispatch/service_preserving/train_remaining_time_model.json": "207dfa3385bf1d59fb380e897e876a745bd8484ee52a53e62b150baa5b33488f",
+        "stage4/config/controlled_replay_v2.json": "2c516b377d9b6d83313016de38738c0939f1f68e58f83b8882431be0a7d338b9",
+        "stage4/output/capability_chain_planning/bottleneck_whole_method_v1/layout/placements.json": "7a35721741c0204dc00c0e8f7f6c09bc96157aa299c0ca510cb58122a449b9a5"
+      },
+      "group": "INDEPENDENT_REFERENCE",
+      "layout_mode": "reference",
+      "policy": "SERVICE_PRESERVING",
+      "version": "bottleneck_whole_method_v1",
+      "layout_sha256": "7a35721741c0204dc00c0e8f7f6c09bc96157aa299c0ca510cb58122a449b9a5",
+      "current_decision_mode": "INDEPENDENT_VALUE",
+      "joint_neighborhood_strategy": null
+    },
+    "SPATIAL_SHARED_PLAN": {
+      "code_sha": "4dd6426611aedf758290aff380b8f9a870767e45",
+      "inputs_sha256": {
+        "stage4/config/bottleneck_whole_method_v1.json": "4db3c41b178a11375136409db16a3f586e7efaadc86d48d3d8b77e0169ef5d09",
+        "stage4/config/scheme_a_two_scale_city_v5_common.json": "d41b1d448d8c5342f45b40b625857fc7e018610ddf98d027bd8f00c684c9c836",
+        "stage4/output/capability_chain_planning/layout_300_600_v1/placements.json": "4f11b259103014a0ad03cf62951893279d366abc628f977d28e42b8a9bc23826",
+        "stage4/input/replay_foundation/replay_fleet_template.parquet": "09fc04e8250b873274ee2e397060417edb081908c2eb4f9f24a0459328b045b0",
+        "stage4/output/paper_enhancement/repositioning_robustness/train_tod_demand_reference.parquet": "97f9931d9a0d114059699ea92b692df80bb1d54e065c757c075d723d7291ab07",
+        "stage4/output/paper_enhancement/repositioning_robustness/train_tod_demand_reference.manifest.json": "bf01340ee02b158819df46f342f3389d8c7d76b6dda0a6c33a9364c103ec605d",
+        "stage4/output/symmetric_flexibility_v1/input/train_request_templates.parquet": "f0ee98eb4ad5aca69125ace8610ce4ff2c40edb6b7f5e62016ee321a432af652",
+        "stage4/output/symmetric_flexibility_v1/input/preparation_summary.json": "916f22a9b2c8aca89254ad6874f2aabaf75be2f75bca2340d3c2582d66cb4d7e",
+        "stage3/config/stage3_av_capability_profiles.json": "bea54c12a0c013995c3644a0bab84b35413d5df8a6785dfdd6a03fd49f32978e",
+        "stage4/config/scheme_a_city_v1.json": "8022d88c8c1377fd87f925bf7f0e35584b9bb3f500bc5cb8fd9d16ea9a0ef47e",
+        "stage4/input/replay_foundation/stage4_order_replay_base.parquet": "dc590c415e08e65ef3975cb7b8122484b04dbef76788d29ee1f2c831e236c874",
+        "stage4/output/symmetric_flexibility_v1/input/test31_research_routes.parquet": "672d635fa24690ba7082b2e925f8419e6b6d67aca2dec613ea0a87835e7e57f7",
+        "stage4/docs/flexibility_dispatch/service_preserving/train_remaining_time_model.json": "207dfa3385bf1d59fb380e897e876a745bd8484ee52a53e62b150baa5b33488f",
+        "stage4/config/controlled_replay_v2.json": "2c516b377d9b6d83313016de38738c0939f1f68e58f83b8882431be0a7d338b9",
+        "stage4/config/bottleneck_whole_method_v3.json": "aff18c8c6057160aa0aa069c50b741efa5f624d94d37df0119b101d65c3fe2d3",
+        "stage4/output/capability_chain_planning/bottleneck_whole_method_v1/layout/placements.json": "7a35721741c0204dc00c0e8f7f6c09bc96157aa299c0ca510cb58122a449b9a5"
+      },
+      "group": "SPATIAL_SHARED_PLAN",
+      "layout_mode": "spatial_joint",
+      "policy": "SERVICE_PRESERVING",
+      "version": "bottleneck_whole_method_v3",
+      "layout_sha256": "7a35721741c0204dc00c0e8f7f6c09bc96157aa299c0ca510cb58122a449b9a5",
+      "current_decision_mode": "BOTTLENECK_JOINT",
+      "joint_neighborhood_strategy": "SPATIAL_JOINT",
+      "joint_execution_mode": "INCREMENTAL_V3"
+    },
+    "BOTTLENECK_SHARED_PLAN": {
+      "code_sha": "4dd6426611aedf758290aff380b8f9a870767e45",
+      "inputs_sha256": {
+        "stage4/config/bottleneck_whole_method_v1.json": "4db3c41b178a11375136409db16a3f586e7efaadc86d48d3d8b77e0169ef5d09",
+        "stage4/config/scheme_a_two_scale_city_v5_common.json": "d41b1d448d8c5342f45b40b625857fc7e018610ddf98d027bd8f00c684c9c836",
+        "stage4/output/capability_chain_planning/layout_300_600_v1/placements.json": "4f11b259103014a0ad03cf62951893279d366abc628f977d28e42b8a9bc23826",
+        "stage4/input/replay_foundation/replay_fleet_template.parquet": "09fc04e8250b873274ee2e397060417edb081908c2eb4f9f24a0459328b045b0",
+        "stage4/output/paper_enhancement/repositioning_robustness/train_tod_demand_reference.parquet": "97f9931d9a0d114059699ea92b692df80bb1d54e065c757c075d723d7291ab07",
+        "stage4/output/paper_enhancement/repositioning_robustness/train_tod_demand_reference.manifest.json": "bf01340ee02b158819df46f342f3389d8c7d76b6dda0a6c33a9364c103ec605d",
+        "stage4/output/symmetric_flexibility_v1/input/train_request_templates.parquet": "f0ee98eb4ad5aca69125ace8610ce4ff2c40edb6b7f5e62016ee321a432af652",
+        "stage4/output/symmetric_flexibility_v1/input/preparation_summary.json": "916f22a9b2c8aca89254ad6874f2aabaf75be2f75bca2340d3c2582d66cb4d7e",
+        "stage3/config/stage3_av_capability_profiles.json": "bea54c12a0c013995c3644a0bab84b35413d5df8a6785dfdd6a03fd49f32978e",
+        "stage4/config/scheme_a_city_v1.json": "8022d88c8c1377fd87f925bf7f0e35584b9bb3f500bc5cb8fd9d16ea9a0ef47e",
+        "stage4/input/replay_foundation/stage4_order_replay_base.parquet": "dc590c415e08e65ef3975cb7b8122484b04dbef76788d29ee1f2c831e236c874",
+        "stage4/output/symmetric_flexibility_v1/input/test31_research_routes.parquet": "672d635fa24690ba7082b2e925f8419e6b6d67aca2dec613ea0a87835e7e57f7",
+        "stage4/docs/flexibility_dispatch/service_preserving/train_remaining_time_model.json": "207dfa3385bf1d59fb380e897e876a745bd8484ee52a53e62b150baa5b33488f",
+        "stage4/config/controlled_replay_v2.json": "2c516b377d9b6d83313016de38738c0939f1f68e58f83b8882431be0a7d338b9",
+        "stage4/config/bottleneck_whole_method_v3.json": "aff18c8c6057160aa0aa069c50b741efa5f624d94d37df0119b101d65c3fe2d3",
+        "stage4/output/capability_chain_planning/bottleneck_whole_method_v1/layout/placements.json": "7a35721741c0204dc00c0e8f7f6c09bc96157aa299c0ca510cb58122a449b9a5"
+      },
+      "group": "BOTTLENECK_SHARED_PLAN",
+      "layout_mode": "bottleneck_joint",
+      "policy": "SERVICE_PRESERVING",
+      "version": "bottleneck_whole_method_v3",
+      "layout_sha256": "7a35721741c0204dc00c0e8f7f6c09bc96157aa299c0ca510cb58122a449b9a5",
+      "current_decision_mode": "BOTTLENECK_JOINT",
+      "joint_neighborhood_strategy": "BOTTLENECK_CLOSURE",
+      "joint_execution_mode": "INCREMENTAL_V3"
+    }
+  },
+  "child_receipts": {
+    "INDEPENDENT_REFERENCE": {
+      "status": "COMPLETE",
+      "child_pid": 11068,
+      "exit_code": 0,
+      "wall_time_s": 3329.0054842000027,
+      "parent_hard_timeout": false,
+      "log_statistics": {
+        "bytes_received": 23691943,
+        "bytes_written": 5329795,
+        "suppressed_info_lines": 276722,
+        "bytes_over_log_limit": 0,
+        "log_limit_mib": 16
+      },
+      "log_capture_error": null,
+      "automatic_retry": false
+    },
+    "SPATIAL_SHARED_PLAN": {
+      "status": "COMPLETE",
+      "child_pid": 29052,
+      "exit_code": 0,
+      "wall_time_s": 6053.004807599999,
+      "parent_hard_timeout": false,
+      "log_statistics": {
+        "bytes_received": 30437536,
+        "bytes_written": 10835159,
+        "suppressed_info_lines": 289825,
+        "bytes_over_log_limit": 0,
+        "log_limit_mib": 16
+      },
+      "log_capture_error": null,
+      "automatic_retry": false
+    },
+    "BOTTLENECK_SHARED_PLAN": {
+      "status": "COMPLETE",
+      "child_pid": 8144,
+      "exit_code": 0,
+      "wall_time_s": 7511.3248446,
+      "parent_hard_timeout": false,
+      "log_statistics": {
+        "bytes_received": 29333171,
+        "bytes_written": 10110351,
+        "suppressed_info_lines": 284766,
+        "bytes_over_log_limit": 0,
+        "log_limit_mib": 16
+      },
+      "log_capture_error": null,
+      "automatic_retry": false
+    }
+  },
+  "analysis_invoked_simulation": false,
+  "analysis_invoked_routing": false,
+  "analysis_invoked_inference": false,
+  "one_day_one_seed": true,
+  "statistical_significance_claimed": false,
+  "full_city_optimality_claimed": false,
+  "deployment_vs_online_effect_separately_identified": false,
+  "retained_reference": true,
+  "new_native_run_count": 2,
+  "layouts_reused_from_v1": true,
+  "runtime_differences_scope": "NATIVE_ONLY_OFFLINE_INCREMENTAL_LAYOUT_TIME_REPORTED_SEPARATELY",
+  "reference_offline_layout_is_retained_not_newly_recomputed": true,
+  "analysis_code_sha": "4dd6426611aedf758290aff380b8f9a870767e45",
+  "raw_identifiers_or_coordinates_exported": false,
+  "runtime_s": 13.089081300000544,
+  "peak_rss_mib": 209.83203125
+}
