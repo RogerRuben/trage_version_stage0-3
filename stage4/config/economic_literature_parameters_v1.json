@@ -1,0 +1,106 @@
+{
+  "schema_version": "economic_literature_parameter_proposal_v1",
+  "created_date": "2026-10-16",
+  "status": "RESEARCH_PROPOSAL_NOT_RUNTIME_CONFIG",
+  "active_in_dispatch": false,
+  "ready_for_dispatch": false,
+  "experiments_authorized_by_this_file": false,
+  "empirically_calibrated_to_xian_2016": false,
+  "institutional_assumption": "platform_owned_AV_and_driver_owned_HV",
+  "currency": "CNY",
+  "currency_basis": "literature_USD_converted_with_reported_2016_market_exchange_rate_not_PPP",
+  "input_price_year_uniformly_2016": false,
+  "inflation_adjustment_applied": false,
+  "sources": {
+    "gao2025": {
+      "doi": "10.1016/j.trc.2025.105326",
+      "extracted_version": "author_manuscript_arxiv_2406.19014_downloaded_20261016",
+      "url": "https://arxiv.org/pdf/2406.19014",
+      "local_pdf_sha256": "a24e0f309aeed9108e540cb4e45adb7ccf910c46785602572eb5ad73b3b568e4",
+      "locator": "PDF pages 8-9, section 3.1, footnote 4"
+    },
+    "becker2020": {
+      "doi": "10.1016/j.tra.2020.04.021",
+      "extracted_version": "published_open_access_version",
+      "url": "https://elib.dlr.de/135405/1/1-s2.0-S0965856420305772-main%5B1%5D.pdf",
+      "local_pdf_sha256": "02742a5733aaabf6651a30ef800988b43c844ec8648a865a6df67ed9492b48be",
+      "locator": "Tables A.4-A.6, A.8, A.10; printed pages 119-123"
+    },
+    "bosch2018": {
+      "doi": "10.1016/j.tranpol.2017.09.005",
+      "use": "cost_classification_background_only_no_Swiss_amount_adopted"
+    }
+  },
+  "hv_commission_proposal": {
+    "source": "gao2025",
+    "literature_reference_range": [0.2, 0.3],
+    "proposed_value": 0.25,
+    "proposed_driver_fare_share": 0.75,
+    "selection_rule": "midpoint_of_literature_reference_range_not_empirical_estimate",
+    "local_contract_verified": false,
+    "driver_vehicle_cost_paid_by": "driver_not_platform"
+  },
+  "av_variable_cost_derivation": {
+    "source": "becker2020",
+    "scope": "energy_maintenance_tires_battery_only_excludes_vehicle_capital_overhead_insurance_remote_assistance_and_tax",
+    "unit": "CNY_per_vehicle_km",
+    "usd_to_cny": 6.644,
+    "base_usd_per_vehicle_km": {
+      "energy": 0.057,
+      "maintenance": 0.018,
+      "tires": 0.009,
+      "battery": 0.041
+    },
+    "multiplicative_adaptation": {
+      "maintenance": [0.65, 0.75],
+      "tires": [0.9, 1.2, 0.75],
+      "beijing_energy": [0.9, 0.95, 0.9],
+      "chongqing_energy": [0.9, 0.95, 0.17],
+      "battery": [1.0]
+    },
+    "derived_cny_per_vehicle_km": {
+      "maintenance": 0.0583011,
+      "tires": 0.04843476,
+      "battery": 0.272404,
+      "beijing_energy": 0.291415806,
+      "chongqing_energy": 0.0550452078,
+      "beijing_subtotal": 0.670555666,
+      "chongqing_subtotal": 0.4341850678
+    },
+    "selected_anchor": null,
+    "adopted_dispatch_rate": null,
+    "interpretation": "project_derived_literature_scenarios_not_paper_reported_Xian_cost_not_total_operating_cost",
+    "apply_to_physical_km_once": ["pickup", "loaded", "reposition"],
+    "additional_empty_distance_multiplier": false
+  },
+  "av_cleaning_proposal": {
+    "source": "becker2020",
+    "original_usd_per_clean": 4.52,
+    "completed_orders_per_clean": 40,
+    "derived_cny_per_completed_order": 0.750772,
+    "interpretation": "average_allocation_proxy_not_cleaning_after_every_order"
+  },
+  "unassigned_parameters": {
+    "fare_rule": null,
+    "hv_additional_pickup_compensation": null,
+    "av_vehicle_usage_depreciation": null,
+    "av_fixed_online_cost_per_hour": null,
+    "av_remote_assistance_cost": null,
+    "av_safety_driver_cost": null,
+    "platform_transaction_cost": null,
+    "av_busy_minute_cash_cost": null
+  },
+  "accounting_rules": {
+    "null_means": "not_assigned_not_zero",
+    "fare_same_across_vehicle_types_and_algorithms": true,
+    "economic_rates_same_across_C_M_A_unless_separately_justified": true,
+    "no_strategy_name_dependent_fare_or_compensation": true,
+    "full_committed_trip_cost_beyond_admission_end": true,
+    "no_duplicate_driver_owned_vehicle_cost_in_platform_ledger": true,
+    "no_duplicate_fixed_or_battery_depreciation_allocation": true,
+    "no_AV_utilization_reward": true,
+    "no_selection_using_Test31_results": true,
+    "no_new_sensitivity_grid": true,
+    "session_slots_are_not_physical_asset_count": true
+  }
+}
