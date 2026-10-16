@@ -105,6 +105,26 @@ def test_forecast_warm_reuse_is_exact_and_invalidates_changed_ready_bin_or_pendi
     assert kept.chains[0].payload["legs"][0][1]==90.
 
 
+def test_rejected_first_move_does_not_hide_another_legal_site():
+    wait=CurrentAction("W",1,"WAIT",None)
+    moves=[CurrentAction(aid,1,"RELOCATE",None,payload=dict(
+        optimistic_move=True,relocation_slot_s=0)) for aid in ("BAD","GOOD")]
+    roots={a.action_id:RouteState(ORIGIN,0.,1800.,"C") for a in (wait,*moves)}
+    baseline=dict(selected_action_ids=("W",)); calls=[]; routed=[]
+    def plan(actions,after,seed,deadline,state,cap):
+        ids={a.action_id for a in actions}; calls.append(ids)
+        chosen="BAD" if "BAD" in ids else "GOOD"
+        return dict(selected_action_ids=(chosen,),joint_control=dict(resource_fallback=False,planning_labels=1))
+    def certify(action):
+        routed.append(action.action_id)
+        if action.action_id=="BAD": return None
+        return replace(action,payload=dict(move={"routed":{}},relocation_slot_s=0)),roots[action.action_id]
+    result,_,_,counts=solve_lazy_moves([wait,*moves],roots,baseline,planner=plan,
+        certify=certify,deadline=perf_counter()+5,memory=RollingJointMemory())
+    assert routed==["BAD","GOOD"] and len(calls)==3
+    assert result["selected_action_ids"]==("GOOD",) and counts["rejection_replans"]==1
+
+
 def test_adaptive_joint_native_executes_only_certified_selected_moves(monkeypatch,tmp_path):
     from stage4.dispatch import scheme_a_two_scale_native as native,bottleneck_native
     c,cfg=fixture(); c.repositioning_manager.active.clear()

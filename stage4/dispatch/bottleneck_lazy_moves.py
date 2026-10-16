@@ -33,7 +33,7 @@ def _combine(result, attempts, counts):
 
 def solve_lazy_moves(actions, roots, baseline, *, planner, certify, deadline, memory,
                      maximum_labels=50000):
-    """At most two joint searches; route only moves selected by the probe.
+    """Route only selected moves, separating definite failures before replan.
 
     planner(actions, roots, baseline, deadline, memory, label_cap) must keep the
     supplied feasible baseline on timeout. certify returns an exact action/root
@@ -47,7 +47,8 @@ def solve_lazy_moves(actions, roots, baseline, *, planner, certify, deadline, me
         raise ValueError("the lazy incumbent must not contain an unvalidated MOVE")
     counts = Counter(optimistic_proposals=len(proposals), probe_selected=0, route_calls=0,
                      certified_moves=0, unsupported_moves=0, budget_skipped_selected=0,
-                     planning_rounds=0, refinement_fallback=0)
+                     route_cap_skipped_selected=0, planning_rounds=0, refinement_fallback=0,
+                     rejection_replans=0)
     started = perf_counter()
     remaining = max(0., deadline-started)
     if not proposals or not remaining:
@@ -55,42 +56,60 @@ def solve_lazy_moves(actions, roots, baseline, *, planner, certify, deadline, me
     # Explicit finite-budget algorithm, not an extension of the ten-second cap.
     probe_deadline = started + .4*remaining
     certification_deadline = started + .7*remaining
-    probe_memory = memory.fork()
-    probe = planner(actions, roots, baseline, probe_deadline, probe_memory, maximum_labels)
-    attempts = [probe]; counts["planning_rounds"] += 1
-    selected = sorted(set(probe["selected_action_ids"]) & proposals.keys())
-    counts["probe_selected"] = len(selected)
-    if not selected:
-        if not probe.get("joint_control", {}).get("resource_fallback", True):
-            memory.adopt(probe_memory)
-        return _combine(probe, attempts, counts), base, {a.action_id: roots[a.action_id] for a in base}, counts
-    certified, exact_roots = [], {a.action_id: roots[a.action_id] for a in base}
-    for index, aid in enumerate(selected):
-        if perf_counter() >= certification_deadline:
-            counts["budget_skipped_selected"] = len(selected)-index
+    working_memory = memory.fork()
+    active = {a.action_id:a for a in actions}; active_roots = dict(roots)
+    certified, attempts, used = {}, [], 0
+    while proposals and perf_counter()<probe_deadline and counts["route_calls"]<50:
+        probe_memory = working_memory.fork()
+        probe = planner(list(active.values()), active_roots, baseline, probe_deadline,
+                        probe_memory, max(0,maximum_labels-used))
+        attempts.append(probe); counts["planning_rounds"] += 1
+        used += probe.get("joint_control", {}).get("planning_labels",0)
+        selected = sorted(set(probe["selected_action_ids"]) & proposals.keys())
+        counts["probe_selected"] += len(selected)
+        if not selected:
+            if not probe.get("joint_control", {}).get("resource_fallback", True):
+                memory.adopt(probe_memory)
+            exact_actions = [*base,*certified.values()]
+            exact_roots = {a.action_id:active_roots[a.action_id] for a in exact_actions}
+            return _combine(probe, attempts, counts), exact_actions, exact_roots, counts
+        working_memory = probe_memory
+        rejected = False
+        for index, aid in enumerate(selected):
+            if counts["route_calls"]>=50:
+                counts["route_cap_skipped_selected"] += len(selected)-index
+                break
+            if perf_counter() >= certification_deadline:
+                counts["budget_skipped_selected"] += len(selected)-index
+                break
+            counts["route_calls"] += 1
+            exact = certify(proposals.pop(aid))
+            if exact is None:
+                counts["unsupported_moves"] += 1; rejected = True
+                del active[aid]; del active_roots[aid]
+                continue
+            action, root = exact
+            if (action.action_id != aid or action.kind != "RELOCATE"
+                    or not isinstance(action.payload, dict)
+                    or action.payload.get("optimistic_move")
+                    or action.payload.get("move", {}).get("routed") is None):
+                raise ValueError("lazy certification did not provide an executable current MOVE")
+            certified[aid] = action; active[aid] = action; active_roots[aid] = root
+        counts["certified_moves"] = len(certified)
+        if not rejected:
             break
-        counts["route_calls"] += 1
-        exact = certify(proposals[aid])
-        if exact is None:
-            counts["unsupported_moves"] += 1
-            continue
-        action, root = exact
-        if (action.action_id != aid or action.kind != "RELOCATE"
-                or not isinstance(action.payload, dict)
-                or action.payload.get("optimistic_move")
-                or action.payload.get("move", {}).get("routed") is None):
-            raise ValueError("lazy certification did not provide an executable current MOVE")
-        certified.append(action); exact_roots[aid] = root
-    counts["certified_moves"] = len(certified)
-    exact_actions = [*base, *certified]
+        # A rejected cell is not evidence against the other sites/vehicles.
+        # Re-price the remaining hints, within the SAME probe/label budget.
+        counts["rejection_replans"] += 1
+    exact_actions = [*base, *certified.values()]
+    exact_roots = {a.action_id:active_roots[a.action_id] for a in exact_actions}
     if not certified or perf_counter() >= deadline:
         counts["refinement_fallback"] = 1
         result = dict(baseline, joint_control=dict(status="LAZY_MOVE_KEEP_PHYSICAL_BASELINE",
             resource_fallback=True, reason="NO_CERTIFIED_MOVE_OR_SHARED_DEADLINE_EXHAUSTED"))
         return _combine(result, attempts, counts), exact_actions, exact_roots, counts
     # Retiming/replanning is mandatory: no zero-time probe path is trusted.
-    final_memory = probe_memory.fork()
-    used = sum(a.get("joint_control", {}).get("planning_labels", 0) for a in attempts)
+    final_memory = working_memory.fork()
     final = planner(exact_actions, exact_roots, baseline, deadline, final_memory,
                     max(0, maximum_labels-used))
     attempts.append(final); counts["planning_rounds"] += 1

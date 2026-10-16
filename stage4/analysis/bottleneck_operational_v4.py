@@ -58,8 +58,9 @@ def run(root,*,prefix=False):
     phase="prefix" if prefix else "native"
     directory=root/OUT/phase/cfg["group"]
     if prefix:
+        directory=root/OUT/phase/previous.code_sha(root)[:12]/cfg["group"]
         cfg.update(diagnostic_stop_tick_s=2400,scenario_timeout_s=600,
-            disk_route_cache=(OUT/phase/cfg["group"]/"routing/cache.sqlite3").as_posix())
+            disk_route_cache=(directory.relative_to(root)/"routing/cache.sqlite3").as_posix())
     binding=previous.binding_for(root,CONFIG,cfg)
     with previous.execution_lock(root,OUT):
         return _run_native(root,FLEETPY,CONFIG,cfg,directory=directory,
@@ -67,14 +68,54 @@ def run(root,*,prefix=False):
             completion_status="OPERATIONAL_V4_NATIVE_COMPLETE",group=cfg["group"],execution_binding=binding)
 
 
+def analyze_prefix(root):
+    """Read completed products only; no policy, routing, inference or replay."""
+    import pyarrow.parquet as pq
+    root=Path(root)
+    summary=json.loads((root/DOC/"prefix_summary.json").read_text(encoding="utf-8"))
+    if summary["status"]!="JOINT_PERFORMANCE_PREFIX_COMPLETE" or summary["prefix_stop_tick_s"]!=2400:
+        raise ValueError("requires a completed 00:00--00:40 prefix")
+    sha=summary["execution_binding"]["code_sha"]
+    directory=root/OUT/"prefix"/sha[:12]/summary["group"]
+    if not directory.is_dir():  # Retain the completed initial implementation check.
+        directory=root/OUT/"prefix"/summary["group"]
+    rows={}
+    for name,path,partial in (("V3_BOTTLENECK",root/previous.OUT.with_name(previous.V3)/"native"/previous.ARMS[2],False),
+                              ("V4_ADAPTIVE",directory,True)):
+        timing=path/("partial_step_timings.parquet" if partial else "step_timings.parquet")
+        steps=pq.read_table(timing,columns=["simulation_time_s","step_wall_s"],
+            filters=[("simulation_time_s","<=",2400)]).to_pandas()
+        metrics=["current_move_proposed_count","current_move_routed_count","current_move_count",
+                 "optional_move_budget_cutoff","adapter_wall_deadline_exceeded"]
+        traces=pq.read_table(path/("partial_solver_trace.parquet" if partial else "solver_trace.parquet"),
+            columns=metrics,filters=[("simulation_time_s","<=",2400)]).to_pandas()
+        rows[name]=dict(step_count=len(steps),step_wall_s=float(steps.step_wall_s.sum()),
+            maximum_step_s=float(steps.step_wall_s.max()),**{k:int(traces[k].fillna(0).sum()) for k in metrics})
+    old,new=rows.values()
+    if old["step_count"]!=81 or new["step_count"]!=81:
+        raise ValueError("prefix comparison must contain the same 81 execution ticks")
+    result=dict(status="OPERATIONAL_V4_BOUNDED_PREFIX_ANALYZED",source_code_sha=sha,
+        rows=rows,step_wall_reduction_share=1-new["step_wall_s"]/old["step_wall_s"],
+        setup_time_s=summary["setup_time_s"],total_runner_wall_s=summary["total_runner_wall_s"],
+        peak_rss_mib=summary["peak_rss_mib"],operations=summary["adapter_performance"]["operations"],
+        joint_phase_times_s=summary["adapter_performance"]["joint_timings_s"],
+        old_result_retained_not_rerun=True,pure_same_policy_engine_speedup_claim=False,
+        full_day_service_result=False,C_idle_improvement_established=False,
+        full_day_time_extrapolated=False,new_simulation_or_routing_invoked=False,
+        note="Different finite-budget methods on the same midnight prefix; low-load result, not peak/day inference.")
+    _atomic_json(root/DOC/"prefix_comparison.json",result)
+    return result
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action",choices=("prepare","prefix","run"),nargs="?",default="prepare")
+    parser.add_argument("action",choices=("prepare","prefix","analyze-prefix","run"),nargs="?",default="prepare")
     parser.add_argument("--execute",action="store_true")
     args=parser.parse_args()
-    if args.action!="prepare" and not args.execute:
+    if args.action in ("prefix","run") and not args.execute:
         parser.error("simulation needs explicit --execute; default only prepares metadata")
-    result=prepare(Path.cwd()) if args.action=="prepare" else run(Path.cwd(),prefix=args.action=="prefix")
+    result=(prepare(Path.cwd()) if args.action=="prepare" else analyze_prefix(Path.cwd())
+            if args.action=="analyze-prefix" else run(Path.cwd(),prefix=args.action=="prefix"))
     print(json.dumps({k:result[k] for k in ("status","group") if k in result}),flush=True)
 
 
