@@ -1,0 +1,302 @@
+{
+  "status": "C_CONNECTION_EIGHT_LINK_CHECK_COMPLETE",
+  "pair_count": 8,
+  "rows": [
+    {
+      "pair_number": 1,
+      "source_date": "20161010",
+      "default_supported": false,
+      "new_supported": false,
+      "default_pickup_eta_s": null,
+      "new_pickup_eta_s": null,
+      "new_within_pickup_cap": false,
+      "default_reasons": [
+        "EDGE_WALK_INVALID_SHAPE_INDEX_OR_LENGTH"
+      ],
+      "new_reasons": [
+        "EDGE_WALK_INVALID_SHAPE_INDEX_OR_LENGTH"
+      ],
+      "recovered": false,
+      "default_wall_s": 0.12688019999768585,
+      "new_wall_s": 0.03259509999770671,
+      "cache_1000_lookups_wall_s": 0.27880999999615597,
+      "repeated_leg_10000_wall_s": 0.14653140000154963,
+      "repeated_leg_certificate_lookups": 1,
+      "cache_backend_queries": 0,
+      "optional_query_budget_slots": 2
+    },
+    {
+      "pair_number": 2,
+      "source_date": "20161010",
+      "default_supported": true,
+      "new_supported": true,
+      "default_pickup_eta_s": 7.869730875526577,
+      "new_pickup_eta_s": 7.869730875526577,
+      "new_within_pickup_cap": true,
+      "default_reasons": [],
+      "new_reasons": [],
+      "recovered": false,
+      "default_wall_s": 0.2921375000005355,
+      "new_wall_s": 0.025548300000082236,
+      "cache_1000_lookups_wall_s": 0.24314890000096057,
+      "repeated_leg_10000_wall_s": 0.1349804999990738,
+      "repeated_leg_certificate_lookups": 1,
+      "cache_backend_queries": 0,
+      "optional_query_budget_slots": 1
+    },
+    {
+      "pair_number": 3,
+      "source_date": "20161010",
+      "default_supported": false,
+      "new_supported": true,
+      "default_pickup_eta_s": null,
+      "new_pickup_eta_s": 515.4878952197106,
+      "new_within_pickup_cap": true,
+      "default_reasons": [
+        "CUSTOMER_EMPTY_JOIN_TOO_FAR_FROM_SHARED_ENDPOINT"
+      ],
+      "new_reasons": [],
+      "recovered": true,
+      "default_wall_s": 0.20946769999864046,
+      "new_wall_s": 0.7842749999981606,
+      "cache_1000_lookups_wall_s": 0.3065074999976787,
+      "repeated_leg_10000_wall_s": 0.13123579999955837,
+      "repeated_leg_certificate_lookups": 1,
+      "cache_backend_queries": 0,
+      "optional_query_budget_slots": 2
+    },
+    {
+      "pair_number": 4,
+      "source_date": "20161010",
+      "default_supported": false,
+      "new_supported": false,
+      "default_pickup_eta_s": null,
+      "new_pickup_eta_s": null,
+      "new_within_pickup_cap": false,
+      "default_reasons": [
+        "UTURN_OUTSIDE_RESEARCH_PROFILE"
+      ],
+      "new_reasons": [
+        "UTURN_OUTSIDE_RESEARCH_PROFILE"
+      ],
+      "recovered": false,
+      "default_wall_s": 0.04286370000045281,
+      "new_wall_s": 0.014268999999330845,
+      "cache_1000_lookups_wall_s": 0.3286969000037061,
+      "repeated_leg_10000_wall_s": 0.13300660000095377,
+      "repeated_leg_certificate_lookups": 1,
+      "cache_backend_queries": 0,
+      "optional_query_budget_slots": 2
+    },
+    {
+      "pair_number": 5,
+      "source_date": "20161010",
+      "default_supported": true,
+      "new_supported": true,
+      "default_pickup_eta_s": 50.48075927975844,
+      "new_pickup_eta_s": 50.48075927975844,
+      "new_within_pickup_cap": true,
+      "default_reasons": [],
+      "new_reasons": [],
+      "recovered": false,
+      "default_wall_s": 0.26709090000076685,
+      "new_wall_s": 0.029095800004142802,
+      "cache_1000_lookups_wall_s": 0.31188839999958873,
+      "repeated_leg_10000_wall_s": 0.17498699999850942,
+      "repeated_leg_certificate_lookups": 1,
+      "cache_backend_queries": 0,
+      "optional_query_budget_slots": 1
+    },
+    {
+      "pair_number": 6,
+      "source_date": "20161010",
+      "default_supported": false,
+      "new_supported": false,
+      "default_pickup_eta_s": null,
+      "new_pickup_eta_s": null,
+      "new_within_pickup_cap": false,
+      "default_reasons": [
+        "UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE"
+      ],
+      "new_reasons": [
+        "UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE"
+      ],
+      "recovered": false,
+      "default_wall_s": 0.07071770000038669,
+      "new_wall_s": 0.011551600000530016,
+      "cache_1000_lookups_wall_s": 0.3424711000043317,
+      "repeated_leg_10000_wall_s": 0.14427879999857396,
+      "repeated_leg_certificate_lookups": 1,
+      "cache_backend_queries": 0,
+      "optional_query_budget_slots": 2
+    },
+    {
+      "pair_number": 7,
+      "source_date": "20161010",
+      "default_supported": false,
+      "new_supported": false,
+      "default_pickup_eta_s": null,
+      "new_pickup_eta_s": null,
+      "new_within_pickup_cap": false,
+      "default_reasons": [
+        "ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE"
+      ],
+      "new_reasons": [
+        "ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE"
+      ],
+      "recovered": false,
+      "default_wall_s": 0.26277159999881405,
+      "new_wall_s": 0.03906280000228435,
+      "cache_1000_lookups_wall_s": 0.308593200003088,
+      "repeated_leg_10000_wall_s": 0.13837680000142427,
+      "repeated_leg_certificate_lookups": 1,
+      "cache_backend_queries": 0,
+      "optional_query_budget_slots": 2
+    },
+    {
+      "pair_number": 8,
+      "source_date": "20161010",
+      "default_supported": false,
+      "new_supported": false,
+      "default_pickup_eta_s": null,
+      "new_pickup_eta_s": null,
+      "new_within_pickup_cap": false,
+      "default_reasons": [
+        "UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE",
+        "UTURN_OUTSIDE_RESEARCH_PROFILE"
+      ],
+      "new_reasons": [
+        "UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE",
+        "UTURN_OUTSIDE_RESEARCH_PROFILE"
+      ],
+      "recovered": false,
+      "default_wall_s": 0.06482090000645258,
+      "new_wall_s": 0.07289239999954589,
+      "cache_1000_lookups_wall_s": 0.30578099999547703,
+      "repeated_leg_10000_wall_s": 0.11618589999852702,
+      "repeated_leg_certificate_lookups": 1,
+      "cache_backend_queries": 0,
+      "optional_query_budget_slots": 2
+    }
+  ],
+  "source": "STABLE_HASH_EARLIER_HISTORY_C_BODY_PAIRS_WITHIN_2KM",
+  "simulator_invoked": false,
+  "inference_invoked": false,
+  "future_Test31_orders_read": false,
+  "full_day_executed": false,
+  "C_idle_improvement_established": false,
+  "runtime_s": 9.68894949999958,
+  "peak_rss_mib": 456.421875,
+  "config_sha256": "011cae3a5b78c1b03497971efbdcc79c7ac947d4a2ff8bf4bbaae47218781a4c",
+  "connector": {
+    "counts": {
+      "train_identity_projection_scans": 1,
+      "train_identity_orders_loaded": 16,
+      "train_identity_tokens_loaded": 992,
+      "train_overlay_projection_scans": 1,
+      "examined_connections": 8024,
+      "certificate_cache_misses": 16,
+      "scalar_route_evaluations": 8,
+      "rejected_connections": 5016,
+      "route_cache_hits": 8,
+      "C_alternative_backend_calls": 6,
+      "customer_body_views_materialized": 16,
+      "C_alternative_paths_checked": 7,
+      "certificate_cache_hits": 8008,
+      "C_directional_seams_examined": 10,
+      "C_directional_seams_passed": 6,
+      "supported_connections": 3008,
+      "C_connections_passed": 3008,
+      "customer_body_cache_hits": 16,
+      "C_connections_recovered_by_alternative": 1
+    },
+    "rejection_reason_counts": {
+      "TRAIN_TEMPLATE_IDENTITY_MISSING": 0,
+      "EDGE_WALK_INVALID_SHAPE_INDEX_OR_LENGTH": 1003,
+      "CUSTOMER_EMPTY_JOIN_TOO_FAR_FROM_SHARED_ENDPOINT": 1,
+      "UTURN_OUTSIDE_RESEARCH_PROFILE": 2006,
+      "UNSIGNALIZED_MOVEMENT_OUTSIDE_RESEARCH_PROFILE": 2006,
+      "ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE": 1003
+    },
+    "timings_s": {
+      "train_identity_geometry_preparation_s": 0.6774665000048117,
+      "scalar_routing_time_s": 0.5198737000027904,
+      "total_connection_time_s": 4.677300900315458,
+      "directional_seam_time_s": 1.4504305999944336
+    },
+    "route_cache_entries": 8,
+    "route_cache_limit": 1024,
+    "body_view_cache_entries": 16,
+    "shared_pickup_and_move_route_cache": true,
+    "body_view_cache_limit": 256,
+    "native_context_cache_entries": 0,
+    "train_identity_arrow_mib": 0.1194620132446289,
+    "train_overlay_arrow_mib": 0.0021467208862304688,
+    "shared_geometry_arrow_mib": 0.11737346649169922,
+    "geometry_object_cache_entries": 256,
+    "actual_body_view_cache_entries": 0,
+    "certificate_cache_entries": 16,
+    "certificate_cache_key_format": "SHA256_COMPLETE_EXACT_CONTEXT_NOT_COORDINATE_ROUNDING",
+    "native_signature_cache_entries": 0,
+    "certificate_cache_entry_limit": 50000,
+    "certificate_cache_mib": 0.06919193267822266,
+    "certificate_cache_byte_limit_mib": 32.0,
+    "geometry_uid_rowgroup_index_mib": 7.9900360107421875,
+    "geometry_rowgroup_cache_mib": 50.67617416381836,
+    "geometry_rowgroup_cache_limit_mib": 64.0,
+    "geometry_rowgroup_reads": 1,
+    "geometry_rowgroup_cache_hits": 6,
+    "join_static_cache_entries": 41,
+    "join_static_cache_mib": 1.3989696502685547,
+    "join_static_cache_limit_mib": 16.0,
+    "join_static_cache_hits": 0,
+    "join_static_cache_misses": 6,
+    "join_parse_cache_hits": 0,
+    "join_parse_cache_misses": 5,
+    "exact_join_result_cache_hits": 4,
+    "exact_join_result_cache_misses": 6,
+    "route_classification_cache_hits": 0,
+    "route_classification_cache_misses": 11,
+    "frozen_evidence_index_mib": 16.820384979248047,
+    "frozen_evidence_index_limit_mib": 32.0,
+    "geometry_timestamp": "2016-10-31T00:00:00+08:00",
+    "eta_beta_time": "ACTUAL_OR_PREDICTED_CONNECTOR_DEPARTURE",
+    "traffic_policy": "EXPLICIT_U_FOR_NEW_EMPTY_CONNECTOR_NO_M3_FABRICATION",
+    "full_customer_token_views": true,
+    "arbitrary_terminal_edge_truncation": false,
+    "HV_semantics": "AUTO_ROUTABLE_WITHOUT_C_CAPABILITY_OR_SEAM_GATE"
+  },
+  "router": {
+    "route_requests": 14,
+    "scalar_route_calls": 14,
+    "edge_walk_calls": 15,
+    "route_cache_hits": 0,
+    "route_cache_entries": 8,
+    "route_cache_limit": 1024,
+    "bearing_cache_entries": 0,
+    "common_support_evaluations": {
+      "unsupported": 4,
+      "supported": 11
+    },
+    "common_failure_reason_counts": {
+      "EDGE_WALK_INVALID_SHAPE_INDEX_OR_LENGTH": 4
+    },
+    "columnar_evidence_mib": 89.02912616729736,
+    "traffic_policy": "EXPLICIT_U_FOR_NEW_ROUTE_WITHOUT_FROZEN_M3_FEATURE_ROWS",
+    "traffic_partition": {
+      "NC": 0.0,
+      "ML": 0.0,
+      "MR": 0.0,
+      "CG": 0.0,
+      "SC": 0.0,
+      "U": 1.0
+    },
+    "traffic_unknown_share": 1.0,
+    "dynamic_evidence_complete": false,
+    "dynamic_reason_codes": [
+      "FROZEN_M3_EXACT_INPUT_CONTRACT_UNAVAILABLE_FOR_NEW_ROUTE"
+    ],
+    "conservative_control_policy": "SIGNALIZED_CONFLICT_MOVEMENTS",
+    "traffic_outside_budget": 0.05
+  }
+}

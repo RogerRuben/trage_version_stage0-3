@@ -322,26 +322,7 @@ class ControlledEmptyRouter:
                 date_time=dict(type=1, value=local.strftime("%Y-%m-%dT%H:%M")))
             self.route_call_count += 1
             trip = actor.route(request)["trip"]
-            if int(trip.get("status", 0)) != 0 or len(trip.get("legs", [])) != 1:
-                raise Stage3S2AError("SCALAR_EMPTY_ROUTE_NOT_ONE_SUCCESSFUL_LEG")
-            raw_time = float(trip["summary"]["time"])
-            distance = float(trip["summary"]["length"]) * 1000.0
-            duration = raw_time * beta
-            if not all(math.isfinite(v) and v > 0 for v in (raw_time, distance, duration)):
-                raise Stage3S2AError("SCALAR_EMPTY_ROUTE_TIME_OR_DISTANCE_INVALID")
-            shape = str(trip["legs"][0]["shape"])
-            points = decode_polyline6(shape)
-            if not all(math.isfinite(lon) and math.isfinite(lat) and -180 <= lon <= 180
-                    and -90 <= lat <= 90 for lon, lat in points) or not any(p != points[0] for p in points[1:]):
-                raise Stage3S2AError("SCALAR_EMPTY_ROUTE_GEOMETRY_INVALID")
-            result.update(points=points, geometry_points=points, shape_polyline6=shape,
-                raw_time_s=raw_time, duration_s=duration, distance_m=distance,
-                beta=beta, snapped_origin=points[0], snapped_target=points[-1],
-                snap_gap_origin_m=_gap_m(coordinates[:2], points[0]),
-                snap_gap_target_m=_gap_m(coordinates[2:], points[-1]), coincident_od=False)
-            edges = self._edge_walk(actor, shape, points, local)
-            result["edges"] = edges
-            result.update(self._classify(edges, local))
+            result = self._trip_result(trip, coordinates, local, beta, result)
         except Exception as exc:
             code = str(exc) if isinstance(exc, Stage3S2AError) else "EMPTY_ROUTE_EXCEPTION"
             result.update(common_supported=False, compatible_profiles=frozenset(),
@@ -350,3 +331,82 @@ class ControlledEmptyRouter:
             return self._remember(key, result)
         self._record_result(result)
         return self._copy_result(result)
+
+    def _trip_result(self, trip, coordinates, local, beta, result=None):
+        """One physical path uses the same edge-walk and C rules in all callers."""
+        result = self._base_result() if result is None else result
+        if int(trip.get("status", 0)) != 0 or len(trip.get("legs", [])) != 1:
+            raise Stage3S2AError("SCALAR_EMPTY_ROUTE_NOT_ONE_SUCCESSFUL_LEG")
+        raw_time = float(trip["summary"]["time"])
+        distance = float(trip["summary"]["length"]) * 1000.0
+        duration = raw_time * beta
+        if not all(math.isfinite(v) and v > 0 for v in (raw_time, distance, duration)):
+            raise Stage3S2AError("SCALAR_EMPTY_ROUTE_TIME_OR_DISTANCE_INVALID")
+        shape = str(trip["legs"][0]["shape"])
+        points = decode_polyline6(shape)
+        if not all(math.isfinite(lon) and math.isfinite(lat) and -180 <= lon <= 180
+                and -90 <= lat <= 90 for lon, lat in points) or not any(p != points[0] for p in points[1:]):
+            raise Stage3S2AError("SCALAR_EMPTY_ROUTE_GEOMETRY_INVALID")
+        result.update(points=points, geometry_points=points, shape_polyline6=shape,
+            raw_time_s=raw_time, duration_s=duration, distance_m=distance,
+            beta=beta, snapped_origin=points[0], snapped_target=points[-1],
+            snap_gap_origin_m=_gap_m(coordinates[:2], points[0]),
+            snap_gap_target_m=_gap_m(coordinates[2:], points[-1]), coincident_od=False)
+        edges = self._edge_walk(self.eta_adapter.actor, shape, points, local)
+        result["edges"] = edges
+        result.update(self._classify(edges, local))
+        return result
+
+    def alternative_routes(self, origin, target, timestamp, *, origin_heading=None,
+                           target_heading=None, maximum_alternates=2, exclude_shapes=()):
+        """At most one extra backend call and three fully checked static paths.
+
+        This is bounded candidate recovery, NOT a complete C shortest-path
+        algorithm. It never changes the passenger body or the default OD cache.
+        Valhalla alternates do not support time-dependent requests: use the
+        fixed snapshot's invariant time (not the machine's current clock),
+        then retime with the existing decision-time beta.
+        """
+        if type(maximum_alternates) is not int or not 0 <= maximum_alternates <= 2:
+            raise ValueError("bounded recovery permits at most two alternate paths")
+        coordinates = tuple(map(float, (*origin, *target)))
+        if (len(coordinates) != 4 or not all(map(math.isfinite, coordinates))
+                or not -180 <= coordinates[0] <= 180 or not -90 <= coordinates[1] <= 90
+                or not -180 <= coordinates[2] <= 180 or not -90 <= coordinates[3] <= 90):
+            raise ValueError("alternative endpoints must be finite WGS84")
+        local = self._local_timestamp(timestamp)
+        _, beta = self.eta_adapter.beta_for(local)
+        beta = float(beta)
+        if not math.isfinite(beta) or beta <= 0:
+            raise ValueError("alternative route beta must be positive")
+        locations = [dict(lon=coordinates[0], lat=coordinates[1], type="break"),
+                     dict(lon=coordinates[2], lat=coordinates[3], type="break")]
+        for location, heading in zip(locations, (origin_heading, target_heading)):
+            if heading is not None:
+                if not math.isfinite(float(heading)):
+                    raise ValueError("a supplied direction must be finite")
+                location.update(heading=float(heading) % 360., heading_tolerance=30.)
+        self.route_request_count += 1
+        self.route_call_count += 1
+        response = self.eta_adapter.actor.route(dict(locations=locations, costing="auto",
+            units="kilometers", directions_type="none", alternates=maximum_alternates,
+            date_time=dict(type=3, value=local.strftime("%Y-%m-%dT%H:%M"))))
+        trips = [response.get("trip", {})]
+        trips.extend(item.get("trip", item) for item in response.get("alternates", ())[:maximum_alternates])
+        seen = set(exclude_shapes)
+        for trip in trips:
+            legs = trip.get("legs", ())
+            shape = legs[0].get("shape") if len(legs) == 1 else None
+            if shape is not None and shape in seen:
+                continue
+            if shape is not None:
+                seen.add(shape)
+            result = self._base_result()
+            try:
+                result = self._trip_result(trip, coordinates, local, beta, result)
+            except Exception as exc:
+                code = str(exc) if isinstance(exc, Stage3S2AError) else "ALTERNATIVE_ROUTE_EXCEPTION"
+                result.update(reason_codes=(code,), reasons=(code,), failure_detail=str(exc))
+            result.update(route_variant="BOUNDED_STATIC_ALTERNATIVE", geometry_request_time_dependent=False)
+            self._record_result(result)
+            yield result

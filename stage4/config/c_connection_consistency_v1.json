@@ -1,0 +1,19 @@
+{
+  "version": "c_connection_consistency_v1",
+  "base_config": "stage4/config/bottleneck_operational_v4.json",
+  "base_config_sha256": "ba3fe9c5c14b6a61bdd15ef60890ca0d32bd79b6c79938b760ab2ee2730af6e9",
+  "group": "C_CONNECTION_ALIGNED",
+  "joint_c_connection_mode": "BOUNDED_CERTIFIED_C_V1",
+  "c_extra_backend_requests_per_epoch": 2,
+  "c_extra_backend_requests_per_snapshot": 32,
+  "c_optional_connection_wall_s": 0.15,
+  "default_action": "prepare",
+  "full_day_authorized": false,
+  "forced_C_priority": false,
+  "idle_utilization_reward": false,
+  "objective_changed": false,
+  "supply_calendar_changed": false,
+  "profile_thresholds_changed": false,
+  "dense_matrix": false,
+  "gpu_used": false
+}

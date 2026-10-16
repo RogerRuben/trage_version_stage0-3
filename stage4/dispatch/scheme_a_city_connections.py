@@ -691,7 +691,7 @@ not permission to execute a scenario's hypothetical future customer path.
         return size(key) + size(certificate) + 160
 
     def _remember_certificate(self, key, certificate):
-        if key is None:
+        if key is None or certificate.get("search_deferred", False):
             return
         byte_count = self._certificate_size(key, certificate)
         if byte_count > CERTIFICATE_CACHE_BYTES:
@@ -722,6 +722,63 @@ not permission to execute a scenario's hypothetical future customer path.
             self.route_cache[key] = route
             while len(self.route_cache) > ROUTE_CACHE_LIMIT:
                 self.route_cache.popitem(last=False)
+        certificate, selected = self._route_certificate(origin_state, target, target_point, profile, site, route)
+        budget = getattr(self, "c_connection_budget", None)
+        if profile != "C" or budget is None:
+            return certificate, selected
+        if not certificate["supported"] and not route.get("coincident_od", False):
+            if not budget.claim("ALTERNATIVE"):
+                certificate["search_deferred"] = True
+            else:
+                entered = perf_counter()
+                self.counts["C_alternative_backend_calls"] += 1
+                recovered = []
+                try:
+                    headings = self._recovery_headings(origin_state, target, site)
+                    for alternative in self.router.alternative_routes(origin, target_point, self.geometry_timestamp,
+                            origin_heading=headings[0], target_heading=headings[1], maximum_alternates=2,
+                            exclude_shapes=(route.get("shape_polyline6"),)):
+                        self.counts["C_alternative_paths_checked"] += 1
+                        result, path = self._route_certificate(
+                            origin_state, target, target_point, profile, site, alternative)
+                        if result["supported"]:
+                            recovered.append((float(result["raw_time_s"]), float(result["distance_m"]),
+                                              str(path.get("shape_polyline6")), result, path))
+                    if recovered:
+                        _, _, _, certificate, selected = min(recovered, key=lambda item: item[:3])
+                        self.counts["C_connections_recovered_by_alternative"] += 1
+                except Exception:
+                    certificate["search_deferred"] = True
+                    self.counts["C_alternative_backend_errors"] += 1
+                finally:
+                    budget.record(perf_counter() - entered)
+        # Only the new opt-in C branch retains a physical path in the existing
+        # byte-bounded certificate LRU. Never replace the type-neutral OD cache
+        # with a direction-specific alternative.
+        if certificate["supported"]:
+            certificate["routed_C"] = selected
+        certificate["search_scope"] = ("DEFAULT_ONLY_ALTERNATIVES_DEFERRED" if certificate.get("search_deferred")
+            else "DEFAULT_OR_BOUNDED_HEADING_AWARE_STATIC_PATHS_NOT_COMPLETE_C_ROUTING")
+        return certificate, selected
+
+    def _recovery_headings(self, origin_state, target, site):
+        source, _, reason = self._source(origin_state)
+        following, target_reason = (None, None) if site else self._body(target)
+        if reason or target_reason:
+            return None, None
+        def heading(frame, last):
+            if frame is None or not len(frame):
+                return None
+            row = frame.iloc[-1 if last else 0]
+            # A historical reverse identity is not a forward heading hint.
+            if row.route_token_type != "FULL_NETWORK_EDGE":
+                return None
+            uid = row.resolved_stage3_edge_uid
+            bearings = self.join_router._bearings_for({uid}).get(uid)
+            return bearings[1 if last else 0] if bearings is not None else None
+        return heading(source, True), heading(following, False)
+
+    def _route_certificate(self, origin_state, target, target_point, profile, site, route):
         certificate = dict(supported=False, compatible_profiles=(), reason_codes=(),
             raw_time_s=None, distance_m=None, arrival_context=None,
             connection_evidence_state=None, coincident_od=bool(route.get("coincident_od", False)))
@@ -893,8 +950,12 @@ This branch is enabled explicitly by the parent protocol, never for site MOVE.
         finally:
             self._prefetched_hv = None
 
-    def __call__(self, origin_state, target, departure_s, profile_id):
+    def __call__(self, origin_state, target, departure_s, profile_id, *,
+                 cache_only=False, query_scope=None, require_geometry=False,
+                 enforce_pickup_deadline=True):
         started = perf_counter()
+        optional_started = None
+        optional_before = 0.
         self.counts["examined_connections"] += 1
         try:
             profile = str(profile_id)
@@ -927,12 +988,16 @@ This branch is enabled explicitly by the parent protocol, never for site MOVE.
             beta = float(beta)
             if not isfinite(beta) or beta <= 0:
                 return self._reject(["CONNECTOR_DEPARTURE_BETA_INVALID"])
-            require_geometry = bool(site and target.get("require_geometry", False))
+            require_geometry = bool(require_geometry or (site and target.get("require_geometry", False)))
             target_key = (("SITE", str(target["site_id"]), target_point) if site else
                 ("CUSTOMER", *identity, target_point, _point(_value(target, "dropoff"))))
-            key = self._certificate_key("AUTO_OD" if fast_hv else "TYPED_SCALAR",
+            bounded_c = profile == "C" and getattr(self, "c_connection_budget", None) is not None
+            mode = "TYPED_SCALAR_C_BOUNDED_V1" if bounded_c else ("AUTO_OD" if fast_hv else "TYPED_SCALAR")
+            key = self._certificate_key(mode,
                 profile, origin, source_key, target_key)
             cached_route = self.route_cache.get((*origin, *target_point)) if require_geometry else None
+            if bounded_c and key in self.certificate_cache:
+                cached_route = self.certificate_cache[key][0].get("routed_C")
             if key is not None and key in self.certificate_cache and (not require_geometry or cached_route is not None):
                 certificate, _ = self.certificate_cache[key]
                 self.certificate_cache.move_to_end(key)
@@ -944,22 +1009,33 @@ This branch is enabled explicitly by the parent protocol, never for site MOVE.
                     self.route_cache.move_to_end((*origin, *target_point))
                     self.counts["current_move_certificate_reuses"] += 1
             else:
+                if cache_only:
+                    return self._reject(["C_CONNECTION_NOT_EVALUATED_CACHE_MISS"])
+                if bounded_c and query_scope == "FUTURE":
+                    if not self.c_connection_budget.claim("FUTURE"):
+                        return self._reject(["C_CONNECTION_NOT_EVALUATED_BUDGET"])
+                    optional_started = perf_counter()
+                    optional_before = self.c_connection_budget.spent_epoch_s
                 self.counts["certificate_cache_misses" if key is not None else "certificate_cache_bypassed"] += 1
                 certificate, route = (self._hv_auto_od_certificate(origin, target_point, stamp)
                     if fast_hv else self._static_certificate(origin_state, target, origin, target_point, profile, site))
                 self._remember_certificate(key, certificate)
             if not certificate["supported"]:
-                return self._reject(certificate["reason_codes"], routed=route)
+                rejected = self._reject(certificate["reason_codes"], routed=route)
+                if bounded_c:
+                    rejected.update(search_scope=certificate.get("search_scope"),
+                        search_deferred=bool(certificate.get("search_deferred")),incapability_proved=False)
+                return rejected
             raw, distance = certificate["raw_time_s"], certificate["distance_m"]
             duration = raw * beta
             if (not certificate["coincident_od"] and not certificate.get("allow_zero_auto_od", False)
                     and min(raw, duration, distance) <= 0):
                 return self._reject(["SCALAR_AUTO_NONCOINCIDENT_ZERO_TIME_OR_DISTANCE"], routed=route)
-            if not site:
+            if not site and enforce_pickup_deadline:
                 deadline = _value(target, "deadline_s")
                 if deadline is not None and departure + duration > float(deadline) + 1e-9:
                     return self._reject(["CONNECTOR_EXCEEDS_ORIGINAL_PICKUP_DEADLINE"], routed=route)
-            routed = dict(route, duration_s=duration, beta=beta, time_bin_index=int(bin_index),
+            routed = dict(deepcopy(route) if bounded_c else route, duration_s=duration, beta=beta, time_bin_index=int(bin_index),
                 origin_wgs84=origin, target_wgs84=target_point, departure_s=departure,
                 geometry_timestamp=self.geometry_timestamp.isoformat(), decision_timestamp=pd.Timestamp(stamp).isoformat(),
                 connection_evidence_state=certificate["connection_evidence_state"], supported=True) if require_geometry and route is not None else None
@@ -970,6 +1046,9 @@ This branch is enabled explicitly by the parent protocol, never for site MOVE.
                 reason_codes=[], routed=routed,
                 connection_evidence_state=certificate["connection_evidence_state"])
         finally:
+            if optional_started is not None:
+                nested = self.c_connection_budget.spent_epoch_s - optional_before
+                self.c_connection_budget.record(max(0., perf_counter() - optional_started - nested))
             self.timings["total_connection_time_s"] += perf_counter() - started
             while len(self.actual_evidence.tokens) > BODY_CACHE_LIMIT:
                 self.actual_evidence.tokens.popitem(last=False)

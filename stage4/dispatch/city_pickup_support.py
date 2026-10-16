@@ -447,7 +447,7 @@ class CityPickupSupportValidator:
                 for phase, values in (phase_codes or {}).items():
                     decisions.reject_stage(arc.request_id, phase, arc.vehicle_type, values)
         valid, indices = [], []
-        route_time = seam_time = 0.0
+        route_time = seam_time = shared_time = 0.0
         self.pickup_paths = {}
         c.city_pickup_paths = {}
         idle_routing_before = float(getattr(self.seam_evidence, "departure_context_routing_time_s", 0.))
@@ -484,6 +484,32 @@ class CityPickupSupportValidator:
                 continue
             if self.routing_budget_s <= 0:
                 reject(arc, ("PICKUP_SUPPORT_ROUTING_BUDGET_EXHAUSTED",))
+                continue
+            shared = getattr(self, "shared_C_support", None)
+            if shared is not None:
+                entered = perf_counter()
+                link = shared.current(c, runtime, request, now)
+                shared_time += perf_counter() - entered
+                counts["shared_C_connections_examined"] += 1
+                if not link["supported"]:
+                    reject(arc, link["reason_codes"], "SHARED_C_CONNECTION")
+                    continue
+                routed = link.get("routed")
+                if routed is None or link.get("connection_evidence_state") != "C_DIRECTED_SEAM_CERTIFIED":
+                    raise ValueError("shared current C connection must have its certified executable route")
+                duration, distance = float(link["travel_time_s"]), float(link["empty_distance_m"])
+                if not assignment_feasible(wait_config, now, meta["pickup_deadline_s"], duration):
+                    reject(arc, (pickup_rejection_code(wait_config),), "PICKUP_TIME")
+                    continue
+                corrected = PickupEstimate(valhalla_time_s=float(routed["raw_time_s"]),
+                    corrected_pickup_eta_s=duration, route_distance_m=distance,
+                    beta=float(routed["beta"]), time_bin_index=int(routed["time_bin_index"]),
+                    cache_hit=bool(routed.get("cache_hit", False)))
+                valid.append(replace(arc, pickup_eta_s=duration, payload=(runtime, request, corrected)))
+                indices.append(index)
+                self.pickup_paths[(int(arc.vehicle_id), int(arc.request_id))] = routed
+                c.city_pickup_paths[(int(arc.vehicle_id), int(arc.request_id))] = routed["points"]
+                counts["av_pickup_arcs_retained"] += 1
                 continue
             origin = tuple(map(float, c.routing_engine.return_position_coordinates(runtime.native_vehicle.pos)))
             target = (float(request.pickup_lon_wgs84), float(request.pickup_lat_wgs84))
@@ -566,6 +592,7 @@ class CityPickupSupportValidator:
         self.last_diagnostics = dict(input_arc_count=len(arcs), validated_arc_count=len(valid),
             original_indices=indices, counts=dict(counts), rejection_reason_counts=dict(reasons),
             pickup_support_time_s=elapsed, pickup_routing_time_s=route_time,
+            shared_C_connection_time_s=shared_time,
             idle_prefix_routing_time_s=idle_routing,
             pickup_seam_evidence_time_s=seam_time, routing_budget_s=self.routing_budget_s,
             routing_budget_is_separate_from_solver=True, geometry_timestamp=self.geometry_timestamp.isoformat(),

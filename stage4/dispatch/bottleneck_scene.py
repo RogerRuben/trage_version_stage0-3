@@ -24,7 +24,7 @@ from .scheme_a_city_master import ServiceChain
 class PredictionSceneOracle:
     def __init__(self, actions, roots, scenes, pending, pace, now, *, check=lambda:None,
                  maximum_labels=50000,maximum_columns=20000,topology=None,forecast_snapshot=None,
-                 efficient=False):
+                 efficient=False, c_support=None):
         self.actions={a.action_id:a for a in actions}
         self.roots=dict(roots)
         if self.actions.keys()!=self.roots.keys():
@@ -38,6 +38,7 @@ class PredictionSceneOracle:
         self.predecessor_refs=0; self.reachable_refs=0
         self.query_wall_time_s=0.; self.query_calls=0; self.target_pruned_nodes=0
         self.efficient=efficient; self.xy={}; self.distances=OrderedDict()
+        self.c_support=c_support; self.road_legs=OrderedDict()
         self.support_cache=OrderedDict(); self.neighbor_cache=OrderedDict()
         self.catalogs=OrderedDict(); self.catalog_refs=0; self.many_label_exhausted=False
         self.batch_queries=0; self.batch_reuses=0
@@ -85,7 +86,11 @@ class PredictionSceneOracle:
         digest=hashlib.sha256(repr((sid,aid,path)).encode()).hexdigest()[:24]
         c=ServiceChain(f"{sid}|{aid}|{digest}",sid,self.actions[aid].vehicle_id,aid,
             tuple(l[0] for l in path),sum(l[4] for l in path),dict(legs=path,
-                support="EARLIER_HISTORY_M3_CHORD_PACE_NOT_DIRECTED_ROUTE_CERTIFICATE"))
+                support=("C_RELAXED_MOVE_PROBE_NOT_EXECUTABLE" if self.c_support is not None
+                    and (self.roots[aid].context or {}).get("kind")=="RELAXED_CURRENT_MOVE_PROBE" else
+                    "C_CACHED_DIRECTED_CONNECTIONS_M3_CUSTOMER_TIME" if self.c_support is not None
+                    and self.roots[aid].profile_id=="C" else
+                    "EARLIER_HISTORY_M3_CHORD_PACE_NOT_DIRECTED_ROUTE_CERTIFICATE")))
         if len(self.registered)>=self.maximum_columns and c.chain_id not in self.registered:
             raise JointBudgetStop("joint oracle column memory cap exhausted")
         self.registered[c.chain_id]=c
@@ -97,7 +102,7 @@ class PredictionSceneOracle:
         forbidden=set(forbidden)
         if self.actions[aid].request_id is not None:
             forbidden.add(self.actions[aid].request_id)
-        position,ready=state.position,state.ready_s
+        position,ready,context=state.position,state.ready_s,state.context
         path=[]
         for _ in range(3):
             check()
@@ -106,7 +111,7 @@ class PredictionSceneOracle:
                 if t.request_id in forbidden or not self._allowed(t,state.profile_id):
                     continue
                 adjusted=ceil(ready/300)*300 if t.source_kind=="FORECAST" else ready
-                leg=self._leg(t,adjusted,position,state.admission_end_s)
+                leg=self._supported_leg(t,adjusted,position,state.admission_end_s,state.profile_id,context)
                 if leg is not None:
                     choices.append((leg[1],leg[4],t.request_id,t,leg))
             if not choices:
@@ -122,6 +127,7 @@ class PredictionSceneOracle:
                 _,_,_,task,leg=min(choices,key=lambda x:x[:3])
             path.append(leg); forbidden.add(task.request_id)
             position,ready=task.dropoff,leg[3]
+            context=dict(kind="CUSTOMER",task=task)
         return (self._remember_path(sid,aid,tuple(path)),) if path else ()
 
     def nearby_resources(self,sid,rid,maximum,check,*,eligible_vehicles=None):
@@ -214,6 +220,32 @@ class PredictionSceneOracle:
             return None
         return (task.request_id,float(dispatch),eta,
                 float(dispatch+eta+task.service_time_s),distance)
+
+    def _supported_leg(self,task,ready,position,end,profile,context):
+        upper=self._leg(task,ready,position,end)
+        if upper is None or profile!="C" or self.c_support is None:
+            return upper
+        if (context or {}).get("kind")=="RELAXED_CURRENT_MOVE_PROBE":
+            return upper  # V4's discovery-only move must still be certified and re-solved before execution.
+        from .c_connection_support import context_key
+        # Synthetic request IDs may repeat between historical scenarios. Bind
+        # the complete target provenance/geometry and predicted service time.
+        key=(position,context_key(context),task.request_id,task.source_date,task.source_order_id,
+             task.source_kind,task.pickup,task.dropoff,task.service_time_s,upper[1])
+        if key in self.road_legs:
+            result=self.road_legs[key]; self.road_legs.move_to_end(key)
+        else:
+            state=RouteState(position,float(ready),float(end),profile,context)
+            link=self.c_support.lookup(state,task,upper[1])
+            result=None
+            if link["supported"]:
+                eta,distance=float(link["travel_time_s"]),float(link["empty_distance_m"])
+                if all(isfinite(v) and v>=0 for v in (eta,distance)) and eta<=600.:
+                    result=(task.request_id,upper[1],eta,upper[1]+eta+task.service_time_s,distance)
+            self.road_legs[key]=result
+            while len(self.road_legs)>4096:
+                self.road_legs.popitem(last=False)
+        return result
 
     def _near(self,sid,point):
         tree,tasks,points=self.trees[sid]
@@ -308,7 +340,7 @@ class PredictionSceneOracle:
 
     def repair(self,sid,aid,request_ids,forbidden,check):
         """Re-anchor retained identities, NEVER retain old travel times or ownership."""
-        state=self.roots[aid]; position,ready=state.position,state.ready_s
+        state=self.roots[aid]; position,ready,context=state.position,state.ready_s,state.context
         used=set(forbidden); used.add(self.actions[aid].request_id)
         path=[]; previous=None
         for rid in request_ids:
@@ -319,10 +351,11 @@ class PredictionSceneOracle:
             if previous is not None and not any(n.request_id==rid for n in self._following(sid,previous,state.profile_id)):
                 continue
             adjusted=ceil(ready/300)*300 if t.source_kind=="FORECAST" else ready
-            leg=self._leg(t,adjusted,position,state.admission_end_s)
+            leg=self._supported_leg(t,adjusted,position,state.admission_end_s,state.profile_id,context)
             if leg is None:
                 continue
             path.append(leg); used.add(rid); previous=t; position,ready=t.dropoff,leg[3]
+            context=dict(kind="CUSTOMER",task=t)
             if len(path)==3:
                 break
         return self._remember_path(sid,aid,tuple(path)) if path else None
@@ -338,7 +371,8 @@ class PredictionSceneOracle:
         for i in candidates:
             aid=self.aids[i]; state=self.roots[aid]
             if (self.actions[aid].request_id!=rid and self._allowed(task,state.profile_id)
-                    and self._leg(task,state.ready_s,state.position,state.admission_end_s) is not None):
+                    and self._supported_leg(task,state.ready_s,state.position,state.admission_end_s,
+                        state.profile_id,state.context) is not None):
                 result.append(aid)
         result=tuple(sorted(result,key=lambda a:(self.actions[a].vehicle_id,a)))
         if self.efficient:
@@ -413,7 +447,8 @@ class PredictionSceneOracle:
                     ready=leg[3]
                     if target.source_kind=="FORECAST":
                         ready=ceil((ready-(self.now//300)*300)/300)*300+(self.now//300)*300
-                    next_leg=self._leg(target,ready,node.dropoff,state.admission_end_s)
+                    next_leg=self._supported_leg(target,ready,node.dropoff,state.admission_end_s,
+                        state.profile_id,dict(kind="CUSTOMER",task=node))
                     if next_leg is None:
                         continue
                     tail=visit(target,next_leg,depth+1,used|{target.request_id},
@@ -433,7 +468,7 @@ class PredictionSceneOracle:
             ready=state.ready_s
             if node.source_kind=="FORECAST":
                 ready=ceil(ready/300)*300
-            leg=self._leg(node,ready,state.position,state.admission_end_s)
+            leg=self._supported_leg(node,ready,state.position,state.admission_end_s,state.profile_id,state.context)
             if leg is None:
                 continue
             found=required is None or node.request_id==required
@@ -484,13 +519,14 @@ class PredictionSceneOracle:
                         ready=leg[3]
                         if target.source_kind=="FORECAST":
                             ready=ceil((ready-(self.now//300)*300)/300)*300+(self.now//300)*300
-                        following=self._leg(target,ready,node.dropoff,state.admission_end_s)
+                        following=self._supported_leg(target,ready,node.dropoff,state.admission_end_s,
+                            state.profile_id,dict(kind="CUSTOMER",task=node))
                         if following is not None: visit(target,following,path,ids,distance)
                 try:
                     for node in self._near(sid,state.position):
                         if node.request_id in forbidden or not self._allowed(node,state.profile_id): continue
                         ready=ceil(state.ready_s/300)*300 if node.source_kind=="FORECAST" else state.ready_s
-                        leg=self._leg(node,ready,state.position,state.admission_end_s)
+                        leg=self._supported_leg(node,ready,state.position,state.admission_end_s,state.profile_id,state.context)
                         if leg is not None: visit(node,leg,(),(),0.)
                 except JointLabelStop:
                     self.many_label_exhausted=True

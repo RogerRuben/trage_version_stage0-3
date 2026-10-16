@@ -61,6 +61,16 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
         if self.joint_execution_mode not in ("REBUILD_V1","INCREMENTAL_V2","INCREMENTAL_V3"):
             raise ValueError("unknown joint execution mode")
         self.joint_memory=None
+        self.c_support=None
+        c_mode=cfg.get("joint_c_connection_mode","PROXY_V4")
+        if c_mode not in ("PROXY_V4","BOUNDED_CERTIFIED_C_V1"):
+            raise ValueError("unknown C connection planning mode")
+        if c_mode!="PROXY_V4":
+            if not self.joint_mode or self.joint_execution_mode!="INCREMENTAL_V3":
+                raise ValueError("bounded C connections require the incremental joint foundation")
+            from .c_connection_support import SharedCConnectionSupport
+            self.c_support=SharedCConnectionSupport(connectors,self._task,cfg)
+            validator.shared_C_support=self.c_support
         if self.joint_mode and self.joint_execution_mode in ("INCREMENTAL_V2","INCREMENTAL_V3"):
             if not 1<=int(cfg.get("joint_maximum_labels",50000))<=50000:
                 raise ValueError("incremental execution cannot increase the label allowance")
@@ -267,6 +277,9 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
         deadline = started + float(self.cfg.get("solver_time_limit_s", 10.))
         self._validate_control(c)
         self._sync(c)
+        if self.c_support is not None:
+            self.c_support.begin(now,deadline)
+            c.shared_C_connection_support=self.c_support
         manager = c.repositioning_manager
         move_epoch = (not self.common_movement and now % 900 == 0
             and 0 <= now < self.cfg.get("movement_day_end_s", 86400))
@@ -404,8 +417,10 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
                 aid=f"V{vid}:MOVE:{site['site_id']}"
                 actions.append(CurrentAction(aid,vid,"RELOCATE",None,payload=dict(
                     optimistic_move=True,source_state=state,target_site=site,relocation_slot_s=int(now))))
+                context=(dict(kind="RELAXED_CURRENT_MOVE_PROBE") if self.c_support is not None
+                         and state.profile_id=="C" else site.get("context"))
                 after[aid]=RouteState(tuple(site["position"]),float(now),state.admission_end_s,
-                    state.profile_id,site.get("context"),float(now),1)
+                    state.profile_id,context,float(now),1)
                 units[aid]=0
         else:
             # The provider's fixed-price root value is monotone nonincreasing
@@ -544,6 +559,8 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
                 if result["joint_control"].get("resource_fallback") else
                 self.cfg.get("joint_neighborhood_strategy","BOTTLENECK_CLOSURE"))
             base["future_chain_variables"]=int(result.get("future_chain_variables",0))
+            base["future_connector_queries"]=int(result.get("future_connector_queries",0))
+            base["future_route_queries"]=int(result.get("future_route_queries",0))
             base["joint_control"]=result["joint_control"]
         timings["current_flow_time_s"] = perf_counter() - stamp - (lazy_route_wall if self.joint_mode else 0.)
         chosen = set(result["selected_action_ids"])

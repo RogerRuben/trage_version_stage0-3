@@ -1,0 +1,19 @@
+{
+  "status": "C_CONNECTION_IMPLEMENTATION_PREPARED_NOT_SIMULATED",
+  "config_sha256": "011cae3a5b78c1b03497971efbdcc79c7ac947d4a2ff8bf4bbaae47218781a4c",
+  "base_config_sha256": "ba3fe9c5c14b6a61bdd15ef60890ca0d32bd79b6c79938b760ab2ee2730af6e9",
+  "mode": "BOUNDED_CERTIFIED_C_V1",
+  "group": "C_CONNECTION_ALIGNED",
+  "extra_backend_requests_per_epoch": 2,
+  "extra_backend_requests_per_300s": 32,
+  "optional_wall_budget_s": 0.15,
+  "existing_certificate_cache_mib": 32,
+  "per_search_C_lookup_entries": 4096,
+  "old_default_and_results_unchanged": true,
+  "full_day_executed": false,
+  "supply_calendar_changed": false,
+  "objective_changed": false,
+  "profile_thresholds_changed": false,
+  "complete_C_routing_claimed": false,
+  "C_idle_improvement_established": false
+}

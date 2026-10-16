@@ -61,6 +61,7 @@ class RollingJointMemory:
                 old=self.paths.get((sid,v),())
                 cached=self.retained_forecast.get((sid,v))
                 reusable=(self.exact_warm_reuse and cached is not None
+                    and not (getattr(oracle,"c_support",None) is not None and oracle.roots[aid].profile_id=="C")
                     and self.last_forecast_signature is self.topology.signature
                     and cached[0]==self._forecast_root(oracle.roots[aid])
                     and all(rid in oracle.tasks[sid] and rid not in occupied for rid in old)
@@ -155,8 +156,10 @@ class RollingJointMemory:
         if self.exact_warm_reuse:
             for c in plan.chains:
                 legs=c.payload.get("legs") if isinstance(c.payload,dict) else None
-                if legs and all(problem.oracle.tasks[c.scenario_id][rid].source_kind=="FORECAST"
-                                for rid in c.request_ids):
+                if (legs and not (getattr(problem.oracle,"c_support",None) is not None
+                        and problem.oracle.roots[c.action_id].profile_id=="C")
+                        and all(problem.oracle.tasks[c.scenario_id][rid].source_kind=="FORECAST"
+                                for rid in c.request_ids)):
                     self.retained_forecast[c.scenario_id,c.vehicle_id]=(
                         self._forecast_root(problem.oracle.roots[c.action_id]),legs)
 
@@ -360,7 +363,7 @@ def incremental_search(p,initial,seeds,*,strategy,deadline,check,
 
 
 def execute_incremental(actions,roots,selected,scenes,pending,pace,library,now,cfg,
-                        memory,deadline,check):
+                        memory,deadline,check,*,c_support=None,c_prefill_seeds=()):
     from .bottleneck_scene import PredictionSceneOracle
     if memory.last_now is not None and now<memory.last_now:
         raise ValueError("incremental plan cannot be reused backwards in simulation time")
@@ -378,7 +381,7 @@ def execute_incremental(actions,roots,selected,scenes,pending,pace,library,now,c
         oracle=PredictionSceneOracle(actions,roots,scenes,pending,pace,now,check=check,
             maximum_labels=int(cfg.get("joint_maximum_labels",50000)),
             maximum_columns=int(cfg.get("maximum_model_variables",20000)),
-            topology=memory.topology,forecast_snapshot=snapshot,efficient=memory.efficient)
+            topology=memory.topology,forecast_snapshot=snapshot,efficient=memory.efficient,c_support=c_support)
         p=JointProblem(actions,oracle,library.weights,[t.request_id for t in pending],move_cap=50,
             maximum_columns=int(cfg.get("maximum_model_variables",20000)),
             maximum_nonzeros=int(cfg.get("maximum_model_nonzeros",150000)))
@@ -387,6 +390,8 @@ def execute_incremental(actions,roots,selected,scenes,pending,pace,library,now,c
             perf_counter()+max(0.,deadline-perf_counter())*.25)
     with timed("frontier_build_time_s"):
         seeds=() if cfg.get("joint_no_deep_search",False) else memory.frontier(p,initial,dirty,check)
+        if not cfg.get("joint_no_deep_search",False):
+            seeds=tuple(dict.fromkeys((*seeds,*c_prefill_seeds)))
     with timed("search_total_time_s"):
         search=incremental_search
         search_options={}
