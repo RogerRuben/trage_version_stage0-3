@@ -32,7 +32,7 @@ def load(root):
         k:declared[k] for k in ("version","group","joint_execution_mode","joint_neighborhood_strategy",
             "joint_move_validation_mode","joint_move_target_mode","joint_exact_warm_reuse",
             "typed_reposition_reference","typed_reposition_manifest")})
-    cfg.update(base_config=source.as_posix(),groups=[cfg["group"]],
+    cfg.update(base_config=source.as_posix(),base_config_sha256=declared["base_config_sha256"],groups=[cfg["group"]],
         disk_route_cache=(OUT/"native"/cfg["group"]/"routing/cache.sqlite3").as_posix(),
         experiment_scope="ONE_FIXED_OPERATIONAL_METHOD_CONFIRMATION_NOT_PARAMETER_SEARCH")
     return cfg
@@ -41,7 +41,8 @@ def load(root):
 def prepare(root):
     cfg=load(root)
     binding=previous.binding_for(Path(root),CONFIG,cfg)
-    result=dict(status="OPERATIONAL_V4_PREPARED_NOT_EXECUTED",binding=binding,
+    result=dict(status="OPERATIONAL_V4_CONFIGURATION_PREPARED",binding=binding,
+        simulation_invoked_by_this_command=False,
         group=cfg["group"],source_layout=cfg["source_layout"],layout_mode=cfg["layout_mode"],
         source_history_dates=cfg["forecast_train_dates"],scientific_conditions_changed=False,
         supply_or_birth_layout_changed=False,objective_tiers_changed=False,

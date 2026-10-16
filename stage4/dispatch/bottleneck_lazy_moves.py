@@ -52,7 +52,11 @@ def solve_lazy_moves(actions, roots, baseline, *, planner, certify, deadline, me
     started = perf_counter()
     remaining = max(0., deadline-started)
     if not proposals or not remaining:
-        return baseline, base, {a.action_id: roots[a.action_id] for a in base}, counts
+        result=dict(baseline,joint_control=dict(
+            status="LAZY_NO_BUDGET_KEEP_PHYSICAL_BASELINE" if not remaining else "LAZY_NO_OPTIONAL_MOVES",
+            resource_fallback=not bool(remaining),
+            reason="SHARED_DEADLINE_EXHAUSTED_BEFORE_PROBE" if not remaining else None))
+        return _combine(result,[],counts), base, {a.action_id: roots[a.action_id] for a in base}, counts
     # Explicit finite-budget algorithm, not an extension of the ten-second cap.
     probe_deadline = started + .4*remaining
     certification_deadline = started + .7*remaining

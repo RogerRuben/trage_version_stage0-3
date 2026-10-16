@@ -175,3 +175,30 @@ def test_C_uses_typed_historical_sites_and_HV_keeps_common_sites(monkeypatch):
         lambda *args:[],None,cfg,typed_reference=typed)
     adapter.solve(c,[],[],900.)
     assert sorted(seen)==[1,2] and adapter.rows[-1]["current_move_routed_count"]==0
+
+
+def test_exhausted_entry_keeps_a_native_readable_receipt_and_config_hash_matches_parent(monkeypatch,tmp_path):
+    from pathlib import Path
+    from stage4.analysis import bottleneck_operational_v4 as protocol
+    from stage4.dispatch import bottleneck_lazy_moves as lazy
+    monkeypatch.setattr(lazy,"perf_counter",lambda:10.)
+    wait=CurrentAction("W",1,"WAIT",None)
+    move=CurrentAction("M",1,"RELOCATE",None,payload={"optimistic_move":True,"relocation_slot_s":0})
+    roots={a.action_id:RouteState(ORIGIN,0.,1800.,"C") for a in (wait,move)}
+    baseline=dict(selected_action_ids=("W",))
+    def forbidden(*args): pytest.fail("an exhausted entry cannot plan or route")
+    result,actions,_,_=solve_lazy_moves([wait,move],roots,baseline,planner=forbidden,
+        certify=forbidden,deadline=10.,memory=RollingJointMemory())
+    assert result["selected_action_ids"]==("W",) and actions==[wait]
+    assert result["joint_control"]["resource_fallback"]
+    assert result["joint_control"]["status"]=="LAZY_NO_BUDGET_KEEP_PHYSICAL_BASELINE"
+    import json
+    declared=json.loads(protocol.CONFIG.read_text(encoding="utf-8"))
+    source=Path(declared["base_config"])
+    for relative in (protocol.CONFIG,source):
+        destination=tmp_path/relative; destination.parent.mkdir(parents=True,exist_ok=True)
+        destination.write_bytes(relative.read_bytes())
+    monkeypatch.setattr(protocol.previous,"load",lambda *args:({"base_config_sha256":"inherited_old_hash"},None,None))
+    monkeypatch.setattr(protocol.previous,"group_config",lambda c,g:dict(c))
+    cfg=protocol.load(tmp_path)
+    assert cfg["base_config_sha256"]==protocol._sha(tmp_path/cfg["base_config"])
