@@ -129,20 +129,42 @@ def analyze(root):
     parts["remaining_step_work_s"]=float(steps.step_wall_s.sum())-sum(parts.values())
     # Joint phase timers are nested in immediate_and_joint_selection_s.
     outcomes=data["cohort_outcomes"]
+    eligible=outcomes.loc[outcomes.C_compatible & outcomes.passenger_accepts_av]
+    future_values=[float(i["expected_future_served"]) for i in joint if i.get("expected_future_served") is not None]
+    by_profile={p:dict(completed_orders=int(orders.profile_id.eq(p).sum()),
+        fare_cny=int(orders.loc[orders.profile_id.eq(p),"fare_cents"].sum())/100,
+        driver_payout_cny=int(orders.loc[orders.profile_id.eq(p),"driver_payout_cents"].sum())/100,
+        variable_cost_cny=int(orders.loc[orders.profile_id.eq(p),"variable_cost_cents"].sum())/100,
+        order_contribution_cny=int(orders.loc[orders.profile_id.eq(p),"contribution_cents"].sum())/100)
+        for p in ("C","HV")}
     result=dict(status="ECONOMIC_NATIVE_INTERFACE_CHECK_COMPLETE",code_sha=summary["code_sha"],
         check_config_sha256=_sha(root/CONFIG),economic_config_sha256=model.fingerprint,
         window="08:15-08:30",cold_start=True,full_day_executed=False,policy_comparison=False,
         revealed_orders=len(outcomes),completed_orders=len(orders),expired_orders=int(outcomes.expired.sum()),
         C_completed_orders=int(orders.profile_id.eq("C").sum()),HV_completed_orders=int(orders.profile_id.eq("HV").sum()),
         financial_equations_and_unique_settlement=True,physical_accounting=summary["physical_accounting"],
-        current_floor_checked_decisions=floor_checks,maximum_shared_economic_blocks_per_epoch=repairs,
-        finances=expected,C_orders_same_order_contract_advantage_cny=c_advantage/100,
+        current_floor_checked_decisions=floor_checks,maximum_shared_economic_blocks_per_epoch=int(repairs),
+        finances=expected,finances_by_profile=by_profile,C_orders_same_order_contract_advantage_cny=c_advantage/100,
         contract_advantage_is_not_a_counterfactual_policy_effect=True,
+        C_candidate_funnel=dict(body_compatible_orders=int(outcomes.C_compatible.sum()),
+            body_and_passenger_eligible_orders=len(eligible),
+            eligible_without_spatial_AV=int(eligible.spatial_av_opportunities.eq(0).sum()),
+            eligible_with_any_final_AV=int(eligible.typed_final_AV_arc_attempts.gt(0).sum()),
+            eligible_HV_without_final_AV=int((eligible.vehicle_type.eq("HV")
+                &eligible.typed_last_final_AV_count.eq(0)).sum()),
+            eligible_HV_with_spatial_but_no_final_AV=int((eligible.vehicle_type.eq("HV")
+                &eligible.spatial_av_opportunities.gt(0)&eligible.typed_last_final_AV_count.eq(0)).sum()),
+            HV_assigned_with_final_AV_same_epoch=int(outcomes.typed_HV_assigned_with_final_AV_same_epoch.eq(True).sum()),
+            counts_are_declared_candidate_graph_not_complete_city_reachability=True),
         joint_decisions=len(joint),joint_current_changed_decisions=sum(bool(i.get("current_action_changed")) for i in joint),
         joint_fallback_decisions=sum(bool(i.get("resource_fallback")) for i in joint),
         same_state_current_contribution_delta_cny=round(float((active.current_operating_contribution_cny
             -active.immediate_operating_contribution_cny).sum()),2),
         current_delta_is_not_a_whole_policy_profit_comparison=True,
+        final_plan_future_values=dict(recorded_decisions=len(future_values),
+            positive_decisions=sum(v>0 for v in future_values),maximum=max(future_values,default=0)),
+        executed_joint_action_change_observed=any(bool(i.get("current_action_changed")) for i in joint),
+        cold_start_check_cannot_establish_policy_advantage=True,
         adapter_wall_overrun_decisions=int(active.adapter_wall_deadline_exceeded.sum()),
         active_decision_wall_s={k:float(v) for k,v in active.solve_wall_time_s.quantile([.5,.9,.95,1.]).rename(
             index={.5:"p50",.9:"p90",.95:"p95",1.:"max"}).items()} if len(active) else {},
@@ -152,6 +174,7 @@ def analyze(root):
         nested_joint_phase_timings_s=performance.get("joint_timings_s",{}),
         operations=performance["operations"],epoch_records=len(epochs),
         actual_routing=summary["actual_routing"],connector=summary["connector"],
+        routing_diagnostics_snapshot_pre_finally_close=True,
         no_full_day_speed_or_C_utilization_improvement_claim=True,
         new_inference_or_training=False,gpu_used=False,dense_matrix=False)
     _atomic_json(root/DOC/"native_check_results.json",result)
