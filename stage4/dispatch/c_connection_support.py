@@ -101,9 +101,18 @@ class SharedCConnectionSupport:
             wall_s=cfg.get("c_optional_connection_wall_s", .15))
         self.connectors.c_connection_budget = self.budget
         self.counts = Counter()
+        self.sparse_index=None; self.visibility={}
+        if cfg.get("economic_sparse_connections") is not None:
+            from .sparse_road_support import MODE as SPARSE_MODE,SparseRoadIndex
+            if cfg["economic_sparse_connections"]!=SPARSE_MODE or not self.all_profiles:
+                raise ValueError("shared sparse connections require the economic two-type road mode")
+            self.sparse_index=SparseRoadIndex(context_key,cfg["sparse_connection_namespace"],
+                path=cfg.get("sparse_connection_store"))
 
     def begin(self, now, deadline):
+        if self.budget.epoch!=now: self.visibility.clear()
         self.budget.begin(now, deadline)
+        if self.sparse_index is not None: self.sparse_index.begin(now)
 
     def current(self, control, runtime, request, now):
         if perf_counter() >= self.budget.deadline:
@@ -117,13 +126,49 @@ class SharedCConnectionSupport:
                                  enforce_pickup_deadline=False, query_scope="CURRENT")
         self.counts["current_connections_examined"] += 1
         self.counts["current_connections_supported"] += bool(result["supported"])
+        if self.sparse_index is not None: self.sparse_index.remember(state,task,result)
+        return result
+
+    def _visible(self,state,task):
+        validate=getattr(self.connectors,"_task_metadata",None)
+        if validate is None: return None  # Small injected test connectors have no source store.
+        check=[task]
+        if (state.context or {}).get("kind")=="CUSTOMER": check.append(state.context["task"])
+        for t in check:
+            key=t.source_date,t.source_order_id,t.source_kind
+            if key not in self.visibility: self.visibility[key]=validate(t)[1]
+            if self.visibility[key]: return self.visibility[key]
+        return None
+
+    def _beta(self,departure):
+        control=self.connectors.control
+        return control.eta_adapter.beta_for(control._timestamp(departure))[1]
+
+    def prepare_edge(self,state,task,departure):
+        """One shared candidate, at most the existing optional query allowance."""
+        reason=self._visible(state,task)
+        if reason: return dict(supported=False,reason_codes=[reason])
+        index=self.sparse_index
+        if index.assessed(state,task):
+            result=index.lookup(state,task,self._beta(departure))
+        else:
+            result=self.connectors(state,task,departure,state.profile_id,query_scope="FUTURE",
+                enforce_pickup_deadline=False)
+            index.remember(state,task,result)
+        self.counts["prefetch_connections_examined"]+=1
+        self.counts[state.profile_id+"_prefetch_connections_examined"]+=1
         return result
 
     def lookup(self, state, task, departure):
         """Read-only certificate lookup. It must NEVER generate a road query."""
         profile=state.profile_id if self.all_profiles else "C"
-        result = self.connectors(state, task, departure, profile, cache_only=True,
-                                 enforce_pickup_deadline=False, query_scope="FUTURE")
+        if self.sparse_index is not None:
+            reason=self._visible(state,task)
+            result=(dict(supported=False,reason_codes=[reason]) if reason else
+                self.sparse_index.lookup(state,task,self._beta(departure)))
+        else:
+            result = self.connectors(state, task, departure, profile, cache_only=True,
+                                     enforce_pickup_deadline=False, query_scope="FUTURE")
         self.counts["planning_cache_lookups"] += 1
         self.counts["planning_cache_supported"] += bool(result["supported"])
         if not result["supported"] and any("NOT_EVALUATED" in reason for reason in result["reason_codes"]):
@@ -262,4 +307,8 @@ class SharedCConnectionSupport:
             extra_backend_requests_per_300s=self.budget.maximum_per_snapshot,
             optional_wall_budget_s=self.budget.wall_s,
             search_road_queries=0, unexamined_is_not_incapable=True,
-            complete_C_reachability_claimed=False, objective_changed=False)
+            complete_C_reachability_claimed=False, objective_changed=False,
+            sparse_road_index=self.sparse_index.diagnostics() if self.sparse_index is not None else None)
+
+    def close(self):
+        if self.sparse_index is not None: self.sparse_index.close()

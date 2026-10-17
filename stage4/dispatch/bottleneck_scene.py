@@ -41,6 +41,7 @@ class PredictionSceneOracle:
         self.efficient=efficient; self.xy={}; self.distances=OrderedDict()
         self.c_support=c_support; self.road_legs=OrderedDict()
         self.economics=economics; self.price_units={}
+        self.prepared_frontier=None
         self.support_cache=OrderedDict(); self.neighbor_cache=OrderedDict()
         self.catalogs=OrderedDict(); self.catalog_refs=0; self.many_label_exhausted=False
         self.batch_queries=0; self.batch_reuses=0
@@ -76,6 +77,7 @@ class PredictionSceneOracle:
         points=np.asarray([_xy(t.dropoff) for t in pending],float).reshape(-1,2)
         self.pending_dropoffs=(cKDTree(points) if len(points) else None,pending)
         self.aids=tuple(sorted(self.actions))
+        self.aid_offsets={aid:i for i,aid in enumerate(self.aids)}
         points=np.asarray([_xy(self.roots[a].position) for a in self.aids],float).reshape(-1,2)
         self.root_tree=cKDTree(points) if len(points) else None
         self.root_points=points
@@ -85,6 +87,19 @@ class PredictionSceneOracle:
 
     def accepts(self,c):
         return self.registered.get(c.chain_id)==c
+
+    def prepare_road_frontier(self,selected,memory,check):
+        from .prepared_road_frontier import PreparedRoadFrontier
+        self.prepared_frontier=PreparedRoadFrontier(self,self.c_support)
+        return self.prepared_frontier.prepare(selected,memory,check)
+
+    def _root_rows(self,sid,aid):
+        return (self.prepared_frontier.root_rows(sid,aid) if self.prepared_frontier is not None
+            else self._root_candidates(sid,self.roots[aid]))
+
+    def _next_rows(self,sid,node,profile):
+        return (self.prepared_frontier.following(sid,node,profile) if self.prepared_frontier is not None
+            else self._following(sid,node,profile))
 
     def _remember_path(self,sid,aid,path):
         digest=hashlib.sha256(repr((sid,aid,path)).encode()).hexdigest()[:24]
@@ -118,7 +133,9 @@ class PredictionSceneOracle:
         for _ in range(3):
             check()
             choices=[]
-            for t in self._near(sid,position):
+            candidates=(self._root_rows(sid,aid) if not path else
+                self._next_rows(sid,self.tasks[sid][path[-1][0]],state.profile_id)) if self.prepared_frontier is not None else self._near(sid,position)
+            for t in candidates:
                 if t.request_id in forbidden or not self._allowed(t,state.profile_id):
                     continue
                 adjusted=ceil(ready/300)*300 if t.source_kind=="FORECAST" else ready
@@ -182,7 +199,7 @@ class PredictionSceneOracle:
             self.possible_cache.move_to_end(key); return self.possible_cache[key]
         state=self.roots[aid]
         frontier=set()
-        for t in self._near(sid,state.position):
+        for t in self._root_rows(sid,aid) if self.prepared_frontier is not None else self._near(sid,state.position):
             if not self._allowed(t,state.profile_id): continue
             ready=ceil(state.ready_s/300)*300 if t.source_kind=="FORECAST" else state.ready_s
             if self._leg(t,ready,state.position,state.admission_end_s) is not None:
@@ -192,7 +209,7 @@ class PredictionSceneOracle:
             added=set()
             for i,rid in enumerate(sorted(frontier)):
                 if i%32==0: check()
-                added.update(t.request_id for t in self._following(sid,self.tasks[sid][rid],state.profile_id))
+                added.update(t.request_id for t in self._next_rows(sid,self.tasks[sid][rid],state.profile_id))
             frontier=added-found; found.update(added)
         result=frozenset(found)
         if len(result)<=20000:
@@ -293,8 +310,16 @@ class PredictionSceneOracle:
                     if leg is not None:
                         rows.append((leg[4],leg[1],t.request_id,t))
                 return sorted(rows,key=lambda x:x[:3])
-            candidates.extend(r for r in self.topology.candidates(sid,node,build)
-                if r[2] in self.tasks[sid] and r[1]<self.horizon)
+            prepared=self.topology.prepared_successors(sid,node)
+            if prepared is None:
+                candidates.extend(r for r in self.topology.candidates(sid,node,build)
+                    if r[2] in self.tasks[sid] and r[1]<self.horizon)
+            else:
+                for target in prepared:
+                    if target.request_id not in self.tasks[sid]: continue
+                    leg=self._leg(target,ready,node.dropoff,float("inf"),horizon=float("inf"))
+                    if leg is not None and leg[1]<self.horizon:
+                        candidates.append((leg[4],leg[1],target.request_id,target))
             tree,pending,points=self.trees[sid]
             ids=tree.query_ball_point(_xy(node.dropoff),2000) if tree is not None else ()
             nearby=(pending[i] for i in ids)
@@ -345,7 +370,7 @@ class PredictionSceneOracle:
                             self._checks(check)
                         if (t.request_id in self.tasks[sid] and t.request_id!=target
                                 and self._allowed(t,profile)
-                                and any(n.request_id==target for n in self._following(sid,t,profile))):
+                                and any(n.request_id==target for n in self._next_rows(sid,t,profile))):
                             previous.append(t.request_id)
                     previous=tuple(previous)
                     if len(previous)<=20000:
@@ -371,7 +396,7 @@ class PredictionSceneOracle:
             t=self.tasks[sid].get(rid)
             if t is None or rid in used or not self._allowed(t,state.profile_id):
                 continue
-            if previous is not None and not any(n.request_id==rid for n in self._following(sid,previous,state.profile_id)):
+            if previous is not None and not any(n.request_id==rid for n in self._next_rows(sid,previous,state.profile_id)):
                 continue
             adjusted=ceil(ready/300)*300 if t.source_kind=="FORECAST" else ready
             leg=self._supported_leg(t,adjusted,position,state.admission_end_s,state.profile_id,context)
@@ -390,6 +415,10 @@ class PredictionSceneOracle:
             self.support_cache.move_to_end(key); return self.support_cache[key]
         task=self.tasks[sid][rid]
         candidates=self.root_tree.query_ball_point(_xy(task.pickup),2000) if self.root_tree else ()
+        if self.prepared_frontier is not None:
+            selected=set(self.prepared_frontier.supports(sid,rid))
+            selected.update(self.aids[i] for i in candidates if self.prepared_frontier.relaxed(self.roots[self.aids[i]]))
+            candidates=(self.aid_offsets[a] for a in sorted(selected))
         result=[]
         for i in candidates:
             aid=self.aids[i]; state=self.roots[aid]
@@ -464,7 +493,7 @@ class PredictionSceneOracle:
                 return memo[memo_key]
             best=(leg,) if found else None
             if depth<3 and leg[3]<min(state.admission_end_s,self.horizon):
-                for target in self._following(sid,node,state.profile_id):
+                for target in self._next_rows(sid,node,state.profile_id):
                     if target.request_id in used or target.request_id in forbidden:
                         continue
                     ready=leg[3]
@@ -482,7 +511,7 @@ class PredictionSceneOracle:
             memo[memo_key]=best
             return best
         best=None
-        for node in self._root_candidates(sid,state):
+        for node in self._root_rows(sid,aid):
             if (node.request_id in forbidden or not self._allowed(node,state.profile_id)):
                 continue
             if reach is not None and node.request_id not in reach[2]:
@@ -537,7 +566,7 @@ class PredictionSceneOracle:
                         if target not in ranks or rank<ranks[target]:
                             best[target]=path; ranks[target]=rank
                     if len(path)>=3 or leg[3]>=min(state.admission_end_s,self.horizon): return
-                    for target in self._following(sid,node,state.profile_id):
+                    for target in self._next_rows(sid,node,state.profile_id):
                         if target.request_id in ids or target.request_id in forbidden: continue
                         ready=leg[3]
                         if target.source_kind=="FORECAST":
@@ -546,7 +575,7 @@ class PredictionSceneOracle:
                             state.profile_id,dict(kind="CUSTOMER",task=node))
                         if following is not None: visit(target,following,path,ids,distance)
                 try:
-                    for node in self._root_candidates(sid,state):
+                    for node in self._root_rows(sid,aid):
                         if node.request_id in forbidden or not self._allowed(node,state.profile_id): continue
                         ready=ceil(state.ready_s/300)*300 if node.source_kind=="FORECAST" else state.ready_s
                         leg=self._supported_leg(node,ready,state.position,state.admission_end_s,state.profile_id,state.context)
@@ -574,15 +603,19 @@ class PredictionSceneOracle:
 
     def _root_candidates(self,sid,state):
         rows=self._near(sid,state.position)
+        self._sort_root_rows(rows,sid,state)
+        return rows
+
+    def _sort_root_rows(self,rows,sid,state):
         if self.economics is not None:
             rows.sort(key=lambda t:(-self.economics._quote_values(t.service_distance_m,state.profile_id,
                 self._distance(state.position,t.pickup))[3]+self.price_units.get((sid,t.request_id),0.),
                 t.release_s,t.request_id))
-        return rows
 
     def set_prices(self,prices):
         """Guidance only: repricing never changes a registered column's money."""
         self.price_units=dict(prices)
         self.cache.clear(); self.catalogs.clear(); self.catalog_refs=0
+        if self.prepared_frontier is not None: self.prepared_frontier.reprice()
         # Prices rank exploration but MUST NOT change the declared TopK domain:
         # retained columns and reverse reachability remain valid after pricing.

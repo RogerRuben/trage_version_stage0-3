@@ -1,0 +1,17 @@
+{
+  "version": "economic_sparse_connections_v1",
+  "base_config": "stage4/config/economic_joint_dispatch_v1.json",
+  "base_config_sha256": "32eda3f14ecef9a292165b4cea64d41793b90ce03504e0d61a9ef4f814b5d034",
+  "economic_sparse_connections": "SHARED_SPARSE_ROAD_SUPPORT_V1",
+  "sparse_candidate_catalog": "stage4/output/capability_chain_planning/economic_sparse_connections_v1/candidates",
+  "sparse_connection_store": "stage4/output/capability_chain_planning/economic_sparse_connections_v1/road_support.sqlite3",
+  "prepared_coarse_slots_s": [29700, 30000, 30300, 30600],
+  "offline_preparation_candidate_pairs": 32,
+  "offline_preparation_query_slots": 96,
+  "offline_preparation_wall_limit_s": 180,
+  "default_action": "prepare",
+  "full_day_authorized": false,
+  "automatic_experiment_launch": false,
+  "economic_parameters_changed": false,
+  "C_reward_added": false
+}

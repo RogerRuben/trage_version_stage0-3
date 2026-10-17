@@ -92,6 +92,9 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
             from .bottleneck_incremental import RollingJointMemory
             self.joint_memory=RollingJointMemory(efficient=self.joint_execution_mode=="INCREMENTAL_V3",
                 exact_warm_reuse=cfg.get("joint_exact_warm_reuse",False))
+            if cfg.get("economic_sparse_connections") is not None:
+                self.joint_memory.topology.prepared_directory=cfg.get("sparse_candidate_catalog")
+                self.joint_memory.topology.prepared_fingerprint=self.economics.fingerprint
         self.lazy_moves=cfg.get("joint_move_validation_mode","EAGER_ALL")=="LAZY_SELECTED_V4"
         if cfg.get("joint_move_validation_mode","EAGER_ALL") not in ("EAGER_ALL","LAZY_SELECTED_V4"):
             raise ValueError("unknown current move validation mode")

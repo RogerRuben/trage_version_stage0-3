@@ -1,5 +1,9 @@
 """One prediction snapshot's lazy geometry/topology, not a dense OD matrix."""
 from collections import Counter,OrderedDict
+from dataclasses import asdict,is_dataclass
+import hashlib
+import json
+from pathlib import Path
 
 import numpy as np
 from scipy.spatial import cKDTree
@@ -13,6 +17,45 @@ class ForecastTopology:
         self.maximum_references=min(20000,maximum_references)
         self.signature=None; self.index={}; self.task_map={}; self.links=OrderedDict(); self.references=0
         self.counts=Counter()
+        self.prepared_directory=None; self.prepared_fingerprint=None
+        self.prepared=None
+
+    def snapshot_digest(self):
+        def canonical(value):
+            if is_dataclass(value): return asdict(value)
+            if isinstance(value,(set,frozenset)): return sorted(value)
+            raise TypeError(f"unsupported snapshot signature value: {type(value).__name__}")
+        payload=json.dumps((self.signature,self.prepared_fingerprint),sort_keys=True,
+            separators=(",",":"),default=canonical,allow_nan=False)
+        return hashlib.sha256(payload.encode()).hexdigest()
+
+    def _load_prepared(self,epoch):
+        self.prepared=None
+        if self.prepared_directory is None: return
+        path=Path(self.prepared_directory)/f"slot={epoch}.parquet"
+        if not path.is_file(): self.counts["prepared_catalog_absent"]+=1; return
+        import pyarrow.parquet as pq
+        table=pq.read_table(path)
+        meta=table.schema.metadata or {}
+        if meta.get(b"sparse_snapshot_signature",b"").decode()!=self.snapshot_digest():
+            self.counts["prepared_catalog_scope_mismatch"]+=1; return
+        rows=tuple(zip(table["scenario_id"].to_pylist(),table["source_request_id"].to_pylist(),
+            table["target_request_id"].to_pylist()))
+        digest=hashlib.sha256(repr(rows).encode()).hexdigest()
+        if digest!=meta.get(b"candidate_rows_sha256",b"").decode() or len(rows)>self.maximum_references:
+            self.counts["prepared_catalog_invalid"]+=1; return
+        result={}
+        for sid,source,target in rows:
+            if sid not in self.task_map or source not in self.task_map[sid] or target not in self.task_map[sid]:
+                self.counts["prepared_catalog_invalid"]+=1; return
+            result.setdefault((sid,source),[]).append(target)
+        self.prepared={k:tuple(v) for k,v in result.items()}
+        self.counts["prepared_catalog_loads"]+=1
+
+    def prepared_successors(self,sid,node):
+        if self.prepared is None: return None
+        self.counts["prepared_successor_reuses"]+=1
+        return tuple(self.task_map[sid][rid] for rid in self.prepared.get((sid,node.request_id),()))
 
     def bind(self,snapshot,pace,now,check):
         epoch=int(now//300)*300
@@ -36,6 +79,7 @@ class ForecastTopology:
         self.task_map={s:{t.request_id:t for t in tasks} for s,tasks in frozen}
         self.links.clear(); self.references=0
         self.counts["snapshot_rebuilds"]+=1
+        self._load_prepared(epoch)
 
     def near(self,sid,point,kind="pickup"):
         tasks,trees=self.index[sid]; tree=trees[kind]

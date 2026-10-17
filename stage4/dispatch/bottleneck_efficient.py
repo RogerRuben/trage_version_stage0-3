@@ -181,7 +181,9 @@ def efficient_search(p,initial,seeds,*,strategy,deadline,check,
             alternatives=[p.economics._quote_values(task.service_distance_m,profile,0.)[3]
                 for profile in ("C","HV") if p.oracle._allowed(task,profile)]
             estimate=max(alternatives,default=0)-p.oracle.price_units.get(key,0.)
-            return task.source_kind!="ACTUAL_PENDING",-estimate,task.deadline_s,key
+            frontier=getattr(p.oracle,"prepared_frontier",None)
+            return ((key not in frontier.useful_seeds,) if frontier is not None else ())+(
+                task.source_kind!="ACTUAL_PENDING",-estimate,task.deadline_s,key)
         seeds=tuple(sorted(set(seeds),key=priority))
     def target_map(): return defaultdict(set)
     def supported(sid,rid,state=None):

@@ -1,0 +1,47 @@
+{
+  "status": "SPARSE_CANDIDATES_AND_ROAD_SUPPORT_STORE_PREPARED",
+  "catalogs": [
+    {
+      "slot_s": 29700,
+      "rows": 8371,
+      "source_tasks": 2182,
+      "path": "stage4/output/capability_chain_planning/economic_sparse_connections_v1/candidates/slot=29700.parquet",
+      "sha256": "dce43dfcf4d105900e7be8237d5eff6267f444312bdbafc7fc142fef87b46136"
+    },
+    {
+      "slot_s": 30000,
+      "rows": 9385,
+      "source_tasks": 2271,
+      "path": "stage4/output/capability_chain_planning/economic_sparse_connections_v1/candidates/slot=30000.parquet",
+      "sha256": "b1830592b515dc705f3f54c8652a58cbe5e02dccf2510e0ec6064abed82f6dee"
+    },
+    {
+      "slot_s": 30300,
+      "rows": 9294,
+      "source_tasks": 2365,
+      "path": "stage4/output/capability_chain_planning/economic_sparse_connections_v1/candidates/slot=30300.parquet",
+      "sha256": "e1b551836aba0e788b9532ab45b9ee188cf20678017912627a02ca5bb6dce19b"
+    },
+    {
+      "slot_s": 30600,
+      "rows": 8680,
+      "source_tasks": 2260,
+      "path": "stage4/output/capability_chain_planning/economic_sparse_connections_v1/candidates/slot=30600.parquet",
+      "sha256": "46027f72ccc8e482ecccc71c206b00ad946cdcc9e1cce4118b34758b4c76645f"
+    }
+  ],
+  "physical_namespace": "e458735236b3f4558d9e818b5bf550820bc9fb26664b6d05028833d859b458af",
+  "economic_fingerprint": "7286e76e1acf07de3f6f825426fb1c15654715877f294832cdd6d0bc1e330ddd",
+  "assessed_persisted_historical_road_connections": 46,
+  "live_candidate_equivalence_comparisons": 35984,
+  "candidate_catalogs_are_not_road_certificates": true,
+  "new_road_queries": 0,
+  "simulation_invoked": false,
+  "new_inference_or_training": false,
+  "economic_parameters_changed": false,
+  "C_reward_added": false,
+  "per_epoch_backend_query_cap": 2,
+  "per_300s_backend_query_cap": 32,
+  "runtime_s": 16.431717399998888,
+  "peak_rss_mib": 221.17578125
+}

@@ -91,6 +91,11 @@ class RollingJointMemory:
         occupied={sid:set(first) for sid in problem.weights}
         for (sid,v),c in chains.items():
             occupied[sid].update(c.request_ids)
+        if getattr(oracle,"prepared_frontier",None) is not None:
+            before=len(fill)
+            fill=[(s,v) for s,v in fill if any(t.request_id not in first
+                for t in oracle._root_rows(s,chosen[v]))]
+            counts["warm_unprepared_roots_skipped"]+=before-len(fill)
         for sid,v in fill:
             if perf_counter()>=seed_deadline:
                 limited=True; break
@@ -115,6 +120,8 @@ class RollingJointMemory:
             for rid,t in oracle.tasks[sid].items():
                 if t.source_kind=="ACTUAL_PENDING": actual.setdefault(rid,(sid,rid))
         actual_seeds=tuple(sorted(actual.values(),key=lambda k:(oracle.tasks[k[0]][k[1]].deadline_s,k)))
+        if getattr(oracle,"prepared_frontier",None) is not None:
+            return tuple(dict.fromkeys((*actual_seeds,*sorted(oracle.prepared_frontier.useful_seeds))))
         if (self.efficient and self.last_now is not None
                 and self.topology.signature is self.last_forecast_signature
                 and (oracle.now>self.last_now or current==self.domains)):
@@ -395,6 +402,11 @@ def execute_incremental(actions,roots,selected,scenes,pending,pace,library,now,c
             maximum_columns=int(cfg.get("maximum_model_variables",20000)),
             maximum_nonzeros=int(cfg.get("maximum_model_nonzeros",150000)),economics=economics)
         if economics is not None: p.economic_budget=memory.economic_budget
+    if c_support is not None and getattr(c_support,"sparse_index",None) is not None:
+        if economics is not None and memory.economic_price_key==(int(now//300),economics.fingerprint):
+            oracle.price_units=dict(memory.economic_prices)
+        with timed("shared_road_frontier_prepare_time_s"):
+            c_prefill_seeds=oracle.prepare_road_frontier(selected,memory,check)
     with timed("warm_plan_repair_time_s"):
         initial,warm,dirty=memory.initial(p,selected,check,
             perf_counter()+max(0.,deadline-perf_counter())*.25)
@@ -453,4 +465,6 @@ def execute_incremental(actions,roots,selected,scenes,pending,pace,library,now,c
             economic_config_sha256=economics.fingerprint,
             protected_current_service=p.protected_current,protected_current_carry=p.protected_carry,
             objective_unit="SCENARIO_WEIGHTED_INTEGER_CENTS_NOT_SERVICE_COUNTS")
+    if oracle.prepared_frontier is not None:
+        info["prepared_road_frontier"]=oracle.prepared_frontier.diagnostics()
     return p,oracle,initial,plan,info

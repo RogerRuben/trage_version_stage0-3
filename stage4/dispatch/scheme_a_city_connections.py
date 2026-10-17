@@ -1043,6 +1043,7 @@ This branch is enabled explicitly by the parent protocol, never for site MOVE.
             self.counts["supported_connections"] += 1
             self.counts[f"{profile}_connections_passed"] += 1
             return dict(supported=True, compatible_profiles=(profile,), travel_time_s=duration,
+                raw_time_s=raw,beta=beta,
                 empty_distance_m=distance, arrival_context=certificate["arrival_context"],
                 reason_codes=[], routed=routed,
                 connection_evidence_state=certificate["connection_evidence_state"])

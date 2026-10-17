@@ -192,8 +192,8 @@ def test_streamed_distances_are_full_route_parts_and_history_rejects_target_day(
         aggregate_distances(source,"20161010",{"missing"})
 
 
-@pytest.mark.parametrize("controller",("MYOPIC","SPATIAL","SUBSTITUTION"))
-def test_native_uses_same_economics_and_books_only_actual_commit(monkeypatch,controller):
+@pytest.mark.parametrize("controller,sparse",(("MYOPIC",False),("SPATIAL",False),("SUBSTITUTION",False),("SUBSTITUTION",True)))
+def test_native_uses_same_economics_and_books_only_actual_commit(monkeypatch,controller,sparse):
     from stage4.dispatch import scheme_a_two_scale_native as native
     from stage4.tests.test_scheme_a_two_scale_native import fixture,Value
     from stage4.dispatch.solver import AssignmentArc
@@ -204,11 +204,15 @@ def test_native_uses_same_economics_and_books_only_actual_commit(monkeypatch,con
         economic_controller=controller,joint_neighborhood_strategy="SPATIAL_JOINT" if controller=="SPATIAL" else "BOTTLENECK_CLOSURE",
         dispatch_economics=dict(mode=MODE,
             **{k:getattr(MODEL,k) for k in MODEL.__dataclass_fields__}))
+    if sparse:
+        cfg.update(economic_sparse_connections="SHARED_SPARSE_ROAD_SUPPORT_V1",sparse_connection_namespace="test-native")
     store=EconomicDistanceStore(pd.DataFrame([dict(date="20161031",order_id="current",service_distance_m=3000.)]))
     value=Value(); value.library=NS(view=lambda now:{"S":()}); value.pace=PACE
     value.library.weights={"S":1}
     class NoBackend:
-        def __init__(self): self.counts=Counter(); self.router=NS(route_call_count=0)
+        def __init__(self):
+            self.counts=Counter(); self.router=NS(route_call_count=0)
+            self.control=NS(_timestamp=lambda t:t,eta_adapter=NS(beta_for=lambda t:(0,1.)))
         def __call__(self,*args,**kwargs):
             if controller=="MYOPIC": raise AssertionError("no future routing in economic myopic control")
             return dict(supported=False,reason_codes=["NOT_EVALUATED_TEST_NO_BACKEND"])

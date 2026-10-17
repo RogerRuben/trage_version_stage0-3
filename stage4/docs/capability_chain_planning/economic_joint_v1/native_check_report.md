@@ -1,5 +1,7 @@
 # 经济异质联合派单：固定原生短窗检查
 
+后续更新：连接准备与预取/搜索协同已实现，见[稀疏连接说明](sparse_connections_implementation.md)。本文件保留此前单次原生检查的真实结果，未补算或改写。
+
 ## Material Passport
 
 - Origin Skill / Mode: academic-research-suite / experiment-agent run

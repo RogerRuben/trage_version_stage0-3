@@ -23,7 +23,7 @@ FIXED=dict(version="economic_joint_native_check_v1",economic_controller="SUBSTIT
     full_day=False,automatic_retry=False)
 
 
-def load(root):
+def load(root,*,sparse=False):
     root=Path(root)
     declared=json.loads((root/CONFIG).read_text(encoding="utf-8"))
     if (set(declared)!=set(FIXED)|{"base_config","base_config_sha256"}
@@ -35,25 +35,43 @@ def load(root):
     cfg.update(declared,groups=[declared["group"]],
         disk_route_cache=(OUT/"native/routing/cache.sqlite3").as_posix(),
         experiment_scope="ONE_COLD_START_NATIVE_INTERFACE_CHECK_NOT_POLICY_COMPARISON")
+    if sparse:
+        from . import economic_sparse_connections as upgrade
+        prepared=upgrade.load(root,controller=cfg["economic_controller"])
+        cfg.update({k:prepared[k] for k in ("economic_sparse_connections","sparse_connection_namespace",
+            "sparse_connection_store","sparse_candidate_catalog")})
+        cfg.update(sparse_connection_config=upgrade.CONFIG.as_posix(),
+            group="ECONOMIC_SUBSTITUTION_SPARSE_NATIVE_CHECK",
+            disk_route_cache=(upgrade.OUT/"native_check/native/routing/cache.sqlite3").as_posix())
+        cfg["groups"]=[cfg["group"]]
     return cfg
 
 
-def run(root,fleetpy=FLEETPY):
+def run(root,fleetpy=FLEETPY,*,sparse=False):
     from .bottleneck_whole_method import execution_lock
-    root=Path(root).resolve(); cfg=load(root)
-    with execution_lock(root,OUT):
-        return _run_native(root,fleetpy,CONFIG,cfg,directory=root/OUT/"native",
-            doc_summary_path=root/OUT/"native_summary.json",completion_status=COMPLETE,
+    root=Path(root).resolve(); cfg=load(root,sparse=sparse)
+    output=OUT
+    if sparse:
+        from .economic_sparse_connections import OUT as UPGRADE
+        output=UPGRADE/"native_check"
+    with execution_lock(root,output):
+        return _run_native(root,fleetpy,CONFIG,cfg,directory=root/output/"native",
+            doc_summary_path=root/output/"native_summary.json",completion_status=COMPLETE,
             group=cfg["group"])
 
 
-def analyze(root):
+def analyze(root,*,sparse=False):
     """Reconcile completed small products only; no simulation or road queries."""
     import pandas as pd
     from stage4.dispatch.economic_inputs import EconomicDistanceStore
     from stage4.dispatch.operating_economics import (OperatingEconomics,ORDER_LEDGER_COLUMNS,
         RELOCATION_LEDGER_COLUMNS)
-    root=Path(root); cfg=load(root); directory=root/OUT/"native"
+    root=Path(root); cfg=load(root,sparse=sparse)
+    output=OUT
+    if sparse:
+        from .economic_sparse_connections import OUT as UPGRADE
+        output=UPGRADE/"native_check"
+    directory=root/output/"native"
     summary=json.loads((directory/"summary.json").read_text(encoding="utf-8"))
     if (summary.get("status")!=COMPLETE or summary.get("full_day") is not False
             or not summary.get("native_execution_performed")):
@@ -177,7 +195,8 @@ def analyze(root):
         routing_diagnostics_snapshot_pre_finally_close=True,
         no_full_day_speed_or_C_utilization_improvement_claim=True,
         new_inference_or_training=False,gpu_used=False,dense_matrix=False)
-    _atomic_json(root/DOC/"native_check_results.json",result)
+    result["sparse_connections_enabled"]=sparse
+    _atomic_json(root/DOC/("sparse_native_check_results.json" if sparse else "native_check_results.json"),result)
     return result
 
 
@@ -185,9 +204,12 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action",choices=("describe","run","analyze"),nargs="?",default="describe")
     parser.add_argument("--execute",action="store_true")
+    parser.add_argument("--sparse-connections",action="store_true",
+        help="opt in to prepared connections in a separate output; never overwrite the completed old check")
     args=parser.parse_args(); root=Path.cwd()
     if args.action=="run" and not args.execute: parser.error("one fixed native check requires --execute")
-    result=run(root) if args.action=="run" else analyze(root) if args.action=="analyze" else load(root)
+    result=(run(root,sparse=args.sparse_connections) if args.action=="run" else
+        analyze(root,sparse=args.sparse_connections) if args.action=="analyze" else load(root,sparse=args.sparse_connections))
     print(json.dumps(result if args.action=="describe" else {k:result[k] for k in (
         "status","total_runner_wall_s","completed_orders","peak_rss_mib") if k in result},ensure_ascii=False,indent=2),flush=True)
 

@@ -1,0 +1,451 @@
+{
+  "status": "STATIC_HISTORICAL_ROAD_PREPARATION_COMPLETE",
+  "physical_namespace": "e458735236b3f4558d9e818b5bf550820bc9fb26664b6d05028833d859b458af",
+  "simulation_invoked": false,
+  "online_query_budget_changed": false,
+  "maximum_query_slots": 96,
+  "hard_limit_s": 180,
+  "completed_assessments": 64,
+  "query_slots_consumed": 88,
+  "runtime_s": 8.717910400002438,
+  "peak_rss_mib": 496.74609375,
+  "selected_pairs": 32,
+  "rows": [
+    {
+      "pair_hash": "0001ed569725c64ece2344b703cd06d698ba86b518890139c6719602c765d88a",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "0001ed569725c64ece2344b703cd06d698ba86b518890139c6719602c765d88a",
+      "profile_id": "C",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "00921a12edae699a89c6e84d3378ee2c960b18faabdfc5069cfe97aea9a3b3ee",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "00921a12edae699a89c6e84d3378ee2c960b18faabdfc5069cfe97aea9a3b3ee",
+      "profile_id": "C",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "00d0dc6b300f1ae6d4440d639be13eac5e5a1a84b6a8fa2572e375597fa5d2bf",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "00d0dc6b300f1ae6d4440d639be13eac5e5a1a84b6a8fa2572e375597fa5d2bf",
+      "profile_id": "C",
+      "supported": false,
+      "reason_codes": [
+        "ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE",
+        "UTURN_OUTSIDE_RESEARCH_PROFILE"
+      ]
+    },
+    {
+      "pair_hash": "0128fe05e0b9ccc408aac89a0cc431490ee763b4f9fb77079b961cc255bd231b",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "0128fe05e0b9ccc408aac89a0cc431490ee763b4f9fb77079b961cc255bd231b",
+      "profile_id": "C",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "023f40d9c525cef5f67048ddc50e5dbba373dfc7eecf13e52bfeaa8961741eca",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "023f40d9c525cef5f67048ddc50e5dbba373dfc7eecf13e52bfeaa8961741eca",
+      "profile_id": "C",
+      "supported": false,
+      "reason_codes": [
+        "EDGE_WALK_INVALID_SHAPE_INDEX_OR_LENGTH"
+      ]
+    },
+    {
+      "pair_hash": "028677e85ad33deca67e6a21f52ba125eca376a9146adc18853dd28e56cab1d1",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "028677e85ad33deca67e6a21f52ba125eca376a9146adc18853dd28e56cab1d1",
+      "profile_id": "C",
+      "supported": false,
+      "reason_codes": [
+        "CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT"
+      ]
+    },
+    {
+      "pair_hash": "030433c775d08a5cfb7ce20fa16647422b3cdb3a4a00574cddcf9d76d721d011",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "030433c775d08a5cfb7ce20fa16647422b3cdb3a4a00574cddcf9d76d721d011",
+      "profile_id": "C",
+      "supported": false,
+      "reason_codes": [
+        "CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT"
+      ]
+    },
+    {
+      "pair_hash": "03579f46d6baca40428bab39aee3525b2368ff05468d11e1c2859addf01e5bc8",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "03579f46d6baca40428bab39aee3525b2368ff05468d11e1c2859addf01e5bc8",
+      "profile_id": "C",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "03e7d652dbc83f679ea7a8fc2567c4e00bbc13db5ce5a88e7aa4670c994790be",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "03e7d652dbc83f679ea7a8fc2567c4e00bbc13db5ce5a88e7aa4670c994790be",
+      "profile_id": "C",
+      "supported": false,
+      "reason_codes": [
+        "CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT"
+      ]
+    },
+    {
+      "pair_hash": "040c0823383f877e69ded04ce436e90261a23be404804ccd8a41ce030832f548",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "040c0823383f877e69ded04ce436e90261a23be404804ccd8a41ce030832f548",
+      "profile_id": "C",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "0490ac443224fab469627974986b03cc7d1bb681f96d71cdd8b12a86d96d7b95",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "0490ac443224fab469627974986b03cc7d1bb681f96d71cdd8b12a86d96d7b95",
+      "profile_id": "C",
+      "supported": false,
+      "reason_codes": [
+        "CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT"
+      ]
+    },
+    {
+      "pair_hash": "04e2ec36787693e503ffe1e9221a8551bf9111bfb5cf74bd9f09404847f72b56",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "04e2ec36787693e503ffe1e9221a8551bf9111bfb5cf74bd9f09404847f72b56",
+      "profile_id": "C",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "05e98eee0e7c9d97c103cfd2f453b362b55c842aac33e52c45f33db818cc4edf",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "05e98eee0e7c9d97c103cfd2f453b362b55c842aac33e52c45f33db818cc4edf",
+      "profile_id": "C",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "06ef05a09f939721eab0c727a17fc1327d640051fdfca022f05c0c63084cbecf",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "06ef05a09f939721eab0c727a17fc1327d640051fdfca022f05c0c63084cbecf",
+      "profile_id": "C",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "07140e0c9a0493c8422fa663aa14a8f79a2ba6beb6d52a2f2f79e4bc8d1dba0f",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "07140e0c9a0493c8422fa663aa14a8f79a2ba6beb6d52a2f2f79e4bc8d1dba0f",
+      "profile_id": "C",
+      "supported": false,
+      "reason_codes": [
+        "UTURN_OUTSIDE_RESEARCH_PROFILE"
+      ]
+    },
+    {
+      "pair_hash": "07709a8b04b6f775a480bc2c8cf5e17fffcc2b11b9a4d2b12370d1f69cf722c4",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "07709a8b04b6f775a480bc2c8cf5e17fffcc2b11b9a4d2b12370d1f69cf722c4",
+      "profile_id": "C",
+      "supported": false,
+      "reason_codes": [
+        "UTURN_OUTSIDE_RESEARCH_PROFILE"
+      ]
+    },
+    {
+      "pair_hash": "07a37ca561372caee19f00d648bd86bbc3108b012a5e496fe7fd4b9c9821bf10",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "07a37ca561372caee19f00d648bd86bbc3108b012a5e496fe7fd4b9c9821bf10",
+      "profile_id": "C",
+      "supported": false,
+      "reason_codes": [
+        "UTURN_OUTSIDE_RESEARCH_PROFILE"
+      ]
+    },
+    {
+      "pair_hash": "0808fccffde4e7ccc7dbadc49fdc8b2a03215a457da60eacd4cba5394b8f6e3d",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "0808fccffde4e7ccc7dbadc49fdc8b2a03215a457da60eacd4cba5394b8f6e3d",
+      "profile_id": "C",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "083c19cd879abca6fd0718eaf27befbc1a2c9f532d3c49cfe6f8a5f025cf6f33",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "083c19cd879abca6fd0718eaf27befbc1a2c9f532d3c49cfe6f8a5f025cf6f33",
+      "profile_id": "C",
+      "supported": false,
+      "reason_codes": [
+        "CUSTOMER_EMPTY_DIRECTED_ENDPOINT_DISCONNECT"
+      ]
+    },
+    {
+      "pair_hash": "094fe833eef8f705906c83b08514b715632bc8b974d1682f95a0622f5e15d4d4",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "094fe833eef8f705906c83b08514b715632bc8b974d1682f95a0622f5e15d4d4",
+      "profile_id": "C",
+      "supported": false,
+      "reason_codes": [
+        "UTURN_OUTSIDE_RESEARCH_PROFILE"
+      ]
+    },
+    {
+      "pair_hash": "0a295ba7233c3d02bf80a8714ff8e21ff466d4a0cf676e687f4b1fdea5d44397",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "0a295ba7233c3d02bf80a8714ff8e21ff466d4a0cf676e687f4b1fdea5d44397",
+      "profile_id": "C",
+      "supported": false,
+      "reason_codes": [
+        "UTURN_OUTSIDE_RESEARCH_PROFILE"
+      ]
+    },
+    {
+      "pair_hash": "0ad7b862d40a5829d9c99e18a194850048b374da3933517a3f1e22c29b68d1c9",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "0ad7b862d40a5829d9c99e18a194850048b374da3933517a3f1e22c29b68d1c9",
+      "profile_id": "C",
+      "supported": false,
+      "reason_codes": [
+        "UTURN_OUTSIDE_RESEARCH_PROFILE"
+      ]
+    },
+    {
+      "pair_hash": "0b7d14d92db9f6a7a08caa26616862faf339b6e9f75cab4202bd3e94fd3e311a",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "0b7d14d92db9f6a7a08caa26616862faf339b6e9f75cab4202bd3e94fd3e311a",
+      "profile_id": "C",
+      "supported": false,
+      "reason_codes": [
+        "UTURN_OUTSIDE_RESEARCH_PROFILE"
+      ]
+    },
+    {
+      "pair_hash": "0b82756c78ea9a01dfb56f0af34ff08638c31c9cd5f6f66f805a7eac6e1b772f",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "0b82756c78ea9a01dfb56f0af34ff08638c31c9cd5f6f66f805a7eac6e1b772f",
+      "profile_id": "C",
+      "supported": false,
+      "reason_codes": [
+        "UTURN_OUTSIDE_RESEARCH_PROFILE"
+      ]
+    },
+    {
+      "pair_hash": "0ced91dabe5d57e85ca4ec2ddb913e24830a1b702cce1a8d8549d5fc817c0c8f",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "0ced91dabe5d57e85ca4ec2ddb913e24830a1b702cce1a8d8549d5fc817c0c8f",
+      "profile_id": "C",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "0d70633751c913034f1b65382402f43fab4c775fb1127decc55a05cf06acae3e",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "0d70633751c913034f1b65382402f43fab4c775fb1127decc55a05cf06acae3e",
+      "profile_id": "C",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "0dada30282d2a23d495ceecadca871ada30d18fee4785b7a98edd6a764c9c27b",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "0dada30282d2a23d495ceecadca871ada30d18fee4785b7a98edd6a764c9c27b",
+      "profile_id": "C",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "0ddb7bff98ebecd01c57273e244347206fc29cf6585987b29f8012cfada27274",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "0ddb7bff98ebecd01c57273e244347206fc29cf6585987b29f8012cfada27274",
+      "profile_id": "C",
+      "supported": false,
+      "reason_codes": [
+        "UTURN_OUTSIDE_RESEARCH_PROFILE"
+      ]
+    },
+    {
+      "pair_hash": "0ddc85e3ffd07a4b03f48676176df0109bc07fff02c7ccef32f645e76aaef2e4",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "0ddc85e3ffd07a4b03f48676176df0109bc07fff02c7ccef32f645e76aaef2e4",
+      "profile_id": "C",
+      "supported": false,
+      "reason_codes": [
+        "ROUNDABOUT_OUTSIDE_RESEARCH_PROFILE"
+      ]
+    },
+    {
+      "pair_hash": "0de5fe10c6d64995aebf94b7df6204fb4376aaceaff3e5528367fc8d48a147c4",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "0de5fe10c6d64995aebf94b7df6204fb4376aaceaff3e5528367fc8d48a147c4",
+      "profile_id": "C",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "0e200daee7c3708ef7e2c0a51a3559282fcd0e176d85d6755dd744d0d0345fab",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "0e200daee7c3708ef7e2c0a51a3559282fcd0e176d85d6755dd744d0d0345fab",
+      "profile_id": "C",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "0ecbf453ad505c541e0b79860c490a5f81351eb496d5f7efb18f1c2cd4c0041f",
+      "profile_id": "HV",
+      "supported": true,
+      "reason_codes": []
+    },
+    {
+      "pair_hash": "0ecbf453ad505c541e0b79860c490a5f81351eb496d5f7efb18f1c2cd4c0041f",
+      "profile_id": "C",
+      "supported": false,
+      "reason_codes": [
+        "UTURN_OUTSIDE_RESEARCH_PROFILE"
+      ]
+    }
+  ],
+  "persisted_positive_records": 46,
+  "supported_HV": 32,
+  "supported_C": 14,
+  "query_slots_by_purpose": {
+    "FUTURE": 64,
+    "ALTERNATIVE": 24
+  },
+  "scalar_route_calls": 56,
+  "edge_walk_calls": 77,
+  "HV_matrix_evaluations": 32,
+  "offline_batch_is_not_a_change_to_online_two_requests_per_epoch": true,
+  "Test31_future_demand_read": false,
+  "customer_routes_replanned": false,
+  "economic_parameters_changed": false,
+  "C_reward_added": false
+}

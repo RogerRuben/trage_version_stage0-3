@@ -28,6 +28,9 @@ def solve_joint_current(c, actions, after, baseline, now, cfg, provider,
     original_ids=set(roots); vids={a.vehicle_id for a in actions}
     started=perf_counter(); peak=0.
     prefill_wall=prefill_queries=prefill_routes=0
+    aligned=c_support is not None and getattr(c_support,"sparse_index",None) is not None
+    queries_before=c_support.counts["prefetch_connections_examined"] if c_support is not None else 0
+    routes_before=c_support.connectors.router.route_call_count if c_support is not None else 0
     process=psutil.Process() if cfg.get("joint_execution_mode")=="INCREMENTAL_V3" else None
     if execution_state is not None:
         execution_state.last_attempt_timings={}
@@ -73,7 +76,7 @@ def solve_joint_current(c, actions, after, baseline, now, cfg, provider,
         scenes=provider.library.view(now)
         state_build_time=perf_counter()-started
         prefill_seeds=()
-        if c_support is not None:
+        if c_support is not None and not aligned:
             entered=perf_counter()
             queries_before=c_support.counts["prefetch_connections_examined"]
             routes_before=c_support.connectors.router.route_call_count
@@ -91,6 +94,10 @@ def solve_joint_current(c, actions, after, baseline, now, cfg, provider,
             problem,oracle,initial,plan,info=execute_incremental(current_actions,roots,initial_ids,
                 scenes,pending,provider.pace,provider.library,now,cfg,execution_state,deadline,check,
                 c_support=c_support,c_prefill_seeds=prefill_seeds,economics=economics)
+            if aligned:
+                prefill_wall=info["phase_timings_s"].get("shared_road_frontier_prepare_time_s",0.)
+                prefill_queries=c_support.counts["prefetch_connections_examined"]-queries_before
+                prefill_routes=c_support.connectors.router.route_call_count-routes_before
             seed_limited=info["seed_limited"]
             info["phase_timings_s"]["supply_state_build_time_s"]=state_build_time
             if c_support is not None:
@@ -163,6 +170,10 @@ def solve_joint_current(c, actions, after, baseline, now, cfg, provider,
             current_empty_distance_m=sum(a.empty_distance_m for a in chosen),
             whole_day_optimality_claimed=False)
     except JointBudgetStop as error:
+        if aligned:
+            prefill_wall=getattr(execution_state,"last_attempt_timings",{}).get("shared_road_frontier_prepare_time_s",0.)
+            prefill_queries=c_support.counts["prefetch_connections_examined"]-queries_before
+            prefill_routes=c_support.connectors.router.route_call_count-routes_before
         return dict(baseline,fallback_reason=str(error),
             future_connector_queries=prefill_queries,future_route_queries=prefill_routes,
             joint_control=dict(status="JOINT_BUDGET_KEEP_VALIDATED_BASELINE",resource_fallback=True,

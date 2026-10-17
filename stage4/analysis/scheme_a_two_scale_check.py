@@ -284,6 +284,8 @@ def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
                           cfg["source_layout"]: _sha(root / cfg["source_layout"])})
         if cfg.get("dispatch_economics") is not None:
             protected[cfg["economic_distance_product"]]=_sha(root/cfg["economic_distance_product"])
+        if cfg.get("sparse_connection_config") is not None:
+            protected[cfg["sparse_connection_config"]]=_sha(root/cfg["sparse_connection_config"])
         if execution_binding is not None and protected != execution_binding["inputs_sha256"]:
             raise RuntimeError("source inputs changed after sequential experiment preparation")
         episode = load_research_episode(root, profile_id=cfg["profile_id"], requested_q_a=cfg["requested_q_a"],
@@ -566,6 +568,8 @@ def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
         raise
     finally:
         hard_stop.close()
+        if adapter is not None and getattr(adapter,"c_support",None) is not None:
+            adapter.c_support.close()
         if routing is not None:
             routing.close()
 
