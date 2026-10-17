@@ -1,8 +1,9 @@
 """Opt-in shared C pickup support with bounded prefetch, never road I/O in search.
 
 Unexamined links contribute no certified future service; they are not labelled
-physically impossible. HV, passenger bodies, capability rules and objective
-tiers are unchanged. The old proxy planner remains the default.
+physically impossible. Legacy mode leaves HV proxies unchanged; economic mode
+shares the small prefetch budget with cached HV road support. Neither changes
+passenger bodies or capability rules. The old proxy planner remains default.
 """
 from collections import Counter
 from math import ceil, isfinite
@@ -92,6 +93,8 @@ class SharedCConnectionSupport:
         if cfg.get("joint_c_connection_mode") != MODE:
             raise ValueError("shared C support is explicitly opt-in")
         self.connectors, self.task_factory = connectors, task_factory
+        self.all_profiles=cfg.get("economic_future_connections")=="BOTH_CACHE_CERTIFIED_V1"
+        self.connectors.bounded_all_profile_future=self.all_profiles
         self.budget = ConnectionBudget(
             maximum_per_epoch=cfg.get("c_extra_backend_requests_per_epoch", 2),
             maximum_per_snapshot=cfg.get("c_extra_backend_requests_per_snapshot", 32),
@@ -118,7 +121,8 @@ class SharedCConnectionSupport:
 
     def lookup(self, state, task, departure):
         """Read-only certificate lookup. It must NEVER generate a road query."""
-        result = self.connectors(state, task, departure, "C", cache_only=True,
+        profile=state.profile_id if self.all_profiles else "C"
+        result = self.connectors(state, task, departure, profile, cache_only=True,
                                  enforce_pickup_deadline=False, query_scope="FUTURE")
         self.counts["planning_cache_lookups"] += 1
         self.counts["planning_cache_supported"] += bool(result["supported"])
@@ -136,6 +140,8 @@ class SharedCConnectionSupport:
         """
         if self.budget.epoch != float(now):
             raise ValueError("C prefetch must share the current decision budget")
+        if self.all_profiles:
+            return self._prefill_both(actions,roots,scenes,pending,selected,memory,now,check)
         selected = set(selected)
         vehicles = [(a.vehicle_id, a.action_id) for a in actions
                     if a.action_id in selected and roots[a.action_id].profile_id == "C"]
@@ -189,8 +195,69 @@ class SharedCConnectionSupport:
             self.counts["prefetch_connections_examined"] += 1
         return tuple(sorted(newly_supported))
 
+    def _prefill_both(self,actions,roots,scenes,pending,selected,memory,now,check):
+        """Same cache-only search evidence for BOTH types, one shared I/O budget.
+
+        Alternate the type examined first across epochs. This is bounded
+        exploration, not a completeness claim or a reward for using AVs.
+        """
+        selected=set(selected); by_type={p:[] for p in ("C","HV")}
+        action_map={a.action_id:a for a in actions}
+        for a in actions:
+            if a.action_id in selected: by_type[roots[a.action_id].profile_id].append(a.action_id)
+        for profile,ids in by_type.items():
+            ids.sort(); offset=int(now//30)%max(1,len(ids))
+            by_type[profile]=ids[offset:]+ids[:offset]
+        catalog={}
+        for sid,forecast in sorted(scenes.items()):
+            tasks={t.request_id:t for t in (*pending,*forecast)}
+            rows=tuple(tasks.values())
+            tree=cKDTree(np.asarray([_xy(t.pickup) for t in rows])) if rows else None
+            catalog[sid]=tasks,rows,tree
+        order=("C","HV") if int(now//30)%2==0 else ("HV","C")
+        offers=[]
+        for depth in range(4):
+            for profile in order:
+                if depth>=len(by_type[profile]): continue
+                aid=by_type[profile][depth]; root=roots[aid]; vid=action_map[aid].vehicle_id
+                for sid,(tasks,rows,tree) in catalog.items():
+                    previous=root
+                    old=getattr(memory,"paths",{}).get((sid,vid),()) if memory is not None else ()
+                    for rid in old[:3]:
+                        task=tasks.get(rid)
+                        if task is None: break
+                        offers.append((sid,previous,task))
+                        previous=RouteState(task.dropoff,task.release_s+task.service_time_s,
+                            root.admission_end_s,profile,dict(kind="CUSTOMER",task=task))
+                    point=np.asarray(_xy(root.position))
+                    indices=tree.query_ball_point(point,2000.) if tree is not None else ()
+                    choices=[rows[i] for i in indices if profile in rows[i].compatible_profiles
+                        and rows[i].request_id!=action_map[aid].request_id
+                        and (profile=="HV" or rows[i].passenger_accepts_av)]
+                    choices.sort(key=lambda t:(float(np.linalg.norm(point-_xy(t.pickup))),
+                        t.release_s,t.request_id))
+                    offers.extend((sid,root,t) for t in choices[:3])
+        seen=set(); discovered=set()
+        for sid,state,task in offers:
+            if len(seen)>=64: break
+            key=state.profile_id,state.position,context_key(state.context),task.source_date,task.source_order_id,task.request_id
+            if key in seen: continue
+            seen.add(key); check()
+            if state.profile_id not in task.compatible_profiles or (state.profile_id!="HV" and not task.passenger_accepts_av): continue
+            dispatch=(ceil(max(state.ready_s,now+30,task.release_s)/30)*30 if task.source_kind=="ACTUAL_PENDING"
+                else ceil(task.release_s/300)*300)
+            if not max(state.ready_s,task.release_s)<=dispatch<min(task.deadline_s,state.admission_end_s,now+1800): continue
+            before=self.connectors.counts["certificate_cache_misses"]
+            link=self.connectors(state,task,dispatch,state.profile_id,query_scope="FUTURE",enforce_pickup_deadline=False)
+            if link["supported"] and float(link["travel_time_s"])<=600.:
+                if self.connectors.counts["certificate_cache_misses"]>before: discovered.add((sid,task.request_id))
+            self.counts["prefetch_connections_examined"]+=1
+            self.counts[state.profile_id+"_prefetch_connections_examined"]+=1
+        return tuple(sorted(discovered))
+
     def diagnostics(self):
         return dict(mode=MODE, counts=dict(self.counts), budget=dict(self.budget.counts),
+            all_profile_cache_evidence=self.all_profiles,
             extra_backend_requests_per_epoch=self.budget.maximum_per_epoch,
             extra_backend_requests_per_300s=self.budget.maximum_per_snapshot,
             optional_wall_budget_s=self.budget.wall_s,

@@ -3,8 +3,9 @@
 Earlier-history tasks retain the existing 300-s dispatch grid, 2-km neighbor
 domain and C Top3 / nested HV Top6. Real pending customers may be booked at
 later 30-s execution epochs, strictly before their ORIGINAL deadline.
-Connections are the declared Train-M3 chord-pace planning proxy, not directed
-Valhalla certificates. Physical current actions are validated by the caller.
+Legacy connections use the Train-M3 chord-pace planning proxy. Opt-in typed
+support rechecks cached road legs (C only, or both types in economic mode);
+search never routes. Physical current actions are validated by the caller.
 """
 from __future__ import annotations
 
@@ -24,7 +25,7 @@ from .scheme_a_city_master import ServiceChain
 class PredictionSceneOracle:
     def __init__(self, actions, roots, scenes, pending, pace, now, *, check=lambda:None,
                  maximum_labels=50000,maximum_columns=20000,topology=None,forecast_snapshot=None,
-                 efficient=False, c_support=None):
+                 efficient=False, c_support=None, economics=None):
         self.actions={a.action_id:a for a in actions}
         self.roots=dict(roots)
         if self.actions.keys()!=self.roots.keys():
@@ -39,6 +40,7 @@ class PredictionSceneOracle:
         self.query_wall_time_s=0.; self.query_calls=0; self.target_pruned_nodes=0
         self.efficient=efficient; self.xy={}; self.distances=OrderedDict()
         self.c_support=c_support; self.road_legs=OrderedDict()
+        self.economics=economics; self.price_units={}
         self.support_cache=OrderedDict(); self.neighbor_cache=OrderedDict()
         self.catalogs=OrderedDict(); self.catalog_refs=0; self.many_label_exhausted=False
         self.batch_queries=0; self.batch_reuses=0
@@ -66,6 +68,8 @@ class PredictionSceneOracle:
             if any("C" in t.compatible_profiles and "HV" not in t.compatible_profiles for t in tasks):
                 raise ValueError("the declared planning profile domain must be nested")
             self.tasks[sid]={t.request_id:t for t in tasks}
+            if economics is not None and any(t.service_distance_m is None for t in tasks):
+                raise ValueError("economic paths require decision-time frozen route distances")
             indexed=tasks if topology is None else pending
             points=np.asarray([_xy(t.pickup) for t in indexed],float).reshape(-1,2)
             self.trees[sid]=(cKDTree(points) if len(points) else None,indexed,points)
@@ -84,13 +88,20 @@ class PredictionSceneOracle:
 
     def _remember_path(self,sid,aid,path):
         digest=hashlib.sha256(repr((sid,aid,path)).encode()).hexdigest()[:24]
-        c=ServiceChain(f"{sid}|{aid}|{digest}",sid,self.actions[aid].vehicle_id,aid,
-            tuple(l[0] for l in path),sum(l[4] for l in path),dict(legs=path,
+        payload=dict(legs=path,
                 support=("C_RELAXED_MOVE_PROBE_NOT_EXECUTABLE" if self.c_support is not None
                     and (self.roots[aid].context or {}).get("kind")=="RELAXED_CURRENT_MOVE_PROBE" else
+                    "BOTH_TYPED_CACHED_CONNECTIONS_M3_CUSTOMER_TIME" if self.c_support is not None
+                    and getattr(self.c_support,"all_profiles",False) else
                     "C_CACHED_DIRECTED_CONNECTIONS_M3_CUSTOMER_TIME" if self.c_support is not None
                     and self.roots[aid].profile_id=="C" else
-                    "EARLIER_HISTORY_M3_CHORD_PACE_NOT_DIRECTED_ROUTE_CERTIFICATE")))
+                    "EARLIER_HISTORY_M3_CHORD_PACE_NOT_DIRECTED_ROUTE_CERTIFICATE"))
+        if self.economics is not None:
+            payload.update(operating_contribution_cents=self.economics.path_cents(
+                self.tasks[sid],self.roots[aid].profile_id,path),
+                economic_config_sha256=self.economics.fingerprint)
+        c=ServiceChain(f"{sid}|{aid}|{digest}",sid,self.actions[aid].vehicle_id,aid,
+            tuple(l[0] for l in path),sum(l[4] for l in path),payload)
         if len(self.registered)>=self.maximum_columns and c.chain_id not in self.registered:
             raise JointBudgetStop("joint oracle column memory cap exhausted")
         self.registered[c.chain_id]=c
@@ -103,7 +114,7 @@ class PredictionSceneOracle:
         if self.actions[aid].request_id is not None:
             forbidden.add(self.actions[aid].request_id)
         position,ready,context=state.position,state.ready_s,state.context
-        path=[]
+        path=[]; prefixes=[]
         for _ in range(3):
             check()
             choices=[]
@@ -113,7 +124,9 @@ class PredictionSceneOracle:
                 adjusted=ceil(ready/300)*300 if t.source_kind=="FORECAST" else ready
                 leg=self._supported_leg(t,adjusted,position,state.admission_end_s,state.profile_id,context)
                 if leg is not None:
-                    choices.append((leg[1],leg[4],t.request_id,t,leg))
+                    rank=(leg[1],leg[4],t.request_id) if self.economics is None else (
+                        *self._rank((leg,),sid,state.profile_id)[:2],t.request_id)
+                    choices.append((*rank,t,leg))
             if not choices:
                 break
             _,_,_,task,leg=min(choices,key=lambda x:x[:3])
@@ -126,8 +139,11 @@ class PredictionSceneOracle:
                     break
                 _,_,_,task,leg=min(choices,key=lambda x:x[:3])
             path.append(leg); forbidden.add(task.request_id)
+            prefixes.append(tuple(path))
             position,ready=task.dropoff,leg[3]
             context=dict(kind="CUSTOMER",task=task)
+        if self.economics is not None:
+            return tuple(self._remember_path(sid,aid,p) for p in prefixes)
         return (self._remember_path(sid,aid,tuple(path)),) if path else ()
 
     def nearby_resources(self,sid,rid,maximum,check,*,eligible_vehicles=None):
@@ -223,14 +239,15 @@ class PredictionSceneOracle:
 
     def _supported_leg(self,task,ready,position,end,profile,context):
         upper=self._leg(task,ready,position,end)
-        if upper is None or profile!="C" or self.c_support is None:
+        if (upper is None or self.c_support is None
+                or (profile!="C" and not getattr(self.c_support,"all_profiles",False))):
             return upper
         if (context or {}).get("kind")=="RELAXED_CURRENT_MOVE_PROBE":
             return upper  # V4's discovery-only move must still be certified and re-solved before execution.
         from .c_connection_support import context_key
         # Synthetic request IDs may repeat between historical scenarios. Bind
         # the complete target provenance/geometry and predicted service time.
-        key=(position,context_key(context),task.request_id,task.source_date,task.source_order_id,
+        key=(profile,position,context_key(context),task.request_id,task.source_date,task.source_order_id,
              task.source_kind,task.pickup,task.dropoff,task.service_time_s,upper[1])
         if key in self.road_legs:
             result=self.road_legs[key]; self.road_legs.move_to_end(key)
@@ -289,9 +306,15 @@ class PredictionSceneOracle:
             leg=self._leg(t,ready,node.dropoff,float("inf"))
             if leg is not None:
                 candidates.append((leg[4],leg[1],t.request_id,t))
-        candidates.sort(key=lambda x:x[:3])
-        c=[r[3] for r in candidates if self._allowed(r[3],"C")][:3]
-        h=[r[3] for r in candidates if self._allowed(r[3],"HV")][:3]
+        def ranked(profile):
+            rows=[r for r in candidates if self._allowed(r[3],profile)]
+            if self.economics is None:
+                rows.sort(key=lambda x:x[:3])
+            else:
+                rows.sort(key=lambda r:(-self.economics._quote_values(r[3].service_distance_m,profile,r[0])[3],
+                    r[1],r[0],r[2]))
+            return [r[3] for r in rows[:3]]
+        c=ranked("C"); h=ranked("HV")
         combined={t.request_id:t for t in (*h,*c)}
         self.successors[key]=tuple(c if profile=="C" else combined.values())
         return self.successors[key]
@@ -390,7 +413,7 @@ class PredictionSceneOracle:
                     (t.source_kind!="ACTUAL_PENDING",t.deadline_s,t.request_id)):
                 check()
                 owner=owners.get((sid,task.request_id))
-                if owner is None:
+                if self.economics is not None or owner is None:
                     yield sid,task.request_id
                 elif (profile[owner]=="HV" and self._allowed(task,"C")
                       and any(profile[self.actions[aid].vehicle_id]=="C"
@@ -454,12 +477,12 @@ class PredictionSceneOracle:
                     tail=visit(target,next_leg,depth+1,used|{target.request_id},
                                found or target.request_id==required)
                     candidate=None if tail is None else (leg,*tail)
-                    if candidate is not None and (best is None or self._rank(candidate)<self._rank(best)):
+                    if candidate is not None and (best is None or self._rank(candidate,sid,state.profile_id)<self._rank(best,sid,state.profile_id)):
                         best=candidate
             memo[memo_key]=best
             return best
         best=None
-        for node in self._near(sid,state.position):
+        for node in self._root_candidates(sid,state):
             if (node.request_id in forbidden or not self._allowed(node,state.profile_id)):
                 continue
             if reach is not None and node.request_id not in reach[2]:
@@ -473,7 +496,7 @@ class PredictionSceneOracle:
                 continue
             found=required is None or node.request_id==required
             candidate=visit(node,leg,1,frozenset((node.request_id,)),found)
-            if candidate is not None and (best is None or self._rank(candidate)<self._rank(best)):
+            if candidate is not None and (best is None or self._rank(candidate,sid,state.profile_id)<self._rank(best,sid,state.profile_id)):
                 best=candidate
         result=()
         if best is not None:
@@ -509,7 +532,7 @@ class PredictionSceneOracle:
                         raise JointLabelStop("joint batch label budget exhausted")
                     if self.labels%64==0: self._checks(check)
                     path=(*path,leg); ids=(*used,node.request_id); distance+=leg[4]
-                    rank=-len(path),distance,ids
+                    rank=self._rank(path,sid,state.profile_id)
                     for target in (None,*ids):
                         if target not in ranks or rank<ranks[target]:
                             best[target]=path; ranks[target]=rank
@@ -523,7 +546,7 @@ class PredictionSceneOracle:
                             state.profile_id,dict(kind="CUSTOMER",task=node))
                         if following is not None: visit(target,following,path,ids,distance)
                 try:
-                    for node in self._near(sid,state.position):
+                    for node in self._root_candidates(sid,state):
                         if node.request_id in forbidden or not self._allowed(node,state.profile_id): continue
                         ready=ceil(state.ready_s/300)*300 if node.source_kind=="FORECAST" else state.ready_s
                         leg=self._supported_leg(node,ready,state.position,state.admission_end_s,state.profile_id,state.context)
@@ -542,6 +565,24 @@ class PredictionSceneOracle:
         finally:
             self.query_wall_time_s+=perf_counter()-started
 
-    @staticmethod
-    def _rank(path):
-        return (-len(path),sum(l[4] for l in path),tuple(l[0] for l in path))
+    def _rank(self,path,sid=None,profile=None):
+        if self.economics is None:
+            return (-len(path),sum(l[4] for l in path),tuple(l[0] for l in path))
+        true=self.economics.path_cents(self.tasks[sid],profile,path)
+        reduced=true-sum(self.price_units.get((sid,l[0]),0.) for l in path)
+        return (-reduced,-true,sum(l[4] for l in path),tuple(l[0] for l in path))
+
+    def _root_candidates(self,sid,state):
+        rows=self._near(sid,state.position)
+        if self.economics is not None:
+            rows.sort(key=lambda t:(-self.economics._quote_values(t.service_distance_m,state.profile_id,
+                self._distance(state.position,t.pickup))[3]+self.price_units.get((sid,t.request_id),0.),
+                t.release_s,t.request_id))
+        return rows
+
+    def set_prices(self,prices):
+        """Guidance only: repricing never changes a registered column's money."""
+        self.price_units=dict(prices)
+        self.cache.clear(); self.catalogs.clear(); self.catalog_refs=0
+        # Prices rank exploration but MUST NOT change the declared TopK domain:
+        # retained columns and reverse reachability remain valid after pricing.

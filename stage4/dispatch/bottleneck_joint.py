@@ -48,7 +48,7 @@ class Coalition:
 
 class JointProblem:
     def __init__(self, actions, oracle, weights, current_ids=(), *, move_cap=50,
-                 maximum_columns=20000, maximum_nonzeros=150000):
+                 maximum_columns=20000, maximum_nonzeros=150000, economics=None):
         self.actions = {a.action_id:a for a in actions}
         if len(self.actions) != len(actions) or not actions:
             raise ValueError("joint actions must be nonempty and uniquely identified")
@@ -97,11 +97,53 @@ class JointProblem:
         if type(move_cap) is not int or not 0 <= move_cap <= 50:
             raise ValueError("the original shared current move cap must be retained")
         self.move_cap, self.oracle = move_cap, oracle
+        self.economics = economics
+        self.economic_budget={"blocks":0}
+        self._action_scores, self._chain_scores = {}, {}
         self.column_cap, self.nonzero_cap = min(20000,maximum_columns), min(150000,maximum_nonzeros)
         self.pool, self.columns, self.entry_count = defaultdict(dict), {}, len(actions)
         self.pool_versions = defaultdict(int)
         self.vehicle_pool_versions = defaultdict(int)
         self.protected_critical = None
+        self.protected_current = self.protected_carry = None
+
+    def action_score(self, action):
+        if action.action_id not in self._action_scores:
+            distance = -self.scale*int(round(action.empty_distance_m*1000))
+            if self.economics is None:
+                score = self.scale*int(action.kind=="SERVE"), int(action.carry_over), distance
+            else:
+                value = self.economics.action_cents(action, self.oracle.roots[action.action_id])
+                score = self.scale*value, 0, distance
+            self._action_scores[action.action_id] = score
+        return self._action_scores[action.action_id]
+
+    def chain_score(self, chain):
+        if chain.chain_id not in self._chain_scores:
+            if self.economics is None:
+                value = len(chain.request_ids)
+            elif not chain.request_ids:
+                value = 0
+            else:
+                payload = chain.payload or {}
+                if payload.get("economic_config_sha256") != self.economics.fingerprint:
+                    raise ValueError("continuation carries missing/stale economic coefficients")
+                value = payload.get("operating_contribution_cents")
+                if type(value) is not int:
+                    raise ValueError("continuation economics must use exact integer cents")
+            score = (self.units[chain.scenario_id]*value, 0,
+                -self.units[chain.scenario_id]*int(round(chain.empty_distance_m*1000)))
+            self._chain_scores[chain.chain_id] = score
+        return self._chain_scores[chain.chain_id]
+
+    def chain_rank(self, chain):
+        return (*(-v for v in self.chain_score(chain)), chain.request_ids, chain.chain_id)
+
+    def protect(self, checked):
+        self.protected_critical = checked["critical"]
+        if self.economics is not None:
+            self.protected_current = checked["current_served"]
+            self.protected_carry = checked["current_carry"]
 
     @staticmethod
     def empty(sid, a):
@@ -159,6 +201,9 @@ class JointProblem:
             raise ValueError("joint resource/current movement conservation failed")
         if self.protected_critical is not None and critical != self.protected_critical:
             raise ValueError("joint plan changed protected urgent service")
+        if ((self.protected_current is not None and len(current)<self.protected_current)
+                or (self.protected_carry is not None and carry<self.protected_carry)):
+            raise ValueError("economic plan reduced the protected current service/carry floor")
         seen, groups, future, owners = {s:set(current) for s in self.weights},set(),0,{}
         for c in plan.chains:
             key = c.scenario_id,c.vehicle_id
@@ -179,9 +224,13 @@ class JointProblem:
         for sid in self.weights:
             owners.update({(sid,rid):v for v,aid in chosen.items()
                            for rid in (self.actions[aid].request_id,) if rid is not None})
-        return dict(score=(self.scale*len(current)+future,carry,-distance),
+        score = tuple(sum(self.action_score(self.actions[a])[i] for a in plan.action_ids)
+            + sum(self.chain_score(c)[i] for c in plan.chains) for i in range(3))
+        return dict(score=score,
             critical=critical,current_served=len(current),current_moves=moves,
+            current_carry=carry, future_service_units=future,
             expected_future_served=float(Fraction(future,self.scale)),
+            expected_operating_contribution_cny=(score[0]/self.scale/100 if self.economics is not None else None),
             owners=owners,chosen=chosen,chains={(c.scenario_id,c.vehicle_id):c for c in plan.chains})
 
 
@@ -215,12 +264,11 @@ def seed_plan(problem, selected, check=lambda:None, *, seed_deadline=None):
                             problem.register(column)
                 except JointBudgetStop:
                     limited = True
-            chain = min((terminal,*alternatives),key=lambda c:(-len(c.request_ids),
-                c.empty_distance_m,c.request_ids,c.chain_id))
+            chain = min((terminal,*alternatives),key=problem.chain_rank)
             chains.append(chain); occupied.update(chain.request_ids)
     plan = JointPlan(selected,tuple(chains))
     checked = problem.evaluate(plan)
-    problem.protected_critical = checked["critical"]
+    problem.protect(checked)
     return plan,limited
 
 
@@ -287,6 +335,8 @@ def solve_block(problem, plan, vehicles, deadline, check=lambda:None, *,
         outside_current = {a.request_id for a in outside if a.kind == "SERVE"}
         out_moves = sum(a.kind=="RELOCATE" for a in outside)
         out_critical = sum(a.critical for a in outside)
+        out_current = sum(a.kind=="SERVE" for a in outside)
+        out_carry = sum(a.carry_over for a in outside)
     else:
         outside=None
         outside_current={a.request_id for a in (problem.actions[aid] for aid in action_ids)
@@ -294,21 +344,22 @@ def solve_block(problem, plan, vehicles, deadline, check=lambda:None, *,
                 for s in problem.weights)}
         out_moves=plan_index.moves-sum(plan_index.contributions[v][4] for v in vehicles)
         out_critical=plan_index.critical-sum(plan_index.contributions[v][3] for v in vehicles)
+        out_current=plan_index.current-sum(plan_index.contributions[v][5] for v in vehicles)
+        out_carry=plan_index.carry-sum(plan_index.contributions[v][6] for v in vehicles)
     current_rows, future_rows = defaultdict(list),defaultdict(list)
     objectives = [np.zeros(n) for _ in range(3)]
     for aid,i in xcol.items():
         a = problem.actions[aid]
-        objectives[0][i] = problem.scale*(a.kind=="SERVE")
-        objectives[1][i] = a.carry_over
-        objectives[2][i] = -problem.scale*int(round(a.empty_distance_m*1000))
+        for k,value in enumerate(problem.action_score(a)):
+            objectives[k][i] = value
         if a.kind=="SERVE":
             current_rows[a.request_id].append((i,1))
             for sid in problem.weights:
                 future_rows[sid,a.request_id].append((i,1))
     for j,c in enumerate(paths,len(action_ids)):
         zcols[c.scenario_id,c.action_id].append((j,1))
-        objectives[0][j] = problem.units[c.scenario_id]*len(c.request_ids)
-        objectives[2][j] = -problem.units[c.scenario_id]*int(round(c.empty_distance_m*1000))
+        for k,value in enumerate(problem.chain_score(c)):
+            objectives[k][j] = value
         for rid in c.request_ids:
             future_rows[c.scenario_id,rid].append((j,1))
     for v in sorted(vehicles):
@@ -324,6 +375,11 @@ def solve_block(problem, plan, vehicles, deadline, check=lambda:None, *,
         0,problem.move_cap-out_moves)
     row([(xcol[a],1) for a in action_ids if problem.actions[a].critical],
         problem.protected_critical-out_critical,problem.protected_critical-out_critical)
+    if problem.protected_current is not None:
+        row([(xcol[a],1) for a in action_ids if problem.actions[a].kind=="SERVE"],
+            problem.protected_current-out_current,float("inf"))
+        row([(xcol[a],1) for a in action_ids if problem.actions[a].carry_over],
+            problem.protected_carry-out_carry,float("inf"))
     best,proved,stages = (plan if plan_index is None else None),True,0
     best_score=base["score"]
     receipt=numerical._solver_options_receipt()

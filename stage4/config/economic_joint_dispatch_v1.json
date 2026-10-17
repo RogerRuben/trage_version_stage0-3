@@ -1,0 +1,36 @@
+{
+  "version": "economic_joint_dispatch_v1",
+  "base_config": "stage4/config/c_connection_consistency_v1.json",
+  "default_action": "prepare",
+  "full_day_authorized": false,
+  "fare_parameter_status": "AUTHOR_CONFIRMED_RESEARCH_FARE_20261017_NOT_XIAN_FARE_CALIBRATION",
+  "dispatch_economics": {
+    "mode": "PLATFORM_OPERATING_CONTRIBUTION_V1",
+    "fare_base_cny": 8.0,
+    "fare_per_km_cny": 2.0,
+    "hv_platform_share": 0.25,
+    "av_variable_per_km_cny": 0.67,
+    "hv_directed_reposition_compensation_per_km_cny": 0.0
+  },
+  "parameter_provenance": {
+    "hv_platform_share": "Gao et al. TR-C 2025, section 9.1, published PDF page 23: NYC case setting, not a Xian estimate",
+    "av_variable_per_km_cny": "Rounded Beijing-anchor energy/maintenance/tires/battery subtotal derived from Becker et al. TR-A 2020; 0.670555666 CNY/vehicle-km before rounding; not total cost",
+    "fare": "Author confirmed on 2026-10-17: common research fare = 8 CNY + 2 CNY per passenger-route km; not observed bills; no legacy strategy/time/stress surcharge",
+    "hv_reposition_compensation": "Explicit driver-borne-cost scenario with no additional platform reimbursement; not an assertion of zero driver cost"
+  },
+  "economic_future_connections": "BOTH_CACHE_CERTIFIED_V1",
+  "economic_extra_av_candidates": 3,
+  "economic_distance_product": "stage4/output/capability_chain_planning/economic_joint_v1/order_route_distances.parquet",
+  "economic_controller": "SUBSTITUTION",
+  "joint_acceptance_rule": "BATCHED_MONETARY_REPAIR",
+  "objective_changed": true,
+  "maximum_economic_block_repairs_per_epoch": 3,
+  "forced_C_priority": false,
+  "idle_utilization_reward": false,
+  "fixed_cost_in_dispatch": false,
+  "automatic_experiment_launch": false,
+  "recompute_birth_layout": false,
+  "parameter_search": false,
+  "gpu_used": false,
+  "dense_matrix": false
+}

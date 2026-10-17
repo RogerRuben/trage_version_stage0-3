@@ -34,7 +34,7 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
     """Reuse native current-action identities, not the old future search."""
 
     def __init__(self, policy, value_provider, reference, connectors, validator,
-                 remaining_model, cfg, *, typed_reference=None):
+                 remaining_model, cfg, *, typed_reference=None,economic_inputs=None):
         if policy not in ("SERVICE_PRESERVING", "CHAIN_DEFER"):
             raise ValueError("unknown two-scale current policy")
         fixed = {"coarse_reference_update_s": 300, "rolling_step_s": 30,
@@ -47,6 +47,17 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
             raise ValueError("current flow must retain at most a ten-second wall deadline")
         super().__init__(policy, value_provider, reference, connectors, validator,
                          remaining_model, cfg)
+        from .operating_economics import OperatingEconomics,OperatingLedger
+        self.economics=OperatingEconomics.from_config(cfg)
+        self.economic_inputs=None; self.economic_ledger=None; self.economic_quotes={}; self.economic_move_cursor=0
+        if self.economics is not None:
+            from .economic_inputs import EconomicDistanceStore
+            from pathlib import Path
+            self.economic_inputs=(economic_inputs if economic_inputs is not None else
+                EconomicDistanceStore.load(Path(connectors.router.root)/cfg["economic_distance_product"]))
+            self.economic_ledger=OperatingLedger()
+            if cfg.get("economic_future_connections")!="BOTH_CACHE_CERTIFIED_V1":
+                raise ValueError("economic comparisons cannot mix certified C futures with optimistic HV futures")
         self.value_provider = value_provider
         self.joint_mode = cfg.get("current_decision_mode", "INDEPENDENT_VALUE") == "BOTTLENECK_JOINT"
         if cfg.get("current_decision_mode", "INDEPENDENT_VALUE") not in ("INDEPENDENT_VALUE","BOTTLENECK_JOINT"):
@@ -71,6 +82,10 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
             from .c_connection_support import SharedCConnectionSupport
             self.c_support=SharedCConnectionSupport(connectors,self._task,cfg)
             validator.shared_C_support=self.c_support
+        if self.economics is not None:
+            if (self.c_support is None or not self.c_support.all_profiles
+                    or cfg.get("economic_controller") not in ("MYOPIC","SPATIAL","SUBSTITUTION")):
+                raise ValueError("economic control requires the declared typed C/HV connection and controller mode")
         if self.joint_mode and self.joint_execution_mode in ("INCREMENTAL_V2","INCREMENTAL_V3"):
             if not 1<=int(cfg.get("joint_maximum_labels",50000))<=50000:
                 raise ValueError("incremental execution cannot increase the label allowance")
@@ -110,7 +125,34 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
             vid = int(row["native_vehicle_id"])
             self.last_assignments[vid] = {key: row[key] for key in _BOOKED_FIELDS}
             self.move_contexts.pop(vid, None)
+            if self.economic_ledger is not None:
+                rid=int(row["native_request_id"])
+                prepared=self.economic_quotes.pop(rid,None)
+                if prepared is None or prepared[0]!=vid:
+                    raise ValueError("actual commitment has no matching decision-time economic quote")
+                self.economic_ledger.commit(rid,vid,prepared[1],prepared[2])
         self.assignment_cursor = len(c.assignment_rows)
+        if self.economic_ledger is not None:
+            manager=c.repositioning_manager
+            for row in manager.rows[self.economic_move_cursor:]:
+                profile="HV" if row["vehicle_type"]=="HV" else "C"
+                self.economic_ledger.move(row["native_vehicle_id"],row["start_time_s"],profile,
+                    row["planned_distance_m"],self.economics)
+            self.economic_move_cursor=len(manager.rows)
+
+    def _task(self,c,rid):
+        task=super()._task(c,rid)
+        if self.economics is None: return task
+        if task.release_s>float(getattr(c,"sim_time",task.release_s)):
+            raise ValueError("an unreleased actual request cannot supply economic features")
+        from dataclasses import replace
+        return replace(task,service_distance_m=self.economic_inputs.distance(task.source_date,task.source_order_id))
+
+    def economic_report(self,c):
+        if self.economic_ledger is None: return None
+        self._sync(c)
+        self.economic_ledger.settle_moves(c.repositioning_manager.rows,self.economics)
+        return self.economic_ledger.summary(c.completed_rids)
 
     def _record(self, row):
         if self.cfg.get("current_empty_distance_mode") == "PRIMARY_FACE_MM":
@@ -130,7 +172,7 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
         # Maximum active neighborhood columns per decision, not the generated
         # all-root column pool and not a count of realized future services.
         self.operation_totals["future_chain_variables"] += int(row.get("future_chain_variables",0))
-        self.operation_totals["future_connector_queries"] += 0
+        self.operation_totals["future_connector_queries"] += int(row.get("future_connector_queries",0))
         joint=row.get("joint_control")
         if joint is not None:
             self.operation_totals["joint_decisions"]+=1
@@ -169,7 +211,7 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
                     joint_neighborhood_strategy=self.cfg.get("joint_neighborhood_strategy","BOTTLENECK_CLOSURE")
                         if self.joint_mode else None,
                     future_chain_variables=self.operation_totals["future_chain_variables"],
-                    future_connector_queries=0)
+                    future_connector_queries=self.operation_totals["future_connector_queries"])
 
     @staticmethod
     def _validate_control(c):
@@ -191,7 +233,9 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
         # At other epochs only vehicles with an actual SERVE choice need flow
         # columns; all other native idle vehicles keep their fixed WAIT.
         calendar = getattr(c, "event_calendar", None)
-        ids = (calendar.active_ids(now) if calendar is not None else sorted(c.runtime_by_vid)) if move_epoch or self.joint_mode else (
+        joint_resources=(self.joint_mode and not (self.economics is not None
+            and self.cfg.get("economic_controller")=="MYOPIC"))
+        ids = (calendar.active_ids(now) if calendar is not None else sorted(c.runtime_by_vid)) if move_epoch or joint_resources else (
             sorted({int(arc.vehicle_id) for arc in valid}))
         result = {}
         serving = {int(arc.vehicle_id) for arc in valid}
@@ -224,6 +268,10 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
         if self.joint_mode:
             # No private-vehicle value is used to accept/reject a coalition.
             # The joint bridge constructs shared integer scene plans instead.
+            if self.economics is not None and self.cfg.get("economic_controller")=="MYOPIC":
+                self.coarse_info=dict(available=True,status="ECONOMIC_MYOPIC_NO_FUTURE_VALUE",refreshed=True,scenario_count=0,supply_state_count=0)
+                self.coarse_bucket=bucket
+                return dict(self.coarse_info)
             scenes=self.value_provider.library.view(now)
             self.coarse_bucket=bucket
             self.coarse_info=dict(available=True,status="JOINT_HISTORY_INPUTS_READY",refreshed=True,
@@ -280,8 +328,11 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
         if self.c_support is not None:
             self.c_support.begin(now,deadline)
             c.shared_C_connection_support=self.c_support
+        if self.economics is not None:
+            c.dispatch_economics_model=self.economics
         manager = c.repositioning_manager
-        move_epoch = (not self.common_movement and now % 900 == 0
+        economic_myopic=self.economics is not None and self.cfg.get("economic_controller")=="MYOPIC"
+        move_epoch = (not economic_myopic and not self.common_movement and now % 900 == 0
             and 0 <= now < self.cfg.get("movement_day_end_s", 86400))
         timings = {name: 0. for name in _TIMINGS}
         move_queries = 0
@@ -418,7 +469,7 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
                 actions.append(CurrentAction(aid,vid,"RELOCATE",None,payload=dict(
                     optimistic_move=True,source_state=state,target_site=site,relocation_slot_s=int(now))))
                 context=(dict(kind="RELAXED_CURRENT_MOVE_PROBE") if self.c_support is not None
-                         and state.profile_id=="C" else site.get("context"))
+                         and (state.profile_id=="C" or getattr(self.c_support,"all_profiles",False)) else site.get("context"))
                 after[aid]=RouteState(tuple(site["position"]),float(now),state.admission_end_s,
                     state.profile_id,context,float(now),1)
                 units[aid]=0
@@ -509,8 +560,11 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
             move_cap=50, time_limit_s=float(self.cfg.get("solver_time_limit_s", 10.)),
             deadline_s=deadline,
             maximum_actions=int(self.cfg.get("maximum_model_variables", 20000)),
-            empty_distance_mode=self.cfg.get("current_empty_distance_mode", "LOCAL_STABLE"))
-        if self.joint_mode:
+            empty_distance_mode=self.cfg.get("current_empty_distance_mode", "LOCAL_STABLE"),
+            **({"operating_contribution_units":{a.action_id:self.economics.action_cents(a,after[a.action_id]) for a in flow_actions}}
+               if self.economics is not None else {}))
+        lazy_route_wall=0.
+        if self.joint_mode and not (self.economics is not None and self.cfg.get("economic_controller")=="MYOPIC"):
             from .bottleneck_native import solve_joint_current
             lazy_route_wall=0.
             if self.lazy_moves and any(a.kind=="RELOCATE" for a in actions):
@@ -566,6 +620,11 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
         chosen = set(result["selected_action_ids"])
         serves = [action for action in actions if action.action_id in chosen and action.kind == "SERVE"]
         moves = [action for action in actions if action.action_id in chosen and action.kind == "RELOCATE"]
+        if self.economic_ledger is not None:
+            for action in serves:
+                task=self._task(c,action.request_id)
+                self.economic_quotes[action.request_id]=(action.vehicle_id,task.source_order_id,
+                    self.economics.quote(task,after[action.action_id].profile_id,action.empty_distance_m))
         decisions = getattr(c, "request_decisions", None)
         if decisions is not None:
             if getattr(decisions, "typed_candidates", False):

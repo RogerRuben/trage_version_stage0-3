@@ -34,6 +34,9 @@ class EfficientWorkspace:
             p.vehicle_pool_versions[v]) for v in sorted(vehicles))
         residual=(p.move_cap-i.moves+sum(i.contributions[v][4] for v in vehicles),
             p.protected_critical-i.critical+sum(i.contributions[v][3] for v in vehicles))
+        if p.economics is not None:
+            residual=(*residual,p.protected_current-i.current+sum(i.contributions[v][5] for v in vehicles),
+                p.protected_carry-i.carry+sum(i.contributions[v][6] for v in vehicles))
         return local,outside,residual
 
     def offer_many(self,sid,aid,targets,forbidden):
@@ -66,6 +69,8 @@ class EfficientWorkspace:
             _,old=self.visits.popitem(last=False); self.visit_refs-=len(old[0][1])+len(old[1])
 
     def evaluate(self,vehicles,targets,deadline):
+        if self.p.economics is not None and self.p.economic_budget["blocks"]>=3:
+            raise JointBudgetStop("ECONOMIC_THREE_BLOCK_REPAIR_CAP")
         self.check(); started=perf_counter(); p=self.p; i=self.index
         vehicles=frozenset(vehicles); footprint=self.footprint(vehicles)
         targets={s:set(ids) for s,ids in targets.items()}
@@ -93,7 +98,7 @@ class EfficientWorkspace:
             return None
         before=i.score; old_chosen={v:i.chosen[v] for v in vehicles}
         fixed={}
-        if hasattr(p.oracle,"tasks"):
+        if p.economics is None and hasattr(p.oracle,"tasks"):
             upper=sum(p.units[s]*len(set(p.oracle.tasks[s])|p.current_ids) for s in p.weights)
             if i.score[0]==upper:
                 fixed[0]=sum(i.contributions[v][0] for v in vehicles)
@@ -127,6 +132,8 @@ class EfficientWorkspace:
         if 0 in fixed and i.score[1]==carry_upper:
             fixed[1]=sum(i.contributions[v][1] for v in vehicles)
         try:
+            if p.economics is not None:
+                self.counts["economic_blocks_solved"]+=1; p.economic_budget["blocks"]+=1
             patch,info=solve_block(p,None,vehicles,deadline,self.check,skip_constant_stages=True,
                 metrics=self.metrics,plan_index=i,persistent=True,fixed_objectives=fixed)
         finally:
@@ -168,6 +175,14 @@ def efficient_search(p,initial,seeds,*,strategy,deadline,check,
     current_support=defaultdict(list)
     for a in p.actions.values():
         if a.kind=="SERVE": current_support[a.request_id].append(a.action_id)
+    if p.economics is not None:
+        def priority(key):
+            sid,rid=key; task=p.oracle.tasks[sid][rid]
+            alternatives=[p.economics._quote_values(task.service_distance_m,profile,0.)[3]
+                for profile in ("C","HV") if p.oracle._allowed(task,profile)]
+            estimate=max(alternatives,default=0)-p.oracle.price_units.get(key,0.)
+            return task.source_kind!="ACTUAL_PENDING",-estimate,task.deadline_s,key
+        seeds=tuple(sorted(set(seeds),key=priority))
     def target_map(): return defaultdict(set)
     def supported(sid,rid,state=None):
         # A last-chance current request need not fit any FUTURE continuation.
@@ -241,8 +256,9 @@ def efficient_search(p,initial,seeds,*,strategy,deadline,check,
                     # Cheap direct-current closure before deep future pricing.
                     # Last-chance requests need no fictitious future pickup.
                     direct=[]
-                    ranked=sorted(current_support[rid],key=lambda a:(p.actions[a].empty_distance_m,
-                        p.actions[a].vehicle_id,a))
+                    ranked=sorted(current_support[rid],key=lambda a:(
+                        -p.action_score(p.actions[a])[0] if p.economics is not None else 0,
+                        p.actions[a].empty_distance_m,p.actions[a].vehicle_id,a))
                     for aid in ranked:
                         if partial>=maximum_partial_states: break
                         c=p.register(p.empty(sid,p.actions[aid])); a=p.actions[aid]

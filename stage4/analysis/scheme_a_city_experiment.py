@@ -81,6 +81,10 @@ def load_history_templates(root, cfg):
     columns = list(CoarseHistoricalLibrary._COLUMNS) + ["research_data_ready"]
     templates = pd.read_parquet(root/source, columns=columns)
     templates = templates.loc[templates.date.astype(str).isin(dates)].copy()
+    if cfg.get("dispatch_economics") is not None:
+        from stage4.dispatch.economic_inputs import EconomicDistanceStore
+        store=EconomicDistanceStore.load(root/cfg["economic_distance_product"])
+        templates=store.attach_history(templates)
     counts = {str(d): int(n) for d, n in templates.groupby(templates.date.astype(str)).size().items()}
     if counts != {d: declared[d] for d in dates}:
         raise ValueError("historical templates do not match complete-day source counts; window/truncated input rejected")

@@ -22,6 +22,7 @@ def solve_joint_current(c, actions, after, baseline, now, cfg, provider,
     initial_ids=list(baseline["selected_action_ids"])
     current_actions=list(actions); roots=dict(after)
     c_support=getattr(c,"shared_C_connection_support",None)
+    economics=getattr(c,"dispatch_economics_model",None)
     if (cfg.get("joint_c_connection_mode","PROXY_V4")!="PROXY_V4") != (c_support is not None):
         raise ValueError("C connection mode must match its shared native support provider")
     original_ids=set(roots); vids={a.vehicle_id for a in actions}
@@ -89,7 +90,7 @@ def solve_joint_current(c, actions, after, baseline, now, cfg, provider,
             from .bottleneck_incremental import execute_incremental
             problem,oracle,initial,plan,info=execute_incremental(current_actions,roots,initial_ids,
                 scenes,pending,provider.pace,provider.library,now,cfg,execution_state,deadline,check,
-                c_support=c_support,c_prefill_seeds=prefill_seeds)
+                c_support=c_support,c_prefill_seeds=prefill_seeds,economics=economics)
             seed_limited=info["seed_limited"]
             info["phase_timings_s"]["supply_state_build_time_s"]=state_build_time
             if c_support is not None:
@@ -97,11 +98,11 @@ def solve_joint_current(c, actions, after, baseline, now, cfg, provider,
         else:
             oracle=PredictionSceneOracle(current_actions,roots,scenes,pending,provider.pace,now,
                 check=check,maximum_labels=int(cfg.get("joint_maximum_labels",50000)),
-                maximum_columns=int(cfg.get("maximum_model_variables",20000)),c_support=c_support)
+                maximum_columns=int(cfg.get("maximum_model_variables",20000)),c_support=c_support,economics=economics)
             problem=JointProblem(current_actions,oracle,provider.library.weights,
                 [t.request_id for t in pending],move_cap=50,
                 maximum_columns=int(cfg.get("maximum_model_variables",20000)),
-                maximum_nonzeros=int(cfg.get("maximum_model_nonzeros",150000)))
+                maximum_nonzeros=int(cfg.get("maximum_model_nonzeros",150000)),economics=economics)
             initial,seed_limited=seed_plan(problem,initial_ids,check,
                                          seed_deadline=perf_counter()+max(0.,deadline-perf_counter())*.25)
             search=spatial_improve if cfg.get("joint_neighborhood_strategy")=="SPATIAL_JOINT" else improve
@@ -129,6 +130,15 @@ def solve_joint_current(c, actions, after, baseline, now, cfg, provider,
                 future_connector_queries=prefill_queries,future_route_queries=prefill_routes,
                 C_connection_support=c_support.diagnostics(),
                 expected_future_served_scope="C_CERTIFIED_SPARSE_SUBSET_HV_HISTORY_PROXY_NOT_REALIZED_SERVICE")
+            if getattr(c_support,"all_profiles",False):
+                info.update(HV_future_auto_routability_certificate=True,
+                    expected_future_served_scope="BOTH_CACHE_SUPPORTED_SPARSE_SUBSETS_C_TYPED_SEAM_HV_AUTO_OD",
+                    both_future_domains_complete=False)
+        if economics is not None:
+            info.update(current_strategy="PROTECT_CURRENT_SERVICE_CARRY_THEN_JOINT_OPERATING_CONTRIBUTION",
+                expected_operating_contribution_cny=checked["expected_operating_contribution_cny"],
+                economic_config_sha256=economics.fingerprint,
+                objective_unit="INTEGER_CENTS_WITH_EXACT_SCENARIO_WEIGHTS")
         info["resource_fallback"]=False
         info["execution_mode"]=cfg.get("joint_execution_mode","REBUILD_V1")
         # Never accumulate per-neighborhood raw traces over an entire day.

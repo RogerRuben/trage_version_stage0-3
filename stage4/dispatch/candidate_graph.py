@@ -76,6 +76,7 @@ class SparseCandidateIndex:
         radius_m: float,
         top_k: int,
         av_eligible: bool,
+        extra_av_top_k: int = 0,
     ) -> tuple[list[tuple[SpatialVehicle, float]], int]:
         point = _xy(
             np.asarray([pickup_lon]), np.asarray([pickup_lat]), self.reference_lat
@@ -100,7 +101,15 @@ class SparseCandidateIndex:
                 candidates.append((vehicle, distance))
         spatial_count = len(candidates)
         candidates.sort(key=lambda item: (item[1], item[0].vehicle_id))
-        return candidates[: int(top_k)], spatial_count
+        if type(extra_av_top_k) is not int or not 0<=extra_av_top_k<=3:
+            raise ValueError("economic type retention adds at most three sparse AV candidates")
+        selected=candidates[:int(top_k)]
+        if av_eligible and extra_av_top_k:
+            kept={v.native_vehicle_id for v,_ in selected}
+            reserved=[row for row in candidates if row[0].vehicle_type=="AV"][:extra_av_top_k]
+            selected.extend(row for row in reserved if row[0].native_vehicle_id not in kept)
+            selected.sort(key=lambda item:(item[1],item[0].vehicle_id))
+        return selected, spatial_count
 
     def count_vehicle_type_within(
         self, pickup_lon: float, pickup_lat: float, radius_m: float, vehicle_type: str

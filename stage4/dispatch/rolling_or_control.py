@@ -320,6 +320,8 @@ class _RollingORFleetControlCore(_NativeFleetControlCore):
                 radius,
                 int(self.config["candidate_top_k"]),
                 av_eligible,
+                **({"extra_av_top_k":int(self.config["economic_extra_av_candidates"])}
+                   if self.config.get("economic_extra_av_candidates",0) else {}),
             )
             spatial_pairs += raw_count
             topk_pairs += len(candidates)

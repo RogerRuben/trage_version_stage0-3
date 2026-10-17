@@ -282,6 +282,8 @@ def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
         protected.update({Path(config).as_posix(): _sha(root / config),
                           cfg["base_config"]: _sha(root / cfg["base_config"]),
                           cfg["source_layout"]: _sha(root / cfg["source_layout"])})
+        if cfg.get("dispatch_economics") is not None:
+            protected[cfg["economic_distance_product"]]=_sha(root/cfg["economic_distance_product"])
         if execution_binding is not None and protected != execution_binding["inputs_sha256"]:
             raise RuntimeError("source inputs changed after sequential experiment preparation")
         episode = load_research_episode(root, profile_id=cfg["profile_id"], requested_q_a=cfg["requested_q_a"],
@@ -326,6 +328,8 @@ def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
         native_cfg["scheme_a_fast_forecast_hv"] = True
         native_cfg.update({key: cfg[key] for key in
             ("precise_request_deadline", "request_decision_diagnostics", "typed_request_diagnostics") if key in cfg})
+        if cfg.get("dispatch_economics") is not None:
+            native_cfg["economic_extra_av_candidates"]=int(cfg.get("economic_extra_av_candidates",3))
         control = create_rolling_or_fleet_control(bindings, vehicles, [], demand, network, routing,
             start, start + pd.Timedelta(seconds=cfg["physical_drain_limit_s"]), native_cfg)
         control.enable_event_calendar()
@@ -483,6 +487,13 @@ def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
             summary["request_decision_diagnostics"] = control.request_decisions.summary()
             del decisions, diagnostic_fields
         movements = pd.DataFrame(manager.rows)
+        if getattr(adapter,"economic_ledger",None) is not None:
+            from stage4.dispatch.operating_economics import ORDER_LEDGER_COLUMNS,RELOCATION_LEDGER_COLUMNS
+            summary["operating_economics"]=adapter.economic_report(control)
+            atomic_parquet(directory/"operating_order_ledger.parquet",
+                pd.DataFrame(adapter.economic_ledger.orders.values(),columns=ORDER_LEDGER_COLUMNS))
+            atomic_parquet(directory/"operating_relocation_ledger.parquet",
+                pd.DataFrame(adapter.economic_ledger.moves.values(),columns=RELOCATION_LEDGER_COLUMNS))
         if len(movements):
             movements["destination_position"] = movements.destination_position.astype(str)
         for name, frame in (("assignments", assignments), ("cohort_outcomes", outcomes),

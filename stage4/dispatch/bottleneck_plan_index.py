@@ -13,6 +13,8 @@ class PlanPatch:
     critical: int
     moves: int
     current: int
+    carry: int = 0
+    future_units: int = 0
 
 
 class PlanIndex:
@@ -23,23 +25,23 @@ class PlanIndex:
         self.owners=dict(checked["owners"]); self.score=checked["score"]
         self.critical=checked["critical"]; self.moves=checked["current_moves"]
         self.current=checked["current_served"]; self.revision=0
+        self.carry=checked["current_carry"]; self.future_units=checked["future_service_units"]
         self.vehicle_revisions={v:0 for v in self.chosen}
         self.request_revisions={}; self.contributions={v:self._contribution(v) for v in self.chosen}
 
     def _contribution(self,v,aid=None,chains=None):
         p=self.p; a=p.actions[self.chosen[v] if aid is None else aid]
         chains=(tuple(self.chains[s,v] for s in p.weights) if chains is None else chains)
-        service=p.scale*int(a.kind=="SERVE")
-        distance=p.scale*int(round(a.empty_distance_m*1000))
+        score=list(p.action_score(a)); future=0
         for c in chains:
-            service+=p.units[c.scenario_id]*len(c.request_ids)
-            distance+=p.units[c.scenario_id]*int(round(c.empty_distance_m*1000))
-        return service,int(a.carry_over),-distance,int(a.critical),int(a.kind=="RELOCATE"),int(a.kind=="SERVE")
+            for k,value in enumerate(p.chain_score(c)): score[k]+=value
+            future+=p.units[c.scenario_id]*len(c.request_ids)
+        return (*score,int(a.critical),int(a.kind=="RELOCATE"),int(a.kind=="SERVE"),int(a.carry_over),future)
 
     def view(self):
         return dict(chosen=self.chosen,chains=self.chains,owners=self.owners,score=self.score,
-            critical=self.critical,current_moves=self.moves,current_served=self.current,
-            expected_future_served=(self.score[0]-self.p.scale*self.current)/self.p.scale)
+            critical=self.critical,current_moves=self.moves,current_served=self.current,current_carry=self.carry,
+            future_service_units=self.future_units, expected_future_served=self.future_units/self.p.scale)
 
     def local_keys(self,vehicles):
         keys=set()
@@ -84,13 +86,16 @@ class PlanIndex:
             owner=self.owners.get(request)
             if owner is not None and owner not in vehicles:
                 raise ValueError("indexed patch steals outside request capacity")
-        totals=[*self.score,self.critical,self.moves,self.current]
+        totals=[*self.score,self.critical,self.moves,self.current,self.carry,self.future_units]
         for v in vehicles:
             contributions[v]=self._contribution(v,chosen[v],tuple(groups[s,v] for s in p.weights))
             for i,(old,new) in enumerate(zip(self.contributions[v],contributions[v])):
                 totals[i]+=new-old
         if totals[4]>p.move_cap or (p.protected_critical is not None and totals[3]!=p.protected_critical):
             raise ValueError("indexed patch violates shared move/critical capacity")
+        if ((p.protected_current is not None and totals[5]<p.protected_current)
+                or (p.protected_carry is not None and totals[6]<p.protected_carry)):
+            raise ValueError("indexed patch violates economic current service/carry floors")
         return PlanPatch(vehicles,tuple(actions),tuple(chains),tuple(totals[:3]),*totals[3:])
 
     def apply(self,patch):
@@ -108,6 +113,7 @@ class PlanIndex:
                 self.owners[c.scenario_id,r]=c.vehicle_id
         self.score=patch.score; self.critical=patch.critical
         self.moves=patch.moves; self.current=patch.current; self.revision+=1
+        self.carry=patch.carry; self.future_units=patch.future_units
         for v in patch.vehicles:
             self.vehicle_revisions[v]+=1; self.contributions[v]=self._contribution(v)
         for key in old|self.local_keys(patch.vehicles):

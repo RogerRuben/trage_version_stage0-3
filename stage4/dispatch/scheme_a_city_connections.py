@@ -992,6 +992,7 @@ This branch is enabled explicitly by the parent protocol, never for site MOVE.
             target_key = (("SITE", str(target["site_id"]), target_point) if site else
                 ("CUSTOMER", *identity, target_point, _point(_value(target, "dropoff"))))
             bounded_c = profile == "C" and getattr(self, "c_connection_budget", None) is not None
+            bounded_future=(bounded_c or (profile=="HV" and getattr(self,"bounded_all_profile_future",False)))
             mode = "TYPED_SCALAR_C_BOUNDED_V1" if bounded_c else ("AUTO_OD" if fast_hv else "TYPED_SCALAR")
             key = self._certificate_key(mode,
                 profile, origin, source_key, target_key)
@@ -1010,10 +1011,10 @@ This branch is enabled explicitly by the parent protocol, never for site MOVE.
                     self.counts["current_move_certificate_reuses"] += 1
             else:
                 if cache_only:
-                    return self._reject(["C_CONNECTION_NOT_EVALUATED_CACHE_MISS"])
-                if bounded_c and query_scope == "FUTURE":
+                    return self._reject([profile+"_CONNECTION_NOT_EVALUATED_CACHE_MISS"])
+                if bounded_future and query_scope == "FUTURE":
                     if not self.c_connection_budget.claim("FUTURE"):
-                        return self._reject(["C_CONNECTION_NOT_EVALUATED_BUDGET"])
+                        return self._reject([profile+"_CONNECTION_NOT_EVALUATED_BUDGET"])
                     optional_started = perf_counter()
                     optional_before = self.c_connection_budget.spent_epoch_s
                 self.counts["certificate_cache_misses" if key is not None else "certificate_cache_bypassed"] += 1

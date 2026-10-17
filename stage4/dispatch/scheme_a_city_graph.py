@@ -54,6 +54,7 @@ class ChainTask:
     source_date: str = ""
     source_order_id: str = ""
     source_kind: str = "FORECAST"
+    service_distance_m: float | None = None
 
     def __post_init__(self):
         if not all(isfinite(float(x)) for x in (
@@ -61,6 +62,9 @@ class ChainTask:
             raise ValueError("nonfinite task timing")
         if self.deadline_s < self.release_s or self.service_time_s <= 0:
             raise ValueError("invalid task deadline or predicted service duration")
+        if self.service_distance_m is not None and (
+                not isfinite(float(self.service_distance_m)) or self.service_distance_m <= 0):
+            raise ValueError("task service route distance must be positive when supplied")
         object.__setattr__(self, "request_id", int(self.request_id))
         object.__setattr__(self, "pickup", _point(self.pickup))
         object.__setattr__(self, "dropoff", _point(self.dropoff))
@@ -127,8 +131,13 @@ class CoarseHistoricalLibrary:
         if not set(dates) <= set(source_dates):
             raise ValueError("configured historical date has no templates")
         self._days = {}
+        economic = cfg.get("dispatch_economics") is not None
+        if economic and "service_distance_m" not in templates:
+            raise ValueError("economic history requires frozen service route lengths, not OD chords")
         for date in dates:
             day = templates.loc[source_dates.eq(date), list(self._COLUMNS)].copy()
+            if economic:
+                day["service_distance_m"] = templates.loc[source_dates.eq(date), "service_distance_m"]
             if "research_data_ready" in templates:
                 ready = templates.loc[source_dates.eq(date), "research_data_ready"]
                 day = day.loc[ready.eq(True)]
@@ -143,7 +152,8 @@ class CoarseHistoricalLibrary:
                     p for p in ("C", "M", "A") if bool(getattr(row, f"compatible_{p}"))})
                 rows.append((release, duration,
                     _point((row.start_lon_wgs84, row.start_lat_wgs84)),
-                    _point((row.end_lon_wgs84, row.end_lat_wgs84)), allowed, str(row.order_id)))
+                    _point((row.end_lon_wgs84, row.end_lat_wgs84)), allowed, str(row.order_id),
+                    float(row.service_distance_m) if economic else None))
             self._days[date] = (np.asarray([r[0] for r in rows], dtype=float), tuple(rows))
         self.weights = {f"TRAIN_DAY_{d}": 1.0 / len(dates) for d in dates}
         self.last_refresh_s = None
@@ -175,7 +185,7 @@ class CoarseHistoricalLibrary:
             tasks = []
             ids = set()
             for index, source_index in enumerate(sampled):
-                release, duration, pickup, dropoff, allowed, order = records[left + int(source_index)]
+                release, duration, pickup, dropoff, allowed, order, distance = records[left + int(source_index)]
                 key = f"FORECAST|{coarse_s}|{date}|{index}"
                 request_id = int.from_bytes(hashlib.sha256(key.encode()).digest()[:8], "big") % (1 << 63)
                 # Negative synthetic IDs cannot collide with native nonnegative IDs.
@@ -186,7 +196,8 @@ class CoarseHistoricalLibrary:
                 release = float(np.clip(release + rng.uniform(-15, 15), coarse_s + 1, horizon_end))
                 accepted = passenger_acceptance(key, rate, acceptance_seed).passenger_accepts_av
                 tasks.append(ChainTask(request_id, release, release + float(self.cfg.get("patience_s", 300)),
-                    duration, pickup, dropoff, allowed, accepted, date, order))
+                    duration, pickup, dropoff, allowed, accepted, date, order,
+                    service_distance_m=distance))
             tasks.sort(key=lambda task: (task.release_s, task.request_id))
             scene = f"TRAIN_DAY_{date}"
             snapshot[scene] = tuple(tasks)

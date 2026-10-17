@@ -131,7 +131,8 @@ def _check_selection(selected, vehicles, move_cap):
 
 def solve_current_flow(actions, continuation_units, *, policy="SERVICE_PRESERVING",
                        move_cap=50, time_limit_s=10., deadline_s=None,
-                       maximum_actions=20_000, backend="AUTO", empty_distance_mode="LOCAL_STABLE"):
+                       maximum_actions=20_000, backend="AUTO", empty_distance_mode="LOCAL_STABLE",
+                       operating_contribution_units=None):
     """Select one feasible current action per available vehicle.
 
 Input actions must ALREADY satisfy road/direction, profile, acceptance,
@@ -142,6 +143,8 @@ current actions. Current MOVE choices share one present-time capacity pool.
 Continuation deltas are bounded integer units [-9,9]: three equal historical
 scenarios, up to three service opportunities each. Future competition is only
 approximated by the value provider; never sum these as realized capacity.
+    With operating_contribution_units, the four priorities are urgent/current/
+    carry counts, then integer cents. No money is encoded as service thirds.
     Legacy LOCAL_STABLE has no global distance guarantee. Opt-in
     PRIMARY_FACE_MM minimizes millimetre costs on the exact primary-optimal
     face without modifying primary weights or physical distance. Equal
@@ -196,7 +199,15 @@ approximated by the value provider; never sum these as realized capacity.
                 raise ValueError("current MOVE retains its original 900-second slot")
             slots.add(slot)
         groups[action.vehicle_id].append(action)
-        features[action.action_id] = _features(action, units, policy)
+        if operating_contribution_units is None:
+            features[action.action_id] = _features(action, units, policy)
+        else:
+            value=operating_contribution_units.get(action.action_id)
+            if type(value) is not int or abs(value)>100_000_000:
+                raise ValueError("every economic action requires bounded integer cents")
+            if action.kind=="WAIT" and value!=0:
+                raise ValueError("WAIT has zero incremental contribution, not an idle reward")
+            features[action.action_id]=(int(action.critical),int(action.kind=="SERVE"),int(action.carry_over),value)
     if set(groups) != set(waits) or len(slots) > 1:
         raise ValueError("current-only flow requires WAITs and one current relocation slot")
     backup = _backup(actions, waits)
@@ -241,6 +252,8 @@ approximated by the value provider; never sum these as realized capacity.
             native_interrupt_api_available=False,
             future_global_optimality_claimed=False, whole_day_optimality_claimed=False)
         row.update(secondary)
+        if operating_contribution_units is not None:
+            row["score_scope"]="CURRENT_URGENT_SERVICE_CARRY_THEN_INTEGER_CENTS"
         return row
 
     if len(actions) > maximum_actions or perf_counter() >= deadline:

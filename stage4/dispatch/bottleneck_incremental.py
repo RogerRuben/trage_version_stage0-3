@@ -32,6 +32,8 @@ class RollingJointMemory:
         self.deferred=(); self.touched=set(); self.last_now=None
         self.last_forecast_signature=None
         self.retained_forecast={}
+        self.economic_price_key=None; self.economic_prices={}
+        self.economic_budget={"epoch":None,"blocks":0}
 
     def fork(self):
         # Selected paths/domains are replaced, never mutated, by save(). Only
@@ -61,7 +63,8 @@ class RollingJointMemory:
                 old=self.paths.get((sid,v),())
                 cached=self.retained_forecast.get((sid,v))
                 reusable=(self.exact_warm_reuse and cached is not None
-                    and not (getattr(oracle,"c_support",None) is not None and oracle.roots[aid].profile_id=="C")
+                    and not (getattr(oracle,"c_support",None) is not None and (
+                        oracle.roots[aid].profile_id=="C" or getattr(oracle.c_support,"all_profiles",False)))
                     and self.last_forecast_signature is self.topology.signature
                     and cached[0]==self._forecast_root(oracle.roots[aid])
                     and all(rid in oracle.tasks[sid] and rid not in occupied for rid in old)
@@ -76,7 +79,9 @@ class RollingJointMemory:
                     c=oracle.repair(sid,aid,old,frozenset(occupied),check) if old else None
                     if old: counts["warm_retime_calls"]+=1
                 if c is not None:
-                    c=problem.register(c); chains[sid,v]=c; occupied.update(c.request_ids)
+                    c=problem.register(c)
+                    c=min((chains[sid,v],c),key=problem.chain_rank)
+                    chains[sid,v]=c; occupied.update(c.request_ids)
                     counts["warm_restored_continuations"]+=1
                 if old and (c is None or c.request_ids!=old):
                     dirty.add(v); counts["warm_repaired_continuations"]+=1
@@ -95,11 +100,11 @@ class RollingJointMemory:
             counts["warm_greedy_seed_queries"]+=1
             for c in candidates:
                 problem.register(c)
-            best=min((old,*candidates),key=lambda c:(-len(c.request_ids),c.empty_distance_m,c.request_ids))
+            best=min((old,*candidates),key=problem.chain_rank)
             chains[sid,v]=best
             occupied[sid].difference_update(old.request_ids); occupied[sid].update(best.request_ids)
         plan=JointPlan(tuple(selected),tuple(chains.values()))
-        checked=problem.evaluate(plan); problem.protected_critical=checked["critical"]
+        checked=problem.evaluate(plan); problem.protect(checked)
         return plan,dict(counts,seed_limited=limited),dirty
 
     def frontier(self,problem,plan,dirty,check):
@@ -157,7 +162,8 @@ class RollingJointMemory:
             for c in plan.chains:
                 legs=c.payload.get("legs") if isinstance(c.payload,dict) else None
                 if (legs and not (getattr(problem.oracle,"c_support",None) is not None
-                        and problem.oracle.roots[c.action_id].profile_id=="C")
+                        and (problem.oracle.roots[c.action_id].profile_id=="C"
+                             or getattr(problem.oracle.c_support,"all_profiles",False)))
                         and all(problem.oracle.tasks[c.scenario_id][rid].source_kind=="FORECAST"
                                 for rid in c.request_ids)):
                     self.retained_forecast[c.scenario_id,c.vehicle_id]=(
@@ -363,11 +369,13 @@ def incremental_search(p,initial,seeds,*,strategy,deadline,check,
 
 
 def execute_incremental(actions,roots,selected,scenes,pending,pace,library,now,cfg,
-                        memory,deadline,check,*,c_support=None,c_prefill_seeds=()):
+                        memory,deadline,check,*,c_support=None,c_prefill_seeds=(),economics=None):
     from .bottleneck_scene import PredictionSceneOracle
     if memory.last_now is not None and now<memory.last_now:
         raise ValueError("incremental plan cannot be reused backwards in simulation time")
     timings={}; memory.last_attempt_timings=timings
+    if economics is not None and memory.economic_budget["epoch"]!=now:
+        memory.economic_budget.update(epoch=now,blocks=0)
     @contextmanager
     def timed(key):
         started=perf_counter()
@@ -381,13 +389,28 @@ def execute_incremental(actions,roots,selected,scenes,pending,pace,library,now,c
         oracle=PredictionSceneOracle(actions,roots,scenes,pending,pace,now,check=check,
             maximum_labels=int(cfg.get("joint_maximum_labels",50000)),
             maximum_columns=int(cfg.get("maximum_model_variables",20000)),
-            topology=memory.topology,forecast_snapshot=snapshot,efficient=memory.efficient,c_support=c_support)
+            topology=memory.topology,forecast_snapshot=snapshot,efficient=memory.efficient,c_support=c_support,
+            economics=economics)
         p=JointProblem(actions,oracle,library.weights,[t.request_id for t in pending],move_cap=50,
             maximum_columns=int(cfg.get("maximum_model_variables",20000)),
-            maximum_nonzeros=int(cfg.get("maximum_model_nonzeros",150000)))
+            maximum_nonzeros=int(cfg.get("maximum_model_nonzeros",150000)),economics=economics)
+        if economics is not None: p.economic_budget=memory.economic_budget
     with timed("warm_plan_repair_time_s"):
         initial,warm,dirty=memory.initial(p,selected,check,
             perf_counter()+max(0.,deadline-perf_counter())*.25)
+    price_info={}
+    if economics is not None and cfg.get("economic_controller")!="SPATIAL":
+        with timed("economic_price_guide_time_s"):
+            key=int(now//300),economics.fingerprint
+            if memory.economic_price_key!=key:
+                from .economic_price_guide import restricted_prices
+                prices,price_info=restricted_prices(p,initial,deadline,check)
+                memory.economic_prices=prices; memory.economic_price_key=key
+            else:
+                price_info=dict(status="CACHED_COARSE_GUIDANCE_NOT_CURRENT_STATE_DUAL_BOUND")
+            oracle.set_prices(memory.economic_prices)
+    elif economics is not None:
+        price_info=dict(status="PLAIN_MONETARY_SPATIAL_NO_PRICE_GUIDANCE")
     with timed("frontier_build_time_s"):
         seeds=() if cfg.get("joint_no_deep_search",False) else memory.frontier(p,initial,dirty,check)
         if not cfg.get("joint_no_deep_search",False):
@@ -424,4 +447,10 @@ def execute_incremental(actions,roots,selected,scenes,pending,pace,library,now,c
         warm_state_persisted=True,wall_overrun=perf_counter()>deadline,
         batch_root_queries=oracle.batch_queries,batch_query_reuses=oracle.batch_reuses,
         phase_timers_are_nested=True)
+    if economics is not None:
+        info.update(economic_price_guide=price_info,
+            expected_operating_contribution_cny=p.evaluate(plan)["expected_operating_contribution_cny"],
+            economic_config_sha256=economics.fingerprint,
+            protected_current_service=p.protected_current,protected_current_carry=p.protected_carry,
+            objective_unit="SCENARIO_WEIGHTED_INTEGER_CENTS_NOT_SERVICE_COUNTS")
     return p,oracle,initial,plan,info

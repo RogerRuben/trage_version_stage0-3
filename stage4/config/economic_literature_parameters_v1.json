@@ -2,6 +2,7 @@
   "schema_version": "economic_literature_parameter_proposal_v1",
   "created_date": "2026-10-16",
   "status": "RESEARCH_PROPOSAL_NOT_RUNTIME_CONFIG",
+  "current_runtime_proposal": "stage4/config/economic_joint_dispatch_v1.json",
   "active_in_dispatch": false,
   "ready_for_dispatch": false,
   "experiments_authorized_by_this_file": false,
@@ -17,7 +18,10 @@
       "extracted_version": "author_manuscript_arxiv_2406.19014_downloaded_20261016",
       "url": "https://arxiv.org/pdf/2406.19014",
       "local_pdf_sha256": "a24e0f309aeed9108e540cb4e45adb7ccf910c46785602572eb5ad73b3b568e4",
-      "locator": "PDF pages 8-9, section 3.1, footnote 4"
+      "locator": "PDF pages 8-9, section 3.1, footnote 4",
+      "published_pdf_sha256": "1987f45f6ca3772fbde39e0bcf1bf8633b804ce865d22baa4621a0e613c4e6a8",
+      "published_cashflow_locator": "published PDF page 6, section 2",
+      "published_25_percent_case_locator": "published PDF page 23, section 9.1"
     },
     "becker2020": {
       "doi": "10.1016/j.tra.2020.04.021",
@@ -36,7 +40,7 @@
     "literature_reference_range": [0.2, 0.3],
     "proposed_value": 0.25,
     "proposed_driver_fare_share": 0.75,
-    "selection_rule": "midpoint_of_literature_reference_range_not_empirical_estimate",
+    "selection_rule": "also_matches_published_Gao2025_NYC_case_setting_not_Xian_empirical_estimate",
     "local_contract_verified": false,
     "driver_vehicle_cost_paid_by": "driver_not_platform"
   },
