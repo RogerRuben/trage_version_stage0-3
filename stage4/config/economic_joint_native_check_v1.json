@@ -1,0 +1,17 @@
+{
+  "version": "economic_joint_native_check_v1",
+  "base_config": "stage4/config/economic_joint_dispatch_v1.json",
+  "base_config_sha256": "32eda3f14ecef9a292165b4cea64d41793b90ce03504e0d61a9ef4f814b5d034",
+  "economic_controller": "SUBSTITUTION",
+  "group": "ECONOMIC_SUBSTITUTION_NATIVE_CHECK",
+  "window_start_s": 29700,
+  "measurement_end_s": 30600,
+  "admission_end_s": 30900,
+  "last_dispatch_s": 30900,
+  "physical_drain_limit_s": 37800,
+  "carry_in_lookback_s": 300,
+  "include_carry_in": true,
+  "scenario_timeout_s": 900,
+  "full_day": false,
+  "automatic_retry": false
+}

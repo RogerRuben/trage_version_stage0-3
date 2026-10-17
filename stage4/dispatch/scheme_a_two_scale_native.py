@@ -563,6 +563,8 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
             empty_distance_mode=self.cfg.get("current_empty_distance_mode", "LOCAL_STABLE"),
             **({"operating_contribution_units":{a.action_id:self.economics.action_cents(a,after[a.action_id]) for a in flow_actions}}
                if self.economics is not None else {}))
+        if self.economics is not None:
+            base["immediate_operating_contribution_cny"]=result["score_units"][3]/100
         lazy_route_wall=0.
         if self.joint_mode and not (self.economics is not None and self.cfg.get("economic_controller")=="MYOPIC"):
             from .bottleneck_native import solve_joint_current
@@ -625,6 +627,9 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
                 task=self._task(c,action.request_id)
                 self.economic_quotes[action.request_id]=(action.vehicle_id,task.source_order_id,
                     self.economics.quote(task,after[action.action_id].profile_id,action.empty_distance_m))
+            base.update(current_operating_contribution_cny=sum(self.economics.action_cents(
+                action,after[action.action_id]) for action in actions if action.action_id in chosen)/100,
+                economic_config_sha256=self.economics.fingerprint)
         decisions = getattr(c, "request_decisions", None)
         if decisions is not None:
             if getattr(decisions, "typed_candidates", False):
@@ -654,6 +659,7 @@ class NativeTwoScaleAdapter(NativeSchemeAAdapter):
         secondary = {key: value for key, value in result.items() if key.startswith("secondary_")}
         self._record(dict(base, **timings, **move_counts, **secondary, opt_status=result["opt_status"], effective_policy=effective_policy,
             current_selected=len(serves), current_move_count=len(moves), variables=len(actions),
+            current_critical_served=result["critical_now"],current_carry_served=result["carry_over_current_served"],
             nonzeros=result["residual_edges"], coarse_refreshed=bool(coarse.get("refreshed", False)),
             coarse_available=bool(coarse["available"]), coarse_status=coarse["status"],
             coarse_supply_state_count=coarse.get("supply_state_count", 0),

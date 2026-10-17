@@ -475,6 +475,8 @@ def _run_native(root, fleetpy, config, cfg, *, directory, doc_summary_path,
                 cfg.get("joint_neighborhood_strategy","BOTTLENECK_CLOSURE")
                 if cfg.get("current_decision_mode")=="BOTTLENECK_JOINT"
                 else "TWO_SCALE_CURRENT_ACTION_FLOW_COARSE_FUTURE")
+            if cfg.get("dispatch_economics") is not None:
+                assignments["dispatch_policy"]="ECONOMIC_"+cfg["economic_controller"]+"_"+assignments["dispatch_policy"]
         physics = time_chain_check(assignments)
         outcomes = outcome_table(control, assignments, cfg)
         if control.request_decisions is not None:

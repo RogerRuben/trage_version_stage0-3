@@ -223,6 +223,10 @@ def test_native_uses_same_economics_and_books_only_actual_commit(monkeypatch,con
         for vid,eta,dist,kind in ((1,60.,400.,"AV"),(2,10.,100.,"HV"))]
     result=adapter.solve(c,arcs,[11],930.)
     assert result.selected_indices==(0,) and adapter.economic_ledger.orders=={}
+    row=adapter.rows[-1]
+    assert row["current_carry_served"]==1 and row["current_critical_served"]==0
+    assert row["economic_config_sha256"]==MODEL.fingerprint
+    assert row["current_operating_contribution_cny"]==MODEL.quote(NS(service_distance_m=3000.),"C",400.)["contribution_cents"]/100
     c.assignment_rows.append(dict(simulation_time_s=930.,native_vehicle_id=1,native_request_id=11,
         pickup_eta_s=60.,predicted_service_time_s=120.))
     c.completed_rids.add(11)
